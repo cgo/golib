@@ -29,4 +29,4 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/mkinstalldirs\
  golib/namespacedoc.h\
  golib/src\
- golib/tools --exclude="graphics" --exclude=".svn" --exclude=".libs" --exclude=".deps" --exclude="*.o"
+ golib/tools --exclude="graphics" --exclude=".svn" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la"
