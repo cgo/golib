@@ -3,14 +3,16 @@
 
 #include <goimagebuffer.h>
 
-class goImage 
-: goImageBuffer {
- public:
-  goImage  ();
-  ~goImage ();
+class goImagePrivate;
 
- protected:
-  
+class goImage : goObjectBase 
+{
+    public:
+        goImage  ();
+        virtual ~goImage ();
+    
+    private:
+        goImagePrivate* myPrivate;
 };
 
 #endif /* GOIMAGE_H */

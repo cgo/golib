@@ -18,6 +18,8 @@ goArray {
   ///
   goArray();
   ///
+  goArray(goSize_t s);
+  ///
   goArray(const goArray<T>& other);
   ///
   ~goArray();
@@ -105,6 +107,14 @@ goArray<T>::
 goArray() {
   Array = 0;
   arraySize = 0;
+}
+
+template< class T >
+goArray<T>::
+goArray(goSize_t s) {
+  Array = 0;
+  arraySize = 0;
+  this->resize (s);
 }
 
 template< class T >

@@ -13,8 +13,18 @@
 # include <gorowvector.h>
 #endif
 
+/** \addtogroup math */
+/** @{ */
+
 /*!
- * Matrix class.
+ * \brief Matrix class.
+ *
+ * This class uses goSignal3D for low level data storage and 
+ * can therefore be very efficient accessing the matrix data.
+ * To enable the [][] indexing, a helper template class for
+ * row vectors, goRowVector, was introduced.
+ *
+ * \author Christian Gosch
  */
 template <class T>
 class goMatrix 
@@ -38,9 +48,16 @@ class goMatrix
   bool initializeRows ();
 
  public:
-  inline goSize_t   getColumns() const;
-  inline goSize_t   getRows()    const;
-
+  inline goSize_t   getColumns () const;
+  inline goSize_t   getRows    () const;
+ 
+  // TNT compatibility methods BEGIN
+  inline int        dim1 () const;
+  inline int        dim2 () const;
+  inline const goMatrix<T>& copy () const;  // NOTE: Makes a deep copy here
+                                            // and a reference in TNT
+  // TNT compatibility methods END  
+  
   inline T&         elem (goSize_t i, goSize_t j);
   /*!
    * @return Number of columns
@@ -51,7 +68,8 @@ class goMatrix
    */
   inline goSize_t	getSizeY() const;
   
-  goRowVector<T>&   operator[] (goSize_t y);
+  goRowVector<T>&       operator[] (goSize_t y);
+  const goRowVector<T>& operator[] (goSize_t y) const;
   goMatrix<T>		operator*  (const goMatrix<T>& other);
   goMatrix<T>		operator-  (const goMatrix<T>& other);
   goMatrix<T>		operator+  (const goMatrix<T>& other);
@@ -61,8 +79,10 @@ class goMatrix
   goMatrix<T>&		operator*= (T scalar);
   goMatrix<T>&		operator/= (T scalar);
 
-  /// Loads unity
+  /// Loads identity
   void unity();
+  /// Loads identity
+  void identity();
   void fill(T v);
   void print();
 
@@ -72,6 +92,7 @@ class goMatrix
   goSubSignal3D<T>*  rows;
   goRowVector<T>*    rowVectors;
 };
+/** @} */
 
 
 #endif /* __GOMATRIX_H */

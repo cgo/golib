@@ -12,8 +12,9 @@ class goRowVector : public goObjectBase
         goRowVector          (goSignal3DBase<T>* data = NULL);
         virtual ~goRowVector ();
 
-        virtual bool setData    (goSignal3DBase<T>* data);
-        inline  T&   operator[] (goSize_t           x);
+        virtual bool     setData    (goSignal3DBase<T>* data);
+        inline  T&       operator[] (goSize_t           x);
+        inline  const T& operator[] (goSize_t           x) const;
 
         void         print      () const;
         
@@ -45,6 +46,13 @@ goRowVector<T>::~goRowVector ()
 
 template <class T>
 T& goRowVector<T>::operator [] (goSize_t i)
+{
+    assert (myJumpTable && myBasePointer);
+    return *(myJumpTable[i] + myBasePointer);
+}
+
+template <class T>
+const T& goRowVector<T>::operator [] (goSize_t i) const
 {
     assert (myJumpTable && myBasePointer);
     return *(myJumpTable[i] + myBasePointer);

@@ -1,6 +1,10 @@
 #ifndef GOMATRIX_I
 #define GOMATRIX_I
 
+#ifndef GOMATH_H
+# include <gomath.h>
+#endif
+
 template <class T>
 bool
 goMatrix<T>::initializeRows ()
@@ -38,6 +42,14 @@ goMatrix<T>::initializeRows ()
 template <class T>
 goRowVector<T>&
 goMatrix<T>::operator [] (goSize_t row)
+{
+    assert (this->rowVectors);
+    return this->rowVectors [row];
+}
+
+template <class T>
+const goRowVector<T>&
+goMatrix<T>::operator [] (goSize_t row) const
 {
     assert (this->rowVectors);
     return this->rowVectors [row];
@@ -121,6 +133,32 @@ goMatrix<T>::getRows() const
 {
     return getSizeY();
 }
+
+
+// TNT compatibility methods BEGIN
+
+template <class T>
+int
+goMatrix<T>::dim1 () const
+{
+    return (int)getRows ();
+}
+
+template <class T>
+int
+goMatrix<T>::dim2 () const
+{
+    return (int)getColumns ();
+}
+
+template <class T>
+const goMatrix<T>&
+goMatrix<T>::copy () const
+{
+    return *this;
+}
+
+// TNT compatibility methods END  
 
 template <class T>
 T&
@@ -310,15 +348,22 @@ goMatrix<T>::transpose()
 
 template<class T>
 void
-goMatrix<T>::unity()
+goMatrix<T>::identity ()
 {
 	fill(0);
 	goSize_t n = MAX(matrix->getSizeX(),matrix->getSizeY());
 	goSize_t i;
 	for (i = 0; i < n; ++i)
 	{
-		*(T*)matrix->getPtr(i,i) = (T)1;
+		(*this)[i][i] = (T)1;
 	}
+}
+
+template<class T>
+void
+goMatrix<T>::unity ()
+{
+    this->identity ();
 }
 
 template<class T>
