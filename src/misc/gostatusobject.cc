@@ -1,5 +1,6 @@
 #include <gostatusobject.h>
 #include <config.h>
+#include <iostream>
 
 goStatusObject::goStatusObject ()
 {
@@ -51,7 +52,7 @@ goStatusObject::forwardProgress (goStatusObject* s)
 void
 goStatusObject::forwardProgressEnd ()
 {
-    cout << "goStatusObject: Killing fwThread" << endl;
+    std::cout << "goStatusObject: Killing fwThread" << std::endl;
     fwThread.cancel();
     fwMutex.unlock();
     fwProgressPtr = 0;

@@ -67,7 +67,7 @@ goConnection::link (int maxconn) {
     remoteHostEnt = gethostbyname((const char*)remoteName.toCharPtr());
     if (!remoteHostEnt) {
       lastFailed = true;
-      cout << "gethostbyname failed \n";
+      std::cout << "gethostbyname failed \n";
       perror("");
       return false;
     }
@@ -75,9 +75,9 @@ goConnection::link (int maxconn) {
     memcpy ((char*)&remoteSockAddr->sin_addr,(char*)remoteHostEnt->h_addr,remoteHostEnt->h_length);
     if ( connect (socketDescriptor, (struct sockaddr*)remoteSockAddr, sizeof (*remoteSockAddr)) != 0 ) {
       lastFailed = true;
-      cout << "goConnection::link(): connect failed \n";
-      cout << "Address: " << std::hex << ((struct sockaddr_in*)remoteSockAddr)->sin_addr.s_addr << std::dec << endl;
-      cout << "Port: " << ntohs(((struct sockaddr_in*)remoteSockAddr)->sin_port) << endl;
+      std::cout << "goConnection::link(): connect failed \n";
+      std::cout << "Address: " << std::hex << ((struct sockaddr_in*)remoteSockAddr)->sin_addr.s_addr << std::dec << std::endl;
+      std::cout << "Port: " << ntohs(((struct sockaddr_in*)remoteSockAddr)->sin_port) << std::endl;
       perror("");
       return false;
     }
@@ -86,13 +86,13 @@ goConnection::link (int maxconn) {
   default:
     if ( bind (socketDescriptor, (struct sockaddr*)mySockAddr, sizeof (*mySockAddr)) != 0 ) {
       lastFailed = true;
-      cout << "bind failed \n";
+      std::cout << "bind failed \n";
       perror("");
       return false;
     }
     if ( listen (socketDescriptor, maxconn) != 0) {
       lastFailed = true;
-      cout << "listen failed \n";
+      std::cout << "listen failed \n";
       perror("");
       return false;
     }
@@ -103,7 +103,7 @@ goConnection::link (int maxconn) {
       remoteSockets.resize (remoteSockets.getSize() + 1);
       socklen = sizeof (remoteSockAddr[i]);
       if ( (remoteSockets[i] = accept (socketDescriptor, (struct sockaddr*)&remoteSockAddr[i], (socklen_t*)&socklen)) == -1 )  {
-	cout << "client " << i << ": " << " accept() failed\n";
+          std::cout << "client " << i << ": " << " accept() failed\n";
 	perror ("");
 	lastFailed = true;
 	return false;

@@ -1,4 +1,5 @@
 #include <gotransferfunction.h>
+#include <iostream>
 
 template <class IN_T,class OUT_T>
 goTransferFunction<IN_T,OUT_T>::
@@ -52,7 +53,7 @@ addSegment (IN_T in1, OUT_T out1, IN_T in2, OUT_T out2) {
   slope->resize (slope->getSize() + 1);
   (*slope)[slope->getSize() - 1] = f;
 
-  cout << "transferFunction: Added " << mi << "->" << ma << " --> " << out1 << "," << f << endl;
+  std::cout << "transferFunction: Added " << mi << "->" << ma << " --> " << out1 << "," << f << std::endl;
 }
 
 

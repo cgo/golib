@@ -77,8 +77,8 @@ class goSignal2D : goObjectInfo {
   T meanDiff ( goSignal2D<T>& other, 
 	       goIndex_t xrel, goIndex_t yrel );
 
-  T meanDiff ( goSignal2D<T>& other, 
-	       goMatrix<goDouble>& m );
+//  T meanDiff ( goSignal2D<T>& other, 
+//	       goMatrix<goDouble>& m );
 
   void fill (T val);
 

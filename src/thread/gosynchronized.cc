@@ -18,7 +18,7 @@ goSynchronized::addSynchronizedListener (goSynchronized* s)
 void
 goSynchronized::signalSynchronize ()
 {
-    cout << "Signalling condition" << endl;
+    std::cout << "Signalling condition" << std::endl;
     goIndex_t i;
     for (i = 0; i < listeners.getSize(); i++)
 	{
@@ -29,6 +29,6 @@ goSynchronized::signalSynchronize ()
 void
 goSynchronized::waitSynchronize ()
 {
-    cout << "waiting for condition" << endl;
+    std::cout << "waiting for condition" << std::endl;
     condition.wait();
 }

@@ -21,7 +21,7 @@ goObjectBase::setClassName (goString& name)
 void
 goObjectBase::printClassMessage (const char* msg)
 {
-    cout << getClassName() << " message: " << msg << endl;
+    std::cout << getClassName() << " message: " << msg << std::endl;
 }
 
 void

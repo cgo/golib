@@ -258,10 +258,12 @@ goSignal2D<T>::meanDiff ( goSignal2D<T>& other,
 /**
  * m: 3x3 transformation matrix applied to other
  */
+#if 0
 template <class T>
 T
 goSignal2D<T>::meanDiff ( goSignal2D<T>& other, 
-			  goMatrix<goDouble>& m ) {
+			  goMatrix<goDouble>& m ) 
+{
   goDouble diff;
   
   T* linePtr  = getPtr (0,0);
@@ -290,7 +292,7 @@ goSignal2D<T>::meanDiff ( goSignal2D<T>& other,
     for (x = 0; x < deltaX; x++) {
       tempMatrix = otherPixel;
       // cout << "other: " << otherPixel[0][0] << ", " << otherPixel[1][0] << endl;
-      tempMatrix = (goMatrix<goDouble>)m * otherPixel;
+      tempMatrix = m * otherPixel;
       // cout << "temp: " << tempMatrix[0][0] << ", " << tempMatrix[1][0] << endl << endl;
       tempMatrix[0][0] /= tempMatrix[2][0];
       tempMatrix[1][0] /= tempMatrix[2][0];
@@ -312,6 +314,7 @@ goSignal2D<T>::meanDiff ( goSignal2D<T>& other,
   
   return (T)diff;
 }
+#endif
 
 template <class T>
 void

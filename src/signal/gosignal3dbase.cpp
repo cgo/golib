@@ -869,8 +869,7 @@ goSignal3DBase<T>::readSlice (ifstream &f, goIndex_t slice, bool no_extra_memory
         }
         if (f.eof()) 
         {
-            goError::print ("goSignal3DBase::readSlice()","Early EOF detected. Some data might be
-                    corrupted.");
+            goError::print ("goSignal3DBase::readSlice()","Early EOF detected. Some data might be corrupted.");
             return false;
         }
     } 

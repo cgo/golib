@@ -134,8 +134,8 @@ goDate::operator= (const char* s) {
   }	
 }	
 
-ostream&
-operator<< (ostream& outstream, goDate& d) {
+std::ostream&
+operator<< (std::ostream& outstream, goDate& d) {
   outstream << (int)(d.getDay()) << "." << (int)(d.getMonth()) << "." << (int)(d.getYear());
   return outstream;
 }

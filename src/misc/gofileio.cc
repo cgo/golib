@@ -37,8 +37,8 @@ goFileIO::readPGM (goString& filename, goSignal2D<goInt32>*& signal) {
 
   GOFILE_PGM_NEXTLINE(f,line);
   if ( !(line == "P5") ) {
-    cout << "goFileIO::readPGM(): no raw 8 bit PGM file !" << endl;
-    cout << "ID read was " << line << endl;
+      std::cout << "goFileIO::readPGM(): no raw 8 bit PGM file !" << std::endl;
+      std::cout << "ID read was " << line << std::endl;
     return;
   }
   GOFILE_PGM_NEXTLINE(f,line);

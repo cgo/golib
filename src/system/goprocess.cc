@@ -72,7 +72,7 @@ void
 goProcess::kill () {
   if (running) {
     if (::kill (pid, SIGKILL) != 0) {
-      cout << "Unable to kill process " << pid << "\n";
+        std::cout << "Unable to kill process " << pid << "\n";
     } else {
       wait ();
     }
@@ -84,7 +84,7 @@ void
 goProcess::suspend () {
   if (running) {
     if (::kill (pid,SIGSTOP) != 0) {
-      cout << "unable to stop process " << pid << "\n";
+        std::cout << "unable to stop process " << pid << "\n";
     }
   }
 }
@@ -93,7 +93,7 @@ void
 goProcess::resume () {
   if (running) {
     if (::kill (pid,SIGCONT) != 0) {
-      cout << "unable to continue process " << pid << "\n";
+        std::cout << "unable to continue process " << pid << "\n";
     }
   }
 }

@@ -12,7 +12,7 @@ goException::~goException()
 void
 goException::print () 
 {
-  std::cout << "libGo exception" << endl;
+  std::cout << "libGo exception" << std::endl;
 }
 
 
@@ -25,5 +25,5 @@ void
 goExceptionString::print()
 {
     goException::print();
-    std::cout << "String: " << st << endl;
+    std::cout << "String: " << st << std::endl;
 }
