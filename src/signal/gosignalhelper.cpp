@@ -26,7 +26,7 @@ static void goNormalizeSignal__ (T minimum, T maximum,
     else
     {
         // Scale
-        goFloat scale = 1.0f / (maximum - minimum);
+        goDouble scale = 1.0f / (maximum - minimum);
         GO_SIGNAL3D_EACHELEMENT_2_GENERIC (*(T*)__ptr = (*(const T*)__ptr_target - minimum) * scale, (*targetSig), (*sig));
     }
 }
@@ -55,49 +55,56 @@ bool goNormalizeSignal (const goSignal3DBase<void>* sig, goSignal3D<void>* targe
     goDouble maximum = 1.0;
     minimum = sig->getMinimum();
     maximum = sig->getMaximum();
-    if (minimum < 0.0 || maximum > 1.0)
     {
-        switch (sig->getDataType().getID())
-        {
-            case GO_FLOAT:
+        goString msg ("goNormalizeSignal(): min = ");
+        msg += goFloat(minimum);
+        msg += ", max = "; msg += goFloat(maximum);
+        goLog::message(msg);
+    }
+    if (minimum >= 0.0 && maximum <= 1.0)
+    {
+        return false;
+    }
+    switch (sig->getDataType().getID())
+    {
+        case GO_FLOAT:
+            {
+                targetSig->setDataType (GO_FLOAT);
+                if (!targetSig->make (sig->getSizeX(), 
+                            sig->getSizeY(),
+                            sig->getSizeZ(),
+                            sig->getBlockSizeX(),
+                            sig->getBlockSizeY(),
+                            sig->getBlockSizeZ(),
+                            16, 16, 16))
                 {
-                    targetSig->setDataType (GO_FLOAT);
-                    if (!targetSig->make (sig->getSizeX(), 
-                                sig->getSizeY(),
-                                sig->getSizeZ(),
-                                sig->getBlockSizeX(),
-                                sig->getBlockSizeY(),
-                                sig->getBlockSizeZ(),
-                                16, 16, 16))
-                    {
-                        goString msg ("goNormalizeSignal(): Could not allocate memory!");
-                        goLog::error (msg);
-                        return false;
-                    }
-                    goNormalizeSignal__ ((goFloat)minimum, (goFloat)maximum, sig, targetSig);
+                    goString msg ("goNormalizeSignal(): Could not allocate memory!");
+                    goLog::error (msg);
+                    return false;
                 }
-                break;
-            case GO_DOUBLE:
+                goNormalizeSignal__ ((goFloat)minimum, (goFloat)maximum, sig, targetSig);
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                targetSig->setDataType (GO_DOUBLE);
+                if (!targetSig->make (sig->getSizeX(), 
+                            sig->getSizeY(),
+                            sig->getSizeZ(),
+                            sig->getBlockSizeX(),
+                            sig->getBlockSizeY(),
+                            sig->getBlockSizeZ(),
+                            16, 16, 16))
                 {
-                    targetSig->setDataType (GO_DOUBLE);
-                    if (!targetSig->make (sig->getSizeX(), 
-                                sig->getSizeY(),
-                                sig->getSizeZ(),
-                                sig->getBlockSizeX(),
-                                sig->getBlockSizeY(),
-                                sig->getBlockSizeZ(),
-                                16, 16, 16))
-                    {
-                        goString msg ("goNormalizeSignal(): Could not allocate memory!");
-                        goLog::error (msg);
-                        return false;
-                    }
-                    goNormalizeSignal__ ((goDouble)minimum, (goDouble)maximum, sig, targetSig);
+                    goString msg ("goNormalizeSignal(): Could not allocate memory!");
+                    goLog::error (msg);
+                    return false;
                 }
-                break;
-            default:
-                break;
-        }
+                goNormalizeSignal__ ((goDouble)minimum, (goDouble)maximum, sig, targetSig);
+            }
+            break;
+        default:
+            break;
     }
     return true;
 }
