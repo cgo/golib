@@ -282,6 +282,8 @@ goSignal3D<void>::fill (const void*)
  * @param border_x Size of the border in x direction
  * @param border_y Size of the border in y direction
  * @param border_z Size of the border in z direction
+ * @param channelCount Number of channels (defaults to 1). If you want to store, say,
+ *                     RGBA data, you would set this to 4.
  */
 template< class T >
 bool
