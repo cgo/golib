@@ -17,9 +17,10 @@
 #ifndef GOTYPES_H
 # include <gotypes.h>
 #endif
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 
-template <class T> class goSignal3DBase;
-template <class T> class goSignal3D;
 
 /*!
  * \addtogroup signal
