@@ -275,10 +275,10 @@ operator= (goArray<T>& other) {
   memcpy ((void*)this->getPtr(), (void*)other.getPtr(), sizeof(T) * this->getSize());
   return (*this);
   
-  for (i = 0; i < this->getSize(); i++) {
-    (*this)[i] = other[i];
-  }
-  return (*this);
+//  for (i = 0; i < this->getSize(); i++) {
+//    (*this)[i] = other[i];
+//  }
+//  return (*this);
 }
 
 template< class T >
