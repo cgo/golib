@@ -49,35 +49,34 @@ class goLU
    goArray<int> piv;
 
 
-   goMatrix<Real> permute_copy(const goMatrix<Real> &A, 
-   			const goArray<int> &piv, int j0, int j1)
+   void permute_copy(const goMatrix<Real> &A, 
+   			const goArray<int> &piv, int j0, int j1, goMatrix<Real>& retValue)
 	{
 		int piv_length = piv.dim();
 
-		goMatrix<Real> X(piv_length, j1-j0+1);
-
+        retValue.resize (piv_length, j1-j0+1);
+		// goMatrix<Real> X(piv_length, j1-j0+1);
 
          for (int i = 0; i < piv_length; i++) 
             for (int j = j0; j <= j1; j++) 
-               X[i][j-j0] = A[piv[i]][j];
-
-		return X;
+               retValue[i][j-j0] = A[piv[i]][j];
+		// return X;
 	}
 
-   goArray<Real> permute_copy(const goArray<Real> &A, 
-   		const goArray<int> &piv)
+   void permute_copy(const goArray<Real> &A, 
+   		const goArray<int> &piv, goArray<Real>& retValue)
 	{
-		int piv_length = piv.dim();
-		if (piv_length != A.dim())
-			return goArray<Real>();
+		int piv_length = piv.getSize();
+		if (piv_length != A.getSize())
+			 retValue.resize(0);
 
-		goArray<Real> x(piv_length);
-
+        retValue.resize (piv_length);
+		// goArray<Real> x(piv_length);
 
          for (int i = 0; i < piv_length; i++) 
-               x[i] = A[piv[i]];
+               retValue[i] = A[piv[i]];
 
-		return x;
+		// return x;
 	}
 
 
@@ -88,7 +87,9 @@ class goLU
    @return     LU Decomposition object to access L, U and piv.
    */
 
-    goLU (const goMatrix<Real> &A) : LU_(A.copy()), m(A.dim1()), n(A.dim2()), 
+    //goLU (const goMatrix<Real> &A) : LU_(A.copy()), m(A.dim1()), n(A.dim2()), 
+	//	piv(A.dim1())
+    goLU (const goMatrix<Real> &A) : LU_(A), m(A.dim1()), n(A.dim2()), 
 		piv(A.dim1())
 	
 	{
@@ -241,44 +242,43 @@ class goLU
    					0x0 (null) array.
    */
 
-   goMatrix<Real> solve (const goMatrix<Real> &B) 
+   bool solve (const goMatrix<Real> &B, goMatrix<Real>& retValue) 
    {
 
 	  /* Dimensions: A is mxn, X is nxk, B is mxk */
       
       if (B.dim1() != m) {
-	  	return goMatrix<Real>(0,0);
+	  	return false;
       }
       if (!isNonsingular()) {
-        return goMatrix<Real>(0,0);
+        return false;
       }
 
       // Copy right hand side with pivoting
       int nx = B.dim2();
 
-
-	  goMatrix<Real> X = permute_copy(B, piv, 0, nx-1);
+      permute_copy(B, piv, 0, nx-1, retValue);
 
       // Solve L*Y = B(piv,:)
       for (int k = 0; k < n; k++) {
          for (int i = k+1; i < n; i++) {
             for (int j = 0; j < nx; j++) {
-               X[i][j] -= X[k][j]*LU_[i][k];
+               retValue[i][j] -= retValue[k][j]*LU_[i][k];
             }
          }
       }
       // Solve U*X = Y;
       for (int k = n-1; k >= 0; k--) {
          for (int j = 0; j < nx; j++) {
-            X[k][j] /= LU_[k][k];
+            retValue[k][j] /= LU_[k][k];
          }
          for (int i = 0; i < k; i++) {
             for (int j = 0; j < nx; j++) {
-               X[i][j] -= X[k][j]*LU_[i][k];
+               retValue[i][j] -= retValue[k][j]*LU_[i][k];
             }
          }
       }
-      return X;
+      return true;
    }
 
 
@@ -289,39 +289,39 @@ class goLU
    						of A.
    @return x a vector (goArray> so that L*U*x = b(piv), if B is nonconformant,
    					returns 0x0 (null) array.
+   @todo  Add solve() method that takes the return value reference 
+          as the second parameter.
    */
 
-   goArray<Real> solve (const goArray<Real> &b) 
+   bool solve (const goArray<Real> &b, goArray<Real>& retValue) 
    {
 
 	  /* Dimensions: A is mxn, X is nxk, B is mxk */
       
-      if (b.dim1() != m) {
-	  	return goArray<Real>();
+      if (b.getSize() != m) {
+	  	return false;
       }
       if (!isNonsingular()) {
-        return goArray<Real>();
+        return false;
       }
 
 
-	  goArray<Real> x = permute_copy(b, piv);
+      permute_copy(b, piv, retValue);
 
       // Solve L*Y = B(piv)
       for (int k = 0; k < n; k++) {
          for (int i = k+1; i < n; i++) {
-               x[i] -= x[k]*LU_[i][k];
+               retValue[i] -= retValue[k]*LU_[i][k];
             }
          }
       
 	  // Solve U*X = Y;
       for (int k = n-1; k >= 0; k--) {
-            x[k] /= LU_[k][k];
+            retValue[k] /= LU_[k][k];
       		for (int i = 0; i < k; i++) 
-            	x[i] -= x[k]*LU_[i][k];
+            	retValue[i] -= retValue[k]*LU_[i][k];
       }
-     
-
-      return x;
+      return true;
    }
 
 }; /* class LU */

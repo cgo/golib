@@ -21,6 +21,8 @@
 template <class T> class goSignal3DBase;
 template <class T> class goSignal3D;
 
+typedef goFloat filter3d_mask_t;
+
 /*!
  * \addtogroup signal
  * @{
@@ -35,7 +37,6 @@ class
 goFilter3D : public goObjectBase
 {
     public:
-    typedef goFloat mask_t;
         
 	public:
         goFilter3D ();
@@ -43,7 +44,7 @@ goFilter3D : public goObjectBase
         goFilter3D (const goFilter3D<T_IN, T_OUT>& other);
         const goFilter3D& operator= (const goFilter3D<T_IN, T_OUT>& other);
 
-        bool                      setMask (const goSignal3DBase<mask_t>& mask,
+        bool                      setMask (const goSignal3DBase<filter3d_mask_t>& mask,
                                            bool normalize = true);
         void                      setMaskCenter (goIndex_t x,
                                                  goIndex_t y,
@@ -52,12 +53,12 @@ goFilter3D : public goObjectBase
         goIndex_t                 getMaskCenterY () const;
         goIndex_t                 getMaskCenterZ () const;
                                                 
-        const goSignal3D<mask_t>& getMask () const;
+        const goSignal3DBase<filter3d_mask_t>&  getMask () const;
         bool                      filter  (goSignal3DBase<T_IN>&  inSignal,
                                            goSignal3DBase<T_OUT>& outSignal);
 
 	private:
-        goSignal3D<mask_t> *myMask;
+        goSignal3D<filter3d_mask_t> *myMask;
         goIndex_t           maskCenterX;
         goIndex_t           maskCenterY;
         goIndex_t           maskCenterZ;

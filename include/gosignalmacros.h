@@ -159,10 +159,10 @@
 }
 
 #define GO_SIGNAL3D_EACHELEMENT_2_GENERIC(__dothis, __signal, __signal_target) {	\
-  goUInt8* __ptr_z		= __signal.getPtr();		\
+  goUInt8* __ptr_z		= (goUInt8*)__signal.getPtr();		\
   goUInt8* __ptr_y;						\
   goUInt8* __ptr;						\
-  goUInt8* __ptr_z_target   = __signal_target.getPtr();	\
+  goUInt8* __ptr_z_target   = (goUInt8*)__signal_target.getPtr();	\
   goUInt8* __ptr_y_target;				\
   goUInt8* __ptr_target;					\
   const goPtrdiff_t* __dx	= __signal.getXDiff();			\

@@ -78,7 +78,7 @@ template <class _input_type, class _output_type>
 goUniformQuantizer<_input_type, _output_type>::goUniformQuantizer (goSize_t quantizationSteps)
     : goQuantizer<_input_type, _output_type> ()
 {
-    setClassName ("goUniformQuantizer");
+    this->setClassName ("goUniformQuantizer");
     myPrivate = new goUniformQuantizerPrivate<_input_type, _output_type> (quantizationSteps);
 }
 
@@ -90,7 +90,7 @@ goUniformQuantizer<_input_type, _output_type>::goUniformQuantizer (
         _output_type min_output,
         _output_type max_output)
 {
-    setClassName ("goUniformQuantizer");
+    this->setClassName ("goUniformQuantizer");
     myPrivate = new goUniformQuantizerPrivate<_input_type, _output_type> (delta_input, min_input, max_input, min_output, max_output);
 }
 
