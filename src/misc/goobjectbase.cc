@@ -205,7 +205,7 @@ goObjectBase::disconnectObject (const goObjectBase* object)
 
 /*! \brief Sends a message to all connected objects. */
 void
-goObjectBase::sendObjectMessage (goObjectMessageID messageID)
+goObjectBase::sendObjectMessage (goObjectMessageID messageID, void* data)
 {
     if (myPrivate->connectedObjects.isEmpty())
     {
@@ -217,6 +217,7 @@ goObjectBase::sendObjectMessage (goObjectMessageID messageID)
     message.mySender        = this;
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
+    message.myData          = data;
     while (!myPrivate->connectedObjects.isTail())
     {
         o = myPrivate->connectedObjects.getCurrent();
@@ -235,7 +236,7 @@ goObjectBase::sendObjectMessage (goObjectMessageID messageID)
 
 /*! \brief Sends a message to a specific object. */
 void
-goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID messageID) 
+goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID messageID, void* data) 
 {
     if (!object)
     {
@@ -245,6 +246,7 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
     message.mySender        = this;
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
+    message.myData          = data;
     object->receiveObjectMessage (message);
 }
 
@@ -257,5 +259,13 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
 void
 goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
+    if (message.myMessageID == GO_OBJECTMESSAGE_DESTRUCTING)
+    {
+        std::cout << "goObjectBase: disconnected object " << std::hex << message.mySender << " (object was destroyed)\n";
+        // Ensure this object does not try to send anything to mySender, 
+        // in case the other direction is also connected.
+        // This may be slow, but it is safer.
+        this->disconnectObject (message.mySender);
+    }
     std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
 }
