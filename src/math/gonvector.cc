@@ -8,7 +8,7 @@ template <class T>
 goNVector<T>::goNVector (goUInt32 n) : goArray<T> () {
   delete_vector = true;
   absValid = false;
-  resize (n);
+  this->resize (n);
 }
 
 template <class T>
