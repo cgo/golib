@@ -1,8 +1,8 @@
 /* --*- C++ -*-- */
 
 
-#ifndef __GOSTRING_H__
-#define __GOSTRING_H__
+#ifndef GOSTRING_H
+#define GOSTRING_H
 
 #include <goarray.h>
 #include <iostream>
