@@ -6,8 +6,11 @@
 #include <iostream>
 
 /*!
- * Resizeable array. Modified version for tempgolib, 2001 work placement with
- * Siemens.
+ * \addtogroup data
+ * @{
+ */
+/*!
+ * Resizeable array. 
  * @author Christian Gosch
  */
 
@@ -86,5 +89,5 @@ goArray {
   T* Array;
   goIndex_t arraySize;
 };
-
+/*! @} */
 #endif
