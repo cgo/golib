@@ -203,21 +203,54 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 #endif	
 }
 
-#ifdef HAVE_LIBIL
 /**
  * @brief Reads an image file into the provided signal object.
  *
- * The goSignal3D object given as parameter <code>signal</code>
+ * The goSignal3D<void> object given as parameter <code>signal</code>
  * determines the type of the loaded data.
  * The image will be converted from the original type to the
  * type given with the signal parameter.
+ * The supported image types depend on the types supported by libIL.
+ * At the time of this being written, those were
+ *     - .bmp
+ *     - .cut
+ *     - .dcx
+ *     - .dds
+ *     - .ico
+ *     - .jpg
+ *     - .lbm
+ *     - .lif
+ *     - .mdl
+ *     - .pcd
+ *     - .pcx
+ *     - .pic
+ *     - .png
+ *     - .pnm
+ *     - .psd
+ *     - .psp
+ *     - .raw
+ *     - .sgi
+ *     - .tga
+ *     - .tif
+ *     - .wal
+ *     - .act
+ *     - .pal
+ *     - Doom graphics
+ *
+ * The image type is selected by the filename's suffix.
  * 
  * @param filename  Name of the file containing the image.
- * @param signal    Object of type goSignal3D that will contain the image after
+ * @param signal    Object of type goSignal3D<void> that will contain the image after
  *                  the method successfully returns.
  *
+ * \note This method only works when libGo was compiled with 
+ *       libIL support (http://openil.sourceforge.net). If not,
+ *       it always returns false.
+ *
+ * \see goSignal3D
  * @return  True if successful, false otherwise.
  **/
+#ifdef HAVE_LIBIL
 bool
 goFileIO::readImage (const char* filename, goObjectBase* signal)
 {
@@ -368,6 +401,88 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
 #else
 bool
 goFileIO::readImage (const char*, goObjectBase*)
+{
+    return false;
+}
+#endif
+
+/**
+ * @brief  Write an image file from a goSignal3DBase<void> object.
+ *
+ * This function needs goLib to be compiled with support for the libIL
+ * image library.
+ * The supported image types depend on the types supported by libIL.
+ * At the time of this being written, those were
+ * - .bmp
+ * - .dds
+ * - .jpg
+ * - .pcx
+ * - .png
+ * - .pnm
+ * - .raw
+ * - .sgi
+ * - .tga
+ * - .tif
+ * - .pal
+ *
+ * Note that these differ from the types supported for reading.
+ * The image type is selected by the filename's suffix.
+ * 
+ * @param filename  Name for the image file.
+ * @param signal    goSignal3DBase<void> to be saved (currently only GO_FLOAT).
+ *
+ * \note This method only works when libGo was compiled with 
+ *       libIL support (http://openil.sourceforge.net). If not,
+ *       it always returns false.
+ *       
+ * @return True if successful, false otherwise.
+ **/
+#ifdef HAVE_LIBIL
+bool
+goFileIO::writeImage (const char* filename, const goObjectBase* signal)
+{
+    if (!signal)
+    {
+        return false;
+    }
+    if (!goGlobal::ILInitialized)
+    {
+        ilInit ();
+        goGlobal::ILInitialized = true;
+    }
+    ILuint imageName = 0;
+    ilGenImages (1, &imageName);
+    ilBindImage (imageName);
+    
+    const goSignal3DBase<void>* s = (const goSignal3DBase<void>*)signal;
+    /// \todo FIXME: add other types
+    if (s->getDataType().getID() != GO_FLOAT)
+    {
+        return false;
+    }
+    ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), 24, IL_LUMINANCE, IL_FLOAT, NULL);
+    if (ilGetError() != IL_NO_ERROR)
+    {
+        ilDeleteImages (1, &imageName);
+        return false;
+    }
+    ILfloat* data = (ILfloat*)ilGetData();
+    GO_SIGNAL3D_EACHELEMENT_GENERIC (*(data++) = *(const goFloat*)__ptr, (*s));
+
+    // DevILish non-const char*
+    goString fname (filename);
+    ilSaveImage (fname.getPtr());
+    if (ilGetError() != IL_NO_ERROR)
+    {
+        ilDeleteImages (1, &imageName);
+        return false;
+    }
+    ilDeleteImages (1, &imageName);
+    return true;
+}
+#else
+bool
+goFileIO::writeImage (const char*, const goObjectBase*)
 {
     return false;
 }
