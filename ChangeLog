@@ -19,3 +19,13 @@ macros)
 - Added temp file creation function to
 goFileIO
 - Some bugfixing
+
+3.4.2005
+--------
+- goSignal3D* classes now support multichannel data
+  (not very well tested yet, goSubSignal3D not tested at all.
+   please report bugs.)
+- goSignal3DGenericConstIterator added (use it!)
+
+
+	
