@@ -18,7 +18,7 @@
 #endif
 
 #define GO_PROJECT_NAME		"libGo"
-#define GO_PROJECT_VERSION	"0.2.1"
+#define GO_PROJECT_VERSION	"0.3"
 
 /** Standard types */
 #if SIZEOF_CHAR == 1
