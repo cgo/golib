@@ -15,7 +15,7 @@
  * \author Christian Gosch
  */
 #define GO_SIGNAL3D_EACHELEMENT(__dothis, __signal, __type) {	\
-  __type *__ptr_z      	= __signal.getPtr();			\
+  __type *__ptr_z      	= __signal.getPtr(0, 0, 0);			\
   __type *__ptr;						\
   __type *__ptr_y;						\
   const goPtrdiff_t* __dx	= __signal.getXDiff();			\
@@ -63,15 +63,15 @@
   const goPtrdiff_t* __dy_target	= __signal_target.getYDiff();	\
   const goPtrdiff_t* __dz_target	= __signal_target.getZDiff();	\
   goSize_t __i, __j, __k;					\
-  for (__i = 0; __i < __signal.getSizeZ(); __i++)		\
+  for (__i = 0; __i < __signal.getSizeZ(); ++__i)		\
     {								\
       __ptr_y = __ptr_z;					\
       __ptr_y_target = __ptr_z_target;				\
-      for (__j = 0; __j < __signal.getSizeY(); __j++)     	\
+      for (__j = 0; __j < __signal.getSizeY(); ++__j)     	\
 	{							\
 	  __ptr = __ptr_y;					\
 	  __ptr_target = __ptr_y_target;			\
-	  for (__k = 0; __k < __signal.getSizeX(); __k++)	\
+	  for (__k = 0; __k < __signal.getSizeX(); ++__k)	\
 	    {							\
 	      {							\
 		    __dothis;					\
