@@ -98,8 +98,6 @@ class goType : public goObjectBase
         goIndex_t         getMinIndex            () const;
         goIndex_t         getMaxIndex            () const;
         
-        const void* getQuantizationTable (goTypeEnum targetType) const;
-       
         goDouble          getMinimum () const;
         goDouble          getMaximum () const;
         
@@ -108,5 +106,13 @@ class goType : public goObjectBase
     private:
         goTypePrivate* myPrivate;
 };
+
+template <class targetT>
+targetT* goCreateQuantizationTable (const goType&     sourceType,
+                                    targetT           minTargetValue,
+                                    targetT           maxTargetValue,
+                                    goIndex_t         minIndex,
+                                    goIndex_t         maxIndex,
+                                    goArray<targetT>& tableRet);
 /*! @} */
 #endif
