@@ -10,7 +10,8 @@ libGomath_la_SOURCES = go3vectori.cc \
                        golinearalgebra.cc \
 					   gopdf.cpp \
 					   gogausspdf.cpp \
-					   gopoint.cpp
+					   gopoint.cpp \
+					   gradient.cpp
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 
