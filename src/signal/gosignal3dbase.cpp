@@ -9,17 +9,17 @@
 
 template< class T >
 goSignal3DBase<T>::goSignal3DBase () 
-    : ptr        (NULL),
-    real_ptr     (NULL),
-    xDiff        (NULL),
-    yDiff        (NULL),
-    zDiff        (NULL),
-    myXJump      (NULL),
-    myYJump      (NULL),
-    myZJump      (NULL),
-    mySize       (0, 0, 0),
-    myBorderSize (0, 0, 0),
-    myBlockSize  (1, 1, 1)
+    : ptr         (NULL),
+    real_ptr      (NULL),
+    xDiff         (NULL),
+    yDiff         (NULL),
+    zDiff         (NULL),
+    myXJump       (NULL),
+    myYJump       (NULL),
+    myZJump       (NULL),
+    mySize        (0, 0, 0),
+    myBorderSize  (0, 0, 0),
+    myBlockSize   (1, 1, 1)
 {
 }
 

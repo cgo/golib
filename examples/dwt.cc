@@ -2,6 +2,7 @@
 #include <gosignal3d.h>
 #include <gosignalmacros.h>
 #include <time.h>
+#include <iostream>
 
 #define TYPE goInt8
 
@@ -35,17 +36,17 @@ int main()
 
   // block.fill(128);
 
-  cout << "Original block first x/y slice: " << endl;
-  cout << "-------------------------------" << endl;
+  std::cout << "Original block first x/y slice: " << std::endl;
+  std::cout << "-------------------------------" << std::endl;
   for (i = 0; i < block.getSizeY(); i++)
   {
       for (j = 0; j < block.getSizeX(); j++)
       {
-	  cout << (int)*block.getPtr(j,i,0) << " ";
+          std::cout << (int)*block.getPtr(j,i,0) << " ";
       }
-      cout << endl;
+      std::cout << std::endl;
   }
-  cout << endl;
+  std::cout << std::endl;
   
   /*
    * Test Haar transform.
@@ -54,19 +55,19 @@ int main()
   t1 = clock();
   dwt.haar(block, 2);
   t2 = clock();
-  cout << "Time for transform: " << (t2-t1) / (float)CLOCKS_PER_SEC << "s" << endl;
+  std::cout << "Time for transform: " << (t2-t1) / (float)CLOCKS_PER_SEC << "s" << std::endl;
   
-  cout << "DWT block first x/y slice: " << endl;
-  cout << "--------------------------" << endl;
+  std::cout << "DWT block first x/y slice: " << std::endl;
+  std::cout << "--------------------------" << std::endl;
   for (i = 0; i < block.getSizeY(); i++)
     {
       for (j = 0; j < block.getSizeX(); j++)
 	{
-	  cout << (int)*block.getPtr(j,i,0) << " ";
+        std::cout << (int)*block.getPtr(j,i,0) << " ";
 	}
-      cout << endl;
+      std::cout << std::endl;
     }
-  cout << endl;
+  std::cout << std::endl;
 
   /*
    * Test reverse Haar transform.
@@ -74,29 +75,29 @@ int main()
   t1 = clock();
   dwt.unHaar (block, 2);
   t2 = clock();
-  cout << "Time for reverse transform: " << (t2-t1) / (float)CLOCKS_PER_SEC << "s" << endl;
+  std::cout << "Time for reverse transform: " << (t2-t1) / (float)CLOCKS_PER_SEC << "s" << std::endl;
 
-  cout << "iDWT block first x/y slice: " << endl;
-  cout << "--------------------------" << endl;
+  std::cout << "iDWT block first x/y slice: " << std::endl;
+  std::cout << "--------------------------" << std::endl;
   for (i = 0; i < block.getSizeY(); i++)
     {
       for (j = 0; j < block.getSizeX(); j++)
 	{
-	  cout << (int)*block.getPtr(j,i,0) << " ";
+        std::cout << (int)*block.getPtr(j,i,0) << " ";
 	}
-      cout << endl;
+      std::cout << std::endl;
     }
-  cout << endl;
+  std::cout << std::endl;
 
-  cout << "block";
+  std::cout << "block";
   goDouble var = 0.0f;
   if (block == block2)
     {
-      cout << " == ";
+        std::cout << " == ";
     }
   else 
     {
-      cout << " != ";
+        std::cout << " != ";
       for (i = 0; i < block.getSizeX(); i++)
 	{
 	  for (j = 0; j < block.getSizeY(); j++)
@@ -109,12 +110,12 @@ int main()
 	}
       var /= (float)(i * j * k);
     }
-  cout << "block2" << endl;
-  cout << "Mean error: " << var << endl;
+  std::cout << "block2" << std::endl;
+  std::cout << "Mean error: " << var << std::endl;
   
-  cout << "Memory usage" << endl;
-  cout << "------------" << endl;
-  cout << "block: " << block.getSize() << " bytes" << endl;
+  std::cout << "Memory usage" << std::endl;
+  std::cout << "------------" << std::endl;
+  std::cout << "block: " << block.getSize() << " bytes" << std::endl;
   
   block.destroy();
   block2.destroy();

@@ -10,17 +10,17 @@ void printSignal (goSignal3DBase<T>& signal)
 {
     goIndex_t x, y;
    
-    GO_SIGNAL3D_EACHELEMENT (cout << *__ptr << " ", signal, T);
+//    GO_SIGNAL3D_EACHELEMENT (std::cout << *__ptr << " ", signal, T);
     
     for (y = 0; y < signal.getSizeY(); ++y)
     {
         for (x = 0; x < signal.getSizeX(); ++x)
         {
-            cout << *signal.getPtr (x, y, 0) << " ";
+            std::cout << *signal.getPtr (x, y, 0) << " ";
         }
-        cout << "\n";
+        std::cout << "\n";
     }
-    cout << "\n";
+    std::cout << "\n";
 }
 
 template<class T>
@@ -34,12 +34,12 @@ void printDirect (goSignal3DBase<T>& signal)
     {
         for (x = 0; x < signal.getSizeX(); ++x)
         {
-            cout << *p << " ";
+            std::cout << *p << " ";
             ++p;
         }
-        cout << "\n";
+        std::cout << "\n";
     }
-    cout << "\n";
+    std::cout << "\n";
 }
 
 template<class T>
@@ -139,5 +139,23 @@ int main (void)
     printSignal (subSignal);
     
     
+    /************************************************************************************/
+    
+    std::cout << "goSubSignal3D with skip\n";
+    std::cout << "-----------------------\n";
+    subSignal.setSize (8, 8, 1);
+    subSignal.setPosition (0, 0, 0);
+    subSignal.setSkip (1, 1, 0);
+    printSignal (subSignal);
+    
+    std::cout << "goSubSignal3D with shifted size\n";
+    std::cout << "-------------------------------\n";
+    subSignal.setSize (16, 16, 16);
+    subSignal.setPosition (0, 0, 0);
+    subSignal.setSkip (0, 0, 0);
+    
+    subSignal.shiftLeftDiff (2);
+    subSignal.shiftRightSize (2);
+    printSignal (subSignal);
     return 1;
 }

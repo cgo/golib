@@ -3,7 +3,7 @@
 
 #include <gotypes.h>
 #include <gosignal3d.h>
-
+#include <gosubsignal3d.h>
 
 /*!
  * Type for transformed data.
@@ -16,7 +16,7 @@ typedef goDouble godwt_t;
 /*!
  * DWT class for 3d signals (separable, so it's for all signals dim < 4)
  * @author Christian Gosch 
- * @todo src/signal/godwt.cc aufräumen
+ * @todo src/signal/godwt.cc aufraeumen
  */
 template<class T>
 class
@@ -36,7 +36,7 @@ goDWT
    * @see goDWT::unHaar()
    */
   void haar (goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal);
-  int haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal, int stage);
+  int  haar (goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal, int stage);
 
   /*!
    * In place version of the Haar transform. There are special implementations
@@ -47,7 +47,7 @@ goDWT
    * @param signal Contains the signal to be transformed and after execution,
    * contains the transform of the signal.
    */
-  void haar (goSignal3D<T>& signal);
+  void haar (goSubSignal3D<T>& signal);
 
   /*!
    * In place version of the Haar transform with <code>stage</code> stages.
@@ -88,7 +88,7 @@ goDWT
    * In place version of the reverse Haar transform. There are special implementations
    * for <code>goFloat</code>, ...
    */
-  void unHaar (goSignal3D<T>& haarSignal);
+  void unHaar (goSubSignal3D<T>& haarSignal);
 
   /*!
    * @see haar(goSignal3D, int);

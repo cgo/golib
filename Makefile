@@ -78,7 +78,7 @@ PACKAGE = golib
 RANLIB = ranlib
 STRIP = strip
 VERSION = 0.3.0
-debug_options = -O2
+debug_options = -g
 lfs_options = 
 streampos_defines = 
 

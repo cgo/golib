@@ -468,7 +468,7 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 // }
 
 void
-goDWT<goFloat>::haar(goSignal3D<goFloat>& signal)
+goDWT<goFloat>::haar(goSubSignal3D<goFloat>& signal)
 {
   // goDouble tp[] = {1,1};
   // goDouble hp[] = {1,-1};
@@ -513,7 +513,7 @@ goDWT<goFloat>::haar(goSignal3D<goFloat>& signal)
 }
 
 void
-goDWT<goDouble>::haar(goSignal3D<goDouble>& signal)
+goDWT<goDouble>::haar(goSubSignal3D<goDouble>& signal)
 {
   // goDouble tp[] = {1,1};
   // goDouble hp[] = {1,-1};
@@ -606,7 +606,7 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
 // }
 
 void
-goDWT<goFloat>::unHaar(goSignal3D<goFloat>& haarSignal)
+goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
 {
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
@@ -635,7 +635,7 @@ goDWT<goFloat>::unHaar(goSignal3D<goFloat>& haarSignal)
 } 
 
 void
-goDWT<goDouble>::unHaar (goSignal3D<goDouble>& haarSignal)
+goDWT<goDouble>::unHaar (goSubSignal3D<goDouble>& haarSignal)
 {
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
@@ -1062,7 +1062,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
  */											
 #define GO_DWT_INTEGER_HAAR_METHOD(__TYPE)						 \
 void											 \
-goDWT<__TYPE>::haar (goSignal3D<__TYPE> &signal) {					 \
+goDWT<__TYPE>::haar (goSubSignal3D<__TYPE> &signal) {					 \
   /* 2D ST of each xy slice */								 \
   goIndex_t i_st;									 \
   ST_XY_BEGIN(signal, __TYPE)								 \
@@ -1077,7 +1077,7 @@ goDWT<__TYPE>::haar (goSignal3D<__TYPE> &signal) {					 \
 
 #define GO_DWT_INTEGER_UNHAAR_METHOD(__TYPE)					\
 void										\
-goDWT<__TYPE>::unHaar (goSignal3D<__TYPE> &signal) {				\
+goDWT<__TYPE>::unHaar (goSubSignal3D<__TYPE> &signal) {				\
   goIndex_t i_ts;								\
   ST_REVERSE_XY_BEGIN(signal, __TYPE);						\
   /* 1D reverse ST in z direction */						\
@@ -1160,5 +1160,5 @@ template class goDWT<goInt8>;
 //template class goDWT<goUInt16>;
 //template class goDWT<goInt32>;
 //template class goDWT<goUInt32>;
-//template class goDWT<goFloat>;
-//template class goDWT<goDouble>;
+template class goDWT<goFloat>;
+template class goDWT<goDouble>;

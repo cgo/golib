@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.4 2003/06/22 14:54:49 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.5 2003/07/20 09:57:38 christian Exp $
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.5  2003/07/20 09:57:38  christian
+ * *** empty log message ***
+ *
  * Revision 1.4  2003/06/22 14:54:49  christian
  * Changes to enable sub sampling for dwt
  *
@@ -266,6 +269,22 @@ goSignal3DBase<T>::getZJump ()
     return myZJump;
 }
 
+#if 0
+template<class T>
+inline
+void
+goSignal3DBase<T>::shiftLeftDiffX (int n)
+{
+   if (n <= 0)
+       return;
+
+   if (getSizeX() > 1)
+   {
+       
+   }
+   shiftLeftDiffX (n-1);
+}
+#endif
 
 template< class T >
 inline

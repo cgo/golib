@@ -247,15 +247,16 @@ template <class T>
 void
 goSubSignal3D<T>::shiftLeftDiff (int n)
 {
-    // FIXME: These skip values are wrong. Fix ...
-    this->setSkip ((skipX + 1) << n, (skipY + 1) << n, (skipZ + 1) << n);
+    // FIXME: Are these right now? 
+    this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
 }
 
 template <class T>
 void
 goSubSignal3D<T>::shiftRightDiff (int n)
 {
-    this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
+    this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
+    // this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
 }
 
 template< class T >
