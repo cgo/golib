@@ -1,5 +1,6 @@
 /* --*- C++ -*-- */
 #include <goarray.h>
+#include <goarray.hpp>
 #include <gocomplex.h>
 #include <goconfigfile.h>
 #include <golist.h>
