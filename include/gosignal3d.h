@@ -76,11 +76,6 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
                      goSize_t border_y, 
                      goSize_t border_z) 
 {
-    if (blockSizeX == 0 || blockSizeY == 0 || blockSizeZ == 0)
-    {
-        return false;
-    }
-    
     assert (blockSizeX > 0);
     assert (blockSizeY > 0);
     assert (blockSizeZ > 0);
