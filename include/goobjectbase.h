@@ -3,6 +3,7 @@
 
 #include <goqueue.h>
 #include <goobjectmessage.h>
+#include <goobjectmethod.h>
 #include <gotypes.h>
 
 class goString;
@@ -50,6 +51,11 @@ goObjectBase
  public:
     void connectObject        (goObjectBase*          object);
     void disconnectObject     (const goObjectBase*    object);
+
+    // Generic API for calling methods (reimplement)
+ public:
+    virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
+            
  protected:
     void sendObjectMessage    (int messageID, void* data = NULL);
     void sendObjectMessage    (goObjectBase* object, int messageID, void* data = NULL);
