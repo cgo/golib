@@ -1,7 +1,3 @@
-/*
- * goDate | Provides simple date handling.
- * Dates can be compared ( <, >, == ), copied ( = ) and written to a string.
- */
 
 #include <godate.h>
 #include <string.h>

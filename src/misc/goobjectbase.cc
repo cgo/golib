@@ -1,3 +1,5 @@
+#include <golist.h>
+#include <golist.hpp>
 #include <goobjectbase.h>
 #include <iostream>
 

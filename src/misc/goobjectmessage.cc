@@ -1,5 +1,8 @@
 #include <goobjectmessage.h>
 
+/**
+ * @brief Constructor
+ **/
 goObjectMessage::goObjectMessage ()
     :
     mySender        (0),
@@ -8,6 +11,9 @@ goObjectMessage::goObjectMessage ()
 {
 }
 
+/**
+ * @brief Destructor
+ **/
 goObjectMessage::~goObjectMessage ()
 {
     if (myMessageString)
