@@ -4,3 +4,16 @@ Preliminary license for golib
 You are not allowed to use this library in the context of any commercial
 product without prior written consent of the author(s), currently Christian
 Gosch.
+
+I am not yet totally sure about this topic, maybe this library will be GPL'ed 
+or LGPL'ed. Until then, you may use the library FOR NON-COMMERCIAL PURPOSES ONLY,
+but you have to 
+report changes you make on it to me, the author, and you may not redistribute 
+a changed version of the library.
+You may, however, redistribute the source 
+unchanged as a whole, including all documentation including this text and 
+all README files eventually included, with NO CHARGE. If you distribute a 
+binary version, you have to include the source as a whole again, including 
+all documentation and all other files included in the original distribution. 
+No version of goLib may be distributed for a fee or charge, except some small 
+fee for copying the library on a storage medium, like a CD or a floppy disk.
