@@ -5,7 +5,6 @@
 #include <iostream>
 #include <fstream>
 #include <gotypes.h>
-#include <goobjectinfo.h>
 #include <go3vector.h>		// sample()
 #include <gosignal3dbase.h>
 
@@ -34,7 +33,7 @@ goSignal3D : public goSignal3DBase<T>
         virtual ~goSignal3D ();
         virtual const goSignal3D<T>& operator= (goSignal3DBase<T>& other);
 
-        // From goObjectInfo
+        // From goObjectBase
         virtual goSize_t memoryUsage();
 
         inline bool make (goSize_t x, goSize_t y, goSize_t z,
