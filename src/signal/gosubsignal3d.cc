@@ -35,8 +35,9 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
     deleteY  (false),
     deleteZ  (false)
 {
+  assert (b);
   this->setParent   (b);
-  this->setSize     (x, y, z);
+  this->setSize     (x, y, z, b->getChannelCount());
   this->setPosition (0,0,0);
 }
 
@@ -244,7 +245,7 @@ goSubSignal3D<T>::shiftLeftSize (int n)
     sx = sx << n;
     sy = sy << n;
     sz = sz << n;
-    this->setSize (sx, sy, sz);
+    this->setSize (sx, sy, sz, this->getChannelCount());
 }
 
 template <class T>
@@ -258,7 +259,7 @@ goSubSignal3D<T>::shiftRightSize (int n)
     if (sx > 1) sx = sx >> n;
     if (sy > 1) sy = sy >> n;
     if (sz > 1) sz = sz >> n;
-    this->setSize (sx, sy, sz);
+    this->setSize (sx, sy, sz, this->getChannelCount());
 }
 
 template <class T>
@@ -293,6 +294,19 @@ goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
   this->real_ptr = p->getRealPtr();
   this->ptr      = p->getPtr(0, 0, 0);
   this->setPosition (0, 0, 0);
+  this->myChannelCount = p->getChannelCount();
+  this->myChannel = p->getChannel();
+  if (this->myChannelOffset)
+  {
+      delete [] this->myChannelOffset;
+      this->myChannelOffset = NULL;
+  }
+  this->myChannelOffset = new goPtrdiff_t[this->getChannelCount()];
+  goSize_t i;
+  for (i = 0; i < this->getChannelCount(); ++i)
+  {
+    this->myChannelOffset[i] = p->getChannelOffset(i);
+  }
 }
 
 template< class T >
@@ -303,6 +317,19 @@ goSubSignal3D<T>::setParent (goSignal3DBase<T> *p)
   this->real_ptr = p->getRealPtr();
   this->ptr      = p->getPtr(0, 0, 0);
   this->setPosition (0, 0, 0);
+  this->myChannelCount = p->getChannelCount();
+  this->myChannel = p->getChannel();
+  if (this->myChannelOffset)
+  {
+      delete [] this->myChannelOffset;
+      this->myChannelOffset = NULL;
+  }
+  this->myChannelOffset = new goPtrdiff_t[this->getChannelCount()];
+  goSize_t i;
+  for (i = 0; i < this->getChannelCount(); ++i)
+  {
+    this->myChannelOffset[i] = p->getChannelOffset(i);
+  }
 }
 
 template <class T>

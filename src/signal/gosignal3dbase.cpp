@@ -4,8 +4,9 @@
 #include <goerror.h>
 #include <gosignalmacros.h>
 #include <go3vector.h>
-#include <string.h> // bzero()
+#include <golog.h>
 
+#include <string.h> // bzero()
 #include <iostream>
 
 template< class T >
@@ -20,10 +21,13 @@ goSignal3DBase<T>::goSignal3DBase ()
     myXJump       (NULL),
     myYJump       (NULL),
     myZJump       (NULL),
+    myChannelOffset (NULL),
     mySize        (0, 0, 0),
     myBorderSize  (0, 0, 0),
     myBlockSize   (1, 1, 1),
-    myDataType    (GO_UINT8)
+    myDataType    (GO_UINT8),
+    myChannelCount (1),
+    myChannel     (0)
 {
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
@@ -32,36 +36,7 @@ goSignal3DBase<T>::goSignal3DBase ()
 template< class T >
 goSignal3DBase<T>::~goSignal3DBase () 
 {
-    if (xDiff)
-    {
-        delete[] (xDiff - myBorderSize.x);
-        xDiff = NULL;
-    }
-    if (yDiff)
-    {
-        delete[] (yDiff - myBorderSize.y);
-        yDiff = NULL;
-    }
-    if (zDiff)
-    {
-        delete[] (zDiff - myBorderSize.z);
-        zDiff = NULL;
-    }
-    if (myXJump)
-    {
-        delete[] (myXJump - myBorderSize.x);
-        myXJump = NULL;
-    }
-    if (myYJump)
-    {
-        delete[] (myYJump - myBorderSize.y);
-        myYJump = NULL;
-    }
-    if (myZJump)
-    {
-        delete[] (myZJump - myBorderSize.z);
-        myZJump = NULL;
-    }
+    this->destroy();
 }
 
 template<class T>
@@ -76,10 +51,13 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myXJump      (NULL),
     myYJump      (NULL),
     myZJump      (NULL),
+    myChannelOffset (NULL),
     mySize       (0, 0, 0),
     myBorderSize (0, 0, 0),
     myBlockSize  (1, 1, 1),
-    myDataType   (GO_UINT8)
+    myDataType   (GO_UINT8),
+    myChannelCount (1),
+    myChannel     (0)
 {
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
@@ -134,6 +112,7 @@ template <class T>
 bool
 goSignal3DBase<T>::initializeDataType ()
 {
+    goLog::error ("Unknown data type in initialization.",this);
     assert ("Unknown data type" == NULL);
     return false;
 }
@@ -141,7 +120,12 @@ goSignal3DBase<T>::initializeDataType ()
 void*
 goSignal3DBase<void>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
-    return (goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x];
+    goString msg = "myChannel: ";
+    msg += (int)myChannel;
+    msg += ", offset: "; 
+    msg += (int)myChannelOffset[myChannel];
+    goLog::message(msg,this);
+    return (goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel];
 }
 
 const void*
@@ -159,7 +143,48 @@ goSignal3DBase<void*>::sample(go3Vector<goFloat>& point)
 goFloat
 goSignal3DBase<void>::sample(go3Vector<goFloat>& point)
 {
+    goLog::warning ("sample() not implemented for <void>. Contact the author.",this);
 	return 0.0f;
+}
+
+template <class T>
+void goSignal3DBase<T>::cleanup ()
+{
+    if (xDiff)
+    {
+            delete[] (xDiff - myBorderSize.x);
+            xDiff = NULL;
+        }
+    if (yDiff)
+    {
+            delete[] (yDiff - myBorderSize.y);
+            yDiff = NULL;
+        }
+    if (zDiff)
+    {
+            delete[] (zDiff - myBorderSize.z);
+            zDiff = NULL;
+        }
+    if (myXJump)
+    {
+            delete[] (myXJump - myBorderSize.x);
+            myXJump = NULL;
+        }
+    if (myYJump)
+    {
+            delete[] (myYJump - myBorderSize.y);
+            myYJump = NULL;
+        }
+    if (myZJump)
+    {
+            delete[] (myZJump - myBorderSize.z);
+            myZJump = NULL;
+        }
+    if (myChannelOffset)
+    {
+            delete[] myChannelOffset;
+            myChannelOffset = NULL;
+        }
 }
 
 template <class T>
@@ -171,38 +196,10 @@ goSignal3DBase<T>::initialize (T*       dataptr,
                                goSize_t blockSizeZ,
                                goSize_t border_x, 
                                goSize_t border_y, 
-                               goSize_t border_z)
+                               goSize_t border_z,
+                               goSize_t channelCount)
 {
-    if (xDiff)
-    {
-        delete[] (xDiff - myBorderSize.x);
-        xDiff = NULL;
-    }
-    if (yDiff)
-    {
-        delete[] (yDiff - myBorderSize.y);
-        yDiff = NULL;
-    }
-    if (zDiff)
-    {
-        delete[] (zDiff - myBorderSize.z);
-        zDiff = NULL;
-    }
-    if (myXJump)
-    {
-        delete[] (myXJump - myBorderSize.x);
-        myXJump = NULL;
-    }
-    if (myYJump)
-    {
-        delete[] (myYJump - myBorderSize.y);
-        myYJump = NULL;
-    }
-    if (myZJump)
-    {
-        delete[] (myZJump - myBorderSize.z);
-        myZJump = NULL;
-    }
+    this->cleanup();
 
     myBorderSize.x = border_x;
     myBorderSize.y = border_y;
@@ -214,7 +211,8 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     mySize.x = x;
     mySize.y = y;
     mySize.z = z;
-  
+    myChannelCount = channelCount;
+    
     myBlocks.x = (mySize.x + myBlockSize.x - 1) / myBlockSize.x;
     myBlocks.y = (mySize.y + myBlockSize.y - 1) / myBlockSize.y;
     myBlocks.z = (mySize.z + myBlockSize.z - 1) / myBlockSize.z;
@@ -227,7 +225,9 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     myYJump = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
     myZJump = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
    
-    if (!xDiff || !yDiff || !zDiff || !myXJump || !myYJump || !myZJump)
+    myChannelOffset = new goPtrdiff_t[myChannelCount];
+
+    if (!xDiff || !yDiff || !zDiff || !myXJump || !myYJump || !myZJump || !myChannelOffset)
     {
         return false;
     }
@@ -240,43 +240,49 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     myYJump += myBorderSize.y;
     myZJump += myBorderSize.z;
     
+    goIndex_t i;
+    // Channel data are stored one element after another for now.
+    for (i = 0; i < (goIndex_t)myChannelCount; ++i)
+    {
+        myChannelOffset[i] = i;
+    }
+    
     real_ptr = dataptr;
     ptr      = real_ptr;
 
-    goIndex_t i;
     goPtrdiff_t blockJump  = myBlockSize.x * 
-                             myBlockSize.y * myBlockSize.z;
+                             myBlockSize.y * myBlockSize.z * myChannelCount;
     goPtrdiff_t blockJumpY = blockJump * myBlocks.x; 
     goPtrdiff_t blockJumpZ = blockJumpY * myBlocks.y;
    
     for (i = 0; i < (goIndex_t)mySize.x; ++i)
     {
-        xDiff[i]   = 1;
+        xDiff[i]   = 1 * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.x - 1; i < (goIndex_t)mySize.x; i += myBlockSize.x)
     {
-        xDiff[i] = blockJump - myBlockSize.x + 1;
+        xDiff[i] = blockJump - (myBlockSize.x + 1)*myChannelCount;
     }
     
     for (i = 0; i < (goIndex_t)mySize.y; ++i)
     {
-        yDiff[i] = myBlockSize.x;
+        yDiff[i] = myBlockSize.x * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.y - 1; i < (goIndex_t)mySize.y; i += myBlockSize.y)
     {
-        yDiff[i] = blockJumpY - (myBlockSize.x * (myBlockSize.y - 1));
+        yDiff[i] = blockJumpY - (myBlockSize.x * (myBlockSize.y - 1)) * myChannelCount;
     }
 
     for (i = 0; i < (goIndex_t)mySize.z; ++i)
     {
-        zDiff[i] = myBlockSize.x * myBlockSize.y;
+        zDiff[i] = myBlockSize.x * myBlockSize.y * myChannelCount * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.z - 1; i < (goIndex_t)mySize.z; i += myBlockSize.z)
     {
-        zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1));
+        zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1)) * myChannelCount;
     }
 
 
@@ -289,7 +295,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
             currentJump = blockJump * j / myBlockSize.x;
         }
         myXJump[j] = currentJump;
-        ++currentJump;
+        currentJump += myChannelCount;
     }
 
     currentJump = 0;
@@ -300,7 +306,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
             currentJump = blockJumpY * j / myBlockSize.y;
         }
         myYJump[j] = currentJump;
-        currentJump += myBlockSize.x;
+        currentJump += myBlockSize.x * myChannelCount;
     }
     
     currentJump = 0;
@@ -311,7 +317,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
             currentJump = blockJumpZ * j / myBlockSize.z;
         }
         myZJump[j] = currentJump;
-        currentJump += myBlockSize.x * myBlockSize.y;
+        currentJump += myBlockSize.x * myBlockSize.y * myChannelCount;
     }
 
 
@@ -377,7 +383,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     {
         zDiff[-1] = myZJump[0] - myZJump[-1];
     }
-    
+  
     return true;
 }
 
@@ -389,39 +395,11 @@ goSignal3DBase<void>::initialize (void*    dataptr,
                                   goSize_t blockSizeZ,
                                   goSize_t border_x, 
                                   goSize_t border_y, 
-                                  goSize_t border_z)
+                                  goSize_t border_z,
+                                  goSize_t channelCount)
 {
-    if (xDiff)
-    {
-        delete[] (xDiff - myBorderSize.x);
-        xDiff = NULL;
-    }
-    if (yDiff)
-    {
-        delete[] (yDiff - myBorderSize.y);
-        yDiff = NULL;
-    }
-    if (zDiff)
-    {
-        delete[] (zDiff - myBorderSize.z);
-        zDiff = NULL;
-    }
-    if (myXJump)
-    {
-        delete[] (myXJump - myBorderSize.x);
-        myXJump = NULL;
-    }
-    if (myYJump)
-    {
-        delete[] (myYJump - myBorderSize.y);
-        myYJump = NULL;
-    }
-    if (myZJump)
-    {
-        delete[] (myZJump - myBorderSize.z);
-        myZJump = NULL;
-    }
-
+    this->cleanup();
+    
     myBorderSize.x = border_x;
     myBorderSize.y = border_y;
     myBorderSize.z = border_z;
@@ -432,6 +410,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     mySize.x = x;
     mySize.y = y;
     mySize.z = z;
+    myChannelCount = channelCount;
   
     myBlocks.x = (mySize.x + myBlockSize.x - 1) / myBlockSize.x;
     myBlocks.y = (mySize.y + myBlockSize.y - 1) / myBlockSize.y;
@@ -445,7 +424,9 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     myYJump = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
     myZJump = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
    
-    if (!xDiff || !yDiff || !zDiff || !myXJump || !myYJump || !myZJump)
+    myChannelOffset = new goPtrdiff_t[myChannelCount];
+
+    if (!xDiff || !yDiff || !zDiff || !myXJump || !myYJump || !myZJump || !myChannelOffset)
     {
         return false;
     }
@@ -458,44 +439,50 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     myYJump += myBorderSize.y;
     myZJump += myBorderSize.z;
     
+    goIndex_t i;
+    goPtrdiff_t elementSize = myDataType.getSize();
+    // Channel data are stored one element after another for now.
+    for (i = 0; i < (goIndex_t)myChannelCount; ++i)
+    {
+        myChannelOffset[i] = i * elementSize;
+    }
+
     real_ptr = dataptr;
     ptr      = real_ptr;
 
-    goPtrdiff_t elementSize = myDataType.getSize();
-    goIndex_t i;
     goPtrdiff_t blockJump  = myBlockSize.x * 
-                             myBlockSize.y * myBlockSize.z * elementSize;
+                             myBlockSize.y * myBlockSize.z * elementSize * myChannelCount;
     goPtrdiff_t blockJumpY = blockJump * myBlocks.x; 
     goPtrdiff_t blockJumpZ = blockJumpY * myBlocks.y;
   
     for (i = 0; i < (goIndex_t)mySize.x; ++i)
     {
-        xDiff[i]   = 1 * elementSize;
+        xDiff[i]   = 1 * elementSize * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.x - 1; i < (goIndex_t)mySize.x; i += myBlockSize.x)
     {
-        xDiff[i] = blockJump - ((myBlockSize.x - 1) * elementSize);
+        xDiff[i] = blockJump - ((myBlockSize.x - 1) * elementSize * myChannelCount);
     }
     
     for (i = 0; i < (goIndex_t)mySize.y; ++i)
     {
-        yDiff[i] = myBlockSize.x * elementSize;
+        yDiff[i] = myBlockSize.x * elementSize * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.y - 1; i < (goIndex_t)mySize.y; i += myBlockSize.y)
     {
-        yDiff[i] = blockJumpY - (myBlockSize.x * (myBlockSize.y - 1) * elementSize);
+        yDiff[i] = blockJumpY - (myBlockSize.x * (myBlockSize.y - 1) * elementSize * myChannelCount);
     }
 
     for (i = 0; i < (goIndex_t)mySize.z; ++i)
     {
-        zDiff[i] = myBlockSize.x * myBlockSize.y * elementSize;
+        zDiff[i] = myBlockSize.x * myBlockSize.y * elementSize * myChannelCount;
     }
 
     for (i = (goIndex_t)myBlockSize.z - 1; i < (goIndex_t)mySize.z; i += myBlockSize.z)
     {
-        zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1) * elementSize);
+        zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1) * elementSize * myChannelCount);
     }
 
     blockJump   = myBlockSize.x * myBlockSize.y * myBlockSize.z;
@@ -509,7 +496,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJump * j / myBlockSize.x;
         }
-        myXJump[j] = currentJump * elementSize;
+        myXJump[j] = currentJump * elementSize * myChannelCount;
         ++currentJump;
     }
 
@@ -520,7 +507,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJumpY * j / myBlockSize.y;
         }
-        myYJump[j] = currentJump * elementSize;
+        myYJump[j] = currentJump * elementSize * myChannelCount;
         currentJump += myBlockSize.x;
     }
     
@@ -531,7 +518,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJumpZ * j / myBlockSize.z;
         }
-        myZJump[j] = currentJump * elementSize;
+        myZJump[j] = currentJump * elementSize * myChannelCount;
         currentJump += myBlockSize.x * myBlockSize.y;
     }
 
@@ -607,36 +594,7 @@ template<class T>
 void
 goSignal3DBase<T>::destroy ()
 {
-    if (xDiff)
-    {
-        delete[] (xDiff - myBorderSize.x);
-        xDiff = NULL;
-    }
-    if (yDiff)
-    {
-        delete[] (yDiff - myBorderSize.y);
-        yDiff = NULL;
-    }
-    if (zDiff)
-    {
-        delete[] (zDiff - myBorderSize.z);
-        zDiff = NULL;
-    }
-    if (myXJump)
-    {
-        delete[] (myXJump - myBorderSize.x);
-        myXJump = NULL;
-    }
-    if (myYJump)
-    {
-        delete[] (myYJump - myBorderSize.y);
-        myYJump = NULL;
-    }
-    if (myZJump)
-    {
-        delete[] (myZJump - myBorderSize.z);
-        myZJump = NULL;
-    }
+    this->cleanup();
 }
 
 template<class T>
@@ -645,7 +603,7 @@ goSignal3DBase<T>::memoryUsage()
 {
     if (real_ptr) 
     {
-        return (goSize_t)(sizeof(T) * getSizeX() * getSizeY() * getSizeZ());
+        return (goSize_t)(sizeof(T) * getSizeX() * getSizeY() * getSizeZ() * this->getChannelCount());
     }
 
     return 0;
@@ -663,7 +621,7 @@ goSignal3DBase<void>::memoryUsage()
 {
     if (real_ptr) 
     {
-        return (goSize_t)(myDataType.getSize() * getSizeX() * getSizeY() * getSizeZ());
+        return (goSize_t)(myDataType.getSize() * getSizeX() * getSizeY() * getSizeZ() * this->getChannelCount());
     }
 
     return 0;
@@ -684,7 +642,7 @@ goSignal3DBase<T>::operator= (goSignal3DBase<T> &other) {
     this->initialize (other.getRealPtr (),
                       other.getSizeX(), other.getSizeY(), other.getSizeZ(),
                       other.getBlockSizeX(), other.getBlockSizeY(), other.getBlockSizeZ(),
-                      other.getBorderX(), other.getBorderY(), other.getBorderZ());
+                      other.getBorderX(), other.getBorderY(), other.getBorderZ(), other.getChannelCount());
     
     return *this;
 }
@@ -741,14 +699,14 @@ goSignal3DBase<void>::operator== (goSignal3DBase<void> &other)
 goSize_t
 goSignal3DBase<void>::getSize()
 {
-    return myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
+    return myChannelCount * myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
 }
 
 template< class T >
 goSize_t
 goSignal3DBase<T>::getSize()
 {
-    return sizeof(T) * (mySize.x * mySize.y * mySize.z);
+    return myChannelCount * sizeof(T) * (mySize.x * mySize.y * mySize.z);
 }
 
 goDouble
@@ -760,7 +718,7 @@ goSignal3DBase<void*>::getMaximum() const
 goDouble
 goSignal3DBase<void>::getMaximum() const
 {
-    const goUInt8* p = (goUInt8*)ptr;
+    const goUInt8* p = (goUInt8*)this->getPtr();
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -805,7 +763,7 @@ template< class T >
 goDouble
 goSignal3DBase<T>::getMaximum() const
 {
-    const T *p = ptr;
+    const T *p = this->getPtr();
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -840,7 +798,7 @@ goSignal3DBase<void*>::getMinimum() const
 goDouble
 goSignal3DBase<void>::getMinimum() const
 {
-    const goUInt8 *p = (goUInt8*)ptr;
+    const goUInt8 *p = (goUInt8*)this->getPtr();
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -885,7 +843,7 @@ template< class T >
 goDouble
 goSignal3DBase<T>::getMinimum() const
 {
-    const T *p = ptr;
+    const T *p = this->getPtr();
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -1099,7 +1057,13 @@ inline
 T*
 goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
-    return ptr + myZJump[z] + myYJump[y] + myXJump[x];
+    goString msg = "myChannel: ";
+    msg += (int)myChannel;
+    msg += ", offset: "; 
+    msg += (int)myChannelOffset[myChannel];
+    goLog::message(msg,this);
+    printf ("%s\n",msg.toCharPtr());
+    return ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel];
 }
 
 template<class T>
@@ -1107,7 +1071,7 @@ inline
 const T*
 goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z) const
 {
-    return (const T*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x]);
+    return (const T*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel]);
 }
 
 template<class T>
@@ -1193,11 +1157,12 @@ goSignal3DBase<T>::getRealPtr () const
 
 template <class T>
 void
-goSignal3DBase<T>::setSize (goSize_t x, goSize_t y, goSize_t z)
+goSignal3DBase<T>::setSize (goSize_t x, goSize_t y, goSize_t z, goSize_t channelCount)
 {
     mySize.x = x;
     mySize.y = y;
     mySize.z = z;
+    myChannelCount = channelCount;
 }
 
 template <class T>
@@ -1289,6 +1254,21 @@ goSize_t
 goSignal3DBase<T>::getBlockSizeZ () const 
 {
     return myBlockSize.z;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getChannelCount () const
+{
+    return myChannelCount;
+}
+
+/// \todo This will be a problem with const objects. Find out how that can be solved.
+template <class T>
+void
+goSignal3DBase<T>::setChannel (goSize_t c) 
+{
+    myChannel = c;
 }
 
 #if 0

@@ -60,7 +60,7 @@ bool goSignal3DIterator<T>::endZ ()
 }
 void goSignal3DIterator<void>::incrementX ()
 {
-    (goByte*)px += *dx;
+    (goByte*&)px += *dx;
     ++posX;
     ++dx;
 }
@@ -73,7 +73,7 @@ void goSignal3DIterator<T>::incrementX ()
 }
 void goSignal3DIterator<void>::incrementY ()
 {
-    (goByte*)py += *dy;
+    (goByte*&)py += *dy;
     ++posY;
     ++dy;
 }
@@ -86,7 +86,7 @@ void goSignal3DIterator<T>::incrementY ()
 }
 void goSignal3DIterator<void>::incrementZ ()
 {
-    (goByte*)pz += *dz;
+    (goByte*&)pz += *dz;
     ++posZ;
     ++dz;
 }
@@ -99,7 +99,7 @@ void goSignal3DIterator<T>::incrementZ ()
 }
 void goSignal3DIterator<void>::decrementX ()
 {
-    (goByte*)px -= *(dx-1);
+    (goByte*&)px -= *(dx-1);
     --posX;
     --dx;
 }
@@ -112,7 +112,7 @@ void goSignal3DIterator<T>::decrementX ()
 }
 void goSignal3DIterator<void>::decrementY ()
 {
-    (goByte*)py -= *(dy-1);
+    (goByte*&)py -= *(dy-1);
     --posY;
     --dy;
 }
@@ -125,7 +125,7 @@ void goSignal3DIterator<T>::decrementY ()
 }
 void goSignal3DIterator<void>::decrementZ ()
 {
-    (goByte*)pz -= *(dz-1);
+    (goByte*&)pz -= *(dz-1);
     --posZ;
     --dz;
 }

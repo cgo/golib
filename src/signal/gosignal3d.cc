@@ -47,13 +47,14 @@ goSignal3D<T>::goSignal3D (goSize_t x,
         goSize_t blocksize_z,
         goSize_t border_x, 
         goSize_t border_y, 
-        goSize_t border_z)
+        goSize_t border_z,
+        goSize_t channelCount)
   : goSignal3DBase<T> ()
 {
     this->setClassName ("goSignal3D");
     this->make (x,y,z, 
             blocksize_x, blocksize_y, blocksize_z,
-            border_x, border_y, border_z);
+            border_x, border_y, border_z, channelCount);
 }
 
 /*! \brief Copy constructor
@@ -108,9 +109,16 @@ goSignal3D<T>::operator= (goSignal3DBase<T>& other)
                 other.getBlockSizeZ(),
                 other.getBorderX(),
                 other.getBorderY(),
-                other.getBorderZ());
-    
-    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
+                other.getBorderZ(),
+                other.getChannelCount());
+   
+    goSize_t i;
+    for (i = 0; i < this->getChannelCount(); ++i)
+    {
+        this->setChannel(i);
+        other.setChannel(i);
+        GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
+    }
     
     return *this;
 }
@@ -122,7 +130,8 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
                         goSize_t blockSizeZ,
 		                goSize_t border_x, 
                         goSize_t border_y, 
-                        goSize_t border_z) 
+                        goSize_t border_z,
+                        goSize_t channelCount) 
 {
     assert (blockSizeX > 0);
     assert (blockSizeY > 0);
@@ -136,7 +145,7 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
     
     // real_ptr = new T[(x + (border_x << 1)) * (y + (border_y << 1)) * (z + (border_z << 1))];
     // ptr = real_ptr + (goPtrdiff_t)(border_x * xDiff + border_y * yDiff + border_z * zDiff);
-    goUInt8* p = new goUInt8 [myDataType.getSize() * blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ];
+    goUInt8* p = new goUInt8 [myDataType.getSize() * blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ * channelCount];
 
     if (!p)
     {
@@ -149,7 +158,8 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
                      blockSizeZ,
                      border_x,
                      border_y,
-                     border_z))
+                     border_z,
+                     channelCount))
     {
         delete[] p;
         p = NULL;
@@ -187,7 +197,8 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
                 other.getBlockSizeZ(),
                 other.getBorderX(),
                 other.getBorderY(),
-                other.getBorderZ());
+                other.getBorderZ(),
+                other.getChannelCount());
     
     goError::print (getClassName(), "operator= not fully implemented for void.");
     // GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
@@ -228,7 +239,7 @@ goSignal3D<T>::memoryUsage()
 /// Copies only the size, NOT THE DATA!
 template< class T >
 bool
-goSignal3D<T>::make (goSignal3D *other) {
+goSignal3D<T>::make (goSignal3D<T> *other) {
     return this->make (other->getSizeX(), 
                        other->getSizeY(), 
                        other->getSizeZ(),
@@ -237,7 +248,8 @@ goSignal3D<T>::make (goSignal3D *other) {
                        other->getBlockSizeZ(), 
                        other->getBorderX(), 
                        other->getBorderY(), 
-                       other->getBorderZ());
+                       other->getBorderZ(),
+                       other->getChannelCount());
 }
 
 /*! 
@@ -279,7 +291,8 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
                      goSize_t blockSizeZ,
 		             goSize_t border_x, 
                      goSize_t border_y, 
-                     goSize_t border_z) 
+                     goSize_t border_z,
+                     goSize_t channelCount) 
 {
     assert (blockSizeX > 0);
     assert (blockSizeY > 0);
@@ -293,7 +306,7 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
     
     // real_ptr = new T[(x + (border_x << 1)) * (y + (border_y << 1)) * (z + (border_z << 1))];
     // ptr = real_ptr + (goPtrdiff_t)(border_x * xDiff + border_y * yDiff + border_z * zDiff);
-    T* p = new T[blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ];
+    T* p = new T[blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ * channelCount];
 
     if (!p)
     {
@@ -306,7 +319,8 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
                      blockSizeZ,
                      border_x,
                      border_y,
-                     border_z))
+                     border_z,
+                     channelCount))
     {
         delete[] p;
         p = NULL;
@@ -323,7 +337,7 @@ void
 goSignal3D<T>::fillByte (goInt8 b)
 { 
     memset ((void*)this->real_ptr, (int)b, 
-            this->getDataType().getSize() * this->mySize.x * this->mySize.y * this->mySize.z ); 
+            this->getDataType().getSize() * this->mySize.x * this->mySize.y * this->mySize.z * this->getChannelCount()); 
 }
 
 template class goSignal3D< goInt8 >;
