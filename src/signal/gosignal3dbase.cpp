@@ -120,11 +120,6 @@ goSignal3DBase<T>::initializeDataType ()
 void*
 goSignal3DBase<void>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
-    goString msg = "myChannel: ";
-    msg += (int)myChannel;
-    msg += ", offset: "; 
-    msg += (int)myChannelOffset[myChannel];
-    goLog::message(msg,this);
     return (goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel];
 }
 
