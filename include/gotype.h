@@ -72,6 +72,19 @@ class goTypePrivate;
     goUInt16 value = LUTOrigin[indexFunction(sig->getPtr(5,1,2)];
     ...
     </pre>
+    You can also use the function goCreateQuantizationTable() for this:
+    <pre>
+    ...
+    goSignal3D<void>* sig = ...;
+    goArray<goUInt16> LUT;
+    goUInt16*         LUTOrigin = 0;
+    lutOrigin = goCreateQuantizationTable (dataType, goUInt16(0), goUInt16(65535), 
+                                           minIndex, maxIndex, lut);
+    goIndexFunction indexFunction = sig->getDataType().getIndexFunction();
+    // Get the uint16 value for the data value at (5,1,2):
+    goUInt16 value = LUTOrigin[indexFunction(sig->getPtr(5,1,2)];
+    ...
+    </pre>
  * 
  */
 class goType : public goObjectBase
