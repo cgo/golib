@@ -122,21 +122,21 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     myBorderSize.x = border_x;
     myBorderSize.y = border_y;
     myBorderSize.z = border_z;
-    myBlockSize.x = blockSizeX;
-    myBlockSize.y = blockSizeY;
-    myBlockSize.z = blockSizeZ;
+    myBlockSize.x  = blockSizeX;
+    myBlockSize.y  = blockSizeY;
+    myBlockSize.z  = blockSizeZ;
     
     mySize.x = x;
     mySize.y = y;
     mySize.z = z;
   
-    myBlocks.x        = (mySize.x + myBlockSize.x - 1) / myBlockSize.x;
-    myBlocks.y        = (mySize.y + myBlockSize.y - 1) / myBlockSize.y;
-    myBlocks.z        = (mySize.z + myBlockSize.z - 1) / myBlockSize.z;
+    myBlocks.x = (mySize.x + myBlockSize.x - 1) / myBlockSize.x;
+    myBlocks.y = (mySize.y + myBlockSize.y - 1) / myBlockSize.y;
+    myBlocks.z = (mySize.z + myBlockSize.z - 1) / myBlockSize.z;
     
-    xDiff = new goPtrdiff_t[mySize.x + 2 * myBorderSize.x];
-    yDiff = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
-    zDiff = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
+    xDiff   = new goPtrdiff_t[mySize.x + 2 * myBorderSize.x];
+    yDiff   = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
+    zDiff   = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
     
     myXJump = new goPtrdiff_t[mySize.x + 2 * myBorderSize.x];
     myYJump = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
