@@ -21,8 +21,6 @@
 template <class T> class goSignal3DBase;
 template <class T> class goSignal3D;
 
-typedef goFloat filter3d_mask_t;
-
 /*!
  * \addtogroup signal
  * @{
@@ -30,6 +28,17 @@ typedef goFloat filter3d_mask_t;
 /**
  * @brief 3D filter class.
  *
+ * Applies a 3D filter to a goSignal3DBase.
+ * Currently, only the version for <void,void> data types is
+ * functional. It is recommended to use goSignal3D of type
+ * <void> everywhere possible to remain more flexible.
+ * This filter class does not support separable filters by its own.
+ * Either use two or more different masks to achieve the speed gain
+ * of a separable filter,
+ * or implement another filter class.
+ *
+ * @todo Implement a separable filter class.
+ * 
  * \author Christian Gosch
  **/
 template<class T_IN, class T_OUT>
@@ -44,7 +53,7 @@ goFilter3D : public goObjectBase
         goFilter3D (const goFilter3D<T_IN, T_OUT>& other);
         const goFilter3D& operator= (const goFilter3D<T_IN, T_OUT>& other);
 
-        bool                      setMask (const goSignal3DBase<filter3d_mask_t>& mask,
+        bool                      setMask (const goSignal3DBase<void>& mask,
                                            bool normalize = true);
         void                      setMaskCenter (goIndex_t x,
                                                  goIndex_t y,
@@ -53,15 +62,15 @@ goFilter3D : public goObjectBase
         goIndex_t                 getMaskCenterY () const;
         goIndex_t                 getMaskCenterZ () const;
                                                 
-        const goSignal3DBase<filter3d_mask_t>&  getMask () const;
+        const goSignal3D<void>&   getMask () const;
         bool                      filter  (goSignal3DBase<T_IN>&  inSignal,
                                            goSignal3DBase<T_OUT>& outSignal);
 
 	private:
-        goSignal3D<filter3d_mask_t> *myMask;
-        goIndex_t           maskCenterX;
-        goIndex_t           maskCenterY;
-        goIndex_t           maskCenterZ;
+        goSignal3D<void>            myMask;
+        goIndex_t                   myMaskCenterX;
+        goIndex_t                   myMaskCenterY;
+        goIndex_t                   myMaskCenterZ;
 };
 /*! @} */
 #endif
