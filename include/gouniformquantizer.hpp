@@ -109,6 +109,6 @@ _output_type
 goUniformQuantizer<_input_type, _output_type>::quantize (_input_type input) const
 {
     goSize_t d = (goSize_t)((input - myPrivate->myMinInput) * myPrivate->myDeltaInput_rec);
-    return myPrivate->myMinOutput + myPrivate->myDeltaOutput * d;
+    return (_output_type)(myPrivate->myMinOutput + myPrivate->myDeltaOutput * d);
 }
 #endif
