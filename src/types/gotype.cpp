@@ -1,5 +1,10 @@
 #include <gotype.h>
 #include <assert.h>
+#include <limits>
+
+template <class T> static bool lowerThanFunction   (const void* v1, const void* v2);
+template <class T> static bool greaterThanFunction (const void* v1, const void* v2);
+template <class T> static bool equalFunction       (const void* v1, const void* v2);
 
 class goTypePrivate
 {
@@ -12,13 +17,25 @@ class goTypePrivate
         goSize_t   size;       // in bytes
         bool       signedness;
         goString   string;     // descriptive string
+
+        goCompareFunction lowerThan;
+        goCompareFunction equal;
+        goCompareFunction greaterThan;
+
+        goDouble minimum;
+        goDouble maximum;
 };
 
 goTypePrivate::goTypePrivate (goTypeEnum t)
-    : typeEnum (t),
-      size     (goType::getSize (t)),
-      signedness (goType::isSigned (t)),
-      string     ("")
+    : typeEnum     (t),
+      size         (goType::getSize (t)),
+      signedness   (goType::isSigned (t)),
+      string       (""),
+      lowerThan    (NULL),
+      greaterThan  (NULL),
+      equal        (NULL),
+      minimum      (0.0),
+      maximum      (1.0)
 {
     goType::getString (t, string);
 }
@@ -26,6 +43,7 @@ goTypePrivate::goTypePrivate (goTypeEnum t)
 goTypePrivate::~goTypePrivate ()
 {
 }
+
 
 /**
  * @brief Constructor.
@@ -38,6 +56,7 @@ goType::goType (goTypeEnum t)
 {
     setClassName ("goType");
     myPrivate = new goTypePrivate (t);
+    setID (t);
     assert (myPrivate);
 }
 
@@ -57,72 +76,122 @@ goType::setID (goTypeEnum t)
     {
         case GO_INT8:
             {
-                myPrivate->size = sizeof (goInt8);
-                myPrivate->signedness = true;
-                myPrivate->string = "signed integer 8 bit";
+                myPrivate->size        = sizeof (goInt8);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "signed integer 8 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goInt8>;
+                myPrivate->greaterThan = greaterThanFunction<goInt8>;
+                myPrivate->equal       = equalFunction<goInt8>;
+                myPrivate->minimum     = std::numeric_limits<goInt8>::min();
+                myPrivate->maximum     = std::numeric_limits<goInt8>::max();
             }
             break;
         case GO_INT16:
             {
-                myPrivate->size = sizeof (goInt16);
-                myPrivate->signedness = true;
-                myPrivate->string = "signed integer 16 bit";
+                myPrivate->size        = sizeof (goInt16);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "signed integer 16 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goInt16>;
+                myPrivate->greaterThan = greaterThanFunction<goInt16>;
+                myPrivate->equal       = equalFunction<goInt16>;
+                myPrivate->minimum     = std::numeric_limits<goInt16>::min();
+                myPrivate->maximum     = std::numeric_limits<goInt16>::max();
             }
             break;
         case GO_INT32:
             {
-                myPrivate->size = sizeof (goInt32);
-                myPrivate->signedness = true;
-                myPrivate->string = "signed integer 32 bit";
+                myPrivate->size        = sizeof (goInt32);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "signed integer 32 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goInt32>;
+                myPrivate->greaterThan = greaterThanFunction<goInt32>;
+                myPrivate->equal       = equalFunction<goInt32>;
+                myPrivate->minimum     = std::numeric_limits<goInt32>::min();
+                myPrivate->maximum     = std::numeric_limits<goInt32>::max();
             }
             break;
         case GO_INT64:
             {
-                myPrivate->size = sizeof (goInt64);
-                myPrivate->signedness = true;
-                myPrivate->string = "signed integer 64 bit";
+                myPrivate->size        = sizeof (goInt64);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "signed integer 64 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goInt64>;
+                myPrivate->greaterThan = greaterThanFunction<goInt64>;
+                myPrivate->equal       = equalFunction<goInt64>;
+                myPrivate->minimum     = std::numeric_limits<goInt64>::min();
+                myPrivate->maximum     = std::numeric_limits<goInt64>::max();
             }
             break;
         case GO_UINT8:
             {
-                myPrivate->size = sizeof (goUInt8);
-                myPrivate->signedness = false;
-                myPrivate->string = "unsigned integer 8 bit";
+                myPrivate->size        = sizeof (goUInt8);
+                myPrivate->signedness  = false;
+                myPrivate->string      = "unsigned integer 8 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goUInt8>;
+                myPrivate->greaterThan = greaterThanFunction<goUInt8>;
+                myPrivate->equal       = equalFunction<goUInt8>;
+                myPrivate->minimum     = std::numeric_limits<goUInt8>::min();
+                myPrivate->maximum     = std::numeric_limits<goUInt8>::max();
             }
             break;
         case GO_UINT16:
             {
-                myPrivate->size = sizeof (goUInt16);
-                myPrivate->signedness = false;
-                myPrivate->string = "unsigned integer 16 bit";
+                myPrivate->size        = sizeof (goUInt16);
+                myPrivate->signedness  = false;
+                myPrivate->string      = "unsigned integer 16 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goUInt16>;
+                myPrivate->greaterThan = greaterThanFunction<goUInt16>;
+                myPrivate->equal       = equalFunction<goUInt16>;
+                myPrivate->minimum     = std::numeric_limits<goUInt16>::min();
+                myPrivate->maximum     = std::numeric_limits<goUInt16>::max();
             }
             break;
         case GO_UINT32:
             {
-                myPrivate->size = sizeof (goUInt32);
-                myPrivate->signedness = false;
-                myPrivate->string = "unsigned integer 32 bit";
+                myPrivate->size        = sizeof (goUInt32);
+                myPrivate->signedness  = false;
+                myPrivate->string      = "unsigned integer 32 bit";
+                myPrivate->lowerThan   = lowerThanFunction<goUInt32>;
+                myPrivate->greaterThan = greaterThanFunction<goUInt32>;
+                myPrivate->equal       = equalFunction<goUInt32>;
+                myPrivate->minimum     = std::numeric_limits<goUInt32>::min();
+                myPrivate->maximum     = std::numeric_limits<goUInt32>::max();
             }
             break;
         case GO_FLOAT:
             {
-                myPrivate->size = sizeof (goFloat);
-                myPrivate->signedness = true;
-                myPrivate->string = "float";
+                myPrivate->size        = sizeof (goFloat);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "float";
+                myPrivate->lowerThan   = lowerThanFunction<goFloat>;
+                myPrivate->greaterThan = greaterThanFunction<goFloat>;
+                myPrivate->equal       = equalFunction<goFloat>;
+                myPrivate->minimum     = std::numeric_limits<goFloat>::min();
+                myPrivate->maximum     = std::numeric_limits<goFloat>::max();
             }
             break;
         case GO_DOUBLE:
             {
-                myPrivate->size = sizeof (goDouble);
-                myPrivate->signedness = true;
-                myPrivate->string = "double";
+                myPrivate->size        = sizeof (goDouble);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "double";
+                myPrivate->lowerThan   = lowerThanFunction<goDouble>;
+                myPrivate->greaterThan = greaterThanFunction<goDouble>;
+                myPrivate->equal       = equalFunction<goDouble>;
+                myPrivate->minimum     = std::numeric_limits<goDouble>::min();
+                myPrivate->maximum     = std::numeric_limits<goDouble>::max();
             }
             break;
         case GO_VOID_POINTER:
             {
-                myPrivate->size = sizeof (void*);
-                myPrivate->signedness = false;
-                myPrivate->string = "void pointer";
+                myPrivate->size        = sizeof (void*);
+                myPrivate->signedness  = false;
+                myPrivate->string      = "void pointer";
+                myPrivate->lowerThan   = lowerThanFunction<void*>;
+                myPrivate->greaterThan = greaterThanFunction<void*>;
+                myPrivate->equal       = equalFunction<void*>;
+                myPrivate->minimum     = std::numeric_limits<unsigned int>::min();
+                myPrivate->maximum     = std::numeric_limits<unsigned int>::max();
             }
             break;
         default:
@@ -373,4 +442,55 @@ goType::operator= (const goType& other)
 {
     assert (this->setID (other.getID()));
     return *this;
+}
+
+goCompareFunction
+goType::getLowerThanFunction () const
+{
+    return myPrivate->lowerThan;
+}
+
+goCompareFunction
+goType::getGreaterThanFunction () const
+{
+    return myPrivate->greaterThan;
+}
+
+goCompareFunction
+goType::getEqualFunction () const
+{
+    return myPrivate->equal;
+}
+
+goDouble
+goType::getMinimum () const
+{
+    return myPrivate->minimum;
+}
+
+goDouble
+goType::getMaximum () const
+{
+    return myPrivate->maximum;
+}
+
+template <class T>
+static bool
+greaterThanFunction (const void* v1, const void* v2)
+{
+    return *(const T*)v1 > *(const T*)v2;
+}
+
+template <class T>
+static bool
+lowerThanFunction (const void* v1, const void* v2)
+{
+    return *(const T*)v1 < *(const T*)v2;
+}
+
+template <class T>
+static bool
+equalFunction (const void* v1, const void* v2)
+{
+    return *(const T*)v1 == *(const T*)v2;
 }
