@@ -5,8 +5,9 @@
 #include <gosignal2d.h>
 
 /*!
- * Filter class. <br>
- * Do only 2D so far, never mind about the rest 
+ * \brief Filter class.
+ *
+ * \todo This works on the old 2D classes. Rework to signal3d.
  */
 template <class T>
 class goFilter {

@@ -5,6 +5,8 @@
 #include <gofilterbankstagereverse.h>
 
 /*!
+ * \todo Make it work with signal3d.
+ *
  * 2D reconstruction filterbank using <CODE>goFilterBank</CODE> to reconstruct the original
  * signal.
  */

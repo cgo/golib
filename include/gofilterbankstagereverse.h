@@ -5,6 +5,11 @@
 #include <gofilterfir.h>
 #include <gotypes.h>
 
+/**
+ * @brief 2D filter bank stage (reverse).
+ *
+ * \todo Make it work with signal3d.
+ **/
 template <class T>
 class
 goFilterBankStageReverse {

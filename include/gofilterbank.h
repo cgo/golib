@@ -6,6 +6,9 @@
 #include <goarray.h>
 
 /*!
+ * \brief 2D-Filterbank.
+ * 
+ * \todo Fix this to work with signal3d.
  * Filterbank, currently only for two dimensional signals. <br>
  * This is handy for playing with wavelet transforms. <br>
  * Uses an array of goFilterBankStage. This should be changed to using only one filter which is used
@@ -48,6 +51,5 @@ class goFilterBank {
   goArray<void*> stages;
 
 };
-
 #endif
 

@@ -5,6 +5,8 @@
 #include <gofilterfir.h>
 
 /*!
+ * \todo Make it work with signal3d.
+ *
  * Stage for a goFilterBank.<br>
  * Currently works only for goSignal2D. 
  */
