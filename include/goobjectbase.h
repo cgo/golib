@@ -51,8 +51,8 @@ goObjectBase
     void connectObject        (goObjectBase*          object);
     void disconnectObject     (const goObjectBase*    object);
  protected:
-    void sendObjectMessage    (goObjectMessageID messageID);
-    void sendObjectMessage    (goObjectBase* object, goObjectMessageID messageID);
+    void sendObjectMessage    (goObjectMessageID messageID, void* data = NULL);
+    void sendObjectMessage    (goObjectBase* object, goObjectMessageID messageID, void* data = NULL);
     virtual void receiveObjectMessage (const goObjectMessage& message);
     
  private:
