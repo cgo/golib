@@ -651,6 +651,13 @@ goSignal3DBase<T>::memoryUsage()
     return 0;
 }
 
+template<class T>
+void
+goSignal3DBase<T>::setChanged ()
+{
+    this->sendObjectMessage (GO_OBJECTMESSAGE_CHANGED);
+}
+
 goSize_t
 goSignal3DBase<void>::memoryUsage()
 {
