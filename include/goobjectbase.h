@@ -7,7 +7,12 @@
 #include <goobjectmessage.h>
 #include <gotypes.h>
 
-/*! \brief Base class for golib objects.
+/*! 
+ * \addtogroup misc
+ * @{
+ */
+/*! 
+ * \brief Base class for golib objects.
  * 
  * This is a base for all objects that we felt needed a common base.
  * It implements class names, class message printing, 
@@ -15,6 +20,10 @@
  * \author Christian Gosch
  * \todo Implement object names
  * \todo Test object communication
+ * \todo Object communication has some problems (deleting objects and 
+ *       sending the last 'dying' message)
+ *
+ * \author Christian Gosch
  */
 class
 goObjectBase
@@ -46,5 +55,8 @@ goObjectBase
     goString                 className;
     goList<goObjectBase*>    myConnectedObjects;
 };
+/*!
+ * @}
+ */
 
 #endif

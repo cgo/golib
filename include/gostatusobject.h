@@ -5,7 +5,17 @@
 #include <gothread.h>
 
 /*!
- * Provides status information for an object.
+ * \addtogroup misc
+ */
+/*!
+ * @{
+ */
+/*!
+ * \brief Provides status information for an object INCOMPLETE.
+ *
+ * \todo Fix this class when there is a use for it.
+ *       It is not complete and tested.
+ *
  * @author Christian Gosch
  * @date 21.9.2001
  */ 
@@ -69,5 +79,8 @@ goStatusObject
     goMutex fwMutex;
     goStatusObject *fwProgressPtr;
 };
+/*!
+ * @}
+ */
 
 #endif

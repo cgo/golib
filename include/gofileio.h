@@ -10,6 +10,14 @@
 #include <gostring.h>
 
 /*!
+ * \addtogroup misc
+ */
+/*!
+ * @{
+ */
+/*!
+ * \brief Reading/writing specific file formats.
+ *
  * Provides file reading/writing facilities. <br>
  * This class contains static members to read and write various file formats into 
  * different data types. Currently, the only files handled are 8 bit raw PGM files.
@@ -33,5 +41,8 @@ class goFileIO {
   ///
   static void writePGM (const char* filename, goSignal2D<goInt32>& signal);
 };
+/*!
+ * @}
+ */
 
 #endif

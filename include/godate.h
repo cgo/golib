@@ -8,7 +8,16 @@
 
 #include <gotypes.h>
 #include <iostream>
-
+/*!
+ * \addtogroup misc
+ * @{
+ */
+/*!
+ * \brief Simple date handling.
+ * 
+ * Dates can be compared ( <, >, == ), copied ( = ) and written to a string.
+ * \author Christian Gosch
+ */
 class goDate 
 {
  public:
@@ -42,6 +51,9 @@ class goDate
   goInt16 month;
   goInt16 year;	
 };
+/*!
+ * @}
+ */
 
 #endif 
 

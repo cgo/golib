@@ -6,6 +6,12 @@
 
 
 /*!
+ * \addtogroup misc
+ */
+/*!
+ * @{
+ */
+/*!
  * \brief Exception base class.
  *
  * @author Christian Gosch
@@ -29,5 +35,8 @@ class goExceptionString : public goException
     
     goString st;
 };
+/*!
+ * @}
+ */
 
 #endif
