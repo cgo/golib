@@ -295,6 +295,8 @@ static bool ddy2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
  *                  sig in x and y dimensions and its z dimension must
  *                  be 1.
  *
+ * \todo BUG: This sometimes can produce NaNs.
+ * 
  * @return True if successful, false otherwise.
  **/
 bool goMath::laplacian2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue)
