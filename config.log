@@ -6,6 +6,7 @@ configure:569: checking whether the C++ compiler (c++  ) works
 configure:585: c++ -o conftest    conftest.C  1>&5
 configure:611: checking whether the C++ compiler (c++  ) is a cross-compiler
 configure:616: checking whether we are using GNU C++
+configure:625: c++ -E conftest.C
 configure:644: checking whether c++ accepts -g
 configure:676: checking whether ln -s works
 configure:699: checking for doc++
@@ -13,29 +14,114 @@ configure:729: checking for doxygen
 configure:760: checking for ar
 configure:790: checking for nasm
 configure:841: checking how to run the C preprocessor
+configure:862: cc -E  conftest.c >/dev/null 2>conftest.out
 configure:924: checking for ieee754.h
+configure:934: cc -E  conftest.c >/dev/null 2>conftest.out
 configure:964: checking for dirent.h
+configure:974: cc -E  conftest.c >/dev/null 2>conftest.out
 configure:1004: checking for time.h
+configure:1014: cc -E  conftest.c >/dev/null 2>conftest.out
 configure:1042: checking size of char
+configure:1061: cc -o conftest    conftest.c  1>&5
 configure:1081: checking size of short int
+configure:1100: cc -o conftest    conftest.c  1>&5
 configure:1120: checking size of int
+configure:1139: cc -o conftest    conftest.c  1>&5
 configure:1159: checking size of long int
+configure:1178: cc -o conftest    conftest.c  1>&5
 configure:1198: checking size of long long int
+configure:1217: cc -o conftest    conftest.c  1>&5
 configure:1237: checking size of float
+configure:1256: cc -o conftest    conftest.c  1>&5
 configure:1276: checking size of double
+configure:1295: cc -o conftest    conftest.c  1>&5
 configure:1319: checking for pthread_create in -lpthread
+configure:1338: cc -o conftest    conftest.c -lpthread   1>&5
 configure:1369: checking for TIFFRGBAImageOK in -ltiff
+configure:1388: cc -o conftest    conftest.c -ltiff  -lpthread  1>&5
 configure:1416: checking for read_tiff_file in -llug
+configure:1435: cc -o conftest    conftest.c -llug  -ltiff -lpthread  1>&5
+/usr/i486-suse-linux/bin/ld: cannot find -llug
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 1424 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char read_tiff_file();
+
+int main() {
+read_tiff_file()
+; return 0; }
 configure:1463: checking for fftw_create_plan in -lfftw
+configure:1482: cc -o conftest    conftest.c -lfftw  -ltiff -lpthread  1>&5
+/usr/i486-suse-linux/bin/ld: cannot find -lfftw
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 1471 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char fftw_create_plan();
+
+int main() {
+fftw_create_plan()
+; return 0; }
 configure:1510: checking for connect in -lnsl
+configure:1529: cc -o conftest    conftest.c -lnsl  -ltiff -lpthread  1>&5
 configure:1557: checking for connect in -lsocket
+configure:1576: cc -o conftest    conftest.c -lsocket  -lnsl -ltiff -lpthread  1>&5
+/usr/i486-suse-linux/bin/ld: cannot find -lsocket
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 1565 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char connect();
+
+int main() {
+connect()
+; return 0; }
 configure:1604: checking for SDL_Init in -lSDL
+configure:1623: cc -o conftest    conftest.c -lSDL  -lnsl -ltiff -lpthread  1>&5
 configure:1652: checking for glVertex3f in -lGL
+configure:1671: cc -o conftest    conftest.c -lGL  -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:1699: checking for glutWireCube in -lglut
+configure:1718: cc -o conftest    conftest.c -lglut  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
+/usr/lib/libglut.so: undefined reference to `gluErrorString'
+/usr/lib/libglut.so: undefined reference to `XGetExtensionVersion'
+/usr/lib/libglut.so: undefined reference to `XFreeDeviceList'
+/usr/lib/libglut.so: undefined reference to `XQueryDeviceState'
+/usr/lib/libglut.so: undefined reference to `gluNewQuadric'
+/usr/lib/libglut.so: undefined reference to `XListInputDevices'
+/usr/lib/libglut.so: undefined reference to `gluQuadricDrawStyle'
+/usr/lib/libglut.so: undefined reference to `gluCylinder'
+/usr/lib/libglut.so: undefined reference to `XFreeDeviceState'
+/usr/lib/libglut.so: undefined reference to `XOpenDevice'
+/usr/lib/libglut.so: undefined reference to `gluQuadricNormals'
+/usr/lib/libglut.so: undefined reference to `XmuLookupStandardColormap'
+/usr/lib/libglut.so: undefined reference to `XSelectExtensionEvent'
+/usr/lib/libglut.so: undefined reference to `gluSphere'
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 1707 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char glutWireCube();
+
+int main() {
+glutWireCube()
+; return 0; }
 configure:1746: checking for test_nurbs_curve in -lGLU
 configure:1765: cc -o conftest    conftest.c -lGLU  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
-/tmp/cccX8XQY.o: In function `main':
-/tmp/cccX8XQY.o(.text+0x7): undefined reference to `test_nurbs_curve'
+/tmp/ccEcO55x.o: In function `main':
+/tmp/ccEcO55x.o(.text+0x7): undefined reference to `test_nurbs_curve'
 /usr/lib/libGLU.so: undefined reference to `fist_tessellation'
 collect2: ld returned 1 exit status
 configure: failed program was:
@@ -50,14 +136,51 @@ int main() {
 test_nurbs_curve()
 ; return 0; }
 configure:1794: checking for modf
+configure:1822: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:1850: checking for X
 configure:2164: checking for dnet_ntoa in -ldnet
+configure:2183: cc -o conftest    conftest.c -ldnet  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
+/usr/i486-suse-linux/bin/ld: cannot find -ldnet
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 2172 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char dnet_ntoa();
+
+int main() {
+dnet_ntoa()
+; return 0; }
 configure:2205: checking for dnet_ntoa in -ldnet_stub
+configure:2224: cc -o conftest    conftest.c -ldnet_stub  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
+/usr/i486-suse-linux/bin/ld: cannot find -ldnet_stub
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 2213 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char dnet_ntoa();
+
+int main() {
+dnet_ntoa()
+; return 0; }
 configure:2253: checking for gethostbyname
+configure:2281: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2351: checking for connect
+configure:2379: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2443: checking for remove
+configure:2471: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2535: checking for shmat
+configure:2563: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2636: checking for IceConnectionNumber in -lICE
+configure:2655: cc -o conftest    -L/usr/X11R6/lib conftest.c -lICE  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2681: checking for ANSI C header files
+configure:2694: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:2761: cc -o conftest    conftest.c -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
 configure:2785: checking for size_t
 configure:2819: checking for object suffix
+configure:2825: cc -c   conftest.c 1>&5

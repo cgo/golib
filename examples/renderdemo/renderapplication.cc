@@ -144,6 +144,9 @@ RenderApplication::RenderApplication ( QWidget* parent,
   joystick = new Vol::goJoystick;
   joystick->connect(navigator);
   joystick->run();
+  keyboard = new Vol::goNavKeyboard;
+  keyboard->connect(navigator);
+  keyboard->run();
   opacityTFFrame = new TransferFunctionFrame ();
   densityTFFrame = new TransferFunctionFrame ();
   greyTFFrame = new TransferFunctionFrame ();
@@ -274,6 +277,8 @@ RenderApplication::~RenderApplication ()
 	if (progressThreadRunning)
 		progressThread.kill();	//kill progress thread
     goSDL::finishVideo();
+	delete joystick;
+	delete keyboard;
     delete navigator;
 }
 
@@ -632,6 +637,7 @@ RenderApplication::moveRight()
 void
 RenderApplication::keyPressEvent (QKeyEvent *e)
 {
+#if 0
     switch (e->key())
 	{
 	case Qt::Key_W:
@@ -646,6 +652,7 @@ RenderApplication::keyPressEvent (QKeyEvent *e)
 	    RenderGUI::keyPressEvent (e);
 	    break;
 	}
+#endif
 }
 
 void

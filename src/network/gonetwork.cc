@@ -131,7 +131,8 @@ goNetwork::waitForData (int descriptor)
   FD_ZERO (&fdset);
   FD_SET (descriptor, &fdset);
   retval = select (descriptor + 1, &fdset, NULL, NULL, NULL);
-  if (retval) return true;
+  if (retval != -1) 
+	  return true;
   return false;
 }
 

@@ -12,6 +12,7 @@
 #include <qwidget.h>
 #include <qprogressbar.h>
 #include <gojoystick.h>
+#include <gonavkeyboard.h>
 
 class RenderApplication : public RenderGUI, public goStatusObject
 {
@@ -108,6 +109,8 @@ class RenderApplication : public RenderGUI, public goStatusObject
 	
    // goNavDevice Joystick	
    Vol::goJoystick *joystick;
+   // goNavDevice Keyboard
+   Vol::goNavKeyboard *keyboard;
 
 };
 

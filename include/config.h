@@ -33,18 +33,18 @@
 /* Stuff not yet tested by configure */
 #define GO_HAVE_MMX 1
 #define GO_HAVE_3DNOW 1
+// Version 0.2.1
+#define GO_DIPLOMARBEIT 1
+// Undefine this to disable multiple threads in the volume navigation system.
+// That's for debugging and should not be turned off unless you know exactly what you are doing.
+// The system will not behave as you expect it to when you don't use threads.
 #define MULTIPLE_THREADS 1
 #define BLOCKSTORE_USE_HASHCACHE 1
-#define GO_DIPLOMARBEIT 1
 /* #undef BLOCKSTORE_USE_HASHTABLE */
 // #define BLOCKSTORE_USE_ARRAY 1
 #define GO_VN_LINEAR_PREDICTION 1
-
-/* Benchmarking */
-#define GO_BENCHMARK 1
-
 /* Debugging */
-#define _GODEBUG 0 
+#define _GODEBUG 1
 // #define _GODEBUG_SBLOCKRENDERER_SEGFAULT 1
 /* #undef _GODEBUG_SBLOCKRENDERER_SEGFAULT */ 
 /* #undef _GODEBUG_VOLUMEFILE */

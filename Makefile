@@ -8,18 +8,17 @@ STATIC_TARGET := lib$(TARGET).a
 #DEFINES		= -DUSE_QT
 DEFINES		= -DHAVE_CONFIG_H -D_REENTRANT 
 CC 		= c++
-CCARGS 		= -c $(DEFINES) -O2 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wall -Wno-non-template-friend 
+CCARGS 		= -c $(DEFINES) -O2  -Wall -Wno-non-template-friend 
 # add this for gcc 2.95
 #-Wno-non-template-friend
 CCLIBARGS 	= 
 LD 		= c++ 
 NASM		= nasm
-LDARGS 		= -mt 
+LDARGS 		= -mt
 LDLIBARGS	= -shared -Wl,-soname,lib$(TARGET).so.$(VERSION)
 #MOC		= @MOC@
 DOCXX		= echo
-DOXYGEN		= doxygen #doxygen.config
-DOXYGEN_CONFIG = doxygen.config
+DOXYGEN		= doxygen doxygen.config
 
 # Static options
 # AR is set by configure
@@ -37,7 +36,7 @@ INSTALLDIR = $(ROOT)/lib
 SRCDIR	   = $(ROOT)/src
 
 # Libraries; remove qt if you dont want to use it.
-LIBS = -lSDL -lnsl -ltiff -lpthread   -lSM -lICE  -L/usr/X11R6/lib 
+LIBS = -lGL -lSDL -lnsl -ltiff -lpthread   -lSM -lICE  -L/usr/X11R6/lib 
 #LIBS = -L/usr/X11R6/lib -lX11 -lstdc++ -lm -lqt
 
 # Includes
@@ -103,10 +102,7 @@ $(TARGET): $(OBJS) $(ASM_OBJS)
 doc:	$(DOC_FILES)
 	$(DOCXX) -f -d $(DOC)/html $(DOC_FILES)
 	$(DOCXX) -f -t -o $(DOC)/latex/$(DOC_LATEX) $(DOC_FILES)
-	$(DOXYGEN) $(DOXYGEN_CONFIG)
-
-doc-vol: $(DOC_FILES)
-	$(DOXYGEN) doxygen-vol.config
+	$(DOXYGEN)
 
 static: $(OBJS)
 ifeq ($(AR),NONE)

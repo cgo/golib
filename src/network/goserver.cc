@@ -46,15 +46,23 @@ requestHandler (void* p)
 
   cout << "Handler for socket " << info->connection->socket << " up and running." << endl;
   while (true)
-    {
-      goNetwork::waitForData (info->connection->socket);
+  { 
+      if(!goNetwork::waitForData (info->connection->socket))
+	  {
+		  cout << "Client on socket " << info->connection->socket << " closed connection\n";
+#ifndef WIN32
+		  return NULL;
+#else
+		  return
+#endif
+	  }
       data = (char*)goNetwork::receiveData (&size, info->connection->socket);
       if (size != 0)
-	{
-	  cout << "Received " << size << " bytes" << endl;
-	  cout << "String output: " << data << endl;
-	}
-    }
+		{
+	  		cout << "Received " << size << " bytes" << endl;
+	  		cout << "String output: " << data << endl;
+		}
+  }
 #ifndef WIN32
   return NULL;
 #endif
@@ -133,10 +141,10 @@ goServer::serverAcceptThread () {
      */
     goThread hThread;
     // FIXME This is only experimental. The object DOES NOT GET DELETED!
-    handlerInfo *inf = new handlerInfo;
-    inf->server = this;
-    inf->connection = con;
-    hThread.create (goNet::requestHandler, (void*)inf, 1);
+    // handlerInfo *inf = new handlerInfo;
+    // inf->server = this;
+    // inf->connection = con;
+    // hThread.create (goNet::requestHandler, (void*)inf, 1);
 
     cout << "List size is now " << connections.getSize() << endl;
     cout << "Member sockets are ";
