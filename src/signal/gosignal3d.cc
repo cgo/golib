@@ -73,7 +73,6 @@ goSignal3D<T>::goSignal3D (goSignal3D<T>& other)
 template< class T >
 goSignal3D<T>::~goSignal3D () 
 {
-    std::cout << "~goSignal3D\n";
     if (real_ptr)
     {
         delete[] real_ptr;
