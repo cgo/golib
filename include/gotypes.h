@@ -126,7 +126,9 @@ typedef clock_t goClock_t;
 typedef unsigned long long goClock_t;
 #endif
 
-///
+/*!
+ * \brief Type enumerators.
+ */
 enum goTypeEnum {
   GO_INT8,
   GO_INT16,

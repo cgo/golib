@@ -21,6 +21,10 @@ class goServerConnection {
 
 
 /*!
+ * \addtogroup net
+ * @{
+ */
+/*!
  * Accepts connections. When you create a server on a specified port, it starts accepting connections
  * on that port when run() is called. The actual request handler has to be implemented by subclasses.
  * The request handler is not automagically invoked. The calling program has to do that itself.
@@ -98,13 +102,6 @@ class goServer {
   goMutex	conMutex;
   goList<void*> connections;
 };
-
+/*! @} */
 };
-
 #endif
-
-
-
-
-
-

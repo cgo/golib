@@ -6,6 +6,17 @@
 
 #include <gotypes.h>
 
+namespace goNet {
+
+/*! 
+ * \addtogroup net
+ * @{
+ */
+/**
+ * @brief Basic network functions.
+ *
+ * @return 
+**/
 class goNetwork {
  public:
   static bool sendData (const void* data, size_t size, int sock);
@@ -22,9 +33,6 @@ class goNetwork {
 
   static bool fail (int internal = 3);
 };
-
-
+/*! @} */
+};
 #endif
-
-
-

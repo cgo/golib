@@ -5,8 +5,8 @@
 #include <gotypes.h>
 #include <goposition.h>
 
-/** \addtogroup signal */
-/** @{ */
+/** \addtogroup signal 
+ * @{ */
 /*! \brief Access to sub-areas of <code>goSignal3DBase</code> objects
  *
  * Enables access to sub signals of a given <CODE>goSignal3DBase</CODE>.

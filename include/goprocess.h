@@ -8,8 +8,6 @@
 
 /*!
  * \addtogroup system
- */
-/*!
  * @{
  */
 /*!

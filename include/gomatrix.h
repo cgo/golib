@@ -13,8 +13,8 @@
 # include <gorowvector.h>
 #endif
 
-/** \addtogroup math */
-/** @{ */
+/** \addtogroup math 
+ * @{ */
 
 /*!
  * \brief Matrix class.

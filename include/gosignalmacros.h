@@ -1,5 +1,5 @@
-/** \addtogroup signal */
-/** @{ */
+/** \addtogroup signal 
+ * @{ */
 
 /*!
  * \file Macros for doing stuff with signals of the goSignal[*] classes.

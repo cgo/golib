@@ -10,6 +10,10 @@
 namespace goNet {
 
 /*!
+ * \addtogroup net
+ * @{
+ */
+/*!
  * Provides a TCP/IP connection.
  * Protocol is TCP, the mode is SOCK_STREAM, so this class should result in a reliable connection.
  * This can be used to act as a client (link(0)) or as a server (link(n>0)).
@@ -109,12 +113,7 @@ class goConnection {
   ///
   struct sockaddr_in	*mySockAddr;
 };
-
+/*! @} */
 };
 
 #endif /* __GOCONNECTION_H */
-
-
-
-
-

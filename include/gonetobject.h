@@ -14,6 +14,15 @@
 
 namespace goNet {
 
+/*!
+ * \addtogroup net
+ * @{
+ */
+/**
+ * @brief Networked object.
+ *
+ * \todo Add documentation
+**/
 class
 goNetObject : public goThreadObject
 {
@@ -27,7 +36,6 @@ goNetObject : public goThreadObject
 	private:
 		goServer server;
 };
-
+/*! @} */
 };
 #endif
-
