@@ -7,7 +7,7 @@
  */
 
 #include <golinearalgebra.h>
-#include <gonvector.h>
+#include <goarray.h>
 #include <gomatrix.h>
 #include <gomatrix.i>
 #include <gotypes.h>
@@ -16,7 +16,7 @@
 namespace goMath {
 template<class T>
 void
-LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)
+LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 {
 	if (a.getSizeX() != a.getSizeY())
 	{
@@ -28,7 +28,7 @@ LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)
 	
 	
 	int n = a.getSizeX();
-	goNVector<double> vv(n);
+	goArray<double> vv(n);
 
 	*d=1.0;
 	for (i=0;i<n;i++) {
@@ -78,7 +78,7 @@ LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)
 }
 
 template<class T>
-void LUBackSubst(goMatrix<T>& a, goNVector<int>& indx, goNVector<T>& b)
+void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b)
 {
 	int i,ii=-1,ip,j;
 	double sum;
@@ -111,8 +111,8 @@ void matrixInversion(goMatrix<T>& a)
 	int n = a.getSizeX();
 	goMatrix<T> y(n,n);
 	double d;
-	goNVector<int> index(n);
-	goNVector<T>   column(n);
+	goArray<int> index(n);
+	goArray<T>   column(n);
 	LUDecomp<T>(a,index,&d);
 	int j,i;
 	for (j = 0; j < n; j++)
@@ -126,11 +126,11 @@ void matrixInversion(goMatrix<T>& a)
 	}
 	a = y;
 }
-template void LUDecomp(goMatrix<double>&,goNVector<int>&,double*);
-template void LUBackSubst(goMatrix<double>&,goNVector<int>&,goNVector<double>&);
+template void LUDecomp(goMatrix<double>&,goArray<int>&,double*);
+template void LUBackSubst(goMatrix<double>&,goArray<int>&,goArray<double>&);
 template void matrixInversion(goMatrix<double>&);
-template void LUDecomp(goMatrix<float>&,goNVector<int>&,double*);
-template void LUBackSubst(goMatrix<float>&,goNVector<int>&,goNVector<float>&);
+template void LUDecomp(goMatrix<float>&,goArray<int>&,double*);
+template void LUBackSubst(goMatrix<float>&,goArray<int>&,goArray<float>&);
 template void matrixInversion(goMatrix<float>&);
 };
 
