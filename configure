@@ -24798,7 +24798,7 @@ fi
 
           ac_config_commands="$ac_config_commands default-1"
 
-                                                                                                              ac_config_files="$ac_config_files ./Makefile ./src/Makefile ./src/data/Makefile ./src/graphics/Makefile ./src/math/Makefile ./src/misc/Makefile ./src/network/Makefile ./src/nifty/Makefile ./src/signal/Makefile ./src/system/Makefile ./src/thread/Makefile"
+                                                                                                                        ac_config_files="$ac_config_files ./Makefile ./src/Makefile ./src/data/Makefile ./src/graphics/Makefile ./src/math/Makefile ./src/misc/Makefile ./src/network/Makefile ./src/nifty/Makefile ./src/signal/Makefile ./src/system/Makefile ./src/thread/Makefile ./src/types/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -25345,6 +25345,7 @@ do
   "./src/signal/Makefile" ) CONFIG_FILES="$CONFIG_FILES ./src/signal/Makefile" ;;
   "./src/system/Makefile" ) CONFIG_FILES="$CONFIG_FILES ./src/system/Makefile" ;;
   "./src/thread/Makefile" ) CONFIG_FILES="$CONFIG_FILES ./src/thread/Makefile" ;;
+  "./src/types/Makefile" ) CONFIG_FILES="$CONFIG_FILES ./src/types/Makefile" ;;
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
