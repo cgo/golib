@@ -1,6 +1,9 @@
 #include <gocache.h>
 #include <goerror.h>
-
+/*
+ * This was created but never really used.
+ * Subject to be dumped.
+ */
 goCache::goCache()
 {
     maxSize = 0;
