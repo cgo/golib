@@ -83,18 +83,10 @@
  * let me know!
  * 
  * \section license License
- * I am not yet totally sure about this topic, but most probably this
- * library will be GPL'ed or LGPL'ed.
- * Until then, you may use the library at will, but you have to report
- * changes you make on it to me, the author, and you may not
- * redistribute a changed version of the library.
- * You may, however, redistribute the source unchanged as a whole, including
- * all documentation including this text and all README files
- * eventually included, with <strong>NO CHARGE</strong>. If you distribute a binary version, you have
- * to include the source as a whole again, including all documentation 
- * and all other files included in the original distribution.
- * No version of goLib may be distributed for a fee or charge, except some small fee
- * for copying the library on a storage medium, like a CD or a floppy disk.
+ * Please read the file COPYING in the distribution directory and note
+ * that you are not allowed to use this library 
+ * in any commercial product or context unless you have prior
+ * written permission to do so by the author, Christian Gosch.
  * 
  * If you should find that the version you downloaded is out of date
  * and does not match this documentation, please notify the me, the author,
