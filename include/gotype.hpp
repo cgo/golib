@@ -51,6 +51,13 @@ targetT* _goCreateQuantizationTable (targetT           minTargetValue,
  * @oaran tableRet       Reference to a goArray of type targetT
  *                       which contains the quantization table after 
  *                       the function returns.
+ * @param sourceMinimum  If sourceMinimum > sourceMaximum, the default values
+ *                       for the source data type are used.
+ *                       If not, these values are used as min and max
+ *                       data values for the input data type of the
+ *                       quantization table.
+ *                       Default is sourceMinimum = 0.0 and sourceMaximum = -1.0.
+ * @param sourceMaximum  See above.
  * 
  * @return A pointer to the quantization table entry
  *         associated with index 0 which is simply &tableRet[-minIndex].
@@ -58,76 +65,90 @@ targetT* _goCreateQuantizationTable (targetT           minTargetValue,
  * @note This works currently only for scalar types.
  **/
 template <class targetT>
-targetT* goCreateQuantizationTable (const goType&     sourceType,
-                                    targetT           minTargetValue,
-                                    targetT           maxTargetValue,
-                                    goIndex_t         minIndex,
-                                    goIndex_t         maxIndex,
-                                    goArray<targetT>& tableRet)
+targetT* goCreateQuantizationTable (const goType&               sourceType,
+                                    targetT                     minTargetValue,
+                                    targetT                     maxTargetValue,
+                                    goIndex_t                   minIndex,
+                                    goIndex_t                   maxIndex,
+                                    goArray<targetT>&           tableRet,
+                                    goDouble                    sourceMinimum,
+                                    goDouble                    sourceMaximum)
 {
+    goDouble sourceMin = 0.0; 
+    goDouble sourceMax = 1.0; 
+    if (sourceMinimum <= sourceMaximum)
+    {
+        sourceMin = sourceMinimum;
+        sourceMax = sourceMaximum;
+    }
+    else
+    {
+        sourceMin = sourceType.getMinimum();
+        sourceMax = sourceType.getMaximum();
+    }
     switch (sourceType.getID())
     {
         case GO_INT8:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goInt8)sourceType.getMinimum(),
-                                                   (goInt8)sourceType.getMaximum(),
+                                                   (goInt8)sourceMin,
+                                                   (goInt8)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_UINT8:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goUInt8)sourceType.getMinimum(),
-                                                   (goUInt8)sourceType.getMaximum(),
+                                                   (goUInt8)sourceMin,
+                                                   (goUInt8)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_INT16:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goInt16)sourceType.getMinimum(),
-                                                   (goInt16)sourceType.getMaximum(),
+                                                   (goInt16)sourceMin,
+                                                   (goInt16)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_UINT16:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goUInt16)sourceType.getMinimum(),
-                                                   (goUInt16)sourceType.getMaximum(),
+                                                   (goUInt16)sourceMin,
+                                                   (goUInt16)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_INT32:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goInt32)sourceType.getMinimum(),
-                                                   (goInt32)sourceType.getMaximum(),
+                                                   (goInt32)sourceMin,
+                                                   (goInt32)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_UINT32:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goUInt32)sourceType.getMinimum(),
-                                                   (goUInt32)sourceType.getMaximum(),
+                                                   (goUInt32)sourceMin,
+                                                   (goUInt32)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_FLOAT:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goFloat)0.0f,
-                                                   (goFloat)1.0f,
+                                                   (goFloat)sourceMin,
+                                                   (goFloat)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
         case GO_DOUBLE:
             {
                 return _goCreateQuantizationTable (minTargetValue, maxTargetValue,
-                                                   (goDouble)0.0,
-                                                   (goDouble)1.0,
+                                                   (goDouble)sourceMin,
+                                                   (goDouble)sourceMax,
                                                    minIndex, maxIndex, tableRet);
             }
             break;
