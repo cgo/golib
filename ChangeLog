@@ -1,0 +1,21 @@
+12.2.2005
+---------
+- filter3d works for <void> type
+- goString got more functionality:
+  - getFileName()
+  - getPathName()
+  - findFirst()
+  - findLast()
+  - copy()
+- goType seems to work ok now
+
+22.3.2005
+---------
+- goHistogram added
+- iterators for goSignal3DBase added 
+(generic iterators (inlined code) are comparable in speed to
+macros)
+- Added gosignalhelper.h/.cpp
+- Added temp file creation function to
+goFileIO
+- Some bugfixing
