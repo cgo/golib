@@ -1,4 +1,5 @@
 #include <golist.h>
+#include <golist.hpp>
 // #include <gostring.h>
 
 template class goListElement<goInt8>;
