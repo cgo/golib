@@ -94,8 +94,8 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_y = __ptr;								\
 	  __ptr_y_target = __ptr_target;						\
-      __dy = __signal.getYDiff(); \
-      __dy_target = __signal_target.getYDiff(); \
+      __dy = signal.getYDiff(); \
+      __dy_target = targetSignal.getYDiff(); \
 	  for (__k = 0; __k < (signal.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __tp0;			\
@@ -125,8 +125,8 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_z = __ptr_y;								\
 	  __ptr_z_target = __ptr_y_target;						\
-      __dz = __signal.getZDiff(); \
-      __dz_target = __signal_target.getZDiff(); \
+      __dz = signal.getZDiff(); \
+      __dz_target = targetSignal.getZDiff(); \
 	  for (__k = 0; __k < (signal.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __tp0;			\
@@ -238,8 +238,8 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr = __ptr_y;								\
 	  __ptr_target = __ptr_y_target;						\
-      __dx = __signal.getXDiff(); \
-      __dx_target = __signal_target.getXDiff(); \
+      __dx = __sig.getXDiff(); \
+      __dx_target = targetSignal.getXDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __f0;			\
@@ -269,8 +269,8 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_y = __ptr;								\
 	  __ptr_y_target = __ptr_target;						\
-      __dy = __signal.getYDiff(); \
-      __dy_target = __signal_target.getYDiff(); \
+      __dy = __sig.getYDiff(); \
+      __dy_target = targetSignal.getYDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __f0;			\
@@ -300,8 +300,8 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_z = __ptr_y;								\
 	  __ptr_z_target = __ptr_y_target;						\
-      __dz = __signal.getZDiff(); \
-      __dz_target = __signal_target.getZDiff(); \
+      __dz = __sig.getZDiff(); \
+      __dz_target = targetSignal.getZDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __f0;			\
@@ -330,7 +330,7 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeY(); __j++)					\
 	{										\
 	  __ptr = __ptr_y;								\
-      __dx = __signal.getXDiff(); \
+      __dx = __sig.getXDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __f0;			\
@@ -354,7 +354,7 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeX(); __j++)					\
 	{										\
 	  __ptr_y = __ptr;								\
-      __dy = __signal.getYDiff(); \
+      __dy = __sig.getYDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __f0;			\
@@ -378,7 +378,7 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeY(); __j++)					\
 	{										\
 	  __ptr_z = __ptr_y;								\
-      __dz = signal.getZDiff(); \
+      __dz = __sig.getZDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __f0;			\
@@ -666,7 +666,7 @@ goDWT<goDouble>::unHaar (goSignal3D<goDouble>& haarSignal)
 
 template< class T >
 int
-goDWT<T>::haar(goSignal3D<T>& signal, int stage)
+goDWT<T>::haar (goSignal3D<T>& signal, int stage)
 {
   int i;
   goSubSignal3D<T>  s;
@@ -705,7 +705,6 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   return stage;
 }
 
-#if 0
 
 /***********************************************************************************/
 /* Specialised integer routines follow						   */
@@ -722,9 +721,10 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goSize_t x = __block.getSizeX();\
   goSize_t y = __block.getSizeY();\
 /*  goSize_t z = __block.getSizeZ(); */\
-  goPtrdiff_t* dx = __block.getXDiff();\
-  goPtrdiff_t* dy = __block.getYDiff();\
-  goPtrdiff_t* dz = __block.getZDiff();\
+  goPtrdiff_t* dx       = __block.getXDiff();\
+  goPtrdiff_t* dy       = __block.getYDiff();\
+  goPtrdiff_t* dz       = __block.getZDiff();\
+  goPtrdiff_t* zAddress = __block.getZJump();\
   register int r1,r2,r3,r4,r5,r6,r7,r8; /* __T */ \
   register __T *p1;\
   __T *p2;\
@@ -748,17 +748,19 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
  *          goIndex_t slice);
  */
 #define ST_XY(__block, __slice) { \
-  p = __block.getPtr();\
-  p += __slice * dz;\
+  p = __block.getPtr(); \
+  p += zAddress[__slice];\
+  dy = __block.getYDiff();\
 \
   for (i = y; i > 0; i -= 2) {\
+    dx = __block.getXDiff();\
     p1 = p;\
-    p2 = p1 + dx;\
-    p3 = p1 + dy;\
-    p4 = p3 + dx;\
+    p2 = p1 + *dx;\
+    p3 = p1 + *dy;\
+    p4 = p3 + *dx; /* Works as long as the line offsets are the same for all lines (true) */\
     for (j = x; j > 0; j -= 2) {\
-      r1 = *p1 + *(p1 + dy);\
-      r2 = *(p1 + dx + dy) + *(p1 + dx);\
+      r1 = *p1 + *(p1 + *dy);\
+      r2 = *(p1 + *dx + *dy) + *(p1 + *dx);\
       /* division by 2: integer shift */\
       r3 = r1 >> 1;\
       r4 = r2 >> 1;\
@@ -768,21 +770,28 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
       /* S(m+1,n) */\
       tmp2 = r3 - r4;\
       /* S(m,n+1) */\
-      tmp3 = (*p1 - *(p1 + dy) - *(p1 + dx + dy) + *(p1 + dx)) >> 1;\
+      tmp3 = (*p1 - *(p1 + *dy) - *(p1 + *dx + *dy) + *(p1 + *dx)) >> 1;\
       /* S(m+1,n+1) */\
-      tmp4 = *p1 - *(p1 + dy) + *(p1 + dx + dy) - *(p1 + dx);\
+      tmp4 = *p1 - *(p1 + *dy) + *(p1 + *dx + *dy) - *(p1 + *dx);\
 \
       *p1 = tmp1;\
       *p2 = tmp2;\
       *p3 = tmp3;\
       *p4 = tmp4;\
       \
-      p1 += dx << 1;\
-      p2 += dx << 1;\
-      p3 += dx << 1;\
-      p4 += dx << 1;\
+      /* p1 += dx << 1; */\
+      /* p2 += dx << 1; */\
+      /* p3 += dx << 1; */\
+      /* p4 += dx << 1; */\
+      p1 += *dx + *(dx + 1);\
+      p2 += *dx + *(dx + 1);\
+      p3 += *dx + *(dx + 1);\
+      p4 += *dx + *(dx + 1);\
+      ++dx;\
     }\
-    p += dy << 1;\
+    /* p += dy << 1; */\
+    p += *dy + *(dy + 1);\
+    ++dy;\
   }\
 }
 
@@ -791,10 +800,10 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goSize_t x = __block.getSizeX();\
   goSize_t y = __block.getSizeY();\
 /*  goSize_t z = __block.getSizeZ(); */\
-  goPtrdiff_t dx = __block.getXDiff();\
-  goPtrdiff_t dy = __block.getYDiff();\
-  register goPtrdiff_t dx_2 = dx << 1;\
-  register goPtrdiff_t dy_2 = dy << 1;\
+  goPtrdiff_t* dx = __block.getXDiff();\
+  goPtrdiff_t* dy = __block.getYDiff();\
+  /* register goPtrdiff_t dx_2 = dx << 1;*/ \
+  /* register goPtrdiff_t dy_2 = dy << 1;*/ \
 \
   goSize_t i,j;\
   register int a_,b_,a,b,A_,B_,A,B; /* __T */ \
@@ -811,18 +820,21 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
  *          goIndex_t slice);
  */
 #define ST_REVERSE_XY(__block, __slice) {\
-  p = __block.getPtr();\
-  p += __slice * __block.getZDiff();\
+  p = __block.getPtr(); \
+  /* p += __slice * __block.getZDiff();*/ \
+  p += __block.getZJump()[__slice];\
+  dy = __block.getYDiff(); \
   \
   /* OUT_T tmp1,tmp2,tmp3,tmp4; */\
   for (i = (y >> 1); i > 0; i--) {\
+    dx = __block.getXDiff(); \
     p1 = p;\
 /*      p2 = p1 + ( (x >> 1) * dx ); */\
 /*      p3 = p1 + ( (y >> 1) * dy ); */\
 /*      p4 = p3 + ( (x >> 1) * dx ); */\
-    p2 = p1 + dx;\
-    p3 = p1 + dy;\
-    p4 = p3 + dx;\
+    p2 = p1 + *dx;\
+    p3 = p1 + *dy;\
+    p4 = p3 + *dx;\
     for (j = (x >> 1); j > 0; j--) {\
       A_ = *p1;\
       B_ = *p2;\
@@ -836,24 +848,26 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
       /* *newP1			= a_ - ( (-a) >> 1 ); */\
       A				= a_ - ( (-a) >> 1 );\
       *p1 = A;\
-      *(p1 + dy)		= A - a;\
+      *(p1 + *dy)		= A - a;\
       /* *(newP1 + newdx)	= b_ - ( (-b) >> 1 ); */\
       B				= b_ - ( (-b) >> 1 );\
-      *(p1 + dx) = B;\
-      *(p1 + dx + dy)	= B - b;\
+      *(p1 + *dx) = B;\
+      *(p1 + *dx + *dy)	= B - b;\
       \
       \
-/*        p1	+= dx; */\
-/*        p2	+= dx; */\
-/*        p3	+= dx; */\
-/*        p4	+= dx; */\
-      p1	+= dx_2;\
-      p2	+= dx_2;\
-      p3	+= dx_2;\
-      p4	+= dx_2;\
+      /* p1	+= dx_2;*/ \
+      /* p2	+= dx_2;*/ \
+      /* p3	+= dx_2;*/ \
+      /* p4	+= dx_2;*/ \
+      p1 += *dx + *(dx + 1); \
+      p2 += *dx + *(dx + 1); \
+      p3 += *dx + *(dx + 1); \
+      p4 += *dx + *(dx + 1); \
+      ++dx; \
     }\
-    /* p    += dy; */\
-    p += dy_2;\
+    /* p += dy_2; */ \
+    p += *dy + *(dy + 1); \
+    ++dy; \
   }\
 }
 
@@ -873,26 +887,29 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goSize_t STZ_y = STZ_block.getSizeY();\
   goSize_t STZ_z = STZ_block.getSizeZ();\
 \
-  register goPtrdiff_t STZ_dx = STZ_block.getXDiff();\
-  register goPtrdiff_t STZ_dy = STZ_block.getYDiff();\
-  goPtrdiff_t STZ_dz = STZ_block.getZDiff();\
+  register goPtrdiff_t* STZ_dx = STZ_block.getXDiff();\
+  register goPtrdiff_t* STZ_dy = STZ_block.getYDiff();\
+  goPtrdiff_t* STZ_dz = STZ_block.getZDiff();\
 \
   register goIndex_t STZ_i,STZ_j,STZ_k;\
   /* register OUT_T r1,r2,r3,r4,r5,r6,r7,r8; */\
   /* register OUT_T a1,a2,a3,a4,a5,a6,a7,a8; */\
   /* OUT_T *p1,*p2,*p3,*p4,*p5,*p6,*p7,*p8; */\
   __T *pSave = STZ_p;\
-  for (STZ_k = (STZ_z >> 1); STZ_k > 0; STZ_k--) {\
+  for (STZ_k = (STZ_z >> 1); STZ_k > 0; --STZ_k) {\
     STZ_p = pSave;\
-    for (STZ_j = (STZ_y >> 1); STZ_j > 0; STZ_j--) {\
+    STZ_dy = STZ_block.getYDiff(); \
+    for (STZ_j = (STZ_y >> 1); STZ_j > 0; --STZ_j) {\
+      STZ_dx = STZ_block.getXDiff(); \
       p1 = STZ_p;\
-      p2 = p1 + STZ_dz;\
-      p3 = p1 + STZ_dx;\
-      p4 = p3 + STZ_dz;\
-      p5 = p1 + STZ_dy;\
-      p6 = p5 + STZ_dz;\
-      p7 = p3 + STZ_dy;\
-      p8 = p7 + STZ_dz;\
+      /* FIXME: This may be an error source. Check if errors occur in the transform. */ \
+      p2 = p1 + *STZ_dz;\
+      p3 = p1 + *STZ_dx;\
+      p4 = p3 + *STZ_dz;\
+      p5 = p1 + *STZ_dy;\
+      p6 = p5 + *STZ_dz;\
+      p7 = p3 + *STZ_dy;\
+      p8 = p7 + *STZ_dz;\
 /*        newP2 = newP1 + (newdz * (z >> 1)); */\
 /*        newP3 = newP1 + (newdx * (x >> 1)); */\
 /*        newP4 = newP3 + (newdz * (z >> 1)); */\
@@ -919,18 +936,31 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 	*p7 = (r7 + r8) >> 1;\
 	*p8 = r7 - r8;\
 \
-	p1 += STZ_dx << 1;\
-	p2 += STZ_dx << 1;\
-	p3 += STZ_dx << 1;\
-	p4 += STZ_dx << 1;\
-	p5 += STZ_dx << 1;\
-	p6 += STZ_dx << 1;\
-	p7 += STZ_dx << 1;\
-	p8 += STZ_dx << 1;\
+	/* p1 += STZ_dx << 1;*/\
+	/* p2 += STZ_dx << 1;*/\
+	/* p3 += STZ_dx << 1;*/\
+	/* p4 += STZ_dx << 1;*/\
+	/* p5 += STZ_dx << 1;*/\
+	/* p6 += STZ_dx << 1;*/\
+	/* p7 += STZ_dx << 1;*/\
+	/* p8 += STZ_dx << 1;*/\
+    p1 += *STZ_dx + *(STZ_dx + 1); \
+    p2 += *STZ_dx + *(STZ_dx + 1); \
+    p3 += *STZ_dx + *(STZ_dx + 1); \
+    p4 += *STZ_dx + *(STZ_dx + 1); \
+    p5 += *STZ_dx + *(STZ_dx + 1); \
+    p6 += *STZ_dx + *(STZ_dx + 1); \
+    p7 += *STZ_dx + *(STZ_dx + 1); \
+    p8 += *STZ_dx + *(STZ_dx + 1); \
+    ++STZ_dx; \
       }\
-      STZ_p += STZ_dy << 1;\
+      /* STZ_p += STZ_dy << 1; */\
+      STZ_p += *STZ_dy + *(STZ_dy + 1); \
+      ++STZ_dy; \
     }\
-    pSave += STZ_dz << 1;\
+    /* pSave += STZ_dz << 1; */\
+    pSave += *STZ_dz + *(STZ_dz + 1);\
+    ++STZ_dz; \
   }\
 }
 
@@ -942,13 +972,13 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goSize_t TSZ_y = TSZ_block.getSizeY();\
   goSize_t TSZ_z = TSZ_block.getSizeZ();\
 \
-  register goPtrdiff_t TSZ_dx = TSZ_block.getXDiff();\
-  register goPtrdiff_t TSZ_dy = TSZ_block.getYDiff();\
-  goPtrdiff_t TSZ_dz = TSZ_block.getZDiff();\
+  register goPtrdiff_t* TSZ_dx = TSZ_block.getXDiff();\
+  register goPtrdiff_t* TSZ_dy = TSZ_block.getYDiff();\
+  goPtrdiff_t* TSZ_dz = TSZ_block.getZDiff();\
 \
-  register goPtrdiff_t TSZ_dx_2 = TSZ_dx << 1;\
-  register goPtrdiff_t TSZ_dy_2 = TSZ_dy << 1;\
-  goPtrdiff_t TSZ_dz_2 = TSZ_dz << 1;\
+  /* register goPtrdiff_t TSZ_dx_2 = TSZ_dx << 1;*/\
+  /* register goPtrdiff_t TSZ_dy_2 = TSZ_dy << 1;*/\
+  /* goPtrdiff_t TSZ_dz_2 = TSZ_dz << 1;*/\
 \
   register goIndex_t TSZ_i,TSZ_j,TSZ_k;\
   /* register OUT_T r1,r2,r3,r4,r5,r6,r7,r8; */ \
@@ -956,25 +986,20 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   /* OUT_T *p1,*p2,*p3,*p4,*p5,*p6,*p7,*p8; */ \
   __T *pSave = TSZ_p;\
   \
-  for (TSZ_k = (TSZ_z >> 1); TSZ_k > 0; TSZ_k--) {\
+  for (TSZ_k = (TSZ_z >> 1); TSZ_k > 0; --TSZ_k) {\
     TSZ_p = pSave;\
-    for (TSZ_j = (TSZ_y >> 1); TSZ_j > 0; TSZ_j--) {\
+    TSZ_dy = TSZ_block.getYDiff(); \
+    for (TSZ_j = (TSZ_y >> 1); TSZ_j > 0; --TSZ_j) {\
+      TSZ_dx = TSZ_block.getXDiff(); \
       p1 = TSZ_p;\
-      p2 = p1 + TSZ_dz;\
-      p3 = p1 + TSZ_dx;\
-      p4 = p3 + TSZ_dz;\
-      p5 = p1 + TSZ_dy;\
-      p6 = p5 + TSZ_dz;\
-      p7 = p3 + TSZ_dy;\
-      p8 = p7 + TSZ_dz;\
-/*        p2 = p1 + (dz * (z >> 1)); */\
-/*        p3 = p1 + (dx * (x >> 1)); */\
-/*        p4 = p3 + (dz * (z >> 1)); */\
-/*        p5 = p1 + (dy * (y >> 1)); */\
-/*        p6 = p5 + (dz * (z >> 1)); */\
-/*        p7 = p3 + (dy * (y >> 1)); */\
-/*        p8 = p7 + (dz * (z >> 1)); */\
-      for (TSZ_i = (TSZ_x >> 1); TSZ_i > 0; TSZ_i--) {\
+      p2 = p1 + *TSZ_dz;\
+      p3 = p1 + *TSZ_dx;\
+      p4 = p3 + *TSZ_dz;\
+      p5 = p1 + *TSZ_dy;\
+      p6 = p5 + *TSZ_dz;\
+      p7 = p3 + *TSZ_dy;\
+      p8 = p7 + *TSZ_dz;\
+      for (TSZ_i = (TSZ_x >> 1); TSZ_i > 0; --TSZ_i) {\
 	r1 = *p1;\
 	r2 = *p2;\
 	r3 = *p3;\
@@ -1001,18 +1026,31 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 	*p7 = a7;\
 	*p8 = a8;\
 \
-	p1 += TSZ_dx_2;\
-	p2 += TSZ_dx_2;\
-	p3 += TSZ_dx_2;\
-	p4 += TSZ_dx_2;\
-	p5 += TSZ_dx_2;\
-	p6 += TSZ_dx_2;\
-	p7 += TSZ_dx_2;\
-	p8 += TSZ_dx_2;\
-      }\
-      TSZ_p += TSZ_dy_2;\
+	/* p1 += TSZ_dx_2;*/\
+	/* p2 += TSZ_dx_2;*/\
+	/* p3 += TSZ_dx_2;*/\
+	/* p4 += TSZ_dx_2;*/\
+	/* p5 += TSZ_dx_2;*/\
+	/* p6 += TSZ_dx_2;*/\
+	/* p7 += TSZ_dx_2;*/\
+	/* p8 += TSZ_dx_2;*/\
+    p1 += *TSZ_dx + *(TSZ_dx + 1); \
+    p2 += *TSZ_dx + *(TSZ_dx + 1); \
+    p3 += *TSZ_dx + *(TSZ_dx + 1); \
+    p4 += *TSZ_dx + *(TSZ_dx + 1); \
+    p5 += *TSZ_dx + *(TSZ_dx + 1); \
+    p6 += *TSZ_dx + *(TSZ_dx + 1); \
+    p7 += *TSZ_dx + *(TSZ_dx + 1); \
+    p8 += *TSZ_dx + *(TSZ_dx + 1); \
+    ++TSZ_dx; \
     }\
-    pSave += TSZ_dz_2;\
+    /* TSZ_p += TSZ_dy_2; */\
+    TSZ_p += *TSZ_dy + *(TSZ_dy + 1); \
+    ++TSZ_dy; \
+   }\
+    /* pSave += TSZ_dz_2;*/\
+    pSave += *TSZ_dz + *(TSZ_dz + 1); \
+    ++TSZ_dz; \
   }\
 }
 
@@ -1056,20 +1094,19 @@ goDWT<__TYPE>::unHaar (goSignal3D<__TYPE> &signal) {				\
  * Unfortunately, my c++ compiler apparently does not handle inline templates.
  */
 GO_DWT_INTEGER_HAAR_METHOD(goInt8)
-GO_DWT_INTEGER_HAAR_METHOD(goUInt8)
-GO_DWT_INTEGER_HAAR_METHOD(goInt16)
-GO_DWT_INTEGER_HAAR_METHOD(goUInt16)
-GO_DWT_INTEGER_HAAR_METHOD(goInt32)
-GO_DWT_INTEGER_HAAR_METHOD(goUInt32)
+//GO_DWT_INTEGER_HAAR_METHOD(goUInt8)
+//GO_DWT_INTEGER_HAAR_METHOD(goInt16)
+//GO_DWT_INTEGER_HAAR_METHOD(goUInt16)
+//GO_DWT_INTEGER_HAAR_METHOD(goInt32)
+//GO_DWT_INTEGER_HAAR_METHOD(goUInt32)
 
 GO_DWT_INTEGER_UNHAAR_METHOD(goInt8)
-GO_DWT_INTEGER_UNHAAR_METHOD(goUInt8)
-GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
-GO_DWT_INTEGER_UNHAAR_METHOD(goUInt16)
-GO_DWT_INTEGER_UNHAAR_METHOD(goInt32)
-GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
+//GO_DWT_INTEGER_UNHAAR_METHOD(goUInt8)
+//GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
+//GO_DWT_INTEGER_UNHAAR_METHOD(goUInt16)
+//GO_DWT_INTEGER_UNHAAR_METHOD(goInt32)
+//GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
     
-#endif
 
 /*
  * Static function STZ is used to perform the transform along the 3rd axis.
@@ -1116,10 +1153,10 @@ GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
 
 
 template class goDWT<goInt8>;
-template class goDWT<goUInt8>;
-template class goDWT<goInt16>;
-template class goDWT<goUInt16>;
-template class goDWT<goInt32>;
-template class goDWT<goUInt32>;
-template class goDWT<goFloat>;
-template class goDWT<goDouble>;
+//template class goDWT<goUInt8>;
+//template class goDWT<goInt16>;
+//template class goDWT<goUInt16>;
+//template class goDWT<goInt32>;
+//template class goDWT<goUInt32>;
+//template class goDWT<goFloat>;
+//template class goDWT<goDouble>;
