@@ -731,13 +731,6 @@ goSignal3DBase<void>::operator== (goSignal3DBase<void> &other)
     goError::print(getClassName(), "operator== not implemented for void.");
 }
 
-template< class T >
-goSize_t
-goSignal3DBase<T>::getSize()
-{
-    return sizeof(T) * (mySize.x * mySize.y * mySize.z);
-}
-
 goSize_t
 goSignal3DBase<void>::getSize()
 {
@@ -745,10 +738,67 @@ goSignal3DBase<void>::getSize()
 }
 
 template< class T >
-T
-goSignal3DBase<T>::getMaximum()
+goSize_t
+goSignal3DBase<T>::getSize()
 {
-    T *p = ptr;
+    return sizeof(T) * (mySize.x * mySize.y * mySize.z);
+}
+
+goDouble
+goSignal3DBase<void*>::getMaximum() const
+{
+    return 0.0;
+}
+
+goDouble
+goSignal3DBase<void>::getMaximum() const
+{
+    const void* p = ptr;
+    goSize_t x,y,z;
+    goSize_t xSize, ySize, zSize;
+    xSize = getSizeX();
+    ySize = getSizeY();
+    zSize = getSizeZ();
+
+    const void* maxVal = p;
+    goCompareFunction greaterThan = getDataType().getGreaterThanFunction();
+    for (z = 0; z < zSize; z++)
+    {
+        for (y = 0; y < ySize; y++)
+        {
+            p = getPtr (0, y, z);
+            for (x = 0; x < xSize; x++)
+            {
+                if (greaterThan(p,maxVal))
+                {
+                    maxVal = p;
+                }
+                (const goUInt8*)p += xDiff[x];
+            }
+        }
+    }
+
+    switch (getDataType().getID())
+    {
+        case GO_INT8:         return (goDouble)*(const goInt8*)maxVal; break;
+        case GO_INT16:        return (goDouble)*(const goInt16*)maxVal; break;
+        case GO_INT32:        return (goDouble)*(const goInt32*)maxVal; break;
+        case GO_INT64:        return (goDouble)*(const goInt64*)maxVal; break;
+        case GO_UINT8:        return (goDouble)*(const goUInt8*)maxVal; break;
+        case GO_UINT16:       return (goDouble)*(const goUInt16*)maxVal; break;
+        case GO_UINT32:       return (goDouble)*(const goUInt32*)maxVal; break;
+        case GO_FLOAT:        return (goDouble)*(const goFloat*)maxVal; break;
+        case GO_DOUBLE:       return (goDouble)*(const goDouble*)maxVal; break;
+        default: goError::print (getClassName(), "getMaximum() not implemented for this type."); return 0.0; break;
+    }
+    return 0.0;
+}
+
+template< class T >
+goDouble
+goSignal3DBase<T>::getMaximum() const
+{
+    const T *p = ptr;
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -771,21 +821,64 @@ goSignal3DBase<T>::getMaximum()
             }
         }
     }
-
-    return maxVal;
+    return (goDouble)maxVal;
 }
 
-void
-goSignal3DBase<void>::getMaximum()
+goDouble
+goSignal3DBase<void*>::getMinimum() const
 {
-    goError::print (getClassName(), "getMaximum() not implemented for void.");
+    return 0.0;
+}
+
+goDouble
+goSignal3DBase<void>::getMinimum() const
+{
+    const void *p = ptr;
+    goSize_t x,y,z;
+    goSize_t xSize, ySize, zSize;
+    xSize = getSizeX();
+    ySize = getSizeY();
+    zSize = getSizeZ();
+
+    const void* minVal = p;
+    goCompareFunction lowerThan = getDataType().getLowerThanFunction();
+    for (z = 0; z < zSize; z++)
+    {
+        for (y = 0; y < ySize; y++)
+        {
+            p = getPtr (0, y, z);
+            for (x = 0; x < xSize; x++)
+            {
+                if (lowerThan(p,minVal))
+                {
+                    minVal = p;
+                }
+                (const goUInt8*)p += xDiff[x];
+            }
+        }
+    }
+
+    switch (getDataType().getID())
+    {
+        case GO_INT8:         return (goDouble)*(const goInt8*)minVal; break;
+        case GO_INT16:        return (goDouble)*(const goInt16*)minVal; break;
+        case GO_INT32:        return (goDouble)*(const goInt32*)minVal; break;
+        case GO_INT64:        return (goDouble)*(const goInt64*)minVal; break;
+        case GO_UINT8:        return (goDouble)*(const goUInt8*)minVal; break;
+        case GO_UINT16:       return (goDouble)*(const goUInt16*)minVal; break;
+        case GO_UINT32:       return (goDouble)*(const goUInt32*)minVal; break;
+        case GO_FLOAT:        return (goDouble)*(const goFloat*)minVal; break;
+        case GO_DOUBLE:       return (goDouble)*(const goDouble*)minVal; break;
+        default: goError::print (getClassName(), "getMinimum() not implemented for this type."); return 0.0; break;
+    }
+    return 0.0;
 }
     
 template< class T >
-    T
-goSignal3DBase<T>::getMinimum()
+goDouble
+goSignal3DBase<T>::getMinimum() const
 {
-    T *p = ptr;
+    const T *p = ptr;
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -809,14 +902,9 @@ goSignal3DBase<T>::getMinimum()
         }
     }
 
-    return minVal;
+    return (goDouble)minVal;
 }
 
-void
-goSignal3DBase<void>::getMinimum()
-{
-    goError::print (getClassName(), "getMinimum() not implemented for void.");
-}
 
 template< class T >
     void
