@@ -18,7 +18,7 @@
 #endif
 
 #define GO_PROJECT_NAME		"libGo"
-#define GO_PROJECT_VERSION	"0.3"
+#define GO_PROJECT_VERSION	"0.4.0"
 
 /* Standard types */
 #if SIZEOF_CHAR == 1
@@ -32,6 +32,10 @@ typedef unsigned char goUInt8;
 typedef char goSint8;
 ///
 typedef char goInt8;
+///
+typedef goInt8 goByte;
+///
+typedef goUInt8 goUByte;
 #endif
 #if SIZEOF_SHORT_INT == 2
 ///
