@@ -69,21 +69,25 @@
   for (__i = 0; __i < __signal.getSizeZ(); __i++)		\
     {								\
       __ptr_y = __ptr_z;					\
+      __dy    = __signal.getYDiff(); \
       for (__j = 0; __j < __signal.getSizeY(); __j++)		\
 	{							\
 	  __ptr = __ptr_y;					\
+      __dx  = __signal.getXDiff(); \
 	  for (__k = 0; __k < __signal.getSizeX(); __k++)	\
 	    {							\
 	      {							\
 		    __dothis;					\
-		    __ptr += __dx[__k];					\
+		    __ptr += *__dx;					\
+            ++__dx; \
 	      }							\
 	    }							\
-	  __ptr_y += __dy[__j];					\
+	  __ptr_y += *__dy;					\
+      ++__dy; \
 	}							\
-      __ptr_z += __dz[__i];						\
+      __ptr_z += *__dz;						\
+      ++__dz; \
     }								\
-								\
 }
 
 #define GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST(__dothis, __signal) {	\
