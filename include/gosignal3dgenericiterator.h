@@ -54,7 +54,19 @@ template<class T> class goSignal3DBase;
  * this since the typical inner-loop methods are inlined. 
  * If you are optimising for speed, it may still be a good idea to simply write your own loop.
  * 
- * @return 
+ * @note Be careful when you use <b>multichannel signals</b>. There is a pitfall:
+ *       <code>
+ *        sig.setChannel(1);
+ *        goSignal3DGenericIterator it(sig);
+ *        sig.setChannel(2);
+ *       </code>
+ *       The iterator will run on channel 1 !!!!
+ *       It will run on channel 2 when you put a it.resetZ() or a it.setPosition(...)
+ *       after setting the channel in sig.
+ *
+ * @todo Maybe do something about the pitfall described in the note (documentation).
+ *       Low priority.
+ * 
  **/
 class goSignal3DGenericIterator
 {

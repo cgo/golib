@@ -28,8 +28,13 @@ goSignal3D : public goSignal3DBase<T>
     public:
         goSignal3D ();
         goSignal3D (goSize_t x, goSize_t y, goSize_t z,
-                    goSize_t blocksize_x = 32, goSize_t blocksize_y = 32, goSize_t blocksize_z = 32,
-                    goSize_t border_x = 0, goSize_t border_y = 0, goSize_t border_z = 0);
+                    goSize_t blocksize_x = 32, 
+                    goSize_t blocksize_y = 32, 
+                    goSize_t blocksize_z = 32,
+                    goSize_t border_x = 0, 
+                    goSize_t border_y = 0, 
+                    goSize_t border_z = 0,
+                    goSize_t channelCount = 1);
         goSignal3D (goSignal3D<T>& other);
         virtual ~goSignal3D ();
         virtual const goSignal3D<T>& operator= (goSignal3DBase<T>& other);
@@ -43,7 +48,8 @@ goSignal3D : public goSignal3DBase<T>
                           goSize_t blocksize_z = 32,
                           goSize_t border_x    = 0,
                           goSize_t border_y    = 0,
-                          goSize_t border_z    = 0);
+                          goSize_t border_z    = 0,
+                          goSize_t channelCount = 1);
 
         bool make (goSignal3D *other);
 

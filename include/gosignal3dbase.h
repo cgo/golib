@@ -59,8 +59,13 @@ goSignal3DBase : public goObjectBase
     protected:
         goSignal3DBase ();
         goSignal3DBase (goSize_t x, goSize_t y, goSize_t z,
-                goSize_t blocksize_x = 32, goSize_t blocksize_y = 32, goSize_t blocksize_z = 32,
-                goSize_t border_x = 0, goSize_t border_y = 0, goSize_t border_z = 0);
+                        goSize_t blocksize_x = 32, 
+                        goSize_t blocksize_y = 32, 
+                        goSize_t blocksize_z = 32,
+                        goSize_t border_x = 0, 
+                        goSize_t border_y = 0, 
+                        goSize_t border_z = 0,
+                        goSize_t channelCount = 1);
         goSignal3DBase (goSignal3DBase<T>& other);
         bool     initializeDataType ();
 
@@ -71,7 +76,10 @@ goSignal3DBase : public goObjectBase
                              goSize_t blocksize_z = 32,
                              goSize_t border_x    = 0, 
                              goSize_t border_y    = 0, 
-                             goSize_t border_z    = 0);
+                             goSize_t border_z    = 0,
+                             goSize_t channelCount = 1);
+
+        void     cleanup ();
 
     public:
         virtual void destroy ();
@@ -83,10 +91,18 @@ goSignal3DBase : public goObjectBase
         
         void          setPtr      (T *p); 
         const goType& getDataType () const;
-
+        
+        void          setChannel  (goSize_t c);
+        goSize_t      getChannel  () const { return this->myChannel; };
+        goPtrdiff_t   getChannelOffset (goSize_t channel) const 
+        {
+            assert (channel < myChannelCount);
+            return myChannelOffset[channel];
+        };
+        
         // Works only for <void> instantiation.
         bool setDataType (goTypeEnum t);
-        
+
               T* getPtr ();
         const T* getPtr () const;
 
@@ -109,7 +125,7 @@ goSignal3DBase : public goObjectBase
               goPtrdiff_t* getYJump ();  
               goPtrdiff_t* getZJump ();  
 
-        void setSize (goSize_t x,goSize_t y,goSize_t z);
+        void setSize (goSize_t x,goSize_t y,goSize_t z,goSize_t channelCount = 1);
 
         void setSize (const goSize3D& sz);
 
@@ -137,6 +153,9 @@ goSignal3DBase : public goObjectBase
         goSize_t getBlockSizeX () const;
         goSize_t getBlockSizeY () const;
         goSize_t getBlockSizeZ () const;
+
+        goSize_t getChannelCount () const;
+
         /*!
          * Does <strong>not</strong> perform a deep copy, instead copies size and pointer difference
          * values and the <strong>pointer</strong> to the signal data.
@@ -178,7 +197,7 @@ goSignal3DBase : public goObjectBase
         void rotateAxes ();
         void swapXY     ();
 
-        const T*	  getClosest (go3Vector<goFloat>& point) const;
+        const T*   getClosest (go3Vector<goFloat>& point) const;
         goFloat    sample (go3Vector<goFloat>& point);
 
     protected:
@@ -189,17 +208,21 @@ goSignal3DBase : public goObjectBase
         goPtrdiff_t* xDiff;
         goPtrdiff_t* yDiff;
         goPtrdiff_t* zDiff;
-
+        
         goPtrdiff_t* myXJump;
         goPtrdiff_t* myYJump;
         goPtrdiff_t* myZJump;
-
+        
+        goPtrdiff_t* myChannelOffset;
+        
         goSize3D     mySize;
         goSize3D     myBorderSize;
         goSize3D     myBlockSize; 
         goSize3D     myBlocks; 
 
         goType       myDataType;
+        goSize_t     myChannelCount;
+        goSize_t     myChannel;
 };
 
 #define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \
