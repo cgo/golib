@@ -2,13 +2,21 @@
 #define GOOBJECTBASE_H
 
 #include <gostring.h>
+#include <goqueue.h>
+#include <golist.h>
+#include <goobjectmessage.h>
+#include <gotypes.h>
 
 class
 goObjectBase
 {
+    public:
+        goObjectBase ();
+        virtual ~goObjectBase ();
 
  public:
     const char* getClassName ();
+    virtual goSize_t memoryUsage();
 
  protected:
     void setClassName(const char* name);
@@ -16,8 +24,18 @@ goObjectBase
     void printClassMessage (const char* msg);
     void printClassMessage (goString& msg);
 
+    // API for sending messages from object to object
+ public:
+    void connectObject        (goObjectBase*          object);
+    void sendObjectMessage    (goObjectMessageID messageID);
+ protected:
+    void disconnectObject     (const goObjectBase*    object);
+    void sendObjectMessage    (goObjectBase* object, goObjectMessageID messageID);
+    virtual void receiveObjectMessage (const goObjectMessage& message);
+    
  private:
-    goString className;
+    goString                 className;
+    goList<goObjectBase*>    myConnectedObjects;
 };
 
 #endif
