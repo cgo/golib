@@ -23,6 +23,7 @@ class goType : public goObjectBase
 {
     public:
         goType (goTypeEnum t);
+        goType (const goType& other);
         virtual ~goType ();
 
         static goSize_t  getSize   (goTypeEnum t);
