@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <iostream.h>
+#include <iostream>
 
 #ifdef HAVE_TYPES_H
 #include <sys/types.h>
@@ -24,7 +24,7 @@ goNetwork::sendData (const void* data, size_t size, int sock) {
     return false;
   }
   goError::note("goNetwork::sendData()","");
-  cout << "\tSent data of size " << s << " to socket " << sock << endl;
+  std::cout << "\tSent data of size " << s << " to socket " << sock << std::endl;
   return true;
 }
 
@@ -58,7 +58,7 @@ goNetwork::receiveDataMax (unsigned int recvsize, int sock) {
 
   goNetwork::fail (0);
   goError::note("goNetwork::receiveDataMax()","");
-  cout << "\trecvsize is " << recvsize << endl;
+  std::cout << "\trecvsize is " << recvsize << std::endl;
   data  = (char*)malloc (recvsize);
   do {
     s = ::read ( sock, (void*)(&((char*)data)[size]), recvsize );
@@ -68,7 +68,7 @@ goNetwork::receiveDataMax (unsigned int recvsize, int sock) {
     }
     size += (unsigned int)s;
     goError::note("goNetwork::receiveDataMax()","");
-    cout << "Received " << s << " bytes" << endl;
+    std::cout << "Received " << s << " bytes" << std::endl;
     if ((unsigned int)size >= recvsize) {
       s = 0;
       break;

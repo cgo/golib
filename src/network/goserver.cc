@@ -1,3 +1,4 @@
+#include <config.h>
 #include <goserver.h>
 #include <gonetwork.h>
 #include <gostring.h>
@@ -8,8 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream.h>
-#include <config.h>
+#include <iostream>
 
 namespace goNet {
 
@@ -44,12 +44,12 @@ requestHandler (void* p)
   char *data;
   goSize_t size;
 
-  cout << "Handler for socket " << info->connection->socket << " up and running." << endl;
+  std::cout << "Handler for socket " << info->connection->socket << " up and running." << std::endl;
   while (true)
   { 
       if(!goNetwork::waitForData (info->connection->socket))
 	  {
-		  cout << "Client on socket " << info->connection->socket << " closed connection\n";
+		  std::cout << "Client on socket " << info->connection->socket << " closed connection\n";
 #ifndef WIN32
 		  return NULL;
 #else
@@ -59,8 +59,8 @@ requestHandler (void* p)
       data = (char*)goNetwork::receiveData (&size, info->connection->socket);
       if (size != 0)
 		{
-	  		cout << "Received " << size << " bytes" << endl;
-	  		cout << "String output: " << data << endl;
+	  		std::cout << "Received " << size << " bytes" << std::endl;
+	  		std::cout << "String output: " << data << std::endl;
 		}
   }
 #ifndef WIN32
@@ -146,18 +146,18 @@ goServer::serverAcceptThread () {
     // inf->connection = con;
     // hThread.create (goNet::requestHandler, (void*)inf, 1);
 
-    cout << "List size is now " << connections.getSize() << endl;
-    cout << "Member sockets are ";
+    std::cout << "List size is now " << connections.getSize() << std::endl;
+    std::cout << "Member sockets are ";
     connections.resetToFront();
     int i;
     for (i = 0; i < connections.getSize(); i++)
 	{
-	    cout << ((goServerConnection*)connections.getCurrent())->socket << " ";
+	    std::cout << ((goServerConnection*)connections.getCurrent())->socket << " ";
 	    connections.getNext();
 	} 
-    cout << endl;
+    std::cout << std::endl;
     conMutex.unlock();
-    cout << "Socket " << con->socket << endl;
+    std::cout << "Socket " << con->socket << std::endl;
     serverMessage ("Connect");
   }
   return con;
@@ -231,7 +231,7 @@ goServer::requestHandler () {
 
 void
 goServer::serverMessage (const char* t) {
-  cout << "goServer: " << t << endl;
+  std::cout << "goServer: " << t << std::endl;
 }
 
 void
