@@ -237,6 +237,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     zDiff[getSizeZ() - 1] = myZJump[0] - myZJump[getSizeZ() - 1] ;
     
     j = getSizeX() - getBorderX();
+
     for (i = -((goIndex_t)getBorderX()); i < 0; ++i, ++j)
     {
         xDiff[i]   = xDiff[j];
@@ -291,8 +292,6 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     {
         zDiff[-1] = myZJump[0] - myZJump[-1];
     }
-//    asm ("int $3");
-    
     
     return true;
 }
