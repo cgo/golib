@@ -6,7 +6,7 @@
  *  by those. For a complete documentation, please refer to the HTML version.
  * \endlatexonly 
  * \section intro What it is
- * goLib is a C++ class library written by <a href="mailto:christian@goschs.de">
+ * goLib is a C++ class library written by 
  * Christian Gosch</a>.
  * It contains some useful classes for everyday use, like arrays, strings, a tree, heap
  * and so forth. Other functionalities are
@@ -26,6 +26,8 @@
  *	 available in many modern Unix environments.
  *	 Depending on the version you are compiling, libSDL might also
  *	 be necessary. You can get it at http://www.libsdl.org.
+ *	 In order to use the goFileIO::readImage() and goFileIO::writeImage() methods,
+ *	 you need libIL which you can get at http://openil.sourceforge.net 
  
  *	\subsection build Compilation
  * 	In the main distribution directory, say, ~/golib,
@@ -74,7 +76,7 @@
  * number then (probably 0.3).
  * I remove bugs
  * as soon as I find them. If you find a bug or think you found a bug, please
- * do not hesitate to send me an <a href="mailto:christian@goschs.de">email</a>.
+ * do not hesitate to send me an email to <code>christian __at__ goschs __ de</code>.
  *
  * \section download How to get the source
  * You should be able to download the source at <a href="http://www.goschs.de">www.goschs.de</a> in the [projects] section. If it's out of date,
@@ -96,7 +98,7 @@
  * 
  * If you should find that the version you downloaded is out of date
  * and does not match this documentation, please notify the me, the author,
- * at <a href="mailto:christian@goschs.de">christian@goschs.de</a>.
+ * at <code>christian __at__ goschs __ de</code>.
  * Since it is under construction quite heavily at the moment,
  * that might well be the case. <br>
  * <strong> 
@@ -113,5 +115,5 @@
  * \section contributions Contributions
  * If you would like to make contributions to goLib, you are more
  * than welcome to! Please send suggestions or source (or both ;-) ) to
- * <a href="mailto:christian@goschs.de">christian@goschs.de</a>.
+ * <code>christian __at__ goschs __ de</code>.
  */
