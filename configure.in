@@ -13,7 +13,7 @@ dnl Variable substitutions
 
 dnl Check options
 AC_ARG_ENABLE(debug,[--enable-debug 		  Enable debugging rather than optimization],\
-	debug_options=-g, debug_options=-O2)
+	CXXFLAGS=-g, CXXFLAGS=-O1)
 AC_ARG_ENABLE(lfs,[--enable-lfs	   	  Enable LFS support for large files],\
 	lfs_options="-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE", lfs_options=)
 AC_SUBST(debug_options)
