@@ -235,48 +235,65 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     xDiff[getSizeX() - 1] = myXJump[0] - myXJump[getSizeX() - 1] ;
     yDiff[getSizeY() - 1] = myYJump[0] - myYJump[getSizeY() - 1] ;
     zDiff[getSizeZ() - 1] = myZJump[0] - myZJump[getSizeZ() - 1] ;
-
+    
     j = getSizeX() - getBorderX();
-    for (i = -getBorderX(); i < 0; ++i, ++j)
+    for (i = -((goIndex_t)getBorderX()); i < 0; ++i, ++j)
     {
         xDiff[i]   = xDiff[j];
         myXJump[i] = myXJump[j];
     }
 
     j = 0;
-    for (i = getSizeX() + 1; i < getSizeX() + getBorderX(); ++i, ++j)
+    for (i = getSizeX(); i < getSizeX() + getBorderX(); ++i, ++j)
     {
         xDiff[i] = xDiff[j];
         myXJump[i] = myXJump[j];
     }
 
     j = getSizeY() - getBorderY();
-    for (i = -getBorderY(); i < 0; ++i, ++j)
+    for (i = -((goIndex_t)getBorderY()); i < 0; ++i, ++j)
     {
         yDiff[i]   = yDiff[j];
         myYJump[i] = myYJump[j];
     }
 
     j = 0;
-    for (i = getSizeY() + 1; i < getSizeY() + getBorderY(); ++i, ++j)
+    for (i = getSizeY(); i < getSizeY() + getBorderY(); ++i, ++j)
     {
         yDiff[i] = yDiff[j];
         myYJump[i] = myYJump[j];
     }
 
     j = getSizeZ() - getBorderZ();
-    for (i = -getBorderZ(); i < 0; ++i, ++j)
+    for (i = -((goIndex_t)getBorderZ()); i < 0; ++i, ++j)
     {
         zDiff[i]   = zDiff[j];
         myZJump[i] = myZJump[j];
     }
 
     j = 0;
-    for (i = getSizeZ() + 1; i < getSizeZ() + getBorderZ(); ++i, ++j)
+    for (i = getSizeZ(); i < getSizeZ() + getBorderZ(); ++i, ++j)
     {
         zDiff[i] = zDiff[j];
         myZJump[i] = myZJump[j];
     }
+
+    
+    if (getBorderX() > 0)
+    {
+        xDiff[-1] = myXJump[0] - myXJump[-1];
+    }
+    if (getBorderY() > 0)
+    {
+        yDiff[-1] = myYJump[0] - myYJump[-1];
+    }
+    if (getBorderZ() > 0)
+    {
+        zDiff[-1] = myZJump[0] - myZJump[-1];
+    }
+//    asm ("int $3");
+    
+    
     return true;
 }
 
