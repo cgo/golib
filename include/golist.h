@@ -178,24 +178,40 @@ goList<T>::getCurrentPtr () {
 template <class T>
 T
 goList<T>::getFront () {
+    if (!front)
+    {
+        return dummy->elem;
+    }
     return front->elem;
 }
 
 template <class T>
 T*
 goList<T>::getFrontPtr () {
+    if (!front)
+    {
+        return dummy->elem;
+    }
   return &front->elem;
 }
 
 template <class T>
 T
 goList<T>::getTail () {
+  if (!tail)
+  {
+      return dummy->elem;
+  }
   return tail->elem;
 }
 
 template <class T>
 T*
 goList<T>::getTailPtr () {
+  if (!tail)
+  {
+      return &dummy->elem;
+  }
   return &tail->elem;
 }
 
