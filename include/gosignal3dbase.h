@@ -73,6 +73,8 @@ goSignal3DBase : public goObjectBase
         // From goObjectInfo
         virtual goSize_t memoryUsage();
 
+        void          setChanged  ();
+        
         void          setPtr      (T *p); 
         const goType& getDataType () const;
 
