@@ -26,7 +26,7 @@ class goUniformQuantizer : public goQuantizer <_input_type, _output_type>
 {
     public:
         goUniformQuantizer (goSize_t quantizationSteps = 255);
-        goUniformQuantizer (_input_type  delta_input,
+        goUniformQuantizer (goDouble     delta_input,
                             _input_type  min_input,
                             _input_type  max_input,
                             _output_type min_output,

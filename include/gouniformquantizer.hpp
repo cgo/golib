@@ -11,7 +11,7 @@ goUniformQuantizerPrivate
 {
     public:
         goUniformQuantizerPrivate (goSize_t quantizationSteps); 
-        goUniformQuantizerPrivate (_input_type  delta_input, 
+        goUniformQuantizerPrivate (goDouble     delta_input, 
                                    _input_type  min_input,
                                    _input_type  max_input,
                                    _output_type min_output,
@@ -19,7 +19,7 @@ goUniformQuantizerPrivate
         ~goUniformQuantizerPrivate ();
     
         goDouble     myDeltaInput_rec;
-        _input_type  myDeltaInput;
+        goDouble     myDeltaInput;
         _input_type  myMinInput;
         _input_type  myMaxInput;
         goDouble     myDeltaOutput;
@@ -31,7 +31,7 @@ template <class _input_type, class _output_type>
 goUniformQuantizerPrivate<_input_type, _output_type>::goUniformQuantizerPrivate (goSize_t quantizationSteps)
     :
     myDeltaInput_rec (0.0),
-    myDeltaInput  (0),
+    myDeltaInput  (0.0),
     myMinInput    (0),
     myMaxInput    (0),
     myDeltaOutput (0.0),
@@ -49,7 +49,8 @@ goUniformQuantizerPrivate<_input_type, _output_type>::goUniformQuantizerPrivate 
 }
 
 template <class _input_type, class _output_type>
-goUniformQuantizerPrivate<_input_type,_output_type>::goUniformQuantizerPrivate (_input_type  delta_input, 
+goUniformQuantizerPrivate<_input_type,_output_type>::goUniformQuantizerPrivate (
+        goDouble  delta_input, 
      _input_type  min_input,
      _input_type  max_input,
      _output_type min_output,
@@ -84,7 +85,7 @@ goUniformQuantizer<_input_type, _output_type>::goUniformQuantizer (goSize_t quan
 
 template <class _input_type, class _output_type>
 goUniformQuantizer<_input_type, _output_type>::goUniformQuantizer (
-        _input_type  delta_input,
+        goDouble     delta_input,
         _input_type  min_input,
         _input_type  max_input,
         _output_type min_output,
