@@ -25,6 +25,7 @@ enum goObjectMessageID
     GO_OBJECTMESSAGE_NONE = 0,
     /// Sent when the destructor of an object is called (FIXME)
     GO_OBJECTMESSAGE_DESTRUCTING,
+    GO_OBJECTMESSAGE_CHANGED,
 
     /*! Start of message space to be used by applications using goLib
      *  and deriving from goObjectBase
