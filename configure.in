@@ -1,5 +1,6 @@
 AC_INIT(src/data/goarray.cc)
-
+AM_INIT_AUTOMAKE(golib,0.2.1)
+AM_PROG_LIBTOOL
 AC_PROG_CXX
 AC_PROG_LN_S
 AC_CHECK_PROG(DOCXX,doc++,doc++,echo)
@@ -67,8 +68,11 @@ dnl OS Service Checks
 AC_OBJEXT
 
 
-AC_CONFIG_HEADER(include/config.h)
-AC_OUTPUT(./Makefile)
+AM_CONFIG_HEADER(include/config.h)
+AC_OUTPUT(./Makefile ./src/Makefile ./src/data/Makefile ./src/graphics/Makefile \
+		  ./src/math/Makefile ./src/misc/Makefile ./src/network/Makefile \
+		  ./src/nifty/Makefile ./src/signal/Makefile ./src/system/Makefile \
+		  ./src/thread/Makefile)
 
 
 

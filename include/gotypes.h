@@ -9,7 +9,7 @@
 
 
 #include <stdlib.h>	//for size_t
-#include <config.h>
+#include "config.h"
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif

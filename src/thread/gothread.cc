@@ -6,6 +6,8 @@
 #include <unistd.h>
 #endif
 
+#include <assert.h>
+
 goThread::goThread () {
   intCount		= 0;
   numberOfThreads	= 0;
@@ -31,8 +33,10 @@ goThread::create (void* (*function) (void*), void* param, int howMany) {
   numberOfThreads = howMany;
   if (threads) delete threads;
   threads = new pthread_t[howMany];
+  int pthreadret = 0;
   for (i = 0; i < howMany; i++) {
-    pthread_create (&threads[i], &threadAttr, function, param);
+    pthreadret = pthread_create (&threads[i], &threadAttr, function, param);
+	assert(pthreadret == 0);
   }
 }
 #endif

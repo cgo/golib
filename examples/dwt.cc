@@ -3,7 +3,7 @@
 #include <gosignalmacros.h>
 #include <time.h>
 
-#define TYPE goUInt8
+#define TYPE goInt8
 
 int main()
 {
@@ -21,18 +21,19 @@ int main()
   int i,j,k;
 
   for (i = 0; i < block.getSizeZ(); i++)
-    {
-      for (j = 0; j < block.getSizeY(); j++)
 	{
-	  for (k = 0; k < block.getSizeX(); k++)
-	    {
-	      // *block.getPtr(k,j,i) = i / 0.3 + j / 0.2 + k * 1.76523;
-	      *block.getPtr(k,j,i) = i + k;
-	    }
-	}
+      for (j = 0; j < block.getSizeY(); j++)
+		{
+		  for (k = 0; k < block.getSizeX(); k++)
+	    	{
+	      	// *block.getPtr(k,j,i) = i / 0.3 + j / 0.2 + k * 1.76523;
+	      	//	*block.getPtr(k,j,i) = i + k;
+				*block.getPtr(k,j,i) = 127 * (k % 2);
+	    	}
+		}
     }
 
-  block.fill(128);
+  // block.fill(128);
 
   cout << "Original block first x/y slice: " << endl;
   cout << "-------------------------------" << endl;

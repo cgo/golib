@@ -66,12 +66,12 @@ class goServer {
    * false on failure. Call <code>stop()</code> to stop the accepting thread.
    * @return true on success, false on failure
    */
-  bool run ();
+  bool runServer();
   /*!
    * Stops the accepting thread.
    * @return true on success, false on failure
    */
-  bool stop ();
+  bool stopServer();
   
   /*! To be implemented by subclasses to handle requests coming in from the connections in the connection 
    *  list. 

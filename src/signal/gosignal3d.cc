@@ -378,6 +378,11 @@ goSignal3D<T>::interpolateBorders()
     GO_SIGNAL3D_EACHELEMENT_2((*__ptr_target = *__ptr), source, target, T, T);
 }		
 
+void
+goSignal3D<void*>::interpolateFromSignal(goSignal3D<void*>& , Neighbour )
+{
+}
+
 
 template <class T>
 void
@@ -667,4 +672,5 @@ template class goSignal3D< goUInt32 >;
 template class goSignal3D< goInt64 >;
 template class goSignal3D< goFloat >;
 template class goSignal3D< goDouble >;
+template class goSignal3D< void* >;
 

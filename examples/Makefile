@@ -1,16 +1,19 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
+#Template version 
+# Fill in __TARGETNAME and __SOURCDIRS as well as all other options
+# you might want to have added.
 
 CXX		= gcc
 CXXARGS		= -c   -D HAVE_CONFIG_H 
 
 LD		= gcc
-LDARGS		=  -L../lib -lGo
+LDARGS		=  
 
-LIBS		=  
+LIBS		=  -L$(GOPATH)/lib -lGo
 
-INCLUDE		=  -I../include
+INCLUDE		=  -I$(GOPATH)/include
 
-TARGET		= powfunction
+TARGET		= netobject
 
 %.o: %.cxx
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
@@ -18,8 +21,8 @@ TARGET		= powfunction
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
 %.o: %.cc
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
-SOURCEDIRS = .
-SOURCES = powfunction.cc
+SOURCEDIRS = 
+SOURCES = netobject.cc
 #SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cxx))
 #SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cpp))
 #SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cc))
@@ -33,3 +36,4 @@ $(TARGET): $(OBJECTS)
 	$(LD) $(LDARGS) $(LIBS) -o $(TARGET) $(OBJECTS)
 clean:
 	rm -f *~ *.o
+

@@ -77,6 +77,10 @@ public:
   goString&	  operator+= (goString& s);
   ///
   goString&	  operator+= (const char* s);
+  ///
+  goString&   operator+= (int i);
+  ///
+  goString&   operator+= (float f);
 
   // ONLY USE THIS IF YOU KNOW EXACTLY WHAT YOU ARE DOING. 
   // ALWAYS AVOID USING THIS METHOD IF THERE'S A WAY TO DO IT IN A CLEAN WAY!

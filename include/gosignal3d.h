@@ -165,15 +165,15 @@ goSignal3D : public goObjectInfo {
   /*!
    * \return Size in samples in x direction.
    */
-  inline const goSize_t getSizeX () { return xSize; }
+  inline const goSize_t getSizeX () const { return xSize; }
   /*!
    * \return Size in samples in y direction.
    */
-  inline const goSize_t getSizeY () { return ySize; }
+  inline const goSize_t getSizeY () const { return ySize; }
   /*!
    * \return Size in samples in z direction.
    */
-  inline const goSize_t getSizeZ () { return zSize; }
+  inline const goSize_t getSizeZ () const { return zSize; }
 
   inline const goSize_t getBorderX () { return borderX; }
   inline const goSize_t getBorderY () { return borderY; }
@@ -302,6 +302,13 @@ goSignal3D<T>::getClosest (go3Vector<goFloat>& point)
     return (*getPtr ((int)point.x, (int)point.y, (int)point.z));
 }
 
+inline
+goFloat
+goSignal3D<void*>::sample(go3Vector<goFloat>& point)
+{
+	return 0.0f;
+}
+
 template<class T>
 inline
 goFloat
@@ -347,6 +354,8 @@ goSignal3D<T>::sample (go3Vector<goFloat>& point)
 }
 
 #ifdef GO_DIPLOMARBEIT
+
+
 template<class T>
 inline 
 volFloat 

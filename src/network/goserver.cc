@@ -21,7 +21,7 @@ class handlerInfo
 {
 public:
   handlerInfo ();
-  ~handlerInfo ();
+  virtual ~handlerInfo ();
   goServer *server;
   goServerConnection *connection;
 };
@@ -211,14 +211,14 @@ void* runThread (void* p) {
 }
 
 bool
-goServer::run () {
+goServer::runServer() {
   stopAccepting = false;
   acceptThread.create (goNet::runThread, this, 1);
   return true;
 }
 
 bool 
-goServer::stop () {
+goServer::stopServer() {
   stopAccepting = true;
   acceptThread.kill();
   return true;

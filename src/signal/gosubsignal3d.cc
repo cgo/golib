@@ -110,7 +110,7 @@ template class goSubSignal3D<goUInt32>;
 template class goSubSignal3D<goInt64>;
 template class goSubSignal3D<goFloat>;
 template class goSubSignal3D<goDouble>;
-
+template class goSubSignal3D<void*>;
 
 
 

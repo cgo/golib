@@ -348,6 +348,21 @@ goString::operator+= (const char* s) {
   return (*this);
 }
 
+goString&
+goString::operator+= (int i) {
+    char s[250];
+    sprintf(&s[0], "%d", i);
+    (*this) += &s[0];
+    return (*this);
+}
+
+goString&
+goString::operator+= (float i) {
+    char s[250];
+    sprintf(&s[0], "%f", i);
+    (*this) += &s[0];
+    return (*this);
+}
 /*
 goString&
 goString::operator+= (const goString& s) {

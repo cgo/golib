@@ -691,7 +691,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goPtrdiff_t dx = __block.getXDiff();\
   goPtrdiff_t dy = __block.getYDiff();\
   goPtrdiff_t dz = __block.getZDiff();\
-  register __T r1,r2,r3,r4,r5,r6,r7,r8;\
+  register int r1,r2,r3,r4,r5,r6,r7,r8; /* __T */ \
   register __T *p1;\
   __T *p2;\
   __T *p3;\
@@ -701,7 +701,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   __T *p7;\
   __T *p8;\
   register goSize_t i,j;\
-  __T tmp1, tmp2, tmp3, tmp4;
+  int tmp1, tmp2, tmp3, tmp4;  /* __T */
 
 #define ST_XY_END() }
 
@@ -763,9 +763,9 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   register goPtrdiff_t dy_2 = dy << 1;\
 \
   goSize_t i,j;\
-  register __T a_,b_,a,b,A_,B_,A,B;\
-  __T r1,r2,r3,r4,r5,r6,r7,r8;\
-  __T a1,a2,a3,a4,a5,a6,a7,a8;\
+  register int a_,b_,a,b,A_,B_,A,B; /* __T */ \
+  int r1,r2,r3,r4,r5,r6,r7,r8; /* __T */ \
+  int a1,a2,a3,a4,a5,a6,a7,a8; /* __T */ \
   __T *p1,*p2,*p3,*p4,*p5,*p6,*p7,*p8;
 
 #define ST_REVERSE_XY_END() }

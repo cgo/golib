@@ -1,16 +1,19 @@
 #ifndef GOTHREAD_H
 #define GOTHREAD_H
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_LIBPTHREAD
 #include <pthread.h>
 #include <semaphore.h>
-#endif
-#ifdef WIN32
-#include <windows.h>
-#include <process.h>
-#endif
+#else
+ #ifdef WIN32
+ #include <windows.h>
+ #include <process.h>
+ #else
+  #error "gothread.h: no thread model available"
+ #endif
+#endif  
 
 typedef void    *(*goThread_exec_t)(void *);
 

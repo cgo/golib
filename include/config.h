@@ -34,7 +34,8 @@
 #define GO_HAVE_MMX 1
 #define GO_HAVE_3DNOW 1
 // Version 0.2.1
-#define GO_DIPLOMARBEIT 1
+// #define GO_DIPLOMARBEIT 1
+/* #undef GO_DIPLOMARBEIT */
 // Undefine this to disable multiple threads in the volume navigation system.
 // That's for debugging and should not be turned off unless you know exactly what you are doing.
 // The system will not behave as you expect it to when you don't use threads.

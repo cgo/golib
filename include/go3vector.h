@@ -14,6 +14,8 @@ class
 go3Vector {
  public:
   go3Vector ();
+  go3Vector (const go3Vector<T>& other);
+  go3Vector (T, T, T);
   virtual ~go3Vector ();
   
   // GO3VECTOR_FUNCTION_PREFIX T& operator[] (goIndex_t i) { return data[i]; }
@@ -118,8 +120,8 @@ go3Vector {
 			    (z * z));
     }
 
-  friend ostream& operator<< (ostream &o, go3Vector<goDouble>& v);
-  friend ostream& operator<< (ostream &o, go3Vector<goFloat>& v);
+//  friend ostream& operator<< (ostream &o, go3Vector<goDouble>& v);
+//  friend ostream& operator<< (ostream &o, go3Vector<goFloat>& v);
 
   T x, y, z;
 
