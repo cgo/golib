@@ -9,17 +9,31 @@
 
 template< class T >
 goSubSignal3D<T>::goSubSignal3D ()
-  : goSignal3DBase<T>() 
+  : 
+    goSignal3DBase<T>(),
+    parent   (NULL),
+    position (0, 0, 0),
+    skipX    (0),
+    skipY    (0),
+    skipZ    (0),
+    deleteX  (false),
+    deleteY  (false),
+    deleteZ  (false)
 {
-  parent        = NULL;
-  position.x    = 0;
-  position.y    = 0;
-  position.z    = 0;
 }
 
 template< class T >
 goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, goSize_t z) 
-  : goSignal3DBase<T> () 
+  : 
+    goSignal3DBase<T>(),
+    parent   (NULL),
+    position (0, 0, 0),
+    skipX    (0),
+    skipY    (0),
+    skipZ    (0),
+    deleteX  (false),
+    deleteY  (false),
+    deleteZ  (false)
 {
   setSize     (x, y, z);
   setParent   (b);
@@ -29,16 +43,25 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
 template< class T >
 goSubSignal3D<T>::~goSubSignal3D () 
 {
-    // avoid deletion of the data -- we didn't actually allocate anything!
+    // avoid deletion of the data in case we didn't actually allocate anything!
     parent   = NULL;
     ptr      = NULL;
     real_ptr = NULL;
-    xDiff    = NULL;
-    yDiff    = NULL;
-    zDiff    = NULL;
-    myXJump  = NULL;
-    myYJump  = NULL;
-    myZJump  = NULL;
+    if (!deleteX)
+    {
+        xDiff    = NULL;
+        myXJump  = NULL;
+    }
+    if (!deleteY)
+    {
+        yDiff    = NULL;
+        myYJump  = NULL;
+    }
+    if (!deleteZ)
+    {
+        zDiff    = NULL;
+        myZJump  = NULL;
+    }
 }
 
 template< class T >
@@ -73,12 +96,57 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     }
 #endif
     
-    myXJump = parent->getXJump() + (goPtrdiff_t)p.x;
-    myYJump = parent->getYJump() + (goPtrdiff_t)p.y;
-    myZJump = parent->getZJump() + (goPtrdiff_t)p.z;
-    xDiff   = parent->getXDiff() + (goPtrdiff_t)p.x;
-    yDiff   = parent->getYDiff() + (goPtrdiff_t)p.y;
-    zDiff   = parent->getZDiff() + (goPtrdiff_t)p.z;
+    if (deleteX)
+    {
+        delete myXJump;
+        myXJump = 0;
+        delete xDiff; 
+        xDiff = NULL;
+    }
+    if (deleteY)
+    {
+        delete myYJump;
+        myYJump = 0;
+        delete yDiff; 
+        yDiff = NULL;
+    }
+    if (deleteZ)
+    {
+        delete myZJump;
+        myZJump = 0;
+        delete zDiff; 
+        zDiff = NULL;
+    }
+    if (skipX == 0)
+    {
+        deleteX = false;
+        myXJump = parent->getXJump() + (goPtrdiff_t)p.x;
+        xDiff   = parent->getXDiff() + (goPtrdiff_t)p.x;
+    }
+    else
+    {
+        myXJump = new goPtrdiff_t []
+    }
+    if (skipY == 0)
+    {
+        myYJump = parent->getYJump() + (goPtrdiff_t)p.y;
+        yDiff   = parent->getYDiff() + (goPtrdiff_t)p.y;
+    }
+    if (skipZ == 0)
+    {
+        myZJump = parent->getZJump() + (goPtrdiff_t)p.z;
+        zDiff   = parent->getZDiff() + (goPtrdiff_t)p.z;
+    }
+}
+
+template<class T>
+void
+goSubSignal3D<T>::setSkip (goSize_t _skipX, goSize_t _skipY, goSize_t _skipZ)
+{
+    skipX = _skipX;
+    skipY = _skipY;
+    skipZ = _skipZ;
+    this->setPosition (this->getPosition());
 }
 
 template<class T>

@@ -24,12 +24,12 @@ goDWT<T>::~goDWT()
   __signal_target_t *__ptr_z_target   = __signal_target.getPtr();	\
   __signal_target_t *__ptr_target = __ptr_z_target;			\
   __signal_target_t *__ptr_y_target = __ptr_z_target;			\
-  goPtrdiff_t __dx	= __signal.getXDiff();			\
-  goPtrdiff_t __dy	= __signal.getYDiff();			\
-  goPtrdiff_t __dz	= __signal.getZDiff();			\
-  goPtrdiff_t __dx_target	= __signal_target.getXDiff();	\
-  goPtrdiff_t __dy_target	= __signal_target.getYDiff();	\
-  goPtrdiff_t __dz_target	= __signal_target.getZDiff();	\
+  goPtrdiff_t* __dx	= __signal.getXDiff();			\
+  goPtrdiff_t* __dy	= __signal.getYDiff();			\
+  goPtrdiff_t* __dz	= __signal.getZDiff();			\
+  goPtrdiff_t* __dx_target	= __signal_target.getXDiff();	\
+  goPtrdiff_t* __dy_target	= __signal_target.getYDiff();	\
+  goPtrdiff_t* __dz_target	= __signal_target.getZDiff();	\
   goSize_t __i, __j, __k;					\
   godwt_t  __tmp1, __tmp2;
 
@@ -38,9 +38,9 @@ goDWT<T>::~goDWT()
   __signal_t *__ptr_z		= __signal.getPtr();			\
   __signal_t *__ptr = __ptr_z;				\
   __signal_t *__ptr_y = __ptr_z;				\
-  goPtrdiff_t __dx	= __signal.getXDiff();			\
-  goPtrdiff_t __dy	= __signal.getYDiff();			\
-  goPtrdiff_t __dz	= __signal.getZDiff();			\
+  goPtrdiff_t* __dx	= __signal.getXDiff();			\
+  goPtrdiff_t* __dy	= __signal.getYDiff();			\
+  goPtrdiff_t* __dz	= __signal.getZDiff();			\
   goSize_t __i, __j, __k;					\
   godwt_t  __tmp1, __tmp2;
 
@@ -63,21 +63,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr = __ptr_y;								\
 	  __ptr_target = __ptr_y_target;						\
+      __dx = signal.getXDiff(); \
+      __dx_target = targetSignal.getXDiff(); \
 	  for (__k = 0; __k < (signal.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __tp0;			\
-	      __tmp2 = *(__ptr + __dx) * __tp1;		\
+	      __tmp2 = *(__ptr + *__dx) * __tp1;		\
 	      *__ptr_target = __tmp1 + __tmp2;		\
-	      __ptr_target += __dx_target;						\
+	      __ptr_target += *__dx_target;						\
               *__ptr_target = __tmp1 - __tmp2;		\
-	      __ptr_target += __dx_target;					\
-	      __ptr += __dx << 1;							\
+	      __ptr_target += *__dx_target;					\
+	      __ptr += *__dx << 1;							\
+          ++__dx; \
+          ++__dx_target; \
 	    }										\
-	  __ptr_y_target += __dy_target;						\
-	  __ptr_y += __dy;								\
+	  __ptr_y_target += __dy_target[__j];						\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_z_target += __dz_target;							\
-      __ptr_z += __dz;									\
+      __ptr_z_target += __dz_target[__i];							\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -90,21 +94,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_y = __ptr;								\
 	  __ptr_y_target = __ptr_target;						\
+      __dy = __signal.getYDiff(); \
+      __dy_target = __signal_target.getYDiff(); \
 	  for (__k = 0; __k < (signal.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __tp0;			\
-	      __tmp2 = *(__ptr_y + __dy) * __tp1;		\
+	      __tmp2 = *(__ptr_y + *__dy) * __tp1;		\
 	      *__ptr_y_target = __tmp1 + __tmp2;		\
-	      __ptr_y_target += __dy_target;						\
+	      __ptr_y_target += *__dy_target;						\
               *__ptr_y_target = __tmp1 - __tmp2;		\
-	      __ptr_y_target += __dy_target;					\
-	      __ptr_y += __dy << 1;							\
+	      __ptr_y_target += *__dy_target;					\
+	      __ptr_y += *__dy << 1;							\
+          ++__dy; \
+          ++__dy_target; \
 	    }										\
-	  __ptr_target += __dx_target;						\
-	  __ptr += __dx;								\
+	  __ptr_target += __dx_target[__j];						\
+	  __ptr += __dx[__j];								\
 	}										\
-      __ptr_z_target += __dz_target;							\
-      __ptr_z += __dz;									\
+      __ptr_z_target += __dz_target[__i];							\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -117,21 +125,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_z = __ptr_y;								\
 	  __ptr_z_target = __ptr_y_target;						\
+      __dz = __signal.getZDiff(); \
+      __dz_target = __signal_target.getZDiff(); \
 	  for (__k = 0; __k < (signal.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __tp0;			\
-	      __tmp2 = *(__ptr_z + __dz) * __tp1;		\
+	      __tmp2 = *(__ptr_z + *__dz) * __tp1;		\
 	      *__ptr_z_target = __tmp1 + __tmp2;		\
-	      __ptr_z_target += __dz_target;						\
+	      __ptr_z_target += *__dz_target;						\
               *__ptr_z_target = __tmp1 - __tmp2;		\
-	      __ptr_z_target += __dz_target;					\
-	      __ptr_z += __dz << 1;							\
+	      __ptr_z_target += *__dz_target;					\
+	      __ptr_z += *__dz << 1;							\
+          ++__dz; \
+          ++__dz_target; \
 	    }										\
-	  __ptr_y_target += __dy_target;						\
-	  __ptr_y += __dy;								\
+	  __ptr_y_target += __dy_target[__j];						\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_target += __dx_target;							\
-      __ptr += __dx;									\
+      __ptr_target += __dx_target[__i];							\
+      __ptr += __dx[__i];									\
     }											\
 }
 
@@ -143,18 +155,20 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < signal.getSizeY(); __j++)					\
 	{										\
 	  __ptr = __ptr_y;								\
+      __dx = signal.getXDiff(); \
 	  for (__k = 0; __k < (signal.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __tp0;			\
-	      __tmp2 = *(__ptr + __dx) * __tp1;		\
+	      __tmp2 = *(__ptr + *__dx) * __tp1;		\
 	      *__ptr = __tmp1 + __tmp2;		\
-	      __ptr += __dx;						\
+	      __ptr += *__dx;						\
               *__ptr = __tmp1 - __tmp2;		\
-	      __ptr += __dx;					\
+	      __ptr += *__dx;					\
+          ++__dx; \
 	    }										\
-	  __ptr_y += __dy;								\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_z += __dz;									\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -165,18 +179,20 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < signal.getSizeX(); __j++)					\
 	{										\
 	  __ptr_y = __ptr;								\
+      __dy = signal.getYDiff(); \
 	  for (__k = 0; __k < (signal.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __tp0;			\
-	      __tmp2 = *(__ptr_y + __dy) * __tp1;		\
+	      __tmp2 = *(__ptr_y + *__dy) * __tp1;		\
 	      *__ptr_y = __tmp1 + __tmp2;		\
-	      __ptr_y += __dy;						\
+	      __ptr_y += *__dy;						\
               *__ptr_y = __tmp1 - __tmp2;		\
-	      __ptr_y += __dy;					\
+	      __ptr_y += *__dy;					\
+          ++__dy; \
 	    }										\
-	  __ptr += __dx;								\
+	  __ptr += __dx[__j];								\
 	}										\
-      __ptr_z += __dz;									\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -187,18 +203,20 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < signal.getSizeY(); __j++)					\
 	{										\
 	  __ptr_z = __ptr_y;								\
+      __dz = signal.getZDiff(); \
 	  for (__k = 0; __k < (signal.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __tp0;			\
-	      __tmp2 = *(__ptr_z + __dz) * __tp1;		\
+	      __tmp2 = *(__ptr_z + *__dz) * __tp1;		\
 	      *__ptr_z = __tmp1 + __tmp2;		\
-	      __ptr_z += __dz;						\
+	      __ptr_z += *__dz;						\
               *__ptr_z = __tmp1 - __tmp2;		\
-	      __ptr_z += __dz;					\
+	      __ptr_z += *__dz;					\
+          ++__dz; \
 	    }										\
-	  __ptr_y += __dy;								\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr += __dx;									\
+      __ptr += __dx[__i];									\
     }											\
 }
 
@@ -220,21 +238,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr = __ptr_y;								\
 	  __ptr_target = __ptr_y_target;						\
+      __dx = __signal.getXDiff(); \
+      __dx_target = __signal_target.getXDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __f0;			\
-	      __tmp2 = *(__ptr + __dx) * __f0;		\
+	      __tmp2 = *(__ptr + *__dx) * __f0;		\
 	      *__ptr_target = (__target_type)(__tmp1 + __tmp2);		\
-	      __ptr_target += __dx_target;						\
+	      __ptr_target += *__dx_target;						\
               *__ptr_target = (__target_type)(__tmp1 - __tmp2);		\
-	      __ptr_target += __dx_target;					\
-	      __ptr += __dx << 1;							\
+	      __ptr_target += *__dx_target;					\
+	      __ptr += *__dx << 1;							\
+          ++__dx; \
+          ++__dx_target; \
 	    }										\
-	  __ptr_y_target += __dy_target;						\
-	  __ptr_y += __dy;								\
+	  __ptr_y_target += __dy_target[__j];						\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_z_target += __dz_target;							\
-      __ptr_z += __dz;									\
+      __ptr_z_target += __dz_target[__i];							\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -247,21 +269,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_y = __ptr;								\
 	  __ptr_y_target = __ptr_target;						\
+      __dy = __signal.getYDiff(); \
+      __dy_target = __signal_target.getYDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __f0;			\
-	      __tmp2 = *(__ptr_y + __dy) * __f0;		\
+	      __tmp2 = *(__ptr_y + *__dy) * __f0;		\
 	      *__ptr_y_target = __tmp1 + __tmp2;		\
-	      __ptr_y_target += __dy_target;						\
+	      __ptr_y_target += *__dy_target;						\
               *__ptr_y_target = __tmp1 - __tmp2;		\
-	      __ptr_y_target += __dy_target;					\
-	      __ptr_y += __dy << 1;							\
+	      __ptr_y_target += *__dy_target;					\
+	      __ptr_y += *__dy << 1;							\
+          ++__dy; \
+          ++__dy_target; \
 	    }										\
-	  __ptr_target += __dx_target;						\
-	  __ptr += __dx;								\
+	  __ptr_target += __dx_target[__j];						\
+	  __ptr += __dx[__j];								\
 	}										\
-      __ptr_z_target += __dz_target;							\
-      __ptr_z += __dz;									\
+      __ptr_z_target += __dz_target[__i];							\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -274,21 +300,25 @@ goDWT<T>::~goDWT()
 	{										\
 	  __ptr_z = __ptr_y;								\
 	  __ptr_z_target = __ptr_y_target;						\
+      __dz = __signal.getZDiff(); \
+      __dz_target = __signal_target.getZDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __f0;			\
-	      __tmp2 = *(__ptr_z + __dz) * __f0;		\
+	      __tmp2 = *(__ptr_z + *__dz) * __f0;		\
 	      *__ptr_z_target = __tmp1 + __tmp2;		\
-	      __ptr_z_target += __dz_target;						\
+	      __ptr_z_target += *__dz_target;						\
               *__ptr_z_target = __tmp1 - __tmp2;		\
-	      __ptr_z_target += __dz_target;					\
-	      __ptr_z += __dz << 1;							\
+	      __ptr_z_target += *__dz_target;					\
+	      __ptr_z += *__dz << 1;							\
+          ++__dz; \
+          ++__dz_target; \
 	    }										\
-	  __ptr_y_target += __dy_target;						\
-	  __ptr_y += __dy;								\
+	  __ptr_y_target += __dy_target[__j];						\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_target += __dx_target;							\
-      __ptr += __dx;									\
+      __ptr_target += __dx_target[__i];							\
+      __ptr += __dx[__i];									\
     }											\
 }
 
@@ -300,18 +330,20 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeY(); __j++)					\
 	{										\
 	  __ptr = __ptr_y;								\
+      __dx = __signal.getXDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr * __f0;			\
-	      __tmp2 = *(__ptr + __dx) * __f0;		\
+	      __tmp2 = *(__ptr + *__dx) * __f0;		\
 	      *__ptr = __tmp1 + __tmp2;		\
-	      __ptr += __dx;						\
+	      __ptr += *__dx;						\
               *__ptr = __tmp1 - __tmp2;		\
-	      __ptr += __dx;					\
+	      __ptr += *__dx;					\
+          ++__dx; \
 	    }										\
-	  __ptr_y += __dy;								\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr_z += __dz;									\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -322,18 +354,20 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeX(); __j++)					\
 	{										\
 	  __ptr_y = __ptr;								\
+      __dy = __signal.getYDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_y * __f0;			\
-	      __tmp2 = *(__ptr_y + __dy) * __f0;		\
+	      __tmp2 = *(__ptr_y + *__dy) * __f0;		\
 	      *__ptr_y = __tmp1 + __tmp2;		\
-	      __ptr_y += __dy;						\
+	      __ptr_y += *__dy;						\
               *__ptr_y = __tmp1 - __tmp2;		\
-	      __ptr_y += __dy;					\
+	      __ptr_y += *__dy;					\
+          ++__dy; \
 	    }										\
-	  __ptr += __dx;								\
+	  __ptr += __dx[__j];								\
 	}										\
-      __ptr_z += __dz;									\
+      __ptr_z += __dz[__i];									\
     }											\
 }
 
@@ -344,18 +378,19 @@ goDWT<T>::~goDWT()
       for (__j = 0; __j < __sig.getSizeY(); __j++)					\
 	{										\
 	  __ptr_z = __ptr_y;								\
+      __dz = signal.getZDiff(); \
 	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
 	    {										\
 	      __tmp1 = *__ptr_z * __f0;			\
-	      __tmp2 = *(__ptr_z + __dz) * __f0;		\
+	      __tmp2 = *(__ptr_z + *__dz) * __f0;		\
 	      *__ptr_z = __tmp1 + __tmp2;		\
-	      __ptr_z += __dz;						\
+	      __ptr_z += *__dz;						\
               *__ptr_z = __tmp1 - __tmp2;		\
-	      __ptr_z += __dz;					\
+	      __ptr_z += *__dz;					\
 	    }										\
-	  __ptr_y += __dy;								\
+	  __ptr_y += __dy[__j];								\
 	}										\
-      __ptr += __dx;									\
+      __ptr += __dx[__i];									\
     }											\
 }
 
@@ -639,9 +674,6 @@ goDWT<T>::haar(goSignal3D<T>& signal, int stage)
   s.setSize (signal.getSizeX(),
 	     signal.getSizeY(),
 	     signal.getSizeZ());
-  s.setDiff (signal.getXDiff(),
-	     signal.getYDiff(),
-	     signal.getZDiff());
   for (i = 0; i < stage; i++)
     {
       haar (s);
@@ -673,6 +705,8 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   return stage;
 }
 
+#if 0
+
 /***********************************************************************************/
 /* Specialised integer routines follow						   */
 /***********************************************************************************/
@@ -688,9 +722,9 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   goSize_t x = __block.getSizeX();\
   goSize_t y = __block.getSizeY();\
 /*  goSize_t z = __block.getSizeZ(); */\
-  goPtrdiff_t dx = __block.getXDiff();\
-  goPtrdiff_t dy = __block.getYDiff();\
-  goPtrdiff_t dz = __block.getZDiff();\
+  goPtrdiff_t* dx = __block.getXDiff();\
+  goPtrdiff_t* dy = __block.getYDiff();\
+  goPtrdiff_t* dz = __block.getZDiff();\
   register int r1,r2,r3,r4,r5,r6,r7,r8; /* __T */ \
   register __T *p1;\
   __T *p2;\
@@ -982,7 +1016,6 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
   }\
 }
 
-
 /* This method uses not exactly a Haar transform, but rather an enhanced
  * S Transform using only integers, additions, and shifts, which makes it faster
  * than a floating point transform on some machines.
@@ -1035,6 +1068,8 @@ GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
 GO_DWT_INTEGER_UNHAAR_METHOD(goUInt16)
 GO_DWT_INTEGER_UNHAAR_METHOD(goInt32)
 GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
+    
+#endif
 
 /*
  * Static function STZ is used to perform the transform along the 3rd axis.

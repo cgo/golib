@@ -42,6 +42,8 @@ goSubSignal3D : public goSignal3DBase<T>
         void setPosition (goPosition &p);
         void setPosition (goIndex_t x, goIndex_t y, goIndex_t z);
 
+        void setSkip (goSize_t skipX, goSize_t skipY, goSize_t skipZ);
+        
         goPosition& getPosition () { return position; }
 
         void move (int dir);
@@ -49,6 +51,12 @@ goSubSignal3D : public goSignal3DBase<T>
     private:
         goPosition         position;
         goSignal3DBase<T>* parent;
+        goSize_t           skipX;
+        goSize_t           skipY;
+        goSize_t           skipZ;
+        bool               deleteX;
+        bool               deleteY;
+        bool               deleteZ;
 };
 
 #endif

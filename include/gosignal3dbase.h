@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.2 2002/10/26 15:12:23 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.3 2002/11/01 12:46:13 christian Exp $
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.3  2002/11/01 12:46:13  christian
+ * changed getBorder*() return values to goIndex_t
+ *
  * Revision 1.2  2002/10/26 15:12:23  christian
  * New signal class structure
  *
@@ -135,10 +138,10 @@ goSignal3DBase : public goObjectInfo
          */
         // void  interpolateFromSignal (goSignal3DBase<T>& other, Neighbour n);
 
-        inline void shiftLeftDiff (int n);
-        inline void shiftRightDiff (int n);
-        inline void shiftLeftSize (int n);
-        inline void shiftRightSize (int n);
+        void shiftLeftDiff  (int n);
+        void shiftRightDiff (int n);
+        void shiftLeftSize  (int n);
+        void shiftRightSize (int n);
 
         /*!
          * Not threadsafe

@@ -483,6 +483,7 @@ goSignal3DBase<T>::fill (T value)
     GO_SIGNAL3D_EACHELEMENT(*__ptr = value, (*this), T);
 }
 
+
 #if 0
 template<class T>
     void
