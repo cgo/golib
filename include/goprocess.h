@@ -12,7 +12,7 @@
 /*!
  * @{
  */
-/**
+/*!
  * \brief Process interface for Unix platforms (so far). 
  *
  * The OS has to provide the necessary exec* functions and a fork() function.
