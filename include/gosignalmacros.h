@@ -46,6 +46,45 @@
 								\
 }
 
+/**
+ * @brief For generic (void type) signals.
+ *
+ * __dothis will be executed for each signal sample.
+ * The pointer __ptr is a pointer to the first <b>byte</b>
+ * of the current sample. Cast to an appropriate pointer.
+ * 
+ * @param __dothis  Code to be executed in the inner loop.
+ * @param __signal  Signal.
+ *
+ **/
+#define GO_SIGNAL3D_EACHELEMENT_GENERIC(__dothis, __signal) {	\
+  goUInt8 *__ptr_z      	= (goUInt8*)__signal.getPtr(0, 0, 0);			\
+  goUInt8 *__ptr;						\
+  goUInt8 *__ptr_y;						\
+  const goPtrdiff_t* __dx	= __signal.getXDiff();			\
+  const goPtrdiff_t* __dy	= __signal.getYDiff();			\
+  const goPtrdiff_t* __dz	= __signal.getZDiff();			\
+  goSize_t __i,__j,__k;						\
+  \
+  for (__i = 0; __i < __signal.getSizeZ(); __i++)		\
+    {								\
+      __ptr_y = __ptr_z;					\
+      for (__j = 0; __j < __signal.getSizeY(); __j++)		\
+	{							\
+	  __ptr = __ptr_y;					\
+	  for (__k = 0; __k < __signal.getSizeX(); __k++)	\
+	    {							\
+	      {							\
+		    __dothis;					\
+		    __ptr += __dx[__k];					\
+	      }							\
+	    }							\
+	  __ptr_y += __dy[__j];					\
+	}							\
+      __ptr_z += __dz[__i];						\
+    }								\
+								\
+}
 
 /*!
  * Does the same as <code>GO_SIGNAL3D_EACHELEMENT</code>

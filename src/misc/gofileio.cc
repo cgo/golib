@@ -248,12 +248,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
 
     //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
     /// \todo Add a sanity check here.
-    goSignal3D<goInt8>* tempSignal = (goSignal3D<goInt8>*)signal;
-    switch (tempSignal->getDataType().getID())
+    goSignal3D<void>* s = (goSignal3D<void>*)signal;
+    switch (s->getDataType().getID())
     {
         case GO_INT8:
             {
-                goSignal3D<goInt8>* s = tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_BYTE) == IL_FALSE)
@@ -262,12 +261,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goInt8* data = (goInt8*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt8);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt8*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT8:
             {
-                goSignal3D<goUInt8>* s = (goSignal3D<goUInt8>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_BYTE) == IL_FALSE)
@@ -276,12 +274,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goUInt8* data = (goUInt8*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt8);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt8*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_INT16:
             {
-                goSignal3D<goInt16>* s = (goSignal3D<goInt16>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_SHORT) == IL_FALSE)
@@ -290,12 +287,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goInt16* data = (goInt16*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt16);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt16*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT16:
             {
-                goSignal3D<goUInt16>* s = (goSignal3D<goUInt16>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_SHORT) == IL_FALSE)
@@ -304,12 +300,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goUInt16* data = (goUInt16*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt16);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt16*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_INT32:
             {
-                goSignal3D<goInt32>* s = (goSignal3D<goInt32>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_INT) == IL_FALSE)
@@ -318,12 +313,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goInt32* data = (goInt32*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt32);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt32*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT32:
             {
-                goSignal3D<goUInt32>* s = (goSignal3D<goUInt32>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_INT) == IL_FALSE)
@@ -332,12 +326,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goUInt32* data = (goUInt32*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt32);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt32*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_FLOAT:
             {
-                goSignal3D<goFloat>* s = (goSignal3D<goFloat>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_FLOAT) == IL_FALSE)
@@ -346,12 +339,11 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goFloat* data = (goFloat*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goFloat);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goFloat*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_DOUBLE:
             {
-                goSignal3D<goDouble>* s = (goSignal3D<goDouble>*)tempSignal;
                 s->destroy ();
                 s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
                 if (ilConvertImage (IL_LUMINANCE, IL_DOUBLE) == IL_FALSE)
@@ -360,7 +352,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
                     return false;
                 }
                 goDouble* data = (goDouble*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goDouble);
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goDouble*)__ptr = *data; ++data, (*s));
             }
             break;
         default:

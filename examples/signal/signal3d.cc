@@ -90,6 +90,36 @@ void printWithPointers (goSignal3D<T>& signal)
     std::cout << "\n";
 }
 
+void printWithPointers (goSignal3D<void>& signal)
+{
+    goUInt8* pz = (goUInt8*)signal.getPtr(0, 0, 0);
+    goUInt8* p  = pz;
+    goUInt8* py = pz;
+    goPtrdiff_t* dx = signal.getXDiff();
+    goPtrdiff_t* dxSave = dx;
+    goPtrdiff_t* dy = signal.getYDiff();
+    goPtrdiff_t* dySave = dy;
+
+    goIndex_t x,y,z;
+
+    for (y = 0; y < signal.getSizeY(); ++y)
+    {
+        dx = dxSave;
+        p = py;
+        for (x = 0; x < signal.getSizeX(); ++x)
+        {
+            std::cout << *(goUInt16*)p << " ";
+            p += *dx;
+            ++dx;
+        }
+        py += *dy;
+        // std::cout << "\n" << *dy << "\n";
+        std::cout << "\n";
+        ++dy;
+    }
+    std::cout << "\n";
+}
+
 int main (void)
 {
     {
@@ -193,21 +223,27 @@ int main (void)
     {
         goSignal3D<void> generic;
 
-        if (!generic.setDataType (GO_INT16))
+        if (!generic.setDataType (GO_UINT16))
         {
             std::cout << "setDataType() failed\n";
         }
-        generic.make (32,32,32,4,4,4,4,4,4);
+        generic.make (32,32,1,4,4,1,4,4,4);
         counter = 0;
         for (y = 0; y < generic.getSizeY(); ++y)
         {
             for (x = 0; x < generic.getSizeX(); ++x)
             {
-                *(goInt16*)generic.getPtr (x, y, 31) = counter;
-                *(goInt16*)generic.getPtr (x, y, 1) = 200 + counter++;
+                *(goInt16*)generic.getPtr (x, y, 0) = counter++;
+                // *(goInt16*)generic.getPtr (x, y, 1) = 200 + counter++;
             }
         }
         printSignal (generic);
+        printWithPointers (generic);
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (std::cout << *(goUInt16*)__ptr, generic);
+
+        goSubSignal3D<void> sub (&generic, 5, 5, 1);
+        sub.setPosition (5, 0, 0);
+        printSignal (sub);
     }
     
     return 1;
