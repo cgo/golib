@@ -31,8 +31,6 @@ goSignal3DBase<T>::goSignal3DBase ()
 template< class T >
 goSignal3DBase<T>::~goSignal3DBase () 
 {
-    std::cout << "~goSignal3DBase\n";
-
     if (xDiff)
     {
         delete[] (xDiff - myBorderSize.x);
