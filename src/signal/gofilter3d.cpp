@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gofilter3d.cpp,v 1.1 2002/10/26 15:45:32 christian Exp $
+ * $Id$
  * $Log: gofilter3d.cpp,v $
  * Revision 1.1  2002/10/26 15:45:32  christian
  * 3d filter class

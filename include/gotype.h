@@ -28,10 +28,13 @@ class goType : public goObjectBase
         static bool      isSigned  (goTypeEnum t);
         static void      getString (goTypeEnum t, goString& stringRet);
 
+        bool            setID     (goTypeEnum t);
         goSize_t        getSize   () const;
         bool            isSigned  () const;
         const goString& getString () const;
         goTypeEnum      getID     () const;
+
+        const goType& operator= (const goType& other);
 
     private:
         goTypePrivate* myPrivate;

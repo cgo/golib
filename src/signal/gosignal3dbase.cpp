@@ -1,5 +1,6 @@
-#include <gosignal3d.h>
-#include <gosubsignal3d.h>
+//#include <gosignal3d.h>
+//#include <gosubsignal3d.h>
+#include <gosignal3dbase.h>
 #include <goerror.h>
 #include <gosignalmacros.h>
 #include <go3vector.h>
@@ -22,7 +23,7 @@ goSignal3DBase<T>::goSignal3DBase ()
     mySize        (0, 0, 0),
     myBorderSize  (0, 0, 0),
     myBlockSize   (1, 1, 1),
-    myDataType    (NULL)
+    myDataType    (GO_UINT8)
 {
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
@@ -61,11 +62,6 @@ goSignal3DBase<T>::~goSignal3DBase ()
         delete[] (myZJump - myBorderSize.z);
         myZJump = NULL;
     }
-    if (myDataType)
-    {
-        delete myDataType;
-        myDataType = NULL;
-    }
 }
 
 template<class T>
@@ -83,7 +79,7 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     mySize       (0, 0, 0),
     myBorderSize (0, 0, 0),
     myBlockSize  (1, 1, 1),
-    myDataType    (NULL)
+    myDataType   (GO_UINT8)
 {
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
@@ -92,13 +88,7 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
 
 #define INITIALIZE_DATATYPE_METHOD(TYPEENUM) {\
     { \
-        if (myDataType) \
-        { \
-            delete myDataType; \
-            myDataType = NULL; \
-        } \
-        myDataType = new goType (TYPEENUM); \
-        return true; \
+        return myDataType.setID (TYPEENUM); \
     } \
 }
 
@@ -132,6 +122,11 @@ INITIALIZE_DATATYPE_METHOD(GO_DOUBLE);
 bool
 goSignal3DBase<void*>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_VOID_POINTER);
+// Initialize the generic container with uint8 -- 
+// the type of the generic container can be changed with setDataType()
+bool
+goSignal3DBase<void>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_UINT8);
 
 #undef INITIALIZE_DATATYPE_METHOD
 
@@ -141,6 +136,30 @@ goSignal3DBase<T>::initializeDataType ()
 {
     assert ("Unknown data type" == NULL);
     return false;
+}
+
+void*
+goSignal3DBase<void>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
+{
+    return (goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x];
+}
+
+const void*
+goSignal3DBase<void>::getClosest (go3Vector<goFloat>& point) const
+{
+    return ((goUInt8*)getPtr ((int)point.x, (int)point.y, (int)point.z));
+}
+
+goFloat
+goSignal3DBase<void*>::sample(go3Vector<goFloat>& point)
+{
+	return 0.0f;
+}
+
+goFloat
+goSignal3DBase<void>::sample(go3Vector<goFloat>& point)
+{
+	return 0.0f;
 }
 
 template <class T>
@@ -362,6 +381,227 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     return true;
 }
 
+bool
+goSignal3DBase<void>::initialize (void*    dataptr,
+                                  goSize_t x, goSize_t y, goSize_t z,
+                                  goSize_t blockSizeX, 
+                                  goSize_t blockSizeY, 
+                                  goSize_t blockSizeZ,
+                                  goSize_t border_x, 
+                                  goSize_t border_y, 
+                                  goSize_t border_z)
+{
+    if (xDiff)
+    {
+        delete[] (xDiff - myBorderSize.x);
+        xDiff = NULL;
+    }
+    if (yDiff)
+    {
+        delete[] (yDiff - myBorderSize.y);
+        yDiff = NULL;
+    }
+    if (zDiff)
+    {
+        delete[] (zDiff - myBorderSize.z);
+        zDiff = NULL;
+    }
+    if (myXJump)
+    {
+        delete[] (myXJump - myBorderSize.x);
+        myXJump = NULL;
+    }
+    if (myYJump)
+    {
+        delete[] (myYJump - myBorderSize.y);
+        myYJump = NULL;
+    }
+    if (myZJump)
+    {
+        delete[] (myZJump - myBorderSize.z);
+        myZJump = NULL;
+    }
+
+    myBorderSize.x = border_x;
+    myBorderSize.y = border_y;
+    myBorderSize.z = border_z;
+    myBlockSize.x  = blockSizeX;
+    myBlockSize.y  = blockSizeY;
+    myBlockSize.z  = blockSizeZ;
+    
+    mySize.x = x;
+    mySize.y = y;
+    mySize.z = z;
+  
+    myBlocks.x = (mySize.x + myBlockSize.x - 1) / myBlockSize.x;
+    myBlocks.y = (mySize.y + myBlockSize.y - 1) / myBlockSize.y;
+    myBlocks.z = (mySize.z + myBlockSize.z - 1) / myBlockSize.z;
+    
+    xDiff   = new goPtrdiff_t[mySize.x + 2 * myBorderSize.x];
+    yDiff   = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
+    zDiff   = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
+    
+    myXJump = new goPtrdiff_t[mySize.x + 2 * myBorderSize.x];
+    myYJump = new goPtrdiff_t[mySize.y + 2 * myBorderSize.y];
+    myZJump = new goPtrdiff_t[mySize.z + 2 * myBorderSize.z];
+   
+    if (!xDiff || !yDiff || !zDiff || !myXJump || !myYJump || !myZJump)
+    {
+        return false;
+    }
+    
+    xDiff += myBorderSize.x;
+    yDiff += myBorderSize.y;
+    zDiff += myBorderSize.z;
+    
+    myXJump += myBorderSize.x;
+    myYJump += myBorderSize.y;
+    myZJump += myBorderSize.z;
+    
+    real_ptr = dataptr;
+    ptr      = real_ptr;
+
+    goPtrdiff_t elementSize = myDataType.getSize();
+    goIndex_t i;
+    goPtrdiff_t blockJump  = myBlockSize.x * 
+                             myBlockSize.y * myBlockSize.z * elementSize;
+    goPtrdiff_t blockJumpY = blockJump * myBlocks.x; 
+    goPtrdiff_t blockJumpZ = blockJumpY * myBlocks.y;
+  
+    
+    for (i = 0; i < (goIndex_t)mySize.x; ++i)
+    {
+        xDiff[i]   = 1 * elementSize;
+    }
+
+    for (i = (goIndex_t)myBlockSize.x - 1; i < (goIndex_t)mySize.x; i += myBlockSize.x)
+    {
+        xDiff[i] = blockJump - myBlockSize.x + 1 * elementSize;
+    }
+    
+    for (i = 0; i < (goIndex_t)mySize.y; ++i)
+    {
+        yDiff[i] = myBlockSize.x * elementSize;
+    }
+
+    for (i = (goIndex_t)myBlockSize.y - 1; i < (goIndex_t)mySize.y; i += myBlockSize.y)
+    {
+        yDiff[i] = blockJumpY - (myBlockSize.x * (myBlockSize.y - 1) * elementSize);
+    }
+
+    for (i = 0; i < (goIndex_t)mySize.z; ++i)
+    {
+        zDiff[i] = myBlockSize.x * myBlockSize.y * elementSize;
+    }
+
+    for (i = (goIndex_t)myBlockSize.z - 1; i < (goIndex_t)mySize.z; i += myBlockSize.z)
+    {
+        zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1) * elementSize);
+    }
+
+
+    goPtrdiff_t currentJump = 0;
+    goIndex_t j;
+    for (j = 0; j < mySize.x; ++j)
+    {
+        if ((j % myBlockSize.x) == 0)
+        {
+            currentJump = blockJump * j / (myBlockSize.x * elementSize);
+        }
+        myXJump[j] = currentJump;
+        currentJump += elementSize;
+    }
+
+    currentJump = 0;
+    for (j = 0; j < mySize.y; ++j)
+    {
+        if ((j % myBlockSize.y) == 0)
+        {
+            currentJump = blockJumpY * j / (myBlockSize.y * elementSize);
+        }
+        myYJump[j] = currentJump;
+        currentJump += myBlockSize.x * elementSize;
+    }
+    
+    currentJump = 0;
+    for (j = 0; j < mySize.z; ++j)
+    {
+        if ((j % myBlockSize.z) == 0)
+        {
+            currentJump = blockJumpZ * j / (myBlockSize.z * elementSize);
+        }
+        myZJump[j] = currentJump;
+        currentJump += myBlockSize.x * myBlockSize.y * elementSize;
+    }
+
+
+    // Periodize signal over the border
+
+    xDiff[getSizeX() - 1] = myXJump[0] - myXJump[getSizeX() - 1] ;
+    yDiff[getSizeY() - 1] = myYJump[0] - myYJump[getSizeY() - 1] ;
+    zDiff[getSizeZ() - 1] = myZJump[0] - myZJump[getSizeZ() - 1] ;
+    
+    j = getSizeX() - getBorderX();
+
+    for (i = -((goIndex_t)getBorderX()); i < 0; ++i, ++j)
+    {
+        xDiff[i]   = xDiff[j];
+        myXJump[i] = myXJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeX(); i < getSizeX() + getBorderX(); ++i, ++j)
+    {
+        xDiff[i] = xDiff[j];
+        myXJump[i] = myXJump[j];
+    }
+
+    j = getSizeY() - getBorderY();
+    for (i = -((goIndex_t)getBorderY()); i < 0; ++i, ++j)
+    {
+        yDiff[i]   = yDiff[j];
+        myYJump[i] = myYJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeY(); i < getSizeY() + getBorderY(); ++i, ++j)
+    {
+        yDiff[i] = yDiff[j];
+        myYJump[i] = myYJump[j];
+    }
+
+    j = getSizeZ() - getBorderZ();
+    for (i = -((goIndex_t)getBorderZ()); i < 0; ++i, ++j)
+    {
+        zDiff[i]   = zDiff[j];
+        myZJump[i] = myZJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeZ(); i < getSizeZ() + getBorderZ(); ++i, ++j)
+    {
+        zDiff[i] = zDiff[j];
+        myZJump[i] = myZJump[j];
+    }
+
+    
+    if (getBorderX() > 0)
+    {
+        xDiff[-1] = myXJump[0] - myXJump[-1];
+    }
+    if (getBorderY() > 0)
+    {
+        yDiff[-1] = myYJump[0] - myYJump[-1];
+    }
+    if (getBorderZ() > 0)
+    {
+        zDiff[-1] = myZJump[0] - myZJump[-1];
+    }
+    
+    return true;
+}
+
+
 template<class T>
 void
 goSignal3DBase<T>::destroy ()
@@ -405,6 +645,17 @@ goSignal3DBase<T>::memoryUsage()
     if (real_ptr) 
     {
         return (goSize_t)(sizeof(T) * getSizeX() * getSizeY() * getSizeZ());
+    }
+
+    return 0;
+}
+
+goSize_t
+goSignal3DBase<void>::memoryUsage()
+{
+    if (real_ptr) 
+    {
+        return (goSize_t)(myDataType.getSize() * getSizeX() * getSizeY() * getSizeZ());
     }
 
     return 0;
@@ -473,11 +724,23 @@ goSignal3DBase<T>::operator== (goSignal3DBase<T> &other) {
     return true;
 }
 
+bool
+goSignal3DBase<void>::operator== (goSignal3DBase<void> &other) 
+{
+    goError::print(getClassName(), "operator== not implemented for void.");
+}
+
 template< class T >
-    goSize_t
+goSize_t
 goSignal3DBase<T>::getSize()
 {
     return sizeof(T) * (mySize.x * mySize.y * mySize.z);
+}
+
+goSize_t
+goSignal3DBase<void>::getSize()
+{
+    return myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
 }
 
 template< class T >
@@ -511,6 +774,12 @@ goSignal3DBase<T>::getMaximum()
     return maxVal;
 }
 
+void
+goSignal3DBase<void>::getMaximum()
+{
+    goError::print (getClassName(), "getMaximum() not implemented for void.");
+}
+    
 template< class T >
     T
 goSignal3DBase<T>::getMinimum()
@@ -542,13 +811,389 @@ goSignal3DBase<T>::getMinimum()
     return minVal;
 }
 
-template< class T >
-    void
-goSignal3DBase<T>::fill (T value)
+void
+goSignal3DBase<void>::getMinimum()
 {
-    GO_SIGNAL3D_EACHELEMENT(*__ptr = value, (*this), T);
+    goError::print (getClassName(), "getMinimum() not implemented for void.");
 }
 
+template< class T >
+    void
+goSignal3DBase<T>::fill (const T* value)
+{
+    GO_SIGNAL3D_EACHELEMENT(*__ptr = *value, (*this), T);
+}
+
+void
+goSignal3DBase<void>::fill (const void*)
+{
+    goError::print ("goSignal3DBase<void>","fill not yet implemented");
+    // GO_SIGNAL3D_EACHELEMENT(*__ptr = value, (*this), T);
+}
+
+/*!
+ * \brief Sets data type for <void> type signals.
+ *
+ * This method works only for signals of type void.
+ * The destroy() method is called in the course of this method,
+ * so all data in the signal, if any, will be lost afterwards.
+ * 
+ * \param t  Type enumerator
+ *
+ * \return  True if successful, false otherwise.
+ */
+bool
+goSignal3DBase<void>::setDataType (goTypeEnum t)
+{
+    if (t == myDataType.getID())
+    {
+        return true;
+    }
+    this->destroy ();
+    return myDataType.setID (t);
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getXDiff () const
+{
+    return xDiff;
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getYDiff () const
+{
+    return yDiff;
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getZDiff () const
+{
+    return zDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getXDiff () 
+{
+    return xDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getYDiff () 
+{
+    return yDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getZDiff () 
+{
+    return zDiff;
+}
+
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getXJump () const
+{
+    return myXJump;
+}
+
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getYJump () const
+{
+    return myYJump;
+}
+
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getZJump () const
+{
+    return myZJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getXJump () 
+{
+    return myXJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getYJump () 
+{
+    return myYJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getZJump () 
+{
+    return myZJump;
+}
+
+#if 0
+template<class T>
+inline
+void
+goSignal3DBase<T>::shiftLeftDiffX (int n)
+{
+   if (n <= 0)
+       return;
+
+   if (getSizeX() > 1)
+   {
+       
+   }
+   shiftLeftDiffX (n-1);
+}
+#endif
+
+template< class T >
+inline
+void
+goSignal3DBase<T>::rotateAxes ()
+{
+  goPtrdiff_t* tempDiff = zDiff;
+  goSize_t tempSize = mySize.z;
+  goPtrdiff_t* tempJump = myZJump;
+  
+  mySize.z = mySize.y;
+  mySize.y = mySize.x;
+  mySize.x = tempSize;
+  zDiff = yDiff;
+  yDiff = xDiff;
+  xDiff = tempDiff;
+  myZJump = myYJump;
+  myYJump = myXJump;
+  myXJump = tempJump;
+}
+
+template <class T>
+inline
+void
+goSignal3DBase<T>::swapXY()
+{
+    goPtrdiff_t* tempDiff = xDiff;
+    goPtrdiff_t* tempJump = myXJump;
+    goSize_t     tempSize = mySize.x;
+
+    xDiff = yDiff;
+    yDiff = tempDiff;
+    myXJump = myYJump;
+    myYJump = tempJump;
+    mySize.x = mySize.y;
+    mySize.y = tempSize;
+}
+
+template <class T>
+const goType& 
+goSignal3DBase<T>::getDataType () const
+{
+    return myDataType;
+}
+        
+template<class T>
+inline
+T*
+goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
+{
+    return ptr + myZJump[z] + myYJump[y] + myXJump[x];
+}
+
+template<class T>
+inline
+const T*
+goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z) const
+{
+    return (const T*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x]);
+}
+
+template<class T>
+inline
+const T*
+goSignal3DBase<T>::getClosest (go3Vector<goFloat>& point) const
+{
+    return (getPtr ((int)point.x, (int)point.y, (int)point.z));
+}
+
+
+template<class T>
+inline
+goFloat
+goSignal3DBase<T>::sample (go3Vector<goFloat>& point)
+{
+    int left = (int)point.x;
+    goFloat px = point.x - left;
+    int top  = (int)point.y;
+    goFloat py = point.y - top;
+    int front = (int)point.z;
+    goFloat pz = point.z - front;
+
+#if 0
+	if ( (left < -1) || (left > getSizeX() - 1) || 
+		 (top < -1) || (top > getSizeY() - 1) ||
+		 (front < -1) || (front > getSizeZ() - 1) )
+	{
+		cout << "################### \n";
+		cout << "\tleft = " << left << ", top = " << top << ", front = " << front << endl;
+		return 0;
+	}
+#endif
+
+    T* p = getPtr (left,top,front);
+    T A = *p;
+    T B = *(p + xDiff[left]);
+    T C = *(p + yDiff[top]); // *getPtr (left,top + 1,front));
+    T D = *(p + xDiff[left] + yDiff[top]); // *getPtr (left + 1,top + 1,front));
+
+    p += zDiff[front];
+    T E = *p;
+    T F = *(p + xDiff[left]);
+    T G = *(p + yDiff[top]);
+    T H = *(p + xDiff[left] + yDiff[top]);
+
+    goFloat I1;
+    SIGNAL3D_bilinear (A,B,C,D,px,py,I1);
+    
+    goFloat I2;
+    SIGNAL3D_bilinear (E,F,G,H,px,py,I2);
+    
+    return (I1 + (I2 - I1) * pz);
+}
+
+template <class T>
+T*
+goSignal3DBase<T>::getPtr ()
+{
+    return getPtr (0, 0, 0);
+}
+
+template <class T>
+const T*
+goSignal3DBase<T>::getPtr () const
+{
+    return getPtr (0, 0, 0);
+}
+
+template <class T>
+T*
+goSignal3DBase<T>::getRealPtr ()
+{
+    return real_ptr;
+}
+
+template <class T>
+const T*
+goSignal3DBase<T>::getRealPtr () const
+{
+    return real_ptr;
+}
+
+template <class T>
+void
+goSignal3DBase<T>::setSize (goSize_t x, goSize_t y, goSize_t z)
+{
+    mySize.x = x;
+    mySize.y = y;
+    mySize.z = z;
+}
+
+template <class T>
+void
+goSignal3DBase<T>::setSize (const goSize3D& sz)
+{
+    mySize = sz;
+}
+
+template <class T>
+void
+goSignal3DBase<T>::setSizeX (goSize_t s)
+{
+    mySize.x = s;
+}
+
+template <class T>
+void
+goSignal3DBase<T>::setSizeY (goSize_t s)
+{
+    mySize.y = s;
+}
+
+template <class T>
+void
+goSignal3DBase<T>::setSizeZ (goSize_t s)
+{
+    mySize.z = s;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getSizeX () const
+{
+    return mySize.x;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getSizeY () const
+{
+    return mySize.y;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getSizeZ () const
+{
+    return mySize.z;
+}
+
+template <class T>
+goIndex_t
+goSignal3DBase<T>::getBorderX () const
+{
+    return (goIndex_t)myBorderSize.x;
+}
+
+template <class T>
+goIndex_t
+goSignal3DBase<T>::getBorderY () const
+{
+    return (goIndex_t)myBorderSize.y;
+}
+
+template <class T>
+goIndex_t
+goSignal3DBase<T>::getBorderZ () const
+{
+    return (goIndex_t)myBorderSize.z;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getBlockSizeX () const 
+{
+    return myBlockSize.x;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getBlockSizeY () const 
+{
+    return myBlockSize.y;
+}
+
+template <class T>
+goSize_t
+goSignal3DBase<T>::getBlockSizeZ () const 
+{
+    return myBlockSize.z;
+}
 
 #if 0
 template<class T>
@@ -1041,4 +1686,5 @@ template class goSignal3DBase< goInt64 >;
 template class goSignal3DBase< goFloat >;
 template class goSignal3DBase< goDouble >;
 template class goSignal3DBase< void* >;
+template class goSignal3DBase< void >;
 

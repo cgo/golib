@@ -22,6 +22,9 @@
 #undef HAVE_LIBFFTW
 #undef HAVE_LIBSDL
 #undef HAVE_LIBJPEG
+#undef HAVE_LIBIL
+#undef HAVE_LIBILU
+#undef HAVE_LIBILUT
 
 #ifdef HAVE_LIBQT
 #define USE_QT

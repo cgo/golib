@@ -50,6 +50,92 @@ goType::~goType ()
     }
 }
 
+bool
+goType::setID (goTypeEnum t)
+{
+    switch (t)
+    {
+        case GO_INT8:
+            {
+                myPrivate->size = sizeof (goInt8);
+                myPrivate->signedness = true;
+                myPrivate->string = "signed integer 8 bit";
+            }
+            break;
+        case GO_INT16:
+            {
+                myPrivate->size = sizeof (goInt16);
+                myPrivate->signedness = true;
+                myPrivate->string = "signed integer 16 bit";
+            }
+            break;
+        case GO_INT32:
+            {
+                myPrivate->size = sizeof (goInt32);
+                myPrivate->signedness = true;
+                myPrivate->string = "signed integer 32 bit";
+            }
+            break;
+        case GO_INT64:
+            {
+                myPrivate->size = sizeof (goInt64);
+                myPrivate->signedness = true;
+                myPrivate->string = "signed integer 64 bit";
+            }
+            break;
+        case GO_UINT8:
+            {
+                myPrivate->size = sizeof (goUInt8);
+                myPrivate->signedness = false;
+                myPrivate->string = "unsigned integer 8 bit";
+            }
+            break;
+        case GO_UINT16:
+            {
+                myPrivate->size = sizeof (goUInt16);
+                myPrivate->signedness = false;
+                myPrivate->string = "unsigned integer 16 bit";
+            }
+            break;
+        case GO_UINT32:
+            {
+                myPrivate->size = sizeof (goUInt32);
+                myPrivate->signedness = false;
+                myPrivate->string = "unsigned integer 32 bit";
+            }
+            break;
+        case GO_FLOAT:
+            {
+                myPrivate->size = sizeof (goFloat);
+                myPrivate->signedness = true;
+                myPrivate->string = "float";
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                myPrivate->size = sizeof (goDouble);
+                myPrivate->signedness = true;
+                myPrivate->string = "double";
+            }
+            break;
+        case GO_VOID_POINTER:
+            {
+                myPrivate->size = sizeof (void*);
+                myPrivate->signedness = false;
+                myPrivate->string = "void pointer";
+            }
+            break;
+        default:
+            {
+                assert ("UNKNOWN TYPE ENUM" == NULL);
+                return false;
+            }
+            break;
+    }
+    myPrivate->typeEnum = t;
+    return true;
+}
+
 /**
  * @brief Get size of type t.
  *
@@ -280,4 +366,11 @@ goType::getID () const
 {
     assert (myPrivate);
     return myPrivate->typeEnum;
+}
+
+const goType&
+goType::operator= (const goType& other)
+{
+    assert (this->setID (other.getID()));
+    return *this;
 }

@@ -1,6 +1,6 @@
 #include <gosignal3d.h>
 #include <gosignal3dbase.h>
-#include <gosubsignal3d.h>
+//#include <gosubsignal3d.h>
 #include <goerror.h>
 #include <gosignalmacros.h>
 #include <go3vector.h>
@@ -107,6 +107,86 @@ goSignal3D<T>::operator= (goSignal3DBase<T>& other)
     return *this;
 }
 
+bool
+goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
+                        goSize_t blockSizeX, 
+                        goSize_t blockSizeY, 
+                        goSize_t blockSizeZ,
+		                goSize_t border_x, 
+                        goSize_t border_y, 
+                        goSize_t border_z) 
+{
+    assert (blockSizeX > 0);
+    assert (blockSizeY > 0);
+    assert (blockSizeZ > 0);
+    
+    goSize3D blocks;
+  
+    blocks.x = (x + blockSizeX - 1) / blockSizeX;
+    blocks.y = (y + blockSizeY - 1) / blockSizeY;
+    blocks.z = (z + blockSizeZ - 1) / blockSizeZ;
+    
+    // real_ptr = new T[(x + (border_x << 1)) * (y + (border_y << 1)) * (z + (border_z << 1))];
+    // ptr = real_ptr + (goPtrdiff_t)(border_x * xDiff + border_y * yDiff + border_z * zDiff);
+    goUInt8* p = new goUInt8 [myDataType.getSize() * blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ];
+
+    if (!p)
+    {
+        return false;
+    }
+    
+    if (!initialize (p, x, y, z,
+                     blockSizeX,
+                     blockSizeY,
+                     blockSizeZ,
+                     border_x,
+                     border_y,
+                     border_z))
+    {
+        delete[] p;
+        p = NULL;
+        return false;
+    }
+
+    return true;
+}
+
+void
+goSignal3D<void>::destroy ()
+{
+    goSignal3DBase<void>::destroy ();
+    
+    if (real_ptr)
+    {
+        delete[] (goUInt8*)real_ptr;
+        real_ptr = NULL;
+        ptr      = NULL;
+    }
+}
+
+
+const goSignal3D<void>&
+goSignal3D<void>::operator= (goSignal3DBase<void>& other)
+{
+    std::cout << "goSignal3D::operator=()\n";
+    this->destroy();
+    this->setDataType (other.getDataType().getID());
+    this->make (other.getSizeX(),
+                other.getSizeY(),
+                other.getSizeZ(),
+                other.getBlockSizeX(),
+                other.getBlockSizeY(),
+                other.getBlockSizeZ(),
+                other.getBorderX(),
+                other.getBorderY(),
+                other.getBorderZ());
+    
+    goError::print (getClassName(), "operator= not fully implemented for void.");
+    // GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
+    
+    return *this;
+}
+
 /*!
  * Deletes the memory used by the block data.
  * @todo Take care what happens when axes are rotated. 
@@ -131,7 +211,7 @@ goSignal3D<T>::memoryUsage()
 {
     if (real_ptr) 
     {
-        return (goSize_t)(sizeof(T) * getSizeX() * getSizeY() * getSizeZ());
+        return (goSize_t)(getDataType().getSize() * getSizeX() * getSizeY() * getSizeZ());
     }
 
     return 0;
@@ -152,14 +232,92 @@ goSignal3D<T>::make (goSignal3D *other) {
                        other->getBorderZ());
 }
 
-/*! \brief Fills this signal with <code>element</code>.
+/*! 
+ * \brief Fills this signal with <code>element</code>.
  */
 template <class T>
 void
-goSignal3D<T>::fill (const T& element)
+goSignal3D<T>::fill (const T* element)
 {
-    GO_SIGNAL3D_EACHELEMENT (*__ptr = element, (*this), T);
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = *element, (*this), T);
 }
+
+void
+goSignal3D<void>::fill (const void*)
+{
+    goError::print (getClassName(), "fill() not implemented for void.");
+}
+
+/*!
+ * Allocates memory of appropriate size for the whole signal.
+ * Sets diffs and size.
+ * The data is uninitialized.
+ * If make is called, <CODE>destroy()</CODE> should be called when
+ * the data is not referenced anymore.
+ * destroy() is NOT called automagically when the destructor is called.
+ * To destroy the actual data, destroy() needs to be called BEFORE deleting the object.
+ * @param x Size in x direction of the signal
+ * @param y Size in y direction of the signal
+ * @param z Size in z direction of the signal
+ * @param border_x Size of the border in x direction
+ * @param border_y Size of the border in y direction
+ * @param border_z Size of the border in z direction
+ */
+template< class T >
+bool
+goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
+                     goSize_t blockSizeX, 
+                     goSize_t blockSizeY, 
+                     goSize_t blockSizeZ,
+		             goSize_t border_x, 
+                     goSize_t border_y, 
+                     goSize_t border_z) 
+{
+    assert (blockSizeX > 0);
+    assert (blockSizeY > 0);
+    assert (blockSizeZ > 0);
+    
+    goSize3D blocks;
+  
+    blocks.x = (x + blockSizeX - 1) / blockSizeX;
+    blocks.y = (y + blockSizeY - 1) / blockSizeY;
+    blocks.z = (z + blockSizeZ - 1) / blockSizeZ;
+    
+    // real_ptr = new T[(x + (border_x << 1)) * (y + (border_y << 1)) * (z + (border_z << 1))];
+    // ptr = real_ptr + (goPtrdiff_t)(border_x * xDiff + border_y * yDiff + border_z * zDiff);
+    T* p = new T[blocks.x * blockSizeX * blocks.y * blockSizeY * blocks.z * blockSizeZ];
+
+    if (!p)
+    {
+        return false;
+    }
+    
+    if (!initialize (p, x, y, z,
+                     blockSizeX,
+                     blockSizeY,
+                     blockSizeZ,
+                     border_x,
+                     border_y,
+                     border_z))
+    {
+        delete[] p;
+        p = NULL;
+        return false;
+    }
+
+    return true;
+}
+
+
+/// Works only with linear-memory blocks. No sub blocks. Uses memset().
+template <class T>
+void  
+goSignal3D<T>::fillByte (goInt8 b)
+{ 
+    memset ((void*)real_ptr, (int)b, 
+            getDataType().getSize() * mySize.x * mySize.y * mySize.z ); 
+}
+
 template class goSignal3D< goInt8 >;
 template class goSignal3D< goUInt8 >;
 template class goSignal3D< goInt16 >;
@@ -170,4 +328,4 @@ template class goSignal3D< goInt64 >;
 template class goSignal3D< goFloat >;
 template class goSignal3D< goDouble >;
 template class goSignal3D< void* >;
-
+template class goSignal3D< void >;

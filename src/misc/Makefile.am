@@ -9,7 +9,8 @@ libGomisc_la_SOURCES = goconfigfile.cc \
 					   goobjectbase.cc \
 					   gostatusobject.cc \
 					   gotransferfunction.cc \
-					   goobjectmessage.cc
+					   goobjectmessage.cc \
+					   goglobal.cpp
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 

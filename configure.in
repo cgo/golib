@@ -54,6 +54,9 @@ AC_CHECK_LIB(SDL,SDL_Init)
 AC_CHECK_LIB(GL,glVertex3f)
 AC_CHECK_LIB(glut,glutWireCube)
 AC_CHECK_LIB(GLU,test_nurbs_curve)
+AC_CHECK_LIB(IL,ilInit)
+AC_CHECK_LIB(ILU,iluInit)
+AC_CHECK_LIB(ILUT,ilutInit)
 
 dnl Check special functions
 AC_CHECK_FUNC(modf,[echo "You have modf() in libc, good..."],\

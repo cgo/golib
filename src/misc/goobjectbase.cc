@@ -54,7 +54,7 @@ goObjectBase::~goObjectBase ()
 /*! \brief Returns the class name. 
  *
  *  \return Name string for this class.
- * /
+ */
 const char*
 goObjectBase::getClassName()
 {

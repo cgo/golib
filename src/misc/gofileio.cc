@@ -2,12 +2,25 @@
 #include <stdio.h>
 #include <config.h>
 #include <goerror.h>
+#include <goglobal.h>
 #ifdef HAVE_LIBJPEG
 	#include <jpeglib.h>
 	#include <jerror.h>
 	#include <jconfig.h>
 	#include <jmorecfg.h>
 #endif	
+
+#ifdef HAVE_LIBIL
+# include <IL/il.h>
+#endif
+
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
+
+#ifndef GOSIGNALMACROS_H
+# include <gosignalmacros.h>
+#endif
 
 static void readLine (FILE* f, goString& str) {
   str.resize (0);
@@ -189,3 +202,181 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 
 #endif	
 }
+
+#ifdef HAVE_LIBIL
+/**
+ * @brief Reads an image file into the provided signal object.
+ *
+ * The goSignal3D object given as parameter <code>signal</code>
+ * determines the type of the loaded data.
+ * The image will be converted from the original type to the
+ * type given with the signal parameter.
+ * 
+ * @param filename  Name of the file containing the image.
+ * @param signal    Object of type goSignal3D that will contain the image after
+ *                  the method successfully returns.
+ *
+ * @return  True if successful, false otherwise.
+ **/
+bool
+goFileIO::readImage (const char* filename, goObjectBase* signal)
+{
+    if (!signal)
+    {
+        return false;
+    }
+    if (!goGlobal::ILInitialized)
+    {
+        ilInit ();
+        goGlobal::ILInitialized = true;
+    }
+    ILuint imageName = 0;
+    ilGenImages (1, &imageName);
+    ilBindImage (imageName);
+
+    // DevIL stupidly asks for char* instead of const char*, so convert it.
+    goString fn = filename;
+    if (ilLoadImage (fn.getPtr()) == IL_FALSE)
+    {
+        ilDeleteImages (1, &imageName);
+        return false;
+    }
+    ILint width  = 0;
+    ILint height = 0;
+    width  = ilGetInteger (IL_IMAGE_WIDTH);
+    height = ilGetInteger (IL_IMAGE_HEIGHT);
+
+    //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
+    /// \todo Add a sanity check here.
+    goSignal3D<goInt8>* tempSignal = (goSignal3D<goInt8>*)signal;
+    switch (tempSignal->getDataType().getID())
+    {
+        case GO_INT8:
+            {
+                goSignal3D<goInt8>* s = tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_BYTE) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goInt8* data = (goInt8*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt8);
+            }
+            break;
+        case GO_UINT8:
+            {
+                goSignal3D<goUInt8>* s = (goSignal3D<goUInt8>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_BYTE) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goUInt8* data = (goUInt8*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt8);
+            }
+            break;
+        case GO_INT16:
+            {
+                goSignal3D<goInt16>* s = (goSignal3D<goInt16>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_SHORT) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goInt16* data = (goInt16*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt16);
+            }
+            break;
+        case GO_UINT16:
+            {
+                goSignal3D<goUInt16>* s = (goSignal3D<goUInt16>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_SHORT) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goUInt16* data = (goUInt16*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt16);
+            }
+            break;
+        case GO_INT32:
+            {
+                goSignal3D<goInt32>* s = (goSignal3D<goInt32>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_INT) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goInt32* data = (goInt32*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goInt32);
+            }
+            break;
+        case GO_UINT32:
+            {
+                goSignal3D<goUInt32>* s = (goSignal3D<goUInt32>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_INT) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goUInt32* data = (goUInt32*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goUInt32);
+            }
+            break;
+        case GO_FLOAT:
+            {
+                goSignal3D<goFloat>* s = (goSignal3D<goFloat>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_FLOAT) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goFloat* data = (goFloat*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goFloat);
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                goSignal3D<goDouble>* s = (goSignal3D<goDouble>*)tempSignal;
+                s->destroy ();
+                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+                if (ilConvertImage (IL_LUMINANCE, IL_DOUBLE) == IL_FALSE)
+                {
+                    ilDeleteImages (1, &imageName);
+                    return false;
+                }
+                goDouble* data = (goDouble*)ilGetData ();
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = *data; ++data, (*s), goDouble);
+            }
+            break;
+        default:
+            {
+                ilDeleteImages (1, &imageName);
+                return false;
+            }
+            break;
+    }
+    ilDeleteImages (1, &imageName);
+    return true;
+}
+#else
+bool
+goFileIO::readImage (const char*, goObjectBase*)
+{
+    return false;
+}
+#endif

@@ -1,7 +1,7 @@
 #ifndef __GOSUBSIGNAL3D_H__
 #define __GOSUBSIGNAL3D_H__
 
-#include <gosignal3d.h>
+#include <gosignal3dbase.h>
 #include <gotypes.h>
 #include <goposition.h>
 
@@ -36,7 +36,7 @@ goSubSignal3D : public goSignal3DBase<T>
         virtual ~goSubSignal3D();
 
         void               setParent (goSignal3DBase<T>* p);
-        goSignal3DBase<T>* getParent () { return parent; }
+        goSignal3DBase<T>* getParent ();
         /*!
          * Sets the position of the subblock in the parent block.
          * Take care, this uses internal pointer differences for the parent
@@ -47,7 +47,7 @@ goSubSignal3D : public goSignal3DBase<T>
 
         void setSkip (goSize_t skipX, goSize_t skipY, goSize_t skipZ);
         
-        goPosition& getPosition () { return position; }
+        goPosition& getPosition ();
 
         void move (int dir);
 

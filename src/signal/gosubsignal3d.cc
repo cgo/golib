@@ -295,6 +295,20 @@ goSubSignal3D<T>::setParent (goSignal3DBase<T> *p)
   setPosition (0, 0, 0);
 }
 
+template <class T>
+goSignal3DBase<T>* 
+goSubSignal3D<T>::getParent ()
+{
+    return parent;
+}
+
+template <class T>
+goPosition&
+goSubSignal3D<T>::getPosition ()
+{
+    return position;
+}
+
 template class goSubSignal3D<goInt8>;
 template class goSubSignal3D<goUInt8>;
 template class goSubSignal3D<goInt16>;
@@ -305,4 +319,4 @@ template class goSubSignal3D<goInt64>;
 template class goSubSignal3D<goFloat>;
 template class goSubSignal3D<goDouble>;
 template class goSubSignal3D<void*>;
-
+template class goSubSignal3D<void>;

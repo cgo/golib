@@ -20,9 +20,12 @@
 #define HAVE_LIBPTHREAD 1
 /* #undef HAVE_LIBQT */
 #define HAVE_LIBTIFF 1
-/* #undef HAVE_LIBFFTW */
+#define HAVE_LIBFFTW 1
 #define HAVE_LIBSDL 1
 /* #undef HAVE_LIBJPEG */
+#define HAVE_LIBIL 1
+#define HAVE_LIBILU 1
+#define HAVE_LIBILUT 1
 
 #ifdef HAVE_LIBQT
 #define USE_QT

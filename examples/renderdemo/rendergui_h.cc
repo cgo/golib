@@ -2,7 +2,7 @@
 ** RenderGUI meta object code from reading C++ file 'rendergui.h'
 **
 ** Created: Thu Jan 17 10:21:04 2002
-**      by: The Qt MOC ($Id: rendergui_h.cc,v 1.12 2002/01/17 16:45:56 christian Exp $)
+**      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/

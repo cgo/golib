@@ -5,6 +5,23 @@
 #include <iostream>
 #include <gosignalmacros.h>
 
+void printSignal (goSignal3DBase<void>& signal)
+{
+    goIndex_t x, y;
+   
+//    GO_SIGNAL3D_EACHELEMENT (std::cout << *__ptr << " ", signal, T);
+    
+    for (y = 0; y < signal.getSizeY(); ++y)
+    {
+        for (x = 0; x < signal.getSizeX(); ++x)
+        {
+            std::cout << *(goInt16*)signal.getPtr (x, y, 0) << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
 template<class T>
 void printSignal (goSignal3DBase<T>& signal)
 {
@@ -79,8 +96,8 @@ int main (void)
         goSignal3D<goInt32> object1;
         goSignal3D<goInt32> object2;
 
-        object1.connectObject (&object2);
-        object2.connectObject (&object1);
+//        object1.connectObject (&object2);
+//        object2.connectObject (&object1);
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_NONE);
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
         // object1.disconnectObject (&object2);
@@ -169,5 +186,29 @@ int main (void)
     subSignal.shiftLeftDiff (2);
     subSignal.shiftRightSize (2);
     printSignal (subSignal);
+
+
+    /************************************************************************************/
+   
+    {
+        goSignal3D<void> generic;
+
+        if (!generic.setDataType (GO_INT16))
+        {
+            std::cout << "setDataType() failed\n";
+        }
+        generic.make (32,32,32,4,4,4,4,4,4);
+        counter = 0;
+        for (y = 0; y < generic.getSizeY(); ++y)
+        {
+            for (x = 0; x < generic.getSizeX(); ++x)
+            {
+                *(goInt16*)generic.getPtr (x, y, 31) = counter;
+                *(goInt16*)generic.getPtr (x, y, 1) = 200 + counter++;
+            }
+        }
+        printSignal (generic);
+    }
+    
     return 1;
 }
