@@ -115,6 +115,57 @@ bool goNormalizeSignal (const goSignal3DBase<void>* sig, goSignal3D<void>* targe
     return true;
 }
 
+/**
+ * @brief Normalizes or translates a float or double type signal to the interval
+ *        [0,1].
+ *
+ * If the signal values are out of the interval [0,1],
+ * the signal is normalized to it.
+ * If (maxValue - minValue) <= 1.0, the signal values are just translated into
+ * [0,1].
+ * 
+ * @param sig        Signal to be normalized.
+ *
+ * @return True if successful, false otherwise (e.g. if the signal is not float or double).
+ **/
+bool goNormalizeSignal (goSignal3DBase<void>* sig)
+{
+    if (sig->getDataType().getID() != GO_FLOAT && sig->getDataType().getID() != GO_DOUBLE)
+    {
+        return false;
+    }
+    goDouble minimum = 0.0;
+    goDouble maximum = 1.0;
+    minimum = sig->getMinimum();
+    maximum = sig->getMaximum();
+    {
+        goString msg ("goNormalizeSignal(): min = ");
+        msg += goFloat(minimum);
+        msg += ", max = "; msg += goFloat(maximum);
+        goLog::message(msg);
+    }
+    if (minimum >= 0.0 && maximum <= 1.0)
+    {
+        return false;
+    }
+    switch (sig->getDataType().getID())
+    {
+        case GO_FLOAT:
+            {
+                goNormalizeSignal__ ((goFloat)minimum, (goFloat)maximum, sig, sig);
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                goNormalizeSignal__ ((goDouble)minimum, (goDouble)maximum, sig, sig);
+            }
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
 template <class T, goTypeEnum T_ENUM>
 bool goFindZeroCrossings__ (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet)
 {
@@ -222,6 +273,7 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
                     minValue = static_cast<T>(0.0f);
                     maxValue = static_cast<T>(1.0f);
                 }
+                break;
             default: 
                 {
                     minValue = static_cast<T>(targetSig->getDataType().getMinimum());
@@ -231,7 +283,7 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
         }
         lutP = goCreateQuantizationTable (sig->getDataType(), minValue, maxValue, minIndex, maxIndex, lut);
     }
-    goSize_t channelCount = goMath::max(sig->getChannelCount(), targetSig->getChannelCount());
+    goSize_t channelCount = goMath::min(sig->getChannelCount(), targetSig->getChannelCount());
     goSize_t i;
     goSignal3DGenericIterator targetIt (targetSig);
     goSignal3DGenericConstIterator sourceIt (sig);
@@ -377,8 +429,26 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
         case GO_INT16:  return _RGBAtoScalar<goUInt8,goInt16>  (sig, targetSig); break;
         case GO_UINT32: return _RGBAtoScalar<goUInt8,goUInt32> (sig, targetSig); break;
         case GO_INT32:  return _RGBAtoScalar<goUInt8,goInt32>  (sig, targetSig); break;
-        case GO_FLOAT:  return _RGBAtoScalar<goUInt8,goFloat>  (sig, targetSig); break;
-        case GO_DOUBLE: return _RGBAtoScalar<goUInt8,goDouble> (sig, targetSig); break;
+        case GO_FLOAT:  
+                  {
+                      bool ok = _RGBAtoScalar<goUInt8,goFloat>  (sig, targetSig); 
+                      if (ok)
+                      {
+                          goNormalizeSignal(targetSig);
+                      }
+                      return ok;
+                  }
+                  break;
+        case GO_DOUBLE: 
+                  {
+                      bool ok = _RGBAtoScalar<goUInt8,goDouble> (sig, targetSig); 
+                      if (ok)
+                      {
+                          goNormalizeSignal(targetSig);
+                      }
+                      return ok;
+                  }
+                  break;
         default: goLog::warning("goRGBAtoScalar(): unknown data type."); break;
     }
     return false;
