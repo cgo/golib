@@ -14,16 +14,23 @@
 
 int main (int argc, char* argv[])
 {
-    if (argc < 2)
+//    if (argc < 2)
+//    {
+//        std::cout << argv[0] << " <number>\n";
+//        exit (1);
+//    }
+
+    Go::goUniformQuantizer<goFloat, goInt8> Q (5.0f, -100.0f, 100.0f, -128, 127);
+
+    // goInt8 q = Q.quantize (atof(argv[1]));
+    // std::cout << "Q(" << argv[1] << ")" << " = " << (int)q << "\n";
+    
+    goFloat f;
+    for (f = -100.0f; f < 101.0f; f += 1.0f)
     {
-        std::cout << argv[0] << " <number>\n";
-        exit (1);
+        std::cout << f << " " << (int)Q.quantize(f) << "\n";
     }
-
-    Go::goUniformQuantizer<goFloat, goInt8> Q (0.5f, -100.0f, 100.0f, -128, 127);
-
-    goInt8 q = Q.quantize (atof(argv[1]));
-    std::cout << "Q(" << argv[1] << ")" << " = " << (int)q << "\n";
+    
     exit (1);
 }
 
