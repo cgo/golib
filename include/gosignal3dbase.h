@@ -1,0 +1,283 @@
+/*
+ * This file and the programs contained in it and in associated files
+ * are copyright 2002 by Christian Gosch.
+ * Email: christian@goschs.de
+ * If no other license is supplied with this file, 
+ * assume it is distributable under the GNU General Public License (GPL).
+ * $Id$
+ * $Log$
+ */
+
+#ifndef GOSIGNAL3DBASE_H
+#define GOSIGNAL3DBASE_H
+
+template <class T>
+class
+goSignal3DBase : public goObjectInfo
+{
+    protected:
+        goSignal3DBase ();
+        goSignal3DBase (goSize_t x, goSize_t y, goSize_t z,
+                goSize_t blocksize_x = 32, goSize_t blocksize_y = 32, goSize_t blocksize_z = 32,
+                goSize_t border_x = 0, goSize_t border_y = 0, goSize_t border_z = 0);
+        goSignal3DBase (goSignal3DBase<T>& other);
+        virtual ~goSignal3DBase ();
+
+        bool     initialize (T* dataptr,
+                             goSize_t x, goSize_t y, goSize_t z,
+                             goSize_t blocksize_x = 32, 
+                             goSize_t blocksize_y = 32, 
+                             goSize_t blocksize_z = 32,
+                             goSize_t border_x    = 0, 
+                             goSize_t border_y    = 0, 
+                             goSize_t border_z    = 0);
+
+    public:
+        virtual void destroy ();
+        
+        // From goObjectInfo
+        virtual goSize_t memoryUsage();
+
+        void setPtr (T *p); 
+
+        inline T* getPtr () { return ptr;}
+
+        inline const T* getRealPtr () const { return (const T*)real_ptr; }
+        inline T* getRealPtr () { return real_ptr; }
+
+        inline T* getPtr (goIndex_t x, goIndex_t y, goIndex_t z);
+
+        inline const goPtrdiff_t* getXDiff () const;
+        inline const goPtrdiff_t* getYDiff () const;
+        inline const goPtrdiff_t* getZDiff () const;
+        inline       goPtrdiff_t* getXDiff () ;
+        inline       goPtrdiff_t* getYDiff () ;
+        inline       goPtrdiff_t* getZDiff () ;
+
+        inline void setSize (goSize_t x,goSize_t y,goSize_t z)
+            { 
+                mySize.x = x; mySize.y = y; mySize.z = z; 
+            }
+
+        inline void setSize (const goSize3D& sz)
+            {
+                mySize = sz;
+            }
+        inline void setSizeX(goSize_t s) { mySize.x = s; }
+        inline void setSizeY(goSize_t s) { mySize.y = s; }
+        inline void setSizeZ(goSize_t s) { mySize.z = s; }
+
+        /*!
+         * \return Size in samples in x direction.
+         */
+        inline goSize_t getSizeX () const { return mySize.x; }
+        /*!
+         * \return Size in samples in y direction.
+         */
+        inline goSize_t getSizeY () const { return mySize.y; }
+        /*!
+         * \return Size in samples in z direction.
+         */
+        inline goSize_t getSizeZ () const { return mySize.z; }
+
+        inline goSize_t getBorderX () const { return myBorderSize.x; }
+        inline goSize_t getBorderY () const { return myBorderSize.y; }
+        inline goSize_t getBorderZ () const { return myBorderSize.z; }
+
+        inline goSize_t getBlockSizeX () const { return myBlockSize.x; }
+        inline goSize_t getBlockSizeY () const { return myBlockSize.y; }
+        inline goSize_t getBlockSizeZ () const { return myBlockSize.z; }
+        /*!
+         * Does <strong>not</strong> perform a deep copy, instead copies size and pointer difference
+         * values and the <strong>pointer</strong> to the signal data.
+         */
+        virtual const goSignal3DBase&	operator= (goSignal3DBase &other);
+
+        /*!
+         * "Deep" comparison of the actual data.
+         */ 
+        bool		operator== (goSignal3DBase &other);
+
+        /*!
+         * @return The size of the object data (without the object overhead) in bytes.
+         */
+        goSize_t	getSize ();
+
+        T	getMaximum();
+        T	getMinimum();
+        void	fill (T value);
+
+        /// Copies the last valid values from the block data into the borders
+        // void  interpolateBorders ();
+
+        /*! copies a side from the other signal in the border of this signal (border = 1)
+         *  If you want to copy all sides and take the edges into account,
+         *  take the order LEFT RIGHT TOP BOTTOM FRONT BACK to copy.
+         *  See source code for details.
+         */
+        // void  interpolateFromSignal (goSignal3DBase<T>& other, Neighbour n);
+
+        inline void shiftLeftDiff (int n);
+        inline void shiftRightDiff (int n);
+        inline void shiftLeftSize (int n);
+        inline void shiftRightSize (int n);
+
+        /*!
+         * Not threadsafe
+         */
+        inline void rotateAxes ();
+
+        inline T	  getClosest (go3Vector<goFloat>& point);
+        inline goFloat sample (go3Vector<goFloat>& point);
+
+    protected:
+        /* pointer to the first value */
+        T		*ptr;
+        /* pointer to the first allocated data element */
+        T		*real_ptr;
+        goPtrdiff_t* xDiff;
+        goPtrdiff_t* yDiff;
+        goPtrdiff_t* zDiff;
+
+        goPtrdiff_t* myXJump;
+        goPtrdiff_t* myYJump;
+        goPtrdiff_t* myZJump;
+
+        goSize3D     mySize;
+        goSize3D     myBorderSize;
+        goSize3D     myBlockSize; 
+        goSize3D     myBlocks; 
+};
+
+#define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \
+    goFloat __p1 = __A + ((__B - __A)*__px);				\
+    goFloat __p2 = __C + ((__D - __C)*__px);				\
+    __target =  (__p1 + ((__p2 - __p1)*__py));				\
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getXDiff () const
+{
+    return xDiff;
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getYDiff () const
+{
+    return yDiff;
+}
+
+template<class T>
+inline const goPtrdiff_t* 
+goSignal3DBase<T>::getZDiff () const
+{
+    return zDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getXDiff () 
+{
+    return xDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getYDiff () 
+{
+    return yDiff;
+}
+
+template<class T>
+inline goPtrdiff_t* 
+goSignal3DBase<T>::getZDiff () 
+{
+    return zDiff;
+}
+
+template< class T >
+inline
+void
+goSignal3DBase<T>::rotateAxes ()
+{
+  goPtrdiff_t* tempDiff = zDiff;
+  goSize_t tempSize = mySize.z;
+  
+  mySize.z = mySize.y;
+  mySize.y = mySize.x;
+  mySize.x = tempSize;
+  zDiff = yDiff;
+  yDiff = xDiff;
+  xDiff = tempDiff;
+}
+
+template<class T>
+inline
+T*
+goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
+{
+    return ptr + myZJump[z] + myYJump[y] + myXJump[x];
+}
+
+template<class T>
+inline
+T
+goSignal3DBase<T>::getClosest (go3Vector<goFloat>& point)
+{
+    return (*getPtr ((int)point.x, (int)point.y, (int)point.z));
+}
+
+inline
+goFloat
+goSignal3DBase<void*>::sample(go3Vector<goFloat>& point)
+{
+	return 0.0f;
+}
+
+template<class T>
+inline
+goFloat
+goSignal3DBase<T>::sample (go3Vector<goFloat>& point)
+{
+    int left = (int)point.x;
+    goFloat px = point.x - left;
+    int top  = (int)point.y;
+    goFloat py = point.y - top;
+    int front = (int)point.z;
+    goFloat pz = point.z - front;
+
+#if 0
+	if ( (left < -1) || (left > getSizeX() - 1) || 
+		 (top < -1) || (top > getSizeY() - 1) ||
+		 (front < -1) || (front > getSizeZ() - 1) )
+	{
+		cout << "################### \n";
+		cout << "\tleft = " << left << ", top = " << top << ", front = " << front << endl;
+		return 0;
+	}
+#endif
+
+    T* p = getPtr (left,top,front);
+    T A = *p;
+    T B = *(p + xDiff[left]);
+    T C = *(p + yDiff[top]); // *getPtr (left,top + 1,front));
+    T D = *(p + xDiff[left] + yDiff[top]); // *getPtr (left + 1,top + 1,front));
+
+    p += zDiff[front];
+    T E = *p;
+    T F = *(p + xDiff[left]);
+    T G = *(p + yDiff[top]);
+    T H = *(p + xDiff[left] + yDiff[top]);
+
+    goFloat I1;
+    SIGNAL3D_bilinear (A,B,C,D,px,py,I1);
+    
+    goFloat I2;
+    SIGNAL3D_bilinear (E,F,G,H,px,py,I2);
+    
+    return (I1 + (I2 - I1) * pz);
+}
+#endif
+
