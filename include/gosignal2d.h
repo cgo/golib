@@ -16,7 +16,10 @@
 /*!
  * \brief Use goSignal3D instead.
  * 
- * 2D signal class, somewhat deprecated.
+ * 2D signal class, deprecated.
+ * All classes using this will in some time in the future be 
+ * replaced by classes using goSignal3DBase.
+ * Do not seriously use this.
  *
  * @author Christian Gosch
  * @see goFilterFIR
