@@ -108,3 +108,62 @@ bool goNormalizeSignal (const goSignal3DBase<void>* sig, goSignal3D<void>* targe
     }
     return true;
 }
+
+template <class T, goTypeEnum T_ENUM>
+bool goFindZeroCrossings__ (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet)
+{
+    goPointf point;
+    pointsRet.resize (0);
+    if (sig->getSizeZ() > 1)
+    {
+        goLog::warning ("goFindZeroCrossings(): Only 2D signals supported so far. Calculating only for first z-slice.");
+    }
+    GO_SIGNAL3D_EACHELEMENT_GENERIC (
+            if (*(const T*)__ptr * *(const T*)(__ptr + *__dx) < T(0))
+            {
+                point.x = (goFloat)__k;
+                point.y = (goFloat)__j + 0.5f;
+                point.x += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dx));
+                pointsRet += point;
+            }
+            if (*(const T*)__ptr * *(const T*)(__ptr + *__dy) < T(0))
+            {
+                point.x = (goFloat)__k + 0.5f;
+                point.y = (goFloat)__j;
+                point.y += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dy));
+                pointsRet += point;
+            }, (*sig));
+    return true;
+}
+
+bool goFindZeroCrossings (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet)
+{
+    if (!sig)
+    {
+        return false;
+    }
+    switch (sig->getDataType().getID())
+    {
+        case GO_FLOAT:
+            {
+                return goFindZeroCrossings__<goFloat, GO_FLOAT> (sig, pointsRet);
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                return goFindZeroCrossings__<goDouble, GO_DOUBLE> (sig, pointsRet);
+            }
+            break;
+        default:
+            {
+                goString msg;
+                msg = "goFindZeroCrossings(): Type ";
+                msg += sig->getDataType().getString().toCharPtr();
+                msg += " not supported. Only float and double.";
+                goLog::warning (msg);
+                return false;
+            }
+            break;
+    }
+    return false;
+}
