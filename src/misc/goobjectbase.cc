@@ -2,8 +2,10 @@
 #include <golist.hpp>
 #include <gostring.h>
 #include <goobjectbase.h>
+#include <gothread.h>
 #include <iostream>
 #include <assert.h>
+#include <stdio.h>
 
 class goObjectBasePrivate
 {
@@ -44,6 +46,7 @@ goObjectBase::goObjectBase ()
 goObjectBase::~goObjectBase ()
 {
     sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+    myPrivate->connectedObjects.erase();
     if (myPrivate)
     {
         delete myPrivate;
@@ -56,7 +59,7 @@ goObjectBase::~goObjectBase ()
  *  \return Name string for this class.
  */
 const char*
-goObjectBase::getClassName()
+goObjectBase::getClassName() const
 {
     return myPrivate->className.toCharPtr();
 }
@@ -254,5 +257,5 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
 void
 goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
-    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n";
+    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
 }
