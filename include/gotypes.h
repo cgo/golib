@@ -4,8 +4,8 @@
  * Else, use the C types (that vary in length dependent on the architecture you are using).
  */
 
-#ifndef __GOTYPES_H__
-#define __GOTYPES_H__
+#ifndef GOTYPES_H
+#define GOTYPES_H
 
 
 #include <stdlib.h>	//for size_t
@@ -20,9 +20,12 @@
 #define GO_PROJECT_NAME		"libGo"
 #define GO_PROJECT_VERSION	"0.3"
 
-/** Standard types */
+/* Standard types */
 #if SIZEOF_CHAR == 1
-//
+/*!
+ * \addtogroup types
+ * @{
+ */
 ///
 typedef unsigned char goUInt8;
 ///
@@ -46,36 +49,47 @@ typedef int goSint32;
 ///
 typedef int goInt32;
 #elif SIZEOF_SHORT_INT == 4
+///
 typedef unsigned short int goUInt32;
+///
 typedef short int goSint32;
+///
 typedef short int goInt32;
 #endif
 
 /* Hopyfully, one of the following will do :-) */
 #if SIZEOF_LONG_INT == 8
 ///
+///
 typedef unsigned long goUInt64;
 ///
+///
 typedef long goSint64;
+///
 ///
 typedef long goInt64;
 #elif SIZEOF_LONG_LONG_INT == 8
 ///
+///
 typedef unsigned long long goUInt64;
 ///
+///
 typedef long long goSint64;
+///
 ///
 typedef long long goInt64;
 #endif
 //
 
-/** index types */
+/* index types */
 //
+///
 typedef goInt32 goIndex_t;
 //
 
-/** floats: */
+/* floats: */
 //
+///
 ///
 typedef double goDouble;
 #ifdef HAVE_IEEE754_H
@@ -94,10 +108,13 @@ typedef size_t	goSize_t;
 #define goSize3D go3Vector<goSize_t>
 
 /** Pointer types: */
+///
 typedef int goPtrOffset_t;
+///
 typedef goPtrOffset_t goPtrdiff_t;
 
 /** Types mainly for signal handling: */
+///
 typedef double goTime_t;
 
 /*!
@@ -120,6 +137,7 @@ enum GO_TYPE {
   GO_FLOAT,
   GO_DOUBLE
 };
+/** @}*/
 #endif /* __GOTYPES_H__ */
 
 
