@@ -10,6 +10,13 @@
 #endif
 
 typedef bool (*goCompareFunction)(const void*, const void*);
+typedef goIndex_t (*goIndexFunction)(const void*);
+
+// We need a function that:
+// - converts from a void* to a float or double
+// - converts from a float or double back to the type (also void* to a table)
+// --> write a class that creates those tables and functions that return float/double
+//     from a void*
 
 class goTypePrivate;
 /*!
@@ -38,6 +45,12 @@ class goType : public goObjectBase
         goCompareFunction getLowerThanFunction   () const;
         goCompareFunction getGreaterThanFunction () const;
         goCompareFunction getEqualFunction       () const;
+       
+        goIndexFunction   getIndexFunction       () const;
+        goIndex_t         getMinIndex            () const;
+        goIndex_t         getMaxIndex            () const;
+        
+        const void* getQuantizationTable (goTypeEnum targetType) const;
        
         goDouble          getMinimum () const;
         goDouble          getMaximum () const;
