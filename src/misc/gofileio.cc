@@ -255,6 +255,22 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
  * @return  True if successful, false otherwise.
  **/
 #ifdef HAVE_LIBIL
+
+template <class T> 
+static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s)
+{
+    s->destroy ();
+    s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
+    if (ilConvertImage (format, type) == IL_FALSE)
+    {
+        ilDeleteImages (1, &imageName);
+        return false;
+    }
+    T* data = (T*)ilGetData ();
+    GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; ++data, (*s));
+    return true;
+}
+
 bool
 goFileIO::readImage (const char* filename, goObjectBase* signal)
 {
@@ -282,6 +298,8 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
     ILint height = 0;
     width  = ilGetInteger (IL_IMAGE_WIDTH);
     height = ilGetInteger (IL_IMAGE_HEIGHT);
+    ILint imageFormat = ilGetInteger (IL_IMAGE_FORMAT);
+    ILint imageType   = ilGetInteger (IL_IMAGE_TYPE);
 
     //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
     /// \todo Add a sanity check here.
@@ -290,106 +308,66 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
     {
         case GO_INT8:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_BYTE) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goInt8> (IL_LUMINANCE, IL_BYTE, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goInt8* data = (goInt8*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt8*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT8:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_BYTE) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goUInt8> (IL_LUMINANCE, IL_UNSIGNED_BYTE, imageName, width, height,  s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goUInt8* data = (goUInt8*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt8*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_INT16:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_SHORT) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goInt16> (IL_LUMINANCE, IL_SHORT, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goInt16* data = (goInt16*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt16*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT16:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_SHORT) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goUInt16> (IL_LUMINANCE, IL_UNSIGNED_SHORT, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goUInt16* data = (goUInt16*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt16*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_INT32:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_INT) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goInt32> (IL_LUMINANCE, IL_INT, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goInt32* data = (goInt32*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goInt32*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_UINT32:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_UNSIGNED_INT) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goUInt32> (IL_LUMINANCE, IL_UNSIGNED_INT, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goUInt32* data = (goUInt32*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt32*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_FLOAT:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_FLOAT) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goFloat> (IL_LUMINANCE, IL_FLOAT, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goFloat* data = (goFloat*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goFloat*)__ptr = *data; ++data, (*s));
             }
             break;
         case GO_DOUBLE:
             {
-                s->destroy ();
-                s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-                if (ilConvertImage (IL_LUMINANCE, IL_DOUBLE) == IL_FALSE)
+                if (!ILtoGOSIGNAL<goDouble> (IL_LUMINANCE, IL_DOUBLE, imageName, width, height, s))
                 {
-                    ilDeleteImages (1, &imageName);
                     return false;
                 }
-                goDouble* data = (goDouble*)ilGetData ();
-                GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goDouble*)__ptr = *data; ++data, (*s));
             }
             break;
         default:
@@ -438,7 +416,9 @@ goFileIO::readImage (const char*, goObjectBase*)
  * \note This method only works when libGo was compiled with 
  *       libIL support (http://openil.sourceforge.net). If not,
  *       it always returns false.
- *       
+ * 
+ * \todo This works only for float signals. Add other types.
+ *
  * @return True if successful, false otherwise.
  **/
 #ifdef HAVE_LIBIL
