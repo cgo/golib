@@ -6,12 +6,26 @@
 #include <gostring.h>
 #include <unistd.h>
 
+/*!
+ * \addtogroup system
+ */
+/*!
+ * @{
+ */
 /**
- * Process interface for Unix platforms. The OS has to provide the necessary exec* functions and a fork() function.
- * I recommend using the run ( ..., goArray<goString* >& argv) member for starting the child process.
+ * \brief Process interface for Unix platforms (so far). 
+ *
+ * The OS has to provide the necessary exec* functions and a fork() function.
+ * I recommend using the run ( ..., goArray<goString* >& argv) member for 
+ * starting the child process.
  * In this case, only the real parameters have to be provided by the user.
- * When using the run(const char* filename, char *const argv[]) member, the user has to provide argv[0] 
- * as the programname (as usual) and the array has to be ended by a NULL pointer.
+ * When using the run(const char* filename, char *const argv[]) member, 
+ * the user has to provide argv[0] 
+ * as the programname (as usual) and the array has to be ended by 
+ * a NULL pointer.
+ *
+ * \todo If needed, add Windoze support.
+ *
  * @author Christian Gosch
  */
 class goProcess {
@@ -39,6 +53,9 @@ class goProcess {
   bool running;
   int pid;
 };
+/*!
+ * @}
+ */
 
 
 #endif

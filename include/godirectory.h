@@ -12,8 +12,14 @@
 #include <gostring.h>
 #include <goarray.h>
 
+/*! 
+ * \addtogroup system
+ */
+/*!
+ * @{
+ */
 /**
- * Handling of file directories.
+ * \brief Handling of file directories.
  * @author Christian Gosch 
  */
 class goDirectory {
@@ -31,7 +37,7 @@ class goDirectory {
   void	close ();
   ///
   void	readEntries ();
-  ///
+  /// Returns true if last operation failed.
   bool	fail () { return last_failed; }
 
   ///
@@ -59,6 +65,9 @@ class goDirectory {
   ///
   goArray<int>		types;
 };
+/*!
+ * @}
+ */
 
 
 #endif
