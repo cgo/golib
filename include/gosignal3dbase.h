@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.1 2002/10/03 21:34:47 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.2 2002/10/26 15:12:23 christian Exp $
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.2  2002/10/26 15:12:23  christian
+ * New signal class structure
+ *
  * Revision 1.1  2002/10/03 21:34:47  christian
  * *** empty log message ***
  *
@@ -95,9 +98,9 @@ goSignal3DBase : public goObjectInfo
          */
         inline goSize_t getSizeZ      () const { return mySize.z; }
 
-        inline goSize_t getBorderX    () const { return myBorderSize.x; }
-        inline goSize_t getBorderY    () const { return myBorderSize.y; }
-        inline goSize_t getBorderZ    () const { return myBorderSize.z; }
+        inline goIndex_t getBorderX    () const { return (goIndex_t)myBorderSize.x; }
+        inline goIndex_t getBorderY    () const { return (goIndex_t)myBorderSize.y; }
+        inline goIndex_t getBorderZ    () const { return (goIndex_t)myBorderSize.z; }
 
         inline goSize_t getBlockSizeX () const { return myBlockSize.x; }
         inline goSize_t getBlockSizeY () const { return myBlockSize.y; }
