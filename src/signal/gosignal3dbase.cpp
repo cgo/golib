@@ -468,7 +468,6 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     goPtrdiff_t blockJumpY = blockJump * myBlocks.x; 
     goPtrdiff_t blockJumpZ = blockJumpY * myBlocks.y;
   
-    
     for (i = 0; i < (goIndex_t)mySize.x; ++i)
     {
         xDiff[i]   = 1 * elementSize;
@@ -476,7 +475,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
 
     for (i = (goIndex_t)myBlockSize.x - 1; i < (goIndex_t)mySize.x; i += myBlockSize.x)
     {
-        xDiff[i] = blockJump - myBlockSize.x + 1 * elementSize;
+        xDiff[i] = blockJump - ((myBlockSize.x - 1) * elementSize);
     }
     
     for (i = 0; i < (goIndex_t)mySize.y; ++i)
@@ -499,17 +498,19 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1) * elementSize);
     }
 
-
+    blockJump   = myBlockSize.x * myBlockSize.y * myBlockSize.z;
+    blockJumpY  = blockJump * myBlocks.x; 
+    blockJumpZ  = blockJumpY * myBlocks.y;
     goPtrdiff_t currentJump = 0;
     goIndex_t j;
     for (j = 0; j < mySize.x; ++j)
     {
         if ((j % myBlockSize.x) == 0)
         {
-            currentJump = blockJump * j / (myBlockSize.x * elementSize);
+            currentJump = blockJump * j / myBlockSize.x;
         }
-        myXJump[j] = currentJump;
-        currentJump += elementSize;
+        myXJump[j] = currentJump * elementSize;
+        ++currentJump;
     }
 
     currentJump = 0;
@@ -517,10 +518,10 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     {
         if ((j % myBlockSize.y) == 0)
         {
-            currentJump = blockJumpY * j / (myBlockSize.y * elementSize);
+            currentJump = blockJumpY * j / myBlockSize.y;
         }
-        myYJump[j] = currentJump;
-        currentJump += myBlockSize.x * elementSize;
+        myYJump[j] = currentJump * elementSize;
+        currentJump += myBlockSize.x;
     }
     
     currentJump = 0;
@@ -528,10 +529,10 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     {
         if ((j % myBlockSize.z) == 0)
         {
-            currentJump = blockJumpZ * j / (myBlockSize.z * elementSize);
+            currentJump = blockJumpZ * j / myBlockSize.z;
         }
-        myZJump[j] = currentJump;
-        currentJump += myBlockSize.x * myBlockSize.y * elementSize;
+        myZJump[j] = currentJump * elementSize;
+        currentJump += myBlockSize.x * myBlockSize.y;
     }
 
 
