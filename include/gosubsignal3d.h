@@ -48,6 +48,11 @@ goSubSignal3D : public goSignal3DBase<T>
 
         void move (int dir);
 
+        void shiftLeftSize  (int n);
+        void shiftRightSize (int n);
+        void shiftLeftDiff  (int n);
+        void shiftRightDiff (int n);
+        
     private:
         goPosition         position;
         goSignal3DBase<T>* parent;

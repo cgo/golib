@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.3 2002/11/01 12:46:13 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.4 2003/06/22 14:54:49 christian Exp $
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.4  2003/06/22 14:54:49  christian
+ * Changes to enable sub sampling for dwt
+ *
  * Revision 1.3  2002/11/01 12:46:13  christian
  * changed getBorder*() return values to goIndex_t
  *
@@ -27,13 +30,15 @@ template <class T>
 class
 goSignal3DBase : public goObjectInfo
 {
+    public:
+        virtual ~goSignal3DBase ();
+
     protected:
         goSignal3DBase ();
         goSignal3DBase (goSize_t x, goSize_t y, goSize_t z,
                 goSize_t blocksize_x = 32, goSize_t blocksize_y = 32, goSize_t blocksize_z = 32,
                 goSize_t border_x = 0, goSize_t border_y = 0, goSize_t border_z = 0);
         goSignal3DBase (goSignal3DBase<T>& other);
-        virtual ~goSignal3DBase ();
 
         bool     initialize (T* dataptr,
                              goSize_t x, goSize_t y, goSize_t z,
@@ -147,6 +152,7 @@ goSignal3DBase : public goObjectInfo
          * Not threadsafe
          */
         inline void rotateAxes ();
+        inline void swapXY     ();
 
         inline T	  getClosest (go3Vector<goFloat>& point);
         inline goFloat sample (go3Vector<goFloat>& point);
@@ -268,6 +274,7 @@ goSignal3DBase<T>::rotateAxes ()
 {
   goPtrdiff_t* tempDiff = zDiff;
   goSize_t tempSize = mySize.z;
+  goPtrdiff_t* tempJump = myZJump;
   
   mySize.z = mySize.y;
   mySize.y = mySize.x;
@@ -275,6 +282,26 @@ goSignal3DBase<T>::rotateAxes ()
   zDiff = yDiff;
   yDiff = xDiff;
   xDiff = tempDiff;
+  myZJump = myYJump;
+  myYJump = myXJump;
+  myXJump = tempJump;
+}
+
+template <class T>
+inline
+void
+goSignal3DBase<T>::swapXY()
+{
+    goPtrdiff_t* tempDiff = xDiff;
+    goPtrdiff_t* tempJump = myXJump;
+    goSize_t     tempSize = mySize.x;
+
+    xDiff = yDiff;
+    yDiff = tempDiff;
+    myXJump = myYJump;
+    myYJump = tempJump;
+    mySize.x = mySize.y;
+    mySize.y = tempSize;
 }
 
 template<class T>

@@ -11,12 +11,12 @@ public:
   virtual ~goTreeNode ();
   
   goTreeNode<T>* getParentPtr () { return parent; }
-  void		 setParentPtr (goTreeNode<T>*);
+  void		     setParentPtr (goTreeNode<T>*);
   goTreeNode<T>* getNextSonPtr ();
   void           prevSon ();
-  void		 addSonPtr (goTreeNode<T>* n);
-  T		 getContent () { return (T)content; }
-  void		 setContent (T newCont) { content = newCont; }
+  void		     addSonPtr (goTreeNode<T>* n);
+  T		         getContent () { return (T)content; }
+  void		     setContent (T newCont) { content = newCont; }
 
   goList<void*>* getSonsListPtr ();
 protected:
@@ -26,7 +26,10 @@ protected:
 };
 
 /*!
- * Tree class.
+ * \brief Tree class.
+ *
+ * This is a tree class with a few extensions that 
+ * were needed in some university project.
  */
 template <class T>
 class goTree {

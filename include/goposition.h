@@ -7,6 +7,7 @@ class
 goPosition : public go3Vector<goInt32> {
  public:
   goPosition ();
+  goPosition (goInt32, goInt32, goInt32);
   virtual ~goPosition ();
 
  protected:
