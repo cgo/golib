@@ -50,9 +50,11 @@ goObjectMessage
         /// Pointer to the sending object
         goObjectBase*     mySender;
         /// ID (see goObjectMessageID)
-        goObjectMessageID myMessageID;
+        int               myMessageID;
+        // goObjectMessageID myMessageID;
         /// Optional string
         char*             myMessageString;
+        void*             myData;
 };
 /*!
  * @}
