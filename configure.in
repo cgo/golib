@@ -69,10 +69,18 @@ AC_OBJEXT
 
 
 AM_CONFIG_HEADER(include/config.h)
-AC_OUTPUT(./Makefile ./src/Makefile ./src/data/Makefile ./src/graphics/Makefile \
-		  ./src/math/Makefile ./src/misc/Makefile ./src/network/Makefile \
-		  ./src/nifty/Makefile ./src/signal/Makefile ./src/system/Makefile \
-		  ./src/thread/Makefile)
+AC_OUTPUT(./Makefile \
+          ./src/Makefile \
+          ./src/data/Makefile \
+          ./src/graphics/Makefile \
+		  ./src/math/Makefile \
+          ./src/misc/Makefile \
+          ./src/network/Makefile \
+		  ./src/nifty/Makefile \
+          ./src/signal/Makefile \
+          ./src/system/Makefile \
+		  ./src/thread/Makefile \
+          ./src/types/Makefile)
 
 
 
