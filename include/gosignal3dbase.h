@@ -4,24 +4,9 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.6 2003/07/24 16:19:15 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.7 2003/12/30 02:56:26 christian Exp $
  * $Log: gosignal3dbase.h,v $
- * Revision 1.6  2003/07/24 16:19:15  christian
- * *** empty log message ***
- *
- * Revision 1.5  2003/07/20 09:57:38  christian
- * *** empty log message ***
- *
- * Revision 1.4  2003/06/22 14:54:49  christian
- * Changes to enable sub sampling for dwt
- *
- * Revision 1.3  2002/11/01 12:46:13  christian
- * changed getBorder*() return values to goIndex_t
- *
- * Revision 1.2  2002/10/26 15:12:23  christian
- * New signal class structure
- *
- * Revision 1.1  2002/10/03 21:34:47  christian
+ * Revision 1.7  2003/12/30 02:56:26  christian
  * *** empty log message ***
  *
  */
@@ -30,7 +15,14 @@
 #define GOSIGNAL3DBASE_H
 
 #include <goobjectbase.h>
-#include <gotypes.h>
+#include <assert.h>
+
+#ifndef GOTYPES_H
+# include <gotypes.h>
+#endif
+#ifndef GOTYPE_H
+# include <gotype.h>
+#endif
 
 /*!
  * \brief Missing documentation.
@@ -48,6 +40,7 @@ goSignal3DBase : public goObjectBase
                 goSize_t blocksize_x = 32, goSize_t blocksize_y = 32, goSize_t blocksize_z = 32,
                 goSize_t border_x = 0, goSize_t border_y = 0, goSize_t border_z = 0);
         goSignal3DBase (goSignal3DBase<T>& other);
+        bool     initializeDataType ();
 
         bool     initialize (T* dataptr,
                              goSize_t x, goSize_t y, goSize_t z,
@@ -65,7 +58,8 @@ goSignal3DBase : public goObjectBase
         virtual goSize_t memoryUsage();
 
         void setPtr (T *p); 
-
+        const goType& getDataType () const;
+        
         inline       T* getPtr ()       { return getPtr (0, 0, 0);}
         inline const T* getPtr () const { return (const T*)getPtr (0, 0, 0);}
 
@@ -183,6 +177,8 @@ goSignal3DBase : public goObjectBase
         goSize3D     myBorderSize;
         goSize3D     myBlockSize; 
         goSize3D     myBlocks; 
+
+        goType*      myDataType;
 };
 
 #define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \
@@ -329,6 +325,17 @@ goSignal3DBase<T>::swapXY()
     mySize.y = tempSize;
 }
 
+template <class T>
+const goType& 
+goSignal3DBase<T>::getDataType () const
+{
+    static goType dummy (GO_INT8);
+    assert (myDataType);
+    if (myDataType)
+        return *myDataType;
+    return dummy;
+}
+        
 template<class T>
 inline
 T*

@@ -127,15 +127,17 @@ typedef unsigned long long goClock_t;
 #endif
 
 ///
-enum GO_TYPE {
+enum goTypeEnum {
   GO_INT8,
   GO_INT16,
   GO_INT32,
+  GO_INT64,
   GO_UINT8,
   GO_UINT16,
   GO_UINT32,
   GO_FLOAT,
-  GO_DOUBLE
+  GO_DOUBLE,
+  GO_VOID_POINTER
 };
 /** @}*/
 #endif /* __GOTYPES_H__ */

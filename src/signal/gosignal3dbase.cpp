@@ -21,8 +21,10 @@ goSignal3DBase<T>::goSignal3DBase ()
     myZJump       (NULL),
     mySize        (0, 0, 0),
     myBorderSize  (0, 0, 0),
-    myBlockSize   (1, 1, 1)
+    myBlockSize   (1, 1, 1),
+    myDataType    (NULL)
 {
+    this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
 }
 
@@ -61,6 +63,11 @@ goSignal3DBase<T>::~goSignal3DBase ()
         delete[] (myZJump - myBorderSize.z);
         myZJump = NULL;
     }
+    if (myDataType)
+    {
+        delete myDataType;
+        myDataType = NULL;
+    }
 }
 
 template<class T>
@@ -77,10 +84,65 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myZJump      (NULL),
     mySize       (0, 0, 0),
     myBorderSize (0, 0, 0),
-    myBlockSize  (1, 1, 1)
+    myBlockSize  (1, 1, 1),
+    myDataType    (NULL)
 {
+    this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
     *this = other;
+}
+
+#define INITIALIZE_DATATYPE_METHOD(TYPEENUM) {\
+    { \
+        if (myDataType) \
+        { \
+            delete myDataType; \
+            myDataType = NULL; \
+        } \
+        myDataType = new goType (TYPEENUM); \
+        return true; \
+    } \
+}
+
+bool
+goSignal3DBase<goInt8>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_INT8);
+bool
+goSignal3DBase<goInt16>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_INT16);
+bool
+goSignal3DBase<goInt32>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_INT32);
+bool
+goSignal3DBase<goInt64>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_INT64);
+bool
+goSignal3DBase<goUInt8>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_UINT8);
+bool
+goSignal3DBase<goUInt16>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_UINT16);
+bool
+goSignal3DBase<goUInt32>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_UINT32);
+bool
+goSignal3DBase<goFloat>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_FLOAT);
+bool
+goSignal3DBase<goDouble>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_DOUBLE);
+bool
+goSignal3DBase<void*>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_VOID_POINTER);
+
+#undef INITIALIZE_DATATYPE_METHOD
+
+template <class T>
+bool
+goSignal3DBase<T>::initializeDataType ()
+{
+    assert ("Unknown data type" == NULL);
+    return false;
 }
 
 template <class T>

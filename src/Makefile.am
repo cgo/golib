@@ -1,4 +1,4 @@
-SUBDIRS = data math misc network nifty signal system thread
+SUBDIRS = data math misc network nifty signal system thread types
 # graphics math misc \
 #		  network network nifty signal \
 #		  system thread
@@ -11,5 +11,6 @@ libGo_la_LIBADD = data/libGodata.la \
 				  nifty/libGonifty.la \
 				  signal/libGosignal.la \
 				  system/libGosystem.la \
-				  thread/libGothread.la
+				  thread/libGothread.la \
+				  types/libGotypes.la
 libGo_la_SOURCES = dummy.cc
