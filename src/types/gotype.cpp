@@ -60,6 +60,16 @@ goType::goType (goTypeEnum t)
     assert (myPrivate);
 }
 
+goType::goType (const goType& other)
+    : goObjectBase (),
+      myPrivate (NULL)
+{
+    setClassName ("goType");
+    myPrivate = new goTypePrivate (other.getID());
+    assert (myPrivate);
+    setID (other.getID());
+}
+
 goType::~goType ()
 {
     if (myPrivate)
