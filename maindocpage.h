@@ -71,22 +71,26 @@
  *
  * \section state State of development
  * Most of this, except for the src/data tree, is work in progress.
- * The current version number is <strong>0.2.1</strong>.
+ * The current version number is <strong>0.4.0</strong>.
  * The non-free parts will be removed and the library will get a higher version 
- * number then (probably 0.3).
+ * number then.
  * I remove bugs
- * as soon as I find them. If you find a bug or think you found a bug, please
- * do not hesitate to send me an email to <code>christian __at__ goschs __ de</code>.
+ * as soon as I find them. As I only use parts of the library very often, these parts
+ * will probably contain less bugs than others.
+ * If you find a bug or think you found a bug, please
+ * do not hesitate to send me an email to <code>golib __at__ goschs __ de</code>.
  *
  * \section download How to get the source
  * You should be able to download the source at <a href="http://www.goschs.de">www.goschs.de</a> in the [projects] section. If it's out of date,
  * let me know!
  * 
  * \section license License
- * Please read the file COPYING in the distribution directory and note
- * that you are not allowed to use this library 
- * in any commercial product or context unless you have prior
- * written permission to do so by the author, Christian Gosch.
+ * Please read the files COPYING and README in the distribution directory. 
+ * This library is distributed under the terms of the GNU General Public License,
+ * but if there is demand, I will provide a <b>commercial license</b> in addition to that
+ * (the GPL'ed version will not be touched by this).
+ * Of course a commercial version would <b>not</b> be free but would enable
+ * you to use the library in a closed source, commercial product.
  * 
  * If you should find that the version you downloaded is out of date
  * and does not match this documentation, please notify the me, the author,
