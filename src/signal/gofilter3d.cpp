@@ -20,6 +20,11 @@
 #include <math.h>
 #include <assert.h>
 
+#include <gotype.h>
+#ifndef GOTYPE_HPP
+# include <gotype.hpp>
+#endif
+
 /*!
  * @class goFilter3D
  * Provides convolution of a filter mask with a given goSignal3DBase.
@@ -191,18 +196,24 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
     
     goArray<goFloat> floatLUT;
     goFloat*         LUTOrigin = NULL;
+    LUTOrigin = goCreateQuantizationTable (inSignal.getDataType(),
+                                           0.0f, 1.0f, minIndex, maxIndex, floatLUT);
+    if (!LUTOrigin)
     {
-        goDouble delta = 1.0 / (goDouble)(maxIndex - minIndex);
-        floatLUT.resize (maxIndex - minIndex + 1);
-        LUTOrigin = floatLUT.getPtr() - minIndex;
-        goIndex_t i;
-        goDouble value = 0.0;
-        for (i = minIndex; i <= maxIndex; ++i)
-        {
-            LUTOrigin[i] = (goFloat)value;
-            value += delta;
-        }
+        return false;
     }
+//    {
+//        goDouble delta = 1.0 / (goDouble)(maxIndex - minIndex);
+//        floatLUT.resize (maxIndex - minIndex + 1);
+//        LUTOrigin = floatLUT.getPtr() - minIndex;
+//        goIndex_t i;
+//        goDouble value = 0.0;
+//        for (i = minIndex; i <= maxIndex; ++i)
+//        {
+//            LUTOrigin[i] = (goFloat)value;
+//            value += delta;
+//        }
+//    }
     
     for (z = 0; z < outSignal.getSizeZ(); ++z)
     {
