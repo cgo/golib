@@ -11,7 +11,7 @@ goUniformQuantizerPrivate
 {
     public:
         goUniformQuantizerPrivate (goSize_t quantizationSteps); 
-        goUniformQuantizerPrivate (_input_type  delta_input, 
+        goUniformQuantizerPrivate (goDouble     delta_input, 
                                    _input_type  min_input,
                                    _input_type  max_input,
                                    _output_type min_output,
@@ -19,7 +19,7 @@ goUniformQuantizerPrivate
         ~goUniformQuantizerPrivate ();
     
         goDouble     myDeltaInput_rec;
-        _input_type  myDeltaInput;
+        goDouble     myDeltaInput;
         _input_type  myMinInput;
         _input_type  myMaxInput;
         goDouble     myDeltaOutput;
@@ -31,7 +31,7 @@ template <class _input_type, class _output_type>
 goUniformQuantizerPrivate<_input_type, _output_type>::goUniformQuantizerPrivate (goSize_t quantizationSteps)
     :
     myDeltaInput_rec (0.0),
-    myDeltaInput  (0),
+    myDeltaInput  (0.0),
     myMinInput    (0),
     myMaxInput    (0),
     myDeltaOutput (0.0),
@@ -43,13 +43,14 @@ goUniformQuantizerPrivate<_input_type, _output_type>::goUniformQuantizerPrivate 
     myMinOutput = std::numeric_limits<_output_type>::min(); 
     myMaxOutput = std::numeric_limits<_output_type>::max();
 
-    myDeltaInput  = (myMaxInput - myMinInput) / (_input_type)quantizationSteps;
-    myDeltaOutput = (myMaxOutput - myMinOutput) / (_input_type)quantizationSteps;
+    myDeltaInput  = (myMaxInput - myMinInput) / quantizationSteps;
+    myDeltaOutput = (myMaxOutput - myMinOutput) / quantizationSteps;
     myDeltaInput_rec = 1.0 / (goDouble)myDeltaInput;
 }
 
 template <class _input_type, class _output_type>
-goUniformQuantizerPrivate<_input_type,_output_type>::goUniformQuantizerPrivate (_input_type  delta_input, 
+goUniformQuantizerPrivate<_input_type,_output_type>::goUniformQuantizerPrivate (
+        goDouble  delta_input, 
      _input_type  min_input,
      _input_type  max_input,
      _output_type min_output,
