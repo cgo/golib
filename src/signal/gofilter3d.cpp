@@ -133,7 +133,63 @@ goFilter3D<T_IN, T_OUT>::getMask () const
     return this->myMask;
 }
 
-#if 1
+template <class in_T, class out_T, class mask_T>
+static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>& outSignal, const goSignal3DBase<void>& mask, goIndex_t myMaskCenterX, goIndex_t  myMaskCenterY, goIndex_t myMaskCenterZ)
+{
+    assert (outSignal.getDataType().getID() == GO_FLOAT);
+    assert (inSignal.getSizeX() == outSignal.getSizeX() &&
+            inSignal.getSizeY() == outSignal.getSizeY() &&
+            inSignal.getSizeZ() == outSignal.getSizeZ());
+    
+    goSubSignal3D<void> inCoeff (&inSignal, 
+                                 mask.getSizeX(),
+                                 mask.getSizeY(),
+                                 mask.getSizeZ());
+
+    goIndex_t x, y, z;
+    x = 0; y = 0; z = 0;
+
+    goUInt8*     xPtrIn;
+    goUInt8*     yPtrIn;
+    goUInt8*     zPtrIn;
+    goUInt8*     xPtrOut;
+    goUInt8*     yPtrOut;
+    goUInt8*     zPtrOut;
+    goPtrdiff_t* xDiffIn;
+    goPtrdiff_t* yDiffIn;
+    goPtrdiff_t* xDiffOut;
+    goPtrdiff_t* yDiffOut;
+    
+    goDouble     cumulationBuffer = 0.0f;
+    
+    for (z = 0; z < outSignal.getSizeZ(); ++z)
+    {
+        yPtrOut  = (goUInt8*)outSignal.getPtr   (0, 0, z);
+        yDiffOut = outSignal.getYDiff ();
+
+        for (y = 0; y < outSignal.getSizeY(); ++y)
+        {
+            xPtrOut  = (goUInt8*)yPtrOut;
+            xDiffOut = outSignal.getXDiff ();
+
+            for (x = 0; x < outSignal.getSizeX(); ++x)
+            {
+                inCoeff.setPosition (x - myMaskCenterX, y - myMaskCenterY, z - myMaskCenterZ);
+                cumulationBuffer = 0.0f;
+                GO_SIGNAL3D_EACHELEMENT_2_GENERIC (cumulationBuffer += *(in_T*)(__ptr) * *(const mask_T*)__ptr_target, inCoeff, mask);
+                *(out_T*)xPtrOut = (out_T)cumulationBuffer;
+                xPtrOut += *xDiffOut;
+                ++xDiffOut;
+            }
+            yPtrOut += *yDiffOut;
+            ++yDiffOut;
+        }
+    }
+    
+    return true;
+}
+
+
 /**
  * @brief Filters a signal.
  *
@@ -162,6 +218,16 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
     {
         return false;
     }
+   
+    if (inSignal.getDataType().getID() == GO_FLOAT)
+    {
+        return filterFunction<goFloat,goFloat,goFloat> (inSignal, outSignal, myMask, myMaskCenterX, myMaskCenterY, myMaskCenterZ);
+    }
+    if (inSignal.getDataType().getID() == GO_DOUBLE)
+    {
+        return filterFunction<goDouble,goFloat,goFloat> (inSignal, outSignal, myMask, myMaskCenterX, myMaskCenterY, myMaskCenterZ);
+    }
+    
     
     goSubSignal3D<void> inCoeff (&inSignal, 
                                  myMask.getSizeX(),
@@ -185,8 +251,8 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
     goDouble     cumulationBuffer = 0.0f;
 
     goIndexFunction  indexFunction = inSignal.getDataType().getIndexFunction();
-    goIndex_t minIndex = inSignal.getDataType().getMinIndex();
-    goIndex_t maxIndex = inSignal.getDataType().getMaxIndex();
+    goIndex_t minIndex             = inSignal.getDataType().getMinIndex();
+    goIndex_t maxIndex             = inSignal.getDataType().getMaxIndex();
     
     goArray<goFloat> floatLUT;
     goFloat*         LUTOrigin = NULL;
@@ -235,7 +301,6 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
     
     return true;
 }
-#endif
 
 /*
  * @brief Start filter operation.
