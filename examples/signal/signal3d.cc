@@ -81,10 +81,10 @@ int main (void)
 
         object1.connectObject (&object2);
         object2.connectObject (&object1);
-        object1.sendObjectMessage (GO_OBJECTMESSAGE_NONE);
-        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+//        object1.sendObjectMessage (GO_OBJECTMESSAGE_NONE);
+//        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
         // object1.disconnectObject (&object2);
-        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+//        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
     }
     
     goSignal3D<goInt32> signal (16, 16, 16, 4, 4, 4, 16, 16, 16);

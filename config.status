@@ -530,7 +530,7 @@ s,@STRIP@,strip,;t t
 s,@ac_ct_STRIP@,strip,;t t
 s,@CPP@,gcc -E,;t t
 s,@CXX@,g++,;t t
-s,@CXXFLAGS@,-O1,;t t
+s,@CXXFLAGS@,-O2,;t t
 s,@ac_ct_CXX@,g++,;t t
 s,@CXXCPP@,g++ -E,;t t
 s,@F77@,g77,;t t
