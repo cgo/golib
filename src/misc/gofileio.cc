@@ -207,6 +207,48 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 #endif	
 }
 
+#ifdef HAVE_LIBIL
+
+template <class T> 
+static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s)
+{
+    s->destroy ();
+    if (format == IL_RGBA)
+    {
+        s->make (width, height, 1, 32, 32, 1, 32, 32, 1, 4);
+    }
+    else
+    {
+        s->make (width, height, 1, 32, 32, 1, 32, 32, 1, 1);
+    }
+    if (ilConvertImage (format, type) == IL_FALSE)
+    {
+        ilDeleteImages (1, &imageName);
+        return false;
+    }
+    T* data = (T*)ilGetData ();
+    if (s->getChannelCount() == 1)
+    {
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; ++data, (*s));
+    }
+    if (s->getChannelCount() == 4)
+    {
+        data = (T*)ilGetData();
+        s->setChannel(0);
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
+        data = (T*)ilGetData() + 1;
+        s->setChannel(1);
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
+        data = (T*)ilGetData() + 2;
+        s->setChannel(2);
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
+        data = (T*)ilGetData() + 3;
+        s->setChannel(3);
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
+    }
+    return true;
+}
+
 /**
  * @brief Reads an image file into the provided signal object.
  *
@@ -244,9 +286,15 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
  * The image type is selected by the filename's suffix.
  * 
  * @param filename  Name of the file containing the image.
- * @param signal    Object of type goSignal3D<void> that will contain the image after
- *                  the method successfully returns.
- *
+ * @param signal    Must be a pointer to a goSignal3D<void>.
+ *                  The data type of signal determines
+ *                  the type to which the image data are
+ *                  converted <b>if</b> the image is not RGB/RGBA.
+ *                  In that case, signal will always contain
+ *                  GO_UINT8, 4 channel data containing
+ *                  red, green, blue, and alpha values.
+ *        
+ *        
  * \note This method only works when libGo was compiled with 
  *       libIL support (http://openil.sourceforge.net). If not,
  *       it always returns false.
@@ -254,26 +302,13 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
  * \see goSignal3D
  * @return  True if successful, false otherwise.
  **/
-#ifdef HAVE_LIBIL
-
-template <class T> 
-static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s)
-{
-    s->destroy ();
-    s->make (width, height, 1, 32, 32, 1, 32, 32, 0);
-    if (ilConvertImage (format, type) == IL_FALSE)
-    {
-        ilDeleteImages (1, &imageName);
-        return false;
-    }
-    T* data = (T*)ilGetData ();
-    GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; ++data, (*s));
-    return true;
-}
-
 bool
 goFileIO::readImage (const char* filename, goObjectBase* signal)
 {
+    if (!signal)
+    {
+        return false;
+    }
     if (!signal)
     {
         return false;
@@ -300,15 +335,50 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
     height = ilGetInteger (IL_IMAGE_HEIGHT);
     ILint imageFormat = ilGetInteger (IL_IMAGE_FORMAT);
     ILint imageType   = ilGetInteger (IL_IMAGE_TYPE);
+    ILint imageNumBytes = ilGetInteger (IL_IMAGE_BYTES_PER_PIXEL);
+    goString msg = "goFileIO::readImage(): Bytes per pixel: ";
+    msg += (int)imageNumBytes;
+    goLog::message(msg);
 
     //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
     /// \todo Add a sanity check here.
     goSignal3D<void>* s = (goSignal3D<void>*)signal;
+    switch (imageFormat)
+    {
+        case IL_LUMINANCE: break;
+        case IL_RGBA:
+        case IL_RGB:
+        case IL_BGR:
+        case IL_BGRA:
+                imageFormat = IL_RGBA;
+                s->setDataType (GO_UINT8);
+                break;
+        default:
+                imageFormat = IL_LUMINANCE;
+                break;
+    }
+   
+    if (imageFormat == IL_LUMINANCE)
+    {
+        switch (imageType)
+        {
+            case IL_BYTE:           s->setDataType (GO_INT8);   break;
+            case IL_UNSIGNED_BYTE:  s->setDataType (GO_UINT8);  break;
+            case IL_SHORT:          s->setDataType (GO_INT16);  break;
+            case IL_UNSIGNED_SHORT: s->setDataType (GO_UINT16); break;
+            case IL_INT:            s->setDataType (GO_INT32);  break;
+            case IL_UNSIGNED_INT:   s->setDataType (GO_UINT32); break;
+            case IL_FLOAT:          s->setDataType (GO_FLOAT);  break;
+            case IL_DOUBLE:         s->setDataType (GO_DOUBLE); break;
+            default: 
+                    goLog::warning("goFileIO::readImage(): Unknown data type."); break;
+        }
+    }
     switch (s->getDataType().getID())
     {
         case GO_INT8:
             {
-                if (!ILtoGOSIGNAL<goInt8> (IL_LUMINANCE, IL_BYTE, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt8> (imageFormat, IL_BYTE, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -316,7 +386,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_UINT8:
             {
-                if (!ILtoGOSIGNAL<goUInt8> (IL_LUMINANCE, IL_UNSIGNED_BYTE, imageName, width, height,  s))
+                if (!ILtoGOSIGNAL<goUInt8> (imageFormat, IL_UNSIGNED_BYTE, imageName, width, height,  s))
                 {
                     return false;
                 }
@@ -324,7 +394,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_INT16:
             {
-                if (!ILtoGOSIGNAL<goInt16> (IL_LUMINANCE, IL_SHORT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt16> (imageFormat, IL_SHORT, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -332,7 +402,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_UINT16:
             {
-                if (!ILtoGOSIGNAL<goUInt16> (IL_LUMINANCE, IL_UNSIGNED_SHORT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goUInt16> (imageFormat, IL_UNSIGNED_SHORT, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -340,7 +410,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_INT32:
             {
-                if (!ILtoGOSIGNAL<goInt32> (IL_LUMINANCE, IL_INT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt32> (imageFormat, IL_INT, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -348,7 +418,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_UINT32:
             {
-                if (!ILtoGOSIGNAL<goUInt32> (IL_LUMINANCE, IL_UNSIGNED_INT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goUInt32> (imageFormat, IL_UNSIGNED_INT, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -356,7 +426,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_FLOAT:
             {
-                if (!ILtoGOSIGNAL<goFloat> (IL_LUMINANCE, IL_FLOAT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goFloat> (imageFormat, IL_FLOAT, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -364,7 +434,7 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
             break;
         case GO_DOUBLE:
             {
-                if (!ILtoGOSIGNAL<goDouble> (IL_LUMINANCE, IL_DOUBLE, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goDouble> (imageFormat, IL_DOUBLE, imageName, width, height, s))
                 {
                     return false;
                 }
@@ -416,8 +486,10 @@ goFileIO::readImage (const char*, goObjectBase*)
  * \note This method only works when libGo was compiled with 
  *       libIL support (http://openil.sourceforge.net). If not,
  *       it always returns false.
+ *  
+ * \note This does not yet work for multichannel data.
  * 
- * \todo This works only for float signals. Add other types.
+ * \todo This works only for float signals. Add other types. Add multichannel.
  *
  * @return True if successful, false otherwise.
  **/
