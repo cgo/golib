@@ -2,4 +2,4 @@
 aclocal
 automake --add-missing 
 autoconf
-./ltconfig ltmain.sh
+#./ltconfig ltmain.sh
