@@ -6,6 +6,8 @@
 
 
 /*!
+ * \brief Exception base class.
+ *
  * @author Christian Gosch
  */
 class goException
@@ -28,10 +30,4 @@ class goExceptionString : public goException
     goString st;
 };
 
-/*!
- * \example exception.cc
- * Example and test program for the goException class.
- * @author Christian Gosch
- */
 #endif
-
