@@ -11,7 +11,9 @@ libGomath_la_SOURCES = go3vectori.cc \
 					   gopdf.cpp \
 					   gogausspdf.cpp \
 					   gopoint.cpp \
-					   gradient.cpp
+					   gradient.cpp \
+					   gomath.cpp \
+					   divnormalizedgrad2d.cpp
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 
