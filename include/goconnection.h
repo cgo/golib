@@ -6,6 +6,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <gostring.h>
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
 
 namespace goNet {
 
@@ -24,12 +27,12 @@ namespace goNet {
  * Thread safety has to be implemented if needed by the user.
  * @author Christian Gosch
  */
-class goConnection {
+class goConnection : public goObjectBase {
  public:
   ///
   goConnection ();
   ///
-  ~goConnection ();
+  virtual ~goConnection ();
 
   /// Sets remote computer name
   void		setRemoteName 	(goString& name);

@@ -4,8 +4,11 @@
 #include <signal.h>
 #include <string.h>
 
-goProcess::goProcess () {
-  running = false;
+goProcess::goProcess ()
+    : goObjectBase ()
+{
+    this->setClassName ("goProcess");
+    running = false;
 }
 
 goProcess::~goProcess () {

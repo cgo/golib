@@ -8,7 +8,9 @@ libGomath_la_SOURCES = go3vectori.cc \
 					   gonvector.cc \
 					   goposition.cc \
 					   goquaternion.cc \
-                       golinearalgebra.cc
+                       golinearalgebra.cc \
+					   gopdf.cpp \
+					   gogausspdf.cpp
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 

@@ -69,7 +69,10 @@ requestHandler (void* p)
 #endif
 }
 
-goServer::goServer (int p) {
+goServer::goServer (int p) 
+    : goObjectBase () 
+{
+  this->setClassName ("goServer");
   port = p;
 
   socklen_t namelen;

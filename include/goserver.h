@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <golist.h>
 #include <gostring.h>
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
 
 namespace goNet {
 
@@ -30,7 +33,7 @@ class goServerConnection {
  * The request handler is not automagically invoked. The calling program has to do that itself.
  * @todo serverAcceptThread(): Call a thread for every connection? That might be too special and should be implemented in a specialisation class.
  */
-class goServer {
+class goServer : public goObjectBase {
  public:
   goServer (int port);
   virtual ~goServer ();

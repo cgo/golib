@@ -7,7 +7,10 @@
 
 namespace goNet {
 
-goConnection::goConnection () {
+goConnection::goConnection () 
+    : goObjectBase () 
+{
+  this->setClassName ("goConnection");
   maxConnections 	= 0;
   currentConnections 	= 0;
   lastFailed 		= false;

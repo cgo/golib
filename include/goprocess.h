@@ -5,6 +5,9 @@
 #include <goarray.h>
 #include <gostring.h>
 #include <unistd.h>
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
 
 /*!
  * \addtogroup system
@@ -26,7 +29,7 @@
  *
  * @author Christian Gosch
  */
-class goProcess {
+class goProcess : public goObjectBase {
  public:
   ///
   goProcess ();

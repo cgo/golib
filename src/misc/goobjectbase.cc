@@ -1,27 +1,64 @@
 #include <golist.h>
 #include <golist.hpp>
+#include <gostring.h>
 #include <goobjectbase.h>
 #include <iostream>
+#include <assert.h>
+
+class goObjectBasePrivate
+{
+    public:
+        goObjectBasePrivate ();
+        ~goObjectBasePrivate ();
+
+        goString              className;
+        goString              objectName;
+        goList<goObjectBase*> connectedObjects;
+};
+
+goObjectBasePrivate::goObjectBasePrivate ()
+    :
+    className        ("goObjectBase"),
+    objectName       ("NO NAME"),
+    connectedObjects ()
+{
+}
+
+goObjectBasePrivate::~goObjectBasePrivate ()
+{
+}
 
 /*! \brief Constructor */
 goObjectBase::goObjectBase ()
     :
-    className            ("goObjectBase"),
-    myConnectedObjects   ()
+    myPrivate (NULL)
 {
+    myPrivate = new goObjectBasePrivate;
+    assert (myPrivate);
 }
 
-/*! \brief Destructor */
+/*! \brief Destructor 
+ *
+ *  The destructor sends a GO_OBJECTMESSAGE_DESTRUCTING message to all connected objects.
+ */
 goObjectBase::~goObjectBase ()
 {
     sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = NULL;
+    }
 }
 
-/*! \brief Returns the class name. */
+/*! \brief Returns the class name. 
+ *
+ *  \return Name string for this class.
+ * /
 const char*
 goObjectBase::getClassName()
 {
-    return className.toCharPtr();
+    return myPrivate->className.toCharPtr();
 }
 
 /*! \brief Returns the size of this object or some measure of its memory
@@ -36,18 +73,52 @@ goObjectBase::memoryUsage ()
     return sizeof (goObjectBase);
 }
 
+/**
+ * @brief Set name string for an object.
+ *
+ * @param name  Name of the object.
+ **/
+void
+goObjectBase::setObjectName (const char* name)
+{
+    myPrivate->objectName = name;
+}
+
+/**
+ * @brief Set name string for an object.
+ *
+ * @param name  Name of the object.
+ **/
+void
+goObjectBase::setObjectName (const goString& name)
+{
+    myPrivate->objectName = name;
+}
+
+/**
+ * @brief Get the object name.
+ *
+ * @return Name of this object.
+ * \see setObjectName()
+ **/
+const goString&
+goObjectBase::getObjectName () const
+{
+    return myPrivate->objectName;
+}
+
 /*! \brief Sets the class name */
 void
 goObjectBase::setClassName (const char* name)
 {
-    className = name;
+    myPrivate->className = name;
 }
 
 /*! \brief Sets the class name */
 void
 goObjectBase::setClassName (goString& name)
 {
-    className = name;
+    myPrivate->className = name;
 }
 
 /*! \brief Prints an informational message to the calling console.
@@ -72,7 +143,10 @@ goObjectBase::printClassMessage (goString& msg)
 
 /*! \brief Connects an object to this object.
  *
- * Connected objects will receive messages sent by this object.
+ * Connected objects will <b>receive</b> messages sent by this object.
+ * So when you say <br>
+ * <code>object1.connectObject (anotherobject)</code> <br>
+ * then anotherobject will receive messages from object1.
  * \todo It may be necessary to only allow bi-directional connections.
  */
 void
@@ -83,20 +157,20 @@ goObjectBase::connectObject (goObjectBase* object)
         return;
     }
     goObjectBase* o = NULL;
-    myConnectedObjects.resetToFront();
-    if (!myConnectedObjects.isEmpty())
+    myPrivate->connectedObjects.resetToFront();
+    if (!myPrivate->connectedObjects.isEmpty())
     {
-        o = myConnectedObjects.getCurrent();
-        for (; !myConnectedObjects.isTail(); o = myConnectedObjects.getNext())
+        o = myPrivate->connectedObjects.getCurrent();
+        for (; !myPrivate->connectedObjects.isTail(); o = myPrivate->connectedObjects.getNext())
         {
-            o = myConnectedObjects.getCurrent();
+            o = myPrivate->connectedObjects.getCurrent();
             if (o == object)
                 return;
         }
-        if (object == myConnectedObjects.getTail())
+        if (object == myPrivate->connectedObjects.getTail())
             return;
     }
-    myConnectedObjects.append (object);
+    myPrivate->connectedObjects.append (object);
 }
 
 /*! \brief Disconnects an object from this object. */
@@ -108,20 +182,20 @@ goObjectBase::disconnectObject (const goObjectBase* object)
         return;
     }
     goObjectBase* o = NULL;
-    myConnectedObjects.resetToFront();
-    o = myConnectedObjects.getCurrent();
-    for (; !myConnectedObjects.isTail(); o = myConnectedObjects.getNext())
+    myPrivate->connectedObjects.resetToFront();
+    o = myPrivate->connectedObjects.getCurrent();
+    for (; !myPrivate->connectedObjects.isTail(); o = myPrivate->connectedObjects.getNext())
     {
-        o = myConnectedObjects.getCurrent();
+        o = myPrivate->connectedObjects.getCurrent();
         if (o == object)
         {
-            myConnectedObjects.remove();
+            myPrivate->connectedObjects.remove();
             return;
         }
     }
-    if (object == myConnectedObjects.getCurrent())
+    if (object == myPrivate->connectedObjects.getCurrent())
     {
-        myConnectedObjects.remove();
+        myPrivate->connectedObjects.remove();
         return;
     }
 }
@@ -130,26 +204,26 @@ goObjectBase::disconnectObject (const goObjectBase* object)
 void
 goObjectBase::sendObjectMessage (goObjectMessageID messageID)
 {
-    if (myConnectedObjects.isEmpty())
+    if (myPrivate->connectedObjects.isEmpty())
     {
         return;
     }
-    myConnectedObjects.resetToFront();
+    myPrivate->connectedObjects.resetToFront();
     goObjectBase* o = NULL;
     goObjectMessage message;
     message.mySender        = this;
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
-    while (!myConnectedObjects.isTail())
+    while (!myPrivate->connectedObjects.isTail())
     {
-        o = myConnectedObjects.getCurrent();
+        o = myPrivate->connectedObjects.getCurrent();
         if (o)
         {
             o->receiveObjectMessage (message);
         }
-        myConnectedObjects.getNext();
+        myPrivate->connectedObjects.getNext();
     }
-    o = myConnectedObjects.getCurrent();
+    o = myPrivate->connectedObjects.getCurrent();
     if (o)
     {
         o->receiveObjectMessage (message);
@@ -175,10 +249,10 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
  * 
  * This function gets called each time another object "sends" a message
  * to this object.
- * Overload as you please.
+ * Reimplement this in order to allow derived classes to react to messages.
  */
 void
 goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
-    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << "\n";
+    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n";
 }
