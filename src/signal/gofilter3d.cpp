@@ -16,7 +16,6 @@
 #include <gosignal3d.h>
 #include <gosubsignal3d.h>
 #include <gosignalmacros.h>
-
 #include <math.h>
 #include <assert.h>
 
@@ -24,14 +23,6 @@
 #ifndef GOTYPE_HPP
 # include <gotype.hpp>
 #endif
-
-/*!
- * @class goFilter3D
- * Provides convolution of a filter mask with a given goSignal3DBase.
- * 
- * @author Christian Gosch
- */
-
 
 template <class T_IN, class T_OUT>
 goFilter3D<T_IN, T_OUT>::goFilter3D ()
@@ -146,11 +137,14 @@ goFilter3D<T_IN, T_OUT>::getMask () const
 /**
  * @brief Filters a signal.
  *
+ * @note Only the implementation for <void,void> type is tested.
+ * 
  * @param inSignal  The signal to be filtered, may be of any type 
  *                  in case it is a giSignal3DBase<void>.
  * @param outSignal  Will contain the filtered signal
  *                   after the method returned true.
- *                   Must currently be of type GO_FLOAT and must be
+ *                   Must currently be of type GO_FLOAT in case of
+ *                   input and output types are void and must be
  *                   of the same size as inSignal.
  *
  * @return True if successful, false otherwise.
@@ -243,7 +237,7 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
 }
 #endif
 
-/**
+/*
  * @brief Start filter operation.
  *
  * @param inSignal   Input signal of any type.
@@ -252,16 +246,8 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
  *                   template parameters <void, void>.
  *
  * @return True if successful, false otherwise.
- **/
-template <class T_IN, class T_OUT>
-bool
-goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
-                                 goSignal3DBase<T_OUT>& outSignal)
-{
-    printf ("goFilter3D::filter() not implemented for types other than void.\n");
-    return false;
-}
-#if 0
+ */
+#if 1
 template <class T_IN, class T_OUT>
 bool
 goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
@@ -291,7 +277,24 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
     goPtrdiff_t* yDiffOut;
     
     goDouble     cumulationBuffer = 0.0f;
-
+    goSize_t sz = myMask.getSizeZ();
+    goSize_t sy = myMask.getSizeY();
+    goSize_t sx = myMask.getSizeX();
+    goUInt8* maskPtrZ;
+    goUInt8* maskPtrY;
+    goUInt8* maskPtrX;
+    T_IN* xPtr;
+    T_IN* yPtr;
+    T_IN* zPtr;
+    goPtrdiff_t* inCoeffDx;
+    goPtrdiff_t* inCoeffDy;
+    goPtrdiff_t* inCoeffDz;
+    goPtrdiff_t* maskDx;
+    goPtrdiff_t* maskDy;
+    goPtrdiff_t* maskDz;
+    goPtrdiff_t* maskDxSave = myMask.getXDiff();
+    goPtrdiff_t* maskDySave = myMask.getYDiff();
+    goPtrdiff_t* maskDzSave = myMask.getZDiff();
     for (z = 0; z < outSignal.getSizeZ(); ++z)
     {
         yPtrOut  = outSignal.getPtr   (0, 0, z);
@@ -306,8 +309,43 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
             {
                 inCoeff.setPosition (x - myMaskCenterX, y - myMaskCenterY, z - myMaskCenterZ);
                 cumulationBuffer = 0.0f;
-                GO_SIGNAL3D_EACHELEMENT_2 (cumulationBuffer += *__ptr * *__ptr_target,
-                                           myMask, inCoeff, filter3d_mask_t, T_IN);
+                goSize_t __i, __j, __k;					
+                maskPtrZ  = (goUInt8*)myMask.getPtr(0,0,0);
+                zPtr      = inCoeff.getPtr(0,0,0);
+                inCoeffDz = inCoeff.getZDiff();
+                maskDz    = maskDzSave;
+                for (__i = 0; __i < sz; ++__i)		
+                {
+                    maskPtrY  = maskPtrZ;
+                    yPtr      = zPtr;
+                    inCoeffDy = inCoeff.getYDiff();
+                    maskDy    = maskDySave;
+                    for (__j = 0; __j < sy; ++__j)     	
+                    {
+                        maskPtrX  = maskPtrY;
+                        xPtr      = yPtr;
+                        inCoeffDx = inCoeff.getXDiff();
+                        maskDx    = maskDxSave;
+                        for (__k = 0; __k < sx; ++__k)
+                        {
+                            cumulationBuffer += *xPtr * *(goFloat*)maskPtrX;
+                            xPtr += *maskDx;
+                            xPtr += *inCoeffDx;
+                            ++maskDx;
+                            ++inCoeffDx;
+                        }
+                        maskPtrY += *maskDy;
+                        yPtr     += *inCoeffDy;
+                        ++maskDy;
+                        ++inCoeffDy;
+                    }
+                    maskPtrZ += *maskDz;
+                    zPtr     += *inCoeffDz;
+                    ++maskDz;
+                    ++inCoeffDz;
+                }
+                // GO_SIGNAL3D_EACHELEMENT_2 (cumulationBuffer += *__ptr * *__ptr_target,
+                //                           myMask, inCoeff, filter3d_mask_t, T_IN);
                 *xPtrOut = (T_OUT)cumulationBuffer;
                 xPtrOut += *xDiffOut;
                 ++xDiffOut;
