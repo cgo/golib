@@ -31,5 +31,10 @@ int main()
       e.print();
     }
   cout << "Ende!" << endl;
+  
+  goSize_t test = 1;
+  test = test >> 1;
+  cout << "test == " << test << "\n";
+  
   return 1;
 }

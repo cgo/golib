@@ -141,14 +141,14 @@ int main (void)
     
     /************************************************************************************/
     
-    std::cout << "goSubSignal3D with skip\n";
+    std::cout << "goSubSignal3D with skip 2\n";
     std::cout << "-----------------------\n";
-    subSignal.setSize (8, 8, 1);
+    subSignal.setSize (signal.getSizeX() / 3, signal.getSizeY() / 3, 1);
     subSignal.setPosition (0, 0, 0);
-    subSignal.setSkip (1, 1, 0);
+    subSignal.setSkip (2, 2, 0);
     printSignal (subSignal);
     
-    std::cout << "goSubSignal3D with shifted size\n";
+    std::cout << "goSubSignal3D with 2-shifted size\n";
     std::cout << "-------------------------------\n";
     subSignal.setSize (16, 16, 16);
     subSignal.setPosition (0, 0, 0);
