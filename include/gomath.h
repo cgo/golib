@@ -11,6 +11,10 @@
 #define MIN(_m1,_m2) (_m1 < _m2 ? _m1 : _m2)
 #endif
 
+#ifndef GOSIGNAL3DBASE_H
+# include <gosignal3dbase.h>
+#endif
+
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask
 // for acknowledgment when TNT is used in a product.
@@ -82,6 +86,10 @@ Real abs(const Real &a)
 }
 /*! @} */
 
-}
+bool gradient2D  (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool laplacian2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+
+};
+
 
 #endif
