@@ -27,9 +27,9 @@ goObjectBase
     // API for sending messages from object to object
  public:
     void connectObject        (goObjectBase*          object);
-    void sendObjectMessage    (goObjectMessageID messageID);
- protected:
     void disconnectObject     (const goObjectBase*    object);
+ protected:
+    void sendObjectMessage    (goObjectMessageID messageID);
     void sendObjectMessage    (goObjectBase* object, goObjectMessageID messageID);
     virtual void receiveObjectMessage (const goObjectMessage& message);
     

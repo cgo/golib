@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gosignal3dbase.h,v 1.5 2003/07/20 09:57:38 christian Exp $
+ * $Id: gosignal3dbase.h,v 1.6 2003/07/24 16:19:15 christian Exp $
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.6  2003/07/24 16:19:15  christian
+ * *** empty log message ***
+ *
  * Revision 1.5  2003/07/20 09:57:38  christian
  * *** empty log message ***
  *
@@ -26,12 +29,15 @@
 #ifndef GOSIGNAL3DBASE_H
 #define GOSIGNAL3DBASE_H
 
-#include <goobjectinfo.h>
+#include <goobjectbase.h>
 #include <gotypes.h>
 
+/*!
+ * \brief Missing documentation.
+ */
 template <class T>
 class
-goSignal3DBase : public goObjectInfo
+goSignal3DBase : public goObjectBase
 {
     public:
         virtual ~goSignal3DBase ();

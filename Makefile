@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 # Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
@@ -16,6 +15,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = .
+
 prefix = /home/christian/pgm/golib
 exec_prefix = ${prefix}
 
@@ -48,7 +48,7 @@ AUTOHEADER = autoheader
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL} $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+INSTALL_SCRIPT = ${INSTALL}
 transform = s,x,x,
 
 NORMAL_INSTALL = :
@@ -57,28 +57,37 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-host_alias = i686-pc-linux-gnu
+host_alias = 
 host_triplet = i686-pc-linux-gnu
 AR = ar
 AS = @AS@
 CC = gcc
-CXX = c++
+CXX = g++
+CXXCPP = g++ -E
 DLLTOOL = @DLLTOOL@
 DOCXX = echo
-DOXYGEN = echo
+DOXYGEN = doxygen doxygen.config
 ECHO = echo
+EGREP = grep -E
 EXEEXT = 
+F77 = g77
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
+HAVE_LIB = @HAVE_LIB@
+LIB = @LIB@
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
+LTLIB = @LTLIB@
 MAKEINFO = makeinfo
-NASM = NONE
+NASM = nasm
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
 PACKAGE = golib
 RANLIB = ranlib
+RC = @RC@
 STRIP = strip
 VERSION = 0.3.0
-debug_options = -g
+debug_options = 
 lfs_options = 
 streampos_defines = 
 

@@ -8,7 +8,10 @@
 template <class T>
 goSignal2D<T>::goSignal2D (goSize_t width, goSize_t height, 
 			   goSize_t border_x, goSize_t border_y,
-			   goSize_t blockWidth, goSize_t blockHeight) {
+			   goSize_t blockWidth, goSize_t blockHeight) 
+    :
+    goObjectBase ()
+{
   sizeX = width;
   sizeY = height;
   blockSizeX = blockWidth;

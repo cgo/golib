@@ -51,7 +51,7 @@ goSignal3D : public goSignal3DBase<T>
 };
 
 /*!
- * Allocates memory of appropriate size for the block.
+ * Allocates memory of appropriate size for the whole signal.
  * Sets diffs and size.
  * The data is uninitialized.
  * If make is called, <CODE>destroy()</CODE> should be called when

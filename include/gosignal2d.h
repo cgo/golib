@@ -7,7 +7,7 @@
 #include <goarray.h>
 #include <gomatrix.h>
 #include <gotypes.h>
-#include <goobjectinfo.h>
+#include <goobjectbase.h>
 
 /*!
  * 2D signal class
@@ -17,7 +17,7 @@
  * @see goFilter
  */
 template <class T>
-class goSignal2D : goObjectInfo {
+class goSignal2D : goObjectBase {
  public:
   /*!
    * blockSizes are in number of shifts and not used yet !

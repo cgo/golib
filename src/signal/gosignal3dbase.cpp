@@ -9,7 +9,9 @@
 
 template< class T >
 goSignal3DBase<T>::goSignal3DBase () 
-    : ptr         (NULL),
+    : 
+    goObjectBase  (),
+    ptr           (NULL),
     real_ptr      (NULL),
     xDiff         (NULL),
     yDiff         (NULL),
@@ -62,7 +64,9 @@ goSignal3DBase<T>::~goSignal3DBase ()
 
 template<class T>
 goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
-  : ptr        (NULL),
+  : 
+  goObjectBase (),
+  ptr        (NULL),
     real_ptr     (NULL),
     xDiff        (NULL),
     yDiff        (NULL),

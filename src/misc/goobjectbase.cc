@@ -10,6 +10,7 @@ goObjectBase::goObjectBase ()
 
 goObjectBase::~goObjectBase ()
 {
+    sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
 }
 
 const char*
@@ -60,16 +61,18 @@ goObjectBase::connectObject (goObjectBase* object)
     }
     goObjectBase* o = NULL;
     myConnectedObjects.resetToFront();
-    o = myConnectedObjects.getCurrent();
-    for (; !myConnectedObjects.isTail(); o = myConnectedObjects.getNext())
+    if (!myConnectedObjects.isEmpty())
     {
         o = myConnectedObjects.getCurrent();
-        if (o == object)
+        for (; !myConnectedObjects.isTail(); o = myConnectedObjects.getNext())
+        {
+            o = myConnectedObjects.getCurrent();
+            if (o == object)
+                return;
+        }
+        if (object == myConnectedObjects.getTail())
             return;
     }
-    if (object == myConnectedObjects.getTail())
-        return;
-
     myConnectedObjects.append (object);
 }
 
@@ -112,13 +115,19 @@ goObjectBase::sendObjectMessage (goObjectMessageID messageID)
     message.mySender        = this;
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
-    for (;;)
+    while (!myConnectedObjects.isTail())
     {
         o = myConnectedObjects.getCurrent();
         if (o)
         {
             o->receiveObjectMessage (message);
         }
+        myConnectedObjects.getNext();
+    }
+    o = myConnectedObjects.getCurrent();
+    if (o)
+    {
+        o->receiveObjectMessage (message);
     }
 }
 
@@ -139,5 +148,5 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
 void
 goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
-    std::cout << "Class " << getClassName() << " received a message!\n";
+    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << "\n";
 }

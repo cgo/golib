@@ -180,7 +180,7 @@ T
 goList<T>::getFront () {
     if (!front)
     {
-        return dummy->elem;
+        return dummy.elem;
     }
     return front->elem;
 }
@@ -190,7 +190,7 @@ T*
 goList<T>::getFrontPtr () {
     if (!front)
     {
-        return dummy->elem;
+        return &dummy.elem;
     }
   return &front->elem;
 }
@@ -200,7 +200,7 @@ T
 goList<T>::getTail () {
   if (!tail)
   {
-      return dummy->elem;
+      return dummy.elem;
   }
   return tail->elem;
 }
@@ -210,7 +210,7 @@ T*
 goList<T>::getTailPtr () {
   if (!tail)
   {
-      return &dummy->elem;
+      return &dummy.elem;
   }
   return &tail->elem;
 }
