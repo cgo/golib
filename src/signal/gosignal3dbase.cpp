@@ -23,6 +23,7 @@ goSignal3DBase<T>::goSignal3DBase ()
     myBorderSize  (0, 0, 0),
     myBlockSize   (1, 1, 1)
 {
+    this->setClassName ("goSignal3DBase");
 }
 
 template< class T >
@@ -78,6 +79,7 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myBorderSize (0, 0, 0),
     myBlockSize  (1, 1, 1)
 {
+    this->setClassName ("goSignal3DBase");
     *this = other;
 }
 
