@@ -3,12 +3,16 @@
 #include <config.h>
 #include <goerror.h>
 #include <goglobal.h>
+#include <golog.h>
 #ifdef HAVE_LIBJPEG
 	#include <jpeglib.h>
 	#include <jerror.h>
 	#include <jconfig.h>
 	#include <jmorecfg.h>
 #endif	
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 #ifdef HAVE_LIBIL
 # include <IL/il.h>
@@ -487,3 +491,33 @@ goFileIO::writeImage (const char*, const goObjectBase*)
     return false;
 }
 #endif
+
+FILE*
+goFileIO::createTempFile (goString& filenameRet)
+{
+#ifdef HAVE_TMPNAM_R
+    filenameRet.resize (L_tmpnam);
+    if (tmpnam_r(filenameRet.getPtr()) == NULL)
+    {
+        return NULL;
+    }
+    return fopen (filenameRet.toCharPtr(), "w");
+#else
+    goLog::warning ("goFileIO::createTempFile(): golib was compiled without tmpnam_r().");
+    return NULL;
+#endif
+}
+
+bool
+goFileIO::remove (const goString& filename)
+{
+#ifndef HAVE_UNLINK
+    return false;
+#else
+    if (unlink (filename.toCharPtr()) != 0)
+    {
+        return false;
+    }
+    return true;
+#endif
+}
