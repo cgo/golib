@@ -2,7 +2,6 @@
 #include <math.h>
 #include <gotypes.h>
 
-
 template <class T>
 goComplex<T>::goComplex () {
   real = 0;
@@ -170,7 +169,7 @@ goComplex<T>::operator!= (goComplex<T>& other) {
 
 template <class T>
 void
-goComplex<T>::con () {
+goComplex<T>::conjugate () {
   ima = -ima;
   info.argValid = false;
 }
@@ -235,5 +234,4 @@ operator< (goComplex<T> &other) {
 
 /* Instantiation */
 template class goComplex<double>;
-
-
+template class goComplex<float>;

@@ -1,10 +1,10 @@
 # Example for library:
 noinst_LTLIBRARIES = libGomath.la
-libGomath_la_SOURCES = go3vector.cc \
+libGomath_la_SOURCES = go3vectori.cc \
 					   go44matrix.cc \
-					   go4vector.cc \
+					   go4vectori.cc \
+					   gomatrixi.cc \
 					   gocomplex.cc \
-					   gointegral.cc \
 					   gonvector.cc \
 					   goposition.cc \
 					   goquaternion.cc \
