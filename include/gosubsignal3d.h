@@ -5,8 +5,11 @@
 #include <gotypes.h>
 #include <goposition.h>
 
-/*!
- * Enables access to sub signals of a given <CODE>goSignal3D</CODE>.
+/** \addtogroup signal */
+/** @{ */
+/*! \brief Access to sub-areas of <code>goSignal3DBase</code> objects
+ *
+ * Enables access to sub signals of a given <CODE>goSignal3DBase</CODE>.
  * Being derived from it, <CODE>goSubSignal3D</CODE> can do anything a 
  * <CODE>goSignal3D</CODE> can.
  * A parent must be set and the position is initialised to (0,0,0).
@@ -63,6 +66,7 @@ goSubSignal3D : public goSignal3DBase<T>
         bool               deleteY;
         bool               deleteZ;
 };
+/** @} */
 
 #endif
 

@@ -7,6 +7,15 @@
 #include <goobjectmessage.h>
 #include <gotypes.h>
 
+/*! \brief Base class for golib objects.
+ * 
+ * This is a base for all objects that we felt needed a common base.
+ * It implements class names, class message printing, 
+ * and inter-object communication.
+ * \author Christian Gosch
+ * \todo Implement object names
+ * \todo Test object communication
+ */
 class
 goObjectBase
 {

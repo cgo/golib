@@ -12,6 +12,15 @@
 #include <assert.h>
 #include <string.h>
 
+/** \addtogroup signal */
+/** @{ */
+/*!
+ * \brief Up to 3-dimensional (signal) data container.
+ *
+ * The memory layout is sort of optimized to get some
+ * data locality when accessing the data locally in all
+ * dimensions.
+ */
 template< class T >
 class
 goSignal3D : public goSignal3DBase<T>
@@ -49,6 +58,7 @@ goSignal3D : public goSignal3DBase<T>
 
         void fill (const T& element);
 };
+/** @} */
 
 /*!
  * Allocates memory of appropriate size for the whole signal.
@@ -117,7 +127,6 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
  * objects. See the source code for details.
  * @author Christian Gosch
  */
-
 #endif
 
 

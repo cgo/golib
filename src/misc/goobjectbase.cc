@@ -1,6 +1,7 @@
 #include <goobjectbase.h>
 #include <iostream>
 
+/*! \brief Constructor */
 goObjectBase::goObjectBase ()
     :
     className            ("goObjectBase"),
@@ -8,18 +9,23 @@ goObjectBase::goObjectBase ()
 {
 }
 
+/*! \brief Destructor */
 goObjectBase::~goObjectBase ()
 {
     sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
 }
 
+/*! \brief Returns the class name. */
 const char*
 goObjectBase::getClassName()
 {
     return className.toCharPtr();
 }
 
-/*!
+/*! \brief Returns the size of this object or some measure of its memory
+ * consumption.
+ *
+ * Overload this function as you please and as it makes sense.
  * @return Size in bytes of this object.
  */
 goSize_t 
@@ -28,30 +34,45 @@ goObjectBase::memoryUsage ()
     return sizeof (goObjectBase);
 }
 
+/*! \brief Sets the class name */
 void
 goObjectBase::setClassName (const char* name)
 {
     className = name;
 }
 
+/*! \brief Sets the class name */
 void
 goObjectBase::setClassName (goString& name)
 {
     className = name;
 }
 
+/*! \brief Prints an informational message to the calling console.
+ *
+ * Prints messages of the form "<classname> message: <your message>".
+ */
 void
 goObjectBase::printClassMessage (const char* msg)
 {
     std::cout << getClassName() << " message: " << msg << std::endl;
 }
 
+/*! \brief Prints an informational message to the calling console.
+ *
+ * Prints messages of the form "<classname> message: <your message>".
+ */
 void
 goObjectBase::printClassMessage (goString& msg)
 {
     printClassMessage (msg.toCharPtr());
 }
 
+/*! \brief Connects an object to this object.
+ *
+ * Connected objects will receive messages sent by this object.
+ * \todo It may be necessary to only allow bi-directional connections.
+ */
 void
 goObjectBase::connectObject (goObjectBase* object)
 {
@@ -76,6 +97,7 @@ goObjectBase::connectObject (goObjectBase* object)
     myConnectedObjects.append (object);
 }
 
+/*! \brief Disconnects an object from this object. */
 void
 goObjectBase::disconnectObject (const goObjectBase* object)
 {
@@ -102,6 +124,7 @@ goObjectBase::disconnectObject (const goObjectBase* object)
     }
 }
 
+/*! \brief Sends a message to all connected objects. */
 void
 goObjectBase::sendObjectMessage (goObjectMessageID messageID)
 {
@@ -131,6 +154,7 @@ goObjectBase::sendObjectMessage (goObjectMessageID messageID)
     }
 }
 
+/*! \brief Sends a message to a specific object. */
 void
 goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID messageID) 
 {
@@ -145,6 +169,12 @@ goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID message
     object->receiveObjectMessage (message);
 }
 
+/*! \brief Receive a message.
+ * 
+ * This function gets called each time another object "sends" a message
+ * to this object.
+ * Overload as you please.
+ */
 void
 goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
