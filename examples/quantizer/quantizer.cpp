@@ -20,7 +20,7 @@ int main (int argc, char* argv[])
 //        exit (1);
 //    }
 
-    Go::goUniformQuantizer<goFloat, goInt8> Q (5.0f, -100.0f, 100.0f, -128, 127);
+    goUniformQuantizer<goFloat, goInt8> Q (5.0f, -100.0f, 100.0f, -128, 127);
 
     // goInt8 q = Q.quantize (atof(argv[1]));
     // std::cout << "Q(" << argv[1] << ")" << " = " << (int)q << "\n";
