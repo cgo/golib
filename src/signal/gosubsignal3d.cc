@@ -35,8 +35,8 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
     deleteY  (false),
     deleteZ  (false)
 {
-  this->setSize     (x, y, z);
   this->setParent   (b);
+  this->setSize     (x, y, z);
   this->setPosition (0,0,0);
 }
 
@@ -283,6 +283,16 @@ goSubSignal3D<T>::shiftRightDiff (int n)
     this->setSkip (newSkipX, newSkipY, newSkipZ); 
     // this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
     // this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
+}
+
+void
+goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
+{
+  this->setDataType (p->getDataType().getID());
+  this->parent   = p;
+  this->real_ptr = p->getRealPtr();
+  this->ptr      = p->getPtr(0, 0, 0);
+  this->setPosition (0, 0, 0);
 }
 
 template< class T >
