@@ -45,7 +45,7 @@ class goNVector : public goArray<T> {
    * Sets size of the vector in elements.
    * This should only be used together with setVectorPtr ().
    */
-  void 	   setSize (int sz) { arraySize = sz; absValid = false;}
+  void 	   setSize (int sz) { this->resize(sz); absValid = false;}
 
   /**
    * Adds two NVectors.
