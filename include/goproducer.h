@@ -3,9 +3,16 @@
 
 #include <gothread.h>
 
+/*! 
+ * \addtogroup thread
+ * @{
+ */
 /*!
  * Simple producer object.
  * In this implementation, each consumer can only be connected to one producer.
+ *
+ * \todo Not thoroughly tested. Report bugs.
+ * 
  * @author Christian Gosch
  * @date 22.9.2001
  * @see goConsumer
@@ -33,5 +40,5 @@ goProducer
  private:
     goSemaphore semaphore;
 };
-
+/*! @} */
 #endif

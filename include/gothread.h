@@ -17,7 +17,13 @@
 
 typedef void    *(*goThread_exec_t)(void *);
 
-/* A mutual exclusion class.
+/*!
+ * \addtogroup thread
+ * @{
+ */
+/*!
+ * \brief A mutual exclusion class.
+ *
  * @author Christian Gosch
  * @note Should work on both POSIX and win32. I recommend to always use POSIX where possible and to avoid 
  * non-POSIX thread implementations. However, If you feel like it you are most warmly welcome to 
@@ -148,13 +154,6 @@ protected:
   goMutex	intMutex;
   int			intCount;
 };
+/*! @} */
 
 #endif
-
-
-
-
-
-
-
-

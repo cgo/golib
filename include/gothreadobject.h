@@ -7,7 +7,15 @@
 class goThread;
 
 /*!
- * Base class for objects that incorporate threads.
+ * \addtogroup thread
+ * @{
+ */
+/*!
+ * \brief Base class for objects that implement threads.
+ *
+ * Reimplement method threadMethod() in derived classes.
+ * threadMethod() will be run in an extra thread when run() is called.
+ *
  * @date 7.1.2002
  * @author Christian Gosch
  */
@@ -37,5 +45,5 @@ class goThreadObject : public goObjectBase
     goThread thisThread;
     
 };
-
+/*! @} */
 #endif

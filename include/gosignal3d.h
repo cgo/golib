@@ -11,14 +11,15 @@
 #include <assert.h>
 #include <string.h>
 
-/** \addtogroup signal */
-/** @{ */
+/** \addtogroup signal 
+ * @{ */
 /*!
  * \brief Up to 3-dimensional (signal) data container.
  *
  * The memory layout is sort of optimized to get some
  * data locality when accessing the data locally in all
  * dimensions.
+ * \author Christian Gosch
  */
 template< class T >
 class

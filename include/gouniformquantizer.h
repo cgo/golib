@@ -11,6 +11,18 @@ namespace Go
 
 template <class _input_type,class _output_type> class goUniformQuantizerPrivate;
 
+/*!
+ * \addtogroup signal
+ * @{
+ */
+/**
+ * @brief Uniform quantizer.
+ *
+ * @param _input_type   Input data type.
+ * @param _output_type  Output data type.
+ *
+ * \author Christian Gosch
+ **/
 template <class _input_type, class _output_type>
 class goUniformQuantizer : public goQuantizer <_input_type, _output_type>
 {
@@ -33,6 +45,6 @@ class goUniformQuantizer : public goQuantizer <_input_type, _output_type>
         goUniformQuantizer<_input_type, _output_type>& operator= (goUniformQuantizer<_input_type, _output_type>& other);
         goUniformQuantizer (goUniformQuantizer<_input_type, _output_type>& other);
 };
-
+/*! @} */
 };
 #endif

@@ -3,6 +3,17 @@
 
 #include <goobjectbase.h>
 
+/*!
+ * \addtogroup signal
+ * @{
+ */
+/**
+ * @brief Quantizer base class.
+ *
+ * Derive from this class for quantizers.
+ *
+ * \author Christian Gosch
+ **/
 template <class _input_type, class _output_type>
 class goQuantizer : public goObjectBase
 {
@@ -17,5 +28,5 @@ class goQuantizer : public goObjectBase
         goQuantizer (goQuantizer<_input_type, _output_type>& other);
         goQuantizer<_input_type, _output_type>& operator= (goQuantizer<_input_type, _output_type>& other); 
 };
-
+/*! @} */
 #endif

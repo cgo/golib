@@ -6,6 +6,10 @@
 #include <gosubsignal3d.h>
 
 /*!
+ * \addtogroup signal
+ * @{
+ */
+/*!
  * Type for transformed data.
  * Using goDouble for this takes double the amount of memory than goFloat.
  * The goDouble Haar transforms are about 18 percent slower than the goFloat operations.
@@ -98,7 +102,7 @@ goDWT
  protected:
 
 };
-
+/*! @} */
 /*!
  * \example dwt.cc
  * This is an example and test program for the goDWT class.

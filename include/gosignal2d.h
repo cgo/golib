@@ -10,7 +10,14 @@
 #include <goobjectbase.h>
 
 /*!
- * 2D signal class
+ * \addtogroup signal
+ * @{
+ */
+/*!
+ * \brief Use goSignal3D instead.
+ * 
+ * 2D signal class, somewhat deprecated.
+ *
  * @author Christian Gosch
  * @see goFilterFIR
  * @see goFilterGauss
@@ -115,7 +122,7 @@ class goSignal2D : goObjectBase {
   goArray<T> *data;
   goSize_t   total_memory_usage;
 };
-
+/*! @} */
 template <class T>
 inline 
 void

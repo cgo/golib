@@ -21,6 +21,15 @@
 template <class T> class goSignal3DBase;
 template <class T> class goSignal3D;
 
+/*!
+ * \addtogroup signal
+ * @{
+ */
+/**
+ * @brief 3D filter class.
+ *
+ * \author Christian Gosch
+ **/
 template<class T_IN, class T_OUT>
 class
 goFilter3D : public goObjectBase
@@ -53,6 +62,6 @@ goFilter3D : public goObjectBase
         goIndex_t           maskCenterY;
         goIndex_t           maskCenterZ;
 };
-
+/*! @} */
 #endif
 
