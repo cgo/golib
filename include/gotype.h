@@ -113,6 +113,8 @@ targetT* goCreateQuantizationTable (const goType&     sourceType,
                                     targetT           maxTargetValue,
                                     goIndex_t         minIndex,
                                     goIndex_t         maxIndex,
-                                    goArray<targetT>& tableRet);
+                                    goArray<targetT>& tableRet,
+                                    goDouble          sourceMin = 0.0,
+                                    goDouble          sourceMax = -1.0);
 /*! @} */
 #endif
