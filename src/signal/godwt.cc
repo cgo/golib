@@ -770,9 +770,8 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 /***********************************************************************************/
 
 /*******************************************************/
-/* This code is not to be disclosed to the public.     */
-/* For the used macros, the public probably doesn't	   */
-/* want to see it anyway ;-)						   */
+/* Don't present this to the open public ---           */
+/* nobody wants to read messy macros.                  */
 /*******************************************************/
 
 #define ST_XY_BEGIN(__block, __T) {\
