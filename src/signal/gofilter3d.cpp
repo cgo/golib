@@ -202,6 +202,68 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
     return true;
 }
 
+#if 0
+bool
+goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
+                                goSignal3DBase<void>& outSignal)
+{
+    assert (myMask != NULL);
+
+    assert (inSignal.getSizeX() == outSignal.getSizeX() &&
+            inSignal.getSizeY() == outSignal.getSizeY() &&
+            inSignal.getSizeZ() == outSignal.getSizeZ());
+    
+    goSubSignal3D<void> inCoeff (&inSignal, 
+                                 myMask->getSizeX(),
+                                 myMask->getSizeY(),
+                                 myMask->getSizeZ());
+
+    goIndex_t x, y, z;
+    x = 0; y = 0; z = 0;
+
+    T_IN*        xPtrIn;
+    T_IN*        yPtrIn;
+    T_IN*        zPtrIn;
+    T_OUT*       xPtrOut;
+    T_OUT*       yPtrOut;
+    T_OUT*       zPtrOut;
+    goPtrdiff_t* xDiffIn;
+    goPtrdiff_t* yDiffIn;
+    goPtrdiff_t* xDiffOut;
+    goPtrdiff_t* yDiffOut;
+    
+    goDouble     cumulationBuffer = 0.0f;
+
+    for (z = 0; z < outSignal.getSizeZ(); ++z)
+    {
+        yPtrOut  = outSignal.getPtr   (0, 0, z);
+        yDiffOut = outSignal.getYDiff ();
+
+        for (y = 0; y < outSignal.getSizeY(); ++y)
+        {
+            xPtrOut  = yPtrOut;
+            xDiffOut = outSignal.getXDiff ();
+
+            for (x = 0; x < outSignal.getSizeX(); ++x)
+            {
+                inCoeff.setPosition (x - maskCenterX, y - maskCenterY, z - maskCenterZ);
+                cumulationBuffer = 0.0f;
+                GO_SIGNAL3D_EACHELEMENT_2 (cumulationBuffer += *__ptr * *__ptr_target,
+                                           (*myMask), inCoeff, mask_t, T_IN);
+                *xPtrOut = (T_OUT)cumulationBuffer;
+                xPtrOut += *xDiffOut;
+                ++xDiffOut;
+            }
+
+            yPtrOut += *yDiffOut;
+            ++yDiffOut;
+        }
+    }
+    
+    return true;
+}
+#endif
+
 template class goFilter3D<goFloat, goFloat>;
 template class goFilter3D<goFloat, goDouble>;
 template class goFilter3D<goDouble, goFloat>;
