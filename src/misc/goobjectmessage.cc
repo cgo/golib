@@ -7,7 +7,8 @@ goObjectMessage::goObjectMessage ()
     :
     mySender        (0),
     myMessageID     (GO_OBJECTMESSAGE_NONE),
-    myMessageString (0)
+    myMessageString (0),
+    myData          (0)
 {
 }
 
