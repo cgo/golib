@@ -5,12 +5,12 @@ libGomath_la_SOURCES = go3vectori.cc \
 					   go4vectori.cc \
 					   gomatrixi.cc \
 					   gocomplex.cc \
-					   gonvector.cc \
 					   goposition.cc \
 					   goquaternion.cc \
                        golinearalgebra.cc \
 					   gopdf.cpp \
-					   gogausspdf.cpp
+					   gogausspdf.cpp \
+					   gopoint.cpp
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 

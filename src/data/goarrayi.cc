@@ -4,6 +4,7 @@
 #include <gocomplex.h>
 #include <goconfigfile.h>
 #include <golist.h>
+#include <gopoint.h>
 #include <gohashtable.h>
 
 // instantiation
@@ -25,6 +26,8 @@ template class goArray< void* >;
 template class goArray<goComplex<goDouble> >;
 
 // more exotic ones
+template class goArray<goPointf>;
+template class goArray<goPointd>;
 template class goArray<goString* >;
 template class goArray<goArray<int>* >;
 template class goArray<goConfigFileEntry* >;

@@ -205,7 +205,7 @@ goObjectBase::disconnectObject (const goObjectBase* object)
 
 /*! \brief Sends a message to all connected objects. */
 void
-goObjectBase::sendObjectMessage (goObjectMessageID messageID, void* data)
+goObjectBase::sendObjectMessage (int messageID, void* data)
 {
     if (myPrivate->connectedObjects.isEmpty())
     {
@@ -236,7 +236,7 @@ goObjectBase::sendObjectMessage (goObjectMessageID messageID, void* data)
 
 /*! \brief Sends a message to a specific object. */
 void
-goObjectBase::sendObjectMessage (goObjectBase* object, goObjectMessageID messageID, void* data) 
+goObjectBase::sendObjectMessage (goObjectBase* object, int messageID, void* data) 
 {
     if (!object)
     {

@@ -171,7 +171,7 @@ goQuantizationTables::~goQuantizationTables ()
 }
 
 // Just for initialization of the static members
-goQuantizationTables _goGlobalQuantizationTables;
+// goQuantizationTables _goGlobalQuantizationTables;
 
 class goTypePrivate
 {

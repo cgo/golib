@@ -81,10 +81,10 @@ goSignal3D<void>::~goSignal3D ()
 template< class T >
 goSignal3D<T>::~goSignal3D () 
 {
-    if (real_ptr)
+    if (this->real_ptr)
     {
-        delete[] real_ptr;
-        real_ptr = NULL;
+        delete[] this->real_ptr;
+        this->real_ptr = NULL;
     }
 }
 
@@ -205,11 +205,11 @@ goSignal3D<T>::destroy ()
 {
     goSignal3DBase<T>::destroy ();
     
-    if (real_ptr)
+    if (this->real_ptr)
     {
-        delete[] real_ptr;
-        real_ptr = NULL;
-        ptr      = NULL;
+        delete[] this->real_ptr;
+        this->real_ptr = NULL;
+        this->ptr      = NULL;
     }
 }
 
@@ -217,9 +217,9 @@ template<class T>
 goSize_t
 goSignal3D<T>::memoryUsage()
 {
-    if (real_ptr) 
+    if (this->real_ptr) 
     {
-        return (goSize_t)(getDataType().getSize() * getSizeX() * getSizeY() * getSizeZ());
+        return (goSize_t)(this->getDataType().getSize() * this->getSizeX() * this->getSizeY() * this->getSizeZ());
     }
 
     return 0;
@@ -322,8 +322,8 @@ template <class T>
 void  
 goSignal3D<T>::fillByte (goInt8 b)
 { 
-    memset ((void*)real_ptr, (int)b, 
-            getDataType().getSize() * mySize.x * mySize.y * mySize.z ); 
+    memset ((void*)this->real_ptr, (int)b, 
+            this->getDataType().getSize() * this->mySize.x * this->mySize.y * this->mySize.z ); 
 }
 
 template class goSignal3D< goInt8 >;

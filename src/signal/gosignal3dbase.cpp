@@ -760,7 +760,7 @@ goSignal3DBase<void*>::getMaximum() const
 goDouble
 goSignal3DBase<void>::getMaximum() const
 {
-    const void* p = ptr;
+    const goUInt8* p = (goUInt8*)ptr;
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
@@ -773,14 +773,14 @@ goSignal3DBase<void>::getMaximum() const
     {
         for (y = 0; y < ySize; y++)
         {
-            p = getPtr (0, y, z);
+            p = (goUInt8*)getPtr (0, y, z);
             for (x = 0; x < xSize; x++)
             {
                 if (greaterThan(p,maxVal))
                 {
                     maxVal = p;
                 }
-                (const goUInt8*)p += xDiff[x];
+                p += xDiff[x];
             }
         }
     }
@@ -840,27 +840,27 @@ goSignal3DBase<void*>::getMinimum() const
 goDouble
 goSignal3DBase<void>::getMinimum() const
 {
-    const void *p = ptr;
+    const goUInt8 *p = (goUInt8*)ptr;
     goSize_t x,y,z;
     goSize_t xSize, ySize, zSize;
     xSize = getSizeX();
     ySize = getSizeY();
     zSize = getSizeZ();
 
-    const void* minVal = p;
+    const goUInt8* minVal = p;
     goCompareFunction lowerThan = getDataType().getLowerThanFunction();
     for (z = 0; z < zSize; z++)
     {
         for (y = 0; y < ySize; y++)
         {
-            p = getPtr (0, y, z);
+            p = (goUInt8*)getPtr (0, y, z);
             for (x = 0; x < xSize; x++)
             {
                 if (lowerThan(p,minVal))
                 {
                     minVal = p;
                 }
-                (const goUInt8*)p += xDiff[x];
+                p += xDiff[x];
             }
         }
     }

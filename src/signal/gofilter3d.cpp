@@ -36,8 +36,8 @@ goFilter3D<T_IN, T_OUT>::goFilter3D ()
       maskCenterZ  (0)
 {
     setClassName ("goFilter3D");
-    myMask = new goSignal3D<mask_t> (3, 3, 3);
-    GO_SIGNAL3D_EACHELEMENT (*__ptr = 0.33333333f, (*myMask), mask_t);
+    myMask = new goSignal3D<filter3d_mask_t> (3, 3, 3);
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = 0.33333333f, (*myMask), filter3d_mask_t);
 }
 
 template <class T_IN, class T_OUT>
@@ -68,7 +68,7 @@ goFilter3D<T_IN, T_OUT>::goFilter3D (const goFilter3D<T_IN, T_OUT>& other)
  */
 template <class T_IN, class T_OUT>
 bool
-goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<mask_t>& mask,
+goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<filter3d_mask_t>& mask,
                                   bool normalize)
 {
     if (myMask)
@@ -76,7 +76,7 @@ goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<mask_t>& mask,
         delete myMask;
     }
 
-    myMask = new goSignal3D<mask_t> (mask.getSizeX      (),
+    myMask = new goSignal3D<filter3d_mask_t> (mask.getSizeX      (),
                                      mask.getSizeY      (),
                                      mask.getSizeZ      (),
                                      mask.getBlockSizeX (),
@@ -91,7 +91,7 @@ goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<mask_t>& mask,
     if (normalize)
     {
         normalizationFactor = 0.0f;
-        GO_SIGNAL3D_EACHELEMENT (normalizationFactor += (*__ptr), mask, const mask_t);
+        GO_SIGNAL3D_EACHELEMENT (normalizationFactor += (*__ptr), mask, const filter3d_mask_t);
 
         assert (normalizationFactor != 0.0f);
 
@@ -99,7 +99,7 @@ goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<mask_t>& mask,
     }
     
     
-   GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = normalizationFactor * *__ptr_target, (*myMask), mask, mask_t, const mask_t);
+   GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = normalizationFactor * *__ptr_target, (*myMask), mask, filter3d_mask_t, const filter3d_mask_t);
 
    return true;
 }
@@ -135,10 +135,10 @@ goFilter3D<T_IN, T_OUT>::getMaskCenterZ () const
 }
 
 template <class T_IN, class T_OUT>
-const goSignal3D<goFilter3D<T_IN, T_OUT>::mask_t>&
+const goSignal3DBase<filter3d_mask_t>&
 goFilter3D<T_IN, T_OUT>::getMask () const
 {
-    return *myMask;
+    return *this->myMask;
 }
 
 template <class T_IN, class T_OUT>
@@ -188,7 +188,7 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
                 inCoeff.setPosition (x - maskCenterX, y - maskCenterY, z - maskCenterZ);
                 cumulationBuffer = 0.0f;
                 GO_SIGNAL3D_EACHELEMENT_2 (cumulationBuffer += *__ptr * *__ptr_target,
-                                           (*myMask), inCoeff, mask_t, T_IN);
+                                           (*myMask), inCoeff, filter3d_mask_t, T_IN);
                 *xPtrOut = (T_OUT)cumulationBuffer;
                 xPtrOut += *xDiffOut;
                 ++xDiffOut;
@@ -249,7 +249,7 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
                 inCoeff.setPosition (x - maskCenterX, y - maskCenterY, z - maskCenterZ);
                 cumulationBuffer = 0.0f;
                 GO_SIGNAL3D_EACHELEMENT_2 (cumulationBuffer += *__ptr * *__ptr_target,
-                                           (*myMask), inCoeff, mask_t, T_IN);
+                                           (*myMask), inCoeff, filter3d_mask_t, T_IN);
                 *xPtrOut = (T_OUT)cumulationBuffer;
                 xPtrOut += *xDiffOut;
                 ++xDiffOut;

@@ -36,7 +36,7 @@ namespace goMath
     {
         if (variance <= 0.0)
         {
-            goError::print (getClassName(), "Variance is zero or lower than zero");
+            goError::print (this->getClassName(), "Variance is zero or lower than zero");
             return;
         }
         assert (variance > 0.0);
@@ -50,7 +50,7 @@ namespace goMath
     output_type
     goGaussPDF<input_type, output_type>::operator () (const input_type& input)
     {
-        goError::print (getClassName(), "operator() not defined for this input/output type combination.");
+        goError::print (this->getClassName(), "operator() not defined for this input/output type combination.");
         assert (false);
         return (output_type)0;
     }
