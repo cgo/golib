@@ -29,8 +29,15 @@ template <class T> class goSignal3D;
  * @brief 3D filter class.
  *
  * Applies a 3D filter to a goSignal3DBase.
- * Currently, only the version for <void,void> data types is
- * functional. It is recommended to use goSignal3D of type
+ * There is a different implementation for goFloat and goDouble
+ * input- and output-types (and vice versa) and for <void,void> template
+ * parameters. In the <void,void> case, goSignal3DBase<void> input signals
+ * can be filtered. Their use is recommended for the flexibility in data types.
+ * The filtering process is a bit slower though.
+ * The filter mask is currently always of type goFloat and must be given as
+ * a goSignal3DBase<void>.
+ * Currently, only the version for <void,void> data types has been
+ * tested. It is recommended to use goSignal3D of type
  * <void> everywhere possible to remain more flexible.
  * This filter class does not support separable filters by its own.
  * Either use two or more different masks to achieve the speed gain
