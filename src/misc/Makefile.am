@@ -7,7 +7,6 @@ libGomisc_la_SOURCES = goconfigfile.cc \
 					   goexception.cc \
 					   gofileio.cc \
 					   goobjectbase.cc \
-					   goobjectinfo.cc \
 					   gostatusobject.cc \
 					   gotransferfunction.cc \
 					   goobjectmessage.cc
