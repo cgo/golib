@@ -1,9 +1,9 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
 
-CXX		= gcc
+CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -O2
 
-LD		= gcc
+LD		= g++
 LDARGS		=  
 
 LIBS		=  -L../lib -lGo

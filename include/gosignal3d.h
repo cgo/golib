@@ -29,12 +29,12 @@ goSignal3D : public goSignal3DBase<T>
         virtual goSize_t memoryUsage();
 
         inline bool make (goSize_t x, goSize_t y, goSize_t z,
-                          goSize_t blocksize_x = 32, 
-                          goSize_t blocksize_y = 32, 
+                          goSize_t blocksize_x = 32,
+                          goSize_t blocksize_y = 32,
                           goSize_t blocksize_z = 32,
-                          goSize_t border_x = 0, 
-                          goSize_t border_y = 0, 
-                          goSize_t border_z = 0);
+                          goSize_t border_x    = 0,
+                          goSize_t border_y    = 0,
+                          goSize_t border_z    = 0);
 
         bool make (goSignal3D *other);
 
