@@ -203,6 +203,12 @@ goObjectBase::disconnectObject (const goObjectBase* object)
     }
 }
 
+bool 
+goObjectBase::callObjectMethod (int methodID, goObjectMethodParameters* param)
+{
+    return false;
+}
+
 /*! \brief Sends a message to all connected objects. */
 void
 goObjectBase::sendObjectMessage (int messageID, void* data)
