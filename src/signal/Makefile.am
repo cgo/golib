@@ -5,7 +5,8 @@ libGosignal_la_SOURCES = gosignal3dbase.cpp \
                          gosignal3d.cc \
                          gosignal2d.cc \
                          gofilter3d.cpp \
-                         godwt.cc
+                         godwt.cc \
+						 gosignalhelper.cpp
                          
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
