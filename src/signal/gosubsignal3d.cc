@@ -134,8 +134,14 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         goPtrdiff_t* parentDiffP = parent->getXDiff();
         for (k = 0; k < xArraySize; ++k)
         {
+            goPtrdiff_t diff = 0;
+            goIndex_t i;
+            for (i = 0; i <= skipX; ++i)
+            {
+                diff += parentDiffP [i];
+            }
+            xDiff [k]   = diff;
             myXJump [k] = *parentJumpP;
-            xDiff [k] = *parentDiffP;
             parentJumpP = parentJumpP + 1 + skipX;
             parentDiffP = parentDiffP + 1 + skipX;
         }
@@ -157,8 +163,14 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         goPtrdiff_t* parentDiffP = parent->getYDiff();
         for (k = 0; k < arraySize; ++k)
         {
+            goPtrdiff_t diff = 0;
+            goIndex_t i;
+            for (i = 0; i <= skipY; ++i)
+            {
+                diff += parentDiffP [i];
+            }
             myYJump [k] = *parentJumpP;
-            yDiff [k] = *parentDiffP;
+            yDiff [k]   = diff;
             parentJumpP = parentJumpP + 1 + skipY;
             parentDiffP = parentDiffP + 1 + skipY;
         }
@@ -180,8 +192,14 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         goPtrdiff_t* parentDiffP = parent->getZDiff();
         for (k = 0; k < arraySize; ++k)
         {
+            goPtrdiff_t diff = 0;
+            goIndex_t i;
+            for (i = 0; i <= skipZ; ++i)
+            {
+                diff += parentDiffP [i];
+            }
             myZJump [k] = *parentJumpP;
-            zDiff [k] = *parentDiffP;
+            zDiff [k]   = diff;
             parentJumpP = parentJumpP + 1 + skipZ;
             parentDiffP = parentDiffP + 1 + skipZ;
         }
@@ -248,14 +266,22 @@ void
 goSubSignal3D<T>::shiftLeftDiff (int n)
 {
     // FIXME: Are these right now? 
-    this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
+    this->setSkip (((skipX + 1) << n) - 1, ((skipY + 1) << n) - 1, ((skipZ + 1) << n) - 1); 
+    // this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
 }
 
 template <class T>
 void
 goSubSignal3D<T>::shiftRightDiff (int n)
 {
-    this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
+    int newSkipX = 0;
+    int newSkipY = 0;
+    int newSkipZ = 0;
+    if (skipX > 1) newSkipX = ((skipX + 1) >> n) - 1;
+    if (skipY > 1) newSkipY = ((skipY + 1) >> n) - 1;
+    if (skipZ > 1) newSkipZ = ((skipZ + 1) >> n) - 1;
+    this->setSkip (newSkipX, newSkipY, newSkipZ); 
+    // this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
     // this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
 }
 

@@ -725,6 +725,7 @@ template< class T >
 int
 goDWT<T>::haar (goSignal3D<T>& signal, int stage)
 {
+    assert (stage > 0);
     int i;
     goSubSignal3D<T>  s;
     s.setParent(&signal);
@@ -744,6 +745,7 @@ template< class T >
 int
 goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 {
+    assert (stage > 0);
     int i;
     goSubSignal3D<T>  s;
     s.setParent(&signal);
@@ -753,7 +755,9 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
     //s.setDiff (signal.getXDiff() << (stage - 1),
     //     signal.getYDiff() << (stage - 1),
     //     signal.getZDiff() << (stage - 1));
-    s.setSkip ((1 << (stage - 1)) - 1, (1 << (stage - 1)) - 1, (1 << (stage - 1)) - 1);
+    s.setSkip ((1 << (stage - 1)) - 1, 
+               (1 << (stage - 1)) - 1, 
+               (1 << (stage - 1)) - 1);
 
     for (i = 0; i < stage; i++)
     {
