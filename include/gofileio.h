@@ -39,8 +39,13 @@ class goFileIO {
   ///
   static void writePGM (const char* filename, goSignal2D<goInt32>& signal);
 
-  static bool readImage  (const char* filename, goObjectBase* signal);
-  static bool writeImage (const char* filename, const goObjectBase* signal);
+  /** @addtogroup signal */
+  /** @{ */
+  static bool  readImage  (const char* filename, goObjectBase* signal);
+  static bool  writeImage (const char* filename, const goObjectBase* signal);
+  /** @} */
+  static FILE* createTempFile (goString& filenameRet);
+  static bool  remove         (const goString& filename);
 };
 /*!
  * @}
