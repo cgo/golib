@@ -1,8 +1,12 @@
 #ifndef GO_LINEAR_ALGEBRA_H
 #define GO_LINEAR_ALGEBRA_H
 
-#include <gomatrix.h>
-#include <gonvector.h>
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+#ifndef GOARRAY_H
+# include <goarray.h>
+#endif
 
 namespace goMath {
 
@@ -10,13 +14,13 @@ namespace goMath {
  * Contains NRC code. No public use.
  */
 template<class T>
-void LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d);
+void LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d);
 
 /*
  * Contains NRC code. No public use.
  */
 template<class T>
-void LUBackSubst(goMatrix<T>& a, goNVector<int>& indx, goNVector<T>& b);
+void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b);
 
 /*
  * Contains NRC code. No public use.
