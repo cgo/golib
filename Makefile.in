@@ -98,7 +98,7 @@ CONFIG_HEADER = ./include/config.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 Makefile.in NEWS aclocal.m4 config.guess config.sub configure \
-configure.in include/config.h.in include/stamp-h.in install-sh ltconfig \
+configure.in include/config.h.in include/stamp-h.in install-sh \
 ltmain.sh missing mkinstalldirs
 
 
