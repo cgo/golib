@@ -5,19 +5,26 @@
 #include <go44matrix.h>
 #include <go3vector.h>
 #include <math.h>
-#include <ostream.h>
+#include <ostream>
 
 #define GO4VECTOR_FUNCTION_PREFIX inline
 // #define GO4VECTOR_FUNCTION_PREFIX
 
 // template <class T> class go44Matrix;
 
+/*! \addtogroup math
+ * @{
+ */
+/**
+ * @brief 4-dimensional vector.
+ **/
 template< class T >
 class
 go4Vector {
  public:
   go4Vector ();
-  virtual ~go4Vector ();
+
+  virtual ~go4Vector () {};
   
   // GO4VECTOR_FUNCTION_PREFIX T& operator[] (goIndex_t i) { return data[i]; }
   GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (go4Vector<T>& other) 
@@ -130,8 +137,8 @@ go4Vector {
       z *= t_1;
     }
 
-  friend ostream& operator<< (ostream &o, go4Vector<goDouble>& v);
-  friend ostream& operator<< (ostream &o, go4Vector<goFloat>& v);
+  friend std::ostream& operator<< (std::ostream &o, go4Vector<goDouble>& v);
+  friend std::ostream& operator<< (std::ostream &o, go4Vector<goFloat>& v);
 
   T x, y, z, t;
 
@@ -139,6 +146,15 @@ go4Vector {
 
 };
 
+template <class T>
+go4Vector<T>::go4Vector ()
+    : x ((T)0),
+      y ((T)0),
+      z ((T)0),
+      t ((T)0)
+{
+}
+/*! @} */
 
 
 #endif

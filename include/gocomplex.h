@@ -10,6 +10,13 @@ public:
   bool	argValid;
 };
 
+/*!
+ * \addtogroup math
+ * @{
+ */
+/**
+ * @brief Complex number class.
+ **/
 template <class T>
 class goComplex {
  public:
@@ -36,7 +43,7 @@ class goComplex {
   bool		operator< (goComplex<T>& other);
 
   /// make conjugate complex number
-  void	con ();
+  void	conjugate ();
 
   /**
    * Calculate the argument (phase angle) of the complex number.
@@ -57,7 +64,7 @@ protected:
   goDouble argValue;
   goComplexInfo	info;
 };
-
+/*! @} */
 ///
 std::ostream& operator<< (std::ostream& o, class goComplex<goDouble>& c);
 

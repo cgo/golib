@@ -9,15 +9,15 @@
 # include <goobjectbase.h>
 #endif
 
-/*! 
- * \brief Provides type information.
- *
+
+class goTypePrivate;
+/*!
  * \addtogroup types
  * @{
  */
-
-class goTypePrivate;
-
+/*! 
+ * \brief Provides type information.
+ */
 class goType : public goObjectBase
 {
     public:
@@ -36,6 +36,5 @@ class goType : public goObjectBase
     private:
         goTypePrivate* myPrivate;
 };
-
 /*! @} */
 #endif

@@ -24,6 +24,9 @@
  * To enable the [][] indexing, a helper template class for
  * row vectors, goRowVector, was introduced.
  *
+ * If you need to instantiate the template for a new type,
+ * include gomatrix.hpp
+ *
  * \author Christian Gosch
  */
 template <class T>

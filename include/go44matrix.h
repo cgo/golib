@@ -8,6 +8,9 @@
 
 #include <iostream>
 
+/*! \addtogroup math
+ * @{
+ */
 /*!
  * 4x4 Matrix.
  */
@@ -71,7 +74,7 @@ public:
 protected:
   T* matrix;
 };
-
+/*! @} */
 
 template <class T>
 inline

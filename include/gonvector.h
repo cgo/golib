@@ -6,8 +6,15 @@
 #include <goarray.h>
 #include <iostream>
 
+/*!
+ * \addtogroup math
+ * @{
+ */
 /**
+ * \brief Somewhat deprecated vector class.
+ *
  * This implements a vector of arbitrary length.
+ * Do not use this for maths, use goMatrix(n,1) instead.
  * @author Christian Gosch
  */
 template<class T>
@@ -60,6 +67,7 @@ class goNVector : public goArray<T> {
   T	   absValue;
   bool	   absValid;
 };
+/*! æ} */
 
   /*
    * This still is no real solution.

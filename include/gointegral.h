@@ -3,13 +3,14 @@
 
 #include <goarray.h>
 
-///
 struct goIntegralStatus {
   /// True if the value is computed and valid
   bool value_valid;
 };
 
-/**
+/*
+ * This class seems unused and will be dumped.
+ *
  * This implements some numerical integration methods.
  * Methods implemented so far are:
  * \begin{itemize}

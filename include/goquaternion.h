@@ -6,6 +6,13 @@
 #include <go3vector.h>
 #include <config.h>
 
+/*!
+ * \addtogroup math
+ * @{
+ */
+/**
+ * @brief Quaternion class.
+ **/
 template <class T>
 class goQuaternion
 {
@@ -22,5 +29,6 @@ class goQuaternion
 	go3Vector<T> v;
 	T			 scalar;
 };
+/*! @} */
 
 #endif

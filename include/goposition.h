@@ -3,6 +3,11 @@
 
 #include <go3vector.h>
 
+/**
+ * @brief 3D position.
+ *
+ * Indices are goInt32.
+ **/
 class
 goPosition : public go3Vector<goInt32> {
  public:

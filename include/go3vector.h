@@ -8,7 +8,13 @@
 #define GO3VECTOR_FUNCTION_PREFIX inline
 // #define GO3VECTOR_FUNCTION_PREFIX
 
-
+/*!
+ * \addtogroup math
+ * @{
+ */
+/**
+ * @brief 3-dimensional vector.
+ **/
 template< class T >
 class
 go3Vector {
@@ -129,6 +135,31 @@ go3Vector {
 
 };
 
+template< class T >
+go3Vector<T>::go3Vector() {
+  x = 0;
+  y = 0;
+  z = 0;
+}
+
+template< class T >
+go3Vector<T>::go3Vector(const go3Vector<T>& other) {
+  x = other.x;
+  y = other.y;
+  z = other.z;
+}
+
+template< class T >
+go3Vector<T>::go3Vector(T _x, T _y, T _z) {
+  x = _x;
+  y = _y;
+  z = _z;
+}
+
+template< class T >
+go3Vector<T>::~go3Vector () {
+}
+/*! @} */
 
 
 #endif
