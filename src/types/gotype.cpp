@@ -20,6 +20,7 @@ static goIndex_t uint32IndexFunction (const void*);
 static goIndex_t floatIndexFunction (const void*);
 static goIndex_t doubleIndexFunction (const void*);
 
+
 class goQuantizationTables
 {
     public:
@@ -88,7 +89,7 @@ goFloat* goQuantizationTables::fTableFloat = new goFloat [goQuantizationTables::
 goDouble* goQuantizationTables::fTableDouble = new goDouble [goQuantizationTables::floatMaxIndex - goQuantizationTables::floatMinIndex];
 
 template <class sourceT, class targetT>
-static inline targetT* createQuantizationTable (targetT* table, sourceT minSourceValue, sourceT maxSourceValue, targetT minTargetValue, targetT maxTargetValue, goIndex_t minIndex, goIndex_t maxIndex)
+static inline targetT* _createQuantizationTable (targetT* table, sourceT minSourceValue, sourceT maxSourceValue, targetT minTargetValue, targetT maxTargetValue, goIndex_t minIndex, goIndex_t maxIndex)
 {
     goDouble step = ((goDouble)maxSourceValue-(goDouble)minSourceValue+1)/(goDouble)(maxIndex-minIndex+1);
     goUniformQuantizer<sourceT,targetT> Q ((sourceT)step, minSourceValue, maxSourceValue, minTargetValue, maxTargetValue);
@@ -109,58 +110,58 @@ goQuantizationTables::goQuantizationTables ()
 {
     {
         goType t (GO_INT8);
-        createQuantizationTable<goInt8,goFloat> (int8Tablef, (goInt8)t.getMinimum(), (goInt8)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goInt8,goFloat> (int8Tablef, (goInt8)t.getMinimum(), (goInt8)t.getMaximum(), 0.0f, 1.0f,
                                                  int8MinIndex, int8MaxIndex);
-        createQuantizationTable<goFloat,goInt8> (fTableInt8, 0.0f, 1.0f, (goInt8)t.getMinimum(), (goInt8)t.getMaximum(),
+        _createQuantizationTable<goFloat,goInt8> (fTableInt8, 0.0f, 1.0f, (goInt8)t.getMinimum(), (goInt8)t.getMaximum(),
                                                  floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_UINT8);
-        createQuantizationTable<goUInt8,goFloat> (uint8Tablef, (goUInt8)t.getMinimum(), (goUInt8)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goUInt8,goFloat> (uint8Tablef, (goUInt8)t.getMinimum(), (goUInt8)t.getMaximum(), 0.0f, 1.0f,
                                                  uint8MinIndex, uint8MaxIndex);
-        createQuantizationTable<goFloat,goUInt8> (fTableUInt8, 0.0f, 1.0f, (goUInt8)t.getMinimum(), (goUInt8)t.getMaximum(),
+        _createQuantizationTable<goFloat,goUInt8> (fTableUInt8, 0.0f, 1.0f, (goUInt8)t.getMinimum(), (goUInt8)t.getMaximum(),
                                                   floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_INT16);
-        createQuantizationTable<goInt16,goFloat> (int16Tablef, (goInt16)t.getMinimum(), (goInt16)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goInt16,goFloat> (int16Tablef, (goInt16)t.getMinimum(), (goInt16)t.getMaximum(), 0.0f, 1.0f,
                                                   int16MinIndex, int16MaxIndex);
-        createQuantizationTable<goFloat,goInt16> (fTableInt16, 0.0f, 1.0f, (goInt16)t.getMinimum(), (goInt16)t.getMaximum(),
+        _createQuantizationTable<goFloat,goInt16> (fTableInt16, 0.0f, 1.0f, (goInt16)t.getMinimum(), (goInt16)t.getMaximum(),
                                                   floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_UINT16);
-        createQuantizationTable<goUInt16,goFloat> (uint16Tablef, (goUInt16)t.getMinimum(), (goUInt16)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goUInt16,goFloat> (uint16Tablef, (goUInt16)t.getMinimum(), (goUInt16)t.getMaximum(), 0.0f, 1.0f,
                                                    uint16MinIndex, uint16MaxIndex);
-        createQuantizationTable<goFloat,goUInt16> (fTableUInt16, 0.0f, 1.0f, (goUInt16)t.getMinimum(), (goUInt16)t.getMaximum(),
+        _createQuantizationTable<goFloat,goUInt16> (fTableUInt16, 0.0f, 1.0f, (goUInt16)t.getMinimum(), (goUInt16)t.getMaximum(),
                                                   floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_INT32); 
-        createQuantizationTable<goInt32,goFloat> (int32Tablef, (goInt32)t.getMinimum(), (goInt32)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goInt32,goFloat> (int32Tablef, (goInt32)t.getMinimum(), (goInt32)t.getMaximum(), 0.0f, 1.0f,
                                                   int32MinIndex, int32MaxIndex);
-        createQuantizationTable<goFloat,goInt32> (fTableInt32, 0.0f, 1.0f, (goInt32)t.getMinimum(), (goInt32)t.getMaximum(),
+        _createQuantizationTable<goFloat,goInt32> (fTableInt32, 0.0f, 1.0f, (goInt32)t.getMinimum(), (goInt32)t.getMaximum(),
                                                   floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_UINT32); 
-        createQuantizationTable<goUInt32,goFloat> (uint32Tablef, (goUInt32)t.getMinimum(), (goUInt32)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goUInt32,goFloat> (uint32Tablef, (goUInt32)t.getMinimum(), (goUInt32)t.getMaximum(), 0.0f, 1.0f,
                                                    uint32MinIndex, uint32MaxIndex);
-        createQuantizationTable<goFloat,goUInt32> (fTableUInt32, 0.0f, 1.0f, (goUInt32)t.getMinimum(), (goUInt32)t.getMaximum(),
+        _createQuantizationTable<goFloat,goUInt32> (fTableUInt32, 0.0f, 1.0f, (goUInt32)t.getMinimum(), (goUInt32)t.getMaximum(),
                                                    floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_FLOAT); 
-        createQuantizationTable<goFloat,goFloat> (floatTablef, (goFloat)t.getMinimum(), (goFloat)t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goFloat,goFloat> (floatTablef, (goFloat)t.getMinimum(), (goFloat)t.getMaximum(), 0.0f, 1.0f,
                                                    floatMinIndex, floatMaxIndex);
-        createQuantizationTable<goFloat,goFloat> (fTableFloat, 0.0f, 1.0f, (goFloat)t.getMinimum(), (goFloat)t.getMaximum(),
+        _createQuantizationTable<goFloat,goFloat> (fTableFloat, 0.0f, 1.0f, (goFloat)t.getMinimum(), (goFloat)t.getMaximum(),
                                                   floatMinIndex, floatMaxIndex);
     }
     {
         goType t (GO_DOUBLE); 
-        createQuantizationTable<goDouble,goFloat> (doubleTablef, t.getMinimum(), t.getMaximum(), 0.0f, 1.0f,
+        _createQuantizationTable<goDouble,goFloat> (doubleTablef, t.getMinimum(), t.getMaximum(), 0.0f, 1.0f,
                                                    doubleMinIndex, doubleMaxIndex);
-        createQuantizationTable<goFloat,goDouble> (fTableDouble, 0.0f, 1.0f, t.getMinimum(), t.getMaximum(),
+        _createQuantizationTable<goFloat,goDouble> (fTableDouble, 0.0f, 1.0f, t.getMinimum(), t.getMaximum(),
                                                    floatMinIndex, floatMaxIndex);
     }
     std::cout << "Initialized goQuantizationTables\n";
@@ -720,6 +721,7 @@ goType::getMaxIndex () const
     return 0;
 }
 
+#if 0
 const void*
 goType::getQuantizationTable (goTypeEnum targetType) const
 {
@@ -823,6 +825,7 @@ goType::getQuantizationTable (goTypeEnum targetType) const
     }
     return NULL;
 }
+#endif
 
 /**
  * @brief Get the minimum value represented by this data type.
