@@ -17,7 +17,7 @@
 template<class T> class goSignal3DBase;
 
 /** 
- * @addtogroup signals
+ * @addtogroup signal
  */
 /** @{ */
 /**
@@ -26,7 +26,7 @@ template<class T> class goSignal3DBase;
  * This is an iterator class for <void> type signals, the preferred signal class.
  *
  * Usage is like this:
- *
+ * <pre>
  * <code>
  *  goSignal3D<void> sig;
  *  ....
@@ -48,18 +48,20 @@ template<class T> class goSignal3DBase;
  *      it.incrementZ();
  *  }
  * </code>
- * 
+ * </pre>
  * @note It may be faster to use the GO_SIGNAL3D_EACHELEMENT* macros for 
  * iterating through a signal. However, with <void> type signals, you should be ok with
  * this since the typical inner-loop methods are inlined. 
  * If you are optimising for speed, it may still be a good idea to simply write your own loop.
  * 
  * @note Be careful when you use <b>multichannel signals</b>. There is a pitfall:
+ *  <pre>
  *       <code>
  *        sig.setChannel(1);
  *        goSignal3DGenericIterator it(sig);
  *        sig.setChannel(2);
  *       </code>
+ *  </pre>
  *       The iterator will run on channel 1 !!!!
  *       It will run on channel 2 when you put a it.resetZ() or a it.setPosition(...)
  *       after setting the channel in sig.

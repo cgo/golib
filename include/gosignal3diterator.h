@@ -17,7 +17,7 @@
 template<class T> class goSignal3DBase;
 
 /** 
- * @addtogroup signals
+ * @addtogroup signal
  */
 /** @{ */
 /**
@@ -30,6 +30,7 @@ template<class T> class goSignal3DBase;
  *
  * Usage is like this:
  *
+ * <pre>
  * <code>
  *  goSignal3D<goInt16> sig;
  *  ....
@@ -50,7 +51,7 @@ template<class T> class goSignal3DBase;
  *      it.incrementZ();
  *  }
  * </code>
- * 
+ * </pre>
  * @note It is faster to use the GO_SIGNAL3D_EACHELEMENT* macros for 
  * iterating through a signal, since there are function calls
  * in the inner loop when you are using the iterator. 
