@@ -31,6 +31,12 @@ public:
   ///
   void      resize (goIndex_t newsize);
 
+  void      getPathName (goString& pathRet);
+  void      getFileName (goString& fileNameRet);
+  goIndex_t findFirst   (char c);
+  goIndex_t findLast    (char c);
+  bool      copy        (goString& target, goIndex_t start, goIndex_t end);
+  
   ///
   int         toInt ();
   ///
