@@ -39,6 +39,16 @@
  * goSignal3DBase and its derivatives can be used as a generic
  * signal container with variable data type. This
  * behaviour is preferable in many situations.
+ *
+ * This class can handle multichannel data (such as RGBA).
+ * To select a channel, use <code>setChannel()</code>.
+ * All data access functions will then work so that
+ * any accessed data value is from the selected channel.
+ * For details on how to create a multichannel see <code>goSignal3D</code>
+ * 
+ * \note Although instances for many explicit data types
+ *       are provided, it is recommended to use the special void type instantiation.
+ * 
  * \todo The <code>void</code> implementation is not completely done.
  *       Add support in gosignalmacros.h and add some of the routines
  *       in gosignal3d and base marked as "not yet implemented".
