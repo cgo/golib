@@ -4,8 +4,11 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id$
- * $Log$
+ * $Id: gofilter3d.cpp,v 1.1 2002/10/26 15:45:32 christian Exp $
+ * $Log: gofilter3d.cpp,v $
+ * Revision 1.1  2002/10/26 15:45:32  christian
+ * 3d filter class
+ *
  */
 
 #include <gofilter3d.h>
@@ -88,7 +91,9 @@ goFilter3D<T_IN, T_OUT>::setMask (const goSignal3DBase<mask_t>& mask,
     if (normalize)
     {
         normalizationFactor = 0.0f;
-        GO_SIGNAL3D_EACHELEMENT (normalizationFactor += (goDouble)*__ptr, mask, const mask_t);
+        GO_SIGNAL3D_EACHELEMENT (normalizationFactor += (*__ptr), mask, const mask_t);
+
+        assert (normalizationFactor != 0.0f);
 
         normalizationFactor = 1.0f / normalizationFactor;
     }
@@ -172,10 +177,12 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
     {
         yPtrOut  = outSignal.getPtr   (0, 0, z);
         yDiffOut = outSignal.getYDiff ();
+
         for (y = 0; y < outSignal.getSizeY(); ++y)
         {
             xPtrOut  = yPtrOut;
             xDiffOut = outSignal.getXDiff ();
+
             for (x = 0; x < outSignal.getSizeX(); ++x)
             {
                 inCoeff.setPosition (x - maskCenterX, y - maskCenterY, z - maskCenterZ);
@@ -186,6 +193,7 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
                 xPtrOut += *xDiffOut;
                 ++xDiffOut;
             }
+
             yPtrOut += *yDiffOut;
             ++yDiffOut;
         }
