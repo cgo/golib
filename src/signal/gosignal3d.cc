@@ -8,6 +8,15 @@
 
 #include <iostream>
 
+/*! 
+ * @class goSignal3D
+ * Class to handle 3-dimensional signals.
+ * Assumes a 3D signal is stored linearly in memory.
+ * xDiff, yDiff, and zDiff, are the pointer differences in each 
+ * direction.
+ * ptr points at the start address of the signal.
+ */
+
 template< class T >
 goSignal3D<T>::goSignal3D () 
     : goSignal3DBase<T> ()
@@ -69,6 +78,11 @@ goSignal3D<T>::operator= (goSignal3DBase<T>& other)
     return *this;
 }
 
+/*!
+ * Deletes the memory used by the block data.
+ * @todo Take care what happens when axes are rotated. 
+ * Nothing bad should happen though.
+ */
 template<class T> void
 goSignal3D<T>::destroy ()
 {
@@ -94,6 +108,7 @@ goSignal3D<T>::memoryUsage()
     return 0;
 }
 
+/// Copies only the size, NOT THE DATA!
 template< class T >
 bool
 goSignal3D<T>::make (goSignal3D *other) {

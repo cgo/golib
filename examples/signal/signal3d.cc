@@ -1,9 +1,11 @@
+#include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <gosubsignal3d.h>
 #include <gotypes.h>
 #include <iostream>
 
 template<class T>
-void printSignal (goSignal3D<T>& signal)
+void printSignal (goSignal3DBase<T>& signal)
 {
     goIndex_t x, y;
     
@@ -19,7 +21,7 @@ void printSignal (goSignal3D<T>& signal)
 }
 
 template<class T>
-void printDirect (goSignal3D<T>& signal)
+void printDirect (goSignal3DBase<T>& signal)
 {
     goIndex_t x, y;
    
@@ -83,7 +85,8 @@ int main (void)
     {
         for (x = 0; x < signal.getSizeX(); ++x)
         {
-            *signal.getPtr (x, y, 0) = counter++;
+            *signal.getPtr (x, y, 0) = counter;
+            *signal.getPtr (x, y, 1) = 200 + counter++;
         }
     }
    
@@ -120,6 +123,16 @@ int main (void)
         std::cout << "!=";
     }
     std::cout << " signal\n";
+  
+    /********************************************************************************************/
+    
+    std::cout << "goSubSignal3D\n";
+    std::cout << "-------------\n";
+    
+    goSubSignal3D<goInt32> subSignal (&signal, 4, 4, 4);
+    subSignal.setPosition (1, 1, 1);
+    printSignal (subSignal);
+    
     
     return 1;
 }

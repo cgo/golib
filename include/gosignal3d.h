@@ -11,13 +11,6 @@
 
 #include <string.h>
 
-/*!
- * Class to handle 3-dimensional signals.
- * Assumes a 3D signal is stored linearly in memory.
- * xDiff, yDiff, and zDiff, are the pointer differences in each 
- * direction.
- * ptr points at the start address of the signal.
- */
 template< class T >
 class
 goSignal3D : public goSignal3DBase<T>
@@ -34,21 +27,6 @@ goSignal3D : public goSignal3DBase<T>
         // From goObjectInfo
         virtual goSize_t memoryUsage();
 
-        /*!
-         * Allocates memory of appropriate size for the block.
-         * Sets diffs and size.
-         * The data is uninitialized.
-         * If make is called, <CODE>destroy()</CODE> should be called when
-         * the data is not referenced anymore.
-         * destroy() is NOT called automagically when the destructor is called.
-         * To destroy the actual data, destroy() needs to be called BEFORE deleting the object.
-         * @param x Size in x direction of the signal
-         * @param y Size in y direction of the signal
-         * @param z Size in z direction of the signal
-         * @param border_x Size of the border in x direction
-         * @param border_y Size of the border in y direction
-         * @param border_z Size of the border in z direction
-         */
         inline bool make (goSize_t x, goSize_t y, goSize_t z,
                           goSize_t blocksize_x = 32, 
                           goSize_t blocksize_y = 32, 
@@ -57,13 +35,8 @@ goSignal3D : public goSignal3DBase<T>
                           goSize_t border_y = 0, 
                           goSize_t border_z = 0);
 
-        /// Copies only the size, NOT THE DATA!
         bool make (goSignal3D *other);
 
-        /*!
-         * Deletes the memory used by the block data.
-         * @todo Take care what happens when axes are rotated. Nothing bad should happen though.
-         */
         virtual void destroy (); 
 
         /// Works only with linear-memory blocks. No sub blocks. Uses memset().
@@ -74,6 +47,21 @@ goSignal3D : public goSignal3DBase<T>
         }
 };
 
+/*!
+ * Allocates memory of appropriate size for the block.
+ * Sets diffs and size.
+ * The data is uninitialized.
+ * If make is called, <CODE>destroy()</CODE> should be called when
+ * the data is not referenced anymore.
+ * destroy() is NOT called automagically when the destructor is called.
+ * To destroy the actual data, destroy() needs to be called BEFORE deleting the object.
+ * @param x Size in x direction of the signal
+ * @param y Size in y direction of the signal
+ * @param z Size in z direction of the signal
+ * @param border_x Size of the border in x direction
+ * @param border_y Size of the border in y direction
+ * @param border_z Size of the border in z direction
+ */
 template< class T >
 inline
 bool

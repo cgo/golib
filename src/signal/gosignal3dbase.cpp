@@ -79,7 +79,7 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
 
 template <class T>
 bool
-goSignal3DBase<T>::initialize (T* dataptr,
+goSignal3DBase<T>::initialize (T*       dataptr,
                                goSize_t x, goSize_t y, goSize_t z,
                                goSize_t blockSizeX, 
                                goSize_t blockSizeY, 
@@ -194,6 +194,7 @@ goSignal3DBase<T>::initialize (T* dataptr,
         zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1));
     }
 
+
     goPtrdiff_t currentJump = 0;
     goIndex_t j;
     for (j = 0; j < mySize.x; ++j)
@@ -228,6 +229,54 @@ goSignal3DBase<T>::initialize (T* dataptr,
         currentJump += myBlockSize.x * myBlockSize.y;
     }
 
+
+    // Periodize signal over the border
+
+    xDiff[getSizeX() - 1] = myXJump[0] - myXJump[getSizeX() - 1] ;
+    yDiff[getSizeY() - 1] = myYJump[0] - myYJump[getSizeY() - 1] ;
+    zDiff[getSizeZ() - 1] = myZJump[0] - myZJump[getSizeZ() - 1] ;
+
+    j = getSizeX() - getBorderX();
+    for (i = -getBorderX(); i < 0; ++i, ++j)
+    {
+        xDiff[i]   = xDiff[j];
+        myXJump[i] = myXJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeX() + 1; i < getSizeX() + getBorderX(); ++i, ++j)
+    {
+        xDiff[i] = xDiff[j];
+        myXJump[i] = myXJump[j];
+    }
+
+    j = getSizeY() - getBorderY();
+    for (i = -getBorderY(); i < 0; ++i, ++j)
+    {
+        yDiff[i]   = yDiff[j];
+        myYJump[i] = myYJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeY() + 1; i < getSizeY() + getBorderY(); ++i, ++j)
+    {
+        yDiff[i] = yDiff[j];
+        myYJump[i] = myYJump[j];
+    }
+
+    j = getSizeZ() - getBorderZ();
+    for (i = -getBorderZ(); i < 0; ++i, ++j)
+    {
+        zDiff[i]   = zDiff[j];
+        myZJump[i] = myZJump[j];
+    }
+
+    j = 0;
+    for (i = getSizeZ() + 1; i < getSizeZ() + getBorderZ(); ++i, ++j)
+    {
+        zDiff[i] = zDiff[j];
+        myZJump[i] = myZJump[j];
+    }
     return true;
 }
 

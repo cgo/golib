@@ -25,12 +25,14 @@ class
 goSubSignal3D : public goSignal3DBase<T> 
 {
     public:
+        goSubSignal3D ();
         goSubSignal3D (goSignal3DBase<T>* p, 
                        goSize_t           sizeX,
                        goSize_t           sizeY,
                        goSize_t           sizeZ);
         virtual ~goSubSignal3D();
 
+        void               setParent (goSignal3DBase<T>* p);
         goSignal3DBase<T>* getParent () { return parent; }
         /*!
          * Sets the position of the subblock in the parent block.
@@ -44,12 +46,9 @@ goSubSignal3D : public goSignal3DBase<T>
 
         void move (int dir);
 
-    protected:
+    private:
         goPosition         position;
         goSignal3DBase<T>* parent;
-        goPtrdiff_t*       parentXDiff;
-        goPtrdiff_t*       parentYDiff;
-        goPtrdiff_t*       parentZDiff;
 };
 
 #endif

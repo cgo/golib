@@ -4,12 +4,18 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id$
- * $Log$
+ * $Id: gosignal3dbase.h,v 1.1 2002/10/03 21:34:47 christian Exp $
+ * $Log: gosignal3dbase.h,v $
+ * Revision 1.1  2002/10/03 21:34:47  christian
+ * *** empty log message ***
+ *
  */
 
 #ifndef GOSIGNAL3DBASE_H
 #define GOSIGNAL3DBASE_H
+
+#include <goobjectinfo.h>
+#include <gotypes.h>
 
 template <class T>
 class
@@ -40,29 +46,38 @@ goSignal3DBase : public goObjectInfo
 
         void setPtr (T *p); 
 
-        inline T* getPtr () { return ptr;}
+        inline       T* getPtr ()       { return getPtr (0, 0, 0);}
+        inline const T* getPtr () const { return (const T*)getPtr (0, 0, 0);}
 
         inline const T* getRealPtr () const { return (const T*)real_ptr; }
-        inline T* getRealPtr () { return real_ptr; }
+        inline       T* getRealPtr () { return real_ptr; }
 
-        inline T* getPtr (goIndex_t x, goIndex_t y, goIndex_t z);
+        inline T*       getPtr     (goIndex_t x, goIndex_t y, goIndex_t z);
+        inline const T* getPtr     (goIndex_t x, goIndex_t y, goIndex_t z) const;
 
         inline const goPtrdiff_t* getXDiff () const;
         inline const goPtrdiff_t* getYDiff () const;
         inline const goPtrdiff_t* getZDiff () const;
-        inline       goPtrdiff_t* getXDiff () ;
-        inline       goPtrdiff_t* getYDiff () ;
-        inline       goPtrdiff_t* getZDiff () ;
+        inline       goPtrdiff_t* getXDiff ();
+        inline       goPtrdiff_t* getYDiff ();
+        inline       goPtrdiff_t* getZDiff ();
+        inline const goPtrdiff_t* getXJump () const;  
+        inline const goPtrdiff_t* getYJump () const;  
+        inline const goPtrdiff_t* getZJump () const;  
+        inline       goPtrdiff_t* getXJump ();  
+        inline       goPtrdiff_t* getYJump ();  
+        inline       goPtrdiff_t* getZJump ();  
 
         inline void setSize (goSize_t x,goSize_t y,goSize_t z)
-            { 
-                mySize.x = x; mySize.y = y; mySize.z = z; 
-            }
+        { 
+            mySize.x = x; mySize.y = y; mySize.z = z; 
+        }
 
         inline void setSize (const goSize3D& sz)
-            {
-                mySize = sz;
-            }
+        {
+            mySize = sz;
+        }
+
         inline void setSizeX(goSize_t s) { mySize.x = s; }
         inline void setSizeY(goSize_t s) { mySize.y = s; }
         inline void setSizeZ(goSize_t s) { mySize.z = s; }
@@ -70,19 +85,19 @@ goSignal3DBase : public goObjectInfo
         /*!
          * \return Size in samples in x direction.
          */
-        inline goSize_t getSizeX () const { return mySize.x; }
+        inline goSize_t getSizeX      () const { return mySize.x; }
         /*!
          * \return Size in samples in y direction.
          */
-        inline goSize_t getSizeY () const { return mySize.y; }
+        inline goSize_t getSizeY      () const { return mySize.y; }
         /*!
          * \return Size in samples in z direction.
          */
-        inline goSize_t getSizeZ () const { return mySize.z; }
+        inline goSize_t getSizeZ      () const { return mySize.z; }
 
-        inline goSize_t getBorderX () const { return myBorderSize.x; }
-        inline goSize_t getBorderY () const { return myBorderSize.y; }
-        inline goSize_t getBorderZ () const { return myBorderSize.z; }
+        inline goSize_t getBorderX    () const { return myBorderSize.x; }
+        inline goSize_t getBorderY    () const { return myBorderSize.y; }
+        inline goSize_t getBorderZ    () const { return myBorderSize.z; }
 
         inline goSize_t getBlockSizeX () const { return myBlockSize.x; }
         inline goSize_t getBlockSizeY () const { return myBlockSize.y; }
@@ -197,6 +212,49 @@ goSignal3DBase<T>::getZDiff ()
     return zDiff;
 }
 
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getXJump () const
+{
+    return myXJump;
+}
+
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getYJump () const
+{
+    return myYJump;
+}
+
+template<class T>
+inline const goPtrdiff_t*
+goSignal3DBase<T>::getZJump () const
+{
+    return myZJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getXJump () 
+{
+    return myXJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getYJump () 
+{
+    return myYJump;
+}
+
+template<class T>
+inline goPtrdiff_t*
+goSignal3DBase<T>::getZJump () 
+{
+    return myZJump;
+}
+
+
 template< class T >
 inline
 void
@@ -219,6 +277,14 @@ T*
 goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
     return ptr + myZJump[z] + myYJump[y] + myXJump[x];
+}
+
+template<class T>
+inline
+const T*
+goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z) const
+{
+    return (const T*) (ptr + myZJump[z] + myYJump[y] + myXJump[x]);
 }
 
 template<class T>
