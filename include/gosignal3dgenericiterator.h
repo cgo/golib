@@ -180,5 +180,115 @@ class goSignal3DGenericIterator
         goIndex_t             maxY;
         goIndex_t             maxZ;
 };
+
+class goSignal3DGenericConstIterator
+{
+    public:
+        goSignal3DGenericConstIterator  (const goSignal3DBase<void>* s);
+        goSignal3DGenericConstIterator  (const goSignal3DGenericConstIterator& other);
+        ~goSignal3DGenericConstIterator ();
+        
+        void     setPosition (goIndex_t x, goIndex_t y, goIndex_t z);
+        /**
+         * @return True if the end of the current x-line is reached, false otherwise.
+         */
+        inline bool     endX        ()
+        {
+            return posX > maxX;
+        };
+        /**
+         * @return True if the end of the current y-plane is reached, false otherwise.
+         */
+        inline bool     endY        ()
+        {
+            return posY > maxY;
+        };
+        /**
+         * @return True if the end of the current z-plane is reached (end of the 3D signal), false otherwise.
+         */
+        inline bool     endZ        ()
+        {
+            return posZ > maxZ;
+        };
+        inline void     incrementX  ()
+        {
+            px += *dx;
+            ++posX;
+            ++dx;
+        };
+        inline void     incrementY  ()
+        {
+            py += *dy;
+            ++posY;
+            ++dy;
+        };
+        inline void     incrementZ  ()
+        {
+            pz += *dz;
+            ++posZ;
+            ++dz;
+        };
+        inline void     decrementX  ()
+        {
+            px -= *(dx-1);
+            --posX;
+            --dx;
+        };
+        inline void     decrementY  ()
+        {
+            py -= *(dy-1);
+            --posY;
+            --dy;
+        };
+        inline void     decrementZ  ()
+        {
+            pz -= *(dz-1);
+            --posZ;
+            --dz;
+        };
+        /**
+         * @brief Resets the X pointer and internals concerning X to the 
+         * beginning of the current x-line.
+         **/
+        inline void     resetX      ()
+        {
+            dx   = dxStart;
+            posX = 0;
+            px   = py;
+        };
+        /**
+         * @brief Resets the Y pointer and internals concerning Y to the 
+         * beginning of the current z-plane.
+         **/
+        inline void     resetY      ()
+        {
+            dy   = dyStart;
+            posY = 0;
+            py   = pz;
+            resetX ();
+        };
+        void     resetZ      ();
+        /** 
+         * @return Pointer to the data element at the current iterator position.
+         */
+        inline const goByte* operator*   ()  const { return px; };
+       
+        const goSignal3DBase<void>* sig;
+        const goPtrdiff_t*    dx;
+        const goPtrdiff_t*    dy;
+        const goPtrdiff_t*    dz;
+        const goPtrdiff_t*    dxStart;
+        const goPtrdiff_t*    dyStart;
+        const goPtrdiff_t*    dzStart;
+        const goByte*         px;
+        const goByte*         py;
+        const goByte*         pz;
+        goIndex_t             posX;
+        goIndex_t             posY;
+        goIndex_t             posZ;
+        goIndex_t             maxX;
+        goIndex_t             maxY;
+        goIndex_t             maxZ;
+};
 /** @} */
 #endif
