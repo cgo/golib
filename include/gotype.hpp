@@ -51,14 +51,19 @@ targetT* _goCreateQuantizationTable (targetT           minTargetValue,
  * @oaran tableRet       Reference to a goArray of type targetT
  *                       which contains the quantization table after 
  *                       the function returns.
- * @param sourceMinimum  If sourceMinimum > sourceMaximum, the default values
+ * @param sourceMinimum  See note! If sourceMinimum > sourceMaximum, the default values
  *                       for the source data type are used.
  *                       If not, these values are used as min and max
  *                       data values for the input data type of the
  *                       quantization table.
  *                       Default is sourceMinimum = 0.0 and sourceMaximum = -1.0.
- * @param sourceMaximum  See above.
+ * @param sourceMaximum  See note! See above.
  * 
+ * @note WARNING: Do not hand over sourceMinimum and sourceMaximum. This does not work.
+ *
+ * @todo sourceMinimum and sourceMaximum does not work because index functions
+ *       assume certain value ranges (esp. float/double!!)
+ *
  * @return A pointer to the quantization table entry
  *         associated with index 0 which is simply &tableRet[-minIndex].
  *
