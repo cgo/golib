@@ -45,7 +45,7 @@ public:
   };
 
   ///
-  friend ostream& operator<< (ostream& outstream,
+  friend std::ostream& operator<< (std::ostream& outstream,
 			      goPaper& paper);
   /*  friend ostream& operator<< (ostream& outstream,
 			      const goPaper& paper);

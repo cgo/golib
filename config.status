@@ -2,7 +2,7 @@
 # Generated automatically by configure.
 # Run this file to recreate the current configuration.
 # This directory was configured as follows,
-# on host valinor:
+# on host box:
 #
 # ./configure  --prefix=/home/christian/pgm/golib
 #
@@ -42,7 +42,7 @@ s%@CXXFLAGS@%-g -O2%g
 s%@FFLAGS@%%g
 s%@DEFS@%-DHAVE_CONFIG_H%g
 s%@LDFLAGS@%%g
-s%@LIBS@%-lnsl -ltiff -lpthread %g
+s%@LIBS@%-lnsl -lpthread %g
 s%@exec_prefix@%${prefix}%g
 s%@prefix@%/home/christian/pgm/golib%g
 s%@program_transform_name@%s,x,x,%g
@@ -62,7 +62,7 @@ s%@INSTALL_PROGRAM@%${INSTALL}%g
 s%@INSTALL_SCRIPT@%${INSTALL_PROGRAM}%g
 s%@INSTALL_DATA@%${INSTALL} -m 644%g
 s%@PACKAGE@%golib%g
-s%@VERSION@%0.2.1%g
+s%@VERSION@%0.3.0%g
 s%@ACLOCAL@%aclocal%g
 s%@AUTOCONF@%autoconf%g
 s%@AUTOMAKE@%automake%g
@@ -96,9 +96,9 @@ s%@NASM@%NONE%g
 s%@debug_options@%-O2%g
 s%@lfs_options@%%g
 s%@streampos_defines@%%g
-s%@X_CFLAGS@% -I/usr/X11R6/include%g
-s%@X_PRE_LIBS@% -lSM -lICE%g
-s%@X_LIBS@% -L/usr/X11R6/lib%g
+s%@X_CFLAGS@%%g
+s%@X_PRE_LIBS@%%g
+s%@X_LIBS@%%g
 s%@X_EXTRA_LIBS@%%g
 
 CEOF
@@ -232,9 +232,9 @@ for ac_file in .. $CONFIG_HEADERS; do if test "x$ac_file" != x..; then
 ${ac_dA}PACKAGE${ac_dB}PACKAGE${ac_dC}"golib"${ac_dD}
 ${ac_uA}PACKAGE${ac_uB}PACKAGE${ac_uC}"golib"${ac_uD}
 ${ac_eA}PACKAGE${ac_eB}PACKAGE${ac_eC}"golib"${ac_eD}
-${ac_dA}VERSION${ac_dB}VERSION${ac_dC}"0.2.1"${ac_dD}
-${ac_uA}VERSION${ac_uB}VERSION${ac_uC}"0.2.1"${ac_uD}
-${ac_eA}VERSION${ac_eB}VERSION${ac_eC}"0.2.1"${ac_eD}
+${ac_dA}VERSION${ac_dB}VERSION${ac_dC}"0.3.0"${ac_dD}
+${ac_uA}VERSION${ac_uB}VERSION${ac_uC}"0.3.0"${ac_uD}
+${ac_eA}VERSION${ac_eB}VERSION${ac_eC}"0.3.0"${ac_eD}
 ${ac_dA}HAVE_DLFCN_H${ac_dB}HAVE_DLFCN_H${ac_dC}1${ac_dD}
 ${ac_uA}HAVE_DLFCN_H${ac_uB}HAVE_DLFCN_H${ac_uC}1${ac_uD}
 ${ac_eA}HAVE_DLFCN_H${ac_eB}HAVE_DLFCN_H${ac_eC}1${ac_eD}
@@ -289,12 +289,12 @@ ${ac_eA}SIZEOF_DOUBLE${ac_eB}SIZEOF_DOUBLE${ac_eC}8${ac_eD}
 ${ac_dA}HAVE_LIBPTHREAD${ac_dB}HAVE_LIBPTHREAD${ac_dC}1${ac_dD}
 ${ac_uA}HAVE_LIBPTHREAD${ac_uB}HAVE_LIBPTHREAD${ac_uC}1${ac_uD}
 ${ac_eA}HAVE_LIBPTHREAD${ac_eB}HAVE_LIBPTHREAD${ac_eC}1${ac_eD}
-${ac_dA}HAVE_LIBTIFF${ac_dB}HAVE_LIBTIFF${ac_dC}1${ac_dD}
-${ac_uA}HAVE_LIBTIFF${ac_uB}HAVE_LIBTIFF${ac_uC}1${ac_uD}
-${ac_eA}HAVE_LIBTIFF${ac_eB}HAVE_LIBTIFF${ac_eC}1${ac_eD}
 ${ac_dA}HAVE_LIBNSL${ac_dB}HAVE_LIBNSL${ac_dC}1${ac_dD}
 ${ac_uA}HAVE_LIBNSL${ac_uB}HAVE_LIBNSL${ac_uC}1${ac_uD}
 ${ac_eA}HAVE_LIBNSL${ac_eB}HAVE_LIBNSL${ac_eC}1${ac_eD}
+${ac_dA}X_DISPLAY_MISSING${ac_dB}X_DISPLAY_MISSING${ac_dC}1${ac_dD}
+${ac_uA}X_DISPLAY_MISSING${ac_uB}X_DISPLAY_MISSING${ac_uC}1${ac_uD}
+${ac_eA}X_DISPLAY_MISSING${ac_eB}X_DISPLAY_MISSING${ac_eC}1${ac_eD}
 CEOF
   sed -f conftest.frag conftest.in > conftest.out
   rm -f conftest.in

@@ -1,7 +1,7 @@
 #ifndef __GO_COMPLEX_H__
 #define __GO_COMPLEX_H__
 
-#include <iostream.h>
+#include <iostream>
 #include <gotypes.h>
 
 class goComplexInfo {
@@ -59,9 +59,9 @@ protected:
 };
 
 ///
-ostream& operator<< (ostream& o, class goComplex<goDouble>& c);
+std::ostream& operator<< (std::ostream& o, class goComplex<goDouble>& c);
 
-#endif __GO_COMPLEX_H__
+#endif 
 
 
 

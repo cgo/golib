@@ -1,7 +1,7 @@
 #include <goconfigfile.h>
-#include <fstream.h>
+#include <fstream>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 #include <ctype.h>
 
 #ifndef isblank
@@ -80,11 +80,11 @@ add (goConfigFileEntry& entry) {
     last_failed = false;
   }
   if (pos >= entries.getSize()) {
-    cout << "GOCONFIGFILE ERROR -- ENTRY INDEX TOO LARGE" << endl;
+      std::cout << "GOCONFIGFILE ERROR -- ENTRY INDEX TOO LARGE" << std::endl;
     return false;
   }
   if (!entries[pos]) {
-    cout << "GOCONFIGFILE ERROR -- ENTRY INDEX SEEMS NOT TO EXIST" << endl;
+      std::cout << "GOCONFIGFILE ERROR -- ENTRY INDEX SEEMS NOT TO EXIST" << std::endl;
     return false;
   }
   *entries[pos]->keyPtr()   = entry.key();
@@ -133,7 +133,7 @@ add (goString& sectionname, goString& keyname, goString& valuename) {
   if (pos < sections.getSize()) {
     return sections[pos]->add (keyname, valuename);
   } else {
-    cout << "GOCONFIGFILE ERROR -- SECTION NOT FOUND" << endl;
+      std::cout << "GOCONFIGFILE ERROR -- SECTION NOT FOUND" << std::endl;
   }
   return false;
 }
@@ -215,7 +215,7 @@ add (goString& chapter, goString& section, goString& key, goString& value) {
   if (pos < chapters.getSize()) {
     chapters[pos]->add (section,key,value);
   } else {
-    cout << "GOCONFIGFILE ERROR -- CHAPTER NOT FOUND" << endl;
+      std::cout << "GOCONFIGFILE ERROR -- CHAPTER NOT FOUND" << std::endl;
   }
   return fail();
 }
@@ -272,7 +272,7 @@ get (const char* chapter) {
 bool
 goConfigFile::
 read (goString& file) {
-  ifstream f;
+    std::ifstream f;
 
   unsigned char c = 0;
   
@@ -398,7 +398,7 @@ read (goString& file) {
       }
       break;
     case error:
-      cout << "Error in line " << line << " -- restarting line.\n";
+      std::cout << "Error in line " << line << " -- restarting line.\n";
       state = start_line;
       break;
     case end:
@@ -426,7 +426,7 @@ read (const char* file) {
 bool
 goConfigFile::
 write (goString& file) {
-  ofstream f;
+    std::ofstream f;
 
   f.open (file.toCharPtr());
   if (f.fail()) {

@@ -3,7 +3,7 @@
 #define __GOARRAY_HH__
 
 #include <gotypes.h>
-#include <iostream.h>
+#include <iostream>
 
 /*!
  * Resizeable array. Modified version for tempgolib, 2001 work placement with
@@ -93,7 +93,7 @@ goArray {
 //#include <goconfigfile.h>
 //#include <golist.h>
 //#include <gohashtable.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>   // realloc
 #include <string.h>   // memset / memcpy
 

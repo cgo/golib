@@ -208,7 +208,7 @@ goComplex<T>::abs () {
   return absValue;
 }
 
-ostream& operator<< (ostream& o, goComplex<double>& c) {
+std::ostream& operator<< (std::ostream& o, goComplex<double>& c) {
   o << c.re() << " + " << c.im() << "i";
   return o;
 }

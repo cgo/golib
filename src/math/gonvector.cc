@@ -1,7 +1,7 @@
 #include <gonvector.h>
 #include <goarray.h>
 #include <gocomplex.h>
-
+#include <iostream>
 // ostream& operator<< (ostream& o, class goComplex<goDouble> >& c);
 
 template <class T>
@@ -90,7 +90,7 @@ abs () {
 }
 
 template <class T>
-ostream& operator<< (ostream& ostr, goNVector<T>& vec) {
+std::ostream& operator<< (std::ostream& ostr, goNVector<T>& vec) {
   goIndex_t i = 0;
   for (i = 0; i < (vec.getSize() - 1); i++) {
     ostr << vec[i] << ",";
@@ -99,7 +99,7 @@ ostream& operator<< (ostream& ostr, goNVector<T>& vec) {
   return ostr;
 }
 
-ostream& operator<< (ostream& ostr, goNVector<int>& vec) {
+std::ostream& operator<< (std::ostream& ostr, goNVector<int>& vec) {
   goIndex_t i = 0;
   for (i = 0; i < (vec.getSize() - 1); i++) {
     ostr << vec[i] << ",";
@@ -108,7 +108,7 @@ ostream& operator<< (ostream& ostr, goNVector<int>& vec) {
   return ostr;
 }
 
-ostream& operator<< (ostream& ostr, goNVector<goInt16>& vec) {
+std::ostream& operator<< (std::ostream& ostr, goNVector<goInt16>& vec) {
   goIndex_t i = 0;
   for (i = 0; i < (vec.getSize() - 1); i++) {
     ostr << vec[i] << ",";
@@ -117,7 +117,7 @@ ostream& operator<< (ostream& ostr, goNVector<goInt16>& vec) {
   return ostr;
 }
 
-ostream& operator<< (ostream& ostr, goNVector<goDouble>& vec) {
+std::ostream& operator<< (std::ostream& ostr, goNVector<goDouble>& vec) {
   goIndex_t i = 0;
   for (i = 0; i < (vec.getSize() - 1); i++) {
     ostr << vec[i] << ",";
@@ -126,7 +126,7 @@ ostream& operator<< (ostream& ostr, goNVector<goDouble>& vec) {
   return ostr;
 }
 
-ostream& operator<< (ostream& ostr, goNVector<goComplex<goDouble> >& vec) {
+std::ostream& operator<< (std::ostream& ostr, goNVector<goComplex<goDouble> >& vec) {
   goIndex_t i = 0;
   for (i = 0; i < (vec.getSize() - 1); i++) {
     ostr << vec[i] << ",";

@@ -437,8 +437,8 @@ operator!= (goString& str, goString& str2) {
   return !operator==(str,str2);
 }
 
-ostream&
-operator<< (ostream& o, goString& s) {
+std::ostream&
+operator<< (std::ostream& o, goString& s) {
   goIndex_t i;
   if (s.getSize() > 0) {
     for (i = 0; i < s.getSize(); i++) {
@@ -448,8 +448,8 @@ operator<< (ostream& o, goString& s) {
   return o;
 }
 
-ostream&
-operator<< (ostream& o, const goString& s) {
+std::ostream&
+operator<< (std::ostream& o, const goString& s) {
   goIndex_t i;
   if (s.getSize() > 0) {
     for (i = 0; i < s.getSize(); i++) {

@@ -19,7 +19,7 @@ LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)
 {
 	if (a.getSizeX() != a.getSizeY())
 	{
-		cout << "Matrix is not quadratic\n";
+        std::cout << "Matrix is not quadratic\n";
 		return;
 	}
 	int i,imax,j,k;
@@ -37,7 +37,7 @@ LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)
 			if ((temp=fabs((double)a[i][j])) > big) big=temp;
 		if (big == 0.0) 
 		{ 
-			cout << "Singular matrix\n";
+            std::cout << "Singular matrix\n";
 			return;
 		}
 		vv[i]=1.0/big;
@@ -106,7 +106,7 @@ void matrixInversion(goMatrix<T>& a)
 {
 	if (a.getSizeX() != a.getSizeY())
 	{
-		cout << "Matrix inversion: Matrix must be quadratic." << endl;
+        std::cout << "Matrix inversion: Matrix must be quadratic." << std::endl;
 		return;
 	}
 	int n = a.getSizeX();

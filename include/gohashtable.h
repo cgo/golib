@@ -122,7 +122,7 @@ goHashTable<I,O>::setModValue (goUInt32 i)
   goIndex_t c;
   goList<void*>* list;
 
-  cout << "hash table generating " << theTable.getSize() << " lists" << endl;
+  std::cout << "hash table generating " << theTable.getSize() << " lists" << std::endl;
   for (c = 0; c < theTable.getSize(); c++)
     {
 	list = new goList<void*>();

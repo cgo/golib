@@ -19,7 +19,7 @@
 /* libraries */
 #define HAVE_LIBPTHREAD 1
 /* #undef HAVE_LIBQT */
-#define HAVE_LIBTIFF 1
+/* #undef HAVE_LIBTIFF */
 /* #undef HAVE_LIBFFTW */
 /* #undef HAVE_LIBSDL */
 /* #undef HAVE_LIBJPEG */

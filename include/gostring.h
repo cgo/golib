@@ -5,7 +5,7 @@
 #define __GOSTRING_H__
 
 #include <goarray.h>
-#include <ostream.h>
+#include <ostream>
 #include <gotypes.h>
 #include <godate.h>
 //#include <linux/types.h>
@@ -104,9 +104,9 @@ public:
   ///
   friend bool	  operator!= (goString& str, const goString& str2);
   ///
-  friend ostream& operator<< (ostream& o,goString& s);
+  friend std::ostream& operator<< (std::ostream& o,goString& s);
   ///
-  friend ostream& operator<< (ostream& o, const goString& s);
+  friend std::ostream& operator<< (std::ostream& o, const goString& s);
   ///
   // friend ostream& operator<< (ostream& o,const goString& s);
 
@@ -121,7 +121,7 @@ protected:
   goDate		  thisDate;
 };
 
-#endif /* __GOSTRING_H__ */
+#endif 
 
 
 

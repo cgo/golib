@@ -3,7 +3,7 @@
 
 #include <gotypes.h>
 #include <goarray.h>
-#include <iostream.h>
+#include <iostream>
 
 template <class IN_T, class OUT_T>
 class

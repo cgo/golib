@@ -1,5 +1,6 @@
 #include <gomatrix.h>
 #include <gomath.h>		// MAX()
+#include <iostream>
 
 template <class T>
 goMatrix<T>::goMatrix (goSize_t y, goSize_t x) {
@@ -237,11 +238,11 @@ goMatrix<T>::print()
 	{
 		for (j = 0; j < sizeX; j++)
 		{
-			cout << (*this)[i][j] << " ";
+            std::cout << (*this)[i][j] << " ";
 		}
-		cout << "\n";
+        std::cout << "\n";
 	}
-	cout << endl;
+    std::cout << std::endl;
 }
 
 /* Instantiation */

@@ -3,7 +3,7 @@
 #ifndef __GO_DEPOT_H__
 #define __GO_DEPOT_H__
 
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <gotypes.h>
 #include <gopaper.h>

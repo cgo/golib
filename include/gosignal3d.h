@@ -2,8 +2,8 @@
 #define __GOSIGNAL3D_H__
 
 #include <config.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <gotypes.h>
 #include <goobjectinfo.h>
 #include <go3vector.h>		// sample()

@@ -4,7 +4,7 @@
 #include <gotypes.h>
 #include <gocomplex.h>
 #include <goarray.h>
-#include <iostream.h>
+#include <iostream>
 
 /**
  * This implements a vector of arbitrary length.
@@ -66,7 +66,7 @@ class goNVector : public goArray<T> {
    * It's a quick hack to output vectors for debugging.
    */
 //ostream&       operator<< (ostream& ostr, goNVector<T>& vec);
-ostream&       operator<< (ostream& ostr, goNVector<goComplex<goDouble> >& vec);
+std::ostream&       operator<< (std::ostream& ostr, goNVector<goComplex<goDouble> >& vec);
 
 
 #endif /* __GONVECTOR_H__ */

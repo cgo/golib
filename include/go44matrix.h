@@ -6,7 +6,7 @@
 #include <gotypes.h>
 // #include <go4vector.h>
 
-#include <iostream.h>
+#include <iostream>
 
 /*!
  * 4x4 Matrix.
@@ -51,9 +51,9 @@ public:
   /*!
    * stream output for float matrices
    */
-  friend ostream&        operator<< (ostream& o, go44Matrix<goFloat>&);
-  friend ostream&        operator<< (ostream& o, go44Matrix<goDouble>&);
-  friend ostream&        operator<< (ostream& o, const go44Matrix<goDouble>&);
+  friend std::ostream&        operator<< (std::ostream& o, go44Matrix<goFloat>&);
+  friend std::ostream&        operator<< (std::ostream& o, go44Matrix<goDouble>&);
+  friend std::ostream&        operator<< (std::ostream& o, const go44Matrix<goDouble>&);
 
   inline void operator= (go44Matrix<T>& other);
   inline void operator= (const go44Matrix<T>& other);

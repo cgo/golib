@@ -1,7 +1,7 @@
 #ifndef __GOERROR_H__
 #define __GOERROR_H__
 
-#include <iostream.h>
+#include <iostream>
 #include <gostring.h>
 
 namespace goError {

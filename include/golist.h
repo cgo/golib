@@ -348,17 +348,4 @@ goList<T>::operator!= (goList<T>& other) {
   return !( (*this) == other );
 }
 
-
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

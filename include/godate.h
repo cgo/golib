@@ -7,15 +7,15 @@
 #define __GO_DATE_H__
 
 #include <gotypes.h>
-#include <iostream.h>
+#include <iostream>
 
-class
-goDate {
+class goDate 
+{
  public:
   goDate ();
   goDate (goInt16 Day,
-	  goInt16 Month,
-	  goInt16 Year);
+	      goInt16 Month,
+	      goInt16 Year);
 
   goInt16 getDay   () { return day; }
   goInt16 getMonth () { return month; }
@@ -35,7 +35,7 @@ goDate {
   void operator=  (const char* s);
   //friend operator++ ();
   //friend operator-- ();	
-  friend ostream& operator<< (ostream& outstr, goDate& d);
+  friend std::ostream& operator<< (std::ostream& outstr, goDate& d);
   
  protected:
   goInt16 day;
@@ -43,7 +43,7 @@ goDate {
   goInt16 year;	
 };
 
-#endif /* __GO_DATE_H__ */
+#endif 
 
 
 

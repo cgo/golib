@@ -4,7 +4,7 @@
 #include <gomatrix.h>
 #include <goarray.h>
 #include <gotypes.h>
-#include <iostream.h>
+#include <iostream>
 
 class goEqSystem : public goMatrix<goDouble> {
 public:
@@ -14,7 +14,7 @@ public:
   bool			solve ();
   goArray<goDouble>&	getSolution () { return solution; }
 
-  friend ostream& operator<< (ostream& o, goEqSystem& s);
+  friend std::ostream& operator<< (std::ostream& o, goEqSystem& s);
 
 protected:
   goArray<goDouble> solution;
