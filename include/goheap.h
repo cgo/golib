@@ -8,7 +8,9 @@
 
 
 /** 
- * Heap implementation .
+ * \brief Heap implementation.
+ * 
+ * goqueue.hpp contains the necessary source code to create new instances.
  */
 template <class T, class KEY_T>
 class goHeap {
