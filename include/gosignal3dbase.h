@@ -23,6 +23,8 @@
 #ifndef GOTYPE_H
 # include <gotype.h>
 #endif
+#include <gosignal3diterator.h>
+#include <gosignal3dgenericiterator.h>
 
 /*!
  * @addtogroup signal
@@ -47,6 +49,10 @@ template <class T>
 class
 goSignal3DBase : public goObjectBase
 {
+    public:
+        typedef goSignal3DIterator<T> iterator;
+        typedef const goSignal3DIterator<T> const_iterator;
+
     public:
         virtual ~goSignal3DBase ();
 
