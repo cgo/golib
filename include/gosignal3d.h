@@ -9,6 +9,7 @@
 #include <go3vector.h>		// sample()
 #include <gosignal3dbase.h>
 
+#include <assert.h>
 #include <string.h>
 
 template< class T >
@@ -45,6 +46,8 @@ goSignal3D : public goSignal3DBase<T>
             memset ((void*)real_ptr, (int)b, 
                     sizeof(T) * mySize.x * mySize.y * mySize.z ); 
         }
+
+        void fill (const T& element);
 };
 
 /*!
@@ -73,6 +76,15 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
                      goSize_t border_y, 
                      goSize_t border_z) 
 {
+    if (blockSizeX == 0 || blockSizeY == 0 || blockSizeZ == 0)
+    {
+        return false;
+    }
+    
+    assert (blockSizeX > 0);
+    assert (blockSizeY > 0);
+    assert (blockSizeZ > 0);
+    
     goSize3D blocks;
   
     blocks.x = (x + blockSizeX - 1) / blockSizeX;

@@ -123,6 +123,13 @@ goSignal3D<T>::make (goSignal3D *other) {
                        other->getBorderZ());
 }
 
+template <class T>
+void
+goSignal3D<T>::fill (const T& element)
+{
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = element, (*this), T);
+}
+
 template class goSignal3D< goInt8 >;
 template class goSignal3D< goUInt8 >;
 template class goSignal3D< goInt16 >;
