@@ -11,6 +11,14 @@ goProcess::goProcess () {
 goProcess::~goProcess () {
 }
 
+/**
+ * @brief Calls a program by filename.
+ *
+ * @param filename  Filename of the program.
+ * @param arg  Argument string for the program. 
+ *
+ * @return The PID of the new process.
+ **/
 int
 goProcess::run (const char* filename, const char* arg) {
   int id = fork();
@@ -22,6 +30,14 @@ goProcess::run (const char* filename, const char* arg) {
   return id;
 }
 
+/**
+ * @brief Runs a program by filename.
+ *
+ * @param filename  Filename of the program.
+ * @param argv      Array of arguments for the program.
+ *
+ * @return The PID of the new process.
+ **/
 int
 goProcess::run (const char* filename, char *const argv[]) {
   int id = fork();
@@ -33,6 +49,14 @@ goProcess::run (const char* filename, char *const argv[]) {
   return id;
 }
 
+/**
+ * @brief Runs a program by filename.
+ *
+ * @param filename  Filename of the program.
+ * @param argv      goArray of string pointers to the arguments.
+ *
+ * @return The PID of the new process.
+ **/
 int 
 goProcess::run (const char* filename, goArray<goString* >& argv) {
   char **tmp;
@@ -59,6 +83,9 @@ goProcess::run (const char* filename, goArray<goString* >& argv) {
   return id;
 }
 
+/**
+ * @brief Waits for the process to return.
+ **/
 void
 goProcess::wait () {
   int status;
@@ -68,6 +95,9 @@ goProcess::wait () {
   running = false;
 }
 
+/**
+ * @brief Ends the child process by sending a SIGKILL signal.
+ **/
 void
 goProcess::kill () {
   if (running) {
@@ -80,6 +110,11 @@ goProcess::kill () {
   running = false;
 }
 
+/**
+ * @brief Suspends the child process.
+ *
+ * Resume it with the resume() method.
+ **/
 void
 goProcess::suspend () {
   if (running) {
@@ -89,6 +124,9 @@ goProcess::suspend () {
   }
 }
 
+/**
+ * @brief Resumes the suspended child process.
+ **/
 void
 goProcess::resume () {
   if (running) {

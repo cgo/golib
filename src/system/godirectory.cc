@@ -9,11 +9,23 @@ goDirectory::goDirectory () {
 goDirectory::~goDirectory () {
 }
 
+/**
+ * @brief Opens directory s
+ * 
+ * \param s  Path to the directory
+ **/
 void
 goDirectory::open (goString& s) {
   open (s.toCharPtr());
 }
 
+/**
+ * @brief Opens directory s
+ * 
+ * You can check for failure by calling the fail() method.
+ *
+ * \param s  Path to the directory
+ **/
 void
 goDirectory::open (const char* s) {
   last_failed = false;
@@ -34,6 +46,10 @@ goDirectory::close () {
 }
 
 
+/**
+ * @brief Reads all entries in an open directory
+ *        info an internal list.
+ **/
 void
 goDirectory::readEntries () {
   for (int i = 0; i < entries.getSize(); i++) {
@@ -111,6 +127,13 @@ goDirectory::isLink (int index) {
   return false;
 }
 
+/**
+ * @brief Tries to open a directory.
+ *
+ * The directory will be closed again when this method returns.
+ *
+ * @return True if successful, false otherwise.
+ **/
 bool
 goDirectory::test (const char* dir_name) {
   DIR* t = opendir (dir_name);
