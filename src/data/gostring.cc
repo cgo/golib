@@ -94,6 +94,98 @@ goString::resize (goIndex_t newsize) {
   thisString[newsize] = 0; // add terminating \0 character
 }
 
+/**
+ * @brief Get the file name portion of a 
+ *        string describing a file name with full path.
+ *
+ * @param fileNameRet  Contains the file name portion.
+ **/
+void
+goString::getFileName (goString& fileNameRet)
+{
+    fileNameRet = "";
+    if (this->getSize() == 0)
+    {
+        return;
+    }
+    goIndex_t i = this->findLast ('/');   // FIXME: This is platform dependent.
+    if (i < (this->getSize()-1))
+    {
+        ++i;
+        this->copy (fileNameRet, i, this->getSize()-1);
+    }
+}
+
+/**
+ * @brief Get the path portion of a 
+ *        string describing a file name with full path.
+ *
+ * @param pathRet  Contains the path portion of the full file name.
+ **/
+void
+goString::getPathName (goString& pathRet)
+{
+    pathRet = "";
+    if (this->getSize() == 0)
+    {
+        return;
+    }
+    goIndex_t i = this->findLast ('/');   // FIXME: This is platform dependent.
+    if (i >= 0 && i < this->getSize())
+    {
+        this->copy (pathRet, 0, i);
+    }
+}
+
+/**
+ * @brief Copy a part of this string to another string.
+ *
+ * @param target  Target string.
+ * @param start   Start index in this string.
+ * @param end     End index in this string.
+ *
+ * @return True if successful, false otherwise.
+ **/
+bool
+goString::copy (goString& target, goIndex_t start, goIndex_t end)
+{
+    if (start >= 0 && start < this->getSize() &&
+        end >= 0 && end >= start && end < this->getSize())
+    {
+        target.resize (end - start + 1);
+        goIndex_t i;
+        memcpy (target.getPtr(), this->getPtr() + start, sizeof(char) * target.getSize());
+        return true;
+    }
+    return false;
+}
+
+goIndex_t 
+goString::findFirst (char c)
+{
+    if (this->getSize() == 0)
+    {
+        return -1;
+    }
+    goIndex_t i = 0;
+    while (i < this->getSize() && (*this)[i] != c)
+        ++i;
+    return i;
+}
+
+goIndex_t 
+goString::findLast (char c)
+{
+    if (this->getSize() == 0)
+    {
+        return -1;
+    }
+    goIndex_t i = this->getSize() - 1;
+    while (i >= 0 && (*this)[i] != c)
+        --i;
+    return i;
+}
+
 int
 goString::toInt () {
   goIndex_t i = 0;
