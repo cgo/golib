@@ -1,0 +1,8 @@
+Blockstore Idee:
+----------------
+"2D Hashtables".
+Bestehend aus 2D Array mit Pointern zu Listen o.ä.
+Adressierung: z.b. (x,y) direkt ins Array, z durch die Liste suchen.
+Suchen dauert idR wahrscheinlich zu lange, daher sortierte Listen?
+
+

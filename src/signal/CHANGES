@@ -1,0 +1,191 @@
+blockstore:
+	- hashcache und hashtable koennen im Moment nicht funktionieren, weil
+	  sie noch keine releaseBlock() Aufrufe (refcount in blockstore) unterstuetzen.
+
+10.11.:
+-------
+pm->unSet: in blockstore->removeBlock()
+pm->set  : volumefile->readTransBlocks_blockwise()
+	Änderung in volumefile, Zeile 1078,
+ 	if (readLast && (i_next > i))
+	zur Abfrage, ob nächster blockindex wirklich größer als jetziger ist.
+
+Blöcke, die schon "scheduled for loading" sind, können u.U. in pm.makePresent nochmals
+fürs Laden vorgemerkt werden und erneut createBlock aufgerufen werden. Ein Flag mehr!
+Flag: PM_SCHEDULED
+Gesetzt von pm.makePresent()
+Gelöscht von pm.set()  ( --> wenn volumefile set() aufruft, ist der Block geladen und
+SCHEDULED muss gelöscht werden)
+Das setzt voraus, dass set() WIRKLICH ERST DANN aufgerufen wird, WENN DER BLOCK  F E R T I G
+geladen ist.
+
+11.11.:
+-------
+- goVolumeFile: Interpolation überprüfen.
+	Fehler können auftreten: Block A grenzt an Block B. Block A soll interpoliert werden.
+	Block B war schonmal in niedrigerer Auflösung geladen, beide sind für höhere vorgemerkt.
+	Block B ist noch nicht neu geladen, aber Block A: Interpolation übernimmt fehlerhafte Werte aus
+	Block B. --> PM_SCHEDULED Flag prüfen für alle angrenzenden Blöcke, bevor interpoliert wird.
+- Leak beim Auflösungsreduzieren/-erhöhen
+	Speicherfreigabe stimmt noch nicht ganz. Alle erzeugten Blöcke
+	mit block->destroy() UND delete block; zerstören!!!
+	Scheint inzwischen stabil zu sein. Speicherbedarf ist korreliert mit
+	der Auflösung (laut top)
+
+Flags für jeden Block:
+ - presence
+ - protection level + PREDICTED + SCHEDULED
+ - resolution
+
+- Änderungen in goBlockStore:
+	Alle delete operatoren ergänzt durch destroy()
+	checkMemoryUsage() fragt pm.isScheduled() ab
+- checkMemoryUsage() scheint einen deadlock hervorzurufen. Prüfen!
+- Alle Änderungen an einem Blockpointer müssen atomar sein!
+- Die Gesamtgrösse in goBlockStore ist nicht stabil.
+  Irgendwo geht etwas schief. Renderer bringt alles zum Absturz.
+
+- Crash:
+	zB Thorax, 0.0.-256, depth 128
+	Erhöhung von 2->3 --> MT: Crash, non-MT: Kein Crash!
+    Es ist möglich, dass der Ladethread einen Block lädt, während
+	er schon wieder von makePresent() verändert wird.
+	Ebenso könnte er gleichzeitig vom renderer verwendet werden
+	(wirklich? presence?)
+	blockstore löscht den Block nur, wenn refcount <= 0 ist.
+	D.h. wahrscheinlich ist es nur möglich, dass der Ladethread
+	am laden ist, während der Block wieder gelöscht werden soll.
+
+
+13.11.:
+-------
+- gosblockrenderer.cc:
+	segfault offenbar bei goSignal3D.sample
+	Bereichsüberschreitungen in eine Richtung
+	(16er Block: z=16.0001, 32er Block: z=32.0001)
+	(beides mit 1er Rand)
+	=> Blöcke müssen natürlich mit einem halben
+	Voxel Versatz gerendert werden. Korrigiert.
+- blockstore: Gesamtgrösse nach Auflösungsveränderung
+		und -rückgängigmachung
+		ist unterschiedlich! Woran liegts?
+- gopresencemanager.cc und goblockstore.cc:
+	Speicherschutzsystem scheint zu funktionieren,
+	braucht aber noch eine Revision und
+	Dokumentation (für die DA)
+- govolumefile.cc: Interpolation muss auf SCHEDULED testen
+	und nur dann von einem Block interpolieren,
+	wenn dieser nicht SCHEDULED, d.h. schon geladen
+	ist.
+- Makefile.in, configure.in: Option für LFS kam dazu.
+	Quelle: http://www.suse.de/~aj/linux_lfs.html
+
+14.11.:
+-------
+- gosblockrenderer.cc: Cancellation: Renderer braucht
+	cancellation handler um Speicher bei cancel() wieder
+	freizugeben.
+- Kalmanfilter: in exp/
+
+16.11.:
+-------
+- goblockstore.cc: prepareBlockResolutionRaise()
+	newB->shift[]Size() Aufrufe dazu. Noch prüfen!
+- govolumefile.cc: readTransBlocks_bandWise()
+	Anpassung auf stufenweises Laden. Ungetestet.
+
+18.11.:
+-------
+- govolumefile.cc: readTransBlocks_bandWise()
+	Funktioniert bis auf folgendes:
+	Wenn alles von Band 0 an geladen wird, klappts
+	Wenn nur ein/mehrere Bänder dazugeladen werden, klappts nicht richtig.
+
+21.11.:
+-------
+- govolumenavigator.cc: goVolumeNavigator ist jetzt ein goNavSlot
+	Joystickunterstützung (goNavDevice/goNavSlot)
+Noch erledigen:
+ o Event polling ist falsche Methode für Joystick, da alle Änderungen
+   registriert und gequeued werden
+   -- Erledigt (22.11.)
+ o Vorne oder hinten im Bild fehlen manchmal Blöcke
+   (calcBlocksInView()) --Problem der clipping plane
+ o Front clipping plane Richtung Beobachter verschieben (realistischer)
+ o Absturz beim Testen beim Auflösungserhöhen/Rendern.
+   Wird noch auf SCHEDULED Blöcke zugegriffen?
+
+22.11.:
+-------
+- gosblockrenderer.cc, goviewmanager.cc:
+	Bedeutung von frontClip und depth in goViewVolume geändert.
+	Siehe handschriftliche Aufzeichnungen.
+	FC ist Abstand vom Beobachter (eyePos) zum view frustum (wies sein sollte),
+	depth ist max. Strahltiefe von dort an.
+Noch erledigen:
+ o Auflösungserhöhung baut Mist (bei blockwise und bandwise Dateien)
+	- +2 Stufen Segfault
+	- "Gekrissel" sonst
+	  --> Ränder initialisieren? evtl. Fehler daher.
+	- Wenn man nicht DAZU lädt, sondern (gopresencemanager.cc)
+	  bei alles NEU lädt, funktioniert. => Muss ein Problem beim
+	  Laden oder Transformieren der Daten sein!!!!!!!
+	  Laden und Transformation bei bekannten Daten testen:
+	  1. Lade Block r=0-3
+	  2. Lade Block r={k>0}-3
+	  3. Vergleiche Daten ohne DWT
+	  4. Vergleiche Daten mit DWT
+	-- scheint erledigt. Ränder in goBlockStore::prepare...() initialisieren mit 0.
+
+ o Konvertierung großer Dateien bandweise
+ 	-- erledigt (26.11.2001), noch testen mit Handy
+	-- scheint zu funktionieren (27.11.2001)
+
+LAHM LAHM LAHM!!!! --> Hashtable aufarbeiten
+(x) o checkMemoryUsage() wieder dazu
+	- checkMemoryUsage() scheint völlig panne
+	  Löscht alle / ergibt deadlock
+	- Fehler beim setProtection behoben (26.11.2001)
+	- 28.11.2001 Hashcache in Vol:: und überarbeitet; mit grossen Daten testen
+ o Zoom von klein aufgelösten Bildern:
+ 	goviewmanager.cc: Gleiche Blöcke wie höchste Auflösung nehmen!
+	govolumenavigator.cc: Verhaltensflags steuern Verhalten,
+		Vergrössern des Endbildes wenn nötig.
+		-- Erledigt, govol.h, src/signal/govol.cc
+
+x o Und schließlich... der Kalmanfilter
+x o Rotation um richtigen Punkt (eyePos)
+x o Auflösungsbereiche wieder dazu
+x o *** !!!! lineare Prädiktion !!!! ***
+x o viewmanager: ausreichend viele Blöcke vorne u. hinten in der Liste?
+x o Anzeige, wo man sich gerade relativ zum Datensatz befindet
+	-- 27.11.2001 In exp/, heute noch fertig machen.
+x o Vielleicht noch ein feature: Frei wählbarer Zoom ins Bild
+x o Large File Support in Qt?
+
+26.11.2001:
+-----------
+Konvertierung grosser files sollte noch verbessert werden,
+falls Dateien >>1500^3 bearbeitet werden (Hauptspeicher!)
+
+30.11.2001:
+-----------
+Schreiben:
+**********
+	o Einfluß von allen freien Parametern messen und ERKLÄREN!
+	  Blockgröße, Dateistruktur, Hashtable/Array
+	  abhängig von der Volumengröße
+	o Vorschlag mit Behalten der Einzelbilder bei kleinen Bewegungen
+	  (lohnt wahrsch. nur bei Rotation, zeigen!) diskutieren,
+	  Intelpaper!
+
+6.12.2001:
+----------
+Schreiben:
+**********
+	o Wavelets fertig, mit Geschwindigkeitsvergleich
+	o Auflösungsbereiche, welcher Anteil der Daten befindet sich in welchen Bereichen
+	o Vorgegebenen Flug durch Datensatz programmieren, Geschwindigkeitsmessungen:
+		- Auflösungsabhängig
+		- Mit/ohne linearer Prädiktion
+	o siehe oben

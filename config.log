@@ -1,0 +1,63 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:537: checking for c++
+configure:569: checking whether the C++ compiler (c++  ) works
+configure:585: c++ -o conftest    conftest.C  1>&5
+configure:611: checking whether the C++ compiler (c++  ) is a cross-compiler
+configure:616: checking whether we are using GNU C++
+configure:644: checking whether c++ accepts -g
+configure:676: checking whether ln -s works
+configure:699: checking for doc++
+configure:729: checking for doxygen
+configure:760: checking for ar
+configure:790: checking for nasm
+configure:841: checking how to run the C preprocessor
+configure:924: checking for ieee754.h
+configure:964: checking for dirent.h
+configure:1004: checking for time.h
+configure:1042: checking size of char
+configure:1081: checking size of short int
+configure:1120: checking size of int
+configure:1159: checking size of long int
+configure:1198: checking size of long long int
+configure:1237: checking size of float
+configure:1276: checking size of double
+configure:1319: checking for pthread_create in -lpthread
+configure:1369: checking for TIFFRGBAImageOK in -ltiff
+configure:1416: checking for read_tiff_file in -llug
+configure:1463: checking for fftw_create_plan in -lfftw
+configure:1510: checking for connect in -lnsl
+configure:1557: checking for connect in -lsocket
+configure:1604: checking for SDL_Init in -lSDL
+configure:1652: checking for glVertex3f in -lGL
+configure:1699: checking for glutWireCube in -lglut
+configure:1746: checking for test_nurbs_curve in -lGLU
+configure:1765: cc -o conftest    conftest.c -lGLU  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
+/tmp/cccX8XQY.o: In function `main':
+/tmp/cccX8XQY.o(.text+0x7): undefined reference to `test_nurbs_curve'
+/usr/lib/libGLU.so: undefined reference to `fist_tessellation'
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 1754 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char test_nurbs_curve();
+
+int main() {
+test_nurbs_curve()
+; return 0; }
+configure:1794: checking for modf
+configure:1850: checking for X
+configure:2164: checking for dnet_ntoa in -ldnet
+configure:2205: checking for dnet_ntoa in -ldnet_stub
+configure:2253: checking for gethostbyname
+configure:2351: checking for connect
+configure:2443: checking for remove
+configure:2535: checking for shmat
+configure:2636: checking for IceConnectionNumber in -lICE
+configure:2681: checking for ANSI C header files
+configure:2785: checking for size_t
+configure:2819: checking for object suffix

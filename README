@@ -1,0 +1,107 @@
+libGo README
+------------
+libGo is a C++ class library containing all kinds of 
+things that proved useful to me.
+For details, see the source documentation in golib/doc.
+
+DIPLOMARBEIT (version 0.2.1), German only
+------------
+Die Klassen, die für die Diplomarbeit wichtig sind, finden sich in
+src/graphics und src/signal.
+Es sind jedoch nicht ALLE Klassen in diesen Verzeichnissen Teil der 
+Diplomarbeit.
+Im Verzeichnis examples/ finden sich einige Test- und Beispielprogramme.
+Insbesondere ist volumefile.cc ein Beispielprogramm für die 
+Konvertierung von Datensätzen. Eine grafische Oberfläche auf Basis
+von Qt für die Konvertierung findet sich in examples/vf-gui.
+examples/renderdemo beherbergt die in der Diplomarbeit 
+angesprochene Benutzeroberfläche des Systems.
+
+Um einen Joystick zu benutzen, müssen alle dazu notwendigen Treiber
+geladen sein!
+
+Die Bibliothek sollte sich auf jeder neueren Linux-Distribution
+übersetzen lassen. 
+Es werden folgende Bibliotheken und Pakete unbedingt benötigt:
+- SDL mit Joystickunterstützung sowie alle von SDL benötigten Pakete
+  http://www.libsdl.org
+- pthread
+  libpthread sollte auf jeder modernen Linux-Installation bereits 
+  vorhanden sein. Wenn sie das nicht ist, ist sie 
+  über http://rpmfind.net
+  und ähnliche Dienste zu finden.
+- Ein laufendes X Window System
+
+Die Bibliothek und alle wichtigen Beispielprogramme 
+wurden in ihrer vorliegenden Form auf einem Linux-
+System mit einem Kernel Version 2.4.4 mit dem gcc Compiler Version 2.95.3
+erfolgreich übersetzt.
+
+Bitte beachten Sie alle README Dateien sowie Hinweise in dieser Datei
+und in der Dokumentation zur Übersetzung der Bibliothek.
+
+Directories
+-----------
+./			- Main libGo distribution directory
+./doc		- Documentation
+./examples	- Example source code and makefiles
+./exp		- Experimental stuff, guaranteed to be unstable ;)
+./include	- All include files
+./src		- Source code, subdivided in different subdirectories
+./tools		- Some scripts, including a Perl script to create makefiles
+./rpm		- Work in progress -- this will contain the files necessary
+			- to build an rpm package
+
+What you need
+-------------
+You will need a C++ compiler (tested with gnu c++ 2.95.3)
+and GNU make. 
+For more information and downloads, see http://www.gnu.org.
+The pthreads library must be installed.
+For version 0.2.1, you will also need the SDL library 
+(see http://www.libsdl.org).
+
+How to build
+------------
+To compile the library, it should be sufficient to type 
+./configure
+followed by
+make
+
+Recognized special options for configure
+----------------------------------------
+--enable-debug		Sets the compiler option for debugging.
+			If left out, sets the compiler option for
+			maximum optimization.
+
+IMPORTANT!
+----------
+Don't forget to add the library path to your LD_LIBRARY_PATH
+environment variable. In a tcsh environment, that would be
+setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH\:<wherever_golib_is>/lib
+or, under bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH\:<wherever_golib_is>/lib
+
+Make sure you set the environment variable GOPATH to
+the root path of golib. All Makefiles for the examples programs rely on
+this variable.
+
+However, I have not had the opportunity to try this on many different machines, so if there are difficulties, please either report them to christian@goschs.de
+or fix them and send the fix to the same address.
+
+Examples
+--------
+To build the examples, you will have to build the library first,
+the go to the golib/examples directory and use one of the provided makefiles, like this:
+make -f <YourChosenMakefile>
+
+Further reading
+---------------
+I suggest you go through the online documentation in the golib/doc
+directory.
+
+Contact
+-------
+Feel free to contact me at christian@goschs.de!
+
+

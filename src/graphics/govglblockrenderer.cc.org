@@ -1,0 +1,260 @@
+#include <govglblockrenderer.h>
+#include <gosignal3d.h>
+#include <goarray.h>
+
+#include <vgl/samplegridexterndata.h>
+#include <vgl/types.h>
+#include <vgl/typeinfo.h>
+#include <vgl/vector3.h>
+#include <vgl/samplematerial.h>
+#include <vgl/directionallight.h>
+#include <vgl/perspectivecamera.h>
+#include <vgl/volumerenderobject.h>
+
+namespace Vol {
+
+template<class T>
+goVGLBlockRenderer<T>::goVGLBlockRenderer()
+	: goSBlockRenderer<T>()
+{
+	scene = 0;
+	camera = 0;
+	material = 0;
+	light = 0;
+}
+
+template<class T>
+goVGLBlockRenderer<T>::~goVGLBlockRenderer()
+{
+	if (scene)
+		delete scene;
+	if (light)
+		delete light;
+	if (material)
+		delete material;		
+}
+
+template<class T>
+void
+goVGLBlockRenderer<T>::init()
+{
+	
+	if (!scene)	
+	{
+		scene = new VGLScene;
+		scene->setAutoDelete(false);
+	}
+	createMaterial();
+	material->setChannelMode(VGL_MATERIAL_OPACITY, VGL_MATERIAL_LUT);
+	material->setLUTData(VGL_MATERIAL_OPACITY, 50, 4096, 0.0f, 1.0f);
+	material->setAutoDelete(false);
+
+	if (!light)
+	{
+		light = new VGLDirectionalLight;
+		light->setAutoDelete(false);
+	}
+
+	scene->addLight(light,0);
+	scene->addLighting(light);
+}
+
+template<class T>
+VGLSampleGridExternData*
+goVGLBlockRenderer<T>::createSampleGrid(goSignal3D<T>* block)
+{
+}
+
+#define CREATE_SAMPLE_GRID_MACRO(TYPE) {	\
+	VGLTypeInfo type(TYPE);			\
+	VGLSampleGridSize size(block->getSizeX()+1,block->getSizeY()+1,block->getSizeZ()+1);	\
+	grid = new VGLSampleGridExternData(type, (void*)block->getRealPtr(), size); \
+}
+
+
+VGLSampleGridExternData*
+goVGLBlockRenderer<goInt8>::createSampleGrid(goSignal3D<goInt8>* block)
+{
+	VGLSampleGridExternData *grid;
+	CREATE_SAMPLE_GRID_MACRO(VGL_TYPE_INT8);
+	return grid;
+}
+
+VGLSampleGridExternData*
+goVGLBlockRenderer<goUInt8>::createSampleGrid(goSignal3D<goUInt8>* block)
+{
+	VGLSampleGridExternData *grid;
+	CREATE_SAMPLE_GRID_MACRO(VGL_TYPE_UINT8);
+	return grid;
+}
+
+VGLSampleGridExternData*
+goVGLBlockRenderer<goInt16>::createSampleGrid(goSignal3D<goInt16>* block)
+{
+	VGLSampleGridExternData *grid;
+	CREATE_SAMPLE_GRID_MACRO(VGL_TYPE_INT16);
+	return grid;
+}
+
+VGLSampleGridExternData*
+goVGLBlockRenderer<goUInt16>::createSampleGrid(goSignal3D<goUInt16>* block)
+{
+	VGLSampleGridExternData *grid;
+	CREATE_SAMPLE_GRID_MACRO(VGL_TYPE_UINT16);
+	return grid;
+}
+
+template<class T>
+void
+goVGLBlockRenderer<T>::setViewPlane(goViewVolume& vp)
+{ 	
+	viewPlane = vp; 
+	setSampleDistance (vp.getSampleDistanceX(),
+						vp.getSampleDistanceY(),
+						vp.getSampleDistanceZ()); 
+	if (!camera)
+	{
+		camera = new VGLPerspectiveCamera;
+	}
+	VGLVector3f v3;
+	v3.x = vp.getEyePos().x;
+	v3.y = vp.getEyePos().y;
+	v3.z = vp.getEyePos().z;
+	camera->setPosition(v3);
+	v3.x = vp.getPosition().x;
+	v3.y = vp.getPosition().y;
+	v3.z = vp.getPosition().z;
+	camera->setCenter(v3);
+	v3.x = vp.getUp().x;
+	v3.y = vp.getUp().y;
+	v3.z = vp.getUp().z;
+	camera->setUpVector(v3);
+	camera->setViewAngle(40.0f);
+	camera->setAspectRatio(1.0f);
+	camera->setNearClip(vp.getFrontClip());
+	camera->setFarClip(vp.getFrontClip() + vp.getDepth());
+	camera->setViewport(0, 0, (int)vp.getSize().x, (int)vp.getSize().y);
+	if (scene)
+		scene->setCamera(camera);
+}
+
+template<class T>
+void
+goVGLBlockRenderer<T>::createMaterial()
+{
+	cout << "No material for this type\n";
+}
+
+#define CREATE_MATERIAL_MACRO(TYPE) {		\
+	VGLTypeInfo type(TYPE);					\
+	material = new VGLSampleMaterial(type); \
+}
+	
+
+void
+goVGLBlockRenderer<goInt8>::createMaterial()
+{
+	if (material)
+		delete material;
+	CREATE_MATERIAL_MACRO(VGL_TYPE_INT8);	
+}
+
+void
+goVGLBlockRenderer<goUInt8>::createMaterial()
+{
+	if (material)
+		delete material;
+	CREATE_MATERIAL_MACRO(VGL_TYPE_UINT8);	
+}
+
+void
+goVGLBlockRenderer<goInt16>::createMaterial()
+{
+	if (material)
+		delete material;
+	CREATE_MATERIAL_MACRO(VGL_TYPE_INT16);	
+}
+
+void
+goVGLBlockRenderer<goUInt16>::createMaterial()
+{
+	if (material)
+		delete material;
+	CREATE_MATERIAL_MACRO(VGL_TYPE_UINT16);	
+}
+
+template<class T>
+void
+goVGLBlockRenderer<T>::addObjectToScene(VGLVolumeRenderObject& o, goSize_t blockIndex)
+{
+	// Translation zur Blockposition hier dazumachen!
+	scene->addRenderObject(&o);
+}
+
+template<class T>
+void
+goVGLBlockRenderer<T>::renderThread(goArray<goSize_t> *indices)
+{
+	VGLVolumeRenderObject renderObjects[indices->getSize()];
+	VGLSampleGridExternData **blockGrids = 0;
+	blockGrids = new VGLSampleGridExternData*[indices->getSize()];
+	int i = 0;
+	goSignal3D<T> *block = 0;
+	goSize_t blockIndex = (*indices)[i];
+	for (i = 0; i < indices->getSize(); i++)
+	{
+		renderObjects[i].setEnum(VGL_RENDER_METHOD, VGL_RAYTRACE_VOLUME_MIP);
+		renderObjects[i].setMaterial(material);
+	}
+	for (i = 0; i < indices->getSize(); i++)
+	{
+		blockIndex = (*indices)[i];
+		while ((!pm->isPresent(blockIndex)) || pm->isScheduled(blockIndex))
+		{
+#ifdef MULTIPLE_THREADS
+		    waitProduction();
+#else
+		    cout << getClassName() << ": Block not yet present" << endl;
+			break;
+#endif
+		}
+
+		block = getBlockProvider()->getBlock(blockIndex);
+		blockGrids[i] = 0;
+		if (block)
+		{
+			cout << getClassName() << ": Adding object for block " << blockIndex << "\n";
+			blockGrids[i] = createSampleGrid(block);
+			renderObjects[i].setVolume(blockGrids[i]);
+			addObjectToScene(renderObjects[i],blockIndex);
+		} else
+		{
+			getBlockProvider()->releaseBlock(blockIndex);
+		}
+	}
+
+	/*
+	 *  render .. blah blah
+	 */
+	cout << getClassName() << ": Starting VGL renderer\n"; 
+	scene->render();
+	cout << getClassName() << ": VGL renderer returned\n";
+
+	for (i = 0; i < indices->getSize(); i++)
+	{
+		if (blockGrids[i])
+		{
+			getBlockProvider()->releaseBlock((*indices)[i]);
+			delete blockGrids[i];
+		}
+	}
+
+	delete[] blockGrids;
+}
+
+};
+
+template class Vol::goVGLBlockRenderer<goInt8>;
+template class Vol::goVGLBlockRenderer<goUInt8>;
+template class Vol::goVGLBlockRenderer<goInt16>;
+template class Vol::goVGLBlockRenderer<goUInt16>;

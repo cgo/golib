@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+@dirs = ("defs","financial","graphics","math","misc","network","nifty","signal","system","thread");
+foreach $dir (@dirs) {
+    opendir d,$dir;
+    @s = readdir d;
+    foreach $f (@s) {
+	$path = $dir . "/" . $f;
+	if (-f $path) {
+	    $newfile = "./" . $f;
+	    $newlink = "../" . $f;
+	    system ("rm","-f","$newfile");
+	    print "Moving $path to $newfile\n";
+	    system ("mv",$path,$newfile);
+	    print "Linking $newlink to $path\n";
+	    system ("ln","-s",$newlink,$path);
+	}
+    }
+    closedir d;
+}
+
+
+
+
+

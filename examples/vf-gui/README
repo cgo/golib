@@ -1,0 +1,7 @@
+GUI Version des Konvertierungstools
+-----------------------------------
+
+- Die zeilenweise Konvertierung von JPEG Bildern ist _noch nicht implementiert_.
+  Die entsprechende	Checkbox wird ignoriert, wenn JPEG Bilder 
+  konvertiert werden.
+- Bei Blocksize immer Zweierpotenzen verwenden.

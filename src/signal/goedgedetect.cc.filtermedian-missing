@@ -1,0 +1,325 @@
+#include <signal/goedgedetect.h>
+#include <gofilterfir.h>
+#include <gofiltergauss.h>
+#include <signal/gofiltermedian.h>
+#include <gotypes.h>
+
+#include <math.h>
+
+template <class T>
+goEdgeDetect<T>::goEdgeDetect () {
+  result = 0;
+  histogram = 0;
+}
+
+template <class T>
+goEdgeDetect<T>::~goEdgeDetect () {
+  if (result)
+    delete result;
+  if (histogram)
+    delete histogram;
+}
+
+#define UNNORMALIZEX(x) (goInt32)((x) * (float)(in->getSizeX()))
+
+#define UNNORMALIZEY(y) (goInt32)((1 - y) * (float)(in->getSizeY()))
+
+#define NORMALIZEX(x) (goFloat)((x / (float)(in->getSizeX()) ) )
+
+#define NORMALIZEY(y) (goFloat)(1 - (float)y / ((float)in->getSizeY()))
+
+
+/*
+ * First threshold is the filter threshold, second is the line threshold.
+ */
+template <class T>
+void
+goEdgeDetect<T>::run (goSignal2D<T> *in, goFloat threshold, goFloat lineThreshold,
+		      goFloat distFactor, goInt32 angles, bool doLowPass) {
+  /*
+   * Define the two Prewitt masks
+   */
+  goDouble maskH[9] = {-1, 0, 1,
+		       -1, 0, 1,
+		       -1, 0, 1};
+  goDouble maskV[9] = { 1, 1, 1,
+		        0, 0, 0,
+			-1, -1, -1};
+  goDouble maskLo[9] = { 1, 2, 1,
+			 2, 4, 2,
+			 1, 2, 1};
+  
+  
+  /*
+   * This is our filter object.
+   */
+  goFilterFIR<T> filter (3,3);
+
+  
+  /* Scale masks */
+  int i;
+  goDouble sumH = 0;
+  goDouble sumV = 0;
+  goDouble sumLo = 0;
+  for (i = 0; i < 9; i++) {
+    sumH += fabs (maskH[i]);
+    sumV += fabs (maskV[i]);
+    sumLo += fabs (maskLo[i]);
+  }
+  sumH = 1 / sumH;
+  sumV = 1 / sumV;
+  sumLo = 1 / sumLo;
+  for (i = 0; i < 9; i++) {
+    maskH[i] *= sumH;
+    maskV[i] *= sumV;
+    maskLo[i] *= sumLo;
+  }
+
+  // Hi pass x and y
+  goSignal2D<T> *sFilt  = new goSignal2D<T> (in->getSizeX(), in->getSizeY());
+  goSignal2D<T> *sFilt2 = new goSignal2D<T> (in->getSizeX(), in->getSizeY());
+
+  /*
+   * Interpolate the border to avoid the usual border effects.
+   */
+  if (doLowPass) {
+    in->interpolateBorders (false);
+    filter.setMask (&maskLo[0]);
+    filter.filter (*in, *sFilt);
+    sFilt->interpolateBorders (false);
+    filter.filter (*sFilt, *in);
+  }
+  in->interpolateBorders (false);
+  filter.setMask (&maskH[0]);
+  filter.filter (*in, *sFilt);
+  filter.setMask (&maskV[0]);
+  filter.filter (*in, *sFilt2);
+  
+  /* Calculate Gradient from hi pass signals */
+  /* optimize this by using pointer arithmetic */
+  if (result)
+    delete result;
+  result = new goSignal2D<goFloat> (in->getSizeX(), in->getSizeY());
+  goSignal2D<goFloat> result_temp(in->getSizeX(), in->getSizeY());
+  goSize_t x,y;
+  float DX, DY, pixel;
+  T max, min;
+  max = -6500000;
+  min = 6500000;
+  for (y = 0; y < in->getSizeY(); y++) {
+    for (x = 0; x < in->getSizeX(); x++) {
+      DX = (float)*sFilt->getPtr (x,y);
+      DY = (float)*sFilt2->getPtr (x,y);
+      pixel = sqrt (DX*DX + DY*DY);
+      if (pixel < min) min = (T)pixel;
+      if (pixel > max) max = (T)pixel;
+      *result_temp.getPtr (x,y) = pixel;
+    }
+  }  
+
+
+
+  float f = fabs (max - min);
+  float thresh = (f * threshold);
+  float* temp;
+  float grad;
+  float alpha;
+  float d;
+
+  /* Threshold the result */
+  for (y = 0; y < result->getSizeY(); y++) {
+    for (x = 0; x < result->getSizeX(); x++) {
+      temp = result_temp.getPtr (x,y);
+      if (*temp < thresh) {
+	*temp = 0;
+      }
+    }
+  }
+  
+  *result = result_temp;
+  //goFilterMedian<goFloat> median(7,7);
+  //median.filter (result_temp, *result);
+
+  float xf, yf;
+
+  if (histogram) 
+    delete histogram;
+  histogram = new goSignal2D<goFloat> ((goInt32)( (in->getSizeX() >> 1) * distFactor), angles);
+  histogram->fill (0);
+
+  goSignal2D<goFloat> maxX (histogram->getSizeX(), histogram->getSizeY());
+  goSignal2D<goFloat> minX (histogram->getSizeX(), histogram->getSizeY());
+  goSignal2D<goFloat> maxY (histogram->getSizeX(), histogram->getSizeY());
+  goSignal2D<goFloat> minY (histogram->getSizeX(), histogram->getSizeY());
+  maxX.fill (-1);
+  minX.fill (2);
+  maxY.fill (-1);
+  minY.fill (2);
+
+  goInt32 d_quant = 0;
+  goInt32 a_quant = 0;
+
+  /*
+   * This loop performs thresholding and the Hough transform.
+   */
+  float beta;
+  for (y = 0; y < result->getSizeY(); y++) {
+    for (x = 0; x < result->getSizeX(); x++) {
+      temp = result->getPtr (x,y);
+      /* 
+       * Hough "voting" 
+       */
+      grad	= *temp;
+      
+      /* normalize the coordinates x and y before doing the calculations, put 0,0 in the middle of the image */
+      float *xf_temp, *yf_temp;
+      float d_temp1, d_temp2;
+      if (grad > 0) {
+	xf = NORMALIZEX(x);
+	yf = NORMALIZEY(y);
+	DX = (float)*sFilt->getPtr (x,y);
+	DY = (float)*sFilt2->getPtr (x,y);
+	
+	alpha	= atan2 (DY,DX);
+	if (alpha < 0) {
+	  alpha = alpha + 2*M_PI;
+	}
+	beta = atan2 (yf,xf);
+	if (beta < 0) {
+	  beta = beta + 2*M_PI;
+	}
+	beta  = fabs (alpha - beta);
+	
+	d = xf * cos (alpha) + yf * sin (alpha);
+	
+	d_quant = (goInt32)rint ( d / sqrt(2) * histogram->getSizeX() );
+	a_quant = (goInt32)rint ( alpha / (float)(2*M_PI) * histogram->getSizeY() );
+	// (*histogram->getPtr (d_quant,a_quant)) += 1;
+	/*
+	 * This is one of the improvements. Do not increment, but instead 
+	 * add a value dependent on the intensity of the gradient pixel.
+	 */
+	(*histogram->getPtr (d_quant,a_quant)) += *temp / (float)max;
+
+	/** See if this point is likely to be an end point for a line. */
+	xf_temp = maxX.getPtr (d_quant, a_quant);
+	yf_temp = maxY.getPtr (d_quant, a_quant);
+
+	if (*xf_temp < 0) {
+	  *xf_temp = xf;
+	  *yf_temp = yf;
+	}
+	  
+	xf_temp = minX.getPtr (d_quant, a_quant);
+	yf_temp = minY.getPtr (d_quant, a_quant);
+	//if (*xf_temp > 1) {
+	*xf_temp = xf;
+	*yf_temp = yf;
+	//}
+
+      }
+	
+    }
+  }
+
+
+  /* Find maximum */
+  goFloat max_hist = 0;
+  for (a_quant = 0; a_quant < (goInt32)histogram->getSizeY(); a_quant++) {
+    for (d_quant = 0; d_quant < (goInt32)histogram->getSizeX(); d_quant++) {
+      if (*histogram->getPtr (d_quant, a_quant) > max_hist) {
+	max_hist = *histogram->getPtr (d_quant, a_quant);
+      }
+    }
+  }
+
+  /* Version 1: take lines above count_thresh */
+  lines.resize(0);
+  lineAngles.resize(0);
+  goFloat count_thresh = rint (lineThreshold * max_hist);
+  for (a_quant = 0; a_quant < (goInt32)histogram->getSizeY(); a_quant++) {
+    alpha = a_quant / (float)histogram->getSizeY() * (float)M_PI * 2;
+    for (d_quant = 0; d_quant < (goInt32)histogram->getSizeX(); d_quant++) {
+      if ( (*histogram->getPtr (d_quant, a_quant) >= count_thresh) ) {
+	x = UNNORMALIZEX(*maxX.getPtr (d_quant, a_quant));
+	lines += (int&)x;
+	x = UNNORMALIZEY(*maxY.getPtr (d_quant, a_quant));
+	lines += (int&)x;
+	x = UNNORMALIZEX(*minX.getPtr (d_quant, a_quant));
+	lines += (int&)x;
+	x = UNNORMALIZEY(*minY.getPtr (d_quant, a_quant));
+	lines += (int&)x;
+	lineAngles += alpha;
+      }
+    }
+  }
+  
+  delete sFilt;
+  delete sFilt2;
+
+}
+
+/*
+ * This is just a little buggy experiment. You don't want to know about it.
+ */
+template <class T>
+void 
+goEdgeDetect<T>::connectLines () {
+  int i1,i2;
+  int x1,y1,x2,y2;
+  
+  double dist;
+
+  int angle1 = 0, angle2 = 0;
+  float angledist;
+  bool changed = true;
+  while (changed) {
+    changed = false;
+    angle1 = 0;
+    for (i1 = 0; i1 < lines.getSize(); i1 += 4) {
+      angle2 = 0;
+      for (i2 = 0; i2 < lines.getSize(); i2 += 4) {
+	if ( (i2 != i1) && (lines[i1] != -1) && (lines[i2] != -1) ) {
+	  x1 = lines[i1];
+	  y1 = lines[i1+1];
+	  x2 = lines[i2+2];
+	  y2 = lines[i2+3];
+	  dist = sqrt ((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+	  angledist = fabs (lineAngles[angle1] - lineAngles[angle2]);
+	  if ( (dist < 5) && (angledist == 0 ) ){
+	    changed = true;
+
+	    lines[i1 + 2] = lines[i2];
+	    lines[i1 + 3] = lines[i2+1];
+	    lines[i2] = -1;
+	    lines[i2 + 1] = -1;
+	    lines[i2 + 2] = -1;
+	    lines[i2 + 3] = -1;
+	  }
+	}
+	angle2++;
+      }
+      angle1++;
+    }
+  }
+
+  goArray<goInt32> tmpl;
+  tmpl.resize(0);
+
+  for (i1 = 0; i1 < lines.getSize(); i1 += 4) {
+    if (lines[i1] != -1) {
+      tmpl += lines[i1];
+      tmpl += lines[i1+1];
+      tmpl += lines[i1+2];
+      tmpl += lines[i1+3];
+    }
+  }
+  lines.resize(0);
+  lines = tmpl;
+}
+
+
+
+template class goEdgeDetect<goInt32>;
+template class goEdgeDetect<goFloat>;
+template class goEdgeDetect<goDouble>;

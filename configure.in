@@ -1,0 +1,97 @@
+AC_INIT(src/data/goarray.cc)
+
+AC_PROG_CXX
+AC_PROG_LN_S
+AC_CHECK_PROG(DOCXX,doc++,doc++,echo)
+AC_CHECK_PROG(DOXYGEN,doxygen,doxygen doxygen.config,echo)
+#AC_CHECK_PROG(MOC,moc,moc,echo)
+AC_CHECK_PROG(AR,ar,ar,NONE)
+AC_CHECK_PROG(NASM,nasm,nasm,NONE)
+
+dnl Variable substitutions
+
+dnl Check options
+AC_ARG_ENABLE(debug,[--enable-debug 		  Enable debugging rather than optimization],\
+	debug_options=-g, debug_options=-O2)
+AC_ARG_ENABLE(lfs,[--enable-lfs	   	  Enable LFS support for large files],\
+	lfs_options="-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE", lfs_options=)
+AC_SUBST(debug_options)
+AC_SUBST(lfs_options)
+
+dnl Check headers
+AC_CHECK_HEADERS(ieee754.h)
+AC_CHECK_HEADERS(dirent.h)
+AC_CHECK_HEADERS(time.h)
+
+dnl Check type sizes
+AC_CHECK_SIZEOF(char,1)
+AC_CHECK_SIZEOF(short int,2)
+AC_CHECK_SIZEOF(int,4)
+AC_CHECK_SIZEOF(long int,4)
+AC_CHECK_SIZEOF(long long int,8)
+AC_CHECK_SIZEOF(float,4)
+AC_CHECK_SIZEOF(double,8)
+
+dnl Check types
+dnl AC_EGREP_HEADER(typedef.*streampos,streambuf.h,\
+dnl 				[streampos_defines=-DHAVE_STREAMPOS; echo "Found streampos typedef"],[streampos_defines=;echo "Did not find streampos typedef"])
+streampos_defines=;
+AC_SUBST(streampos_defines)
+
+dnl Check libraries
+AC_CHECK_LIB(pthread,pthread_create,,
+	[echo "***** :( Please install libpthread first :( *****"; exit])
+#AC_CHECK_LIB(qt,__builtin_delete,,
+#	[echo "***** Compiling without Qt *****"])
+AC_CHECK_LIB(tiff,TIFFRGBAImageOK)
+AC_CHECK_LIB(lug,read_tiff_file)
+AC_CHECK_LIB(fftw,fftw_create_plan)
+AC_CHECK_LIB(nsl,connect)
+AC_CHECK_LIB(socket,connect)
+AC_CHECK_LIB(SDL,SDL_Init)
+# AC_CHECK_LIB(jpeg,jpeg_read_scanlines)
+AC_CHECK_LIB(GL,glVertex3f)
+AC_CHECK_LIB(glut,glutWireCube)
+AC_CHECK_LIB(GLU,test_nurbs_curve)
+
+dnl Check special functions
+AC_CHECK_FUNC(modf,[echo "You have modf() in libc, good..."],\
+		   [echo "No modf() found in libc. Go and find a library\
+			  containing modf(), then try again."; exit])
+
+AC_PATH_XTRA
+
+AC_TYPE_SIZE_T
+
+dnl OS Service Checks
+AC_OBJEXT
+
+
+AC_CONFIG_HEADER(include/config.h)
+AC_OUTPUT(./Makefile)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

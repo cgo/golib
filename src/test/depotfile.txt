@@ -1,0 +1,117 @@
+
+# Index number 0
+ticker = INTC
+name = Intel corp. shares
+nr = 999999
+currency = DEM
+amount = 60
+buyprice = 133.20
+sellprice = 193.50
+costs = 80.00
+sold = 0
+buydate = 1.10.1998
+selldate = 9.10.1998
+
+# Index number 1
+ticker = SMS
+name = Siemens
+nr = 10010
+currency = DEM
+amount = 20
+buyprice = 120.00
+sellprice = 101.79
+costs = 75.90
+sold = 0
+buydate = 5.1.1999
+selldate = 9.7.2000
+
+# Index number 2
+ticker = 
+name = Kali- und Salz AG
+nr = 716200
+currency = DEM
+amount = 0
+buyprice = 0.00
+sellprice = 0.00
+costs = 0.00
+sold = 0
+buydate = 0.0.0
+selldate = 0.0.0
+
+# Index number 3
+ticker = 
+name = Kali- und Salz AG
+nr = 
+currency = DEM
+amount = 0
+buyprice = 0.00
+sellprice = 0.00
+costs = 0.00
+sold = 0
+buydate = 0.0.0
+selldate = 0.0.0
+
+# Index number 4
+ticker = PAP
+name = Testpaper
+nr = 110112
+currency = DEM
+amount = 10
+buyprice = 20.50
+sellprice = 10.20
+costs = 20.00
+sold = 0
+buydate = 1.1.1901
+selldate = 1.1.2000
+
+# Index number 5
+ticker = INTC
+name = Intel corp. shares
+nr = 999999
+currency = DEM
+amount = 50
+buyprice = 139.20
+sellprice = 193.50
+costs = 80.00
+sold = 0
+buydate = 1.1.1900
+selldate = 1.1.1999
+
+# Index number 6
+ticker = SMS
+name = Siemens
+nr = 10010
+currency = DEM
+amount = 40
+buyprice = 120.00
+sellprice = 101.79
+costs = 75.90
+sold = 1
+buydate = 1.1.1900
+selldate = 1.1.1999
+
+# Index number 7
+ticker = INTC
+name = Intel corp. shares
+nr = 999999
+currency = DEM
+amount = 10
+buyprice = 133.20
+sellprice = 193.50
+costs = 80.00
+sold = 0
+buydate = 1.1.1900
+selldate = 1.1.1999
+
+# Index number 8
+ticker = tst
+name = Testpaper
+nr = 110112
+currency = DEM
+amount = 125
+buyprice = 120.00
+sellprice = 170.00
+costs = 35.00
+sold = 0
+buydate = 1.1.1999
+selldate = 0.0.0

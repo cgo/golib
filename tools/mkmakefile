@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+$HEADER = "#Makefile automatically created by mkmakefile (C)Christian Gosch";
+$CXX = "gcc";
+$LD = "gcc";
+$CXXARGS = "-c";
+$INCLUDE = "";
+$LDARGS = "";
+$LIBS = "";
+
+$SRCEXT = "cxx cpp cc";
+
+if (-f "Makefile")
+  {
+    print "Makefile exists.\n";
+    exit;
+  }
+
+print "Makefile creation tool for simple makefiles.\n";
+print "copyleft 2001, Christian Gosch <christian\@goschs.de>\n";
+print "This tool is distributed under the terms of the GPL\n";
+print "See http://www.gnu.org/copyleft/gpl.html\n\n";
+
+print "Compiler ($CXX): ";
+$CXX2 = <STDIN>;
+chop $CXX2;
+if (!($CXX2 eq "")) {
+    $CXX = $CXX2;
+}
+print "Linker ($LD): ";
+$LD2 = <STDIN>;
+chop $LD2;
+if (!($LD2 eq "")) {
+    $LD = $LD2;
+}
+print "Target name: ";
+$TARGET = <STDIN>;
+print "Source directories: ";
+$SOURCEDIRS = <STDIN>;
+print "Include arguments: ";
+$INCLUDE = $INCLUDE . " " . <STDIN>;
+print "Additional compiler arguments: ";
+$CXXARGS = $CXXARGS . " " . <STDIN>;
+print "Linker arguments: ";
+$LDARGS = $LDARGS . " " . <STDIN>;
+print "Library arguments: ";
+$LIBS   = $LIBS . " " . <STDIN>;
+print "Source file endings other than .cxx, .cc, .cpp (no leading dots): ";
+$SRCEXT = $SRCEXT . " " . <STDIN>;
+print "Define HAVE_CONFIG_H(y,n)? ";
+$CONFIG_H = <STDIN>;
+chop $CONFIG_H;
+$DEFINES = "";
+if ($CONFIG_H eq "y") {
+    $DEFINES = " -D HAVE_CONFIG_H";
+}
+print "Additional defines: ";
+$ADD_DEFINES = <STDIN>;
+$DEFINES = $DEFINES . " " . $ADD_DEFINES;
+
+# Print out the Makefile
+open (MAKEFILE, ">Makefile");
+print MAKEFILE ($HEADER . "\n\n");
+print MAKEFILE "CXX		= $CXX\n";
+chop $CXXARGS;
+print MAKEFILE "CXXARGS		= $CXXARGS $DEFINES\n";
+print MAKEFILE "LD		= $LD\n";
+print MAKEFILE "LDARGS		= $LDARGS\n";
+print MAKEFILE "LIBS		= $LIBS\n";
+print MAKEFILE "INCLUDE		= $INCLUDE\n";
+
+print MAKEFILE "TARGET		= $TARGET\n";
+
+# Rules for compiling
+@TEMP_SRCEXT = split (/ /,$SRCEXT);
+chomp @TEMP_SRCEXT;
+foreach $EXT (@TEMP_SRCEXT)
+  {
+    if (!($EXT eq ""))
+      {
+	print MAKEFILE "%.o: %.$EXT\n\t\$(CXX) \$(CXXARGS) \$(INCLUDE) -o \$@ \$<\n";
+      }
+  }
+
+#Make list of sources
+chomp $SOURCEDIRS;
+print MAKEFILE "SOURCEDIRS = $SOURCEDIRS\n";
+print MAKEFILE "SOURCES = \n";
+foreach $EXT (@TEMP_SRCEXT)
+  {
+    if (!($EXT eq "")) 
+      {
+	print MAKEFILE "SOURCES := \$(SOURCES) \$(foreach DIR,\$(SOURCEDIRS),\$(wildcard \$(DIR)/*.$EXT))\n";
+      }
+  }
+
+print MAKEFILE "OBJECTS0 = \$(SOURCES)\n";
+$i = 0;
+foreach $EXT (@TEMP_SRCEXT)
+  {
+    if ($i > 0)
+      {
+	$j = $i - 1;
+      } else { $j = 0; }
+    if (!($EXT eq "")) {
+      print MAKEFILE "OBJECTS$i := \$(subst .$EXT,.o,\$(OBJECTS$j))\n";
+      $i++;
+    }
+}
+print MAKEFILE "OBJECTS = \$(OBJECTS$j)\n";
+
+# Rules for linking
+print MAKEFILE "all: \$(TARGET)\n";
+print MAKEFILE "\$(TARGET): \$(OBJECTS)\n";
+print MAKEFILE "\t\$(LD) \$(LDARGS) \$(LIBS) -o \$(TARGET) \$(OBJECTS)\n";
+
+#Other rules
+print MAKEFILE "clean:\n\trm -f *\~ *.o\n";
+
+close MAKEFILE;
+
+
+
+
+
+
+
+
+
+
+

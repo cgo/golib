@@ -1,0 +1,10 @@
+#ifndef GOCONFIG_H
+#define GOCONFIG_H
+
+// #define GO_3DCOMPRESSED_USECACHE 1
+#undef GO_3DCOMPRESSED_USECACHE
+#define GO_3DTAKETIME 1
+// #undef GO_3DTAKETIME
+#undef GO_3DPROGRESS
+
+#endif

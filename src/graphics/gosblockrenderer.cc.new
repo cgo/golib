@@ -1,0 +1,1141 @@
+#include <gosblockrenderer.h>
+#include <gotypes.h>
+#include <goarray.h>
+#include <go3vector.h>
+#include <go4vector.h>
+#include <go3dalgo.h>
+#include <gomath.h>
+#include <govolumerenderermacros.h>
+#include <gotransferfunction.h>
+#include <gohashtable.h>
+
+#include <config.h>
+
+#include <gopresencemanager.h>
+
+#include <goviewvolume.h>
+
+#include <goerror.h>
+#include <goexception.h>
+
+#include <math.h>
+
+#include <stdio.h>			// sprintf
+
+namespace Vol {
+
+#define USE_SUBIMAGES 1
+//#undef USE_SUBIMAGES
+
+static inline void blendSubImage (goSubImage *subImage, goSignal2D<goDouble> *image, 
+				  goSignal2D<goDouble> *alphaImage, 
+				  goSize_t w, goSize_t h, 
+				  goDouble sampleWidth, goDouble sampleHeight);
+
+void*
+render_thread (void* p);
+static inline goDouble 	bilinear 	(goDouble A, goDouble B, goDouble C, goDouble D, goDouble px, goDouble py);
+static inline goDouble 	bilinearSample 	(goSubImage *subImage, goDouble subX, goDouble subY);
+static inline void 	bilinearSample2 (goSubImage *subImage, goDouble subX, goDouble subY, goDouble& Color, goDouble& Alpha);
+static inline goDouble 	bilinearSampleAlpha (goSubImage *subImage, goDouble subX, goDouble subY);
+static inline void  copyImageAlpha (goSignal2D<goDouble>* alphaImage, goSubImage *subImage);
+static inline void 	copyAlphaImage 	(goSubImage *subImage, goSignal2D<goDouble>* alphaImage);
+
+template <class T>
+goSBlockRenderer<T>::goSBlockRenderer() 
+    : goBlockRenderer<T>(), goConsumer()
+{
+    setClassName ("goSBlockRenderer");
+    subImages.setModValue (1023);
+    pm = 0;
+    renderTime = 0.0f;
+    MRImages.resize(0);
+    MRViews.resize(0);
+	rayOffsets = 0;
+}
+    
+template <class T>
+goSBlockRenderer<T>::~goSBlockRenderer()
+{
+}
+
+template <class T>
+void
+goSBlockRenderer<T>::init ()
+{
+    goBlockRenderer<T>::init();
+    if (!pm)
+	{
+	    goString s;
+	    s = getClassName();
+	    s += " does not have a presence manager set";
+	    throw goExceptionString(s);
+	    return;
+	}
+    xStep *= sampleDistanceX;
+    yStep *= sampleDistanceY;
+    zStep *= sampleDistanceZ;
+	if (rayOffsets)
+	{
+		delete rayOffsets;
+	}
+    goInt32 imageWidth  = getImageWidth();
+    goInt32 imageHeight = getImageHeight();
+	rayOffsets = new goSignal2D<goDouble> (imageWidth, imageHeight, 32, 32);
+	rayOffsets->fill (0.0f);
+    
+    goInt32 res = resolutionManager->getMinResolution();
+    goInt32 n;
+    for (n = 0; n < MRImages.getSize(); n++)
+    {
+	goSignal2D<goDouble>* rmSig;
+	rmSig = (goSignal2D<goDouble>*)MRImages[n]; 
+	goViewVolume *rmView;
+	rmView = (goViewVolume*)MRViews[n];
+// 	cout << "Before deletion: " << endl;
+// 	cout << "MRImages[" << n << "] = " << hex << MRImages[n] << dec << endl;
+// 	cout << "MRViews[" << n << "] = " << hex << MRViews[n] << dec << endl;
+
+	delete rmSig;
+	delete rmView;
+	
+    }
+    MRViews.resize (res + 1);
+    MRImages.resize (res + 1);
+    for (n = res; n >= 0; n--)
+    {
+	//cout << "Making MRImage " << n << ", size " << imageWidth << " x " << imageHeight << endl;
+	MRImages[n] = (void*) new goSignal2D<goDouble>(imageWidth, imageHeight, 32, 32);
+	//cout << "MRImages[" << n << "] = " << hex << MRImages[n] << dec << endl;
+	((goSignal2D<goDouble>*)MRImages[n])->fill (0.0f);
+	//cout << "Making MRView " << n << endl;
+	MRViews[n] = (void*) new goViewVolume;
+	//cout << "MRViews[" << n << "] = " << hex << MRViews[n] << dec << endl;
+	imageWidth >>= 1;
+	imageHeight >>= 1;
+    }
+}
+
+class render_thread_arg
+{
+public:
+    void* renderer;
+    goArray<goSize_t> indices;
+};
+
+// Not sure if every compiler will be able to do this.
+template<class T>
+void*
+render_thread (void* p)
+{
+    render_thread_arg *arg = (render_thread_arg*)p;
+    goSBlockRenderer<T>* renderer = (goSBlockRenderer<T>*)arg->renderer;
+    renderer->renderThread(&arg->indices);
+    arg->indices.resize(0);
+    delete arg;
+    return 0;
+}
+
+template<class T>
+void
+goSBlockRenderer<T>::initMR()
+{
+    goViewVolume *view;
+    goInt32 res = resolutionManager->getMinResolution();
+    goInt32 n;
+    goDouble scalefactor = 1.0f;
+    for (n = res; n >= 0; n--)
+    {
+ 		view = (goViewVolume*)MRViews[n];
+ 		*view = getViewPlane();
+ 		view->scale (scalefactor);
+ 		view->update();
+ 		scalefactor *= 0.5f;
+    }
+}
+
+template<class T>
+void
+goSBlockRenderer<T>::renderThread (goArray<goSize_t> *indices)
+{
+    goThread::setCancelType(0);
+    setBusy (true);
+
+    startTimer();
+    
+    /*
+     * MR variable initialization
+     */
+#if _GODEBUG >= 1
+    goString s;
+    s = getClassName();
+    s += "::render()";
+    goError::note(s.toCharPtr(), " initMR()");
+#endif
+    initMR();
+        
+    /*
+     * Initialize sub images
+     */
+#if _GODEBUG >= 1
+    s = getClassName();
+    s += "::render()";
+    goError::note(s.toCharPtr(), " initSubImages()");
+#endif
+
+    initSubImages(indices);
+
+    /*
+     * Render sub images
+     */
+#if _GODEBUG >= 1
+    goError::note(s.toCharPtr(), " renderSubImages()");
+#endif
+    renderSubImages(indices);
+
+    /*
+     * Composite sub images to the final image
+     */
+#if _GODEBUG >= 1
+    goError::note(s.toCharPtr(), " compositeSubImages()");
+    //goError::note(s.toCharPtr(), " sampleSubImages()");
+#endif
+#ifdef USE_SUBIMAGES
+     compositeSubImages(indices);
+     //sampleSubImages(indices);
+#else
+    compositeMRImages();
+#endif
+    stopTimer();
+    renderTime = getTimerSeconds();
+
+    setBusy (false);
+    // Make sure progress is ending correctly at the max value.
+    setProgress (getMaxProgress());
+    signalProgress();
+}
+
+template <class T>
+void
+goSBlockRenderer<T>::render (goArray<goSize_t> *indices)
+{
+    rThread.cancel();   // ATTENTION: What happens with the arg object for the killed thread?
+    render_thread_arg *arg = new render_thread_arg;
+    arg->renderer = (void*)this;
+    arg->indices = *indices;
+#ifdef MULTIPLE_THREADS	
+    rThread.create (render_thread<T>, (void*)arg, 1);
+#else	
+    render_thread<T> ((void*)arg);
+#endif	
+}
+
+
+template <class T>
+void
+goSBlockRenderer<T>::renderSubImages (goArray<goSize_t> *indices)
+{
+
+//#ifndef USE_SUBIMAGES    
+    tempImage->fill (0.0f);
+    alphaImage->fill (1.0f);
+//#endif    
+
+    goSignal3D<T> *block;
+    
+    goSize_t i;
+    goIndex_t x,y,z;
+
+	goIndex_t invalidLines = 0;
+	goIndex_t totalLines   = 0;
+
+#if _GODEBUG >= 1
+    goError::note("goSBlockRenderer::render()","Entering render loop");
+    cout << "Number of indices: " << indices->getSize() << endl;
+#endif
+    setProgress (0.0f);
+    signalProgress();
+    goFloat progressStep = 1.0 / ((float)indices->getSize() + 1);
+    
+    for (i = 0; i < (goSize_t)indices->getSize(); i++)
+	{
+	    /*
+	     * Get sub image structure for the next block
+	     */
+	    while (!pm->isPresent((*indices)[i]))
+		{
+		    // unavailableBlocks = true;
+		    // cout << "Index number is " << i << endl;
+		    waitProduction();
+		    // break;
+		}
+	    
+		
+	    setProgress (getProgress() + progressStep);
+	    signalProgress();
+		
+	    /*
+	     * Get subimage object, resolution, scaled viewplane and tempimage
+	     */
+	    goSubImage   *subImage 	  = (goSubImage*)subImages[(*indices)[i]];
+	    if (subImages.fail())
+	    {
+			goError::print("goSBlockRenderer::renderSubImages()","subImage hash table access failed!!!!!");
+			return;
+	    }
+	    goInt32	 	 resolution	  = resolutionManager->getResolution ((*indices)[i]);
+	    goViewVolume 	 *view;
+	    // view = (goViewVolume*)MRViews[resolution];
+		view = &getViewPlane();
+	    goSignal2D<goDouble> *MRImage;
+	    MRImage = (goSignal2D<goDouble>*)MRImages[resolution];
+	    
+	    int resDiff 	= subImage->resDiff;
+	    goDouble resDiffD_1 = 1.0f / (float)(1 << resDiff);
+			    
+	    /*
+	     * Start point on the viewplane, in world coordinates.
+	     */
+        go3Vector<goDouble> planePointSave;
+	    go3Vector<goDouble> tempV;
+	    planePointSave	= view->getPosition();
+		
+	    tempV		= view->getU();		// take the original U and V values here
+		// tempV	    *= resDiffD_1;		// Correct for the smaller image size
+	    tempV		*= subImage->firstXHi;
+	    planePointSave	+= tempV;
+// 		tempV		= view->getU();
+// 		tempV		*= resDiffD_1;
+// 		tempV		*= (float)(subImage->lastXHi - subImage->firstXHi) / (float)(subImage->width + 1);
+// 		planePointSave  += tempV;
+
+	    tempV		= view->getV();
+		// tempV	   *= resDiffD_1;
+	    tempV		*= subImage->firstYHi;
+	    planePointSave	+= tempV;
+		// tempV		= view->getV();
+// 		tempV		*= resDiffD_1;
+// 		tempV		*= (float)(subImage->lastYHi - subImage->firstYHi) / (float)(subImage->height + 1);
+// 		planePointSave  += tempV;
+
+	    // cout << "plane point (start): " << planePointSave << endl;
+		
+	    /*
+	     * Get this block
+	     */ 
+	    block = getBlockProvider()->getBlock((*indices)[i]);		// Get block pointer
+	    // interpolateBlock (block, (*indices)[i], subImage->blockX, subImage->blockY, subImage->blockZ);
+	    if ((*indices)[i] == 0)
+		{
+			cout << "size block 0: " << block->getSizeX() << "," << block->getSizeY() << "," << block->getSizeZ() << endl;
+			int r,k;
+			for (r = -1; r <= (int)block->getSizeY(); r++)
+			{
+				for (k = -1; k <= (int)block->getSizeX(); k++)
+				{
+					cout << *block->getPtr(k,r,-1) << " ";
+				}
+				cout << endl;
+			}
+			cout << endl;
+		}
+		
+	    // DEBUGGING ONLY!
+	    if (block == 0)
+		{
+		    goString s;
+		    char num[255];
+		    s = "Block ";
+		    sprintf(&num[0],"%d",(*indices)[i]);
+		    s += &num[0];
+		    s += " seems not to be in the hash table!";
+		    goError::print("goSBlockRenderer::renderSubImages()",s);
+		    return;
+		}
+		
+	    
+	    go4Vector<goDouble> blockStartPos = subImage->blockStartPos;	// Previously calculated start position in scaled world coords.
+		
+	    /*
+	     * Calculate step vectors in x and y direction on the view plane
+	     */
+	    go3Vector<goDouble> u = view->getU();
+	    go3Vector<goDouble> v = view->getV();
+	    //u *= getViewPlaneSampleWidth();			// Correct the x and y step vectors for the sample distances
+	    //v *= getViewPlaneSampleHeight();
+		//u *= resDiffD_1;						// ...and for the image size
+		//v *= resDiffD_1;
+		//u *= (float)(subImage->lastXHi - subImage->firstXHi) / (float)(subImage->width + 1);
+		//v *= (float)(subImage->lastYHi - subImage->firstYHi) / (float)(subImage->height + 1);
+
+	    // u *= (subImage->lastXHi - subImage->firstXHi) / (double)(subImage->width - 1); 
+	    // v *= (subImage->lastYHi - subImage->firstYHi) / (double)(subImage->height - 1); 
+		
+	    goDouble tempAlphaVal;
+	    goDouble tempImageVal;
+	    // goPtrdiff_t blockDiff;
+	    go3Vector<goDouble> planePoint;
+	    go3Vector<goDouble> start,end;
+	    go3Vector<goDouble> rayStep;
+	    bool lineIsValid;
+	    
+#ifdef USE_SUBIMAGES
+	    goIndex_t xMax = subImage->width;
+	    goIndex_t yMax = subImage->height;
+	    goIndex_t yMin = 0;
+	    goIndex_t xMin = 0;
+#else
+	    goIndex_t xMin = subImage->firstX + (goInt32)(view->getSize().x * 0.5);
+	    goIndex_t yMin = subImage->firstY + (goInt32)(view->getSize().y * 0.5);
+//	    goIndex_t xMin = 0;
+//	    goIndex_t yMin = 0;
+	    goIndex_t xMax = xMin + subImage->width;
+	    goIndex_t yMax = yMin + subImage->height;
+		
+		goIndex_t subX = 0;
+		goIndex_t subY = 0;
+#endif
+	    go3Vector<goInt32> blockSize;
+// 	    blockSize.x = getBlockProvider()->getBlockSize().x >> resDiff;
+// 	    blockSize.y = getBlockProvider()->getBlockSize().y >> resDiff;
+// 	    blockSize.z = getBlockProvider()->getBlockSize().z >> resDiff;
+		goDouble xStepScaled = xStep * resDiffD_1;
+		goDouble yStepScaled = yStep * resDiffD_1;
+		goDouble zStepScaled = zStep * resDiffD_1;
+
+		//goDouble deltaU = (subImage->lastXHi - subImage->firstXHi) / ((double)subImage->width - 1);
+		//goDouble deltaV = (subImage->lastYHi - subImage->firstYHi) / ((double)subImage->height - 1);
+		//u *= deltaU;
+		//v *= deltaV;
+ 		//cout << "deltaU     = " << deltaU << endl;
+ 		//cout << "deltaV     = " << deltaV << endl;
+// 		cout << "resDiffD_1 = " << resDiffD_1 << endl;
+//		cout << "u = " << u << endl << "v = " << v << endl;
+
+		// Copy big alpha data area to subimage alpha data
+		copyImageAlpha (alphaImage, subImage);
+				
+	    goDouble rayDepth = view->getDepth();
+// 	    goDouble rayDepth_1 = 1.0f / rayDepth;
+	    GO_3D_CLIPLIANGBARSKY_START()
+		// FOR (The bounding box on the view plane) DO
+#ifdef USE_SUBIMAGES
+	    for (y = yMin; (y < yMax) ; y++)
+#else
+	    for (y = yMin, subY = 0; y < yMax; y++, subY++)
+#endif						    
+		    {
+			planePoint = planePointSave;
+#ifdef USE_SUBIMAGES
+			for (x = xMin; (x < xMax) ; x++)
+#else			    
+		        for (x = xMin, subX = 0; (x < xMax); x++, subX++)
+#endif			
+			    {
+#ifdef USE_SUBIMAGES
+				//tempAlphaVal = 1.0f;
+				tempAlphaVal = *subImage->alphaData->getPtr(x,y);
+				tempImageVal = 0.0f;
+#else
+				tempImageVal = *MRImage->getPtr(x,y);
+				tempAlphaVal = *subImage->alphaData->getPtr(subX,subY);
+#endif
+				if (tempAlphaVal > 0.0f)
+				    {
+					rayStep = planePoint;
+					rayStep -= view->getEyePos();
+					// rayStep *= 1 / rayStep.abs();
+					// rayStep *= rayDepth / view->getEyeDistance();
+					rayStep *= rayDepth / rayStep.abs();
+					lineIsValid = false;
+					GO_3D_CLIPLIANGBARSKY((blockStartPos.x ), (blockStartPos.x  +
+							xStep ),
+							      (blockStartPos.y ), (blockStartPos.y +
+							yStep ),
+							      (blockStartPos.z ), (blockStartPos.z +
+							zStep ),
+							      rayStep, planePoint,
+							      start, end, lineIsValid);
+					    if (!lineIsValid)
+						{
+							invalidLines++;
+// 							cout << "Invalid line: " << endl;
+// 							cout << "rayStep = " << rayStep << endl;
+// 							cout << "Planepoint = " << planePoint << endl;
+// 							char c;
+// 							cin >> c;
+						}
+						totalLines++;
+      					if (lineIsValid)
+					    {
+					    	rayStep *= 1.0f / (rayStep.abs());
+							end -= start;
+							goDouble dz = end.abs() * resDiffD_1;
+							z = (goIndex_t)(dz);
+							goDouble l = 1.0f; // (goDouble)(1 << resDiff);
+							goDouble lLast = (dz - z) * l;     // Last sample length
+
+							// Calculate the relative start in a block and store it in start:
+							start += planePoint;
+							start.x -= blockStartPos.x;
+							start.y -= blockStartPos.y;
+							start.z -= blockStartPos.z;
+							
+							start.x *= sampleDistanceX_1;
+							start.y *= sampleDistanceY_1;
+							start.z *= sampleDistanceZ_1;
+							
+							start.x *= resDiffD_1;
+							start.y *= resDiffD_1;
+							start.z *= resDiffD_1;
+							
+							rayStep.x *= sampleDistanceX_1;
+							rayStep.y *= sampleDistanceY_1;
+							rayStep.z *= sampleDistanceZ_1;
+								
+							goDouble alpha;
+							goDouble fm;
+							goDouble gm;
+							T val;
+							for ( ; (z > 0); z--)
+							{
+								// Akkumulieren
+								
+								// Sampling
+								val = (T)block->sample (start);
+								alpha = l * alphaFunction[val];
+								//fm = 1 - (pow (1 - alpha, resDiff + 1));
+								//gm = alpha != 0 ? fm / alpha : 1.0f;
+								tempImageVal += colorFunction[val] * alpha * tempAlphaVal; // * gm;
+								tempAlphaVal *= (1 - alpha); //pow((1 - alpha), resDiff + 1);
+
+								// MIP
+								//if (tempImageVal < densityToFloat[*(blockPtr + blockDiff)])
+								// tempImageVal = densityToFloat[*(blockPtr + blockDiff)];
+								start.x += rayStep.x;
+								start.y += rayStep.y;
+								start.z += rayStep.z;
+							}
+							// Last sample
+							val   = (T)block->sample (start);
+							alpha = lLast * alphaFunction[val]; // * (1 << resDiff);
+							//fm = 1 - (pow (1 - alpha, resDiff + 1));
+							//gm = alpha != 0 ? fm / alpha : 1.0f;
+							tempImageVal += colorFunction[val] * alpha * tempAlphaVal; // * gm;
+							tempAlphaVal *= (1 - alpha); // pow ((1 - alpha), resDiff + 1);
+							
+#ifdef USE_SUBIMAGES
+							*subImage->imageData->getPtr(x,y) = tempImageVal;
+							
+							// FALSCH, NUR TEST
+							// *alphaImage->getPtr (xFinal, yFinal) = tempAlphaVal;
+#else
+ 							if ( (x >= 0) && (y >= 0) &&
+ 							     (x < MRImage->getSizeX()) && (y < MRImage->getSizeY()) )
+							{
+							    *MRImage->getPtr (x,y) = tempImageVal;
+							}
+#endif
+						} // lineIsValid (hopefully...)
+					} // alphaValue > x
+#ifdef USE_SUBIMAGES
+					*subImage->alphaData->getPtr(x,y) = tempAlphaVal;
+#else 					
+				    *subImage->alphaData->getPtr (subX, subY) = tempAlphaVal;
+																    
+#endif					
+    				planePoint += u;
+			    }
+			planePointSave += v;
+		    }
+		    // Copy the new alpha values into the alpha image, scaled as needed
+#ifdef USE_SUBIMAGES		    
+		    copyAlphaImage (subImage, alphaImage);
+#else
+		    copyAlphaImage (subImage, alphaImage);
+		    //char c;
+		    //cin >> c;
+#endif		    
+	    GO_3D_CLIPLIANGBARSKY_END();      
+	    subImage->ageStamp++;
+	} // for all indices
+	cout << "Total lines: " << totalLines << "\tInvalid lines: " << invalidLines << endl;
+}
+
+
+
+// Copy big alpha image to subimage alpha data
+static inline void copyImageAlpha (goSignal2D<goDouble>* alphaImage, goSubImage *subImage)
+{
+    goDouble px = (subImage->lastXHi - subImage->firstXHi) / (float)(subImage->width - 1);
+    goDouble py = (subImage->lastYHi - subImage->firstYHi) / (float)(subImage->height - 1);
+    goDouble subX, subY;
+    goIndex_t x,y;
+    subY = subImage->topImage;
+
+    for (y = 0; (y < (goIndex_t)subImage->height); y++)
+    {
+		subX = subImage->leftImage;
+		for (x = 0; (x < (goIndex_t)subImage->width); x++)
+		{
+			goDouble C;
+			alphaImage->sample (subX, subY, C);
+			*subImage->alphaData->getPtr (x,y) = C;
+			subX += px;
+		}
+		subY += py;
+    }
+}
+
+// Copy sub image alpha data to big image
+static inline void copyAlphaImage (goSubImage *subImage, goSignal2D<goDouble>* alphaImage)
+{
+    goDouble px = (subImage->width - 1) / (float)(subImage->lastXHi - subImage->firstXHi);
+    goDouble py = (subImage->height - 1) / (float)(subImage->lastYHi - subImage->firstYHi);
+    goDouble subX, subY;
+    goIndex_t x,y;
+    subY = 0;
+
+    for (y = subImage->topImage; (y <= subImage->bottomImage) && (y < (goIndex_t)alphaImage->getSizeY()); y++)
+    {
+	subX = 0;
+	for (x = subImage->leftImage; (x <= (subImage->rightImage)) && (x < (goIndex_t)alphaImage->getSizeX()); x++)
+	{
+	    goDouble C;
+	    subImage->alphaData->sample (subX, subY, C);
+	    *alphaImage->getPtr (x,y) = C;
+	    subX += px;
+	}
+	subY += py;
+    }
+}
+
+static inline goDouble bilinear (goDouble A, goDouble B, goDouble C, goDouble D, goDouble px, goDouble py)
+{
+    goDouble p1 = A + ((B - A)*px);
+    goDouble p2 = C + ((D - C)*px);
+    return (p1 + ((p2 - p1)*py));
+}
+
+static inline goDouble bilinearSample (goSubImage *subImage, goDouble subX, goDouble subY)
+{
+    goSize_t x = (goSize_t)subX;
+    goSize_t y = (goSize_t)subY;
+    goDouble px = subX - x;
+    goDouble py = subY - y;
+    goDouble A,B,C,D;
+
+    A = *subImage->imageData->getPtr (x,y);
+    B = *subImage->imageData->getPtr (x+1,y);
+    C = *subImage->imageData->getPtr (x, y+1);
+    D = *subImage->imageData->getPtr (x + 1, y + 1);
+    return bilinear (A,B,C,D,px,py);
+}
+
+static inline void bilinearSample2 (goSubImage *subImage, goDouble subX, goDouble subY, goDouble& Color, goDouble& Alpha)
+{
+    int x = (int)subX;
+    int y = (int)subY;
+    goDouble px = subX - x;
+    goDouble py = subY - y;
+    goDouble A,B,C,D;
+
+    A = *subImage->imageData->getPtr (x,y);
+    B = *subImage->imageData->getPtr (x+1,y);
+    C = *subImage->imageData->getPtr (x, y+1);
+    D = *subImage->imageData->getPtr (x + 1, y + 1);
+    Color = bilinear (A,B,C,D,px,py);
+    A = *subImage->alphaData->getPtr (x,y);
+    B = *subImage->alphaData->getPtr (x+1,y);
+    C = *subImage->alphaData->getPtr (x, y+1);
+    D = *subImage->alphaData->getPtr (x + 1, y + 1);
+    Alpha = bilinear (A,B,C,D,px,py);
+}
+
+static inline goDouble bilinearSampleAlpha (goSubImage *subImage, goDouble subX, goDouble subY)
+{
+    goSize_t x = (goSize_t)subX;
+    goSize_t y = (goSize_t)subY;
+    goDouble px = subX - x;
+    goDouble py = subY - y;
+    goDouble A,B,C,D;
+
+    A = *subImage->alphaData->getPtr (x,y);
+    B = *subImage->alphaData->getPtr (x+1,y);
+    C = *subImage->alphaData->getPtr (x, y+1);
+    D = *subImage->alphaData->getPtr (x + 1, y + 1);
+    return bilinear (A,B,C,D,px,py);
+}
+
+/*
+ * Smoothly blend sub image subImage into the final image.
+ * @param subImage     Pointer to the goSubImage to blend
+ * @param image        Pointer to the goSignal2D<goDouble> representing the intermediate image to blend subImage into
+ * @param alphaImage   Pointer to the goSignal2D<goDouble> representing the alpha image to blend subImage into
+ * @param w	       Width of the intermediate image
+ * @param h	       Height of the intermediate image
+ * @param sampleWidth  Sample distance in x direction on the target image
+ * @param sampleHeight Sample distance in y direction on the target image
+ * @todo Replace slow getPtr() calls to goSignal2D objects
+ */
+static inline void blendSubImage (goSubImage *subImage, goSignal2D<goDouble> *image, 
+				  goSignal2D<goDouble> *alphaImage, 
+				  goSize_t w, goSize_t h, 
+				  goDouble sampleWidth, goDouble sampleHeight)
+{
+
+    /*
+     * Steps in x and y directions on the sub image.
+     */
+    goDouble dx = (subImage->width - 1) / (double)(subImage->lastXHi - subImage->firstXHi);
+    goDouble dy = (subImage->height - 1) / (double)(subImage->lastYHi - subImage->firstYHi);
+    /*
+     * Position on the whole image
+     */ 
+    goIndex_t x,y;
+    goDouble C;
+    /*
+     * Position on the sub image
+	 * Hier muss eventuell eine Korrektur addiert werden!
+     */
+    goDouble subX	    = 0;
+    goDouble subXStart  = 0; // (subImage->left - ceil(subImage->left));
+    goDouble subY	    = 0;
+	goDouble subYStart  = 0; // -0.5 * subImage->resDiff; // (subImage->top - ceil(subImage->top));
+
+    
+	goInt32 xFinalStart;
+	goInt32 yFinalStart;
+	goInt32 xFinalEnd;
+	goInt32 yFinalEnd;
+	xFinalStart = subImage->leftImage;
+	xFinalEnd   = subImage->rightImage + 1;
+	yFinalStart = subImage->topImage;
+	yFinalEnd   = subImage->bottomImage + 1;
+	subY = subYStart;
+    for (y = yFinalStart; (y < yFinalEnd) && (y < (goIndex_t)h); y++)
+	{
+	    subX = subXStart;
+	    for (x = xFinalStart; (x < xFinalEnd) && (x < (goIndex_t)w); x++)
+		{
+		    C = bilinearSample (subImage, subX, subY);
+	    	*image->getPtr(x, y) += C ; // * (1 << subImage->resDiff);
+		    subX += dx;
+		}
+	    subY += dy;
+	}
+}
+
+template <class T>
+void
+goSBlockRenderer<T>::compositeMRImages ()
+{
+    goInt32 res = resolutionManager->getMinResolution();
+    goInt32 x, y;
+	goDouble subX, subY;
+    // Schrittweiten fuer Interpolation auf MR Bildern
+    goDouble dx = 1.0f, dy = 1.0f;                 // Skalierungsfaktor war immer 0.5
+
+	go4Vector<goDouble> commonPoint;   // common point in Hi coordinates
+	go44Matrix<goDouble> proj;
+	proj = getViewPlane().getViewMatrix();
+	commonPoint.x = 0; commonPoint.y = 0; commonPoint.z = 0;   // Noch ändern, abhängig von Blickrichtung
+	commonPoint.t = 1.0f;
+	
+    goInt32 j;
+    for (j = res; j >= 0; j--)
+    {
+		goViewVolume	     *view;
+		view = (goViewVolume*)MRViews[j];
+		proj    = view->getViewMatrix();
+		goSignal2D<goDouble>* MRImage;
+		MRImage = (goSignal2D<goDouble>*&)(MRImages[j]);
+		cout << "Scale " << j << " size " << MRImage->getSizeX() << " x " << MRImage->getSizeY() << endl;
+		subY = -0.5f;
+		for (y = 0; y < (goInt32)tempImage->getSizeY(); y++)
+	    {
+			subX = -0.5f;
+			for (x = 0; x < (goInt32)tempImage->getSizeX(); x++)
+			{
+				goDouble temp = 0;
+				MRImage->sample (subX, subY, temp);
+				*tempImage->getPtr(x,y) += temp;
+				subX += dx;
+	    	}
+			subY += dy;
+		}
+		dx *= 0.5f;
+		dy *= 0.5f;
+	}
+}
+
+template <class T>
+void
+goSBlockRenderer<T>::compositeSubImages (goArray<goSize_t> *indices)
+{
+    /*
+     * TEST VERSION: just add everything 
+     * The final version needs to be much more sophisticated... think about this problem (alpha!)
+     * Make the renderer as much independent of this problem as possible!
+     */
+    goSize_t i;
+    goSubImage *subImage;
+
+    tempImage->fill (0.0f);
+		     
+    for (i = 0; i < (goSize_t)indices->getSize(); i++)
+	{
+	    subImage = (goSubImage*)subImages[(*indices)[i]];
+#if 0
+	    goString s;
+	    s = getClassName();
+	    s += "::compositeSubImages()";
+	    s += " sub image at (h/v) ";
+	    char c[255];
+	    sprintf(&c[0], "%f", subImage->left);
+	    s += &c[0];
+	    s += "->";
+	    sprintf(&c[0], "%f", subImage->right);
+	    s += &c[0];
+	    s += "/";
+	    sprintf(&c[0], "%f", subImage->top);
+	    s += &c[0];
+	    s += "->";
+	    sprintf(&c[0], "%f", subImage->bottom);
+	    s += &c[0];
+	    cout << s << "\n";
+#endif
+	    
+	    /*
+	     * Ineffizient, aber nur ein Test :-)
+	     */
+// 	    cout << "subImage->height = " << subImage->height << "\n";
+// 	    cout << "subImage->width = " << subImage->width << "\n";
+// 	    cout << "xFinalSave = " << xFinalSave << "\n";
+// 	    cout << "yFinal = " << yFinal << "\n";
+
+#if 1
+	blendSubImage (subImage, tempImage, alphaImage, getImageWidth(), getImageHeight(),
+		       getViewPlaneSampleWidth(), getViewPlaneSampleHeight());
+#else
+	    goIndex_t x, y, xFinal, yFinal, xFinalSave;
+	    goDouble left = subImage->firstX;
+	    goDouble top = subImage->firstY;
+	    xFinalSave = (goIndex_t)left;
+	    yFinal = (goIndex_t)top;
+	    
+	    for (y = 0; (y < (goIndex_t)subImage->height) && (yFinal < (goIndex_t)tempImage->getSizeY()) && (yFinal >= 0) && (yFinal <= subImage->lastY); y++)
+		{
+		    xFinal = xFinalSave;
+		    for (x = 0; (x < (goIndex_t)subImage->width) && (xFinal >= 0) && (xFinal <= subImage->lastX) && (xFinal <
+				    (goIndex_t)tempImage->getSizeX()); x++)
+			{
+			    //goSize_t imageAddress = getImageWidth() * yFinal + xFinal;
+			    if (*alphaImage->getPtr(xFinal,yFinal) > 0.0f)
+				{
+				    *tempImage->getPtr(xFinal,yFinal) += *subImage->imageData.getPtr(x,y);
+				}
+			    xFinal++;
+			}
+		    yFinal++;
+		}
+#endif
+	}
+
+}
+
+
+template <class T>
+void 
+goSBlockRenderer<T>::initSubImages (goArray<goSize_t>* indices)
+{
+    goIndex_t i;
+    goDouble _1_y_x = 1.0f / (double)(xBlocks * yBlocks);
+    goDouble _1_x   = 1.0f / (double)xBlocks;
+    goSize_t _x_y   = xBlocks * yBlocks;
+    goSize_t x,y,z;
+    
+    goSubImage* subImage;
+    
+    go4Vector<goDouble> volumeStartPos;
+    volumeStartPos.x = getPosition().x;
+    volumeStartPos.y = getPosition().y;
+    volumeStartPos.z = getPosition().z;
+    volumeStartPos.t = 1.0f;
+    go3Vector<goDouble> size = getSize();
+    
+    volumeStartPos.x -= (size.x) * 0.5f * sampleDistanceX;
+    volumeStartPos.y -= (size.y) * 0.5f * sampleDistanceY;
+    volumeStartPos.z -= (size.z) * 0.5f * sampleDistanceZ;
+
+    go3Vector<goDouble> blockSize;
+    
+    int minResolution = resolutionManager->getMinResolution();
+    int resolution;
+    int resDiff;
+    goDouble resDiffD = 0;
+    goDouble resDiffD_1 = 0;
+    GO_VREXP_FINDBOUNDS_START()
+    for (i = 0; i < indices->getSize(); i++)
+	{
+	    /*
+	     * Calculate bounds on the final picture of the current block
+	     */
+	    /******************************************************************************************/
+	    goSize_t 		blockIndex 	= (*indices)[i];
+	    resolution = resolutionManager->getResolution (blockIndex);
+
+	    goViewVolume 	*view;
+	    view = (goViewVolume*)(MRViews[resolution]);
+	    // Vorsicht, bissiger copy constructor. Ich hasse copy Kontruktoren. Ich hasse sie von ganzem Herzen.
+	    go44Matrix<goDouble> projMatrix;
+	    projMatrix	= view->getViewMatrix(); 	
+
+	    resDiff = minResolution - resolution;
+	    resDiffD = (goDouble)(1 << resDiff);
+	    resDiffD_1 = 1.0f / resDiffD;
+    	blockSize.x = (goDouble)getBlockProvider()->getBlockSize().x * resDiffD_1;
+    	blockSize.y = (goDouble)getBlockProvider()->getBlockSize().y * resDiffD_1;
+    	blockSize.z = (goDouble)getBlockProvider()->getBlockSize().z * resDiffD_1;
+
+	    	    // Bounding box auf der viewplane berechnen
+	    go4Vector<goDouble> blockStartPos;
+	    go4Vector<goDouble> blockStartPosHi;
+
+	    blockStartPos    = volumeStartPos;
+ 	    blockStartPosHi  = volumeStartPos;
+ 	    blockStartPos.x *= resDiffD_1; 
+ 	    blockStartPos.y *= resDiffD_1;
+ 	    blockStartPos.z *= resDiffD_1;
+	    
+	    // Find out block position
+	    goDouble 		tempD = blockIndex * _1_y_x;
+	    z 				= (goSize_t)tempD;
+	    goDouble tempD2 = blockIndex - z * _x_y;
+	    y 				= (goSize_t)(tempD2 * _1_x);
+	    x 				= (goSize_t)(tempD2 - y * xBlocks);
+
+	    goDouble xStepCorr = xStep * resDiffD_1;
+	    goDouble yStepCorr = yStep * resDiffD_1;
+	    goDouble zStepCorr = zStep * resDiffD_1;
+	    // World coordinates of current block's 0th corner
+	    // Move the block's corner for -0.5 in each direction (samples in the middle of each block)
+	    blockStartPos.x   += x * xStepCorr;
+	    blockStartPos.y   += y * yStepCorr;
+	    blockStartPos.z   += z * zStepCorr;
+	    blockStartPos.t    = 1;
+ 	    blockStartPosHi.x += x * xStep;
+ 	    blockStartPosHi.y += y * yStep;
+ 	    blockStartPosHi.z += z * zStep;
+ 	    blockStartPosHi.t  = 1;
+
+//	    cout << "Blockstartpos: " << 
+//		blockStartPos.x << "," << blockStartPos.y << "," << blockStartPos.z << endl;
+    
+	    goDouble left, right, top, bottom;
+	    // Find the bounding box on the final picture for this block:
+
+//	    cout << "Finding bounds on MR plane" << endl;	   
+	    GO_VREXP_FINDBOUNDS_2(blockStartPos, left, right, top, bottom, xStepCorr, yStepCorr, zStepCorr, projMatrix);
+//  	    blockStartPos.x += 0.5;
+//  	    blockStartPos.y += 0.5;
+//  	    blockStartPos.z += 0.5;
+		
+	    
+//	    cout << "Finding bounds on final plane" << endl;
+ 	    goDouble leftHi, rightHi, topHi, bottomHi;
+//		cout << "xStep = " << xStep << endl;
+//		cout << "yStep = " << yStep << endl;
+//		cout << "zStep = " << zStep << endl;
+ 	    GO_VREXP_FINDBOUNDS_2(blockStartPosHi, leftHi, rightHi, topHi, bottomHi, xStep, yStep, zStep, Tproj);
+//   	    blockStartPosHi.x += 0.5;
+// 	    blockStartPosHi.y += 0.5;
+//   	    blockStartPosHi.z += 0.5;
+
+
+		// Sollte eigentlich nur gemacht werden, wenn die Projektion auf dem Ebenenursprung liegt.
+ 		if (ceil(rightHi) == floor (rightHi))
+ 		{
+// 			cout << "Katastrophenfall: rightHi = " << rightHi << endl;
+			if (rightHi == 0)
+	 		   rightHi -= 0.5;
+ 		}
+		if (ceil(bottomHi) == floor (bottomHi))
+		{
+//			cout << "Katastrophenfall: bottomHi = " << bottomHi << endl;
+			if (bottomHi == 0)
+			   bottomHi -= 0.5;
+		}
+
+		if (ceil(right) == floor (right))
+		{
+//			cout << "Katastrophenfall: right = " << right << endl;
+			if (right == 0)
+			   right -= 0.5;
+		}
+		if (ceil(bottom) == floor (bottom))
+		{
+//			cout << "Katastrophenfall: bottom = " << bottom << endl;
+			if (bottom == 0)
+			   bottom -= 0.5;
+		}
+		
+//    	    left   = leftHi   * resDiffD_1;	    
+//   	    right  = rightHi  * resDiffD_1;	    
+//    	    top    = topHi    * resDiffD_1;	    
+//    	    bottom = bottomHi * resDiffD_1;	    
+
+		// Fuer gleichmaessige Abtastung. Ungleichmaessige gibt Artefakte (keine Zeit mehr dafuer)			
+    	    left   = leftHi;	    
+	   	    right  = rightHi;	    
+    	    top    = topHi;	    
+    	    bottom = bottomHi;    
+		
+		goDouble scaleFactorX = (right - left) / (rightHi - leftHi);
+		goDouble scaleFactorY = (bottom - top) / (bottomHi - topHi);
+
+	    goIndex_t subImageWidth, subImageHeight;
+	    subImageWidth = (goSize_t) ( (floor(right) - ceil(left) + 1) );
+        subImageHeight = (goSize_t) ( (floor(bottom) - ceil(top) + 1) );
+	    /******************************************************************************************/
+	    /*
+	     * Create the sub image as needed
+	     */
+	    /******************************************************************************************/
+	    subImage = (goSubImage*)subImages[(*indices)[i]];
+	    if (subImages.fail())
+		{
+		    subImage = new goSubImage (subImageWidth, subImageHeight);
+					       
+		    subImage->left   = left;
+		    subImage->right  = right;
+		    subImage->top    = top;
+		    subImage->bottom = bottom;
+
+		    /*
+		     * Translate bounds so that upper left corner of the viewplane is (0,0)
+		     */
+		    subImage->firstX	  = (goInt32) ceil(left);
+		    subImage->firstY	  = (goInt32) ceil(top);
+		    subImage->lastX	  = (goInt32) floor(right);
+		    subImage->lastY	  = (goInt32) floor(bottom);
+		    
+ 		    subImage->firstXHi	  = (goInt32) ceil (leftHi);
+ 		    subImage->lastXHi	  = (goInt32) floor (rightHi);
+ 		    subImage->firstYHi	  = (goInt32) ceil (topHi);
+ 		    subImage->lastYHi	  = (goInt32) floor (bottomHi);
+
+			subImage->leftImage   = subImage->firstXHi + (goInt32)((getViewPlane().getSize().x) * 0.5);
+			subImage->rightImage  = subImage->lastXHi  + (goInt32)((getViewPlane().getSize().x) * 0.5);
+			subImage->topImage    = subImage->firstYHi + (goInt32)((getViewPlane().getSize().y) * 0.5);
+			subImage->bottomImage = subImage->lastYHi  + (goInt32)((getViewPlane().getSize().y) * 0.5);
+			
+
+			subImage->scaleFactorX = scaleFactorX;
+			subImage->scaleFactorY = scaleFactorY;
+					    
+		    subImage->blockX	  = x;
+		    subImage->blockY	  = y;
+		    subImage->blockZ	  = z;
+		    subImage->resDiff	  = resDiff;
+		    subImage->ageStamp	  = 0;
+		    subImage->imageData->fill(0.0f);
+		    subImage->alphaData->fill(1.0f);
+		    subImage->blockStartPos = blockStartPosHi;
+//		    cout << "Adding subImage " << (*indices)[i] << " to hash table" << endl;
+		    subImages.add ((*indices)[i], (void*)subImage);
+		} else {
+		    /*
+		     * If image exists and is older than [CHANGE VALUE HERE], delete the old one and make a new one
+		     */
+		    if (subImage->ageStamp > 0)
+			{
+			    // cout << "goSBlockRenderer: Image " << (*indices)[i] << " overaged. Removing." << endl;
+			    goSubImage *remImage = (goSubImage*)subImages.remove ((*indices)[i]);
+			    delete remImage;
+			    subImage = new goSubImage (subImageWidth, subImageHeight);
+						       
+			    subImage->left   = left;
+			    subImage->right  = right;
+			    subImage->top    = top;
+			    subImage->bottom = bottom;
+			    /*
+			     * Translate bounds so that upper left corner of the viewplane in (0,0)
+			     */
+// 			    subImage->leftImage   = left   + (view->getSize().x - 1) * 0.5;
+// 			    subImage->rightImage  = right  + (view->getSize().x - 1) * 0.5;
+// 			    subImage->topImage    = top    + (view->getSize().y - 1) * 0.5;
+// 			    subImage->bottomImage = bottom + (view->getSize().y - 1) * 0.5;
+			    subImage->firstX	  = (goInt32) ceil(left);
+			    subImage->firstY	  = (goInt32) ceil(top);
+			    subImage->lastX	  = (goInt32) floor(right);
+			    subImage->lastY	  = (goInt32) floor(bottom);
+			    
+ 		        subImage->firstXHi	  = (goInt32) ceil (leftHi);
+ 		        subImage->lastXHi	  = (goInt32) floor (rightHi);
+ 		        subImage->firstYHi	  = (goInt32) ceil (topHi);
+	 		    subImage->lastYHi	  = (goInt32) floor (bottomHi);
+				subImage->leftImage   = subImage->firstXHi + (goInt32)((getViewPlane().getSize().x) *
+				0.5);
+				subImage->rightImage  = subImage->lastXHi  + (goInt32)((getViewPlane().getSize().x) *
+				0.5);
+				subImage->topImage    = subImage->firstYHi + (goInt32)((getViewPlane().getSize().y) *
+				0.5);
+				subImage->bottomImage = subImage->lastYHi  + (goInt32)((getViewPlane().getSize().y) *
+				0.5);
+
+				subImage->scaleFactorX = scaleFactorX;
+				subImage->scaleFactorY = scaleFactorY;
+		    
+		    	subImage->blockX	  = x;
+		        subImage->blockY	  = y;
+		        subImage->blockZ	  = z;
+			    subImage->ageStamp    = 0;
+			    subImage->resDiff	  = resDiff;
+			    subImage->imageData->fill(0.0f);
+			    subImage->alphaData->fill(1.0f);
+			    subImage->blockStartPos = blockStartPosHi;		    
+//		    	    cout << "Adding subImage " << (*indices)[i] << " to hash table" << endl;
+			    subImages.add ((*indices)[i], (void*)subImage);
+			}
+		}
+	    /******************************************************************************************/
+	    /*
+	     * Go on here!
+	     */
+	}
+    GO_VREXP_FINDBOUNDS_END();
+    
+    /*
+     * Sort using block distances as sort keys (so images close to the viewer get in first)
+     */ 
+    goArray<goDouble> distances;
+    distances.resize(0);
+    go3Vector<goDouble> tempV3;
+    for (i = 0; i < indices->getSize(); i++)
+	{
+	    // Calculate distance to eye
+	    tempV3.x = -((goSubImage*)subImages[(*indices)[i]])->blockStartPos.x;
+	    tempV3.y = -((goSubImage*)subImages[(*indices)[i]])->blockStartPos.y;
+	    tempV3.z = -((goSubImage*)subImages[(*indices)[i]])->blockStartPos.z;
+	    tempV3.x -= xStep * 0.5;
+	    tempV3.y -= yStep * 0.5;
+	    tempV3.z -= zStep * 0.5;
+	    tempV3 += getViewPlane().getEyePos();
+	    distances += tempV3.abs();
+	}
+    // Sort both arrays using the distances as sort keys.
+    distances.sort (*indices);
+
+}
+
+}
+
+template class Vol::goSBlockRenderer<goInt8>;
+template class Vol::goSBlockRenderer<goUInt8>;
+template class Vol::goSBlockRenderer<goInt16>;
+template class Vol::goSBlockRenderer<goUInt16>;
+template class Vol::goSBlockRenderer<goInt32>;
+template class Vol::goSBlockRenderer<goUInt32>;
+template class Vol::goSBlockRenderer<goFloat>;
+template class Vol::goSBlockRenderer<goDouble>;

@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+#Replaces oldName with newName in all files in the directory dirName.
+
+$oldName = $ARGV[0];
+$newName = $ARGV[1];
+
+$dirName = $ARGV[2];
+
+opendir ($dir,$dirName);
+@files = readdir ($dir);
+closedir $dir;
+
+print scalar(@files) . " files\n";
+
+for ($i = 2; $i < scalar(@files); $i++)
+{
+    $fileName = $dirName . "/" . $files[$i];
+    $newFileName = $fileName . ".new";
+    print "File: " . $fileName . "\n";
+    open (FILE,$fileName);
+    open (NEWFILE,">",$newFileName);
+    while (!eof(FILE))
+    {
+	$fileContent = <FILE>;
+	$fileContent =~ s/$oldName/$newName/g;
+	#print $fileContent;
+	syswrite NEWFILE,$fileContent;
+    }
+    close FILE;
+    close NEWFILE;
+    system ("rm","-f","$fileName");
+    system ("mv","$newFileName","$fileName");
+}
+
+

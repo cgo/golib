@@ -1,0 +1,16 @@
+renderdemo README und bekannte Fehler
+-----------------
+
+Dies ist die 
+Benutzeroberfläche für die in meiner Diplomarbeit beschriebene Software.
+Es sind folgende Fehler bekannt:
+
+0.	Unter manchen Umständen werden die mittleren Bildpunkte 
+	auf Schwarz gesetzt. Problem tritt erst seit Einführung der Alphakorrektur auf,
+	hat daher evtl. damit zu tun. Werteüberlauf???
+1. 	Wenn kein Joystick verwendet wird, sondern die Tastatur zur Translation und
+	die Bedienelemente der Oberfläche zur Rotation verwendet werden, 
+	kann das Programm sich aufhängen. Die Bedienelemente nicht überfordern (:)) oder
+	besser Joystick verwenden.
+2.  Xlib antwortet beim Beenden manchmal mit "async reply".
+	Keine besonderen Auswirkungen feststellbar.
