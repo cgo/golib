@@ -16,7 +16,14 @@
 #ifndef GOSIGNAL3D_H
 # include <gosignal3d.h>
 #endif
+#ifndef GOPOINT_H
+# include <gopoint.h>
+#endif
+#ifndef GOARRAY_H
+# include <goarray.h>
+#endif
 
-bool goNormalizeSignal (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);
+bool goNormalizeSignal   (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);
+bool goFindZeroCrossings (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet);
 
 #endif
