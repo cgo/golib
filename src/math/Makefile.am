@@ -5,11 +5,10 @@ libGomath_la_SOURCES = go3vector.cc \
 					   go4vector.cc \
 					   gocomplex.cc \
 					   gointegral.cc \
-					   golinearalgebra.cc \
-					   gomatrix.cc \
 					   gonvector.cc \
 					   goposition.cc \
-					   goquaternion.cc
+					   goquaternion.cc \
+                       golinearalgebra.cc
 INCLUDES = -I@top_srcdir@/include 
 #libgame_la_LIBADD = -L$(GOPATH)/lib -lGo
 

@@ -1,5 +1,5 @@
 #include <gotree.h>
-#include <iostream.h>
+#include <iostream>
 
 template <class T>
 goTreeNode<T>::goTreeNode () {

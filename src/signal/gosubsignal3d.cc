@@ -125,17 +125,66 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     }
     else
     {
-        myXJump = new goPtrdiff_t []
+        deleteX = true;
+        goSize_t xArraySize = parent->getSizeX() / (1 + skipX);
+        myXJump = new goPtrdiff_t [xArraySize];
+        xDiff = new goPtrdiff_t [xArraySize];
+        goSize_t k;
+        goPtrdiff_t* parentJumpP = parent->getXJump();
+        goPtrdiff_t* parentDiffP = parent->getXDiff();
+        for (k = 0; k < xArraySize; ++k)
+        {
+            myXJump [k] = *parentJumpP;
+            xDiff [k] = *parentDiffP;
+            parentJumpP = parentJumpP + 1 + skipX;
+            parentDiffP = parentDiffP + 1 + skipX;
+        }
     }
     if (skipY == 0)
     {
+        deleteY = false;
         myYJump = parent->getYJump() + (goPtrdiff_t)p.y;
         yDiff   = parent->getYDiff() + (goPtrdiff_t)p.y;
     }
+    else
+    {
+        deleteY = true;
+        goSize_t arraySize = parent->getSizeY() / (1 + skipY);
+        myYJump = new goPtrdiff_t [arraySize];
+        yDiff = new goPtrdiff_t [arraySize];
+        goSize_t k;
+        goPtrdiff_t* parentJumpP = parent->getYJump();
+        goPtrdiff_t* parentDiffP = parent->getYDiff();
+        for (k = 0; k < arraySize; ++k)
+        {
+            myYJump [k] = *parentJumpP;
+            yDiff [k] = *parentDiffP;
+            parentJumpP = parentJumpP + 1 + skipY;
+            parentDiffP = parentDiffP + 1 + skipY;
+        }
+    }
     if (skipZ == 0)
     {
+        deleteZ = false;
         myZJump = parent->getZJump() + (goPtrdiff_t)p.z;
         zDiff   = parent->getZDiff() + (goPtrdiff_t)p.z;
+    }
+    else
+    {
+        deleteZ = true;
+        goSize_t arraySize = parent->getSizeZ() / (1 + skipZ);
+        myZJump = new goPtrdiff_t [arraySize];
+        zDiff = new goPtrdiff_t [arraySize];
+        goSize_t k;
+        goPtrdiff_t* parentJumpP = parent->getZJump();
+        goPtrdiff_t* parentDiffP = parent->getZDiff();
+        for (k = 0; k < arraySize; ++k)
+        {
+            myZJump [k] = *parentJumpP;
+            zDiff [k] = *parentDiffP;
+            parentJumpP = parentJumpP + 1 + skipZ;
+            parentDiffP = parentDiffP + 1 + skipZ;
+        }
     }
 }
 
@@ -164,6 +213,49 @@ goSubSignal3D<T>::move(int dir)
 	    default: break;	
 	}
 	setPosition(position.x, position.y, position.z);
+}
+
+template <class T>
+void
+goSubSignal3D<T>::shiftLeftSize (int n)
+{
+    goSize_t sx = getSizeX();
+    goSize_t sy = getSizeY();
+    goSize_t sz = getSizeZ();
+
+    sx = sx << n;
+    sy = sy << n;
+    sz = sz << n;
+    this->setSize (sx, sy, sz);
+}
+
+template <class T>
+void
+goSubSignal3D<T>::shiftRightSize (int n)
+{
+    goSize_t sx = getSizeX();
+    goSize_t sy = getSizeY();
+    goSize_t sz = getSizeZ();
+
+    if (sx > 1) sx = sx >> n;
+    if (sy > 1) sy = sy >> n;
+    if (sz > 1) sz = sz >> n;
+    this->setSize (sx, sy, sz);
+}
+
+template <class T>
+void
+goSubSignal3D<T>::shiftLeftDiff (int n)
+{
+    // FIXME: These skip values are wrong. Fix ...
+    this->setSkip ((skipX + 1) << n, (skipY + 1) << n, (skipZ + 1) << n);
+}
+
+template <class T>
+void
+goSubSignal3D<T>::shiftRightDiff (int n)
+{
+    this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
 }
 
 template< class T >

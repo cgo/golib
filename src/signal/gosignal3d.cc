@@ -63,6 +63,7 @@ template <class T>
 const goSignal3D<T>&
 goSignal3D<T>::operator= (goSignal3DBase<T>& other)
 {
+    std::cout << "goSignal3D::operator=()\n";
     this->destroy();
 
     this->make (other.getSizeX(),
@@ -74,7 +75,9 @@ goSignal3D<T>::operator= (goSignal3DBase<T>& other)
                 other.getBorderX(),
                 other.getBorderY(),
                 other.getBorderZ());
-
+    
+    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
+    
     return *this;
 }
 

@@ -687,22 +687,24 @@ template< class T >
 int
 goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 {
-  int i;
-  goSubSignal3D<T>  s;
-  s.setParent(&signal);
-  s.setSize (signal.getSizeX() >> (stage - 1),
-	     signal.getSizeY() >> (stage - 1),
-	     signal.getSizeZ() >> (stage - 1));
-  s.setDiff (signal.getXDiff() << (stage - 1),
-	     signal.getYDiff() << (stage - 1),
-	     signal.getZDiff() << (stage - 1));
-  for (i = 0; i < stage; i++)
+    int i;
+    goSubSignal3D<T>  s;
+    s.setParent(&signal);
+    s.setSize (signal.getSizeX() >> (stage - 1),
+               signal.getSizeY() >> (stage - 1),
+               signal.getSizeZ() >> (stage - 1));
+    //s.setDiff (signal.getXDiff() << (stage - 1),
+    //     signal.getYDiff() << (stage - 1),
+    //     signal.getZDiff() << (stage - 1));
+    s.setSkip ((1 << stage) - 1, (1 << stage) - 1, (1 << stage) - 1);
+
+    for (i = 0; i < stage; i++)
     {
-      unHaar (s);
-      s.shiftLeftSize(1);
-      s.shiftRightDiff(1);
+        unHaar (s);
+        s.shiftLeftSize(1);
+        s.shiftRightDiff(1);
     }
-  return stage;
+    return stage;
 }
 
 
