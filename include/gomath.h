@@ -20,6 +20,8 @@
 // for acknowledgment when TNT is used in a product.
 namespace goMath
 {
+    extern const goFloat epsilon;
+    
 /**
  * \addtogroup math
  * @{
@@ -86,8 +88,11 @@ Real abs(const Real &a)
 }
 /*! @} */
 
-bool gradient2D  (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
-bool laplacian2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool gradient2D          (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool laplacian2D         (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
+bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
 };
 
