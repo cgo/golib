@@ -162,7 +162,7 @@ glutWireCube()
 ; return 0; }
 configure:2683: checking for test_nurbs_curve in -lGLU
 configure:2702: gcc -o conftest -g -O2   conftest.c -lGLU  -lGL -lSDL -lnsl -ltiff -lpthread  1>&5
-/tmp/cc8GH82v.o: In function `main':
+/tmp/cckYMGrk.o: In function `main':
 /home/dixie/Christian/pgm/golib/configure:2698: undefined reference to `test_nurbs_curve'
 /usr/lib/libGLU.so: undefined reference to `fist_tessellation'
 collect2: ld returned 1 exit status
