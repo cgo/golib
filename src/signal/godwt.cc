@@ -586,10 +586,8 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 {
   goSignal3D<godwt_t>	temp1;  // 
   goSignal3D<godwt_t>	temp2;  
-  temp1.make (signal.getSizeX(), signal.getSizeY(), signal.getSizeZ(),
-	      0, 0, 0);
-  temp2.make (signal.getSizeX(), signal.getSizeY(), signal.getSizeZ(),
-	      0, 0, 0);
+  temp1.make (signal.getSizeX(), signal.getSizeY(), signal.getSizeZ());
+  temp2.make (signal.getSizeX(), signal.getSizeY(), signal.getSizeZ());
   
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
@@ -683,10 +681,8 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
   
   goSignal3D<godwt_t>	temp1;
   goSignal3D<godwt_t>	temp2;
-  temp1.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ(),
-	      0, 0, 0);
-  temp2.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ(),
-	      0, 0, 0);
+  temp1.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ());
+  temp2.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ());
 
   haarReverseZ (haarSignal, temp1, tp0, tp1);
   
