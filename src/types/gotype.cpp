@@ -27,6 +27,11 @@ goTypePrivate::~goTypePrivate ()
 {
 }
 
+/**
+ * @brief Constructor.
+ *
+ * @param t  Type enumerator for this object. See goTypeEnum
+ **/
 goType::goType (goTypeEnum t)
     : goObjectBase (),
       myPrivate    (NULL)
@@ -45,6 +50,13 @@ goType::~goType ()
     }
 }
 
+/**
+ * @brief Get size of type t.
+ *
+ * @param t  Type enumerator.
+ *
+ * @return The size of the type t in bytes.
+ **/
 goSize_t 
 goType::getSize (goTypeEnum t)
 {
@@ -109,6 +121,13 @@ goType::getSize (goTypeEnum t)
     return 0;
 }
 
+/**
+ * @brief Returns signedness of type t.
+ *
+ * @param t  Type enumerator.
+ *
+ * @return True if t is signed, false otherwise.
+ **/
 bool
 goType::isSigned (goTypeEnum t)
 {
@@ -141,6 +160,13 @@ goType::isSigned (goTypeEnum t)
     return false;
 }
 
+/**
+ * @brief Get description string for type t.
+ *
+ * @param t          Type enumerator.
+ * @param stringRet  String containing the description after the method
+ *                   returned.
+ **/
 void 
 goType::getString (goTypeEnum t, goString& stringRet)
 {
@@ -205,6 +231,11 @@ goType::getString (goTypeEnum t, goString& stringRet)
     }
 }
 
+/**
+ * @brief Get size of this type.
+ *
+ * @return Size of the type set in this object.
+ **/
 goSize_t
 goType::getSize () const
 {
@@ -212,6 +243,12 @@ goType::getSize () const
     return myPrivate->size;
 }
 
+/**
+ * @brief Query signedness of this type.
+ *
+ * @return True if the type set in this object is 
+ *         signed, false otherwise.
+ **/
 bool
 goType::isSigned () const
 {
@@ -219,6 +256,12 @@ goType::isSigned () const
     return myPrivate->signedness;
 }
 
+/**
+ * @brief Get description string of this type.
+ *
+ * @return Const reference to a goString containing the description
+ *         for the type set in this object.
+ **/
 const goString&
 goType::getString () const
 {
@@ -226,6 +269,12 @@ goType::getString () const
     return myPrivate->string;
 }
 
+/**
+ * @brief Get enumerator for the type set in this object.
+ *
+ * @return The enumerator t of the type set in the constructor
+ *         goType(t).
+ **/
 goTypeEnum
 goType::getID () const
 {
