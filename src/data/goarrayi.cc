@@ -6,10 +6,6 @@
 #include <golist.h>
 #include <gohashtable.h>
 
-#include <godepot.h>
-#include <gopaper.h>
-
-
 // instantiation
 template class goArray< goInt8 >;
 template class goArray< goUInt8 >;
@@ -30,8 +26,6 @@ template class goArray<goComplex<goDouble> >;
 
 // more exotic ones
 template class goArray<goString* >;
-template class goArray<goPaper* >;
-template class goArray<goDepot* >;
 template class goArray<goArray<int>* >;
 template class goArray<goConfigFileEntry* >;
 template class goArray<goConfigFileSection* >;

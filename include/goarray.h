@@ -13,7 +13,6 @@
  * Resizeable array. 
  * @author Christian Gosch
  */
-
 template< class T >
 class
 goArray {
