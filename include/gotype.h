@@ -9,6 +9,7 @@
 # include <goobjectbase.h>
 #endif
 
+typedef bool (*goCompareFunction)(const void*, const void*);
 
 class goTypePrivate;
 /*!
@@ -28,12 +29,18 @@ class goType : public goObjectBase
         static bool      isSigned  (goTypeEnum t);
         static void      getString (goTypeEnum t, goString& stringRet);
 
-        bool            setID     (goTypeEnum t);
-        goSize_t        getSize   () const;
-        bool            isSigned  () const;
-        const goString& getString () const;
-        goTypeEnum      getID     () const;
-
+        bool              setID     (goTypeEnum t);
+        goSize_t          getSize   () const;
+        bool              isSigned  () const;
+        const goString&   getString () const;
+        goTypeEnum        getID     () const;
+        goCompareFunction getLowerThanFunction   () const;
+        goCompareFunction getGreaterThanFunction () const;
+        goCompareFunction getEqualFunction       () const;
+       
+        goDouble          getMinimum () const;
+        goDouble          getMaximum () const;
+        
         const goType& operator= (const goType& other);
 
     private:

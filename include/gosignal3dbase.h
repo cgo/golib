@@ -25,6 +25,10 @@
 #endif
 
 /*!
+ * @addtogroup signal
+ * @{
+ */
+/*!
  * \brief Base class for up to 3D signals.
  *
  * This can be used as a template class as you would expect, giving
@@ -141,8 +145,8 @@ goSignal3DBase : public goObjectBase
          */
         goSize_t	getSize ();
 
-        T	getMaximum();
-        T	getMinimum();
+        goDouble	getMaximum() const;
+        goDouble	getMinimum() const;
         void	fill (const T* value);
 
         /// Copies the last valid values from the block data into the borders
@@ -195,6 +199,6 @@ goSignal3DBase : public goObjectBase
     goFloat __p2 = __C + ((__D - __C)*__px);				\
     __target =  (__p1 + ((__p2 - __p1)*__py));				\
 }
-
+/*! @} */
 #endif
 

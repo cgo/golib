@@ -6,8 +6,6 @@
 #endif
 #include <gotypes.h>
 
-namespace Go
-{
 
 template <class _input_type,class _output_type> class goUniformQuantizerPrivate;
 
@@ -46,5 +44,4 @@ class goUniformQuantizer : public goQuantizer <_input_type, _output_type>
         goUniformQuantizer (goUniformQuantizer<_input_type, _output_type>& other);
 };
 /*! @} */
-};
 #endif
