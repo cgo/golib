@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by configure.
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = .
-prefix = /home/dixie/Christian/pgm/golib
+prefix = /home/christian/pgm/golib
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -57,23 +57,26 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-host_alias = i686-suse-linux
-host_triplet = i686-suse-linux
+host_alias = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
 AR = ar
 AS = @AS@
 CC = gcc
 CXX = c++
 DLLTOOL = @DLLTOOL@
 DOCXX = echo
-DOXYGEN = doxygen doxygen.config
+DOXYGEN = echo
+ECHO = echo
+EXEEXT = 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
-NASM = nasm
+NASM = NONE
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
 PACKAGE = golib
 RANLIB = ranlib
+STRIP = strip
 VERSION = 0.2.1
 debug_options = -O2
 lfs_options = 
@@ -106,7 +109,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 $(ACLOCAL_M4):  configure.in 
 	cd $(srcdir) && $(ACLOCAL)
 
-config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+config.status: $(srcdir)/configure.in $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)

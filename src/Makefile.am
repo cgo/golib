@@ -1,11 +1,10 @@
-SUBDIRS = data graphics math misc network nifty signal system thread
+SUBDIRS = data math misc network nifty signal system thread
 # graphics math misc \
 #		  network network nifty signal \
 #		  system thread
 lib_LTLIBRARIES = libGo.la
-libGo_la_LDFLAGS = -release 0.2.2
+libGo_la_LDFLAGS = -release 0.3.0
 libGo_la_LIBADD = data/libGodata.la \
-				  graphics/libGographics.la \
 				  math/libGomath.la \
 				  misc/libGomisc.la \
 				  network/libGonetwork.la \

@@ -21,7 +21,7 @@
 /* #undef HAVE_LIBQT */
 #define HAVE_LIBTIFF 1
 /* #undef HAVE_LIBFFTW */
-#define HAVE_LIBSDL 1
+/* #undef HAVE_LIBSDL */
 /* #undef HAVE_LIBJPEG */
 
 #ifdef HAVE_LIBQT

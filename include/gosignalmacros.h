@@ -18,10 +18,11 @@
   __type *__ptr_z      	= __signal.getPtr();			\
   __type *__ptr;						\
   __type *__ptr_y;						\
-  goPtrdiff_t __dx	= __signal.getXDiff();			\
-  goPtrdiff_t __dy	= __signal.getYDiff();			\
-  goPtrdiff_t __dz	= __signal.getZDiff();			\
+  const goPtrdiff_t* __dx	= __signal.getXDiff();			\
+  const goPtrdiff_t* __dy	= __signal.getYDiff();			\
+  const goPtrdiff_t* __dz	= __signal.getZDiff();			\
   goSize_t __i,__j,__k;						\
+  \
   for (__i = 0; __i < __signal.getSizeZ(); __i++)		\
     {								\
       __ptr_y = __ptr_z;					\
@@ -31,13 +32,13 @@
 	  for (__k = 0; __k < __signal.getSizeX(); __k++)	\
 	    {							\
 	      {							\
-		__dothis;					\
-		__ptr += __dx;					\
+		    __dothis;					\
+		    __ptr += __dx[__k];					\
 	      }							\
 	    }							\
-	  __ptr_y += __dy;					\
+	  __ptr_y += __dy[__j];					\
 	}							\
-      __ptr_z += __dz;						\
+      __ptr_z += __dz[__i];						\
     }								\
 								\
 }
@@ -55,12 +56,12 @@
   __type_target *__ptr_z_target   = __signal_target.getPtr();	\
   __type_target *__ptr_y_target;				\
   __type_target *__ptr_target;					\
-  goPtrdiff_t __dx	= __signal.getXDiff();			\
-  goPtrdiff_t __dy	= __signal.getYDiff();			\
-  goPtrdiff_t __dz	= __signal.getZDiff();			\
-  goPtrdiff_t __dx_target	= __signal_target.getXDiff();	\
-  goPtrdiff_t __dy_target	= __signal_target.getYDiff();	\
-  goPtrdiff_t __dz_target	= __signal_target.getZDiff();	\
+  const goPtrdiff_t* __dx	= __signal.getXDiff();			\
+  const goPtrdiff_t* __dy	= __signal.getYDiff();			\
+  const goPtrdiff_t* __dz	= __signal.getZDiff();			\
+  const goPtrdiff_t* __dx_target	= __signal_target.getXDiff();	\
+  const goPtrdiff_t* __dy_target	= __signal_target.getYDiff();	\
+  const goPtrdiff_t* __dz_target	= __signal_target.getZDiff();	\
   goSize_t __i, __j, __k;					\
   for (__i = 0; __i < __signal.getSizeZ(); __i++)		\
     {								\
@@ -73,16 +74,16 @@
 	  for (__k = 0; __k < __signal.getSizeX(); __k++)	\
 	    {							\
 	      {							\
-		__dothis;					\
-		__ptr += __dx;					\
-		__ptr_target += __dx_target;			\
+		    __dothis;					\
+		    __ptr += __dx[__k];					\
+		    __ptr_target += __dx_target[__k];			\
 	      }							\
 	    }							\
-	  __ptr_y += __dy;					\
-	  __ptr_y_target += __dy_target;			\
+	  __ptr_y += __dy[__j];					\
+	  __ptr_y_target += __dy_target[__j];			\
 	}							\
-      __ptr_z += __dz;						\
-      __ptr_z_target += __dz_target;				\
+      __ptr_z += __dz[__i];						\
+      __ptr_z_target += __dz_target[__i];				\
     }								\
 }
 

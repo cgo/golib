@@ -1,5 +1,5 @@
 AC_INIT(src/data/goarray.cc)
-AM_INIT_AUTOMAKE(golib,0.2.1)
+AM_INIT_AUTOMAKE(golib,0.3.0)
 AM_PROG_LIBTOOL
 AC_PROG_CXX
 AC_PROG_LN_S

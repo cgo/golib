@@ -1,5 +1,5 @@
 #include <gosubsignal3d.h>
-#include <gosignal3d.h>
+#include <gosignal3dbase.h>
 #include <godefs.h>
 #include <goerror.h>
 #include <gotypes.h>
@@ -8,17 +8,17 @@
 
 template< class T >
 goSubSignal3D<T>::goSubSignal3D ()
-  : goSignal3D<T>() {
-  parent = 0;
-  position.x = 0;
-  position.y = 0;
-  position.z = 0;
-  parentXDiff = 0;
-  parentYDiff = 0;
-  parentZDiff = 0;
-  borderX = 0;
-  borderY = 0;
-  borderZ = 0;
+  : goSignal3DBase<T>() {
+  parent        = NULL;
+  position.x    = 0;
+  position.y    = 0;
+  position.z    = 0;
+  parentXDiff   = 0;
+  parentYDiff   = 0;
+  parentZDiff   = 0;
+  borderX       = 0;
+  borderY       = 0;
+  borderZ       = 0;
 }
 
 template< class T >
@@ -32,12 +32,11 @@ template< class T >
 goSubSignal3D<T>::~goSubSignal3D () {
 }
 
-
 template< class T >
 void
-goSubSignal3D<T>::setPosition (int x,
-			       			   int y,
-			       			   int z) 
+goSubSignal3D<T>::setPosition (goIndex_t x,
+			       			   goIndex_t y,
+			       			   goIndex_t z) 
 {
 	goPosition p;
     p.x = x;
@@ -48,28 +47,18 @@ goSubSignal3D<T>::setPosition (int x,
 
 template< class T >
 void
-goSubSignal3D<T>::setPositionSub (int x,
-				  int y,
-				  int z) {
-  goPtrdiff_t offset = zDiff * z + yDiff * y + xDiff * x;
-  // cout << hex << "Setting to offset " << offset << ", coordinates " << x << "," << y << "," << z << endl;
-  this->setPtr (parent->getPtr() + offset);
-  // cout << "parent->getPtr(): " << hex << parent->getPtr() << endl;
-  // cout << "this->getPtr(): " << this->getPtr() << dec << endl;
-}
-
-template< class T >
-void
-goSubSignal3D<T>::setPosition (goPosition &p) {
-  position = p;
+goSubSignal3D<T>::setPosition (goPosition &p) 
+{
+    assert (parent != NULL);
+    position = p;
 #ifdef GO_SUBSIGNAL3D_DEBUG
-  if (!parent) {
-    goError::print ("goSubSignal3D::setPosition()","No parent set.");
-    return;
-  }
+    if (!parent) {
+        goError::print ("goSubSignal3D::setPosition()","No parent set.");
+        return;
+    }
 #endif
-  goPtrdiff_t offset = parentZDiff * p.z + parentYDiff * p.y + parentXDiff * p.x;
-  setPtr (parent->getPtr() + offset);
+    setPtr (parent->getPtr(p.x, p.y, p.z));
+
 }
 
 template<class T>

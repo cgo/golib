@@ -22,37 +22,34 @@
  */
 template< class T >
 class
-goSubSignal3D : public goSignal3D<T> {
- public:
-  goSubSignal3D ();
-  goSubSignal3D (goSignal3D<T>*);
-  virtual ~goSubSignal3D();
+goSubSignal3D : public goSignal3DBase<T> 
+{
+    public:
+        goSubSignal3D (goSignal3DBase<T>* p, 
+                       goSize_t           sizeX,
+                       goSize_t           sizeY,
+                       goSize_t           sizeZ);
+        virtual ~goSubSignal3D();
 
-  void setParent (goSignal3D<T> *p);
-  goSignal3D<T> *getParent () { return parent; }
-  /*!
-   * Sets the position of the subblock in the parent block.
-   * Take care, this uses internal pointer differences for the parent
-   * which get invalid if you change the diffs in the parent.
-   */
-  void setPosition (goPosition &p);
-  void setPosition (int x, int y, int z);
-  /*!
-   * Sets the position using the pointer differences of this subsignal instead
-   * of those belonging to the parent signal.
-   */
-  void setPositionSub (int x, int y, int z);
+        goSignal3DBase<T>* getParent () { return parent; }
+        /*!
+         * Sets the position of the subblock in the parent block.
+         * Take care, this uses internal pointer differences for the parent
+         * which get invalid if you change the diffs in the parent.
+         */
+        void setPosition (goPosition &p);
+        void setPosition (goIndex_t x, goIndex_t y, goIndex_t z);
 
-  goPosition& getPosition () { return position; }
+        goPosition& getPosition () { return position; }
 
-  void move (int dir);
+        void move (int dir);
 
- protected:
-  goPosition position;
-  goSignal3D<T> *parent;
-  goPtrdiff_t parentXDiff;
-  goPtrdiff_t parentYDiff;
-  goPtrdiff_t parentZDiff;
+    protected:
+        goPosition         position;
+        goSignal3DBase<T>* parent;
+        goPtrdiff_t*       parentXDiff;
+        goPtrdiff_t*       parentYDiff;
+        goPtrdiff_t*       parentZDiff;
 };
 
 #endif
