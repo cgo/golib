@@ -3,7 +3,7 @@ SUBDIRS = data math misc network nifty signal system thread types
 #		  network network nifty signal \
 #		  system thread
 lib_LTLIBRARIES = libGo.la
-libGo_la_LDFLAGS = -release 0.3.0
+libGo_la_LDFLAGS = -release 0.4.0
 libGo_la_LIBADD = data/libGodata.la \
 				  math/libGomath.la \
 				  misc/libGomisc.la \

@@ -14,6 +14,8 @@
 #include <unistd.h>
 #endif
 
+namespace goNet {
+
 bool
 goNetwork::sendData (const void* data, size_t size, int sock) {
   int s = 0;
@@ -136,8 +138,4 @@ goNetwork::waitForData (int descriptor)
   return false;
 }
 
-
-
-
-
-
+};
