@@ -17,386 +17,560 @@ goDWT<T>::~goDWT()
 {
 }
 
-#define HAAR_FILTER_BEGIN(__signal, __signal_target, __signal_t, __signal_target_t) {	\
-  __signal_t *__ptr_z		= __signal.getPtr();			\
-  __signal_t *__ptr = __ptr_z;				\
-  __signal_t *__ptr_y = __ptr_z;				\
-  __signal_target_t *__ptr_z_target   = __signal_target.getPtr();	\
-  __signal_target_t *__ptr_target = __ptr_z_target;			\
-  __signal_target_t *__ptr_y_target = __ptr_z_target;			\
-  goPtrdiff_t* __dx	= __signal.getXDiff();			\
-  goPtrdiff_t* __dy	= __signal.getYDiff();			\
-  goPtrdiff_t* __dz	= __signal.getZDiff();			\
-  goPtrdiff_t* __dx_target	= __signal_target.getXDiff();	\
-  goPtrdiff_t* __dy_target	= __signal_target.getYDiff();	\
-  goPtrdiff_t* __dz_target	= __signal_target.getZDiff();	\
-  goSize_t __i, __j, __k;					\
-  godwt_t  __tmp1, __tmp2;
+template<class signal_t, class signal_target_t>
+static inline void
+haarFilterX (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
 
 
-#define HAAR_FILTER_BEGIN_INPLACE(__signal, __signal_t) {	\
-  __signal_t *__ptr_z		= __signal.getPtr();			\
-  __signal_t *__ptr = __ptr_z;				\
-  __signal_t *__ptr_y = __ptr_z;				\
-  goPtrdiff_t* __dx	= __signal.getXDiff();			\
-  goPtrdiff_t* __dy	= __signal.getYDiff();			\
-  goPtrdiff_t* __dz	= __signal.getZDiff();			\
-  goSize_t __i, __j, __k;					\
-  godwt_t  __tmp1, __tmp2;
-
-
-#define HAAR_FILTER_REINIT(__signal,__signal_target) {				\
-  __ptr_z_target = __signal_target.getPtr();	\
-  __ptr_z	 = __signal.getPtr();				\
-  __ptr = __ptr_z; \
-  __ptr_y = __ptr_z; \
-  __ptr_target = __ptr_z_target; \
-  __ptr_y_target = __ptr_z_target; \
+    for (i = 0; i < signal.getSizeZ(); i++)						
+    {											
+        ptr_y_target = ptr_z_target;							
+        ptr_y = ptr_z;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr = ptr_y;								
+            ptr_target = ptr_y_target;						
+            dx = signal.getXDiff(); 
+            dx_target = signal_target.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr_target = tmp1 + tmp2;		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = tmp1 - tmp2;		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);
+                dx += 2;
+                ++dx_target; 
+            }
+            ptr_y_target += dy_target[j];
+            ptr_y += dy[j];	
+        }
+        ptr_z_target += dz_target[i];
+        ptr_z += dz[i];	
+    }
 }
 
-#define HAAR_FILTER_X(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeZ(); __i++)						\
-    {											\
-      __ptr_y_target = __ptr_z_target;							\
-      __ptr_y = __ptr_z;								\
-      for (__j = 0; __j < signal.getSizeY(); __j++)					\
-	{										\
-	  __ptr = __ptr_y;								\
-	  __ptr_target = __ptr_y_target;						\
-      __dx = signal.getXDiff(); \
-      __dx_target = targetSignal.getXDiff(); \
-	  for (__k = 0; __k < (signal.getSizeX() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr * __tp0;			\
-	      __tmp2 = *(__ptr + *__dx) * __tp1;		\
-	      *__ptr_target = __tmp1 + __tmp2;		\
-	      __ptr_target += *__dx_target;						\
-              *__ptr_target = __tmp1 - __tmp2;		\
-	      __ptr_target += *__dx_target;					\
-	      __ptr += *__dx << 1;							\
-          ++__dx; \
-          ++__dx_target; \
-	    }										\
-	  __ptr_y_target += __dy_target[__j];						\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_z_target += __dz_target[__i];							\
-      __ptr_z += __dz[__i];									\
-    }											\
+template<class signal_t, class signal_target_t>
+static inline void
+haarFilterY (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeZ(); i++)
+    {
+        ptr_target = ptr_z_target;
+        ptr = ptr_z;
+        for (j = 0; j < signal.getSizeX(); j++)	
+        {
+            ptr_y = ptr;
+            ptr_y_target = ptr_target;
+            dy = signal.getYDiff();
+            dy_target = signal_target.getYDiff();
+            for (k = 0; k < (signal.getSizeY() >> 1); k++)   /* one less than size! */
+            {
+                tmp1 = *ptr_y * tp0;
+                tmp2 = *(ptr_y + *dy) * tp1;
+                *ptr_y_target = tmp1 + tmp2;
+                ptr_y_target += *dy_target;
+                ++dy_target;
+                *ptr_y_target = tmp1 - tmp2;
+                ptr_y_target += *dy_target;
+                ptr_y += *dy + *(dy + 1);
+                dy += 2;
+                ++dy_target;
+            }
+            ptr_target += dx_target[j];	
+            ptr += dx[j];
+        }
+        ptr_z_target += dz_target[i];
+        ptr_z += dz[i];	
+    }
 }
 
-#define HAAR_FILTER_Y(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeZ(); __i++)						\
-    {											\
-      __ptr_target = __ptr_z_target;							\
-      __ptr = __ptr_z;								\
-      for (__j = 0; __j < signal.getSizeX(); __j++)					\
-	{										\
-	  __ptr_y = __ptr;								\
-	  __ptr_y_target = __ptr_target;						\
-      __dy = signal.getYDiff(); \
-      __dy_target = targetSignal.getYDiff(); \
-	  for (__k = 0; __k < (signal.getSizeY() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_y * __tp0;			\
-	      __tmp2 = *(__ptr_y + *__dy) * __tp1;		\
-	      *__ptr_y_target = __tmp1 + __tmp2;		\
-	      __ptr_y_target += *__dy_target;						\
-              *__ptr_y_target = __tmp1 - __tmp2;		\
-	      __ptr_y_target += *__dy_target;					\
-	      __ptr_y += *__dy << 1;							\
-          ++__dy; \
-          ++__dy_target; \
-	    }										\
-	  __ptr_target += __dx_target[__j];						\
-	  __ptr += __dx[__j];								\
-	}										\
-      __ptr_z_target += __dz_target[__i];							\
-      __ptr_z += __dz[__i];									\
-    }											\
+template<class signal_t, class signal_target_t>
+static inline void
+haarFilterZ (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeX(); i++)						
+    {											
+        ptr_y_target = ptr_target;							
+        ptr_y = ptr;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr_z = ptr_y;								
+            ptr_z_target = ptr_y_target;						
+            dz = signal.getZDiff(); 
+            dz_target = signal_target.getZDiff(); 
+            for (k = 0; k < (signal.getSizeZ() >> 1); k++)   /* one less than size! */
+            {
+                tmp1 = *ptr_z * tp0;
+                tmp2 = *(ptr_z + *dz) * tp1;
+                *ptr_z_target = tmp1 + tmp2;
+                ptr_z_target += *dz_target;
+                ++dz_target;
+                *ptr_z_target = tmp1 - tmp2;
+                ptr_z_target += *dz_target;
+                ptr_z += *dz + *(dz + 1);
+                dz += 2;
+                ++dz_target;
+            }
+            ptr_y_target += dy_target[j];
+            ptr_y += dy[j];
+        }
+        ptr_target += dx_target[i];	
+        ptr += dx[i];
+    }
 }
 
-#define HAAR_FILTER_Z(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeX(); __i++)						\
-    {											\
-      __ptr_y_target = __ptr_target;							\
-      __ptr_y = __ptr;								\
-      for (__j = 0; __j < signal.getSizeY(); __j++)					\
-	{										\
-	  __ptr_z = __ptr_y;								\
-	  __ptr_z_target = __ptr_y_target;						\
-      __dz = signal.getZDiff(); \
-      __dz_target = targetSignal.getZDiff(); \
-	  for (__k = 0; __k < (signal.getSizeZ() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_z * __tp0;			\
-	      __tmp2 = *(__ptr_z + *__dz) * __tp1;		\
-	      *__ptr_z_target = __tmp1 + __tmp2;		\
-	      __ptr_z_target += *__dz_target;						\
-              *__ptr_z_target = __tmp1 - __tmp2;		\
-	      __ptr_z_target += *__dz_target;					\
-	      __ptr_z += *__dz << 1;							\
-          ++__dz; \
-          ++__dz_target; \
-	    }										\
-	  __ptr_y_target += __dy_target[__j];						\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_target += __dx_target[__i];							\
-      __ptr += __dx[__i];									\
-    }											\
+template<class signal_t>
+static inline void
+haarFilterXInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeZ(); i++)	
+    {
+        ptr_y = ptr_z;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr = ptr_y;								
+            dx = signal.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr = tmp1 + tmp2;		
+                ptr += *dx;					
+                ++dx;
+                *ptr = tmp1 - tmp2;		
+                ptr += *dx;					
+                ++dx; // FIXME: This must be +2 at this point (?)
+            }										
+            ptr_y += dy[j];								
+        }										
+        ptr_z += dz[i];								
+    }
 }
 
+template<class signal_t>
+static inline void
+haarFilterYInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
 
-#define HAAR_FILTER_X_INPLACE(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeZ(); __i++)						\
-    {											\
-      __ptr_y = __ptr_z;								\
-      for (__j = 0; __j < signal.getSizeY(); __j++)					\
-	{										\
-	  __ptr = __ptr_y;								\
-      __dx = signal.getXDiff(); \
-	  for (__k = 0; __k < (signal.getSizeX() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr * __tp0;			\
-	      __tmp2 = *(__ptr + *__dx) * __tp1;		\
-	      *__ptr = __tmp1 + __tmp2;		\
-	      __ptr += *__dx;						\
-              *__ptr = __tmp1 - __tmp2;		\
-	      __ptr += *__dx;					\
-          ++__dx; \
-	    }										\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_z += __dz[__i];									\
-    }											\
+    for (i = 0; i < signal.getSizeZ(); i++)						
+    {											
+        ptr = ptr_z;								
+        for (j = 0; j < signal.getSizeX(); j++)					
+        {										
+            ptr_y = ptr;								
+            dy = signal.getYDiff(); 
+            for (k = 0; k < (signal.getSizeY() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_y * tp0;
+                tmp2 = *(ptr_y + *dy) * tp1;		
+                *ptr_y = tmp1 + tmp2;		
+                ptr_y += *dy;
+                ++dy;
+                *ptr_y = tmp1 - tmp2;		
+                ptr_y += *dy;					
+                ++dy; 
+            }										
+            ptr += dx[j];								
+        }										
+        ptr_z += dz[i];									
+    }											
 }
 
-#define HAAR_FILTER_Y_INPLACE(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeZ(); __i++)						\
-    {											\
-      __ptr = __ptr_z;								\
-      for (__j = 0; __j < signal.getSizeX(); __j++)					\
-	{										\
-	  __ptr_y = __ptr;								\
-      __dy = signal.getYDiff(); \
-	  for (__k = 0; __k < (signal.getSizeY() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_y * __tp0;			\
-	      __tmp2 = *(__ptr_y + *__dy) * __tp1;		\
-	      *__ptr_y = __tmp1 + __tmp2;		\
-	      __ptr_y += *__dy;						\
-              *__ptr_y = __tmp1 - __tmp2;		\
-	      __ptr_y += *__dy;					\
-          ++__dy; \
-	    }										\
-	  __ptr += __dx[__j];								\
-	}										\
-      __ptr_z += __dz[__i];									\
-    }											\
-}
+template<class signal_t>
+static inline void
+haarFilterZInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
 
-#define HAAR_FILTER_Z_INPLACE(__tp0, __tp1) {							\
-  for (__i = 0; __i < signal.getSizeX(); __i++)						\
-    {											\
-      __ptr_y = __ptr;								\
-      for (__j = 0; __j < signal.getSizeY(); __j++)					\
-	{										\
-	  __ptr_z = __ptr_y;								\
-      __dz = signal.getZDiff(); \
-	  for (__k = 0; __k < (signal.getSizeZ() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_z * __tp0;			\
-	      __tmp2 = *(__ptr_z + *__dz) * __tp1;		\
-	      *__ptr_z = __tmp1 + __tmp2;		\
-	      __ptr_z += *__dz;						\
-              *__ptr_z = __tmp1 - __tmp2;		\
-	      __ptr_z += *__dz;					\
-          ++__dz; \
-	    }										\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr += __dx[__i];									\
-    }											\
-}
-
-
-#define HAAR_FILTER_REVERSE_BEGIN(__tp0, __tp1) {	\
-  godwt_t __f0, __f1;					\
-  __f0 = 1 / (2 * __tp0);				\
-  __f1 = 1 / (2 * __tp1);
-
-#define HAAR_FILTER_REVERSE_END() }
-
-// Assumes that tp0 == tp1. Just to save 2 multiplications. True for HAAR filters.
-#define HAAR_FILTER_REVERSE_X(__sig, __target_type) {					    \
-  for (__i = 0; __i < __sig.getSizeZ(); __i++)						\
-    {											\
-      __ptr_y_target = __ptr_z_target;							\
-      __ptr_y = __ptr_z;								\
-      for (__j = 0; __j < __sig.getSizeY(); __j++)					\
-	{										\
-	  __ptr = __ptr_y;								\
-	  __ptr_target = __ptr_y_target;						\
-      __dx = __sig.getXDiff(); \
-      __dx_target = targetSignal.getXDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr * __f0;			\
-	      __tmp2 = *(__ptr + *__dx) * __f0;		\
-	      *__ptr_target = (__target_type)(__tmp1 + __tmp2);		\
-	      __ptr_target += *__dx_target;						\
-              *__ptr_target = (__target_type)(__tmp1 - __tmp2);		\
-	      __ptr_target += *__dx_target;					\
-	      __ptr += *__dx << 1;							\
-          ++__dx; \
-          ++__dx_target; \
-	    }										\
-	  __ptr_y_target += __dy_target[__j];						\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_z_target += __dz_target[__i];							\
-      __ptr_z += __dz[__i];									\
-    }											\
-}
-
-#define HAAR_FILTER_REVERSE_Y(__sig) {					   \
-  for (__i = 0; __i < __sig.getSizeZ(); __i++)						\
-    {											\
-      __ptr_target = __ptr_z_target;							\
-      __ptr = __ptr_z;								\
-      for (__j = 0; __j < __sig.getSizeX(); __j++)					\
-	{										\
-	  __ptr_y = __ptr;								\
-	  __ptr_y_target = __ptr_target;						\
-      __dy = __sig.getYDiff(); \
-      __dy_target = targetSignal.getYDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_y * __f0;			\
-	      __tmp2 = *(__ptr_y + *__dy) * __f0;		\
-	      *__ptr_y_target = __tmp1 + __tmp2;		\
-	      __ptr_y_target += *__dy_target;						\
-              *__ptr_y_target = __tmp1 - __tmp2;		\
-	      __ptr_y_target += *__dy_target;					\
-	      __ptr_y += *__dy << 1;							\
-          ++__dy; \
-          ++__dy_target; \
-	    }										\
-	  __ptr_target += __dx_target[__j];						\
-	  __ptr += __dx[__j];								\
-	}										\
-      __ptr_z_target += __dz_target[__i];							\
-      __ptr_z += __dz[__i];									\
-    }											\
-}
-
-#define HAAR_FILTER_REVERSE_Z(__sig) {					     \
-  for (__i = 0; __i < __sig.getSizeX(); __i++)						\
-    {											\
-      __ptr_y_target = __ptr_target;							\
-      __ptr_y = __ptr;								\
-      for (__j = 0; __j < __sig.getSizeY(); __j++)					\
-	{										\
-	  __ptr_z = __ptr_y;								\
-	  __ptr_z_target = __ptr_y_target;						\
-      __dz = __sig.getZDiff(); \
-      __dz_target = targetSignal.getZDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_z * __f0;			\
-	      __tmp2 = *(__ptr_z + *__dz) * __f0;		\
-	      *__ptr_z_target = __tmp1 + __tmp2;		\
-	      __ptr_z_target += *__dz_target;						\
-              *__ptr_z_target = __tmp1 - __tmp2;		\
-	      __ptr_z_target += *__dz_target;					\
-	      __ptr_z += *__dz << 1;							\
-          ++__dz; \
-          ++__dz_target; \
-	    }										\
-	  __ptr_y_target += __dy_target[__j];						\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_target += __dx_target[__i];							\
-      __ptr += __dx[__i];									\
-    }											\
+    for (i = 0; i < signal.getSizeX(); i++)						
+    {											
+        ptr_y = ptr;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr_z = ptr_y;								
+            dz = signal.getZDiff(); 
+            for (k = 0; k < (signal.getSizeZ() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_z * tp0;			
+                tmp2 = *(ptr_z + *dz) * tp1;		
+                *ptr_z = tmp1 + tmp2;		
+                ptr_z += *dz;
+                ++dz;
+                *ptr_z = tmp1 - tmp2;		
+                ptr_z += *dz;					
+                ++dz; \
+            }									
+            ptr_y += dy[j];								
+        }										
+        ptr += dx[i];									
+    }											
 }
 
 
-#define HAAR_FILTER_REVERSE_X_INPLACE(__sig) {					    \
-  for (__i = 0; __i < __sig.getSizeZ(); __i++)						\
-    {											\
-      __ptr_y = __ptr_z;								\
-      for (__j = 0; __j < __sig.getSizeY(); __j++)					\
-	{										\
-	  __ptr = __ptr_y;								\
-      __dx = __sig.getXDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeX() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr * __f0;			\
-	      __tmp2 = *(__ptr + *__dx) * __f0;		\
-	      *__ptr = __tmp1 + __tmp2;		\
-	      __ptr += *__dx;						\
-              *__ptr = __tmp1 - __tmp2;		\
-	      __ptr += *__dx;					\
-          ++__dx; \
-	    }										\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr_z += __dz[__i];									\
-    }											\
+template<class signal_t, class signal_target_t>
+static inline void
+haarReverseX (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1.0f / (2 * tp0);
+    f1 = 1.0f / (2 * tp1);
+
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeZ(); i++)
+    {							
+        ptr_y_target = ptr_z_target;			
+        ptr_y = ptr_z;					
+        for (j = 0; j < signal.getSizeY(); j++)		
+        {					
+            ptr = ptr_y;							
+            ptr_target = ptr_y_target;						
+            dx = signal.getXDiff(); 
+            dx_target = signal_target.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * f0;			
+                tmp2 = *(ptr + *dx) * f0;		
+                *ptr_target = (signal_target_t)(tmp1 + tmp2);		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = (signal_target_t)(tmp1 - tmp2);		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);							
+                dx += 2; 
+                ++dx_target; 
+            }										
+            ptr_y_target += dy_target[j];						
+            ptr_y += dy[j];								
+        }										
+        ptr_z_target += dz_target[i];							
+        ptr_z += dz[i];									
+    }											
 }
 
-#define HAAR_FILTER_REVERSE_Y_INPLACE(__sig) {					   \
-  for (__i = 0; __i < __sig.getSizeZ(); __i++)						\
-    {											\
-      __ptr = __ptr_z;								\
-      for (__j = 0; __j < __sig.getSizeX(); __j++)					\
-	{										\
-	  __ptr_y = __ptr;								\
-      __dy = __sig.getYDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeY() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_y * __f0;			\
-	      __tmp2 = *(__ptr_y + *__dy) * __f0;		\
-	      *__ptr_y = __tmp1 + __tmp2;		\
-	      __ptr_y += *__dy;						\
-              *__ptr_y = __tmp1 - __tmp2;		\
-	      __ptr_y += *__dy;					\
-          ++__dy; \
-	    }										\
-	  __ptr += __dx[__j];								\
-	}										\
-      __ptr_z += __dz[__i];									\
-    }											\
+template<class signal_t, class signal_target_t>
+static inline void
+haarReverseY (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1.0f / (2 * tp0);
+    f1 = 1.0f / (2 * tp1);
+
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeZ(); i++)						
+    {											
+        ptr_target = ptr_z_target;							
+        ptr = ptr_z;								
+        for (j = 0; j < signal.getSizeX(); j++)					
+        {										
+            ptr_y = ptr;								
+            ptr_y_target = ptr_target;						
+            dy = signal.getYDiff(); 
+            dy_target = signal_target.getYDiff(); 
+            for (k = 0; k < (signal.getSizeY() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_y * f0;			
+                tmp2 = *(ptr_y + *dy) * f0;		
+                *ptr_y_target = tmp1 + tmp2;		
+                ptr_y_target += *dy_target;
+                ++dy_target;
+                *ptr_y_target = tmp1 - tmp2;		
+                ptr_y_target += *dy_target;					
+                ptr_y += *dy + *(dy + 1);							
+                dy += 2; 
+                ++dy_target; 
+            }										
+            ptr_target += dx_target[j];						
+            ptr += dx[j];								
+        }										
+        ptr_z_target += dz_target[i];							
+        ptr_z += dz[i];									
+    }											
 }
 
-#define HAAR_FILTER_REVERSE_Z_INPLACE(__sig) {					     \
-  for (__i = 0; __i < __sig.getSizeX(); __i++)						\
-    {											\
-      __ptr_y = __ptr;								\
-      for (__j = 0; __j < __sig.getSizeY(); __j++)					\
-	{										\
-	  __ptr_z = __ptr_y;								\
-      __dz = __sig.getZDiff(); \
-	  for (__k = 0; __k < (__sig.getSizeZ() >> 1); __k++)   /* one less than size! */	\
-	    {										\
-	      __tmp1 = *__ptr_z * __f0;			\
-	      __tmp2 = *(__ptr_z + *__dz) * __f0;		\
-	      *__ptr_z = __tmp1 + __tmp2;		\
-	      __ptr_z += *__dz;						\
-              *__ptr_z = __tmp1 - __tmp2;		\
-	      __ptr_z += *__dz;					\
-	    }										\
-	  __ptr_y += __dy[__j];								\
-	}										\
-      __ptr += __dx[__i];									\
-    }											\
+template<class signal_t, class signal_target_t>
+static inline void
+haarReverseZ (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)
+{
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1.0f / (2 * tp0);
+    f1 = 1.0f / (2 * tp1);
+
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    for (i = 0; i < signal.getSizeX(); i++)						
+    {											
+        ptr_y_target = ptr_target;							
+        ptr_y = ptr;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr_z = ptr_y;							
+            ptr_z_target = ptr_y_target;						
+            dz = signal.getZDiff(); 
+            dz_target = signal_target.getZDiff(); 
+            for (k = 0; k < (signal.getSizeZ() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_z * f0;			
+                tmp2 = *(ptr_z + *dz) * f0;		
+                *ptr_z_target = tmp1 + tmp2;		
+                ptr_z_target += *dz_target;
+                ++dz_target;
+                *ptr_z_target = tmp1 - tmp2;		
+                ptr_z_target += *dz_target;					
+                ptr_z += *dz + *(dz + 1);							
+                dz += 2;
+                ++dz_target; 
+            }										
+            ptr_y_target += dy_target[j];						
+            ptr_y += dy[j];								
+        }										
+        ptr_target += dx_target[i];							
+        ptr += dx[i];									
+    }											
 }
 
+template<class signal_t>
+static inline void
+haarReverseXInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
 
-#define HAAR_FILTER_END() }
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1 / (2 * tp0);
+    f1 = 1 / (2 * tp1);
 
+
+    for (i = 0; i < signal.getSizeZ(); i++)	
+    {						
+        ptr_y = ptr_z;						
+        for (j = 0; j < signal.getSizeY(); j++)			
+        {								
+            ptr = ptr_y;					
+            dx = signal.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * f0;			
+                tmp2 = *(ptr + *dx) * f0;		
+                *ptr = tmp1 + tmp2;		
+                ptr += *dx;
+                ++dx;
+                *ptr = tmp1 - tmp2;		
+                ptr += *dx;					
+                ++dx; 
+            }										
+            ptr_y += dy[j];								
+        }										
+        ptr_z += dz[i];									
+    }											
+}
+    
+template<class signal_t> 
+static inline void
+haarReverseYInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
+
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1 / (2 * tp0);
+    f1 = 1 / (2 * tp1);
+
+    for (i = 0; i < signal.getSizeZ(); i++)
+    {										
+        ptr = ptr_z;								
+        for (j = 0; j < signal.getSizeX(); j++)					
+        {										
+            ptr_y = ptr;								
+            dy = signal.getYDiff(); 
+            for (k = 0; k < (signal.getSizeY() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_y * f0;			
+                tmp2 = *(ptr_y + *dy) * f0;		
+                *ptr_y = tmp1 + tmp2;		
+                ptr_y += *dy;
+                ++dy;
+                *ptr_y = tmp1 - tmp2;		
+                ptr_y += *dy;					
+                ++dy; 
+            }										
+            ptr += dx[j];								
+        }										
+        ptr_z += dz[i];									
+    }											
+}
+
+template<class signal_t>
+static inline void
+haarReverseZInplace (goSignal3DBase<signal_t>& signal, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z = signal.getPtr();
+    signal_t *ptr   = ptr_z;
+    signal_t *ptr_y = ptr_z;
+    goPtrdiff_t* dx   = signal.getXDiff();
+    goPtrdiff_t* dy   = signal.getYDiff();
+    goPtrdiff_t* dz   = signal.getZDiff();
+    goSize_t i, j, k;
+    godwt_t  tmp1, tmp2;
+
+    godwt_t f0;
+    godwt_t f1;
+    f0 = 1 / (2 * tp0);
+    f1 = 1 / (2 * tp1);
+
+    for (i = 0; i < signal.getSizeX(); i++)						
+    {											
+        ptr_y = ptr;								
+        for (j = 0; j < signal.getSizeY(); j++)				
+        {										
+            ptr_z = ptr_y;								
+            dz = signal.getZDiff(); 
+            for (k = 0; k < (signal.getSizeZ() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr_z * f0;			
+                tmp2 = *(ptr_z + *dz) * f0;		
+                *ptr_z = tmp1 + tmp2;		
+                ptr_z += *dz;
+                ++dz;
+                *ptr_z = tmp1 - tmp2;	
+                ptr_z += *dz;
+                ++dz;
+            }										
+            ptr_y += dy[j];								
+        }										
+        ptr += dx[i];									
+    }											
+}
 
 inline
 static
@@ -410,8 +584,6 @@ template<class T>
 void
 goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 {
-  // goDouble tp[] = {1,1};
-  // goDouble hp[] = {1,-1};
   goSignal3D<godwt_t>	temp1;  // 
   goSignal3D<godwt_t>	temp2;  
   temp1.make (signal.getSizeX(), signal.getSizeY(), signal.getSizeZ(),
@@ -422,30 +594,20 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
   
-  HAAR_FILTER_BEGIN(signal,temp1, T, godwt_t);
-  // temp1.setSizeX(temp1.getSizeX() >> 1);
-  // temp1.setXDiff(temp1.getXDiff() << 1);
-  HAAR_FILTER_X(tp0,tp1);
-  HAAR_FILTER_END();  
+  haarFilterX (signal, temp1, tp0, tp1);
 
   /*
    * temp1: L H L H L H ....
    *        L H L H L H ....
    */
-
-  HAAR_FILTER_BEGIN(temp1,temp2,godwt_t, godwt_t);
-  HAAR_FILTER_Y(tp0,tp1);
-  HAAR_FILTER_END();
+  haarFilterY (temp1,temp2,tp0,tp1);
 
   /*
    * temp2: LL HL ...
    *        LH HH ...
    *        .....
    */
-  
-  HAAR_FILTER_BEGIN(temp2,targetSignal,godwt_t, godwt_t);
-  HAAR_FILTER_Z(tp0,tp1);
-  HAAR_FILTER_END();
+  haarFilterZ (temp2,targetSignal,tp0,tp1);
 
   /*
    * targetSignal:    .
@@ -470,91 +632,45 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 void
 goDWT<goFloat>::haar(goSubSignal3D<goFloat>& signal)
 {
-  // goDouble tp[] = {1,1};
-  // goDouble hp[] = {1,-1};
-  
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
   
-  HAAR_FILTER_BEGIN_INPLACE(signal, goFloat);
-  // temp1.setSizeX(temp1.getSizeX() >> 1);
-  // temp1.setXDiff(temp1.getXDiff() << 1);
-  HAAR_FILTER_X_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();  
+  haarFilterXInplace (signal, tp0, tp1);
 
   /*
    * temp1: L H L H L H ....
    *        L H L H L H ....
    */
-
-  // HAAR_FILTER_BEGIN(temp1,temp2,godwt_t, godwt_t);
-  HAAR_FILTER_BEGIN_INPLACE(signal, goFloat);
-  HAAR_FILTER_Y_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();
+  haarFilterYInplace (signal, tp0, tp1);
 
   /*
    * temp2: LL HL ...
    *        LH HH ...
    *        .....
    */
-  
-  // HAAR_FILTER_BEGIN(temp2,targetSignal,godwt_t, godwt_t);
-  HAAR_FILTER_BEGIN_INPLACE(signal, goFloat);
-  HAAR_FILTER_Z_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();
-
-  /*
-   * targetSignal:    .
-   *                .
-   *         LLL HLL ....
-   *         LHL HHL ....
-   *         ......
-   */
+  haarFilterZInplace (signal, tp0, tp1);
 }
 
 void
 goDWT<goDouble>::haar(goSubSignal3D<goDouble>& signal)
 {
-  // goDouble tp[] = {1,1};
-  // goDouble hp[] = {1,-1};
-  
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
-  
-  HAAR_FILTER_BEGIN_INPLACE(signal, goDouble);
-  // temp1.setSizeX(temp1.getSizeX() >> 1);
-  // temp1.setXDiff(temp1.getXDiff() << 1);
-  HAAR_FILTER_X_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();  
 
+  haarFilterXInplace (signal, tp0, tp1);   
+ 
   /*
    * temp1: L H L H L H ....
    *        L H L H L H ....
    */
-
-  // HAAR_FILTER_BEGIN(temp1,temp2,godwt_t, godwt_t);
-  HAAR_FILTER_BEGIN_INPLACE(signal, goDouble);
-  HAAR_FILTER_Y_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();
+  haarFilterYInplace (signal, tp0, tp1);   
 
   /*
    * temp2: LL HL ...
    *        LH HH ...
    *        .....
    */
-  
-  // HAAR_FILTER_BEGIN(temp2,targetSignal,godwt_t, godwt_t);
-  HAAR_FILTER_BEGIN_INPLACE(signal, goDouble);
-  HAAR_FILTER_Z_INPLACE(tp0,tp1);
-  HAAR_FILTER_END();
-
-  /*
-   * targetSignal:    .
-   *                .
-   *         LLL HLL ....
-   *         LHL HHL ....
-   *         ......
-   */
+  haarFilterZInplace (signal, tp0, tp1);   
 }
 
 
@@ -565,8 +681,6 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
   
-  //  goDouble hp0 = tp0;
-  //  goDouble hp1 = -hp0;
   goSignal3D<godwt_t>	temp1;
   goSignal3D<godwt_t>	temp2;
   temp1.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ(),
@@ -574,36 +688,15 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
   temp2.make (haarSignal.getSizeX(), haarSignal.getSizeY(), haarSignal.getSizeZ(),
 	      0, 0, 0);
 
-  HAAR_FILTER_BEGIN(haarSignal, temp1, godwt_t, godwt_t);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Z(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
+  haarReverseZ (haarSignal, temp1, tp0, tp1);
+  
+  haarReverseY (temp1, temp2, tp0, tp1);
 
-  HAAR_FILTER_BEGIN(temp1, temp2, godwt_t, godwt_t);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Y(temp1);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
-  HAAR_FILTER_BEGIN(temp2, targetSignal, godwt_t, T);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_X(targetSignal,T);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
+  haarReverseX (temp2, targetSignal, tp0, tp1);
 
   temp1.destroy();
   temp2.destroy();
 } 
-
-
-// template<class T>
-// void
-// goDWT<T>::unHaar (goSignal3D<T>& haarSignal)
-// {
-//   goError::note("goDWT::unHaar()","Not implemented for this data type. Please use unHaar(goSignal3D, goSignal3D)");  
-//   exit(2);
-// }
 
 void
 goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
@@ -611,27 +704,9 @@ goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
   
-  //  goDouble hp0 = tp0;
-  //  goDouble hp1 = -hp0;
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goFloat);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Z_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goFloat);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Y_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goFloat);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_X_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
+  haarReverseZInplace (haarSignal, tp0, tp1);
+  haarReverseYInplace (haarSignal, tp0, tp1);
+  haarReverseXInplace (haarSignal, tp0, tp1);
 } 
 
 void
@@ -640,27 +715,9 @@ goDWT<goDouble>::unHaar (goSubSignal3D<goDouble>& haarSignal)
   goDouble tp0 = 0.5;
   goDouble tp1 = tp0;
   
-  //  goDouble hp0 = tp0;
-  //  goDouble hp1 = -hp0;
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goDouble);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Z_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goDouble);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_Y_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
-  HAAR_FILTER_BEGIN_INPLACE(haarSignal, goDouble);
-  HAAR_FILTER_REVERSE_BEGIN(tp0, tp1);
-  HAAR_FILTER_REVERSE_X_INPLACE(haarSignal);
-  HAAR_FILTER_REVERSE_END();
-  HAAR_FILTER_END();
-
+  haarReverseZInplace (haarSignal, tp0, tp1);
+  haarReverseYInplace (haarSignal, tp0, tp1);
+  haarReverseXInplace (haarSignal, tp0, tp1);
 } 
 
 
@@ -668,19 +725,19 @@ template< class T >
 int
 goDWT<T>::haar (goSignal3D<T>& signal, int stage)
 {
-  int i;
-  goSubSignal3D<T>  s;
-  s.setParent(&signal);
-  s.setSize (signal.getSizeX(),
-	     signal.getSizeY(),
-	     signal.getSizeZ());
-  for (i = 0; i < stage; i++)
+    int i;
+    goSubSignal3D<T>  s;
+    s.setParent(&signal);
+    s.setSize (signal.getSizeX(),
+            signal.getSizeY(),
+            signal.getSizeZ());
+    for (i = 0; i < stage; i++)
     {
-      haar (s);
-      s.shiftRightSize(1);
-      s.shiftLeftDiff(1);
+        haar (s);
+        s.shiftRightSize(1);
+        s.shiftLeftDiff(1);
     }
-  return stage;
+    return stage;
 }
 
 template< class T >
@@ -696,7 +753,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
     //s.setDiff (signal.getXDiff() << (stage - 1),
     //     signal.getYDiff() << (stage - 1),
     //     signal.getZDiff() << (stage - 1));
-    s.setSkip ((1 << stage) - 1, (1 << stage) - 1, (1 << stage) - 1);
+    s.setSkip ((1 << (stage - 1)) - 1, (1 << (stage - 1)) - 1, (1 << (stage - 1)) - 1);
 
     for (i = 0; i < stage; i++)
     {
@@ -877,7 +934,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 /*
  * STZ and TSZ are done in-place since they use the same data type for
  * input and output. 
- * The data organisation in {ST|TS}Slice is as described in go3ddwt.h.
+ * The data organisation in {ST|TS}Slice is as described in godwt.h.
  * The coder has to step through the data
  * not in 1-steps but in 2-steps with an appropriate offset for each 
  * subband.
@@ -1097,14 +1154,14 @@ goDWT<__TYPE>::unHaar (goSubSignal3D<__TYPE> &signal) {				\
  */
 GO_DWT_INTEGER_HAAR_METHOD(goInt8)
 //GO_DWT_INTEGER_HAAR_METHOD(goUInt8)
-//GO_DWT_INTEGER_HAAR_METHOD(goInt16)
+GO_DWT_INTEGER_HAAR_METHOD(goInt16)
 //GO_DWT_INTEGER_HAAR_METHOD(goUInt16)
 //GO_DWT_INTEGER_HAAR_METHOD(goInt32)
 //GO_DWT_INTEGER_HAAR_METHOD(goUInt32)
 
 GO_DWT_INTEGER_UNHAAR_METHOD(goInt8)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goUInt8)
-//GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
+GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goUInt16)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goInt32)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
@@ -1156,7 +1213,7 @@ GO_DWT_INTEGER_UNHAAR_METHOD(goInt8)
 
 template class goDWT<goInt8>;
 //template class goDWT<goUInt8>;
-//template class goDWT<goInt16>;
+template class goDWT<goInt16>;
 //template class goDWT<goUInt16>;
 //template class goDWT<goInt32>;
 //template class goDWT<goUInt32>;
