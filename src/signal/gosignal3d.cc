@@ -68,7 +68,15 @@ goSignal3D<T>::goSignal3D (goSignal3D<T>& other)
     this->setClassName ("goSignal3D");
     *this = other;
 }
-    
+
+goSignal3D<void>::~goSignal3D () 
+{
+    if (real_ptr)
+    {
+        delete[] (goUInt8*)real_ptr;
+        real_ptr = NULL;
+    }
+}
 
 template< class T >
 goSignal3D<T>::~goSignal3D () 
