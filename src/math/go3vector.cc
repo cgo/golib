@@ -1,5 +1,5 @@
 #include <go3vector.h>
-#include <ostream>
+#include <iostream>
 
 template< class T >
 go3Vector<T>::go3Vector() {

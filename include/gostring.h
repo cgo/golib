@@ -5,7 +5,7 @@
 #define __GOSTRING_H__
 
 #include <goarray.h>
-#include <ostream>
+#include <iostream>
 #include <gotypes.h>
 #include <godate.h>
 //#include <linux/types.h>

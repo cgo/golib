@@ -3,7 +3,7 @@
 
 #include <gotypes.h>
 #include <math.h>
-#include <ostream>
+#include <iostream>
 
 #define GO3VECTOR_FUNCTION_PREFIX inline
 // #define GO3VECTOR_FUNCTION_PREFIX

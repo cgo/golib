@@ -52,7 +52,9 @@ class goHashTable {
   ///
   O&	operator[] (I in);
   ///
-  virtual void	add (I key, O value);
+  // Removed for game2
+  // virtual void	add (I key, O value);
+  virtual void  add (I key, const O& value);
   /*!
    * @note Only superficially tested.
    * @return The value for the given key.
@@ -154,9 +156,25 @@ goHashTable<I,O>::operator[] (I in) {
   return dummy;
 }
 
+//template <class I, class O>
+//void
+//goHashTable<I,O>::add (I key, O value) {
+//    //    cout << "hashtable adding " << key << "," << value << endl;
+//  I tmp = (key & modValue);
+//  (*this)[key] = value;
+//  if (fail()) {
+//      // cout << "...adding new entry." << endl;
+//    goHashEntry<I,O> *entry = new goHashEntry<I,O>();
+//    entry->key = key;
+//    entry->value = value;
+//    addEntry (tmp, (void*)entry);
+//  }
+//  lastFailed = false;
+//}
+
 template <class I, class O>
 void
-goHashTable<I,O>::add (I key, O value) {
+goHashTable<I,O>::add (I key, const O& value) {
     //    cout << "hashtable adding " << key << "," << value << endl;
   I tmp = (key & modValue);
   (*this)[key] = value;
