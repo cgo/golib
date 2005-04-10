@@ -25,6 +25,7 @@ class goDWT3DPrivate
         goFilter1D            highPassReverse;
         goIndex_t             centerDWT;
         goIndex_t             centerIDWT;
+        bool                  pyramidMode;
 };
 
 goDWT3DPrivate::goDWT3DPrivate ()
@@ -36,7 +37,8 @@ goDWT3DPrivate::goDWT3DPrivate ()
       lowPassReverse    (),
       highPassReverse   (),
       centerDWT  (0),
-      centerIDWT (0)
+      centerIDWT (0),
+      pyramidMode (false)
 {
     dwt = new goSignal3D<void> [8];
 }
@@ -161,27 +163,49 @@ goDWT3D::calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType)
     if (myPrivate->axes & GO_Z)
         sz = sz <= 1 ? sz : sz >> 1;
 
-
     goSignal3D<void> L;
     goSignal3D<void> H;
     L.setDataType (dwtType);
     H.setDataType (dwtType);
-    downsampleFilter (sig, L, H);
-    L.rotateAxes(); L.rotateAxes();
-    H.rotateAxes(); H.rotateAxes();
-    dwt[0].rotateAxes(); dwt[0].rotateAxes();
-    dwt[1].rotateAxes(); dwt[1].rotateAxes();
-    dwt[2].rotateAxes(); dwt[2].rotateAxes();
-    dwt[3].rotateAxes(); dwt[3].rotateAxes();
-    downsampleFilter (L, dwt[0], dwt[1]);   // LL,LH
-    downsampleFilter (H, dwt[2], dwt[3]);   // HL,HH
-    L.rotateAxes();
-    H.rotateAxes();
-    dwt[0].rotateAxes();
-    dwt[1].rotateAxes();
-    dwt[2].rotateAxes();
-    dwt[3].rotateAxes();
-    
+
+    if (!myPrivate->pyramidMode)
+    // Normal dwt operation
+    {
+        downsampleFilter (sig, L, H);
+        L.rotateAxes(); L.rotateAxes();
+        H.rotateAxes(); H.rotateAxes();
+        dwt[0].rotateAxes(); dwt[0].rotateAxes();
+        dwt[1].rotateAxes(); dwt[1].rotateAxes();
+        dwt[2].rotateAxes(); dwt[2].rotateAxes();
+        dwt[3].rotateAxes(); dwt[3].rotateAxes();
+        downsampleFilter (L, dwt[0], dwt[1]);   // LL,LH
+        downsampleFilter (H, dwt[2], dwt[3]);   // HL,HH
+        L.rotateAxes();
+        H.rotateAxes();
+        dwt[0].rotateAxes();
+        dwt[1].rotateAxes();
+        dwt[2].rotateAxes();
+        dwt[3].rotateAxes();
+    }
+    else
+    // Pyramid-like operation. Downsample only LL band.
+    {
+        this->filter (sig, L, H);
+        L.rotateAxes(); L.rotateAxes();
+        H.rotateAxes(); H.rotateAxes();
+        dwt[0].rotateAxes(); dwt[0].rotateAxes();
+        dwt[1].rotateAxes(); dwt[1].rotateAxes();
+        dwt[2].rotateAxes(); dwt[2].rotateAxes();
+        dwt[3].rotateAxes(); dwt[3].rotateAxes();
+        this->filter (L, dwt[0], dwt[1]);   // LL,LH
+        this->filter (H, dwt[2], dwt[3]);   // HL,HH
+        L.rotateAxes();
+        H.rotateAxes();
+        dwt[0].rotateAxes();
+        dwt[1].rotateAxes();
+        dwt[2].rotateAxes();
+        dwt[3].rotateAxes();
+    }
     return true;
 }
 
@@ -331,15 +355,46 @@ goDWT3D::downsampleFilter (goSignal3DBase<void>& sig,
     subsignal.setSkip (1,0,0);
     goCopySignal (&subsignal, &H);
 
-    goString msg = "copy subsignal to H: max H = ";
-    msg += (float)H.getMaximum();
-    msg += " max subsignal = ";
-    msg += (float)subsignal.getMaximum();
-    msg += " max temp = ";
-    msg += (float)temp.getMaximum();
-    goLog::message (msg.toCharPtr());
-   
     temp.destroy();
+    return true;
+}
+
+bool
+goDWT3D::filter (goSignal3DBase<void>& sig,
+                 goSignal3D<void>& L, 
+                 goSignal3D<void>& H)
+                          
+{
+    // L.make (sig.getSizeX(), sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
+    // H.make (sig.getSizeX(), sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
+   
+    L = sig;
+    myPrivate->lowPass.filter (L);
+    H = sig;
+    myPrivate->highPass.filter (H);
+
+    return true;
+}
+
+bool
+goDWT3D::reconstruct (goSignal3DBase<void>& L, goSignal3DBase<void>& H, goSignal3D<void>& target)
+{
+    if (L.getDataType().getID() != H.getDataType().getID())
+    {
+        goLog::warning("upsampleFilter(): input data types mismatch.",this);
+        return false;
+    }
+    goSize_t sx = L.getSizeX();
+    goSize_t sy = L.getSizeY();
+    goSize_t sz = L.getSizeZ();
+
+    target.setDataType (L.getDataType().getID());
+    target.make (sx, sy, sz, 16, 16, 16, 32, 32, 32);
+
+    myPrivate->lowPassReverse.filter (L);
+    myPrivate->highPassReverse.filter (H);
+
+    _combine (L, H, target);
     return true;
 }
 
@@ -354,14 +409,58 @@ goDWT3D::dwt (goSignal3DBase<void>* sig, int axes, goTypeEnum dwtType)
 bool
 goDWT3D::dwt (goDWT3D& parentDWT, int axes)
 {
-    return this->dwt (&parentDWT.getDWT()[0], axes, parentDWT.getDWT()[0].getDataType().getID());
+    if (!myPrivate->pyramidMode)
+    {
+        return this->dwt (&parentDWT.getDWT()[0], axes, parentDWT.getDWT()[0].getDataType().getID());
+    }
+    else
+    {
+        goSubSignal3D<void> subsignal;
+        myPrivate->axes = axes;
+        goIndex_t sx = parentDWT.getDWT()[0].getSizeX();
+        goIndex_t sy = parentDWT.getDWT()[0].getSizeY();
+        goIndex_t sz = parentDWT.getDWT()[0].getSizeZ();
+        if (axes & GO_X)
+            sx = sx <= 1 ? sx : sx >> 1;
+        if (axes & GO_Y)
+            sy = sy <= 1 ? sy : sy >> 1;
+        if (axes & GO_Z)
+            sz = sz <= 1 ? sz : sz >> 1;
+        subsignal.setSize (sx, sy, sz);
+        // FIXME: Fix this for 3D. This only works for 2D.
+        subsignal.setSkip (1,1,0);
+        subsignal.setParent (&parentDWT.getDWT()[0]);
+        return this->dwt (&subsignal, axes, parentDWT.getDWT()[0].getDataType().getID());
+    }
 }
 
 bool 
 goDWT3D::idwt (goDWT3D& parentDWT)
 {
-    // We know this is a signal3d<void>
-    return this->idwt (reinterpret_cast<goSignal3D<void>* > (&parentDWT.getDWT()[0]));
+    if (!myPrivate->pyramidMode)
+    {
+        // We know this is a signal3d<void>
+        return this->idwt (reinterpret_cast<goSignal3D<void>* > (&parentDWT.getDWT()[0]));
+    }
+    else
+    {
+        goSignal3D<void> tempTarget;
+        this->idwt (&tempTarget);
+        goSubSignal3D<void> subsignal;
+        subsignal.setSize (this->getDWT()[0].getSizeX(),
+                           this->getDWT()[0].getSizeY(),
+                           this->getDWT()[0].getSizeZ());
+        // FIXME: Fix this for 3D. This only works for 2D.
+        subsignal.setSkip (1,1,0);
+        subsignal.setParent (&parentDWT.getDWT()[0]);
+        goCopySignal (&tempTarget, &subsignal);
+        parentDWT.getDWT()[0].rotateAxes();
+        parentDWT.getDWT()[0].rotateAxes();
+        myPrivate->lowPass.filter (parentDWT.getDWT()[0]);
+        parentDWT.getDWT()[0].rotateAxes();
+        myPrivate->lowPass.filter (parentDWT.getDWT()[0]);
+        return true;
+    }
 }
 
 bool 
@@ -375,21 +474,67 @@ goDWT3D::idwt (goSignal3D<void>* target)
     goSignal3D<void>* dwt = myPrivate->dwt;
     goSignal3D<void> tempH;
     goSignal3D<void> tempL;
-    dwt[2].rotateAxes(); dwt[2].rotateAxes();
-    dwt[3].rotateAxes(); dwt[3].rotateAxes();
-    upsampleFilter (dwt[2], dwt[3], tempH);
-    tempH.rotateAxes();
-    dwt[2].rotateAxes();
-    dwt[3].rotateAxes();
-    
-    dwt[0].rotateAxes(); dwt[0].rotateAxes();
-    dwt[1].rotateAxes(); dwt[1].rotateAxes();
-    upsampleFilter (dwt[0], dwt[1], tempL);
-    tempL.rotateAxes();
-    dwt[0].rotateAxes();
-    dwt[1].rotateAxes();
 
-    upsampleFilter (tempL, tempH, *target);
+    if (!myPrivate->pyramidMode)
+    // Normal DWT operation.
+    {
+        dwt[2].rotateAxes(); dwt[2].rotateAxes();
+        dwt[3].rotateAxes(); dwt[3].rotateAxes();
+        upsampleFilter (dwt[2], dwt[3], tempH);
+        tempH.rotateAxes();
+        dwt[2].rotateAxes();
+        dwt[3].rotateAxes();
+
+        dwt[0].rotateAxes(); dwt[0].rotateAxes();
+        dwt[1].rotateAxes(); dwt[1].rotateAxes();
+        upsampleFilter (dwt[0], dwt[1], tempL);
+        tempL.rotateAxes();
+        dwt[0].rotateAxes();
+        dwt[1].rotateAxes();
+        upsampleFilter (tempL, tempH, *target);
+    }
+    else
+    // Pyramid-like operation. Upsample only LL band.
+    {
+        dwt[2].rotateAxes(); dwt[2].rotateAxes();
+        dwt[3].rotateAxes(); dwt[3].rotateAxes();
+        reconstruct (dwt[2], dwt[3], tempH);
+        tempH.rotateAxes();   // bring tempH back to XYZ arrangement.
+                              // The YZX arrangement stems from the rotation of dwt[...].
+        dwt[2].rotateAxes();
+        dwt[3].rotateAxes();
+
+        goSize_t sx = dwt[1].getSizeX();
+        goSize_t sy = dwt[1].getSizeY();
+        goSize_t sz = dwt[1].getSizeZ();
+        if (myPrivate->axes & GO_X)
+            sx = sx <= 1 ? sx : sx >> 1;
+        if (myPrivate->axes & GO_Y)
+            sy = sy <= 1 ? sy : sy >> 1;
+        if (myPrivate->axes & GO_Z)
+            sz = sz <= 1 ? sz : sz >> 1;
+        goSignal3D<void> tempLL;
+        tempLL.setDataType (dwt[1].getDataType().getID());
+        tempLL.make (dwt[1].getSizeX(), dwt[1].getSizeY(), dwt[1].getSizeZ(),
+                     dwt[1].getBlockSizeX(), dwt[1].getBlockSizeY(), dwt[1].getBlockSizeZ(),
+                     32,32,32);
+//        goFillSignal (&tempLL, 0.0f);
+//        goSubSignal3D<void> subsignal;
+//        subsignal.setSize (sx,sy,sz);
+//        // FIXME: fix this for 3D operation. This is only for 2D.
+//        subsignal.setSkip (1,1,0);
+//        subsignal.setParent (&tempLL);
+        // dwt[0].rotateAxes(); dwt[0].rotateAxes();
+//        goCopySignal (&dwt[0], &subsignal);
+//        tempLL.rotateAxes(); tempLL.rotateAxes();
+        dwt[0].rotateAxes(); dwt[0].rotateAxes();
+        dwt[1].rotateAxes(); dwt[1].rotateAxes();
+        reconstruct (dwt[0], dwt[1], tempL);
+        tempL.rotateAxes();
+        dwt[0].rotateAxes();
+        dwt[1].rotateAxes();
+        reconstruct (tempL, tempH, *target);
+    }
     return true;
 }
 
@@ -399,3 +544,8 @@ goDWT3D::getDWT ()
     return myPrivate->dwt;
 }
 
+void
+goDWT3D::setPyramidMode (bool m)
+{
+    myPrivate->pyramidMode = m;
+}
