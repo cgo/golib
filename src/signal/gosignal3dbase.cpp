@@ -1085,6 +1085,31 @@ goSignal3DBase<T>::rotateAxes ()
   myZJump = myYJump;
   myYJump = myXJump;
   myXJump = tempJump;
+
+  tempDiff = real_zDiff;
+  real_zDiff = real_yDiff;
+  real_yDiff = real_xDiff;
+  real_xDiff = tempDiff;
+  
+  tempJump = real_myZJump;
+  real_myZJump = real_myYJump;
+  real_myYJump = real_myXJump;
+  real_myXJump = tempJump;
+  
+  tempSize = myBorderSize.z;
+  myBorderSize.z = myBorderSize.y;
+  myBorderSize.y = myBorderSize.x;
+  myBorderSize.x = tempSize;
+  
+  tempSize = myBlockSize.z;
+  myBlockSize.z = myBlockSize.y;
+  myBlockSize.y = myBlockSize.x;
+  myBlockSize.x = tempSize;
+
+  tempSize = myBlocks.z;
+  myBlocks.z = myBlocks.y;
+  myBlocks.y = myBlocks.x;
+  myBlocks.x = tempSize;
 }
 
 template <class T>
@@ -1096,12 +1121,24 @@ goSignal3DBase<T>::swapXY()
     goPtrdiff_t* tempJump = myXJump;
     goSize_t     tempSize = mySize.x;
 
-    xDiff = yDiff;
-    yDiff = tempDiff;
-    myXJump = myYJump;
-    myYJump = tempJump;
-    mySize.x = mySize.y;
-    mySize.y = tempSize;
+    xDiff         = yDiff;
+    yDiff         = tempDiff;
+    tempDiff      = real_xDiff;
+    real_xDiff    = real_yDiff;
+    real_yDiff    = tempDiff;
+    myXJump       = myYJump;
+    myYJump       = tempJump;
+    tempJump      = real_myXJump;
+    real_myXJump  = real_myYJump;
+    real_myYJump  = tempJump;
+    mySize.x      = mySize.y;
+    mySize.y      = tempSize;
+    tempSize      = myBlockSize.x;
+    myBlockSize.x = myBlockSize.y;
+    myBlockSize.y = tempSize;
+    tempSize      = myBlocks.x;
+    myBlocks.x    = myBlocks.y;
+    myBlocks.y    = tempSize;
 }
 
 template <class T>
