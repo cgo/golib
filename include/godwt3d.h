@@ -37,18 +37,23 @@ goDWT3D : public goObjectBase
             D8
         };
         
-        bool dwt (goSignal3DBase<void>* sig, int axes, goTypeEnum dwtType);
-        bool dwt (goDWT3D& parentDWT, int axes = GO_X|GO_Y|GO_Z);
-        bool idwt (goSignal3D<void>* target);
-        bool idwt (goDWT3D& parentDWT);
-        bool setFilter (int filterEnum);
+        bool dwt            (goSignal3DBase<void>* sig, int axes, goTypeEnum dwtType);
+        bool dwt            (goDWT3D& parentDWT, int axes = GO_X|GO_Y|GO_Z);
+        bool idwt           (goSignal3D<void>* target);
+        bool idwt           (goDWT3D& parentDWT);
+        bool setFilter      (int filterEnum);
+        void setPyramidMode (bool m = true);
 
         goSignal3DBase<void>* getDWT ();
       
     private:
         bool calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType);
+        // For regular dwt operation
         bool upsampleFilter (goSignal3DBase<void>& L, goSignal3DBase<void>& H, goSignal3D<void>& target);
         bool downsampleFilter (goSignal3DBase<void>& sig, goSignal3D<void>& L, goSignal3D<void>& H);
+        // For pyramid operation
+        bool reconstruct (goSignal3DBase<void>& L, goSignal3DBase<void>& H, goSignal3D<void>& target);
+        bool filter (goSignal3DBase<void>& sig, goSignal3D<void>& L, goSignal3D<void>& H);
         
     private:
         goDWT3DPrivate* myPrivate;
