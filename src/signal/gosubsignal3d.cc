@@ -3,6 +3,7 @@
 #include <godefs.h>
 #include <goerror.h>
 #include <gotypes.h>
+#include <gomath.h>
 
 #include <config.h>
 #include <assert.h>
@@ -99,24 +100,30 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     
     if (deleteX)
     {
-        delete this->myXJump;
+        delete[] real_myXJump;
+        this->real_myXJump = 0;
         this->myXJump = 0;
-        delete this->xDiff; 
+        delete[] real_xDiff;
         this->xDiff = NULL;
+        this->real_xDiff = NULL;
     }
     if (deleteY)
     {
-        delete this->myYJump;
+        delete[] real_myYJump;
+        this->real_myYJump = 0;
         this->myYJump = 0;
-        delete this->yDiff; 
+        delete[] real_yDiff;
         this->yDiff = NULL;
+        this->real_yDiff = NULL;
     }
     if (deleteZ)
     {
-        delete this->myZJump;
+        delete[] real_myZJump;
+        this->real_myZJump = 0;
         this->myZJump = 0;
-        delete this->zDiff; 
+        delete[] real_zDiff;
         this->zDiff = NULL;
+        this->real_zDiff = NULL;
     }
     if (skipX == 0)
     {
@@ -127,13 +134,16 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     else
     {
         deleteX = true;
-        goSize_t xArraySize = parent->getSizeX() / (1 + skipX);
-        this->myXJump = new goPtrdiff_t [xArraySize];
-        this->xDiff = new goPtrdiff_t [xArraySize];
-        goSize_t k;
-        goPtrdiff_t* parentJumpP = parent->getXJump();
-        goPtrdiff_t* parentDiffP = parent->getXDiff();
-        for (k = 0; k < xArraySize; ++k)
+        goIndex_t xArraySize = this->getSizeX() + 2*this->getBorderX();
+        // FIXME: Enable own borders (optionally)! Necessary for DWT.
+        this->real_myXJump = new goPtrdiff_t [xArraySize];
+        this->myXJump      = this->real_myXJump + this->getBorderX();
+        this->real_xDiff   = new goPtrdiff_t [xArraySize];
+        this->xDiff        = this->real_xDiff + this->getBorderX();
+        goIndex_t k;
+        goPtrdiff_t* parentJumpP = parent->getXJump() + (goPtrdiff_t)p.x;
+        goPtrdiff_t* parentDiffP = parent->getXDiff() + (goPtrdiff_t)p.x;
+        for (k = 0; k < this->getSizeX(); ++k)
         {
             goPtrdiff_t diff = 0;
             goIndex_t i;
@@ -146,6 +156,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipX;
             parentDiffP = parentDiffP + 1 + skipX;
         }
+        this->periodize (GO_X);
     }
     if (skipY == 0)
     {
@@ -156,13 +167,15 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     else
     {
         deleteY = true;
-        goSize_t arraySize = parent->getSizeY() / (1 + skipY);
-        this->myYJump = new goPtrdiff_t [arraySize];
-        this->yDiff = new goPtrdiff_t [arraySize];
+        goSize_t arraySize = this->getSizeY() + 2*this->getBorderY();
+        this->real_myYJump = new goPtrdiff_t [arraySize];
+        this->myYJump      = this->real_myYJump + this->getBorderY();
+        this->real_yDiff   = new goPtrdiff_t [arraySize];
+        this->yDiff        = this->real_yDiff + this->getBorderY();
         goSize_t k;
-        goPtrdiff_t* parentJumpP = parent->getYJump();
-        goPtrdiff_t* parentDiffP = parent->getYDiff();
-        for (k = 0; k < arraySize; ++k)
+        goPtrdiff_t* parentJumpP = parent->getYJump() + (goPtrdiff_t)p.y;
+        goPtrdiff_t* parentDiffP = parent->getYDiff() + (goPtrdiff_t)p.y;
+        for (k = 0; k < this->getSizeY(); ++k)
         {
             goPtrdiff_t diff = 0;
             goIndex_t i;
@@ -175,6 +188,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipY;
             parentDiffP = parentDiffP + 1 + skipY;
         }
+        this->periodize (GO_Y);
     }
     if (skipZ == 0)
     {
@@ -185,13 +199,15 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     else
     {
         deleteZ = true;
-        goSize_t arraySize = parent->getSizeZ() / (1 + skipZ);
-        this->myZJump = new goPtrdiff_t [arraySize];
-        this->zDiff = new goPtrdiff_t [arraySize];
+        goSize_t arraySize = this->getSizeZ() + 2*this->getBorderZ();
+        this->real_myZJump = new goPtrdiff_t [arraySize];
+        this->myZJump      = this->real_myZJump + this->getBorderZ();
+        this->real_zDiff   = new goPtrdiff_t [arraySize];
+        this->zDiff        = this->real_zDiff + this->getBorderZ();
         goSize_t k;
-        goPtrdiff_t* parentJumpP = parent->getZJump();
-        goPtrdiff_t* parentDiffP = parent->getZDiff();
-        for (k = 0; k < arraySize; ++k)
+        goPtrdiff_t* parentJumpP = parent->getZJump() + (goPtrdiff_t)p.z;
+        goPtrdiff_t* parentDiffP = parent->getZDiff() + (goPtrdiff_t)p.z;
+        for (k = 0; k < this->getSizeZ(); ++k)
         {
             goPtrdiff_t diff = 0;
             goIndex_t i;
@@ -204,6 +220,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipZ;
             parentDiffP = parentDiffP + 1 + skipZ;
         }
+        this->periodize (GO_Z);
     }
 }
 
@@ -236,51 +253,70 @@ goSubSignal3D<T>::move(int dir)
 
 template <class T>
 void
-goSubSignal3D<T>::shiftLeftSize (int n)
+goSubSignal3D<T>::shiftLeftSize (int n, int axes)
 {
     goSize_t sx = this->getSizeX();
     goSize_t sy = this->getSizeY();
     goSize_t sz = this->getSizeZ();
 
-    sx = sx << n;
-    sy = sy << n;
-    sz = sz << n;
+    if (axes & GO_X)
+        sx = sx << n;
+    if (axes & GO_Y)
+        sy = sy << n;
+    if (axes & GO_Z)
+        sz = sz << n;
     this->setSize (sx, sy, sz, this->getChannelCount());
 }
 
 template <class T>
 void
-goSubSignal3D<T>::shiftRightSize (int n)
+goSubSignal3D<T>::shiftRightSize (int n, int axes)
 {
     goSize_t sx = this->getSizeX();
     goSize_t sy = this->getSizeY();
     goSize_t sz = this->getSizeZ();
 
-    if (sx > 1) sx = sx >> n;
-    if (sy > 1) sy = sy >> n;
-    if (sz > 1) sz = sz >> n;
+    if (axes & GO_X)
+        if (sx > 1) sx = sx >> n;
+    if (axes & GO_Y)
+        if (sy > 1) sy = sy >> n;
+    if (axes & GO_Z)
+        if (sz > 1) sz = sz >> n;
     this->setSize (sx, sy, sz, this->getChannelCount());
 }
 
 template <class T>
 void
-goSubSignal3D<T>::shiftLeftDiff (int n)
+goSubSignal3D<T>::shiftLeftDiff (int n, int axes)
 {
-    // FIXME: Are these right now? 
-    this->setSkip (((skipX + 1) << n) - 1, ((skipY + 1) << n) - 1, ((skipZ + 1) << n) - 1); 
+    goSize_t newSkipX = skipX;
+    goSize_t newSkipY = skipY;
+    goSize_t newSkipZ = skipZ;
+     
+    if (axes & GO_X)
+        newSkipX = this->getSizeX() > 1 ? ((skipX + 1) << n) - 1 : skipX;
+    if (axes & GO_Y)
+        newSkipY = this->getSizeY() > 1 ? ((skipY + 1) << n) - 1 : skipY;
+    if (axes & GO_Z)
+        newSkipZ = this->getSizeZ() > 1 ? ((skipZ + 1) << n) - 1 : skipZ;
+    this->setSkip (newSkipX, newSkipY, newSkipZ); 
     // this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
 }
 
 template <class T>
 void
-goSubSignal3D<T>::shiftRightDiff (int n)
+goSubSignal3D<T>::shiftRightDiff (int n, int axes)
 {
-    int newSkipX = 0;
-    int newSkipY = 0;
-    int newSkipZ = 0;
-    if (skipX > 1) newSkipX = ((skipX + 1) >> n) - 1;
-    if (skipY > 1) newSkipY = ((skipY + 1) >> n) - 1;
-    if (skipZ > 1) newSkipZ = ((skipZ + 1) >> n) - 1;
+    goSize_t newSkipX = skipX;
+    goSize_t newSkipY = skipY;
+    goSize_t newSkipZ = skipZ;
+
+    if (axes & GO_X)
+        if (skipX > 1) newSkipX = ((skipX + 1) >> n) - 1;
+    if (axes & GO_Y)
+        if (skipY > 1) newSkipY = ((skipY + 1) >> n) - 1;
+    if (axes & GO_Z)
+        if (skipZ > 1) newSkipZ = ((skipZ + 1) >> n) - 1;
     this->setSkip (newSkipX, newSkipY, newSkipZ); 
     // this->setSkip (skipX + (1 << n) - 1, skipY + (1 << n) - 1, skipZ + (1 << n) - 1);
     // this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
@@ -289,6 +325,13 @@ goSubSignal3D<T>::shiftRightDiff (int n)
 void
 goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
 {
+  if (p == 0)
+  {
+      return;
+  }
+  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)4),
+                   goMath::min(this->getSizeY(),(goSize_t)4),
+                   goMath::min(this->getSizeZ(),(goSize_t)4));
   this->setDataType (p->getDataType().getID());
   this->parent   = p;
   this->real_ptr = p->getRealPtr();
@@ -313,6 +356,9 @@ template< class T >
 void
 goSubSignal3D<T>::setParent (goSignal3DBase<T> *p)
 {
+  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)4),
+                   goMath::min(this->getSizeY(),(goSize_t)4),
+                   goMath::min(this->getSizeZ(),(goSize_t)4));
   this->parent   = p;
   this->real_ptr = p->getRealPtr();
   this->ptr      = p->getPtr(0, 0, 0);

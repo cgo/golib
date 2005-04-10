@@ -24,7 +24,9 @@
 # include <gotype.h>
 #endif
 #include <gosignal3diterator.h>
-#include <gosignal3dgenericiterator.h>
+#ifndef GODEFS_H
+# include <godefs.h>
+#endif
 
 /*!
  * @addtogroup signal
@@ -142,7 +144,7 @@ goSignal3DBase : public goObjectBase
         void setSizeX(goSize_t s); 
         void setSizeY(goSize_t s); 
         void setSizeZ(goSize_t s); 
-
+        
         /*!
          * \return Size in samples in x direction.
          */
@@ -196,10 +198,10 @@ goSignal3DBase : public goObjectBase
          */
         // void  interpolateFromSignal (goSignal3DBase<T>& other, Neighbour n);
 
-        void shiftLeftDiff  (int n);
-        void shiftRightDiff (int n);
-        void shiftLeftSize  (int n);
-        void shiftRightSize (int n);
+        void shiftLeftDiff  (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftRightDiff (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftLeftSize  (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftRightSize (int n, int axes = GO_X | GO_Y | GO_Z);
 
         /*!
          * Not threadsafe
@@ -211,6 +213,10 @@ goSignal3DBase : public goObjectBase
         goFloat    sample (go3Vector<goFloat>& point);
 
     protected:
+        void setBorder (goSize_t x, goSize_t y, goSize_t z);
+        void periodize (int axes = GO_X|GO_Y|GO_Z);
+        
+    protected:
         /* pointer to the first value */
         T		*ptr;
         /* pointer to the first allocated data element */
@@ -218,10 +224,16 @@ goSignal3DBase : public goObjectBase
         goPtrdiff_t* xDiff;
         goPtrdiff_t* yDiff;
         goPtrdiff_t* zDiff;
-        
+        goPtrdiff_t* real_xDiff;
+        goPtrdiff_t* real_yDiff;
+        goPtrdiff_t* real_zDiff;
+
         goPtrdiff_t* myXJump;
         goPtrdiff_t* myYJump;
         goPtrdiff_t* myZJump;
+        goPtrdiff_t* real_myXJump;
+        goPtrdiff_t* real_myYJump;
+        goPtrdiff_t* real_myZJump;
         
         goPtrdiff_t* myChannelOffset;
         

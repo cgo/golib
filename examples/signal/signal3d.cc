@@ -227,23 +227,43 @@ int main (void)
         {
             std::cout << "setDataType() failed\n";
         }
-        generic.make (32,32,1,4,4,1,4,4,4);
+        generic.make (4,4,1,4,4,1,4,4,4);
         counter = 0;
-        for (y = 0; y < generic.getSizeY(); ++y)
+
+        goSignal3D<void>::iterator it (&generic);
+        while (!it.endZ())
         {
-            for (x = 0; x < generic.getSizeX(); ++x)
+            it.resetY();
+            while (!it.endY())
             {
-                *(goInt16*)generic.getPtr (x, y, 0) = counter++;
-                // *(goInt16*)generic.getPtr (x, y, 1) = 200 + counter++;
+                it.resetX();
+                while (!it.endX())
+                {
+                    printf ("%d ", counter);
+                    *(goInt16*)*it = counter++;
+                    it.incrementX();
+                }
+                printf ("\n");
+                it.incrementY();
             }
+            it.incrementZ();
         }
+        
+//        for (y = 0; y < generic.getSizeY(); ++y)
+//        {
+//            for (x = 0; x < generic.getSizeX(); ++x)
+//            {
+//                *(goInt16*)generic.getPtr (x, y, 0) = counter++;
+//                // *(goInt16*)generic.getPtr (x, y, 1) = 200 + counter++;
+//            }
+//        }
         printSignal (generic);
         printWithPointers (generic);
-        GO_SIGNAL3D_EACHELEMENT_GENERIC (std::cout << *(goUInt16*)__ptr, generic);
+        // GO_SIGNAL3D_EACHELEMENT_GENERIC (std::cout << *(goUInt16*)__ptr, generic);
 
         goSubSignal3D<void> sub (&generic, 5, 5, 1);
         sub.setPosition (5, 0, 0);
-        printSignal (sub);
+        // printSignal (sub);
     }
     
     return 1;

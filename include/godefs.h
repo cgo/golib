@@ -11,4 +11,12 @@ enum {
   GO_DIRECTION_Z_NEGATIVE
 };
 
+/** 
+* Axes definitions
+*/
+enum {
+    GO_X = 1,
+    GO_Y = 2,
+    GO_Z = 4
+};
 #endif

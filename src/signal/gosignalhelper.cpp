@@ -334,7 +334,7 @@ bool goConvertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* tar
     }
     if (sig->getChannelCount() != targetSig->getChannelCount())
     {
-        goLog::warning("goConvertSignal(): Channel count of source and target signals differs. Converting only up to max(source,target) number of channels.");
+        goLog::warning("goConvertSignal(): Channel count of source and target signals differs. Converting only up to min(source,target) number of channels.");
     }
     if (sig->getSizeX() != targetSig->getSizeX() ||
         sig->getSizeY() != targetSig->getSizeY() ||
@@ -356,6 +356,87 @@ bool goConvertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* tar
         default: goLog::warning("goConvertSignal(): unknown data type."); 
                  return false;
                  break;
+    }
+    return false;
+}
+
+template <class T, class targetT>
+static bool copySignal2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    goSignal3DGenericIterator targetIt (targetSig);
+    goSignal3DGenericConstIterator it (sig);
+
+    while (!it.endZ() && !targetIt.endZ())
+    {
+        it.resetY();
+        targetIt.resetY();
+        while (!it.endY() && !targetIt.endY())
+        {
+            it.resetX();
+            targetIt.resetX();
+            while (!it.endX() && !targetIt.endX())
+            {
+                *(targetT*)*targetIt = static_cast<targetT>(*(T*)*it);
+                it.incrementX();
+                targetIt.incrementX();
+            }
+            it.incrementY();
+            targetIt.incrementY();
+        }
+        it.incrementZ();
+        targetIt.incrementZ();
+    }
+    return true;
+}
+
+template <class T>
+static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    switch (targetSig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignal2<T,goInt8>     (sig,   targetSig);   break;
+        case   GO_UINT8:    return copySignal2<T,goUInt8>    (sig,   targetSig);   break;
+        case   GO_INT16:    return copySignal2<T,goInt16>    (sig,   targetSig);   break;
+        case   GO_UINT16:   return copySignal2<T,goUInt16>   (sig,   targetSig);   break;
+        case   GO_INT32:    return copySignal2<T,goInt32>    (sig,   targetSig);   break;
+        case   GO_UINT32:   return copySignal2<T,goUInt32>   (sig,   targetSig);   break;
+        case   GO_FLOAT:    return copySignal2<T,goFloat>    (sig,   targetSig);   break;
+        case   GO_DOUBLE:   return copySignal2<T,goDouble>   (sig,   targetSig);   break;
+        default: return false;
+    }
+}
+
+bool goCopySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    if (!targetSig)
+    {
+        goLog::warning("goCopySignal(): targetSig == 0");
+        return false;                                           
+    }
+    if (!sig)
+    {
+        goLog::warning("goCopySignal(): sig == 0");
+        return false;                                           
+    }
+
+    goString msg = "goCopySignal(): Copying ";
+    msg += sig->getObjectName().toCharPtr();
+    msg += " ("; msg += sig->getDataType().getString().toCharPtr();
+    msg += ") to "; msg += targetSig->getObjectName().toCharPtr();
+    msg += " ("; msg += targetSig->getDataType().getString().toCharPtr(); msg += ")";
+    goLog::message (msg.toCharPtr());
+    
+    switch (sig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignal<goInt8>     (sig,   targetSig);   break;
+        case   GO_UINT8:    return copySignal<goUInt8>    (sig,   targetSig);   break;
+        case   GO_INT16:    return copySignal<goInt16>    (sig,   targetSig);   break;
+        case   GO_UINT16:   return copySignal<goUInt16>   (sig,   targetSig);   break;
+        case   GO_INT32:    return copySignal<goInt32>    (sig,   targetSig);   break;
+        case   GO_UINT32:   return copySignal<goUInt32>   (sig,   targetSig);   break;
+        case   GO_FLOAT:    return copySignal<goFloat>    (sig,   targetSig);   break;
+        case   GO_DOUBLE:   return copySignal<goDouble>   (sig,   targetSig);   break;
+        default: goLog::warning("goCopySignal(): unknown type."); break;
     }
     return false;
 }
@@ -450,6 +531,33 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
                   }
                   break;
         default: goLog::warning("goRGBAtoScalar(): unknown data type."); break;
+    }
+    return false;
+}
+
+template <class T>
+static bool _fillSignal (goSignal3DBase<void>* sig, goFloat value)
+{
+    T v = T(value);
+    sig->fill (&v);
+    return true;
+}
+
+bool goFillSignal (goSignal3DBase<void>* sig, goFloat value)
+{
+    if (!sig)
+        return false;
+    switch (sig->getDataType().getID())
+    {
+        case GO_INT8: return _fillSignal<goInt8> (sig, value); break;
+        case GO_UINT8: return _fillSignal<goUInt8> (sig, value); break;
+        case GO_INT16: return _fillSignal<goInt16> (sig, value); break;
+        case GO_UINT16: return _fillSignal<goUInt16> (sig, value); break;
+        case GO_INT32: return _fillSignal<goInt32> (sig, value); break;
+        case GO_UINT32: return _fillSignal<goUInt32> (sig, value); break;
+        case GO_FLOAT: return _fillSignal<goFloat> (sig, value); break;
+        case GO_DOUBLE: return _fillSignal<goDouble> (sig, value); break;
+        default: goLog::warning ("goFillSignal(): unknown type."); return false; break;
     }
     return false;
 }

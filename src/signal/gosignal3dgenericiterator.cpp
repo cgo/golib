@@ -45,16 +45,16 @@ goSignal3DGenericIterator::~goSignal3DGenericIterator ()
  * @param y  Y position
  * @param z  Z position
  **/
-void goSignal3DGenericIterator::setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
-{
-    posX = x; posY = y; posZ = z;
-    dx = sig->getXDiff() + x;
-    dy = sig->getYDiff() + y;
-    dz = sig->getZDiff() + z;
-    px = (goByte*)sig->getPtr(x,y,z);
-    py = (goByte*)sig->getPtr(x,y,z);
-    pz = (goByte*)sig->getPtr(x,y,z);
-}
+//void goSignal3DGenericIterator::setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
+//{
+//    posX = x; posY = y; posZ = z;
+//    dx = sig->getXDiff() + x;
+//    dy = sig->getYDiff() + y;
+//    dz = sig->getZDiff() + z;
+//    px = (goByte*)sig->getPtr(x,y,z);
+//    py = (goByte*)sig->getPtr(x,y,z);
+//    pz = (goByte*)sig->getPtr(x,y,z);
+//}
 
 /**
  * @brief Resets the Z pointer and internals concerning Z to initial values.
@@ -70,98 +70,6 @@ void goSignal3DGenericIterator::resetZ ()
     resetX ();
 }
 
-#if 0
-bool goSignal3DGenericIterator::endX ()
-{
-    return posX > maxX;
-}
-
-bool goSignal3DGenericIterator::endY ()
-{
-    return posY > maxY;
-}
-
-bool goSignal3DGenericIterator::endZ ()
-{
-    return posZ > maxZ;
-}
-
-void goSignal3DGenericIterator::incrementX ()
-{
-    px += *dx;
-    ++posX;
-    ++dx;
-}
-
-void goSignal3DGenericIterator::incrementY ()
-{
-    py += *dy;
-    ++posY;
-    ++dy;
-}
-
-void goSignal3DGenericIterator::incrementZ ()
-{
-    pz += *dz;
-    ++posZ;
-    ++dz;
-}
-
-void goSignal3DGenericIterator::decrementX ()
-{
-    px -= *(dx-1);
-    --posX;
-    --dx;
-}
-
-void goSignal3DGenericIterator::decrementY ()
-{
-    py -= *(dy-1);
-    --posY;
-    --dy;
-}
-
-void goSignal3DGenericIterator::decrementZ ()
-{
-    pz -= *(dz-1);
-    --posZ;
-    --dz;
-}
-
-void goSignal3DGenericIterator::resetX ()
-{
-    dx   = sig->getXDiff();
-    posX = 0;
-    px   = py;
-}
-
-void goSignal3DGenericIterator::resetY ()
-{
-    dy   = sig->getYDiff();
-    posY = 0;
-    py   = pz;
-    resetX ();
-}
-
-void goSignal3DGenericIterator::resetZ ()
-{
-    dz   = sig->getZDiff();
-    posZ = 0;
-    pz   = (goByte*)sig->getPtr(0,0,0);
-    resetY ();
-    resetX ();
-}
-
-goByte* goSignal3DGenericIterator::operator* ()
-{
-    return px;
-}
-
-const goByte* goSignal3DGenericIterator::operator* () const
-{
-    return px;
-}
-#endif
 
 /**
  * @brief Sets the iterator position to x,y,z in the signal.
@@ -205,16 +113,16 @@ goSignal3DGenericConstIterator::~goSignal3DGenericConstIterator ()
  * @param y  Y position
  * @param z  Z position
  **/
-void goSignal3DGenericConstIterator::setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
-{
-    posX = x; posY = y; posZ = z;
-    dx = sig->getXDiff() + x;
-    dy = sig->getYDiff() + y;
-    dz = sig->getZDiff() + z;
-    px = (goByte*)sig->getPtr(x,y,z);
-    py = (goByte*)sig->getPtr(x,y,z);
-    pz = (goByte*)sig->getPtr(x,y,z);
-}
+//void goSignal3DGenericConstIterator::setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
+//{
+//    posX = x; posY = y; posZ = z;
+//    dx = sig->getXDiff() + x;
+//    dy = sig->getYDiff() + y;
+//    dz = sig->getZDiff() + z;
+//    px = (goByte*)sig->getPtr(x,y,z);
+//    py = (goByte*)sig->getPtr(x,y,z);
+//    pz = (goByte*)sig->getPtr(x,y,z);
+//}
 
 /**
  * @brief Resets the Z pointer and internals concerning Z to initial values.

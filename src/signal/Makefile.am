@@ -6,6 +6,9 @@ libGosignal_la_SOURCES = gosignal3dbase.cpp \
                          gosignal2d.cc \
                          gofilter3d.cpp \
                          godwt.cc \
+                         gohaar3d.cpp \
+                         godwt3d.cpp \
+						 gofilter1d.cpp \
 						 gosignalhelper.cpp \
 						 gohistogram.cpp \
 						 gosignal3diterator.cpp \

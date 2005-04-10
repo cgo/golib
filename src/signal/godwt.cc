@@ -17,6 +17,168 @@ goDWT<T>::~goDWT()
 {
 }
 
+/*! \todo: Add void type support for goDWT */
+#if 0
+template <class T>
+static inline void
+_haarFilterX (goSignal3DBase<void>& signal, goSignal3DBase<void>& signal_target, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    goSignal3DGenericIterator sourceIt (&signal);
+    goSignal3DGenericIterator targetIt (&signal_target);
+
+    sourceIt.resetZ();
+    targetIt.resetZ();
+    goSize_t i;
+    while (!sourceIt.endZ())
+    {
+        sourceIt.resetY();
+        targetIt.resetY();
+        while (!sourceIt.endY())
+        {
+            sourceIt.resetX();
+            targetIt.resetX();
+            for (k = 0; k < (signal.getSizeX() >> 1); ++k)   /* one less than size! */	
+            {										
+                tmp1 = *(T*)*sourceIt * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr_target = tmp1 + tmp2;		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = tmp1 - tmp2;		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);
+                dx += 2;
+                ++dx_target; 
+            }
+        }
+    }
+    
+    for (i = 0; i < signal.getSizeZ(); i++)						
+    {											
+        ptr_y_target = ptr_z_target;							
+        ptr_y = ptr_z;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr = ptr_y;								
+            ptr_target = ptr_y_target;						
+            dx = signal.getXDiff(); 
+            dx_target = signal_target.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr_target = tmp1 + tmp2;		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = tmp1 - tmp2;		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);
+                dx += 2;
+                ++dx_target; 
+            }
+            ptr_y_target += dy_target[j];
+            ptr_y += dy[j];	
+        }
+        ptr_z_target += dz_target[i];
+        ptr_z += dz[i];	
+    }
+}
+
+static inline void
+haarFilterX (goSignal3DBase<void>& signal, goSignal3DBase<void>& signal_target, goDouble tp0, goDouble tp1)
+{
+    signal_t *ptr_z               = signal.getPtr();
+    signal_t *ptr                 = ptr_z;
+    signal_t *ptr_y               = ptr_z;
+    signal_target_t *ptr_z_target = signal_target.getPtr();
+    signal_target_t *ptr_target   = ptr_z_target;
+    signal_target_t *ptr_y_target = ptr_z_target;
+    goPtrdiff_t* dx                 = signal.getXDiff();
+    goPtrdiff_t* dy                 = signal.getYDiff();
+    goPtrdiff_t* dz                 = signal.getZDiff();
+    goPtrdiff_t* dx_target          = signal_target.getXDiff();
+    goPtrdiff_t* dy_target          = signal_target.getYDiff();
+    goPtrdiff_t* dz_target          = signal_target.getZDiff();
+    goSize_t i, j, k;					
+    godwt_t  tmp1, tmp2;
+
+    goSignal3DGenericIterator sourceIt (&signal);
+    goSignal3DGenericIterator targetIt (&signal_target);
+
+    sourceIt.resetZ();
+    targetIt.resetZ();
+    goSize_t i;
+    while (!sourceIt.endZ())
+    {
+        sourceIt.resetY();
+        targetIt.resetY();
+        while (!sourceIt.endY())
+        {
+            sourceIt.resetX();
+            targetIt.resetX();
+            for (k = 0; k < (signal.getSizeX() >> 1); ++k)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr_target = tmp1 + tmp2;		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = tmp1 - tmp2;		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);
+                dx += 2;
+                ++dx_target; 
+            }
+        }
+    }
+    
+    for (i = 0; i < signal.getSizeZ(); i++)						
+    {											
+        ptr_y_target = ptr_z_target;							
+        ptr_y = ptr_z;								
+        for (j = 0; j < signal.getSizeY(); j++)					
+        {										
+            ptr = ptr_y;								
+            ptr_target = ptr_y_target;						
+            dx = signal.getXDiff(); 
+            dx_target = signal_target.getXDiff(); 
+            for (k = 0; k < (signal.getSizeX() >> 1); k++)   /* one less than size! */	
+            {										
+                tmp1 = *ptr * tp0;			
+                tmp2 = *(ptr + *dx) * tp1;		
+                *ptr_target = tmp1 + tmp2;		
+                ptr_target += *dx_target;
+                ++dx_target;
+                *ptr_target = tmp1 - tmp2;		
+                ptr_target += *dx_target;					
+                ptr += *dx + *(dx + 1);
+                dx += 2;
+                ++dx_target; 
+            }
+            ptr_y_target += dy_target[j];
+            ptr_y += dy[j];	
+        }
+        ptr_z_target += dz_target[i];
+        ptr_z += dz[i];	
+    }
+}
+#endif
+
 template<class signal_t, class signal_target_t>
 static inline void
 haarFilterX (goSignal3DBase<signal_t>& signal, goSignal3DBase<signal_target_t>& signal_target, goDouble tp0, goDouble tp1)

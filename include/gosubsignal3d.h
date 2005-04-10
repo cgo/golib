@@ -51,10 +51,10 @@ goSubSignal3D : public goSignal3DBase<T>
 
         void move (int dir);
 
-        void shiftLeftSize  (int n);
-        void shiftRightSize (int n);
-        void shiftLeftDiff  (int n);
-        void shiftRightDiff (int n);
+        void shiftLeftDiff  (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftRightDiff (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftLeftSize  (int n, int axes = GO_X | GO_Y | GO_Z);
+        void shiftRightSize (int n, int axes = GO_X | GO_Y | GO_Z);
         
     private:
         goPosition         position;

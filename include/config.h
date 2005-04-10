@@ -15,17 +15,22 @@
 #define HAVE_IEEE754_H 1
 #define HAVE_DIRENT_H 1
 #define HAVE_TIME_H 1
+#define HAVE_UNISTD_H 1
+
+/* functions */
+#define HAVE_TMPNAM_R 1
+#define HAVE_UNLINK 1
 
 /* libraries */
 #define HAVE_LIBPTHREAD 1
 /* #undef HAVE_LIBQT */
 #define HAVE_LIBTIFF 1
-#define HAVE_LIBFFTW 1
+/* #undef HAVE_LIBFFTW */
 #define HAVE_LIBSDL 1
 /* #undef HAVE_LIBJPEG */
 #define HAVE_LIBIL 1
 #define HAVE_LIBILU 1
-#define HAVE_LIBILUT 1
+/* #undef HAVE_LIBILUT */
 
 #ifdef HAVE_LIBQT
 #define USE_QT

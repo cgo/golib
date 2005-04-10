@@ -3,7 +3,9 @@
 //#include <gosubsignal3d.h>
 #include <goerror.h>
 #include <gosignalmacros.h>
+#include <gosignalhelper.h>
 #include <go3vector.h>
+#include <golog.h>
 #include <string.h> // bzero()
 
 #include <iostream>
@@ -186,7 +188,7 @@ goSignal3D<void>::destroy ()
 const goSignal3D<void>&
 goSignal3D<void>::operator= (goSignal3DBase<void>& other)
 {
-    std::cout << "goSignal3D::operator=()\n";
+    goLog::message("goSignal3D::operator=()");
     this->destroy();
     this->setDataType (other.getDataType().getID());
     this->make (other.getSizeX(),
@@ -199,10 +201,17 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
                 other.getBorderY(),
                 other.getBorderZ(),
                 other.getChannelCount());
-    
-    goError::print (getClassName(), "operator= not fully implemented for void.");
-    // GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
-    
+
+    goIndex_t chan = other.getChannel();
+    goIndex_t i;
+    for (i = 0; i < this->getChannelCount(); ++i)
+    {
+        this->setChannel (i);
+        other.setChannel (i);
+        goCopySignal (&other, this);
+    }
+    this->setChannel (0);
+    other.setChannel (chan);
     return *this;
 }
 

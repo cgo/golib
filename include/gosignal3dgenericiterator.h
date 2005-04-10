@@ -14,7 +14,7 @@
 # include <gotypes.h>
 #endif
 
-template<class T> class goSignal3DBase;
+#include <gosignal3dbase.h>
 
 /** 
  * @addtogroup signal
@@ -77,7 +77,24 @@ class goSignal3DGenericIterator
         goSignal3DGenericIterator  (const goSignal3DGenericIterator& other);
         ~goSignal3DGenericIterator ();
         
-        void     setPosition (goIndex_t x, goIndex_t y, goIndex_t z);
+        /**
+         * @brief Sets the iterator position to x,y,z in the signal.
+         *
+         * @param x  X position
+         * @param y  Y position
+         * @param z  Z position
+         **/
+        inline void setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
+        {
+            posX = x; posY = y; posZ = z;
+            dx = sig->getXDiff() + x;
+            dy = sig->getYDiff() + y;
+            dz = sig->getZDiff() + z;
+            px = (goByte*)sig->getPtr(x,y,z);
+            py = (goByte*)sig->getPtr(x,y,z);
+            pz = (goByte*)sig->getPtr(x,y,z);
+        }
+        
         /**
          * @return True if the end of the current x-line is reached, false otherwise.
          */
@@ -161,6 +178,12 @@ class goSignal3DGenericIterator
          * @return Pointer to the data element at the current iterator position.
          */
         inline goByte*  operator*   () { return px; };
+        inline goByte*  leftX       () { return px - *(dx-1); }
+        inline goByte*  leftY       () { return px - *(dy-1); }
+        inline goByte*  leftZ       () { return px - *(dz-1); }
+        inline goByte*  rightX      () { return px + *dx; }
+        inline goByte*  rightY      () { return px + *dy; }
+        inline goByte*  rightZ      () { return px + *dz; }
         inline const goByte* operator*   ()  const { return px; };
        
         goSignal3DBase<void>* sig;
@@ -188,7 +211,23 @@ class goSignal3DGenericConstIterator
         goSignal3DGenericConstIterator  (const goSignal3DGenericConstIterator& other);
         ~goSignal3DGenericConstIterator ();
         
-        void     setPosition (goIndex_t x, goIndex_t y, goIndex_t z);
+        /**
+         * @brief Sets the iterator position to x,y,z in the signal.
+         *
+         * @param x  X position
+         * @param y  Y position
+         * @param z  Z position
+         **/
+        inline void setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
+        {
+            posX = x; posY = y; posZ = z;
+            dx = sig->getXDiff() + x;
+            dy = sig->getYDiff() + y;
+            dz = sig->getZDiff() + z;
+            px = (goByte*)sig->getPtr(x,y,z);
+            py = (goByte*)sig->getPtr(x,y,z);
+            pz = (goByte*)sig->getPtr(x,y,z);
+        }
         /**
          * @return True if the end of the current x-line is reached, false otherwise.
          */

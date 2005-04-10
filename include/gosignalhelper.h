@@ -27,6 +27,8 @@ bool goNormalizeSignal   (const goSignal3DBase<void>* sig, goSignal3D<void>* tar
 bool goNormalizeSignal   (goSignal3DBase<void>* sig);
 bool goFindZeroCrossings (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet);
 bool goConvertSignal     (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+bool goCopySignal        (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+bool goFillSignal        (goSignal3DBase<void>* sig, goFloat value);
 bool goRGBAtoScalar      (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
 
 #endif

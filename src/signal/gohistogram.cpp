@@ -11,6 +11,7 @@
 #include <golog.h>
 #include <gotypes.h>
 #include <gosignalmacros.h>
+#include <gosignal3dgenericiterator.h>
 #include <gotype.h>
 #include <assert.h>
 
@@ -155,6 +156,15 @@ goHistogram<level_type>::setBins (goSize_t n)
 {
     myPrivate->userSetLevels = false;
     myPrivate->bins.resize(n);
+    myLevels.resize(n);
+    return true;
+}
+
+template <class level_type>
+goIndex_t
+goHistogram<level_type>::getBins () const
+{
+    return myPrivate->bins.getSize();
 }
 
 template <class level_type>
@@ -271,7 +281,7 @@ static goIndex_t goCDFDoubleIndexFunction (void* valuePtr)
 
 template <class level_type>
 bool
-goCDF<level_type>::makeInverseLUT (goArray<goIndex_t>& inverseLUTRet, goIndexFunction& indexFunctionRet)
+goCDF<level_type>::makeInverseLUT (goArray<goFloat>& inverseLUTRet, goIndexFunction& indexFunctionRet)
 {
     goType typ (GO_DOUBLE);
     inverseLUTRet.resize (typ.getMaxIndex() - typ.getMinIndex() + 1);
@@ -287,10 +297,89 @@ goCDF<level_type>::makeInverseLUT (goArray<goIndex_t>& inverseLUTRet, goIndexFun
         {
             ++cdfIndex;
         }
-        inverseLUTRet[i] = cdfIndex;
+        if (cdfIndex == 0)
+        {
+            inverseLUTRet[i] = cdfIndex;
+        }
+        else
+        {
+            goDouble diff = histo[cdfIndex] - histo[cdfIndex - 1];
+            if (diff == 0.0)
+            {
+                inverseLUTRet[i] = cdfIndex;
+            }
+            else
+            {
+                inverseLUTRet[i] = cdfIndex - 1 + fabs((value - histo[cdfIndex-1]) / diff);
+            }
+        }
         value += step;
     }
     return true;
+}
+
+template <class cdfT, class T>
+static bool _equalizeHistogram (goSignal3DBase<void>* sig, goCDF<cdfT>& targetCDF)
+{
+    if (!sig)
+    {
+        return false;
+    }
+    goCDF<cdfT> fromCDF;
+    fromCDF.setBins (targetCDF.getBins());
+    fromCDF.calculate (*sig);
+
+    goArray<goFloat> inverseLUT;
+    goIndexFunction inverseIndexFunction;
+    targetCDF.makeInverseLUT (inverseLUT, inverseIndexFunction);
+    goArray<cdfT>& targetLevels = targetCDF.getLevels();
+
+    goSignal3DGenericIterator it (sig);
+    goDouble temp;
+    cdfT     level0;
+    cdfT     level1;
+    goFloat  indexf;
+    goFloat  r;
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                temp = fromCDF.lookup(*it);
+                indexf = inverseLUT[inverseIndexFunction(&temp)];
+                level0 = targetLevels[(goIndex_t)indexf];
+                level1 = targetLevels[(goIndex_t)ceil(indexf)];
+                r      = indexf - (goIndex_t)indexf;
+                *(T*)*it = (T)(level0 + (level1-level0)*r);
+                it.incrementX();
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+    return true;
+}
+
+template <class T>
+bool goEqualizeHistogram (goSignal3DBase<void>* sig, goCDF<T>& targetCDF)
+{
+    
+    switch (sig->getDataType().getID())
+    {
+        case GO_INT8: return _equalizeHistogram<T,goInt8> (sig, targetCDF); break;
+        case GO_UINT8: return _equalizeHistogram<T,goUInt8> (sig, targetCDF); break;
+        case GO_INT16: return _equalizeHistogram<T,goInt16> (sig, targetCDF); break;
+        case GO_UINT16: return _equalizeHistogram<T,goUInt16> (sig, targetCDF); break;
+        case GO_INT32: return _equalizeHistogram<T,goInt32> (sig, targetCDF); break;
+        case GO_UINT32: return _equalizeHistogram<T,goUInt32> (sig, targetCDF); break;
+        case GO_FLOAT: return _equalizeHistogram<T,goFloat> (sig, targetCDF); break;
+        case GO_DOUBLE: return _equalizeHistogram<T,goDouble> (sig, targetCDF); break;
+        default: goLog::warning("goEqualizeHistogram(): unknown data type."); break;
+    }
+    return false;
 }
 
 bool goMatchHistograms (const goSignal3DBase<void>* fromSignal, const goSignal3DBase<void>* toSignal, goSignal3DBase<void>* retSignal)
@@ -320,7 +409,7 @@ bool goMatchHistograms (const goSignal3DBase<void>* fromSignal, const goSignal3D
     toCDF.setBins (256);
     toCDF.calculate (*toSignal);
     
-    goArray<goIndex_t> inverseLUT;
+    goArray<goFloat> inverseLUT;
     goIndexFunction inverseIndexFunction;
     toCDF.makeInverseLUT (inverseLUT, inverseIndexFunction);
     goArray<goFloat>& toLevels = toCDF.getLevels();
@@ -347,7 +436,7 @@ bool goMatchHistograms (const goSignal3DBase<void>* fromSignal, const goSignal3D
             for (i = 0; i < sx; ++i)
             {
                 temp = fromCDF.lookup(fromP);
-                *(goFloat*)retP = toLevels[inverseLUT[inverseIndexFunction(&temp)]];
+                *(goFloat*)retP = toLevels[(goIndex_t)inverseLUT[inverseIndexFunction(&temp)]];
                 retP += *retDx;
                 fromP += *fromDx;
                 ++retDx;
@@ -362,3 +451,6 @@ template class goHistogram<goFloat>;
 template class goHistogram<goDouble>;
 template class goCDF<goFloat>;
 template class goCDF<goDouble>;
+template bool  goEqualizeHistogram<goFloat>(goSignal3DBase<void>* sig, goCDF<goFloat>& targetCDF);
+template bool  goEqualizeHistogram<goDouble>(goSignal3DBase<void>* sig, goCDF<goDouble>& targetCDF);
+

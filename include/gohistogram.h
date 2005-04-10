@@ -40,6 +40,7 @@ goHistogram : public goObjectBase
         virtual bool         calculate    (const goSignal3DBase<void>&, bool normalize = false);
         bool                 setLevels    (const goArray<level_type>& levelArray);
         bool                 setBins      (goSize_t n);
+        goIndex_t            getBins      () const;
         goDouble             lookup       (const void* valueP);
         goArray<goDouble>&   getHistogram ();
         goArray<level_type>& getLevels    ();
@@ -72,13 +73,16 @@ goCDF : public goHistogram<level_type>
         virtual ~goCDF ();
 
         virtual bool calculate      (const goSignal3DBase<void>&, bool normalize = true);
-        bool         makeInverseLUT (goArray<goIndex_t>& inverseLUTRet, goIndexFunction& indexFunctionRet);
+        bool         makeInverseLUT (goArray<goFloat>& inverseLUTRet, goIndexFunction& indexFunctionRet);
     private:
         goCDFPrivate* myPrivate;
 };
 /** @} */
 
 bool goMatchHistograms (const goSignal3DBase<void>* fromSignal, const goSignal3DBase<void>* toSignal, goSignal3DBase<void>* retSignal);
+
+template <class T>
+bool goEqualizeHistogram (goSignal3DBase<void>* sig, goCDF<T>& targetCDF);
 
 #endif
 
