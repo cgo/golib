@@ -329,9 +329,9 @@ goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
   {
       return;
   }
-  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)4),
-                   goMath::min(this->getSizeY(),(goSize_t)4),
-                   goMath::min(this->getSizeZ(),(goSize_t)4));
+  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)32),
+                   goMath::min(this->getSizeY(),(goSize_t)32),
+                   goMath::min(this->getSizeZ(),(goSize_t)32));
   this->setDataType (p->getDataType().getID());
   this->parent   = p;
   this->real_ptr = p->getRealPtr();
