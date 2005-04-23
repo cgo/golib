@@ -561,3 +561,76 @@ bool goFillSignal (goSignal3DBase<void>* sig, goFloat value)
     }
     return false;
 }
+
+#define MAKE_SIGNAL_SIGNAL_OPERATOR1(OPERATOR,OPERATORNAME) \
+template <class T, class T2> \
+static inline void _signalOperator##OPERATORNAME__ (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
+{ \
+    goSignal3DGenericIterator      it (&sig); \
+    goSignal3DGenericConstIterator ot (&other); \
+     \
+    while (!it.endZ() && !ot.endZ()) \
+    { \
+        it.resetY(); \
+        ot.resetY(); \
+        while (!it.endY() && !ot.endY()) \
+        { \
+            it.resetX(); \
+            ot.resetX(); \
+            while (!it.endX() && !ot.endX()) \
+            { \
+                *(T*)*it OPERATOR (T)*(T2*)*ot; \
+                it.incrementX(); \
+                ot.incrementX(); \
+            } \
+            it.incrementY(); \
+            ot.incrementY(); \
+        } \
+        it.incrementZ(); \
+        ot.incrementZ(); \
+    } \
+} 
+
+#define MAKE_SIGNAL_SIGNAL_OPERATOR2(OPERATOR,OPERATORNAME) \
+template <class T>  \
+static inline void _signalOperator##OPERATORNAME_ (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
+{ \
+    switch (other.getDataType().getID()) \
+    { \
+        case   GO_INT8:     _signalOperator##OPERATORNAME__<T,goInt8>     (sig,   other);   break; \
+        case   GO_UINT8:    _signalOperator##OPERATORNAME__<T,goUInt8>    (sig,   other);   break; \
+        case   GO_INT16:    _signalOperator##OPERATORNAME__<T,goInt16>    (sig,   other);   break; \
+        case   GO_UINT16:   _signalOperator##OPERATORNAME__<T,goUInt16>   (sig,   other);   break; \
+        case   GO_INT32:    _signalOperator##OPERATORNAME__<T,goInt32>    (sig,   other);   break; \
+        case   GO_UINT32:   _signalOperator##OPERATORNAME__<T,goUInt32>   (sig,   other);   break; \
+        case   GO_FLOAT:    _signalOperator##OPERATORNAME__<T,goFloat>    (sig,   other);   break; \
+        case   GO_DOUBLE:   _signalOperator##OPERATORNAME__<T,goDouble>   (sig,   other);   break; \
+        default: goLog::warning("goSignal3DBase<void> operator+=: unknown type."); break; \
+    } \
+} 
+
+#define MAKE_SIGNAL_SIGNAL_OPERATOR3(OPERATOR,OPERATORNAME)  \
+static inline void _signalOperator##OPERATORNAME (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
+{ \
+    switch (sig.getDataType().getID()) \
+    { \
+        case   GO_INT8:     _signalOperator##OPERATORNAME_<goInt8>     (sig,other);   break; \
+        case   GO_UINT8:    _signalOperator##OPERATORNAME_<goUInt8>    (sig,other);   break; \
+        case   GO_INT16:    _signalOperator##OPERATORNAME_<goInt16>    (sig,other);   break; \
+        case   GO_UINT16:   _signalOperator##OPERATORNAME_<goUInt16>   (sig,other);   break; \
+        case   GO_INT32:    _signalOperator##OPERATORNAME_<goInt32>    (sig,other);   break; \
+        case   GO_UINT32:   _signalOperator##OPERATORNAME_<goUInt32>   (sig,other);   break; \
+        case   GO_FLOAT:    _signalOperator##OPERATORNAME_<goFloat>    (sig,other);   break; \
+        case   GO_DOUBLE:   _signalOperator##OPERATORNAME_<goDouble>   (sig,other);   break; \
+        default: goLog::warning("operator #OPERATOR: unknown type."); break; \
+    } \
+}
+
+MAKE_SIGNAL_SIGNAL_OPERATOR1(+=,PlusEqual);
+MAKE_SIGNAL_SIGNAL_OPERATOR2(+=,PlusEqual);
+MAKE_SIGNAL_SIGNAL_OPERATOR3(+=,PlusEqual);
+
+void goSignalPlus (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other)
+{
+    _signalOperatorPlusEqual (sig, other);
+}
