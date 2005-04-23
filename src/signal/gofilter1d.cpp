@@ -133,3 +133,26 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
     }
     return true;
 }
+
+bool goFilter1D::normalize (goDouble constant)
+{
+    goDouble sum = 0.0;
+    goIndex_t i;
+    for (i = 0; i < myPrivate->mask.getSize(); ++i)
+    {
+        sum += fabs(myPrivate->mask[i]);
+    }
+    if (sum > 0.0)
+    {
+        goDouble f = constant * 1 / sum;
+        for (i = 0; i < myPrivate->mask.getSize(); ++i)
+        {
+            myPrivate->mask[i] *= f;
+        }
+        return true;
+    }
+    else 
+    {
+        return false;
+    }
+}
