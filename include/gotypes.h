@@ -133,7 +133,7 @@ typedef unsigned long long goClock_t;
 /*!
  * \brief Type enumerators.
  */
-enum goTypeEnum {
+enum {
   GO_INT8,
   GO_INT16,
   GO_INT32,
@@ -145,6 +145,9 @@ enum goTypeEnum {
   GO_DOUBLE,
   GO_VOID_POINTER
 };
+
+typedef int goTypeEnum;
+
 /** @}*/
 #endif /* __GOTYPES_H__ */
 
