@@ -212,6 +212,15 @@ goSignal3DBase : public goObjectBase
         const T*   getClosest (go3Vector<goFloat>& point) const;
         goFloat    sample (go3Vector<goFloat>& point);
 
+        goSignal3DBase<T>& operator += (const goSignal3DBase<T>& other);
+        goSignal3DBase<T>& operator -= (const goSignal3DBase<T>& other);
+        goSignal3DBase<T>& operator *= (const goSignal3DBase<T>& other);
+        goSignal3DBase<T>& operator /= (const goSignal3DBase<T>& other);
+        goSignal3DBase<T>& operator += (goFloat scalar);
+        goSignal3DBase<T>& operator -= (goFloat scalar);
+        goSignal3DBase<T>& operator *= (goFloat scalar);
+        goSignal3DBase<T>& operator /= (goFloat scalar);
+        
     protected:
         void setBorder (goSize_t x, goSize_t y, goSize_t z);
         void periodize (int axes = GO_X|GO_Y|GO_Z);
