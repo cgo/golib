@@ -10,6 +10,10 @@
 
 typedef goDouble godwt_t;
 
+static void _scaleValues (goSignal3DBase<void>& sig, goDouble value);
+template <class T>
+static void _scaleValues2 (goSignal3DBase<void>& sig, goDouble value);
+
 class goDWT3DPrivate
 {
     public:
@@ -144,6 +148,13 @@ goDWT3D::setFilter (int filterEnum)
 bool
 goDWT3D::calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType)
 {
+    if (myPrivate->pyramidMode)
+    {
+//        myPrivate->lowPass.normalize();
+//        myPrivate->highPass.normalize();
+//        myPrivate->lowPassReverse.normalize();
+//        myPrivate->highPassReverse.normalize();
+    }
     goLog::message("calculateDWT(): Currently only 2D.", this);
     goSignal3D<void>* dwt = myPrivate->dwt;
     goIndex_t i;
@@ -188,7 +199,7 @@ goDWT3D::calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType)
         dwt[3].rotateAxes();
     }
     else
-    // Pyramid-like operation. Downsample only LL band.
+    // Pyramid-like operation. No decimation.
     {
         this->filter (sig, L, H);
         L.rotateAxes(); L.rotateAxes();
@@ -205,6 +216,10 @@ goDWT3D::calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType)
         dwt[1].rotateAxes();
         dwt[2].rotateAxes();
         dwt[3].rotateAxes();
+//        _scaleValues (dwt[0], 0.5);
+//        _scaleValues (dwt[1], 0.5);
+//        _scaleValues (dwt[2], 0.5);
+//        _scaleValues (dwt[3], 0.5);
     }
     return true;
 }
@@ -415,22 +430,61 @@ goDWT3D::dwt (goDWT3D& parentDWT, int axes)
     }
     else
     {
-        goSubSignal3D<void> subsignal;
-        myPrivate->axes = axes;
-        goIndex_t sx = parentDWT.getDWT()[0].getSizeX();
-        goIndex_t sy = parentDWT.getDWT()[0].getSizeY();
-        goIndex_t sz = parentDWT.getDWT()[0].getSizeZ();
-        if (axes & GO_X)
-            sx = sx <= 1 ? sx : sx >> 1;
-        if (axes & GO_Y)
-            sy = sy <= 1 ? sy : sy >> 1;
-        if (axes & GO_Z)
-            sz = sz <= 1 ? sz : sz >> 1;
-        subsignal.setSize (sx, sy, sz);
-        // FIXME: Fix this for 3D. This only works for 2D.
-        subsignal.setSkip (1,1,0);
-        subsignal.setParent (&parentDWT.getDWT()[0]);
-        return this->dwt (&subsignal, axes, parentDWT.getDWT()[0].getDataType().getID());
+        return this->dwt (&parentDWT.getDWT()[0], axes, parentDWT.getDWT()[0].getDataType().getID());
+//        goSubSignal3D<void> subsignal;
+//        myPrivate->axes = axes;
+//        goIndex_t sx = parentDWT.getDWT()[0].getSizeX();
+//        goIndex_t sy = parentDWT.getDWT()[0].getSizeY();
+//        goIndex_t sz = parentDWT.getDWT()[0].getSizeZ();
+//        if (axes & GO_X)
+//            sx = sx <= 1 ? sx : sx >> 1;
+//        if (axes & GO_Y)
+ //           sy = sy <= 1 ? sy : sy >> 1;
+ ////       if (axes & GO_Z)
+ //           sz = sz <= 1 ? sz : sz >> 1;
+ //       subsignal.setSize (sx, sy, sz);
+ //       // FIXME: Fix this for 3D. This only works for 2D.
+ //       subsignal.setSkip (1,1,0);
+ //       subsignal.setParent (&parentDWT.getDWT()[0]);
+ //       return this->dwt (&subsignal, axes, parentDWT.getDWT()[0].getDataType().getID());
+    }
+}
+
+template <class T>
+static void _scaleValues2 (goSignal3DBase<void>& sig, goDouble value)
+{
+    goSignal3DGenericIterator it (&sig);
+
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                *(T*)*it = static_cast<T>(*(T*)*it * value);
+                it.incrementX();
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+}
+
+static void _scaleValues (goSignal3DBase<void>& sig, goDouble value)
+{
+    switch (sig.getDataType().getID())
+    {
+        case   GO_INT8:     _scaleValues2<goInt8>     (sig,value);   break;
+        case   GO_UINT8:    _scaleValues2<goUInt8>    (sig,value);   break;
+        case   GO_INT16:    _scaleValues2<goInt16>    (sig,value);   break;
+        case   GO_UINT16:   _scaleValues2<goUInt16>   (sig,value);   break;
+        case   GO_INT32:    _scaleValues2<goInt32>    (sig,value);   break;
+        case   GO_UINT32:   _scaleValues2<goUInt32>   (sig,value);   break;
+        case   GO_FLOAT:    _scaleValues2<goFloat>    (sig,value);   break;
+        case   GO_DOUBLE:   _scaleValues2<goDouble>   (sig,value);   break;
+        default: break;
     }
 }
 
@@ -444,22 +498,25 @@ goDWT3D::idwt (goDWT3D& parentDWT)
     }
     else
     {
-        goSignal3D<void> tempTarget;
-        this->idwt (&tempTarget);
-        goSubSignal3D<void> subsignal;
-        subsignal.setSize (this->getDWT()[0].getSizeX(),
-                           this->getDWT()[0].getSizeY(),
-                           this->getDWT()[0].getSizeZ());
+        return this->idwt (reinterpret_cast<goSignal3D<void>* > (&parentDWT.getDWT()[0]));
+//        goSignal3D<void> tempTarget;
+//        this->idwt (&tempTarget);
+        // _scaleValues (tempTarget, 2);       // Undo the value scaling in the next stage
+//        goSubSignal3D<void> subsignal;
+//        subsignal.setSize (this->getDWT()[0].getSizeX(),
+//                           this->getDWT()[0].getSizeY(),
+//                           this->getDWT()[0].getSizeZ());
         // FIXME: Fix this for 3D. This only works for 2D.
-        subsignal.setSkip (1,1,0);
-        subsignal.setParent (&parentDWT.getDWT()[0]);
-        goCopySignal (&tempTarget, &subsignal);
-        parentDWT.getDWT()[0].rotateAxes();
-        parentDWT.getDWT()[0].rotateAxes();
-        myPrivate->lowPass.filter (parentDWT.getDWT()[0]);
-        parentDWT.getDWT()[0].rotateAxes();
-        myPrivate->lowPass.filter (parentDWT.getDWT()[0]);
-        return true;
+//        subsignal.setSkip (1,1,0);
+//        subsignal.setParent (&parentDWT.getDWT()[0]);
+//        goFillSignal (&parentDWT.getDWT()[0], 0.0);
+//        goCopySignal (&tempTarget, &subsignal);
+//        parentDWT.getDWT()[0].rotateAxes();
+//        parentDWT.getDWT()[0].rotateAxes();
+//        myPrivate->lowPassReverse.filter (parentDWT.getDWT()[0]);
+//        parentDWT.getDWT()[0].rotateAxes();
+//        myPrivate->lowPassReverse.filter (parentDWT.getDWT()[0]);
+//        return true;
     }
 }
 
@@ -470,6 +527,13 @@ goDWT3D::idwt (goSignal3D<void>* target)
     {
         goLog::warning("idwt(): target ist 0.", this);
         return false;
+    }
+    if (myPrivate->pyramidMode)
+    {
+//        myPrivate->lowPass.normalize();
+//        myPrivate->highPass.normalize();
+//        myPrivate->lowPassReverse.normalize();
+//        myPrivate->highPassReverse.normalize();
     }
     goSignal3D<void>* dwt = myPrivate->dwt;
     goSignal3D<void> tempH;
@@ -504,29 +568,15 @@ goDWT3D::idwt (goSignal3D<void>* target)
         dwt[2].rotateAxes();
         dwt[3].rotateAxes();
 
-        goSize_t sx = dwt[1].getSizeX();
-        goSize_t sy = dwt[1].getSizeY();
-        goSize_t sz = dwt[1].getSizeZ();
-        if (myPrivate->axes & GO_X)
-            sx = sx <= 1 ? sx : sx >> 1;
-        if (myPrivate->axes & GO_Y)
-            sy = sy <= 1 ? sy : sy >> 1;
-        if (myPrivate->axes & GO_Z)
-            sz = sz <= 1 ? sz : sz >> 1;
-        goSignal3D<void> tempLL;
-        tempLL.setDataType (dwt[1].getDataType().getID());
-        tempLL.make (dwt[1].getSizeX(), dwt[1].getSizeY(), dwt[1].getSizeZ(),
-                     dwt[1].getBlockSizeX(), dwt[1].getBlockSizeY(), dwt[1].getBlockSizeZ(),
-                     32,32,32);
-//        goFillSignal (&tempLL, 0.0f);
-//        goSubSignal3D<void> subsignal;
-//        subsignal.setSize (sx,sy,sz);
-//        // FIXME: fix this for 3D operation. This is only for 2D.
-//        subsignal.setSkip (1,1,0);
-//        subsignal.setParent (&tempLL);
-        // dwt[0].rotateAxes(); dwt[0].rotateAxes();
-//        goCopySignal (&dwt[0], &subsignal);
-//        tempLL.rotateAxes(); tempLL.rotateAxes();
+//        goSize_t sx = dwt[1].getSizeX();
+//        goSize_t sy = dwt[1].getSizeY();
+//        goSize_t sz = dwt[1].getSizeZ();
+//        if (myPrivate->axes & GO_X)
+//            sx = sx <= 1 ? sx : sx >> 1;
+//        if (myPrivate->axes & GO_Y)
+//            sy = sy <= 1 ? sy : sy >> 1;
+//        if (myPrivate->axes & GO_Z)
+//            sz = sz <= 1 ? sz : sz >> 1;
         dwt[0].rotateAxes(); dwt[0].rotateAxes();
         dwt[1].rotateAxes(); dwt[1].rotateAxes();
         reconstruct (dwt[0], dwt[1], tempL);
@@ -534,6 +584,7 @@ goDWT3D::idwt (goSignal3D<void>* target)
         dwt[0].rotateAxes();
         dwt[1].rotateAxes();
         reconstruct (tempL, tempH, *target);
+        _scaleValues (*target, 0.5);
     }
     return true;
 }
