@@ -30,6 +30,7 @@ goFilter1D : public goObjectBase
         bool setMask   (const goArray<goFloat>& mask);
         bool setCenter (goIndex_t c);
         bool filter    (goSignal3DBase<void>& sig);
+        bool normalize (goDouble constant = 1.0);
         
 	private:
         goFilter1DPrivate* myPrivate;
