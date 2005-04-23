@@ -1398,12 +1398,199 @@ goSignal3DBase<T>::getChannelCount () const
     return myChannelCount;
 }
 
-/// \todo This will be a problem with const objects. Find out how that can be solved.
+/// \todo This will be a problem with const objects. Find out how that can be solved without const_cast<>
 template <class T>
 void
 goSignal3DBase<T>::setChannel (goSize_t c) 
 {
     myChannel = c;
+}
+
+#ifndef GOSIGNAL3DGENERICITERATOR_H
+# include <gosignal3dgenericiterator.h>
+#endif
+
+// === Please excuse the macros. They make the operator+=-like operators for void signals.
+
+#define MAKE_SIGNAL_SIGNAL_OPERATOR(OPERATOR,OPERATORNAME) \
+template <class T, class T2> \
+static inline void _signalOperator##OPERATORNAME##__ (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
+{ \
+    goSignal3DGenericIterator      it (&sig); \
+    goSignal3DGenericConstIterator ot (&other); \
+     \
+    while (!it.endZ() && !ot.endZ()) \
+    { \
+        it.resetY(); \
+        ot.resetY(); \
+        while (!it.endY() && !ot.endY()) \
+        { \
+            it.resetX(); \
+            ot.resetX(); \
+            while (!it.endX() && !ot.endX()) \
+            { \
+                *(T*)*it OPERATOR (T)*(T2*)*ot; \
+                it.incrementX(); \
+                ot.incrementX(); \
+            } \
+            it.incrementY(); \
+            ot.incrementY(); \
+        } \
+        it.incrementZ(); \
+        ot.incrementZ(); \
+    } \
+} \
+template <class T>  \
+static inline void _signalOperator##OPERATORNAME##_ (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
+{ \
+    switch (other.getDataType().getID()) \
+    { \
+        case   GO_INT8:     _signalOperator##OPERATORNAME##__<T,goInt8>     (sig,   other);   break; \
+        case   GO_UINT8:    _signalOperator##OPERATORNAME##__<T,goUInt8>    (sig,   other);   break; \
+        case   GO_INT16:    _signalOperator##OPERATORNAME##__<T,goInt16>    (sig,   other);   break; \
+        case   GO_UINT16:   _signalOperator##OPERATORNAME##__<T,goUInt16>   (sig,   other);   break; \
+        case   GO_INT32:    _signalOperator##OPERATORNAME##__<T,goInt32>    (sig,   other);   break; \
+        case   GO_UINT32:   _signalOperator##OPERATORNAME##__<T,goUInt32>   (sig,   other);   break; \
+        case   GO_FLOAT:    _signalOperator##OPERATORNAME##__<T,goFloat>    (sig,   other);   break; \
+        case   GO_DOUBLE:   _signalOperator##OPERATORNAME##__<T,goDouble>   (sig,   other);   break; \
+        default: goLog::warning("goSignal3DBase<void> operator+=: unknown type."); break; \
+    } \
+} \
+goSignal3DBase<void>& \
+goSignal3DBase<void>::operator OPERATOR (const goSignal3DBase<void>& other) \
+{ \
+    switch (this->getDataType().getID()) \
+    { \
+        case   GO_INT8:     _signalOperator##OPERATORNAME##_<goInt8>     (*this,other);   break; \
+        case   GO_UINT8:    _signalOperator##OPERATORNAME##_<goUInt8>    (*this,other);   break; \
+        case   GO_INT16:    _signalOperator##OPERATORNAME##_<goInt16>    (*this,other);   break; \
+        case   GO_UINT16:   _signalOperator##OPERATORNAME##_<goUInt16>   (*this,other);   break; \
+        case   GO_INT32:    _signalOperator##OPERATORNAME##_<goInt32>    (*this,other);   break; \
+        case   GO_UINT32:   _signalOperator##OPERATORNAME##_<goUInt32>   (*this,other);   break; \
+        case   GO_FLOAT:    _signalOperator##OPERATORNAME##_<goFloat>    (*this,other);   break; \
+        case   GO_DOUBLE:   _signalOperator##OPERATORNAME##_<goDouble>   (*this,other);   break; \
+        default: goLog::warning("operator #OPERATOR: unknown type."); break; \
+    } \
+}
+
+#define MAKE_SIGNAL_SCALAR_OPERATOR(OPERATOR,OPERATORNAME,SCALAR) \
+template <class T> \
+static inline void _signalScalarOperator##OPERATORNAME##_ (goSignal3DBase<void>& sig, SCALAR scalar) \
+{ \
+    goSignal3DGenericIterator it (&sig); \
+     \
+    while (!it.endZ()) \
+    { \
+        it.resetY(); \
+        while (!it.endY()) \
+        { \
+            it.resetX(); \
+            while (!it.endX()) \
+            { \
+                *(T*)*it OPERATOR (T)scalar; \
+                it.incrementX(); \
+            } \
+            it.incrementY(); \
+        } \
+        it.incrementZ(); \
+    } \
+} \
+goSignal3DBase<void>& \
+goSignal3DBase<void>::operator OPERATOR (SCALAR scalar) \
+{ \
+    switch (this->getDataType().getID()) \
+    { \
+        case   GO_INT8:     _signalScalarOperator##OPERATORNAME##_<goInt8>     (*this,scalar);   break; \
+        case   GO_UINT8:    _signalScalarOperator##OPERATORNAME##_<goUInt8>    (*this,scalar);   break; \
+        case   GO_INT16:    _signalScalarOperator##OPERATORNAME##_<goInt16>    (*this,scalar);   break; \
+        case   GO_UINT16:   _signalScalarOperator##OPERATORNAME##_<goUInt16>   (*this,scalar);   break; \
+        case   GO_INT32:    _signalScalarOperator##OPERATORNAME##_<goInt32>    (*this,scalar);   break; \
+        case   GO_UINT32:   _signalScalarOperator##OPERATORNAME##_<goUInt32>   (*this,scalar);   break; \
+        case   GO_FLOAT:    _signalScalarOperator##OPERATORNAME##_<goFloat>    (*this,scalar);   break; \
+        case   GO_DOUBLE:   _signalScalarOperator##OPERATORNAME##_<goDouble>   (*this,scalar);   break; \
+        default: goLog::warning("operator #OPERATOR: unknown type."); break; \
+    } \
+}
+
+MAKE_SIGNAL_SIGNAL_OPERATOR(+=,PlusEqual);
+MAKE_SIGNAL_SIGNAL_OPERATOR(-=,MinusEqual);
+MAKE_SIGNAL_SIGNAL_OPERATOR(*=,TimesEqual);
+MAKE_SIGNAL_SIGNAL_OPERATOR(/=,DivideEqual);
+MAKE_SIGNAL_SCALAR_OPERATOR(+=,PlusEqual,goFloat);
+MAKE_SIGNAL_SCALAR_OPERATOR(-=,MinusEqual,goFloat);
+MAKE_SIGNAL_SCALAR_OPERATOR(*=,TimesEqual,goFloat);
+MAKE_SIGNAL_SCALAR_OPERATOR(/=,DivideEqual,goFloat);
+
+#undef MAKE_SIGNAL_SIGNAL_OPERATOR
+#undef MAKE_SIGNAL_SCALAR_OPERATOR
+
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator += (const goSignal3DBase<T>& other)
+{
+    goLog::warning ("operator+= not implemented for this type. Use goSignal3DBase<void> instead!",this);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator -= (const goSignal3DBase<T>& other)
+{
+    goLog::warning ("operator-= not implemented for this type. Use goSignal3DBase<void> instead!",this);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator *= (const goSignal3DBase<T>& other)
+{
+    goLog::warning ("operator*= not implemented for this type. Use goSignal3DBase<void> instead!",this);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator /= (const goSignal3DBase<T>& other)
+{
+    goLog::warning ("operator/= not implemented for this type. Use goSignal3DBase<void> instead!",this);
+    return *this;
+}
+goSignal3DBase<void*>& goSignal3DBase<void*>::operator += (goFloat scalar)
+{
+    goLog::warning ("operator [+-*/]= not implemented for void*.",this);
+    return *this;
+}
+goSignal3DBase<void*>& goSignal3DBase<void*>::operator -= (goFloat scalar)
+{
+    goLog::warning ("operator [+-*/]= not implemented for void*.",this);
+    return *this;
+}
+goSignal3DBase<void*>& goSignal3DBase<void*>::operator *= (goFloat scalar)
+{
+    goLog::warning ("operator [+-*/]= not implemented for void*.",this);
+    return *this;
+}
+goSignal3DBase<void*>& goSignal3DBase<void*>::operator /= (goFloat scalar)
+{
+    goLog::warning ("operator [+-*/]= not implemented for void*.",this);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator += (goFloat scalar)
+{
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr + scalar), (*this), T);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator -= (goFloat scalar)
+{
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr - scalar), (*this), T);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator *= (goFloat scalar)
+{
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr * scalar), (*this), T);
+    return *this;
+}
+template <class T>
+goSignal3DBase<T>& goSignal3DBase<T>::operator /= (goFloat scalar)
+{
+    GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr / scalar), (*this), T);
+    return *this;
 }
 
 #if 0
