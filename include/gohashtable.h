@@ -31,7 +31,7 @@ template <class I, class O>
 class goHashTable {
  public:
   ///
-  goHashTable ();
+  goHashTable (goUInt32 mod_value = 511);
   /*!
    * @todo Problem: Hashtable für Zeiger. Daten müssen per Hand gelöscht werden. 
    */
@@ -46,7 +46,7 @@ class goHashTable {
    * @param i Mod value.
    */
   void	setModValue (goUInt32);
-
+  void  clear       ();
   ///
   goUInt32 getModValue () { return modValue; }
   ///

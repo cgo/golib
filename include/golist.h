@@ -27,6 +27,8 @@ class goList {
    */
   ~goList ();
 
+  void      next ();
+  void      prev ();
   /// Returns the current item and increments the pointer.
   T			getNext ();
   T*			getNextPtr ();

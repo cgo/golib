@@ -17,16 +17,40 @@ goList<T>::~goList () {
 }
 
 template <class T>
+void goList<T>::next ()
+{
+    if (position) 
+    {
+        if (position != tail) 
+        {
+            position = position->next;
+        }
+    }
+}
+
+template <class T>
+void goList<T>::prev ()
+{
+    if (position) 
+    {
+        if (position != front) 
+        {
+            position = position->prev;
+        }
+    }
+}
+
+template <class T>
 T
 goList<T>::getNext () {
-  T tmp = 0;
+  T* tmp = 0;
   if (position) {
-    tmp = (position->elem);
+    tmp = &(position->elem);
     if (position != tail) {
       position = position->next;
     }
   }
-  return tmp;
+  return *tmp;
 }
 
 template <class T>
@@ -45,14 +69,14 @@ goList<T>::getNextPtr () {
 template <class T>
 T
 goList<T>::getPrev () {
-  T tmp = 0;
+  T* tmp = 0;
   if (position) {
-    tmp = (position->elem);
+    tmp = &(position->elem);
     if (position != front) {
       position = position->prev;
     }
   }
-  return tmp;
+  return *tmp;
 }
 
 template <class T>

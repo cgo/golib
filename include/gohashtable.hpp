@@ -7,8 +7,9 @@ goHashEntry<I,O>::operator= (goHashEntry<I,O>& other) {
 }
 
 template <class I, class O>
-goHashTable<I,O>::goHashTable () {
-    // setModValue (511);
+goHashTable<I,O>::goHashTable (goUInt32 mod_value) 
+{
+    setModValue (mod_value);
     lastFailed = false;
     dummy = (O)0;
     // table = new goArray<goList<goHashEntry<I,O> > >;
@@ -37,19 +38,24 @@ void
 goHashTable<I,O>::setModValue (goUInt32 i)
 {
     eraseLists();
-  modValue = i;
-  theTable.resize (modValue + 1);
-  goIndex_t c;
-  goList<void*>* list;
+    modValue = i;
+    theTable.resize (modValue + 1);
+    goIndex_t c;
+    goList<void*>* list;
 
-  std::cout << "hash table generating " << theTable.getSize() << " lists" << std::endl;
-  for (c = 0; c < theTable.getSize(); c++)
+    std::cout << "hash table generating " << theTable.getSize() << " lists" << std::endl;
+    for (c = 0; c < theTable.getSize(); c++)
     {
-	list = new goList<void*>();
-	theTable[c] = (void*)list;
+        list = new goList<void*>();
+        theTable[c] = (void*)list;
     }
 }
 
+template <class I, class O>
+void goHashTable<I,O>::clear ()
+{
+    this->setModValue (this->getModValue());
+}
 
 template <class I, class O>
 O&
