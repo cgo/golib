@@ -10,6 +10,8 @@
 #define SIZEOF_FLOAT ${SIZEOF_FLOAT}
 #define SIZEOF_DOUBLE ${SIZEOF_DOUBLE}
 
+#cmakedefine HAVE_INT64 ${HAVE_INT64}
+
 /* header files */
 #cmakedefine HAVE_IEEE754_H ${HAVE_IEEE754_H}
 #cmakedefine HAVE_DIRENT_H ${HAVE_DIRENT_H}
