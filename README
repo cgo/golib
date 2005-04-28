@@ -9,11 +9,15 @@ all derived work is also put under the terms of the GNU general public
 license, you may use this library as you please, as long as you do
 not violate the terms of the GPL.
 The text of the GPL can be found in the file COPYING in this distribution
-or on the web pages of the Free Software Foundation.
+or on the web pages of the Free Software Foundation. Make sure
+you read and understand it before using this software.
 
+COMMERCIAL USE:
 ***
 However, if there is demand, I, the author, will make it possible to obtain 
 a commercial license for golib. Please contact me at golib@goschs.de.
+Note that with the GNU GPL, you are not allowed to use
+this software in closed source, commercial applications.
 ***
 
 About
@@ -21,7 +25,6 @@ About
 libGo is a C++ class library containing all kinds of 
 things that proved useful to me.
 For details, see the source documentation in golib/doc.
-
 
 Directories
 -----------
