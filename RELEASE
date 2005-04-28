@@ -1,10 +1,18 @@
-This is golib 0.4.0
+This is golib 0.4.1
 -------------------
+On the way to 0.5!
 
+Plans for version 0.5
+---------------------
+- Clean up the code, e.g. with respect to const usage
+- Bug fixes
+- Remove unused code
+- Make the rest of the code usable
+(- Make it compile under Windows)
 
 IMPORTANT NOTE FOR VERSION 0.2.1:
 ---------------------------------
-This version is not for public use. I have to remove some things that
+Version 0.2.1 is not for public use. I have to remove some things that
 are sponsored by a company and they don't want the code to be released to
 the public (I tried to convince them though, but it was fruitless).
 If you accidentally got this version of the library (see the ending of
