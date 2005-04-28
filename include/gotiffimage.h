@@ -1,7 +1,7 @@
 #ifndef __GOTIFFIMAGE_H
 #define __GOTIFFIMAGE_H
 
-#include <config.h>
+#include <goconfig.h>
 #ifdef HAVE_LIBTIFF
 #include <tiffio.h>
 

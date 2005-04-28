@@ -1,4 +1,4 @@
-#include <config.h>
+#include <goconfig.h>
 #include <goserver.h>
 #include <gonetwork.h>
 #include <gostring.h>
@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <config.h>
 
 namespace goNet {
 

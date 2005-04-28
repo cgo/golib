@@ -1,6 +1,7 @@
 #include <gohashcache.h>
 #include <gorandom.h>
 #include <gopresencemanager.h>
+#include <goconfig.h>
 
 namespace Vol {
 
@@ -350,8 +351,11 @@ goHashCache<I,O,T>::fail()
 
 /* Instantiation */
 
+#ifdef HAVE_INT64
 template class Vol::goHashCacheEntry<goUInt64, void*>;
+#endif
 template class Vol::goHashCacheEntry<goUInt32, void*>;
+#ifdef HAVE_INT64
 template class Vol::goHashCache<goUInt64, void*, goInt8>;
 template class Vol::goHashCache<goUInt64, void*, goUInt8>;
 template class Vol::goHashCache<goUInt64, void*, goInt16>;
@@ -360,6 +364,7 @@ template class Vol::goHashCache<goUInt64, void*, goInt32>;
 template class Vol::goHashCache<goUInt64, void*, goUInt32>;
 template class Vol::goHashCache<goUInt64, void*, goFloat>;
 template class Vol::goHashCache<goUInt64, void*, goDouble>;
+#endif
 // template class Vol::goHashCache<goUInt32, void*>;   // Im Wesentlichen das einzige, was gebraucht wird
 template class Vol::goHashCache<goUInt32, void*, goInt8>;
 template class Vol::goHashCache<goUInt32, void*, goUInt8>;

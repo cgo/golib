@@ -33,14 +33,7 @@ goArray<T>::
 goArray(const goArray<T>& other) {
   arraySize = 0;
   Array = 0;
-  /*
-  arraySize = other.getSize();
-  Array = (T*)malloc(sizeof(T) * arraySize);
-  goIndex_t i;
-  for (i = 0; i < arraySize; i++) {
-    Array[i] = other[i];
-  }
-  */
+  *this = other;
 }
 
 template< class T >
@@ -268,11 +261,11 @@ goArray<T>::remove (goIndex_t index)
 template< class T >
 goArray<T>&
 goArray<T>::
-operator= (goArray<T>& other) {
+operator= (const goArray<T>& other) {
   goIndex_t i = 0;
   this->resize (other.getSize());
   // Faster version
-  memcpy ((void*)this->getPtr(), (void*)other.getPtr(), sizeof(T) * this->getSize());
+  memcpy ((void*)this->getPtr(), (const void*)other.getPtr(), sizeof(T) * this->getSize());
   return (*this);
   
 //  for (i = 0; i < this->getSize(); i++) {
@@ -281,17 +274,17 @@ operator= (goArray<T>& other) {
 //  return (*this);
 }
 
-template< class T >
-goArray<T>&
-goArray<T>::
-operator= (const goArray<T>& other) {
-  goIndex_t i = 0;
-  this->resize (other.getSize());
-  for (i = 0; i < this->getSize(); i++) {
-    (*this)[i] = other[i];
-  }
-  return (*this);
-}
+//template< class T >
+//goArray<T>&
+//goArray<T>::
+//operator= (const goArray<T>& other) {
+//  goIndex_t i = 0;
+//  this->resize (other.getSize());
+//  for (i = 0; i < this->getSize(); i++) {
+//    (*this)[i] = other[i];
+//  }
+//  return (*this);
+//}
 
 template< class T >
 goArray<T>&
@@ -305,7 +298,7 @@ operator+= (T item) {
 template< class T >
 bool
 goArray<T>::
-operator== (goArray<T>& other) {
+operator== (const goArray<T>& other) {
   if (other.getSize() != this->getSize()) return false;
   goIndex_t i;
   for (i = 0; i < getSize(); i++) {
@@ -317,6 +310,6 @@ operator== (goArray<T>& other) {
 template< class T >
 bool
 goArray<T>::
-operator!= (goArray<T>& other) {
+operator!= (const goArray<T>& other) {
   return !( (*this) == other );
 }

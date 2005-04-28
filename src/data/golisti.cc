@@ -21,18 +21,3 @@ template class goList<goUInt32>;
 template class goList<goFloat>;
 template class goList<goDouble>;
 template class goList<void*>;
-
-// template class goList<goString>;
-
-//template class goList<goHashEntry<goUInt64, void*> >;
-//template class goList<goHashEntry<goUInt32, void*> >;
-
-
-
-
-
-
-
-
-
-

@@ -6,9 +6,9 @@
 template <class T>
 class goListElement {
  public:
-  T			elem;
-  goListElement*	next;
-  goListElement*	prev;
+  T         elem;
+  goListElement*    next;
+  goListElement*    prev;
 };
 
 /**
@@ -21,69 +21,65 @@ class goList {
  public:
   ///
   goList ();
-  /*!
-   * @todo Rework the list destructor, it does not destruct anything now.
-   * Also have a look at goHashTable.
-   */
   ~goList ();
 
   void      next ();
   void      prev ();
   /// Returns the current item and increments the pointer.
-  T			getNext ();
-  T*			getNextPtr ();
+  T         getNext ();
+  T*        getNextPtr ();
   /// Returns the current item and decrements the pointer.
-  T			getPrev ();
-  T*			getPrevPtr ();
+  T         getPrev ();
+  T*        getPrevPtr ();
   /// Returns the current item without touching the pointer.
-  T			getCurrent ();
-  T*			getCurrentPtr ();
+  T         getCurrent ();
+  T*        getCurrentPtr ();
   /// Returns the front of the list.
-  T			getFront ();
-  T*			getFrontPtr ();
+  T         getFront ();
+  T*        getFrontPtr ();
   /// Returns the tail of the list.
-  T			getTail ();
-  T*			getTailPtr ();
+  T         getTail ();
+  T*        getTailPtr ();
   ///
-  inline bool		isFront () { return position == front; }
+  inline bool       isFront () { return position == front; }
   ///
-  inline bool		isTail  () { return position == tail; }
+  inline bool       isTail  () { return position == tail; }
   ///
-  inline bool		isEmpty	() { return size == 0; }
+  inline bool       isEmpty () { return size == 0; }
   ///
-  bool			append  (T elem);
+  bool          append  (T elem);
   ///
-  bool			insert  (T elem);
+  bool          insert  (T elem);
   /// Removes the current Item.
-  bool			remove  ();
+  bool          remove  ();
   /// Deletes the whole list leaving a zero length list.
-  void			erase ();
+  void          erase ();
 
   /// Resets the pointer to the front of the list.
-  inline void		resetToFront () { position = front; }
+  inline void       resetToFront () { position = front; }
 
   ///
-  inline goInt32	getSize () { return size; }
+  inline goInt32    getSize () { return size; }
 
   ///
-  goList<T>&		operator= (goList<T>& other);
+  goList<T>&        operator= (goList<T>& other);
 
   /// UNTESTED
-  bool			operator== (goList<T>& other);
+  bool          operator== (goList<T>& other);
   /// UNTESTED
-  bool			operator!= (goList<T>& other);
-  bool			operator< (goList<T>& other);
-  bool			operator> (goList<T>& other);
+  bool          operator!= (goList<T>& other);
+  bool          operator< (goList<T>& other);
+  bool          operator> (goList<T>& other);
 
  protected:
   ///
-  goInt32		size;
+  goInt32       size;
   ///
-  goListElement<T>*	front;
+  goListElement<T>* front;
   ///
-  goListElement<T>*	tail;
+  goListElement<T>* tail;
   ///
-  goListElement<T>*	position;
+  goListElement<T>* position;
 
   ///
   goListElement<T>      dummy;

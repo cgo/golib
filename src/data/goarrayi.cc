@@ -6,6 +6,7 @@
 #include <golist.h>
 #include <gopoint.h>
 #include <gohashtable.h>
+#include <goconfig.h>
 
 // instantiation
 template class goArray< goInt8 >;
@@ -14,8 +15,10 @@ template class goArray< goInt16 >;
 template class goArray< goUInt16 >;
 template class goArray< goInt32 >;
 template class goArray< goUInt32 >;
+#ifdef HAVE_INT64
 template class goArray< goInt64 >;
 template class goArray< goUInt64 >;
+#endif
 template class goArray< goFloat >;
 template class goArray< goDouble >;
 template class goArray< void* >;

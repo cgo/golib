@@ -1,7 +1,7 @@
 #ifndef __GOSIGNAL3D_H__
 #define __GOSIGNAL3D_H__
 
-#include <config.h>
+#include <goconfig.h>
 #include <iostream>
 #include <fstream>
 #include <gotypes.h>

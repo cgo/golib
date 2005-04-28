@@ -6,9 +6,13 @@
 #include <golist.h>
 
 template <class I, class O>
-class goHashEntry {
+class goHashEntry 
+{
  public:
-    virtual goHashEntry<I,O>& operator = (goHashEntry<I,O>& other);
+     goHashEntry();
+     ~goHashEntry();
+
+  goHashEntry<I,O>& operator = (goHashEntry<I,O>& other);
   I	key;
   O	value;
 };

@@ -25,36 +25,24 @@ public:
   ~goString ();
 
   ///
-  goIndex_t getSize ();
-  ///
   goIndex_t getSize () const;
   ///
   void      resize (goIndex_t newsize);
 
-  void      getPathName (goString& pathRet);
-  void      getFileName (goString& fileNameRet);
-  goIndex_t findFirst   (char c);
-  goIndex_t findLast    (char c);
-  bool      copy        (goString& target, goIndex_t start, goIndex_t end);
+  void      getPathName (goString& pathRet) const;
+  void      getFileName (goString& fileNameRet) const;
+  goIndex_t findFirst   (char c) const;
+  goIndex_t findLast    (char c) const;
+  bool      copy        (goString& target, goIndex_t start, goIndex_t end) const;
   
-  ///
-  int         toInt ();
   ///
   int         toInt () const;
   ///
-  float	      toFloat ();
-  ///
   float	      toFloat () const;
-  ///
-  double      toDouble ();
   ///
   double      toDouble () const;
   ///
-  bool	      toBool ();
-  ///
   bool	      toBool () const;
-  ///
-  const char* toCharPtr ();
   ///
   const char* toCharPtr () const;
   ///
@@ -68,9 +56,7 @@ public:
   ///
   char&		operator[] (goIndex_t i);
   ///
-  char&         operator[] (goIndex_t i) const;
-  ///
-  goString& 	  operator=  (goString& other);
+  const char& operator[] (goIndex_t i) const;
   ///
   goString& 	  operator=  (const goString& other);
   ///
@@ -91,26 +77,21 @@ public:
   // ONLY USE THIS IF YOU KNOW EXACTLY WHAT YOU ARE DOING. 
   // ALWAYS AVOID USING THIS METHOD IF THERE'S A WAY TO DO IT IN A CLEAN WAY!
   char*		  getPtr () { return thisString.getPtr(); }
+  const char* getPtr () const { return thisString.getPtr(); }
   
   // goString&	  operator+= (const goString& s);
   // bool		  operator== (const char* s);
-  friend bool	  operator== (goString& str,const char* s);
+  friend bool	  operator== (const goString& str,const char* s);
   ///
   // friend bool	  operator== (const goString& str,const char* s);
   ///
-  friend bool	  operator== (goString& str, goString& str2);
+  friend bool	  operator== (const goString& str, const goString& str2);
   ///
-  friend bool	  operator== (goString& str, const goString& str2);
-  ///
-  friend bool	  operator!= (goString& str,const char* s);
+  friend bool	  operator!= (const goString& str,const char* s);
   ///
   // friend bool	  operator!= (const goString& str,const char* s);
   ///
-  friend bool	  operator!= (goString& str, goString& str2);
-  ///
-  friend bool	  operator!= (goString& str, const goString& str2);
-  ///
-  friend std::ostream& operator<< (std::ostream& o,goString& s);
+  friend bool	  operator!= (const goString& str, const goString& str2);
   ///
   friend std::ostream& operator<< (std::ostream& o, const goString& s);
   ///
@@ -122,7 +103,7 @@ protected:
   ///
   char*			  charPtr;
   ///
-  char                    dummyChar;
+  char            dummyChar;
   ///
   goDate		  thisDate;
 };

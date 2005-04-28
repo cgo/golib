@@ -1,5 +1,5 @@
 #include <gostatusobject.h>
-#include <config.h>
+#include <goconfig.h>
 #include <iostream>
 
 goStatusObject::goStatusObject ()

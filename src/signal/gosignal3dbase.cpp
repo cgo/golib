@@ -5,7 +5,7 @@
 #include <gosignalmacros.h>
 #include <go3vector.h>
 #include <golog.h>
-
+#include <goconfig.h>
 #include <string.h> // bzero()
 #include <iostream>
 
@@ -91,9 +91,11 @@ INITIALIZE_DATATYPE_METHOD(GO_INT16);
 bool
 goSignal3DBase<goInt32>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT32);
+#ifdef HAVE_INT64
 bool
 goSignal3DBase<goInt64>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT64);
+#endif
 bool
 goSignal3DBase<goUInt8>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT8);
@@ -779,7 +781,9 @@ goSignal3DBase<void>::getMaximum() const
         case GO_INT8:         return (goDouble)*(const goInt8*)maxVal; break;
         case GO_INT16:        return (goDouble)*(const goInt16*)maxVal; break;
         case GO_INT32:        return (goDouble)*(const goInt32*)maxVal; break;
+#ifdef HAVE_INT64                              
         case GO_INT64:        return (goDouble)*(const goInt64*)maxVal; break;
+#endif                              
         case GO_UINT8:        return (goDouble)*(const goUInt8*)maxVal; break;
         case GO_UINT16:       return (goDouble)*(const goUInt16*)maxVal; break;
         case GO_UINT32:       return (goDouble)*(const goUInt32*)maxVal; break;
@@ -859,7 +863,9 @@ goSignal3DBase<void>::getMinimum() const
         case GO_INT8:         return (goDouble)*(const goInt8*)minVal; break;
         case GO_INT16:        return (goDouble)*(const goInt16*)minVal; break;
         case GO_INT32:        return (goDouble)*(const goInt32*)minVal; break;
+#ifdef HAVE_INT64
         case GO_INT64:        return (goDouble)*(const goInt64*)minVal; break;
+#endif
         case GO_UINT8:        return (goDouble)*(const goUInt8*)minVal; break;
         case GO_UINT16:       return (goDouble)*(const goUInt16*)minVal; break;
         case GO_UINT32:       return (goDouble)*(const goUInt32*)minVal; break;
@@ -2080,7 +2086,9 @@ template class goSignal3DBase< goInt16 >;
 template class goSignal3DBase< goUInt16 >;
 template class goSignal3DBase< goInt32 >;
 template class goSignal3DBase< goUInt32 >;
+#ifdef HAVE_INT64
 template class goSignal3DBase< goInt64 >;
+#endif
 template class goSignal3DBase< goFloat >;
 template class goSignal3DBase< goDouble >;
 template class goSignal3DBase< void* >;

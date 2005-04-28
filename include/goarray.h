@@ -61,18 +61,12 @@ goArray {
     void remove (goIndex_t index);
   
   ///
-  inline goIndex_t size () {return arraySize;}
-  ///
-  inline goIndex_t getSize () {return arraySize;}
-  ///
   inline goIndex_t getSize () const {return arraySize;}
   ///
   T*	   getPtr () { return Array; }
   const T* getPtr () const { return Array; }
-  inline T&      operator[] (goIndex_t idx) { return Array[idx]; }
-  inline T&      operator[] (goIndex_t idx) const { return Array[idx]; }
-  ///
-  goArray<T>& operator=  (goArray<T>& other);
+  inline T&       operator[] (goIndex_t idx) { return Array[idx]; }
+  inline const T& operator[] (goIndex_t idx) const { return Array[idx]; }
   ///
   goArray<T>& operator=  (const goArray<T>& other);
   /// Resizes the array and adds {\bf item} at the end of it.
@@ -80,12 +74,12 @@ goArray {
   goArray<T>& operator+= (T item);
 
   /// 
-  bool operator== (goArray<T>& other);
+  bool operator== (const goArray<T>& other);
   /// 
-  bool operator!= (goArray<T>& other);
+  bool operator!= (const goArray<T>& other);
   
  protected:
-  T* Array;
+  T*        Array;
   goIndex_t arraySize;
 };
 /*! @} */

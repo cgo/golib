@@ -4,7 +4,7 @@
 
 #include <gotypes.h>
 #include <go3vector.h>
-#include <config.h>
+#include <goconfig.h>
 
 /*!
  * \addtogroup math

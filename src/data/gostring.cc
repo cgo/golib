@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <assert.h>
 
 goString::
 goString() {
@@ -43,12 +44,14 @@ goString::operator[](goIndex_t i) {
   return dummyChar;
 }
 
-char&
-goString::operator[](goIndex_t i) const {
-  if (i < thisString.getSize()) {
-    return thisString[i];
-  }
-  return (char&)dummyChar;
+const char&
+goString::operator[](goIndex_t i) const 
+{
+    if (i < thisString.getSize()) 
+    {
+        return thisString[i];
+    }
+    return (char&)dummyChar;
 }
 
 /*
@@ -75,11 +78,6 @@ goString::getSize () const {
   return (thisString.getSize() - 1);
 }
 
-goIndex_t
-goString::getSize () {
-  return (thisString.getSize() - 1);
-}
-
 /*
 goIndex_t
 goString::getSize () const {
@@ -101,7 +99,7 @@ goString::resize (goIndex_t newsize) {
  * @param fileNameRet  Contains the file name portion.
  **/
 void
-goString::getFileName (goString& fileNameRet)
+goString::getFileName (goString& fileNameRet) const
 {
     fileNameRet = "";
     if (this->getSize() == 0)
@@ -123,7 +121,7 @@ goString::getFileName (goString& fileNameRet)
  * @param pathRet  Contains the path portion of the full file name.
  **/
 void
-goString::getPathName (goString& pathRet)
+goString::getPathName (goString& pathRet) const
 {
     pathRet = "";
     if (this->getSize() == 0)
@@ -147,7 +145,7 @@ goString::getPathName (goString& pathRet)
  * @return True if successful, false otherwise.
  **/
 bool
-goString::copy (goString& target, goIndex_t start, goIndex_t end)
+goString::copy (goString& target, goIndex_t start, goIndex_t end) const
 {
     if (start >= 0 && start < this->getSize() &&
         end >= 0 && end >= start && end < this->getSize())
@@ -161,7 +159,7 @@ goString::copy (goString& target, goIndex_t start, goIndex_t end)
 }
 
 goIndex_t 
-goString::findFirst (char c)
+goString::findFirst (char c) const
 {
     if (this->getSize() == 0)
     {
@@ -174,7 +172,7 @@ goString::findFirst (char c)
 }
 
 goIndex_t 
-goString::findLast (char c)
+goString::findLast (char c) const
 {
     if (this->getSize() == 0)
     {
@@ -187,19 +185,8 @@ goString::findLast (char c)
 }
 
 int
-goString::toInt () {
-  goIndex_t i = 0;
-  char tmp[255];
-  memset (tmp,0,255);
-  for (i = 0; (i < this->getSize()) &&
-	      ( i < 255); i++) {
-    tmp[i] = (*this)[i];
-  }
-  return atoi(tmp);
-}
-
-int
-goString::toInt () const {
+goString::toInt () const 
+{
   goIndex_t i = 0;
   char tmp[255];
   memset (tmp,0,255);
@@ -211,19 +198,8 @@ goString::toInt () const {
 }
 
 float
-goString::toFloat () {
-  goIndex_t i = 0;
-  char tmp[255];
-  memset (tmp,0,255);
-  for (i = 0; (i < this->getSize()) &&
-	      ( i < 255); i++) {
-    tmp[i] = (*this)[i];
-  }
-  return (float)atof(tmp);
-}
-
-float
-goString::toFloat () const {
+goString::toFloat () const
+{
   goIndex_t i = 0;
   char tmp[255];
   memset (tmp,0,255);
@@ -235,19 +211,8 @@ goString::toFloat () const {
 }
 
 double
-goString::toDouble () {
-  goIndex_t i = 0;
-  char tmp[255];
-  memset (tmp,0,255);
-  for (i = 0; (i < this->getSize()) &&
-	 ( i < 255); i++) {
-    tmp[i] = (*this)[i];
-  }
-  return (double)atof(tmp);
-}
-
-double
-goString::toDouble () const {
+goString::toDouble () const 
+{
   goIndex_t i = 0;
   char tmp[255];
   memset (tmp,0,255);
@@ -259,18 +224,8 @@ goString::toDouble () const {
 }
 
 bool
-goString::toBool () {
-  if (this->getSize() >= 1) {
-    if ((*this)[0] == '0') {
-      return false;
-    }
-    else return true;
-  }
-  return false;	
-}
-
-bool
-goString::toBool () const {
+goString::toBool () const 
+{
   if (this->getSize() >= 1) {
     if ((*this)[0] == '0') {
       return false;
@@ -282,7 +237,7 @@ goString::toBool () const {
 
 
 const char*
-goString::toCharPtr () {
+goString::toCharPtr () const {
   if (!thisString.getPtr()) {
     return &dummyChar; 
   }
@@ -306,16 +261,6 @@ goString::toCharPtr () {
     return &dummyChar;
   }
   */
-}
-
-const char*
-goString::toCharPtr () const {
-  if (!thisString.getPtr()) {
-    return &dummyChar; 
-  }
-  // char c = 0;
-  // thisString += c;
-  return thisString.getPtr();
 }
 
 goDate&
@@ -370,22 +315,12 @@ goString::toLower () {
 }
 
 goString&
-goString::operator= (goString& other) {
-  goIndex_t i;
-  this->resize (other.getSize());
-  for (i = 0; i < this->getSize(); i++) {
-    (*this)[i] = other[i];
-  }
-  return *this;
-}
-
-
-goString&
 goString::operator= (const goString& other) {
   goIndex_t i;
   goIndex_t s = other.getSize();
   this->resize (s);
-  for (i = 0; i < this->getSize(); i++) {
+  assert (s == this->getSize());
+  for (i = 0; i < s; i++) {
     (*this)[i] = other[i];
   }
   return *this;
@@ -395,8 +330,9 @@ goString::operator= (const goString& other) {
 goString&
 goString::operator= (const char* other) {
   goIndex_t i;
-  this->resize (strlen(other));   
-  for (i = 0; i < this->getSize(); i++) {
+  this->resize (strlen(other));
+  goIndex_t s = this->getSize();
+  for (i = 0; i < s; i++) {
     (*this)[i] = other[i];
   }
   return *this;
@@ -455,36 +391,9 @@ goString::operator+= (float i) {
     (*this) += &s[0];
     return (*this);
 }
-/*
-goString&
-goString::operator+= (const goString& s) {
-  goIndex_t i = 0;
-  for (i = 0; i < s.getSize(); i++) { 
-    (*this) += s[i];
-  }
-  return (*this);
-}
-*/ 
-
-/* THIS IS NOT NEEDED
-bool
-goString::operator== (const char* s) {
-  goIndex_t i = 0;
-  if (strlen (s) < this->getSize()) {
-    return false;
-  } else {
-    for (i = 0; i < this->getSize(); i++) {
-      if ( (*this)[i] != s[i]) {
-	return false;
-      }	
-    }
-  }
-  return true;
-}	
-*/
 
 bool
-operator== (goString& str,const char* s) {
+operator== (const goString& str,const char* s) {
   goIndex_t i = 0;
   if (strlen (s) != (unsigned)str.getSize()) {
     return false;
@@ -499,13 +408,13 @@ operator== (goString& str,const char* s) {
 }
 
 bool
-operator== (goString& str, const goString& str2) {
+operator== (const goString& str, const goString& str2) {
   goString tmpStr = str2.toCharPtr();
   return (str == tmpStr);
 }
 
 bool	  
-operator== (goString& str, goString& str2) {
+operator== (const goString& str, goString& str2) {
   goIndex_t i = 0;
   if (str.getSize() != str2.getSize()) { return false; }
   for (i = 0; i < str.getSize(); i++) {
@@ -515,29 +424,18 @@ operator== (goString& str, goString& str2) {
 }
 
 bool
-operator!= (goString& str,const char* s) {
+operator!= (const goString& str,const char* s) {
   return !operator==(str,s);
 }
 
 bool
-operator!= (goString& str, const goString& str2) {
+operator!= (const goString& str, const goString& str2) {
   return !operator==(str,str2);
 }
 
 bool	  
-operator!= (goString& str, goString& str2) {
+operator!= (const goString& str, goString& str2) {
   return !operator==(str,str2);
-}
-
-std::ostream&
-operator<< (std::ostream& o, goString& s) {
-  goIndex_t i;
-  if (s.getSize() > 0) {
-    for (i = 0; i < s.getSize(); i++) {
-      o << s[i];
-    }
-  }
-  return o;
 }
 
 std::ostream&
@@ -550,19 +448,3 @@ operator<< (std::ostream& o, const goString& s) {
   }
   return o;
 }
-
-/*
-ostream&
-operator<< (ostream& o, const goString& s) {
-  goIndex_t i;
-  if (s.getSize() > 0) {
-    for (i = 0; i < s.getSize(); i++) {
-      o << s[i];
-    }
-  }
-  return o;
-}
-*/
-
-
-

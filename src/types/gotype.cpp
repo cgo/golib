@@ -5,6 +5,7 @@
 #include <goquantizer.hpp>
 #include <gouniformquantizer.h>
 #include <gouniformquantizer.hpp>
+#include <goconfig.h>
 
 template <class T> static bool      lowerThanFunction   (const void* v1, const void* v2);
 template <class T> static bool      greaterThanFunction (const void* v1, const void* v2);
@@ -293,6 +294,7 @@ goType::setID (goTypeEnum t)
                 myPrivate->indexFunction = int32IndexFunction;
             }
             break;
+#ifdef HAVE_INT64
         case GO_INT64:
             {
                 myPrivate->size        = sizeof (goInt64);
@@ -306,6 +308,7 @@ goType::setID (goTypeEnum t)
                 myPrivate->indexFunction = int32IndexFunction;
             }
             break;
+#endif
         case GO_UINT8:
             {
                 myPrivate->size        = sizeof (goUInt8);
@@ -421,11 +424,13 @@ goType::getSize (goTypeEnum t)
                 return sizeof (goInt32);
             }
             break;
+#ifdef HAVE_INT64
         case GO_INT64:
             {
                 return sizeof (goInt64);
             }
             break;
+#endif
         case GO_UINT8:
             {
                 return sizeof (goUInt8);

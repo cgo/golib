@@ -1,7 +1,7 @@
 #ifndef GODIRECTORY_H
 #define GODIRECTORY_H
 
-#include <config.h>
+#include <goconfig.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 

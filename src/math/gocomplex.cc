@@ -4,32 +4,20 @@
 
 template <class T>
 goComplex<T>::goComplex () {
-  real = 0;
-  ima  = 0;
-  argValue = 0;
-  absValue = 0;
-  info.argValid = false;
-  info.absValid = false;
+  real          = 0;
+  ima           = 0;
 }
 
 template <class T>
 goComplex<T>::goComplex (T r, T i) {
-  real = r;
-  ima  = i;
-  argValue = 0;
-  absValue = 0;
-  info.argValid = false;
-  info.absValid = false;
+  real          = r;
+  ima           = i;
 }
 
 template <class T>
-goComplex<T>::goComplex (goComplex<T>& other) {
-  real = other.re ();
-  ima  = other.im ();
-  argValue = 0;
-  absValue = 0;
-  info.argValid = false;
-  info.absValid = false;
+goComplex<T>::goComplex (const goComplex<T>& other) {
+  real          = other.re ();
+  ima           = other.im ();
 }
 
 template <class T>
@@ -38,7 +26,7 @@ goComplex<T>::~goComplex () {
 
 template <class T>
 goComplex<T>
-goComplex<T>::operator* (goComplex<T>& other) {
+goComplex<T>::operator* (const goComplex<T>& other) {
   goComplex<T> retval;
 
   retval.re() = (real * other.re()) - (ima * other.im());
@@ -49,7 +37,7 @@ goComplex<T>::operator* (goComplex<T>& other) {
 
 template <class T>
 goComplex<T>&
-goComplex<T>::operator*= (goComplex<T>& other) {
+goComplex<T>::operator*= (const goComplex<T>& other) {
   T tmpreal;
   T tmpima;
 
@@ -58,14 +46,12 @@ goComplex<T>::operator*= (goComplex<T>& other) {
 
   real = tmpreal;
   ima  = tmpima;
-  info.argValid = false;
-  info.absValid = false;
   return *this;
 }
 
 template <class T>
 goComplex<T>
-goComplex<T>::operator+ (goComplex<T>& other) {
+goComplex<T>::operator+ (const goComplex<T>& other) {
   goComplex<T> retval;
 
   retval.re() = real + other.re();
@@ -76,17 +62,15 @@ goComplex<T>::operator+ (goComplex<T>& other) {
 
 template <class T>
 goComplex<T>&
-goComplex<T>::operator+= (goComplex<T>& other) {
+goComplex<T>::operator+= (const goComplex<T>& other) {
   real += other.re();
   ima  += other.im();
-  info.argValid = false;
-  info.absValid = false;
   return *this;
 }
 
 template <class T>
 goComplex<T>
-goComplex<T>::operator- (goComplex<T>& other) {
+goComplex<T>::operator- (const goComplex<T>& other) {
   goComplex<T> retval;
 
   retval.re() = real - other.re();
@@ -97,33 +81,29 @@ goComplex<T>::operator- (goComplex<T>& other) {
 
 template <class T>
 goComplex<T>&
-goComplex<T>::operator-= (goComplex<T>& other) {
+goComplex<T>::operator-= (const goComplex<T>& other) {
   real -= other.re();
   ima  -= other.im();
-  info.argValid = false;
-  info.absValid = false;
 
   return *this;
 }
 
 template <class T>
 goComplex<T>
-goComplex<T>::operator/ (goComplex& other) {
+goComplex<T>::operator/ (const goComplex& other) {
   goComplex<T> retval;
   T tmp;
 
   tmp = (other.re()*other.re()) + (other.im()*other.im());
   retval.re() = ( (real * other.re()) + (ima * other.im()) ) / tmp; 
   retval.im() = ( (other.re() * ima) - (real * other.im()) ) / tmp;
-  info.argValid = false;
-  info.absValid = false;
 
   return retval;
 }
 
 template <class T>
 goComplex<T>&
-goComplex<T>::operator/= (goComplex<T>& other) {
+goComplex<T>::operator/= (const goComplex<T>& other) {
   T tmpreal;
   T tmpima;
   T tmp;
@@ -134,77 +114,78 @@ goComplex<T>::operator/= (goComplex<T>& other) {
 
   real = tmpreal;
   ima  = tmpima;
-  info.argValid = false;
-  info.absValid = false;
   return *this;
 }
 
 template <class T>
 goComplex<T>&
-goComplex<T>::operator= (goComplex& other) {
+goComplex<T>::operator= (const goComplex& other) {
   real = other.re();
   ima  = other.im();
-  info.argValid = false;
-  info.absValid = false;
   return *this;
 }
 
 template <class T>
 bool
-goComplex<T>::operator== (goComplex<T>& other) {
-  if ( (other.re() == real) && (other.im() == ima) ) {
-    return true;
-  }
-  return false;
+goComplex<T>::operator== (const goComplex<T>& other) const
+{
+    if ( (other.re() == real) && (other.im() == ima) ) 
+    {
+        return true;
+    }
+    return false;
 }
 
 template <class T>
 bool
-goComplex<T>::operator!= (goComplex<T>& other) {
-  if ( (other.re() != real) || (other.im() != ima) ) {
-    return true;
-  }
-  return false;
+goComplex<T>::operator!= (const goComplex<T>& other) const
+{
+    if ( (other.re() != real) || (other.im() != ima) ) 
+    {
+        return true;
+    }
+    return false;
 }
 
 template <class T>
 void
 goComplex<T>::conjugate () {
   ima = -ima;
-  info.argValid = false;
 }
 
 template <class T>
-goDouble
-goComplex<T>::arg () {
-  if (!info.argValid) {
-    if (real != 0) { 
-      if (real > 0) {
-	if (ima >= 0)
-	  argValue = ( (T)atan (ima / real) ); 
-	else argValue = ( M_PI + M_PI_2 - (T)atan (ima / real) );
-      } else {
-	if (ima >= 0)
-	  argValue = ( M_PI_2 - (T)atan (ima / real) );
-	else argValue = ( M_PI + (T)atan (ima / real) );
-      }
+goDouble goComplex<T>::arg () const
+{
+    goDouble argValue = 0.0;
+    if (real != 0) 
+    { 
+        if (real > 0) 
+        {
+            if (ima >= 0)
+                argValue = ( (T)atan (ima / real) ); 
+            else argValue = ( M_PI + M_PI_2 - (T)atan (ima / real) );
+        } 
+        else 
+        {
+            if (ima >= 0)
+                argValue = ( M_PI_2 - (T)atan (ima / real) );
+            else 
+                argValue = ( M_PI + (T)atan (ima / real) );
+        }
 
-    } else {
-      argValue = (T)(M_PI_2);
+    } 
+    else 
+    {
+        argValue = (T)(M_PI_2);
     }
-    info.argValid = true;
-  }
-  return argValue;
+    return argValue;
 }
 
 template <class T>
 goDouble
-goComplex<T>::abs () {
-  if (!info.absValid) {
-    absValue = (goDouble)sqrt ( (double) (ima*ima + real*real) );
-    info.absValid = true;
-  }
-  return absValue;
+goComplex<T>::abs () const 
+{
+    return sqrt ( (double) (ima*ima + real*real) );
 }
 
 std::ostream& operator<< (std::ostream& o, goComplex<double>& c) {
@@ -215,7 +196,8 @@ std::ostream& operator<< (std::ostream& o, goComplex<double>& c) {
 template <class T>
 bool
 goComplex<T>::
-operator> (goComplex<T> &other) {
+operator> (const goComplex<T> &other) const 
+{
   if (other.abs() < this->abs()) {
     return true;
   }
@@ -225,7 +207,8 @@ operator> (goComplex<T> &other) {
 template <class T>
 bool
 goComplex<T>::
-operator< (goComplex<T> &other) {
+operator< (const goComplex<T> &other) const 
+{
   if (other.abs() > this->abs()) {
     return true;
   }

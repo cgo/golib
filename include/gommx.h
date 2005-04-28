@@ -1,7 +1,7 @@
 #ifndef GOMMX_H
 #define GOMMX_H
 
-#include <config.h>
+#include <goconfig.h>
 
 extern "C" int goASMCheckMMX();		// src/mmx/gommxcheck.s
 extern "C" int goASMCheck3DNOW();	// src/mmx/gommxcheck.s

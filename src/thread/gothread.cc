@@ -1,4 +1,4 @@
-#include <config.h>
+#include <goconfig.h>
 #include <goerror.h>
 #include <gothread.h>
 #ifndef WIN32

@@ -1,4 +1,14 @@
 template <class I, class O>
+goHashEntry<I,O>::goHashEntry ()
+{
+}
+
+template <class T, class O>
+goHashEntry<I,O>::~goHashEntry ()
+{
+}
+
+template <class I, class O>
 goHashEntry<I,O>&
 goHashEntry<I,O>::operator= (goHashEntry<I,O>& other) {
   key = other.key;
@@ -12,7 +22,6 @@ goHashTable<I,O>::goHashTable (goUInt32 mod_value)
     setModValue (mod_value);
     lastFailed = false;
     dummy = (O)0;
-    // table = new goArray<goList<goHashEntry<I,O> > >;
     theTable.resize(0);
 }
 

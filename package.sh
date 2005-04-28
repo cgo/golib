@@ -28,5 +28,6 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/missing\
  golib/mkinstalldirs\
  golib/namespacedoc.h\
+ golib/CMakeLists.txt\
  golib/src\
  golib/tools --exclude="graphics" --exclude=".svn" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la"

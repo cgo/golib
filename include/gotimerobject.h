@@ -1,7 +1,7 @@
 #ifndef GO_TIMEROBJECT_H
 #define GO_TIMEROBJECT_H
 
-#include <config.h>
+#include <goconfig.h>
 #include <gotypes.h>
 #include <goobjectbase.h>
 

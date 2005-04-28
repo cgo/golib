@@ -11,7 +11,7 @@
 
 #include <govol.h>
 
-#include <config.h>
+#include <goconfig.h>
 
 #include <gopresencemanager.h>
 

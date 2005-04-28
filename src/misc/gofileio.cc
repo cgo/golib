@@ -1,6 +1,6 @@
 #include <gofileio.h>
 #include <stdio.h>
-#include <config.h>
+#include <goconfig.h>
 #include <goerror.h>
 #include <goglobal.h>
 #include <golog.h>

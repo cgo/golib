@@ -1,7 +1,7 @@
 #ifndef GOTHREAD_H
 #define GOTHREAD_H
 
-#include "config.h"
+#include <goconfig.h>
 
 #ifdef HAVE_LIBPTHREAD
 #include <pthread.h>

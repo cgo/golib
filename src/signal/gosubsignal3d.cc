@@ -5,7 +5,7 @@
 #include <gotypes.h>
 #include <gomath.h>
 
-#include <config.h>
+#include <goconfig.h>
 #include <assert.h>
 
 template< class T >
@@ -398,7 +398,9 @@ template class goSubSignal3D<goInt16>;
 template class goSubSignal3D<goUInt16>;
 template class goSubSignal3D<goInt32>;
 template class goSubSignal3D<goUInt32>;
+#ifdef HAVE_INT64
 template class goSubSignal3D<goInt64>;
+#endif
 template class goSubSignal3D<goFloat>;
 template class goSubSignal3D<goDouble>;
 template class goSubSignal3D<void*>;

@@ -9,7 +9,7 @@
 
 
 #include <stdlib.h>	//for size_t
-#include "config.h"
+#include <goconfig.h>
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
@@ -41,47 +41,37 @@ typedef goUInt8 goUByte;
 ///
 typedef unsigned short goUInt16;
 ///
-typedef short goSint16;
-///
 typedef short goInt16;
 #endif
 #if SIZEOF_INT == 4
 ///
 typedef unsigned int goUInt32;
 ///
-typedef int goSint32;
-///
 typedef int goInt32;
 #elif SIZEOF_SHORT_INT == 4
 ///
 typedef unsigned short int goUInt32;
 ///
-typedef short int goSint32;
-///
 typedef short int goInt32;
 #endif
 
 /* Hopyfully, one of the following will do :-) */
-#if SIZEOF_LONG_INT == 8
+#ifdef HAVE_INT64
+# if SIZEOF_LONG_INT == 8
 ///
 ///
 typedef unsigned long goUInt64;
 ///
 ///
-typedef long goSint64;
-///
-///
 typedef long goInt64;
-#elif SIZEOF_LONG_LONG_INT == 8
+# elif SIZEOF_LONG_LONG_INT == 8
 ///
 ///
 typedef unsigned long long goUInt64;
 ///
 ///
-typedef long long goSint64;
-///
-///
 typedef long long goInt64;
+# endif
 #endif
 //
 
@@ -141,6 +131,7 @@ enum {
   GO_UINT8,
   GO_UINT16,
   GO_UINT32,
+  GO_UINT64,
   GO_FLOAT,
   GO_DOUBLE,
   GO_VOID_POINTER
@@ -150,7 +141,3 @@ typedef int goTypeEnum;
 
 /** @}*/
 #endif /* __GOTYPES_H__ */
-
-
-
-

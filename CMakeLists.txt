@@ -81,6 +81,11 @@ CHECK_TYPE_SIZE("long long int" SIZEOF_LONG_LONG_INT)
 CHECK_TYPE_SIZE("float"         SIZEOF_FLOAT)
 CHECK_TYPE_SIZE("double"        SIZEOF_DOUBLE)
 
+# We have 64 bit integers:
+IF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
+    SET (HAVE_INT64 1)
+ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
+
 CHECK_INCLUDE_FILE (ieee754.h HAVE_IEEE754_H)
 CHECK_INCLUDE_FILE (dirent.h  HAVE_DIRENT_H)
 CHECK_INCLUDE_FILE (time.h    HAVE_TIME_H)
@@ -139,7 +144,7 @@ INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
   
 # Add -MT flag!
 # ADD_DEFINITIONS     (-)
-CONFIGURE_FILE      (${GOPATH}/include/config.h.cmake.in
-                     ${GOPATH}/include/config.h)
+CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
+                     ${GOPATH}/include/goconfig.h)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 INSTALL_TARGETS     (/lib ${TARGETNAME})

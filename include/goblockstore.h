@@ -1,7 +1,7 @@
 #ifndef GOBLOCKSTORE_H
 #define GOBLOCKSTORE_H
 
-#include <config.h>
+#include <goconfig.h>
 #include <gotypes.h>
 #ifdef BLOCKSTORE_USE_HASHTABLE
 #include <gohashtable.h>
