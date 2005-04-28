@@ -27,5 +27,7 @@ goFileIO
    please report bugs.)
 - goSignal3DGenericConstIterator added (use it!)
 
-
-	
+28.04.2005
+----------
+- Cleanup in data/ directory; tree needs work (make it a real usable tree)
+- Added operators for goSignal3D
