@@ -135,6 +135,93 @@ goString::getPathName (goString& pathRet) const
     }
 }
 
+goIndex_t goString::find (const char* str, goIndex_t start)
+{
+    goIndex_t i = 0;
+    goIndex_t j = 0;
+    goIndex_t sz = static_cast<goIndex_t> (this->getSize());
+    goIndex_t sz_str = strlen(str);
+    goIndex_t currentStart = start;
+    while (currentStart <= sz - sz_str)
+    {
+        i = findFirst (str[0], currentStart);
+        j = 0;
+        while ((i+j) < sz && j < sz_str)
+        {
+            if (str[j] != (*this)[i+j])
+            {
+                break;
+            }
+            ++j;
+        }
+        if (j == sz_str)
+        {
+            //= Found!
+            return i;
+        }
+        ++currentStart;
+    }
+    //= Failure
+    return -1;
+}
+
+/**
+ * @brief 
+ *
+ * @todo Inefficient. Rework when there's need and time.
+ * 
+ * @param str  
+ * @param replacement  
+ *
+ * @return 
+ **/
+goIndex_t goString::replace (const char* str, const char* replacement)
+{
+    assert (str && replacement);
+    if (strlen(str) == 0)
+    {
+        return 0;
+    }
+    goString temp;
+    goString result = "";
+    goIndex_t startPosition = 0;
+    goIndex_t i = 0;
+    goIndex_t sz_str = strlen(str);
+    goIndex_t count = 0;
+    goIndex_t lastFoundIndex = 0;
+    while (i >= 0 && (startPosition + sz_str) <= this->getSize())
+    {
+        i = this->find (str, startPosition);
+        printf ("startPosition == %d\n", startPosition);
+        printf ("i == %d\n", i);
+        if (i >= 0)
+        {
+            //= Somewhat inefficient, but ok for now.
+            if (i > 0)
+            {
+                this->copy (temp, startPosition, i-1);
+                result += temp.toCharPtr();
+            } 
+            result += replacement;
+            printf ("result: %s\n", result.toCharPtr());
+            ++count;
+            lastFoundIndex = i;
+            startPosition = i + sz_str;
+        }
+    }
+    //= Copy the rest
+    if (count > 0)
+    {
+        if (lastFoundIndex < (this->getSize() - sz_str))
+        {
+            this->copy (temp, lastFoundIndex + sz_str, this->getSize() - 1);
+            result += temp.toCharPtr();
+        }
+        *this = result;
+    }
+    return count;
+}
+
 /**
  * @brief Copy a part of this string to another string.
  *
@@ -151,7 +238,6 @@ goString::copy (goString& target, goIndex_t start, goIndex_t end) const
         end >= 0 && end >= start && end < this->getSize())
     {
         target.resize (end - start + 1);
-        goIndex_t i;
         memcpy (target.getPtr(), this->getPtr() + start, sizeof(char) * target.getSize());
         return true;
     }
@@ -159,13 +245,13 @@ goString::copy (goString& target, goIndex_t start, goIndex_t end) const
 }
 
 goIndex_t 
-goString::findFirst (char c) const
+goString::findFirst (char c, goIndex_t start) const
 {
     if (this->getSize() == 0)
     {
         return -1;
     }
-    goIndex_t i = 0;
+    goIndex_t i = start;
     while (i < this->getSize() && (*this)[i] != c)
         ++i;
     return i;
