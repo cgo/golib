@@ -192,8 +192,6 @@ goIndex_t goString::replace (const char* str, const char* replacement)
     while (i >= 0 && (startPosition + sz_str) <= this->getSize())
     {
         i = this->find (str, startPosition);
-        printf ("startPosition == %d\n", startPosition);
-        printf ("i == %d\n", i);
         if (i >= 0)
         {
             //= Somewhat inefficient, but ok for now.
@@ -203,7 +201,6 @@ goIndex_t goString::replace (const char* str, const char* replacement)
                 result += temp.toCharPtr();
             } 
             result += replacement;
-            printf ("result: %s\n", result.toCharPtr());
             ++count;
             lastFoundIndex = i;
             startPosition = i + sz_str;
