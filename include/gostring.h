@@ -31,8 +31,10 @@ public:
 
   void      getPathName (goString& pathRet) const;
   void      getFileName (goString& fileNameRet) const;
-  goIndex_t findFirst   (char c) const;
+  goIndex_t findFirst   (char c, goIndex_t start = 0) const;
   goIndex_t findLast    (char c) const;
+  goIndex_t find        (const char* str, goIndex_t start = 0);
+  goIndex_t replace     (const char* str, const char* replacement);
   bool      copy        (goString& target, goIndex_t start, goIndex_t end) const;
   
   ///
