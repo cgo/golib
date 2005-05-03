@@ -26,6 +26,7 @@
 # include <gosignalmacros.h>
 #endif
 
+#if 0
 static void readLine (FILE* f, goString& str) {
   str.resize (0);
   char c = 0;
@@ -35,6 +36,7 @@ static void readLine (FILE* f, goString& str) {
     c = fgetc(f); 
   }
 }
+#endif
 
 #define GOFILE_PGM_NEXTLINE(f,line) {\
   readLine (f, line);\
@@ -43,6 +45,7 @@ static void readLine (FILE* f, goString& str) {
   }\
 }
 
+#if 0
 void
 goFileIO::readPGM (goString& filename, goSignal2D<goInt32>*& signal) {
   FILE* f;
@@ -206,6 +209,7 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 
 #endif	
 }
+#endif
 
 #ifdef HAVE_LIBIL
 
@@ -499,6 +503,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
 {
     if (!signal)
     {
+        goLog::warning("goFileIO::writeImage(): no signal.");
         return false;
     }
     if (!goGlobal::ILInitialized)
@@ -514,12 +519,14 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
     /// \todo FIXME: add other types
     if (s->getDataType().getID() != GO_FLOAT)
     {
+        goLog::warning("goFileIO::writeImage(): signal is not float.");
         return false;
     }
     ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), 24, IL_LUMINANCE, IL_FLOAT, NULL);
     if (ilGetError() != IL_NO_ERROR)
     {
         ilDeleteImages (1, &imageName);
+        goLog::warning("goFileIO::writeImage(): IL ERROR.");
         return false;
     }
     ILfloat* data = (ILfloat*)ilGetData();
@@ -531,6 +538,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
     if (ilGetError() != IL_NO_ERROR)
     {
         ilDeleteImages (1, &imageName);
+        goLog::warning("goFileIO::writeImage(): IL ERROR.");
         return false;
     }
     ilDeleteImages (1, &imageName);
@@ -572,4 +580,42 @@ goFileIO::remove (const goString& filename)
     }
     return true;
 #endif
+}
+
+goSize_t goFileIO::fileSize (const char* filename)
+{
+    FILE* f = NULL;
+    f = fopen (filename, "r");
+    if (!f)
+        return 0;
+    fseek (f, 0, SEEK_END);
+    int pos = ftell (f);
+    fclose (f);
+    return (goSize_t)pos;
+}
+
+bool  
+goFileIO::readASCII (const char* filename, goString& target)
+{
+    goSize_t sz = goFileIO::fileSize (filename);
+    FILE* f = NULL;
+    f = fopen (filename, "r");
+    if (!f)
+        return false;
+    target.resize (sz);
+    fread (target.getPtr(), 1, sz, f);
+    fclose (f);
+    return true;
+}
+
+bool  
+goFileIO::writeASCII (const char* filename, const goString& str)
+{
+    FILE* f = NULL;
+    f = fopen (filename, "w");
+    if (!f)
+        return false;
+    fwrite (str.getPtr(), 1, str.getSize(), f);
+    fclose (f);
+    return true;
 }
