@@ -48,7 +48,6 @@ SET                 (SOURCES
  src/signal/gosignal3dbase.cpp 
  src/signal/gosubsignal3d.cc 
  src/signal/gosignal3d.cc 
- src/signal/gosignal2d.cc 
  src/signal/gofilter3d.cpp 
  src/signal/godwt.cc 
  src/signal/gohaar3d.cpp 
@@ -95,6 +94,7 @@ CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
 CHECK_FUNCTION_EXISTS (modf     HAVE_MODF)
 
+
 #EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
 #EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (swig ARGS 
@@ -138,13 +138,14 @@ ENDIF (${HAVE_LIBPTHREAD} MATCHES 1)
 #    SET (HAVE_LIBPTHREAD 1)
 #ENDIF (DEFINED ${CMAKE_USE_PTHREADS_INIT})
 
-LINK_LIBRARIES      (${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      $ENV{GOPATH}/include)
   
 # Add -MT flag!
-# ADD_DEFINITIONS     (-)
+ADD_DEFINITIONS     (-Wall -ansi)
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
+TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 INSTALL_TARGETS     (/lib ${TARGETNAME})
+
