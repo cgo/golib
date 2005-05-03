@@ -35,6 +35,7 @@ public:
   goIndex_t findLast    (char c) const;
   goIndex_t find        (const char* str, goIndex_t start = 0);
   goIndex_t replace     (const char* str, const char* replacement);
+  goIndex_t getLine     (goString& ret, goIndex_t start);
   bool      copy        (goString& target, goIndex_t start, goIndex_t end) const;
   
   ///
