@@ -30,6 +30,18 @@
  *	 you need libIL which you can get at http://openil.sourceforge.net 
  
  *	\subsection build Compilation
+ *  Using CMake:
+ *  - If you don't have it, get it at http://www.cmake.org
+ *  - In the main distribution directory, say, ~/golib, do
+ *    <ul>
+ *      <li>mkdir build</li>
+ *      <li>cd build</li>
+ *      <li>cmake ..  or  ccmake ..</li>
+ *      <li>make</li>
+ *      <li>(and if you like) make install</li>
+ *    </ul>
+ * 
+ *	DEPRECATED: Using GNU Autotools
  * 	In the main distribution directory, say, ~/golib,
  *	do the following:
  *	<ul>
