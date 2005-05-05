@@ -3,7 +3,7 @@ goHashEntry<I,O>::goHashEntry ()
 {
 }
 
-template <class T, class O>
+template <class I, class O>
 goHashEntry<I,O>::~goHashEntry ()
 {
 }
