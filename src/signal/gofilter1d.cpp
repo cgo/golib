@@ -68,7 +68,7 @@ static void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_
     goArray<T> lineBuffer (sig.getSizeX() + 2*maskSize);
     T* lineBufferP  = 0;
     T* lineBufferP2 = 0;
-    goIndex_t sx = sig.getSizeX();
+    // goIndex_t sx = sig.getSizeX();
     goIndex_t i;
     goIndex_t y;
     goIndex_t z = 0;
