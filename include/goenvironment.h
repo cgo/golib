@@ -10,6 +10,10 @@
 #ifndef GOENVIRONMENT_H
 #define GOENVIRONMENT_H
 
+#ifndef GOSTRING_H
+# include <gostring.h>
+#endif
+
 bool goGetEnv (const char* variable, goString& retVal);
 
 #endif
