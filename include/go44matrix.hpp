@@ -36,13 +36,6 @@ go44Matrix<T>::go44Matrix (const go44Matrix<T>& other)
 }
 
 template <class T>
-go44Matrix<T>::go44Matrix (go44Matrix<T>& other)
-{
-  matrix = new T[16];
-  (*this) = (const go44Matrix<T>&)other;
-}
-
-template <class T>
 go44Matrix<T>::~go44Matrix () {
   delete[] matrix;
 }
