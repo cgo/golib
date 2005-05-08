@@ -30,4 +30,5 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/namespacedoc.h\
  golib/CMakeLists.txt\
  golib/src\
+ golib/swig\
  golib/tools --exclude="graphics" --exclude=".svn" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la"
