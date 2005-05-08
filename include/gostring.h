@@ -38,6 +38,8 @@ public:
   goIndex_t getLine     (goString& ret, goIndex_t start);
   bool      copy        (goString& target, goIndex_t start, goIndex_t end) const;
   
+  void      fill        (char c);
+  
   ///
   int         toInt () const;
   ///
