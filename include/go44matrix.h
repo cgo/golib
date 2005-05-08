@@ -13,6 +13,7 @@
  */
 /*!
  * 4x4 Matrix.
+ * @todo Either throw this class away or rework it a bit.
  */
 template <class T>
 class go44Matrix {
@@ -22,7 +23,6 @@ public:
 	      T, T, T, T,
 	      T, T, T, T,
 	      T, T, T, T);
-  go44Matrix (go44Matrix<T>& other);
   go44Matrix (const go44Matrix<T>& other);
   ~go44Matrix ();
 
@@ -181,7 +181,7 @@ go44Matrix<T>::operator+= (go44Matrix<T>& other)
   goSize_t __i;					\
   for (__i = 0; __i < 16; __i++)		\
     {						\
-      *__tmp *= __r;				\
+      *__tmp = (T)(*__tmp * __r);				\
       __tmp++;					\
     }						\
 }
