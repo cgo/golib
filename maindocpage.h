@@ -27,8 +27,12 @@
  *	 Depending on the version you are compiling, libSDL might also
  *	 be necessary. You can get it at http://www.libsdl.org.
  *	 In order to use the goFileIO::readImage() and goFileIO::writeImage() methods,
- *	 you need libIL which you can get at http://openil.sourceforge.net 
- 
+ *	 you need libIL which you can get at http://openil.sourceforge.net <br>
+ *	 I recently switched from GNU Autotools to CMake, which can be obtained from 
+ *	 http://www.cmake.org <br>
+ *	 I have not yet decided if I cease using Autotools completely or support both.
+ *	 Probably I will drop Autotools in favour of CMake.
+ *
  *	\subsection build Compilation
  *  Using CMake:
  *  - If you don't have it, get it at http://www.cmake.org
@@ -66,7 +70,11 @@
  *	 Makefile.NAME_OF_THE_EXAMPLE_PROGRAM. Use these makefiles
  * 	 to compile the examples. Be sure to have the environment variables
  *	 mentioned above set correctly.
- * 	 
+ *
+ * \subsection scripting Scripting support with Guile and SWIG
+ *   I am experimenting with scripting support for golib 
+ *   using Guile (http://www.gnu.org/software/guile) and
+ *   swig (http://www.swig.org). The relevant directory is <code>swig</code>.
  *		 
  * \section da  ---Diplomarbeit---
  * Version 0.2.1 of this library contains the source code for my Diplomarbeit 
