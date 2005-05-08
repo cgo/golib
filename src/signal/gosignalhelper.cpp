@@ -287,7 +287,6 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     goSize_t i;
     goSignal3DGenericIterator targetIt (targetSig);
     goSignal3DGenericConstIterator sourceIt (sig);
-    goIndex_t x,y,z;
     for (i = 0; i < channelCount; ++i)
     {
         (const_cast<goSignal3DBase<void>*>(sig))->setChannel(i);
@@ -446,7 +445,7 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
 {
     goSignal3DGenericConstIterator sourceIt (sig);
     goSignal3DGenericIterator targetIt (targetSig);
-    goPtrdiff_t redOffset = 0 * sizeof(sourceT);
+    // goPtrdiff_t redOffset = 0 * sizeof(sourceT);
     goPtrdiff_t greenOffset = 1 * sizeof(sourceT);
     goPtrdiff_t blueOffset = 2 * sizeof(sourceT);
     while (!sourceIt.endZ())

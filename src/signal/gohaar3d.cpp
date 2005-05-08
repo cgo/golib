@@ -25,7 +25,6 @@ _haarFilterX (goSignal3DBase<void>& signal, goSignal3DBase<void>& signal_target,
 
     sourceIt.resetZ();
     targetIt.resetZ();
-    goSize_t i;
     while (!sourceIt.endZ())
     {
         sourceIt.resetY();

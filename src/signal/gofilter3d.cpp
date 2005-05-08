@@ -146,17 +146,17 @@ static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>
                                  mask.getSizeY(),
                                  mask.getSizeZ());
 
-    goIndex_t x, y, z;
+    goSize_t x, y, z;
     x = 0; y = 0; z = 0;
 
-    goUInt8*     xPtrIn;
-    goUInt8*     yPtrIn;
-    goUInt8*     zPtrIn;
+//    goUInt8*     xPtrIn;
+//    goUInt8*     yPtrIn;
+//    goUInt8*     zPtrIn;
     goUInt8*     xPtrOut;
     goUInt8*     yPtrOut;
-    goUInt8*     zPtrOut;
-    goPtrdiff_t* xDiffIn;
-    goPtrdiff_t* yDiffIn;
+//    goUInt8*     zPtrOut;
+//    goPtrdiff_t* xDiffIn;
+//    goPtrdiff_t* yDiffIn;
     goPtrdiff_t* xDiffOut;
     goPtrdiff_t* yDiffOut;
     
@@ -234,17 +234,17 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
                                  myMask.getSizeY(),
                                  myMask.getSizeZ());
 
-    goIndex_t x, y, z;
+    goSize_t x, y, z;
     x = 0; y = 0; z = 0;
 
-    goUInt8*     xPtrIn;
-    goUInt8*     yPtrIn;
-    goUInt8*     zPtrIn;
+//    goUInt8*     xPtrIn;
+//    goUInt8*     yPtrIn;
+//    goUInt8*     zPtrIn;
     goUInt8*     xPtrOut;
     goUInt8*     yPtrOut;
-    goUInt8*     zPtrOut;
-    goPtrdiff_t* xDiffIn;
-    goPtrdiff_t* yDiffIn;
+//    goUInt8*     zPtrOut;
+//    goPtrdiff_t* xDiffIn;
+//    goPtrdiff_t* yDiffIn;
     goPtrdiff_t* xDiffOut;
     goPtrdiff_t* yDiffOut;
     
@@ -327,17 +327,17 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
                                  myMask.getSizeY(),
                                  myMask.getSizeZ());
 
-    goIndex_t x, y, z;
+    goSize_t x, y, z;
     x = 0; y = 0; z = 0;
 
-    T_IN*        xPtrIn;
-    T_IN*        yPtrIn;
-    T_IN*        zPtrIn;
+//    T_IN*        xPtrIn;
+//    T_IN*        yPtrIn;
+//    T_IN*        zPtrIn;
     T_OUT*       xPtrOut;
     T_OUT*       yPtrOut;
-    T_OUT*       zPtrOut;
-    goPtrdiff_t* xDiffIn;
-    goPtrdiff_t* yDiffIn;
+//    T_OUT*       zPtrOut;
+//    goPtrdiff_t* xDiffIn;
+//    goPtrdiff_t* yDiffIn;
     goPtrdiff_t* xDiffOut;
     goPtrdiff_t* yDiffOut;
     

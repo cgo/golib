@@ -203,7 +203,7 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
                 other.getChannelCount());
 
     goIndex_t chan = other.getChannel();
-    goIndex_t i;
+    goSize_t i;
     for (i = 0; i < this->getChannelCount(); ++i)
     {
         this->setChannel (i);

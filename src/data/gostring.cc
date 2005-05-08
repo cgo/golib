@@ -219,6 +219,90 @@ goIndex_t goString::replace (const char* str, const char* replacement)
     return count;
 }
 
+goIndex_t goString::getLine (goString& ret, goIndex_t start)
+{
+    goIndex_t i = this->findFirst ('\n', start);
+    if (i < 0)
+    {
+        ret = "";
+        return this->getSize() + 1;
+    }
+    if (i >= this->getSize())
+    {
+        this->copy (ret, start, this->getSize() - 1);
+        return i;
+    }
+    if (i == start)
+    {
+        ret = "";
+    }
+    else
+    {
+        this->copy (ret, start, i - 1);
+    }
+    return i;
+}
+
+#if 0
+bool goString::getLine (goIndex_t n, goString& ret)
+{
+    goIndex_t start = 0;
+    goIndex_t lastStart = 0;
+    goIndex_t line = 0;
+    goIndex_t i;
+    i = this->findFirst ('\n', start);
+    if (i >= this->getSize())
+    {
+        if (n == 0)
+        {
+            ret = *this;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    for (line = 0; line <= n && start < this->getSize(); ++line)
+    {
+        i = this->findFirst ('\n', start);
+        if (i < 0)
+        {
+            ret = "";
+            return false;
+        }
+        lastStart = start;
+        start = i+1;
+    }
+    printf ("getSize() == %d\n", this->getSize());
+    printf ("line      == %d\n", line);
+    printf ("lastStart == %d\n", lastStart);
+    printf ("i         == %d\n", i);
+    if (line < n+1)
+    {
+        ret = "";
+        return false;
+    }
+    if (line == n+1)
+    {
+        i = this->findFirst ('\n', lastStart);
+        if (i < 0)
+        {
+            ret = "";
+            return false;
+        }
+        if (i >= this->getSize())
+        {
+            this->copy (ret, lastStart, this->getSize() - 1);
+            return true;
+        }
+        this->copy (ret, lastStart, i - 1);
+        return true;
+    }
+    return false;
+}
+#endif
+
 /**
  * @brief Copy a part of this string to another string.
  *
@@ -239,6 +323,16 @@ goString::copy (goString& target, goIndex_t start, goIndex_t end) const
         return true;
     }
     return false;
+}
+
+void
+goString::fill (char c)
+{
+    if (!this->getPtr())
+    {
+        return;
+    }
+    memset (this->getPtr(), (int)c, sizeof(char) * this->getSize());
 }
 
 goIndex_t 

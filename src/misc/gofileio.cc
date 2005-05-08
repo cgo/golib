@@ -14,6 +14,10 @@
 # include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
 #ifdef HAVE_LIBIL
 # include <IL/il.h>
 #endif
@@ -618,4 +622,20 @@ goFileIO::writeASCII (const char* filename, const goString& str)
     fwrite (str.getPtr(), 1, str.getSize(), f);
     fclose (f);
     return true;
+}
+
+bool
+goFileIO::fileExists (const char* filename)
+{
+#ifdef HAVE_STAT
+    struct stat buffer;
+    if (stat(filename, &buffer) == -1)
+    {
+        return false;
+    }
+    return true;
+#else
+    goLog::warning ("goFileIO::fileExists(): golib was compiled without HAVE_STAT.");
+    return false;
+#endif
 }

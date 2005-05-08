@@ -302,7 +302,7 @@ goSignal3DBase<T>::initialize (T*       dataptr,
 
 
     goPtrdiff_t currentJump = 0;
-    goIndex_t j;
+    goSize_t j;
     for (j = 0; j < mySize.x; ++j)
     {
         if ((j % myBlockSize.x) == 0)
@@ -346,8 +346,8 @@ goSignal3DBase<T>::periodize (int axes)
 {
     // Periodize signal over the border
 
-    goIndex_t j;
-    goIndex_t i;
+    goSize_t j;
+    goSize_t i;
    
     if (axes & GO_X)
     {
@@ -382,7 +382,7 @@ goSignal3DBase<T>::periodize (int axes)
         }
 
         j = 0;
-        for (i = getSizeY(); i < getSizeY() + getBorderY(); ++i, ++j)
+        for (i = getSizeY(); i < getSizeY() + (goSize_t)getBorderY(); ++i, ++j)
         {
             yDiff[i] = yDiff[j];
             myYJump[i] = myYJump[j];
@@ -518,7 +518,7 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     blockJumpY  = blockJump * myBlocks.x; 
     blockJumpZ  = blockJumpY * myBlocks.y;
     goPtrdiff_t currentJump = 0;
-    goIndex_t j;
+    goSize_t j;
     for (j = 0; j < mySize.x; ++j)
     {
         if ((j % myBlockSize.x) == 0)
@@ -727,6 +727,7 @@ bool
 goSignal3DBase<void>::operator== (goSignal3DBase<void> &other) 
 {
     goError::print(getClassName(), "operator== not implemented for void.");
+    return false;
 }
 
 goSize_t
@@ -1477,6 +1478,7 @@ goSignal3DBase<void>::operator OPERATOR (const goSignal3DBase<void>& other) \
         case   GO_DOUBLE:   _signalOperator##OPERATORNAME##_<goDouble>   (*this,other);   break; \
         default: goLog::warning("operator #OPERATOR: unknown type."); break; \
     } \
+    return *this; \
 }
 
 #define MAKE_SIGNAL_SCALAR_OPERATOR(OPERATOR,OPERATORNAME,SCALAR) \
@@ -1516,6 +1518,7 @@ goSignal3DBase<void>::operator OPERATOR (SCALAR scalar) \
         case   GO_DOUBLE:   _signalScalarOperator##OPERATORNAME##_<goDouble>   (*this,scalar);   break; \
         default: goLog::warning("operator #OPERATOR: unknown type."); break; \
     } \
+    return *this; \
 }
 
 MAKE_SIGNAL_SIGNAL_OPERATOR(+=,PlusEqual);

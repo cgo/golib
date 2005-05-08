@@ -334,8 +334,8 @@ goSignal2D<T>::fill (T val) {
 	T* localPtr1;\
         T* localPtr2;\
         goIndex_t localY, localX, localY2;\
-        int localOffX1 = source.getOffsetX();\
-        int localOffX2 = target.getOffsetX();\
+        goPtrOffset_t localOffX1 = source.getOffsetX();\
+        goPtrOffset_t localOffX2 = target.getOffsetX();\
         localY2 = startY2;\
          for (localY = startY1; localY <= endY1; localY++, localY2++) {\
            localPtr1 = source.getPtr (startX1, localY);\

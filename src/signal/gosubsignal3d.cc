@@ -12,8 +12,8 @@ template< class T >
 goSubSignal3D<T>::goSubSignal3D ()
   : 
     goSignal3DBase<T>(),
-    parent   (NULL),
     position (0, 0, 0),
+    parent   (NULL),
     skipX    (0),
     skipY    (0),
     skipZ    (0),
@@ -27,8 +27,8 @@ template< class T >
 goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, goSize_t z) 
   : 
     goSignal3DBase<T>(),
-    parent   (NULL),
     position (0, 0, 0),
+    parent   (NULL),
     skipX    (0),
     skipY    (0),
     skipZ    (0),
@@ -140,13 +140,13 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         this->myXJump      = this->real_myXJump + this->getBorderX();
         this->real_xDiff   = new goPtrdiff_t [xArraySize];
         this->xDiff        = this->real_xDiff + this->getBorderX();
-        goIndex_t k;
+        goSize_t k;
         goPtrdiff_t* parentJumpP = parent->getXJump() + (goPtrdiff_t)p.x;
         goPtrdiff_t* parentDiffP = parent->getXDiff() + (goPtrdiff_t)p.x;
         for (k = 0; k < this->getSizeX(); ++k)
         {
             goPtrdiff_t diff = 0;
-            goIndex_t i;
+            goSize_t i;
             for (i = 0; i <= skipX; ++i)
             {
                 diff += parentDiffP [i];
@@ -178,7 +178,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         for (k = 0; k < this->getSizeY(); ++k)
         {
             goPtrdiff_t diff = 0;
-            goIndex_t i;
+            goSize_t i;
             for (i = 0; i <= skipY; ++i)
             {
                 diff += parentDiffP [i];
@@ -210,7 +210,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         for (k = 0; k < this->getSizeZ(); ++k)
         {
             goPtrdiff_t diff = 0;
-            goIndex_t i;
+            goSize_t i;
             for (i = 0; i <= skipZ; ++i)
             {
                 diff += parentDiffP [i];

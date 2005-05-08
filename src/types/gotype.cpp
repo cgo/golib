@@ -197,16 +197,16 @@ class goTypePrivate
 };
 
 goTypePrivate::goTypePrivate (goTypeEnum t)
-    : typeEnum     (t),
-      size         (goType::getSize (t)),
-      signedness   (goType::isSigned (t)),
-      string       (""),
-      lowerThan    (NULL),
-      greaterThan  (NULL),
-      equal        (NULL),
-      minimum      (0.0),
-      maximum      (1.0),
-      indexFunction (NULL)
+    : typeEnum      (t),
+      size          (goType::getSize (t)),
+      signedness    (goType::isSigned (t)),
+      string        (""),
+      lowerThan     (NULL),
+      equal         (NULL),
+      greaterThan   (NULL),
+      indexFunction (NULL),
+      minimum       (0.0),
+      maximum       (1.0)
 {
     goType::getString (t, string);
 }

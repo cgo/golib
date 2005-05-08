@@ -53,8 +53,8 @@ static bool laplacian2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
     const goByte* sigP;
     goByte*       retP;
 
-    goIndex_t i,j;
-    goFloat u[9];
+    goSize_t i,j;
+    // goFloat u[9];
     goFloat lambda = 1.0f/3.0f;
     goFloat _lambda = 1.0f - lambda;
     for (j = 0; j < sig.getSizeY(); ++j)
@@ -119,8 +119,8 @@ static bool gradient2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& 
     goByte*       retP1;
     goByte*       retP2;
 
-    goIndex_t i,j;
-    goFloat u[9];
+    goSize_t i,j;
+    // goFloat u[9];
     goFloat lambda = sqrt(2.0f) - 1.0f;
     goFloat _lambda = (1.0f - lambda) * 0.5f;
     for (j = 0; j < sig.getSizeY(); ++j)
@@ -188,8 +188,8 @@ static bool ddx2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
     const goByte* sigP;
     goByte*       retP;
 
-    goIndex_t i,j;
-    goFloat u[9];
+    goSize_t i,j;
+    // goFloat u[9];
     goFloat lambda = sqrt(2.0f) - 1.0f;
     goFloat _lambda = (1.0f - lambda) * 0.5f;
     for (j = 0; j < sig.getSizeY(); ++j)
@@ -249,8 +249,8 @@ static bool ddy2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
     const goByte* sigP;
     goByte*       retP;
 
-    goIndex_t i,j;
-    goFloat u[9];
+    goSize_t i,j;
+    // goFloat u[9];
     goFloat lambda = sqrt(2.0f) - 1.0f;
     goFloat _lambda = (1.0f - lambda) * 0.5f;
     for (j = 0; j < sig.getSizeY(); ++j)

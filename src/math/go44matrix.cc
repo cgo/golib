@@ -2,7 +2,7 @@
 #include <go44matrix.h>
 #include <go44matrix.hpp>
 #include <stdlib.h>
-#include <iostream.h>
+#include <iostream>
 
 
 //  template <class T>
@@ -19,7 +19,7 @@
 //  }
 
 
-ostream& operator<< (ostream& o, go44Matrix<goFloat>& mat) {
+std::ostream& operator<< (std::ostream& o, const go44Matrix<goFloat>& mat) {
   goIndex_t i = 0, j = 0;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
@@ -31,19 +31,7 @@ ostream& operator<< (ostream& o, go44Matrix<goFloat>& mat) {
   return o;
 }
 
-ostream& operator<< (ostream& o, go44Matrix<goDouble>& mat) {
-  goIndex_t i = 0, j = 0;
-  for (i = 0; i < 4; i++) {
-    for (j = 0; j < 4; j++) {
-      o << mat.elem(i,j) << " ";
-    }
-    o << "\n";
-  }
-  o << "\n";
-  return o;
-}
-
-ostream& operator<< (ostream& o, const go44Matrix<goDouble>& mat) {
+std::ostream& operator<< (std::ostream& o, const go44Matrix<goDouble>& mat) {
   goIndex_t i = 0, j = 0;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {

@@ -78,6 +78,7 @@ static bool calculateHistogram (const goSignal3DBase<void>& sig,
                 bins[(goIndex_t)((*(const signal_type*)__ptr - minValue) * _binStep)] += 1.0;, sig
                 );
     }
+    return true;
 }
 
 template <class level_type>

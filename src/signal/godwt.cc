@@ -943,7 +943,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
 /*  goSize_t z = __block.getSizeZ(); */\
   goPtrdiff_t* dx       = __block.getXDiff();\
   goPtrdiff_t* dy       = __block.getYDiff();\
-  goPtrdiff_t* dz       = __block.getZDiff();\
+/*  goPtrdiff_t* dz       = __block.getZDiff(); */ \
   goPtrdiff_t* zAddress = __block.getZJump();\
   register int r1,r2,r3,r4,r5,r6,r7,r8; /* __T */ \
   register __T *p1;\
