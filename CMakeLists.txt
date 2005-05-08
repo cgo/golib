@@ -59,6 +59,7 @@ SET                 (SOURCES
  src/signal/gosignal3dgenericiterator.cpp
  src/system/godirectory.cc
  src/system/goprocess.cc
+ src/system/goenvironment.cpp
  src/thread/gothread.cc 
  src/thread/goconsumer.cc 
  src/thread/goproducer.cc 
@@ -85,14 +86,17 @@ IF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
     SET (HAVE_INT64 1)
 ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 
-CHECK_INCLUDE_FILE (ieee754.h HAVE_IEEE754_H)
-CHECK_INCLUDE_FILE (dirent.h  HAVE_DIRENT_H)
-CHECK_INCLUDE_FILE (time.h    HAVE_TIME_H)
-CHECK_INCLUDE_FILE (unistd.h  HAVE_UNISTD_H)
+CHECK_INCLUDE_FILE (ieee754.h   HAVE_IEEE754_H)
+CHECK_INCLUDE_FILE (dirent.h    HAVE_DIRENT_H)
+CHECK_INCLUDE_FILE (time.h      HAVE_TIME_H)
+CHECK_INCLUDE_FILE (unistd.h    HAVE_UNISTD_H)
+CHECK_INCLUDE_FILE (sys/stat.h  HAVE_SYS_STAT_H)
 
 CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
 CHECK_FUNCTION_EXISTS (modf     HAVE_MODF)
+CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
+CHECK_FUNCTION_EXISTS (stat     HAVE_STAT)
 
 
 #EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
@@ -142,7 +146,7 @@ INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      $ENV{GOPATH}/include)
   
 # Add -MT flag!
-ADD_DEFINITIONS     (-Wall -ansi)
+ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS})
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
