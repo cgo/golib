@@ -262,7 +262,6 @@ template< class T >
 goArray<T>&
 goArray<T>::
 operator= (const goArray<T>& other) {
-  goIndex_t i = 0;
   this->resize (other.getSize());
   // Faster version
   memcpy ((void*)this->getPtr(), (const void*)other.getPtr(), sizeof(T) * this->getSize());
