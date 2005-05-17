@@ -346,8 +346,8 @@ goSignal3DBase<T>::periodize (int axes)
 {
     // Periodize signal over the border
 
-    goSize_t j;
-    goSize_t i;
+    goIndex_t j;
+    goIndex_t i;
    
     if (axes & GO_X)
     {
@@ -360,7 +360,7 @@ goSignal3DBase<T>::periodize (int axes)
         }
 
         j = 0;
-        for (i = getSizeX(); i < getSizeX() + getBorderX(); ++i, ++j)
+        for (i = getSizeX(); i < (goIndex_t)getSizeX() + getBorderX(); ++i, ++j)
         {
             xDiff[i] = xDiff[j];
             myXJump[i] = myXJump[j];
@@ -382,7 +382,7 @@ goSignal3DBase<T>::periodize (int axes)
         }
 
         j = 0;
-        for (i = getSizeY(); i < getSizeY() + (goSize_t)getBorderY(); ++i, ++j)
+        for (i = getSizeY(); i < (goIndex_t)getSizeY() + getBorderY(); ++i, ++j)
         {
             yDiff[i] = yDiff[j];
             myYJump[i] = myYJump[j];
@@ -404,7 +404,7 @@ goSignal3DBase<T>::periodize (int axes)
         }
 
         j = 0;
-        for (i = getSizeZ(); i < getSizeZ() + getBorderZ(); ++i, ++j)
+        for (i = getSizeZ(); i < (goIndex_t)getSizeZ() + getBorderZ(); ++i, ++j)
         {
             zDiff[i] = zDiff[j];
             myZJump[i] = myZJump[j];
@@ -514,9 +514,10 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         zDiff[i] = blockJumpZ - (myBlockSize.x * myBlockSize.y * (myBlockSize.z - 1) * elementSize * myChannelCount);
     }
 
-    blockJump   = myBlockSize.x * myBlockSize.y * myBlockSize.z;
-    blockJumpY  = blockJump * myBlocks.x; 
-    blockJumpZ  = blockJumpY * myBlocks.y;
+    // Du bloeder, kleiner Scheiss-Idiot.  FIXME
+//    blockJump   = myBlockSize.x * myBlockSize.y * myBlockSize.z;
+//    blockJumpY  = blockJump * myBlocks.x; 
+//    blockJumpZ  = blockJumpY * myBlocks.y;
     goPtrdiff_t currentJump = 0;
     goSize_t j;
     for (j = 0; j < mySize.x; ++j)
@@ -525,8 +526,8 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJump * j / myBlockSize.x;
         }
-        myXJump[j] = currentJump * elementSize * myChannelCount;
-        ++currentJump;
+        myXJump[j] = currentJump; // * elementSize * myChannelCount;
+        currentJump += elementSize * myChannelCount;
     }
 
     currentJump = 0;
@@ -536,8 +537,8 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJumpY * j / myBlockSize.y;
         }
-        myYJump[j] = currentJump * elementSize * myChannelCount;
-        currentJump += myBlockSize.x;
+        myYJump[j] = currentJump; //  * elementSize * myChannelCount;
+        currentJump += myBlockSize.x * elementSize * myChannelCount;
     }
     
     currentJump = 0;
@@ -547,8 +548,8 @@ goSignal3DBase<void>::initialize (void*    dataptr,
         {
             currentJump = blockJumpZ * j / myBlockSize.z;
         }
-        myZJump[j] = currentJump * elementSize * myChannelCount;
-        currentJump += myBlockSize.x * myBlockSize.y;
+        myZJump[j] = currentJump; // * elementSize * myChannelCount;
+        currentJump += myBlockSize.x * myBlockSize.y * elementSize * myChannelCount;
     }
 
 
@@ -1079,6 +1080,43 @@ inline
 void
 goSignal3DBase<T>::rotateAxes ()
 {
+    goString msg;
+    msg = "Rotate axes ---\n";
+    msg += "\tdiffs == "; 
+    msg += (int)xDiff; msg += " ";
+    msg += (int)yDiff; msg += " ";
+    msg += (int)zDiff;
+    msg += "\n\tjumps == ";
+    msg += (int)myXJump; msg += " ";
+    msg += (int)myYJump; msg += " ";
+    msg += (int)myZJump;
+    msg += "\n\trealdiffs == ";
+    msg += (int)real_xDiff; msg += " ";
+    msg += (int)real_yDiff; msg += " ";
+    msg += (int)real_zDiff;
+    msg += "\n\trealjumps == ";
+    msg += (int)real_myXJump; msg += " ";
+    msg += (int)real_myYJump; msg += " ";
+    msg += (int)real_myZJump;
+    msg += "\n\tsize == ";
+    msg += (int)mySize.x; msg += " ";
+    msg += (int)mySize.y; msg += " ";
+    msg += (int)mySize.z; 
+    msg += "\n\tbordersize == ";
+    msg += (int)myBorderSize.x; msg += " ";
+    msg += (int)myBorderSize.y; msg += " ";
+    msg += (int)myBorderSize.z; 
+    msg += "\n\tblocksize == ";
+    msg += (int)myBlockSize.x; msg += " ";
+    msg += (int)myBlockSize.y; msg += " ";
+    msg += (int)myBlockSize.z; 
+    msg += "\n\tblocks == ";
+    msg += (int)myBlocks.x; msg += " ";
+    msg += (int)myBlocks.y; msg += " ";
+    msg += (int)myBlocks.z; 
+    
+    goLog::message(msg,this);
+    
   goPtrdiff_t* tempDiff = zDiff;
   goSize_t tempSize = mySize.z;
   goPtrdiff_t* tempJump = myZJump;
