@@ -62,6 +62,7 @@ goArray {
   
   ///
   inline goIndex_t getSize () const {return arraySize;}
+  inline goIndex_t dim     () const {return arraySize;} 
   ///
   T*	   getPtr () { return Array; }
   const T* getPtr () const { return Array; }

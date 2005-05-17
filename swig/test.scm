@@ -1,4 +1,4 @@
-#!/usr/bin/guile -s 
+#!/home/christian/Software/bin/guile -s 
 !#
 (primitive-load "./golib_guile.scm")
 (use-modules (oop goops describe))
@@ -32,7 +32,7 @@
 (describe (cadr siglist))
 
 ;; Test reading an image:
-(primitive:goFileIO-readImage "caro4.jpg" sig)
+(primitive:goFileIO-readImage "/home/christian/KDE.jpg" sig)
 ;; Make a new signal and set to float type:
 (define sig2 (make-instance <gosignal3d>))
 (setDataType sig2 (GO-FLOAT))

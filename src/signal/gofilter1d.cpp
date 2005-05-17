@@ -61,7 +61,7 @@ bool goFilter1D::setCenter (goIndex_t c)
 }
 
 template <class T>
-static void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_t center)
+inline void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_t center)
 {
     goSignal3DGenericIterator it (&sig);
     goIndex_t maskSize = mask.getSize();

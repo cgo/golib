@@ -7,6 +7,9 @@
 
 #include <gotypes.h>
 #include <gostring.h>
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 
 class goObjectBase;
 
@@ -43,7 +46,7 @@ class goFileIO {
 
   /** @addtogroup signal */
   /** @{ */
-  static bool  readImage  (const char* filename, goObjectBase* signal);
+  static bool  readImage  (const char* filename, goSignal3D<void>* signal);
   static bool  writeImage (const char* filename, const goObjectBase* signal);
   /** @} */
   static FILE* createTempFile (goString& filenameRet);

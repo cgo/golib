@@ -40,5 +40,5 @@
 
 %template(gosignal3dbase) goSignal3DBase<void>; 
 %template(gosignal3d)     goSignal3D<void>; 
-
+%name(make_signal) goSignal3D::make;
 // %rename(readImage) goFileIO::readImage;

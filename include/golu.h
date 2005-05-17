@@ -217,7 +217,7 @@ class goLU
    */
 
    goArray<int> getPivot () {
-      return p;
+      return piv;
    }
 
 

@@ -146,7 +146,9 @@ INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      $ENV{GOPATH}/include)
   
 # Add -MT flag!
-ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS})
+IF(UNIX)
+ ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
+ENDIF(UNIX)
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})

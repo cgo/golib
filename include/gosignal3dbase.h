@@ -74,9 +74,9 @@ goSignal3DBase : public goObjectBase
                         goSize_t blocksize_x = 32, 
                         goSize_t blocksize_y = 32, 
                         goSize_t blocksize_z = 32,
-                        goSize_t border_x = 0, 
-                        goSize_t border_y = 0, 
-                        goSize_t border_z = 0,
+                        goSize_t border_x = 16, 
+                        goSize_t border_y = 16, 
+                        goSize_t border_z = 16,
                         goSize_t channelCount = 1);
         goSignal3DBase (goSignal3DBase<T>& other);
         bool     initializeDataType ();
@@ -86,9 +86,9 @@ goSignal3DBase : public goObjectBase
                              goSize_t blocksize_x = 32, 
                              goSize_t blocksize_y = 32, 
                              goSize_t blocksize_z = 32,
-                             goSize_t border_x    = 0, 
-                             goSize_t border_y    = 0, 
-                             goSize_t border_z    = 0,
+                             goSize_t border_x    = 16, 
+                             goSize_t border_y    = 16, 
+                             goSize_t border_z    = 16,
                              goSize_t channelCount = 1);
 
         void     cleanup ();

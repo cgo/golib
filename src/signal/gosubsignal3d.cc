@@ -100,28 +100,28 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     
     if (deleteX)
     {
-        delete[] real_myXJump;
+        delete[] this->real_myXJump;
         this->real_myXJump = 0;
         this->myXJump = 0;
-        delete[] real_xDiff;
+        delete[] this->real_xDiff;
         this->xDiff = NULL;
         this->real_xDiff = NULL;
     }
     if (deleteY)
     {
-        delete[] real_myYJump;
+        delete[] this->real_myYJump;
         this->real_myYJump = 0;
         this->myYJump = 0;
-        delete[] real_yDiff;
+        delete[] this->real_yDiff;
         this->yDiff = NULL;
         this->real_yDiff = NULL;
     }
     if (deleteZ)
     {
-        delete[] real_myZJump;
+        delete[] this->real_myZJump;
         this->real_myZJump = 0;
         this->myZJump = 0;
-        delete[] real_zDiff;
+        delete[] this->real_zDiff;
         this->zDiff = NULL;
         this->real_zDiff = NULL;
     }

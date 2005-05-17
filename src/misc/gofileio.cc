@@ -223,11 +223,11 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
     s->destroy ();
     if (format == IL_RGBA)
     {
-        s->make (width, height, 1, 32, 32, 1, 32, 32, 1, 4);
+        s->make (width, height, 1, 32, 32, 1, 32, 32, 0, 4);
     }
     else
     {
-        s->make (width, height, 1, 32, 32, 1, 32, 32, 1, 1);
+        s->make (width, height, 1, 32, 32, 1, 32, 32, 0, 1);
     }
     if (ilConvertImage (format, type) == IL_FALSE)
     {
@@ -241,6 +241,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
     }
     if (s->getChannelCount() == 4)
     {
+        
         data = (T*)ilGetData();
         s->setChannel(0);
         GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
@@ -253,6 +254,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
         data = (T*)ilGetData() + 3;
         s->setChannel(3);
         GO_SIGNAL3D_EACHELEMENT_GENERIC (*(T*)__ptr = *data; data+=4, (*s));
+        s->setChannel(0);
     }
     return true;
 }
@@ -311,7 +313,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  * @return  True if successful, false otherwise.
  **/
 bool
-goFileIO::readImage (const char* filename, goObjectBase* signal)
+goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
 {
     if (!signal)
     {
@@ -350,7 +352,15 @@ goFileIO::readImage (const char* filename, goObjectBase* signal)
 
     //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
     /// \todo Add a sanity check here.
-    goSignal3D<void>* s = (goSignal3D<void>*)signal;
+    if (goString(signal->getClassName()) != "goSignal3D")
+    {
+        goString msg = "goFileIO::readImage(): signal must be a goSignal3D but is ";
+        msg += signal->getClassName();
+        msg += ". Not loading.";
+        goLog::warning (msg);
+        return false;
+    }
+    goSignal3D<void>* s = signal;
     switch (imageFormat)
     {
         case IL_LUMINANCE: break;
