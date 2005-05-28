@@ -310,7 +310,13 @@ class goSignal3DGenericConstIterator
         /** 
          * @return Pointer to the data element at the current iterator position.
          */
-        inline const goByte* operator*   ()  const { return px; };
+        inline const goByte*  leftX    () const { return px - *(dx-1); }
+        inline const goByte*  leftY    () const { return px - *(dy-1); }
+        inline const goByte*  leftZ    () const { return px - *(dz-1); }
+        inline const goByte*  rightX   () const { return px + *dx; }
+        inline const goByte*  rightY   () const { return px + *dy; }
+        inline const goByte*  rightZ   () const { return px + *dz; }
+        inline const goByte* operator* () const { return px; };
        
         const goSignal3DBase<void>* sig;
         const goPtrdiff_t*    dx;
