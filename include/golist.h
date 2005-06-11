@@ -6,6 +6,9 @@
 template <class T>
 class goListElement {
  public:
+     goListElement ();
+     ~goListElement ();
+
   T         elem;
   goListElement*    next;
   goListElement*    prev;
@@ -26,19 +29,19 @@ class goList {
   void      next ();
   void      prev ();
   /// Returns the current item and increments the pointer.
-  T         getNext ();
+  T&        getNext ();
   T*        getNextPtr ();
   /// Returns the current item and decrements the pointer.
-  T         getPrev ();
+  T&        getPrev ();
   T*        getPrevPtr ();
   /// Returns the current item without touching the pointer.
-  T         getCurrent ();
+  T&        getCurrent ();
   T*        getCurrentPtr ();
   /// Returns the front of the list.
-  T         getFront ();
+  T&        getFront ();
   T*        getFrontPtr ();
   /// Returns the tail of the list.
-  T         getTail ();
+  T&        getTail ();
   T*        getTailPtr ();
   ///
   inline bool       isFront () { return position == front; }
@@ -47,9 +50,9 @@ class goList {
   ///
   inline bool       isEmpty () { return size == 0; }
   ///
-  bool          append  (T elem);
+  bool          append  (const T& elem);
   ///
-  bool          insert  (T elem);
+  bool          insert  (const T& elem);
   /// Removes the current Item.
   bool          remove  ();
   /// Deletes the whole list leaving a zero length list.

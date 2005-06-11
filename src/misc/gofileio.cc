@@ -18,6 +18,14 @@
 # include <sys/stat.h>
 #endif
 
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
+# include <errno.h>
+#endif
+
 #ifdef HAVE_LIBIL
 # include <IL/il.h>
 #endif
@@ -313,7 +321,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  * @return  True if successful, false otherwise.
  **/
 bool
-goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
+goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException)
 {
     if (!signal)
     {
@@ -337,6 +345,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
     if (ilLoadImage (fn.getPtr()) == IL_FALSE)
     {
         ilDeleteImages (1, &imageName);
+        throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
     ILint width  = 0;
@@ -389,7 +398,8 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
             case IL_FLOAT:          s->setDataType (GO_FLOAT);  break;
             case IL_DOUBLE:         s->setDataType (GO_DOUBLE); break;
             default: 
-                    goLog::warning("goFileIO::readImage(): Unknown data type."); break;
+                    goLog::warning("goFileIO::readImage(): Unknown data type."); 
+                    throw goTypeException(goTypeException::UNKNOWN_TYPE); break;
         }
     }
     switch (s->getDataType().getID())
@@ -461,6 +471,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
         default:
             {
                 ilDeleteImages (1, &imageName);
+                throw goTypeException(goTypeException::UNKNOWN_TYPE);
                 return false;
             }
             break;
@@ -470,7 +481,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal)
 }
 #else
 bool
-goFileIO::readImage (const char*, goObjectBase*)
+goFileIO::readImage (const char*, goObjectBase*) throw (goFileIOException, goTypeException)
 {
     return false;
 }
@@ -513,7 +524,7 @@ goFileIO::readImage (const char*, goObjectBase*)
  **/
 #ifdef HAVE_LIBIL
 bool
-goFileIO::writeImage (const char* filename, const goObjectBase* signal)
+goFileIO::writeImage (const char* filename, const goObjectBase* signal) throw (goFileIOException, goTypeException)
 {
     if (!signal)
     {
@@ -534,6 +545,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
     if (s->getDataType().getID() != GO_FLOAT)
     {
         goLog::warning("goFileIO::writeImage(): signal is not float.");
+        throw goTypeException(goTypeException::WRONG_TYPE);
         return false;
     }
     ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), 24, IL_LUMINANCE, IL_FLOAT, NULL);
@@ -541,6 +553,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
     {
         ilDeleteImages (1, &imageName);
         goLog::warning("goFileIO::writeImage(): IL ERROR.");
+        throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
     ILfloat* data = (ILfloat*)ilGetData();
@@ -553,6 +566,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
     {
         ilDeleteImages (1, &imageName);
         goLog::warning("goFileIO::writeImage(): IL ERROR.");
+        throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
     ilDeleteImages (1, &imageName);
@@ -560,7 +574,7 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal)
 }
 #else
 bool
-goFileIO::writeImage (const char*, const goObjectBase*)
+goFileIO::writeImage (const char*, const goObjectBase*) throw (goFileIOException)
 {
     return false;
 }
@@ -648,4 +662,30 @@ goFileIO::fileExists (const char* filename)
     goLog::warning ("goFileIO::fileExists(): golib was compiled without HAVE_STAT.");
     return false;
 #endif
+}
+
+bool
+goFileIO::mkdir (const char* pathname)
+{
+    if (!pathname)
+        return false;
+#ifdef HAVE_MKDIR
+    int retval = ::mkdir (pathname, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP);
+    switch (retval)
+    {
+        case 0:
+            return true;
+            break;
+        default:
+            {
+                if (errno == EEXIST)
+                {
+                    return true;
+                }
+                return false;
+            }
+            break;
+    }
+#endif
+    return false;
 }

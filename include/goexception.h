@@ -33,6 +33,44 @@ class goExceptionString : public goException
     
     goString st;
 };
+
+class goMemoryException
+{
+};
+
+class goFileIOException
+{
+    public:
+    enum
+    {
+        NOT_FOUND,
+        FAILED
+    };
+
+    goFileIOException (int _code = FAILED) : code (_code) {};
+    ~goFileIOException () {};
+
+    int code;
+};
+
+class goTypeException
+{
+    public:
+    enum
+    {
+        UNKNOWN_TYPE,
+        WRONG_TYPE
+    };
+    goTypeException (int t = WRONG_TYPE) : code (t) {};
+    ~goTypeException () {};
+
+    int code;
+};
+
+class goNullException
+{
+};
+
 /*!
  * @}
  */

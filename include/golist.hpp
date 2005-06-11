@@ -2,6 +2,19 @@
 // #include <gostring.h>
 // #include <gohashtable.h>
 
+template<class T>
+goListElement<T>::goListElement ()
+    : elem (),
+      next (0),
+      prev (0)
+{
+}
+
+template<class T>
+goListElement<T>::~goListElement ()
+{
+}
+
 template <class T>
 goList<T>::goList () {
   front		= 0;
@@ -41,7 +54,7 @@ void goList<T>::prev ()
 }
 
 template <class T>
-T
+T&
 goList<T>::getNext () {
   T* tmp = 0;
   if (position) {
@@ -67,7 +80,7 @@ goList<T>::getNextPtr () {
 }
 
 template <class T>
-T
+T&
 goList<T>::getPrev () {
   T* tmp = 0;
   if (position) {
@@ -93,12 +106,12 @@ goList<T>::getPrevPtr () {
 }
 
 template <class T>
-T
+T&
 goList<T>::getCurrent () {
   if (position) {
       return (position->elem);
   }
-  return 0;
+  return dummy.elem;
 }
 
 template <class T>
@@ -111,7 +124,7 @@ goList<T>::getCurrentPtr () {
 }
 
 template <class T>
-T
+T&
 goList<T>::getFront () {
     if (!front)
     {
@@ -131,7 +144,7 @@ goList<T>::getFrontPtr () {
 }
 
 template <class T>
-T
+T&
 goList<T>::getTail () {
   if (!tail)
   {
@@ -170,7 +183,7 @@ goList<T>::getTailPtr () {
 
 template <class T>
 bool
-goList<T>::append (T elem) {
+goList<T>::append (const T& elem) {
   goListElement<T> *e = new goListElement<T>;
 
   e->elem = elem;
@@ -194,7 +207,7 @@ goList<T>::append (T elem) {
 
 template <class T>
 bool
-goList<T>::insert (T elem) {
+goList<T>::insert (const T& elem) {
   goListElement<T> *e = new goListElement<T>;
   
   e->elem = elem;
@@ -215,26 +228,47 @@ goList<T>::insert (T elem) {
 template <class T>
 bool
 goList<T>::remove () {
-  if (position) {
-    goListElement<T>* tmp = position->next;
-    goListElement<T>* tmp2 = position->prev;
-    if (tmp) {
-      tmp->prev = tmp2;
-    } else {
-      tail = tmp2;
+    if (position) 
+    {
+        goListElement<T>* tmp = position->next;
+        goListElement<T>* tmp2 = position->prev;
+        if (tmp) 
+        {
+            tmp->prev = tmp2;
+        } else 
+        {
+            tail = tmp2;
+        }
+        if (tmp2) 
+        {
+            tmp2->next = tmp;
+        } else 
+        {
+            front = tmp;
+        }
+        delete position;
+        if (tmp)
+        {
+            position = tmp;
+        }
+        else
+        {
+            if (tmp2)
+            {
+                position = tmp2;
+            }
+            else
+            {
+                position = 0;
+            }
+        }
+        size--;
+    } 
+    else 
+    {
+        return false;
     }
-    if (tmp2) {
-      tmp2->next = tmp;
-    } else {
-      front = tmp;
-    }
-    delete position;
-    position = tmp;
-    size--;
-  } else {
-    return false;
-  }
-  return true;
+    return true;
 }
 
 template <class T>

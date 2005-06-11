@@ -6,6 +6,9 @@
 #ifdef HAVE_MATLAB
 # include "mex.h"
 #endif
+#ifndef GOLOG_H
+# include <golog.h>
+#endif
 #include <assert.h>
 
 class goSparseFEMPrivate;
@@ -59,6 +62,7 @@ class goSparseMatrix
         inline goSparseMatrix  (int rows = 0, int cols = 0);
         inline ~goSparseMatrix ();
 
+        inline void init    ();
         inline void setSize (int rows, int cols);
 //        inline double operator () (int row, int column);
         inline void set (int row, int col, double value);
@@ -174,6 +178,7 @@ goSparseMatrix::goSparseMatrix (int rows, int cols)
       mColIndex            (),
       mRowIndex            (),
       mValues              (),
+      mMaxElementCount     (0),
       mDefaultValue        (0.0),
       mRows                (0),
       mCols                (0),
@@ -194,6 +199,17 @@ goSparseMatrix::goSparseMatrix (int rows, int cols)
 
 goSparseMatrix::~goSparseMatrix ()
 {
+}
+
+void goSparseMatrix::init ()
+{
+    mColIndex.resize(0);
+    mRowIndex.resize(0);
+    mValues.resize(0);
+    mElementCount     = 0;
+    mMaxElementCount  = 0;
+    mFillCurrentIndex = 0;
+    mFillElementCount = 0;
 }
 
 void goSparseMatrix::setSize (int rows, int cols)
@@ -555,7 +571,7 @@ bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goArray<goDoub
         {
             if (ret.fillNext (rowIndex,0,value) == 0)
             {
-                printf ("**************** SOMETHING TERRIBLE HAPPENED! *******************");
+                goLog::error("goSparseMatrix::matrixVectorMult(): **************** SOMETHING TERRIBLE HAPPENED! *******************");
             }
             rowIndex = this->row(i);
             value = this->value(i) * v[this->column(i)];

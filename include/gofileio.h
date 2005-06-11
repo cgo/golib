@@ -10,6 +10,9 @@
 #ifndef GOSIGNAL3D_H
 # include <gosignal3d.h>
 #endif
+#ifndef GOEXCEPTION_H
+# include <goexception.h>
+#endif
 
 class goObjectBase;
 
@@ -46,8 +49,8 @@ class goFileIO {
 
   /** @addtogroup signal */
   /** @{ */
-  static bool  readImage  (const char* filename, goSignal3D<void>* signal);
-  static bool  writeImage (const char* filename, const goObjectBase* signal);
+  static bool  readImage  (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException);
+  static bool  writeImage (const char* filename, const goObjectBase* signal) throw (goFileIOException, goTypeException);
   /** @} */
   static FILE* createTempFile (goString& filenameRet);
   static bool  remove         (const goString& filename);
@@ -55,6 +58,7 @@ class goFileIO {
   static bool  readASCII      (const char* filename, goString& target);
   static bool  writeASCII     (const char* filename, const goString& str);
   static bool  fileExists     (const char* filename);
+  static bool  mkdir          (const char* pathname);
 };
 /*!
  * @}

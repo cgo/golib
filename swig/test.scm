@@ -3,11 +3,7 @@
 (primitive-load "./golib_guile.scm")
 (use-modules (oop goops describe))
 ; (use-modules (golib_guile))
-(define sig (make-instance <gosignal3d>))
-(if (entity? sig)
-  (format #t "This is an entity.~%")
-  (format #t "This is not an entity.~%"))
-(describe sig)
+(define sig (make <goSignal3Dv>))
 (format #t "Class name: ~a~%Object name: ~a~%" 
         (getClassName sig) 
         (toCharPtr (getObjectName sig)))
@@ -24,25 +20,27 @@
   (format #t "Don't have libIL~%"))
 
 ;; Make a list of signals:
-(define siglist (list (make-instance <gosignal3d>) 
-                      (make-instance <gosignal3d>) 
-                      (make-instance <gosignal3d>) 
-                      (make-instance <gosignal3d>)))
-
-(describe (cadr siglist))
+(define siglist (list (make-instance <goSignal3Dv>) 
+                      (make-instance <goSignal3Dv>) 
+                      (make-instance <goSignal3Dv>) 
+                      (make-instance <goSignal3Dv>)))
 
 ;; Test reading an image:
-(primitive:goFileIO-readImage "/home/christian/KDE.jpg" sig)
+(if (primitive:goFileIO-readImage "/home/gosch/Documents/fem-level-sets/matlab/person.jpg" sig)
+  (format #t "Read image.~%")
+  (begin
+    (format #t "Could not read image.~%")
+    (quit)))
 ;; Make a new signal and set to float type:
-(define sig2 (make-instance <gosignal3d>))
+(define sig2 (make-instance <goSignal3Dv>))
 (setDataType sig2 (GO-FLOAT))
 ;; Allocate it:
-(make sig2 (getSizeX sig) (getSizeY sig) (getSizeZ sig))
+(make-signal sig2 (getSizeX sig) (getSizeY sig) (getSizeZ sig))
 ;; Convert first image to scalar float:
 (if (goRGBAtoScalar sig sig2)
   (format #t "Successfully converted.~%")
   (format #t "Conversion failed.~%"))
 ;; Try to write the converted image:
-(if (primitive:goFileIO-writeImage "caro4-scalar.jpg" sig2)
+(if (primitive:goFileIO-writeImage "scalar-image.jpg" sig2)
   (format #t "Written.~%")
   (format #t "Write failed.~%"))

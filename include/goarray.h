@@ -3,7 +3,6 @@
 #define __GOARRAY_HH__
 
 #include <gotypes.h>
-#include <iostream>
 
 /*!
  * \addtogroup data
@@ -61,13 +60,13 @@ goArray {
     void remove (goIndex_t index);
   
   ///
-  inline goIndex_t getSize () const {return arraySize;}
-  inline goIndex_t dim     () const {return arraySize;} 
+  inline goIndex_t getSize () const {return arraySize;};
+  inline goIndex_t dim     () const {return arraySize;};
   ///
-  T*	   getPtr () { return Array; }
-  const T* getPtr () const { return Array; }
-  inline T&       operator[] (goIndex_t idx) { return Array[idx]; }
-  inline const T& operator[] (goIndex_t idx) const { return Array[idx]; }
+  inline T*	      getPtr () { return Array; };
+  inline const T* getPtr () const { return Array; };
+  inline T&       operator[] (goIndex_t idx) { return Array[idx]; };
+  inline const T& operator[] (goIndex_t idx) const { return Array[idx]; };
   ///
   goArray<T>& operator=  (const goArray<T>& other);
   /// Resizes the array and adds {\bf item} at the end of it.

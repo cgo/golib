@@ -22,7 +22,7 @@ goHashTable<I,O>::goHashTable (goUInt32 mod_value)
     setModValue (mod_value);
     lastFailed = false;
     dummy = (O)0;
-    theTable.resize(0);
+//    theTable.resize(0);
 }
 
 template <class I, class O>
@@ -35,10 +35,10 @@ void
 goHashTable<I,O>::eraseLists ()
 {
   goIndex_t i;
-  for ( i = 0; i < theTable.getSize(); i++)
-    {
-	delete (goList<void*>*)theTable[i];
-    }
+  for (i = 0; i < theTable.getSize(); i++)
+  {
+      delete (goList<void*>*)theTable[i];
+  }
   theTable.resize (0);
 }
 
@@ -68,25 +68,30 @@ void goHashTable<I,O>::clear ()
 
 template <class I, class O>
 O&
-goHashTable<I,O>::operator[] (I in) {
-  I	tmp = (in & modValue);   // use the last n bits for accessing the list
-  goList<void*> *list = 0;
-  list = (goList<void*>*)theTable[tmp];
-  if (!list->isEmpty()) {
-    list->resetToFront();
-    bool endFlag = false;
-      do {
-	  endFlag = list->isTail();
-	  if ( ((goHashEntry<I,O>*)list->getCurrent())->key == in) {
-	    lastFailed = false;
-	    return (O&)( ((goHashEntry<I,O>*)list->getCurrent())->value);
-	  } else {
-	    list->getNext();
-	  }
-      } while (!endFlag);
-  }
-  lastFailed = true;
-  return dummy;
+goHashTable<I,O>::operator[] (I in) 
+{
+    I	tmp = (in & modValue);   // use the last n bits for accessing the list
+    goList<void*> *list = 0;
+    list = (goList<void*>*)theTable[tmp];
+    if (!list->isEmpty()) 
+    {
+        list->resetToFront();
+        bool endFlag = false;
+        do 
+        {
+            endFlag = list->isTail();
+            if ( ((goHashEntry<I,O>*)list->getCurrent())->key == in) 
+            {
+                lastFailed = false;
+                return (O&)( ((goHashEntry<I,O>*)list->getCurrent())->value);
+            } else 
+            {
+                list->getNext();
+            }
+        } while (!endFlag);
+    }
+    lastFailed = true;
+    return dummy;
 }
 
 //template <class I, class O>
@@ -132,31 +137,34 @@ template <class I, class O>
 O
 goHashTable<I,O>::remove (I key)
 {
-  I	tmp = (key & modValue);   // use the last n bits for accessing the list
-  goList<void*>	*list = 0;
+    I	tmp = (key & modValue);   // use the last n bits for accessing the list
+    goList<void*>	*list = 0;
 
-  lastFailed = false;
-//   if (tmp > (unsigned)theTable.getSize()) {
-//     lastFailed = true;
-//   }
-  list = (goList<void*>*)theTable[tmp];
-  O retval = 0;
-  if (list->getFront()) {
-    list->resetToFront();
-    bool endFlag = false;
-    do {
-	endFlag = list->isTail();
-      if ( ((goHashEntry<I,O>*)list->getCurrent())->key == key) {
-	retval = ((goHashEntry<I,O>*)list->getCurrent())->value;
-	delete ((goHashEntry<I,O>*)list->getCurrent());
-	list->remove();
-	return retval;
-      }
-      list->getNext();
-    } while (!endFlag);
-  }
-  lastFailed = true;
-  return retval;
+    lastFailed = false;
+    //   if (tmp > (unsigned)theTable.getSize()) {
+    //     lastFailed = true;
+    //   }
+    list = (goList<void*>*)theTable[tmp];
+    O retval = 0;
+    if (!list->isEmpty()) 
+    {
+        list->resetToFront();
+        bool endFlag = false;
+        do 
+        {
+            endFlag = list->isTail();
+            if ( ((goHashEntry<I,O>*)list->getCurrent())->key == key) 
+            {
+                retval = ((goHashEntry<I,O>*)list->getCurrent())->value;
+                delete ((goHashEntry<I,O>*)list->getCurrent());
+                list->remove();
+                return retval;
+            }
+            list->next();
+        } while (!endFlag);
+    }
+    lastFailed = true;
+    return retval;
 }
 
 template <class I, class O>
