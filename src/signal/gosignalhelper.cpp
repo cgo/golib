@@ -36,7 +36,7 @@ static void goNormalizeSignal__ (T minimum, T maximum,
         GO_SIGNAL3D_EACHELEMENT_2_GENERIC (*(T*)__ptr = (*(const T*)__ptr_target - minimum) * scale, (*targetSig), (*sig));
     }
 }
-/**
+/*!
  * @brief Normalizes or translates a float or double type signal to the interval
  *        [0,1].
  *
@@ -319,6 +319,20 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     return true;
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Convert a signal to another signal with a given data type.
+ * 
+ * The signal sig will be converted if possible to targetSig. The target data type
+ * is determined by the data type of targetSig.
+ * (set with targetSig->setDataType()).
+ * The size of the target signal must be the same as the source signal.
+ * The signals should only differ in their data types.
+ * 
+ * @param sig        Pointer to the signal to convert.
+ * @param targetSig  Pointer to the target signal. The size must be the same as sig.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
 bool goConvertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!targetSig)
@@ -405,6 +419,18 @@ static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* t
     }
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Copies a signal to another signal.
+ * 
+ * The signals do not have to have the same data type.
+ * The size is not checked, but each dimension is only copied until
+ * the smallest size is reached.
+ * 
+ * @param sig       Signal to copy.
+ * @param targetSig Signal to hold the target.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
 bool goCopySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!targetSig)
@@ -474,6 +500,18 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     return true;
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Converts a RGBA 4-channel signal to a scalar 1-channel signal.
+ * 
+ * The source signal must have 3 or 4 channels that are interpreted as
+ * RGB(A).
+ * 
+ * @param sig       Source signal, must be of type GO_UINT8 and have >= 3 channels.
+ * @param targetSig Target signal. Data type must be set and the size must be the same as
+ *                  that of the source signal.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
 bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!sig || !targetSig)
@@ -543,6 +581,15 @@ static bool _fillSignal (goSignal3DBase<void>* sig, goFloat value)
     return true;
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Fills a signal with a float value (will be converted).
+ * 
+ * @param sig   Signal to fill.
+ * @param value Float value. This value will be converted to an appropriate
+ *              data type for the signal.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
 bool goFillSignal (goSignal3DBase<void>* sig, goFloat value)
 {
     if (!sig)
@@ -630,11 +677,27 @@ MAKE_SIGNAL_SIGNAL_OPERATOR1(+=,PlusEqual);
 MAKE_SIGNAL_SIGNAL_OPERATOR2(+=,PlusEqual);
 MAKE_SIGNAL_SIGNAL_OPERATOR3(+=,PlusEqual);
 
+/** --------------------------------------------------------------------------
+ * @brief Adds two signals.
+ * 
+ * Adds other to sig.
+ * 
+ * @param sig   Signal 1. Will also hold the sum of both signals.
+ * @param other The signal to add to the first argument, sig.
+ ----------------------------------------------------------------------------*/
 void goSignalPlus (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other)
 {
     _signalOperatorPlusEqual (sig, other);
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Get some description (as ASCII text) for a signal.
+ * 
+ * @param sig    Signal to get the description for.
+ * @param strRet String to hold the description.
+ * @param html   If true, the text will be HTML formatted, if false, the text
+ *               will be plain ASCII.
+ ----------------------------------------------------------------------------*/
 void goSignalInfoText (const goSignal3DBase<void>& sig, goString& strRet, bool html)
 {
     if (html)
@@ -697,6 +760,14 @@ template <typename T> static goDouble signalMean (const goSignal3DBase<void>& si
     return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Calculate the signal mean.
+ * 
+ * @param sig  Signal to calculate the mean of.
+ * 
+ * @return  Mean value as goDouble. For multichannel signals,
+ *          just do setChannel() and then goSignalMean() for each channel.
+ ----------------------------------------------------------------------------*/
 goDouble goSignalMean (const goSignal3DBase<void>& sig)
 {
     switch (sig.getDataType().getID())
@@ -742,6 +813,13 @@ template <typename T> static goDouble signalVariance (const goSignal3DBase<void>
     return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Calculate mean and variance of a signal.
+ * 
+ * @param sig       Signal.
+ * @param mean      After returning, holds the mean value as double.
+ * @param variance  After returning, holds the variance as double.
+ ----------------------------------------------------------------------------*/
 void goSignalMeanVariance (const goSignal3DBase<void>& sig, 
                            goDouble& mean, 
                            goDouble& variance)
