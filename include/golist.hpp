@@ -30,6 +30,30 @@ goList<T>::~goList () {
 }
 
 template <class T>
+typename goList<T>::Element* goList<T>::getFrontElement ()
+{
+    return this->front;
+}
+
+template <class T>
+typename goList<T>::Element* goList<T>::getTailElement ()
+{
+    return this->tail;
+}
+
+template <class T>
+typename goList<T>::ConstElement* goList<T>::getFrontElement () const
+{
+    return this->front;
+}
+
+template <class T>
+typename goList<T>::ConstElement* goList<T>::getTailElement () const
+{
+    return this->tail;
+}
+
+template <class T>
 void goList<T>::next ()
 {
     if (position) 
@@ -207,7 +231,35 @@ goList<T>::append (const T& elem) {
 
 template <class T>
 bool
-goList<T>::insert (const T& elem) {
+goList<T>::prepend (T& elem)
+{
+  goListElement<T> *e = new goListElement<T>;
+
+  e->elem = elem;
+  if (!front) 
+  {
+    front = e;
+    tail = e;
+    e->next = 0;
+    e->prev = 0;
+  } else 
+  {
+    front->prev = e;
+    e->prev = 0;
+    e->next = front;
+    front = e;
+  }
+  if (!position) 
+  {
+    position = front;
+  }
+  size++;
+  return true;
+}
+
+template <class T>
+bool
+goList<T>::insert (T& elem) {
   goListElement<T> *e = new goListElement<T>;
   
   e->elem = elem;
@@ -217,7 +269,8 @@ goList<T>::insert (const T& elem) {
     position->next = e;
     e->prev = position;
     e->next = tmp;
-    tmp->prev = e;
+    if (tmp)
+        tmp->prev = e;
     size++;
   } else {
     append (elem);
@@ -272,6 +325,41 @@ goList<T>::remove () {
 }
 
 template <class T>
+goListElement<T>* goList<T>::remove (goListElement<T>* el)
+{
+    if (!el)
+        return 0;
+    if (el->prev)
+    {
+        el->prev->next = el->next;
+    }
+    if (el->next)
+    {
+        el->next->prev = el->prev;
+    }
+    if (el == front)
+    {
+        front = el->next;
+    }
+    if (el == tail)
+    {
+        tail = el->prev;
+    }
+    if (position == el)
+    {
+        if (el->next)
+            position = el->next;
+        else
+            position = el->prev;
+    }
+    goListElement<T>* n = el->next;
+    --this->size;
+    delete el;
+    el = 0;
+    return n;
+}
+
+template <class T>
 void
 goList<T>::erase () {
   resetToFront();
@@ -282,6 +370,44 @@ goList<T>::erase () {
     remove();
     size = 0;
   }
+}
+
+template <class T>
+void goList<T>::close ()
+{
+    if (this->front && this->tail)
+    {
+        this->front->prev = this->tail;
+        this->tail->next = this->front;
+    }
+}
+
+template <class T>
+void goList<T>::open (goList<T>::Element* newFront)
+{
+    if (!this->isClosed() || !newFront)
+        return;
+    goList<T>::Element* p = newFront->prev;
+    newFront->prev = 0;
+    if (p)
+    {
+        p->next = 0;
+    }
+    this->front = newFront;
+    this->tail = p;
+}
+
+template <class T>
+bool goList<T>::isClosed () const
+{
+    if (this->front && this->tail)
+    {
+        if (this->front->prev && this->tail->next)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 template <class T>
@@ -299,18 +425,39 @@ goList<T>::operator< (goList<T>& other) {
   return !this->operator> (other);
 }
 
+/** --------------------------------------------------------------------------
+ * @brief Deep-copy this list.
+ * 
+ * Makes a deep copy of this list, that is copied each element in other
+ * and appends it to this.
+ * 
+ * @param other list to be copied.
+ * @return Reference to *this.
+ ----------------------------------------------------------------------------*/
 template <class T>
 goList<T>&
-goList<T>::operator= (goList<T>& other) {
+goList<T>::operator= (const goList<T>& other) {
   erase ();
-  if (!other.isEmpty()) {
-    other.resetToFront ();
-    while (!other.isTail()) {
-      append (other.getNext());
-    }
-    append (other.getCurrent());
+  if (other.isEmpty())
+      return *this;
+  
+  goList<T>::ConstElement* el = other.getFrontElement();
+  while (true)
+  {
+      this->append(el->elem);
+      if (!el->next)
+          break;
+      el = el->next;
   }
   return *this;
+//  if (!other.isEmpty()) {
+//    other.resetToFront ();
+//    while (!other.isTail()) {
+//      append (other.getNext());
+//    }
+//    append (other.getCurrent());
+//  }
+//  return *this;
 }
 
 template <class T>

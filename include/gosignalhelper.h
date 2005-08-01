@@ -23,12 +23,15 @@
 # include <goarray.h>
 #endif
 
-bool goNormalizeSignal   (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);
-bool goNormalizeSignal   (goSignal3DBase<void>* sig);
-bool goFindZeroCrossings (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet);
-bool goConvertSignal     (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
-bool goCopySignal        (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
-bool goFillSignal        (goSignal3DBase<void>* sig, goFloat value);
-bool goRGBAtoScalar      (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+bool     goNormalizeSignal    (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);
+bool     goNormalizeSignal    (goSignal3DBase<void>* sig);
+bool     goFindZeroCrossings  (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet);
+bool     goConvertSignal      (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+bool     goCopySignal         (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+bool     goFillSignal         (goSignal3DBase<void>* sig, goFloat value);
+bool     goRGBAtoScalar       (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
+void     goSignalInfoText     (const goSignal3DBase<void>& sig, goString& strRet, bool html = false);
+goDouble goSignalMean         (const goSignal3DBase<void>& sig);
+void     goSignalMeanVariance (const goSignal3DBase<void>& sig, goDouble& mean, goDouble& variance);
 
 #endif

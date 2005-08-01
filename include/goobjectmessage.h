@@ -26,11 +26,13 @@ enum goObjectMessageID
     /// Sent when the destructor of an object is called (FIXME)
     GO_OBJECTMESSAGE_DESTRUCTING,
     GO_OBJECTMESSAGE_CHANGED,
+    /// Sent when an object changed its name (getObjectName()).
+    GO_OBJECTMESSAGE_NAME_CHANGED,
 
     /*! Start of message space to be used by applications using goLib
      *  and deriving from goObjectBase
      */
-    GO_OBJECTMESSAGE_USER = 0xfff00000
+    GO_OBJECTMESSAGE_USER = 0x0000FFFF
 };
 
 /**

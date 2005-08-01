@@ -4,10 +4,18 @@
 #include <goarray.h>
 #include <gomatrix.h>
 #include <gomath.h>
+#include <gofixedarray.h>
+#include <govector.h>
+#include <gocomplex.h>
 
 namespace goMath
 {
 
+    /** \addtogoup math
+     * @{
+     */
+    bool goComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
+    
 /** 
  * \addtogroup math
  * @{

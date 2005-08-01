@@ -94,6 +94,9 @@ bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
+template <class MatrixType, class VectorType>
+goDouble goConjugateGradients (const MatrixType& A, const VectorType& b, VectorType& x, goDouble epsilon = 1e-6);
+
 };
 
 

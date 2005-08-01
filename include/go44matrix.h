@@ -33,16 +33,24 @@ public:
   { 
     return matrix[(y << 2) + x]; 
   }
-
   inline const T& 	elem (goIndex_t y, goIndex_t x)  const
   { 
     return matrix[(y << 2) + x]; 
   }
 
+  inline T& operator() (goIndex_t y, goIndex_t x)
+  {
+    return matrix[(y << 2) + x]; 
+  }
+  inline const T& operator() (goIndex_t y, goIndex_t x) const
+  {
+    return matrix[(y << 2) + x]; 
+  }
+  
   /*!
    * Fills the matrix with data found at source.
    */
-  inline void 	fill (T* source);
+  inline void 	fill (const T* source);
 
   inline void	fill (T value);
 
@@ -58,19 +66,18 @@ public:
   friend std::ostream&        operator<< (std::ostream& o, go44Matrix<goDouble>&);
   friend std::ostream&        operator<< (std::ostream& o, const go44Matrix<goDouble>&);
 
-  inline void operator= (go44Matrix<T>& other);
   inline void operator= (const go44Matrix<T>& other);
   /*
    * Arithmetic operators
    */
-  inline void  operator+= ( go44Matrix<T>& other);
+  inline void  operator+= (const go44Matrix<T>& other);
   inline void  operator*= (goDouble r);
   inline void  operator*= (goInt32 r);
-  inline void  operator*= ( go44Matrix<T>& other);
+  inline void  operator*= (const go44Matrix<T>& other);
   // go4Vector<T>	operator* (go4Vector<T>& v);
 
   inline T* getPtr () { return matrix; }
-  inline const T* getConstPtr () const { return (const T*)matrix; }
+  inline const T* getPtr () const { return (const T*)matrix; }
 protected:
   T* matrix;
 };
@@ -79,9 +86,9 @@ protected:
 template <class T>
 inline
 void
-go44Matrix<T>::fill (T* source) {
+go44Matrix<T>::fill (const T* source) {
   T *tmp = matrix;
-  T *stmp = source;
+  const T *stmp = source;
   goSize_t i;
   for (i = 0; i < 16; i++)
     {
@@ -135,25 +142,10 @@ go44Matrix<T>::transpose ()
 template <class T>
 inline
 void
-go44Matrix<T>::operator= (go44Matrix<T>& other) 
-{
-  T *tmp = matrix;
-  T *stmp = other.getPtr();
-  goSize_t i;
-  for (i = 0; i < 16; i++)
-    {
-      *(tmp) = *(stmp);
-      tmp++; stmp++;
-    }
-}
-
-template <class T>
-inline
-void
 go44Matrix<T>::operator= (const go44Matrix<T>& other) 
 {
   T *tmp = matrix;
-  const T *stmp = other.getConstPtr();
+  const T *stmp = other.getPtr();
   goSize_t i;
   for (i = 0; i < 16; i++)
     {
@@ -165,10 +157,10 @@ go44Matrix<T>::operator= (const go44Matrix<T>& other)
 template <class T>
 inline
 void
-go44Matrix<T>::operator+= (go44Matrix<T>& other) 
+go44Matrix<T>::operator+= (const go44Matrix<T>& other) 
 {
   register goSize_t i = 0;
-  register T *otmp = other.getPtr();
+  register const T *otmp = other.getPtr();
   register T *tmp = matrix;
   for (i = 0; i < 16; i++) {
     *(tmp) += *(otmp);
@@ -205,37 +197,31 @@ go44Matrix<T>::operator*= (goInt32 r)
 template <class T>
 inline
 void
-go44Matrix<T>::operator*= (go44Matrix<T>& other)
+go44Matrix<T>::operator*= (const go44Matrix<T>& other)
 {
-  T a1,a2,a3,a4;
-  T *o = other.getPtr();
-  T *m = matrix;
-  goSize_t i,j;
-  for (i = 0; i < 4; i++)
+    T a1,a2,a3,a4;
+    const T *o = other.getPtr();
+    T *m = matrix;
+    goSize_t i,j;
+    for (i = 0; i < 4; i++)
     {
-      a1 = *m;
-      a2 = *(m + 1);
-      a3 = *(m + 2);
-      a4 = *(m + 3);
-      for (j = 0; j < 4; j++)
-	{
-	  *m = a1 * (*o) + 
-	    a2 * (*(o + 4)) + 
-	    a3 * (*(o + 8)) + 
-	    a4 * (*(o + 12));
-	  m++; o++;
-	}
-      o -= 4;
+        a1 = *m;
+        a2 = *(m + 1);
+        a3 = *(m + 2);
+        a4 = *(m + 3);
+        for (j = 0; j < 4; j++)
+        {
+            *m = a1 * (*o) + 
+                a2 * (*(o + 4)) + 
+                a3 * (*(o + 8)) + 
+                a4 * (*(o + 12));
+            m++; o++;
+        }
+        o -= 4;
     }
 } 
 
+typedef go44Matrix<goFloat> go44Matrixf;
+typedef go44Matrix<goDouble> go44Matrixd;
 
 #endif /* __GO44MATRIX_H__ */
-
-
-
-
-
-
-
-

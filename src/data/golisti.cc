@@ -1,6 +1,10 @@
 #include <golist.h>
 #include <golist.hpp>
 #include <gostring.h>
+#include <gopoint.h>
+#include <go4vector.h>
+#include <gocurve.h>
+#include <goindexpair.h>
 
 template class goListElement<goInt8>;
 template class goListElement<goUInt8>;
@@ -12,6 +16,12 @@ template class goListElement<goFloat>;
 template class goListElement<goDouble>;
 template class goListElement<goString>;
 template class goListElement<void*>;
+template class goListElement<goPointf>;
+template class goListElement<goPointd>;
+template class goListElement<goCurve>;
+template class goListElement<goCurve*>;
+template class goListElement<go4Vectorf>;
+template class goListElement<goIndexPair>;
 
 template class goList<goInt8>;
 template class goList<goUInt8>;
@@ -23,3 +33,9 @@ template class goList<goFloat>;
 template class goList<goDouble>;
 template class goList<goString>;
 template class goList<void*>;
+template class goList<goPointf>;
+template class goList<goPointd>;
+template class goList<goCurve>;
+template class goList<goCurve*>;
+template class goList<go4Vectorf>;
+template class goList<goIndexPair>;

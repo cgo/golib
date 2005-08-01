@@ -9,9 +9,7 @@ CXXARGS		= -c   -D HAVE_CONFIG_H -g
 LD		= g++
 LDARGS		=  
 
-GOPATH		= /home/gosch/privat/pgm/golib
-
-LIBS		=  -L$(GOPATH)/lib -lGo
+LIBS		=  -L$(GOPATH)/../lib -lGo
 
 INCLUDE		=  -I$(GOPATH)/include
 

@@ -28,6 +28,7 @@
 
 #ifdef HAVE_LIBIL
 # include <IL/il.h>
+# include <IL/ilu.h>
 #endif
 
 #ifndef GOSIGNAL3D_H
@@ -37,6 +38,8 @@
 #ifndef GOSIGNALMACROS_H
 # include <gosignalmacros.h>
 #endif
+
+#include <gosignal3dgenericiterator.h>
 
 #if 0
 static void readLine (FILE* f, goString& str) {
@@ -523,6 +526,59 @@ goFileIO::readImage (const char*, goObjectBase*) throw (goFileIOException, goTyp
  * @return True if successful, false otherwise.
  **/
 #ifdef HAVE_LIBIL
+template <class T, class ilT, int iltype>
+static bool copySignalToIL (const goSignal3DBase<void>* s)
+{
+    if (s->getChannelCount() == 1)
+    {
+        ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), sizeof(ilT), IL_LUMINANCE, iltype, NULL);
+        if (ilGetError() != IL_NO_ERROR)
+        {
+            goLog::warning("goFileIO::writeImage(): IL ERROR.");
+            throw goFileIOException(goFileIOException::FAILED);
+            return false;
+        }
+        ilT* data = (ilT*)ilGetData();
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(data++) = *(const T*)__ptr, (*s));
+    }
+    if (s->getChannelCount() == 4)
+    {
+        ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), sizeof(ilT) * 4, IL_RGBA, iltype, NULL);
+        if (ilGetError() != IL_NO_ERROR)
+        {
+            goLog::warning("goFileIO::writeImage(): IL ERROR.");
+            throw goFileIOException(goFileIOException::FAILED);
+            return false;
+        }
+        goIndex_t chan = s->getChannel();
+        const_cast<goSignal3DBase<void>*>(s)->setChannel(0);
+        ilT* data = (ilT*)ilGetData();
+        //= NOTE: This assumes the channel data are stored linearly for each element.
+        goSignal3DGenericConstIterator it (s);
+        while (!it.endZ())
+        {
+            it.resetY();
+            while (!it.endY())
+            {
+                it.resetX();
+                while (!it.endX())
+                {
+                    *data = *(const T*)*it;
+                    *(data + 1) = *((const T*)*it + 1);
+                    *(data + 2) = *((const T*)*it + 2);
+                    *(data + 3) = *((const T*)*it + 3);
+                    data += 4;
+                    it.incrementX();
+                }
+                it.incrementY();
+            }
+            it.incrementZ();
+        }
+        const_cast<goSignal3DBase<void>*>(s)->setChannel(chan);
+    }
+    return true;
+}
+
 bool
 goFileIO::writeImage (const char* filename, const goObjectBase* signal) throw (goFileIOException, goTypeException)
 {
@@ -536,36 +592,63 @@ goFileIO::writeImage (const char* filename, const goObjectBase* signal) throw (g
         ilInit ();
         goGlobal::ILInitialized = true;
     }
+    //= Trying iluFlipImage() instead below ...
+//    ilEnable (IL_ORIGIN_SET);
+//    ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
     ILuint imageName = 0;
     ilGenImages (1, &imageName);
     ilBindImage (imageName);
     
     const goSignal3DBase<void>* s = (const goSignal3DBase<void>*)signal;
     /// \todo FIXME: add other types
-    if (s->getDataType().getID() != GO_FLOAT)
+//    if (s->getDataType().getID() != GO_FLOAT)flip
+//    {
+//        goLog::warning("goFileIO::writeImage(): signal is not float.");
+//        throw goTypeException(goTypeException::WRONG_TYPE);
+//        return false;
+//    }
+
+    bool ok = false;
+    try 
     {
-        goLog::warning("goFileIO::writeImage(): signal is not float.");
-        throw goTypeException(goTypeException::WRONG_TYPE);
-        return false;
+        switch (s->getDataType().getID())
+        {
+            case GO_INT8: ok = copySignalToIL<goInt8, ILbyte, IL_BYTE> (s); break;
+            case GO_UINT8: ok = copySignalToIL<goUInt8, ILubyte, IL_UNSIGNED_BYTE> (s); break;
+            case GO_INT16: ok = copySignalToIL<goInt16, ILshort, IL_SHORT> (s); break;
+            case GO_UINT16: ok = copySignalToIL<goUInt16, ILushort, IL_UNSIGNED_SHORT> (s); break;
+            case GO_INT32: ok = copySignalToIL<goInt32, ILint, IL_INT> (s); break;
+            case GO_UINT32: ok = copySignalToIL<goUInt32, ILuint, IL_UNSIGNED_INT> (s); break;
+            case GO_FLOAT: ok = copySignalToIL<goFloat, ILfloat, IL_FLOAT> (s); break;
+            case GO_DOUBLE: ok = copySignalToIL<goDouble, ILdouble, IL_DOUBLE> (s); break;
+            default:
+                goLog::warning ("goFileIO::writeImage(): unknown data type.");
+                return false;
+                break;
+        }
     }
-    ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), 24, IL_LUMINANCE, IL_FLOAT, NULL);
-    if (ilGetError() != IL_NO_ERROR)
+    catch (goFileIOException ex)
     {
         ilDeleteImages (1, &imageName);
-        goLog::warning("goFileIO::writeImage(): IL ERROR.");
-        throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
-    ILfloat* data = (ILfloat*)ilGetData();
-    GO_SIGNAL3D_EACHELEMENT_GENERIC (*(data++) = *(const goFloat*)__ptr, (*s));
+    
 
+    iluFlipImage();
     // DevILish non-const char*
     goString fname (filename);
     ilSaveImage (fname.getPtr());
-    if (ilGetError() != IL_NO_ERROR)
+    ILenum er = ilGetError();
+    if (er != IL_NO_ERROR)
     {
         ilDeleteImages (1, &imageName);
-        goLog::warning("goFileIO::writeImage(): IL ERROR.");
+        goString msg = "goFileIO::writeImage(): IL ERROR.\n";
+        msg += iluErrorString (er);
+        goLog::warning(msg);
+        if (er == IL_FILE_ALREADY_EXISTS)
+        {
+            throw goFileIOException(goFileIOException::EXISTS);
+        }
         throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
@@ -637,6 +720,79 @@ goFileIO::readASCII (const char* filename, goString& target)
 }
 
 bool  
+goFileIO::readASCII (FILE* f, goString& target, goSize_t sz)
+{
+    if (!f)
+        return false;
+    target.resize (sz);
+    if (fread (target.getPtr(), 1, sz, f) != sz)
+        return false;
+    return true;
+}
+
+/**
+* @brief Reads up to <code>max</code> characters or until 0.
+*
+* The trailing 0 will be dropped.
+* 
+* @param f  
+* @param target  
+* @param max  
+*
+* @return True if successful, false otherwise.
+**/
+bool  
+goFileIO::readASCIIMax (FILE* f, goString& target, goSize_t max)
+{
+    if (!f)
+        return false;
+    goSize_t n = 0;
+    goSize_t total = 0;
+    char c = 0;
+    while (true && total < max)
+    {
+        n = fread(&c, sizeof(char), 1, f);
+        if (n != 1)
+            return false;
+        if (c == 0)
+            return true;
+        target += c;
+        total += n;
+    }
+    return true;
+}
+
+
+/**
+ * @brief Read until 0 is read or nothing else can be read.
+ *
+ * The trailing 0 will be dropped.
+ * 
+ * @param f  FILE*
+ * @param target  String is stored here
+ *
+ * @return  True if string was read an trailed by 0, false otherwise.
+ **/
+bool  
+goFileIO::readASCII (FILE* f, goString& target)
+{
+    if (!f)
+        return false;
+    goSize_t n = 0;
+    char c = 0;
+    while (true)
+    {
+        n = fread(&c, sizeof(char), 1, f);
+        if (n != 1)
+            return false;
+        if (c == 0)
+            return true;
+        target += c;
+    }
+    return true;
+}
+
+bool  
 goFileIO::writeASCII (const char* filename, const goString& str)
 {
     FILE* f = NULL;
@@ -645,6 +801,16 @@ goFileIO::writeASCII (const char* filename, const goString& str)
         return false;
     fwrite (str.getPtr(), 1, str.getSize(), f);
     fclose (f);
+    return true;
+}
+
+bool  
+goFileIO::writeASCII (FILE* f, const goString& str)
+{
+    if (!f)
+        return false;
+    if (fwrite (str.getPtr(), 1, str.getSize(), f) != str.getSize())
+        return false;
     return true;
 }
 

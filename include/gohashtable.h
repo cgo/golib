@@ -50,26 +50,29 @@ class goHashTable {
    * @param i Mod value.
    */
   void	setModValue (goUInt32);
+  void  setDefault  (const O& d);
   void  clear       ();
   ///
-  goUInt32 getModValue () { return modValue; }
+  goUInt32 getModValue () const;
   ///
-  O&	operator[] (I in);
+  O&	operator[] (const I& in);
   ///
   // Removed for game2
   // virtual void	add (I key, O value);
-  virtual void  add (I key, const O& value);
+  virtual void  add (const I& key, const O& value);
   /*!
    * @note Only superficially tested.
    * @return The value for the given key.
    */ 
-  virtual O	remove (I key);
+  virtual O	remove (const I& key);
   
   ///
   bool	fail ();
 
+  goArray<void*>& getLists ();
+
  protected:
-  void addEntry (I table, void* entry);
+  void addEntry (goUInt32 table, void* entry);
   /// Erases all lists and resizes the table to zero.
   void eraseLists();
   ///

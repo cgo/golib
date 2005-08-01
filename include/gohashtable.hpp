@@ -18,6 +18,10 @@ goHashEntry<I,O>::operator= (goHashEntry<I,O>& other) {
 
 template <class I, class O>
 goHashTable<I,O>::goHashTable (goUInt32 mod_value) 
+    :   lastFailed (false),
+        modValue   (0),
+        theTable   (),
+        dummy      ()
 {
     setModValue (mod_value);
     lastFailed = false;
@@ -47,17 +51,39 @@ void
 goHashTable<I,O>::setModValue (goUInt32 i)
 {
     eraseLists();
-    modValue = i;
-    theTable.resize (modValue + 1);
-    goIndex_t c;
+    this->modValue = i;
+    theTable.resize (this->modValue + 1);
     goList<void*>* list;
 
-    std::cout << "hash table generating " << theTable.getSize() << " lists" << std::endl;
+    printf("hash table generating %d lists.\n", theTable.getSize());
+    goIndex_t c;
     for (c = 0; c < theTable.getSize(); c++)
     {
         list = new goList<void*>();
         theTable[c] = (void*)list;
     }
+}
+
+/** --------------------------------------------------------------------------
+ * @brief  Set the default return value.
+ * 
+ * This value is returned whenever operator[] fails, i.e. there is no 
+ * output value stored for a given input value.
+ * 
+ * @param d  Default value.
+ ----------------------------------------------------------------------------*/
+template <class I, class O>
+void
+goHashTable<I,O>::setDefault (const O& d)
+{
+    this->dummy = d;
+}
+
+template <class I, class O>
+goUInt32
+goHashTable<I,O>::getModValue () const
+{ 
+    return this->modValue; 
 }
 
 template <class I, class O>
@@ -68,9 +94,9 @@ void goHashTable<I,O>::clear ()
 
 template <class I, class O>
 O&
-goHashTable<I,O>::operator[] (I in) 
+goHashTable<I,O>::operator[] (const I& in) 
 {
-    I	tmp = (in & modValue);   // use the last n bits for accessing the list
+    goUInt32	tmp = (in & modValue);   // use the last n bits for accessing the list
     goList<void*> *list = 0;
     list = (goList<void*>*)theTable[tmp];
     if (!list->isEmpty()) 
@@ -112,10 +138,10 @@ goHashTable<I,O>::operator[] (I in)
 
 template <class I, class O>
 void
-goHashTable<I,O>::add (I key, const O& value) {
+goHashTable<I,O>::add (const I& key, const O& value) {
     //    cout << "hashtable adding " << key << "," << value << endl;
-  I tmp = (key & modValue);
-  (*this)[key] = value;
+  goUInt32 tmp = (key & modValue);
+  O* old = &(*this)[key];
   if (fail()) {
       // cout << "...adding new entry." << endl;
     goHashEntry<I,O> *entry = new goHashEntry<I,O>();
@@ -123,21 +149,25 @@ goHashTable<I,O>::add (I key, const O& value) {
     entry->value = value;
     addEntry (tmp, (void*)entry);
   }
+  else
+  {
+      *old = value;
+  }
   lastFailed = false;
 }
 
 template <class I, class O>
 void
-goHashTable<I,O>::addEntry (I table, void* e)
+goHashTable<I,O>::addEntry (goUInt32 table, void* e)
 {
     ((goList<void*>*)theTable[table])->append (e);
 }
 
 template <class I, class O>
 O
-goHashTable<I,O>::remove (I key)
+goHashTable<I,O>::remove (const I& key)
 {
-    I	tmp = (key & modValue);   // use the last n bits for accessing the list
+    goUInt32 tmp = (key & modValue);   // use the last n bits for accessing the list
     goList<void*>	*list = 0;
 
     lastFailed = false;
@@ -172,3 +202,10 @@ bool
 goHashTable<I,O>::fail() {
   return lastFailed;
 }
+
+template <class I, class O>
+goArray<void*>& goHashTable<I,O>::getLists ()
+{
+    return theTable;
+}
+

@@ -48,6 +48,9 @@
 #cmakedefine HAVE_SWIG ${HAVE_SWIG}
 #cmakedefine HAVE_NASM ${HAVE_NASM}
 
+#undef USE_MATPACK
+#define GO_USE_EXCEPTIONS 1
+
 /* Stuff not yet tested by configure */
 #define GO_HAVE_MMX 1
 #define GO_HAVE_3DNOW 1

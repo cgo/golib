@@ -41,6 +41,9 @@ goObjectBase
     void            setObjectName (const goString& name);
     const goString& getObjectName () const;
 
+    virtual bool writeObjectFile (FILE*) const;
+    virtual bool readObjectFile  (FILE*);
+
  protected:
     void setClassName(const char* name);
     void setClassName(goString& name);

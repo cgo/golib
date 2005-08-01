@@ -1,6 +1,6 @@
 /* --*- C++ -*-- */
-#ifndef __GOARRAY_HH__
-#define __GOARRAY_HH__
+#ifndef GOARRAY_H
+#define GOARRAY_H
 
 #include <gotypes.h>
 

@@ -4,6 +4,7 @@
 #include <goerror.h>
 #include <gotypes.h>
 #include <gomath.h>
+#include <gocomplex.h>
 
 #include <goconfig.h>
 #include <assert.h>
@@ -405,3 +406,4 @@ template class goSubSignal3D<goFloat>;
 template class goSubSignal3D<goDouble>;
 template class goSubSignal3D<void*>;
 template class goSubSignal3D<void>;
+template class goSubSignal3D<goComplexf>;

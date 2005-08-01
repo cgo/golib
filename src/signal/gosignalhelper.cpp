@@ -448,6 +448,7 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     // goPtrdiff_t redOffset = 0 * sizeof(sourceT);
     goPtrdiff_t greenOffset = 1 * sizeof(sourceT);
     goPtrdiff_t blueOffset = 2 * sizeof(sourceT);
+    goDouble third = 1.0 / 3.0;
     while (!sourceIt.endZ())
     {
         sourceIt.resetY();
@@ -460,7 +461,7 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
             {
                 *(targetT*)*targetIt = static_cast<targetT>((*(sourceT*)*sourceIt + 
                                         *(sourceT*)(*sourceIt + greenOffset) +
-                                        *(sourceT*)(*sourceIt + blueOffset)) * 0.3333);
+                                        *(sourceT*)(*sourceIt + blueOffset)) * third);
                 sourceIt.incrementX();
                 targetIt.incrementX();
             }
@@ -632,4 +633,134 @@ MAKE_SIGNAL_SIGNAL_OPERATOR3(+=,PlusEqual);
 void goSignalPlus (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other)
 {
     _signalOperatorPlusEqual (sig, other);
+}
+
+void goSignalInfoText (const goSignal3DBase<void>& sig, goString& strRet, bool html)
+{
+    if (html)
+    {
+        strRet  = "<table bgcolor=\"#80FF80\">";
+        strRet += "<tr>";
+        strRet += "<td><b>Object class </b></td><td>"; strRet += sig.getClassName(); strRet += "</td>";
+        strRet += "</tr>";
+        strRet += "<tr>";
+        strRet += "<td><b>Object name </b></td><td>"; strRet += sig.getObjectName().toCharPtr(); strRet += "</td>";
+        strRet += "</tr>";
+        strRet += "<tr>";
+        strRet += "<td><b>Dimensions </b></td><td>"; strRet += (int)sig.getSizeX(); 
+        strRet += ",";              strRet += (int)sig.getSizeY();
+        strRet += ",";              strRet += (int)sig.getSizeZ(); strRet += "</td>";
+        strRet += "</tr>";
+        strRet += "<tr>";
+        strRet += "<td><b>Data type </b></td><td>"; strRet += sig.getDataType().getString().toCharPtr(); strRet += "</td>";
+        strRet += "</tr>";
+        strRet += "<tr>";
+        strRet += "<td><b>Channels </b></td><td>"; strRet += (int)sig.getChannelCount(); strRet += "</td>";
+        strRet += "</tr>";
+        strRet += "<tr>";
+        strRet += "<td><b>Approx. size </b></td><td>"; strRet += (int)sig.getSize(); strRet += " bytes</td>";
+        strRet += "</tr>";
+        strRet += "</table>";
+    }
+    else
+    {
+        strRet = "Object class: "; strRet += sig.getClassName(); strRet += "\n";
+        strRet += "Object name: "; strRet += sig.getObjectName().toCharPtr(); strRet += "\n";
+        strRet += "Dimensions: "; strRet += (int)sig.getSizeX(); 
+        strRet += ",";              strRet += (int)sig.getSizeY();
+        strRet += ",";              strRet += (int)sig.getSizeZ(); strRet += "\n";
+        strRet += "Data type: "; strRet += sig.getDataType().getString().toCharPtr(); strRet += "\n";
+        strRet += "Channels: "; strRet += (int)sig.getChannelCount(); strRet += "\n";
+        strRet += "Approx. size: "; strRet += (int)sig.getSize(); strRet += " bytes";
+    }
+}
+
+template <typename T> static goDouble signalMean (const goSignal3DBase<void>& sig)
+{
+    goDouble ret = 0.0;
+    goSignal3DGenericConstIterator it (&sig);
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                ret += (goDouble)*(const T*)*it;
+                it.incrementX();
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+    return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
+}
+
+goDouble goSignalMean (const goSignal3DBase<void>& sig)
+{
+    switch (sig.getDataType().getID())
+    {
+        case GO_INT8: return signalMean<goInt8> (sig); break;
+        case GO_UINT8: return signalMean<goUInt8> (sig); break;
+        case GO_INT16: return signalMean<goInt16> (sig); break;
+        case GO_UINT16: return signalMean<goUInt16> (sig); break;
+        case GO_INT32: return signalMean<goInt32> (sig); break;
+        case GO_UINT32: return signalMean<goUInt32> (sig); break;
+        case GO_FLOAT: return signalMean<goFloat> (sig); break;
+        case GO_DOUBLE: return signalMean<goDouble> (sig); break;
+        default:
+            {
+                goLog::warning ("goSignalMean(): unknown data type.");
+                return 0.0;
+            }
+            break;
+    }
+}
+
+template <typename T> static goDouble signalVariance (const goSignal3DBase<void>& sig, goDouble mean)
+{
+    goDouble ret = 0.0;
+    goDouble temp = 0.0;
+    goSignal3DGenericConstIterator it (&sig);
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                temp = (goDouble)*(const T*)*it - mean;
+                ret += temp * temp;
+                it.incrementX();
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+    return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
+}
+
+void goSignalMeanVariance (const goSignal3DBase<void>& sig, 
+                           goDouble& mean, 
+                           goDouble& variance)
+{
+    mean = goSignalMean(sig);
+    switch (sig.getDataType().getID())
+    {
+        case GO_INT8: variance = signalVariance<goInt8> (sig,mean); break;
+        case GO_UINT8: variance = signalVariance<goUInt8> (sig,mean); break;
+        case GO_INT16: variance = signalVariance<goInt16> (sig,mean); break;
+        case GO_UINT16: variance = signalVariance<goUInt16> (sig,mean); break;
+        case GO_INT32: variance = signalVariance<goInt32> (sig,mean); break;
+        case GO_UINT32: variance = signalVariance<goUInt32> (sig,mean); break;
+        case GO_FLOAT: variance = signalVariance<goFloat> (sig,mean); break;
+        case GO_DOUBLE: variance = signalVariance<goDouble> (sig,mean); break;
+        default:
+            {
+                goLog::warning ("goSignalVariance(): unknown data type.");
+            }
+            break;
+    }
 }

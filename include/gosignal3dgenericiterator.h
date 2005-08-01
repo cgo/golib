@@ -50,10 +50,13 @@
  * </code>
  * </pre>
  * @note It may be faster to use the GO_SIGNAL3D_EACHELEMENT* macros for 
- * iterating through a signal. However, with <void> type signals, you should be ok with
+ * iterating through a signal. However, with void type signals, you should be ok with
  * this since the typical inner-loop methods are inlined. 
  * If you are optimising for speed, it may still be a good idea to simply write your own loop.
- * 
+ * @note Mind that if you want to reuse the iterator from the example above, 
+ * you must reset it with resetZ(); resetY(); resetX();
+ * @note If you want to iterate over a subwindow of a signal, it may be a good idea
+ * to use goSubSignal3D<void>.
  * @note Be careful when you use <b>multichannel signals</b>. There is a pitfall:
  *  <pre>
  *       <code>
@@ -128,6 +131,14 @@ class goSignal3DGenericIterator
             ++posY;
             ++dy;
         };
+        /** --------------------------------------------------------------------------
+         * @bug See todo.
+         * @todo This runs over the edge of the dz array when there is no 
+         *       border (holds for all increment functions). This leads
+         *       to an invalid read operation which may lead to problems.
+         *       Check if there is a way to fix this without having to change
+         *       all iterator calls.
+         ----------------------------------------------------------------------------*/
         inline void     incrementZ  ()
         {
             pz += *dz;

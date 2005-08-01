@@ -12,8 +12,10 @@ SET                 (SOURCES
  src/data/golisti.cc 
  src/data/goheapi.cc 
  src/data/gotreei.cc 
- src/data/goqueuei.cc 
+ src/data/gobtreei.cpp 
+ src/data/goqueuei.cc
  src/data/gostring.cc
+ src/data/gohashtablei.cpp
  src/math/go3vectori.cc 
  src/math/go44matrix.cc 
  src/math/go4vectori.cc 
@@ -28,6 +30,8 @@ SET                 (SOURCES
  src/math/gradient.cpp 
  src/math/gomath.cpp 
  src/math/divnormalizedgrad2d.cpp
+ src/math/goeigenvalue.cpp
+ src/math/cg.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
@@ -40,6 +44,7 @@ SET                 (SOURCES
  src/misc/goobjectmessage.cc 
  src/misc/goglobal.cpp 
  src/misc/golog.cpp
+ src/misc/goplot.cpp
  src/network/goconnection.cc
  src/network/gonetobject.cc 
  src/network/gonetwork.cc 
@@ -65,10 +70,90 @@ SET                 (SOURCES
  src/thread/goproducer.cc 
  src/thread/gosynchronized.cc 
  src/thread/gothreadobject.cc
- src/types/gotype.cpp)
+ src/types/gotype.cpp
+ src/shape/gopointcloud.cpp
+ src/shape/gocurve.cpp
+ src/shape/gonurbs.cpp
+ src/shape/goshape.cpp
+ src/seispack/bakvec.c
+ src/seispack/balanc.c
+ src/seispack/balbak.c
+ src/seispack/bandr.c
+ src/seispack/bandv.c
+ src/seispack/bisect.c
+ src/seispack/bqr.c
+ src/seispack/cbabk2.c
+ src/seispack/cbal.c
+ src/seispack/cdiv.c
+ src/seispack/cg.c
+ src/seispack/ch.c
+ src/seispack/cinvit.c
+ src/seispack/combak.c
+ src/seispack/comhes.c
+ src/seispack/comlr2.c
+ src/seispack/comlr.c
+ src/seispack/comqr2.c
+ src/seispack/comqr.c
+ src/seispack/cortb.c
+ src/seispack/corth.c
+ src/seispack/csroot.c
+ src/seispack/elmbak.c
+ src/seispack/elmhes.c
+ src/seispack/eltran.c
+ src/seispack/epslon.c
+ src/seispack/figi2.c
+ src/seispack/figi.c
+ src/seispack/hqr2.c
+ src/seispack/hqr.c
+ src/seispack/htrib3.c
+ src/seispack/htribk.c
+ src/seispack/htrid3.c
+ src/seispack/htridi.c
+ src/seispack/imtql1.c
+ src/seispack/imtql2.c
+ src/seispack/imtqlv.c
+ src/seispack/invit.c
+ src/seispack/minfit.c
+ src/seispack/ortbak.c
+ src/seispack/orthes.c
+ src/seispack/ortran.c
+ src/seispack/pythag.c
+ src/seispack/qzhes.c
+ src/seispack/qzit.c
+ src/seispack/qzval.c
+ src/seispack/qzvec.c
+ src/seispack/ratqr.c
+ src/seispack/rebakb.c
+ src/seispack/rebak.c
+ src/seispack/reduc2.c
+ src/seispack/reduc.c
+ src/seispack/rg.c
+ src/seispack/rgg.c
+ src/seispack/rsb.c
+ src/seispack/rs.c
+ src/seispack/rsgab.c
+ src/seispack/rsgba.c
+ src/seispack/rsg.c
+ src/seispack/rsm.c
+ src/seispack/rsp.c
+ src/seispack/rst.c
+ src/seispack/rt.c
+ src/seispack/svd.c
+ src/seispack/tinvit.c
+ src/seispack/tql1.c
+ src/seispack/tql2.c
+ src/seispack/tqlrat.c
+ src/seispack/trbak1.c
+ src/seispack/trbak3.c
+ src/seispack/tred1.c
+ src/seispack/tred2.c
+ src/seispack/tred3.c
+ src/seispack/tridib.c
+ src/seispack/tsturm.c
+ src/seispack/r_sign.c)
 
-SET                 (EXTRA_LIB_PATH /home/christian/Software/lib)
-SET                 (EXTRA_INCLUDE_PATH /home/christian/Software/include)
+SET                 (EXTRA_LIB_PATH /home/gosch/Software/lib)
+SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include)
 SET                 (EXTRA_LIBS "")
 SET                 (GOPATH $ENV{GOPATH})
 # FILE                (GLOB SOURCES *.cpp *.cxx)
@@ -114,6 +199,10 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 #                      "$ENV{LD_LIBRARY_PATH};/usr/lib;/usr/local/lib;${EXTRA_LIB_PATH}"
 #                      HAVE_LIBIL)
 
+CHECK_LIBRARY_EXISTS (atlas ATL_cputime "" HAVE_LIBATLAS)
+IF (${HAVE_LIBATLAS} MATCHES 1)
+    SET (EXTRA_LIBS "${EXTRA_LIBS} -latlas")
+ENDIF (${HAVE_LIBATLAS} MATCHES 1)
 CHECK_LIBRARY_EXISTS (IL ilInit "" HAVE_LIBIL)
 IF (${HAVE_LIBIL} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lIL")
@@ -146,8 +235,10 @@ ENDIF (${HAVE_LIBPTHREAD} MATCHES 1)
 #ENDIF (DEFINED ${CMAKE_USE_PTHREADS_INIT})
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
-                     $ENV{GOPATH}/include)
-  
+                     $ENV{GOPATH}/include
+                     ${MATPACK_INCLUDE})
+
+                     
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
@@ -156,5 +247,5 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+# SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")
 INSTALL_TARGETS     (/lib ${TARGETNAME})
-

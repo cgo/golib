@@ -48,12 +48,29 @@ goFilter1D::~goFilter1D ()
     }
 }
 
+/**
+ * @brief Set the filter mask.
+ *
+ * @note If the mask is not normalized, you can do that by calling 
+ * this->normalize().
+ * 
+ * @param m  Float array containing the mask.
+ *
+ * @return True if successful, false otherwise.
+ **/
 bool goFilter1D::setMask (const goArray<goFloat>& m)
 {
     myPrivate->mask = m;
     return true;
 }
 
+/**
+ * @brief Set the center of the filter mask.
+ *
+ * @param c  Center index.
+ *
+ * @return True if successful, false otherwise.
+ **/
 bool goFilter1D::setCenter (goIndex_t c)
 {
     myPrivate->center = c;
@@ -117,6 +134,13 @@ inline void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_
     }
 }
 
+/**
+ * @brief Apply the filter in-place.
+ *
+ * @param sig  Signal to apply the filter to.
+ *
+ * @return True if successful, false otherwise.
+ **/
 bool goFilter1D::filter (goSignal3DBase<void>& sig)
 {
     switch (sig.getDataType().getID())
@@ -134,6 +158,13 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
     return true;
 }
 
+/**
+ * @brief Normalize the filter mask.
+ *
+ * @param constant  Constant to normalize to. Default is 1.0.
+ *
+ * @return True if successful, false otherwise.
+ **/
 bool goFilter1D::normalize (goDouble constant)
 {
     goDouble sum = 0.0;

@@ -85,4 +85,3 @@ template <class T>
 bool goEqualizeHistogram (goSignal3DBase<void>* sig, goCDF<T>& targetCDF);
 
 #endif
-

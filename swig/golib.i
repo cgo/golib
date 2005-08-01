@@ -1,16 +1,9 @@
 /* example.i */
+%scheme %{ (load-extension "libgolib_guile.so" "scm_init_golib_guile_module") %}
 %goops %{ 
-   (load-extension "./libgolib_guile.so" "scm_init_golib_guile_module") 
-   (primitive-load "./golib_guile-primitive.scm") 
-   (primitive-load "./common.scm")
+   (primitive-load-path "golib_guile-primitive.scm") 
+   (primitive-load-path "common.scm")
 %}
-%scheme %{ (load-extension "./libgolib_guile.so" "scm_init_golib_guile_module") %}
-// only include the following definition if (my modules foo) cannot
-// be loaded automatically
-//%goops %{ 
-//  (primitive-load "./golib_guile-primitive.scm") 
-//  (primitive-load "./common.scm")
-//%}
 
 %module golib_guile
 %{
@@ -19,17 +12,26 @@
 #include <goobjectbase.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <goarray.h>
 #include <gostring.h>
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goexception.h>
-#include <goarray.h>
+#include <golibguile.h>
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
 %ignore goSignal3DBase<void>::shiftRightDiff (int,int);
 %ignore goSignal3DBase<void>::shiftLeftSize (int,int);
 %ignore goSignal3DBase<void>::shiftRightSize (int,int);
+
+// Renaming
+// %rename(re_size) goString::resize;
+// %rename(re_size) goArray<goFloat>::resize;
+%rename(go_sort) goArray::sort;
+%rename(make_signal) goSignal3D<void>::make;
+//%rename(golib_readImage) goFileIO::readImage;
+//%rename(golib_writeImage) goFileIO::writeImage;
 
 %include <goobjectbase.h>
 %include <gostring.h>
@@ -40,15 +42,14 @@
 %include <gofileio.h>
 %include <gosignalhelper.h>
 %include <goarray.h>
+%include <golibguile.h>
 
+// Templates
 %template(goArrayf)        goArray<goFloat>;
-//%template(goArrayd)        goArray<goDouble>;
-//%template(goArrayi)        goArray<goInt32>;
-// Renaming and templates
-%rename(make_signal) goSignal3D<void>::make;
+%template(goArrayd)        goArray<goDouble>;
+%template(goArrayi)        goArray<goInt32>;
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
-%rename(golib_readImage) goFileIO::readImage;
 
 // Exceptions
 %exception goFileIO::readImage {
@@ -81,6 +82,11 @@
         {
             printf ("readImage: not found.\n");
         }
+        if (ex.code == goFileIOException::EXISTS)
+        {
+            printf ("readImage: file exists.\n");
+        }
+        return false;
     }
     catch (goTypeException ex) {
         if (ex.code == goTypeException::WRONG_TYPE)
@@ -91,5 +97,6 @@
         {
             printf ("readImage: unknown data type.\n");
         }
+        return false;
     }
 }

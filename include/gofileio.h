@@ -13,6 +13,7 @@
 #ifndef GOEXCEPTION_H
 # include <goexception.h>
 #endif
+#include <stdio.h>   // FILE*
 
 class goObjectBase;
 
@@ -56,7 +57,11 @@ class goFileIO {
   static bool  remove         (const goString& filename);
   static goSize_t fileSize    (const char* filename);
   static bool  readASCII      (const char* filename, goString& target);
+  static bool  readASCII      (FILE* f, goString& target, goSize_t sz);
+  static bool  readASCIIMax   (FILE* f, goString& target, goSize_t max);
+  static bool  readASCII      (FILE* f, goString& target);
   static bool  writeASCII     (const char* filename, const goString& str);
+  static bool  writeASCII     (FILE* f, const goString& str);
   static bool  fileExists     (const char* filename);
   static bool  mkdir          (const char* pathname);
 };

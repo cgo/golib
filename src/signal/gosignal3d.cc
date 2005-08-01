@@ -6,6 +6,8 @@
 #include <gosignalhelper.h>
 #include <go3vector.h>
 #include <golog.h>
+#include <gocomplex.h>
+#include <gomath.h>
 #include <string.h> // bzero()
 
 #include <iostream>
@@ -139,6 +141,13 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
     assert (blockSizeY > 0);
     assert (blockSizeZ > 0);
     
+    //= NOTE: In order for the iterator classes not to
+    //=       cause illegal reads at the end of a zero-border
+    //=       signal, make the border min. 1.
+    border_x = goMath::max<goSize_t> (border_x, 1);
+    border_y = goMath::max<goSize_t> (border_y, 1);
+    border_z = goMath::max<goSize_t> (border_z, 1);
+
     goSize3D blocks;
   
     blocks.x = (x + blockSizeX - 1) / blockSizeX;
@@ -309,6 +318,13 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
     assert (blockSizeY > 0);
     assert (blockSizeZ > 0);
     
+    //= NOTE: In order for the iterator classes not to
+    //=       cause illegal reads at the end of a zero-border
+    //=       signal, make the border min. 1.
+    border_x = goMath::max<goSize_t> (border_x, 1);
+    border_y = goMath::max<goSize_t> (border_y, 1);
+    border_z = goMath::max<goSize_t> (border_z, 1);
+    
     goSize3D blocks;
   
     blocks.x = (x + blockSizeX - 1) / blockSizeX;
@@ -360,5 +376,6 @@ template class goSignal3D< goUInt32 >;
 template class goSignal3D< goInt64 >;
 template class goSignal3D< goFloat >;
 template class goSignal3D< goDouble >;
+template class goSignal3D< goComplex<goFloat> >;
 template class goSignal3D< void* >;
 template class goSignal3D< void >;

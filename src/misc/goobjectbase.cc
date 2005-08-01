@@ -1,11 +1,18 @@
 #include <golist.h>
 #include <golist.hpp>
 #include <gostring.h>
-#include <goobjectbase.h>
-#include <gothread.h>
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
+#ifndef GOTHREAD_H
+# include <gothread.h>
+#endif
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
+#ifndef GOFILEIO_H
+# include <gofileio.h>
+#endif
 
 class goObjectBasePrivate
 {
@@ -85,6 +92,7 @@ void
 goObjectBase::setObjectName (const char* name)
 {
     myPrivate->objectName = name;
+    this->sendObjectMessage (GO_OBJECTMESSAGE_NAME_CHANGED);
 }
 
 /**
@@ -96,6 +104,7 @@ void
 goObjectBase::setObjectName (const goString& name)
 {
     myPrivate->objectName = name;
+    this->sendObjectMessage (GO_OBJECTMESSAGE_NAME_CHANGED);
 }
 
 /**
@@ -108,6 +117,51 @@ const goString&
 goObjectBase::getObjectName () const
 {
     return myPrivate->objectName;
+}
+
+/**
+* @brief Write object to a file.
+*
+* Reimplement this in sub-classes.
+* 
+* @param f  Valid C file pointer.
+*
+* @return True if successful, false otherwise.
+**/
+bool goObjectBase::writeObjectFile (FILE* f) const
+{
+    if (!f)
+        return false;
+    if (!goFileIO::writeASCII (f, this->getObjectName()))
+        return false;
+    const char cnull = 0;
+    fwrite (&cnull, sizeof(char), 1, f);
+    if (!goFileIO::writeASCII (f, "goObjectBase"))
+        return false;
+    fwrite (&cnull, sizeof(char), 1, f);
+    return true;
+}
+
+/**
+* @brief Read object from a file.
+*
+* Reimplement this in sub-classes.
+* 
+* @param f  Valid C file pointer.
+*
+* @return True if successful, false otherwise.
+**/
+bool goObjectBase::readObjectFile (FILE* f)
+{
+    if (!f)
+        return false;
+    goString name;
+    if (!goFileIO::readASCII (f, name))
+        return false;
+    this->setObjectName (name);
+    //if (!goFileIO::writeASCII (f, "goObjectBase"))
+    //    return false;
+    return true;
 }
 
 /*! \brief Sets the class name */
@@ -159,19 +213,17 @@ goObjectBase::connectObject (goObjectBase* object)
     {
         return;
     }
-    goObjectBase* o = NULL;
-    myPrivate->connectedObjects.resetToFront();
+    goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
     if (!myPrivate->connectedObjects.isEmpty())
     {
-        o = myPrivate->connectedObjects.getCurrent();
-        for (; !myPrivate->connectedObjects.isTail(); o = myPrivate->connectedObjects.getNext())
+        while (true)
         {
-            o = myPrivate->connectedObjects.getCurrent();
-            if (o == object)
+            if (object == el->elem)
                 return;
+            if (!el->next)
+                break;
+            el = el->next;
         }
-        if (object == myPrivate->connectedObjects.getTail())
-            return;
     }
     myPrivate->connectedObjects.append (object);
 }
@@ -184,25 +236,41 @@ goObjectBase::disconnectObject (const goObjectBase* object)
     {
         return;
     }
-    goObjectBase* o = NULL;
-    myPrivate->connectedObjects.resetToFront();
-    o = myPrivate->connectedObjects.getCurrent();
-    for (; !myPrivate->connectedObjects.isTail(); o = myPrivate->connectedObjects.getNext())
+    if (myPrivate->connectedObjects.isEmpty())
     {
-        o = myPrivate->connectedObjects.getCurrent();
-        if (o == object)
+        return;
+    }
+    goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
+    while (true)
+    {
+        if (el->elem == object)
         {
-            myPrivate->connectedObjects.remove();
+            el = myPrivate->connectedObjects.remove (el);
             return;
         }
-    }
-    if (object == myPrivate->connectedObjects.getCurrent())
-    {
-        myPrivate->connectedObjects.remove();
-        return;
+        if (!el->next)
+            break;
+        el = el->next;
     }
 }
 
+/**
+* @brief Call an object method by identifier.
+*
+* See the file goobjectmessage.h for messages and add messages there
+* if needed. 
+* External applications building on this class should use
+* identifiers starting with GO_OBJECTMETHOD_USER.
+* 
+* @note Reimplement this in sub-classes as needed.
+* The method should return true if the method call was successful.
+* Values can also be returned through the goObjectMethodParameters* param.
+* 
+* @param methodID  ID of the method.
+* @param param  Pointer to parameters for the method, if any.
+*
+* @return True if successful, false otherwise.
+**/
 bool 
 goObjectBase::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
@@ -217,26 +285,23 @@ goObjectBase::sendObjectMessage (int messageID, void* data)
     {
         return;
     }
-    myPrivate->connectedObjects.resetToFront();
+    goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
     goObjectBase* o = NULL;
     goObjectMessage message;
     message.mySender        = this;
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
     message.myData          = data;
-    while (!myPrivate->connectedObjects.isTail())
+    while (true)
     {
-        o = myPrivate->connectedObjects.getCurrent();
+        o = el->elem;
         if (o)
         {
             o->receiveObjectMessage (message);
         }
-        myPrivate->connectedObjects.getNext();
-    }
-    o = myPrivate->connectedObjects.getCurrent();
-    if (o)
-    {
-        o->receiveObjectMessage (message);
+        if (!el->next)
+            break;
+        el = el->next;
     }
 }
 
@@ -267,11 +332,11 @@ goObjectBase::receiveObjectMessage (const goObjectMessage& message)
 {
     if (message.myMessageID == GO_OBJECTMESSAGE_DESTRUCTING)
     {
-        std::cout << "goObjectBase: disconnected object " << std::hex << message.mySender << " (object was destroyed)\n";
+        // std::cout << "goObjectBase: disconnected object " << std::hex << message.mySender << " (object was destroyed)\n";
         // Ensure this object does not try to send anything to mySender, 
         // in case the other direction is also connected.
         // This may be slow, but it is safer.
         this->disconnectObject (message.mySender);
     }
-    std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
+    // std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
 }

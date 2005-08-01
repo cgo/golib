@@ -5,6 +5,7 @@
 #include <goquantizer.hpp>
 #include <gouniformquantizer.h>
 #include <gouniformquantizer.hpp>
+#include <gocomplex.h>
 #include <goconfig.h>
 
 template <class T> static bool      lowerThanFunction   (const void* v1, const void* v2);
@@ -384,6 +385,32 @@ goType::setID (goTypeEnum t)
                 myPrivate->equal       = equalFunction<void*>;
                 myPrivate->minimum     = std::numeric_limits<unsigned int>::min();
                 myPrivate->maximum     = std::numeric_limits<unsigned int>::max();
+            }
+            break;
+        case GO_COMPLEX_SINGLE:
+            {
+                myPrivate->size        = sizeof (goComplexf);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "single precision complex";
+                myPrivate->lowerThan   = lowerThanFunction<goComplexf>;
+                myPrivate->greaterThan = greaterThanFunction<goComplexf>;
+                myPrivate->equal       = equalFunction<goComplexf>;
+                myPrivate->minimum     = std::numeric_limits<goFloat>::min();
+                myPrivate->maximum     = std::numeric_limits<goFloat>::max();
+                myPrivate->indexFunction = 0; // floatIndexFunction;
+            }
+            break;
+        case GO_COMPLEX_DOUBLE:
+            {
+                myPrivate->size        = sizeof (goComplexd);
+                myPrivate->signedness  = true;
+                myPrivate->string      = "double precision complex";
+                myPrivate->lowerThan   = lowerThanFunction<goComplexd>;
+                myPrivate->greaterThan = greaterThanFunction<goComplexd>;
+                myPrivate->equal       = equalFunction<goComplexd>;
+                myPrivate->minimum     = std::numeric_limits<goDouble>::min();
+                myPrivate->maximum     = std::numeric_limits<goDouble>::max();
+                myPrivate->indexFunction = 0; // floatIndexFunction;
             }
             break;
         default:

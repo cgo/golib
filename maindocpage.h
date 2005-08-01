@@ -6,20 +6,43 @@
  *  by those. For a complete documentation, please refer to the HTML version.
  * \endlatexonly 
  * \section intro What it is
+ * \subsection intro2 Introduction
  * goLib is a C++ class library written by 
  * Christian Gosch</a>.
- * It contains some useful classes for everyday use, like arrays, strings, a tree, heap
+ * It contains some useful classes for everyday use, like arrays, strings, lists, hashtables,
  * and so forth. Other functionalities are
  * - Classes for signal processing, especially image processing and processing
  * of 3D grid data (source tree under src/signal)
- * - A base for 1D signal processing is there, but not really functional. I am going to
- * add that as soon as I have time and have a use for it.
- * - Some limited matrix and vector classes
+ * - Some limited matrix and vector classes, and (more recently added) a sparse matrix class.
  * \par 
  * <strong>Important notice:</strong> All of this was made because I had
  * a use for it. If you want to make your own contributions, please see further 
- * below!
- *
+ * below! <br>
+ * It may well be the case that classes contained in the library are not well tested
+ * or have never been in actual use. I can not guarantee perfect suitability for
+ * any purpose. However, the signal related stuff seems to work quite fine (and surely
+ * still has bugs). Also, the classes in src/data seem to work ok (the basic 
+ * arrays, fixed arrays, strings, lists, hashtables and goSignal3DBase-based classes 
+ * are used by me a lot and therefore
+ * get more bug fixing than other classes like the network server or 
+ * similar).
+ * \subsection intro3 Scripting with Guile Scheme (EXPERIMENTAL and very recent)
+ * If you have GNU Guile >= 1.6.7, you can use Guile's implementation of the Scheme
+ * programming language to write scripts that use the functionality of golib.
+ * In the directory <code>swig</code>, you will find code and a CMakeLists.txt
+ * to create a Guile module using SWiG (so you need SWiG >= 1.3.25 too).
+ * If you want to use the Guile module, install the created .so library
+ * to a location included in the LD_LIBRARY_PATH environment variable and
+ * copy the created .scm files to a path that can be found by Guile
+ * (e.g., a path contained in the GUILE_LOAD_PATH environment variable).
+ * Also, if the file common.scm, which comes from SWiG, is not available on your system,
+ * copy it to the same location as the other .scm files (it resides in golib's swig directory).
+ * Note that golib's Guile Scheme support is highly experimental and subject to changes.<br>
+ * <ul>
+ *   <li>http://www.swig.org</li>
+ *   <li>http://www.gnu.org/software/guile</li>
+ * </ul>
+ * 
  * \section howto How to build and use
  *	\subsection pre Prerequisites
  *	 You will always need the pthread library to compile goLib. It is
@@ -71,11 +94,6 @@
  * 	 to compile the examples. Be sure to have the environment variables
  *	 mentioned above set correctly.
  *
- * \subsection scripting Scripting support with Guile and SWIG
- *   I am experimenting with scripting support for golib 
- *   using Guile (http://www.gnu.org/software/guile) and
- *   swig (http://www.swig.org). The relevant directory is <code>swig</code>.
- *		 
  * \section da  ---Diplomarbeit---
  * Version 0.2.1 of this library contains the source code for my Diplomarbeit 
  * (final thesis in Germany). 

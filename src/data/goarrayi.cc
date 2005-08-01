@@ -6,6 +6,7 @@
 #include <golist.h>
 #include <gopoint.h>
 #include <gohashtable.h>
+#include <goobjectbase.h>
 #include <goconfig.h>
 
 // instantiation
@@ -26,11 +27,11 @@ template class goArray< void* >;
 // added for goNVector
 //template class goArray<goUInt32>;
 //template class goArray<goFloat>;
-template class goArray<goComplex<goDouble> >;
+// template class goArray<goComplex<goDouble> >;
 
 // more exotic ones
 template class goArray<goPointf>;
-template class goArray<goPointd>;
+template class goArray<goObjectBase*>;
 template class goArray<goString* >;
 template class goArray<goArray<int>* >;
 template class goArray<goConfigFileEntry* >;
@@ -39,4 +40,3 @@ template class goArray<goConfigFileChapter* >;
 //template class goArray<goList<goHashEntry<goUInt64, void*> > >;
 //template class goArray<goList<goHashEntry<goUInt32, void*> > >;
 template class goArray< void* (*)(void*) >;
-

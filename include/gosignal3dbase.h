@@ -182,7 +182,7 @@ goSignal3DBase : public goObjectBase
         /*!
          * @return The size of the object data (without the object overhead) in bytes.
          */
-        goSize_t	getSize ();
+        goSize_t	getSize () const;
 
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;

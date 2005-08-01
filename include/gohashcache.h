@@ -56,8 +56,8 @@ class goHashCache {
    * Again: CALL ONLY ONCE PER INSTANCE OF THIS CLASS!
    * @param i Mod value.
    */
-  void		setModValue (goUInt32);
-  goUInt32	getModValue () { return modValue; }
+  void     setModValue (goUInt32);
+  goUInt32 getModValue ();
   ///
   inline O&			 operator[] (I in);
   goHashCacheEntry<I,O>* getEntry (I in);

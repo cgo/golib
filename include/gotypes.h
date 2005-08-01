@@ -134,7 +134,9 @@ enum {
   GO_UINT64,
   GO_FLOAT,
   GO_DOUBLE,
-  GO_VOID_POINTER
+  GO_VOID_POINTER,
+  GO_COMPLEX_SINGLE,
+  GO_COMPLEX_DOUBLE
 };
 
 typedef int goTypeEnum;

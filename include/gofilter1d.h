@@ -20,6 +20,39 @@
 
 class goFilter1DPrivate;
 
+/*!
+ * \addtogroup signal
+ * @{
+ */
+
+/**
+ * @brief Separable filter for 3D signals.
+ *
+ * Applies a separable filter to a goSignal3DBase<void>. Note that
+ * this filter class was not implemented for typed instances of goSignal3DBase.
+ * You should not use typed versions anymore anyway.
+ *
+ * Usage would be like this:
+ * <pre>
+ *  <code>
+ *      ...
+ *      goSignal3D<void> sig;
+ *      ...
+ *      goArray<goFloat> mask;
+ *      mask += 1.0f;
+ *      mask += 2.0f;
+ *      mask += 1.0f;
+ *      goFilter1D filter;
+ *      filter.setMask   (mask);  // Set the mask
+ *      filter.setCenter (1);     // Set center to the entry "2"
+ *      filter.normalize ();      // Normalize the mask
+ *      filter.filter    (sig);   // Filter in-place
+ *      ...
+ *  </code>
+ * </pre>
+ * 
+ * @return 
+ **/
 class
 goFilter1D : public goObjectBase
 {
@@ -35,6 +68,6 @@ goFilter1D : public goObjectBase
 	private:
         goFilter1DPrivate* myPrivate;
 };
-
+/*! @} */
 #endif
 

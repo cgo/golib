@@ -40,15 +40,26 @@ Directories
 
 What you need
 -------------
-You will need a C++ compiler (tested with gnu c++ 2.95.3)
-and GNU make. 
+You will need a C++ compiler (tested with gnu c++ 3.3)
+and a current version of CMake (http://www.cmake.org). Earlier versions also
+supported GNU autotools and maybe this will be kept up parallel to CMake.
 For more information and downloads, see http://www.gnu.org.
 The pthreads library must be installed.
-For version 0.2.1, you will also need the SDL library 
+For version 0.2.1, you will also need the SDL library
 (see http://www.libsdl.org).
+For image loading/writing support you need libdevil (http://openil.sourceforge.net/).
 
 How to build
 ------------
+Set the environment variable GOPATH to the path where golib resides, e.g. in bash
+ export GOPATH=/home/christian/golib
+In the golib directory, do
+ mkdir build
+ cd build
+ cmake ..
+ make
+ 
+In earlier versions, with the GNU autotools:
 To compile the library, it should be sufficient to type 
 ./configure
 followed by

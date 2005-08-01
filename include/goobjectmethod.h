@@ -19,6 +19,14 @@ enum goObjectMethodID
     GO_OBJECTMETHOD_USER = 0xfff00000
 };
 
+/*! \addtogroup misc
+ * @{
+ */
+/**
+ * @brief Parameter container for goObjectBase::callObjectMethod()
+ *
+ * @todo Add goObjectBase* parameters?
+ **/
 class
 goObjectMethodParameters
 {
@@ -30,13 +38,18 @@ goObjectMethodParameters
            myFloats(), 
            myDoubles() {};
         ~goObjectMethodParameters () {};
-        
+ 
+        /// Void pointers
         goArray<void*>    myVoidPointers;
+        /// Integer parameters
         goArray<goInt32>  myIntegers;
+        /// UInt parameters
         goArray<goUInt32> myUnsignedIntegers;
+        /// Float parameters
         goArray<goFloat>  myFloats;
+        /// Double parameters
         goArray<goDouble> myDoubles;
 };
-
+/*! @} */
 #endif
 

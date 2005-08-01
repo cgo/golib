@@ -44,7 +44,8 @@ class goFileIOException
     enum
     {
         NOT_FOUND,
-        FAILED
+        FAILED,
+        EXISTS
     };
 
     goFileIOException (int _code = FAILED) : code (_code) {};
@@ -69,6 +70,20 @@ class goTypeException
 
 class goNullException
 {
+};
+
+class goMathException
+{
+    public:
+        enum
+        {
+            SIZE_MISMATCH,
+            OTHER
+        };
+        goMathException (int t = OTHER) : code (t) {};
+        ~goMathException () {};
+
+        int code;
 };
 
 /*!

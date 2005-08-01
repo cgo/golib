@@ -6,6 +6,7 @@
 #include <go3vector.h>
 #include <golog.h>
 #include <goconfig.h>
+#include <gocomplex.h>
 #include <string.h> // bzero()
 #include <iostream>
 
@@ -119,6 +120,10 @@ INITIALIZE_DATATYPE_METHOD(GO_VOID_POINTER);
 bool
 goSignal3DBase<void>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT8);
+
+bool
+goSignal3DBase<goComplexf>::initializeDataType ()
+INITIALIZE_DATATYPE_METHOD(GO_COMPLEX_SINGLE);
 
 #undef INITIALIZE_DATATYPE_METHOD
 
@@ -732,20 +737,26 @@ goSignal3DBase<void>::operator== (goSignal3DBase<void> &other)
 }
 
 goSize_t
-goSignal3DBase<void>::getSize()
+goSignal3DBase<void>::getSize() const
 {
     return myChannelCount * myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
 }
 
 template< class T >
 goSize_t
-goSignal3DBase<T>::getSize()
+goSignal3DBase<T>::getSize() const
 {
     return myChannelCount * sizeof(T) * (mySize.x * mySize.y * mySize.z);
 }
 
 goDouble
 goSignal3DBase<void*>::getMaximum() const
+{
+    return 0.0;
+}
+
+goDouble
+goSignal3DBase<goComplex<goFloat> >::getMaximum() const
 {
     return 0.0;
 }
@@ -831,6 +842,13 @@ goSignal3DBase<void*>::getMinimum() const
 {
     return 0.0;
 }
+
+goDouble
+goSignal3DBase<goComplex<goFloat> >::getMinimum() const
+{
+    return 0.0;
+}
+
 
 goDouble
 goSignal3DBase<void>::getMinimum() const
@@ -1198,12 +1216,12 @@ inline
 T*
 goSignal3DBase<T>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
-    goString msg = "myChannel: ";
-    msg += (int)myChannel;
-    msg += ", offset: "; 
-    msg += (int)myChannelOffset[myChannel];
-    goLog::message(msg,this);
-    printf ("%s\n",msg.toCharPtr());
+//    goString msg = "myChannel: ";
+//    msg += (int)myChannel;
+//    msg += ", offset: "; 
+//    msg += (int)myChannelOffset[myChannel];
+//    goLog::message(msg,this);
+//    printf ("%s\n",msg.toCharPtr());
     return ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel];
 }
 
@@ -1223,6 +1241,13 @@ goSignal3DBase<T>::getClosest (go3Vector<goFloat>& point) const
     return (getPtr ((int)point.x, (int)point.y, (int)point.z));
 }
 
+
+inline
+goFloat
+goSignal3DBase<goComplex<goFloat> >::sample (go3Vector<goFloat>& point)
+{
+    return 0.0f;
+}
 
 template<class T>
 inline
@@ -2132,6 +2157,7 @@ template class goSignal3DBase< goInt64 >;
 #endif
 template class goSignal3DBase< goFloat >;
 template class goSignal3DBase< goDouble >;
+template class goSignal3DBase< goComplex<goFloat> >;
 template class goSignal3DBase< void* >;
 template class goSignal3DBase< void >;
 

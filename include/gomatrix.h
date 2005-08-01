@@ -45,14 +45,16 @@ class goMatrix
   virtual bool resize    (goSize_t rows, goSize_t columns);
   virtual void transpose ();
   virtual goMatrix<T>& operator= (const goMatrix<T>& other);
+  goSignal3DBase<T>* getData () { return matrix; };
+  const goSignal3DBase<T>* getData () const { return matrix; };
   
  protected:
   goMatrix (goSignal3DBase<T>* data);
   bool initializeRows ();
 
  public:
-  inline goSize_t   getColumns () const;
-  inline goSize_t   getRows    () const;
+  goSize_t   getColumns () const;
+  goSize_t   getRows    () const;
  
   // TNT compatibility methods BEGIN
   inline int        dim1 () const;

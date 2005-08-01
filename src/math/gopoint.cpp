@@ -3,7 +3,8 @@
 
 template <class T>
 goPoint<T>::goPoint (T xf, T yf, T zf, T wf, goDouble v)
-    : x(xf), y(yf), z(zf), w(wf), value(v)
+    : go4Vector<T> (xf, yf, zf, wf),
+      value (v)
 {
 }
 
@@ -12,12 +13,14 @@ goPoint<T>::~goPoint ()
 {
 }
 
+#if 0
 template <class T>
 goDouble
 goPoint<T>::abs () const
 {
     return sqrt(x*x + y*y + z*z + w*w);
 }
+#endif
 
 template <class T>
 bool
@@ -33,6 +36,7 @@ goPoint<T>::operator> (const goPoint<T>& other) const
     return (this->abs() > other.abs());
 }
 
+#if 1
 /**
  * @brief Comparison of the coordinates
  *
@@ -81,5 +85,32 @@ goPoint<T>::operator+ (const goPoint<T>& other) const
     return ret;
 }
 
+template <class T>
+void goPoint<T>::operator-= (const goPoint<T>& other)
+{
+    this->x -= other.x;
+    this->y -= other.y;
+    this->z -= other.z;
+    this->w -= other.w;
+}
+
+template <class T>
+void goPoint<T>::operator+= (const goPoint<T>& other)
+{
+    this->x += other.x;
+    this->y += other.y;
+    this->z += other.z;
+    this->w += other.w;
+}
+
+//template <class T>
+//void goPoint<T>::operator*= (T scalar)
+//{
+//    this->x *= scalar;
+//    this->y *= scalar;
+//    this->z *= scalar;
+//    this->w *= scalar;
+//}
+#endif
 template class goPoint<goFloat>;
 template class goPoint<goDouble>;
