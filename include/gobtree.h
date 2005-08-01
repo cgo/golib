@@ -10,9 +10,9 @@ class goBTreeElement : public goObjectBase
         goBTreeElement (const T&);
         virtual ~goBTreeElement ();
 
-        goBTreeElement<T>* leftChild;
-        goBTreeElement<T>* rightChild;
-        goBTreeElement<T>* parent;
+		goBTreeElement<T>* leftChild;
+		goBTreeElement<T>* rightChild;
+		goBTreeElement<T>* parent;
         T                  value;
 };
 
@@ -24,7 +24,7 @@ class goBTreeAlgorithm
     public:
         goBTreeAlgorithm () {};
         virtual ~goBTreeAlgorithm () {};
-        bool run (typename goBTree<T>::Element* root);
+        bool depthFirst (typename goBTree<T>::Element* root);
         virtual bool action (typename goBTree<T>::Element* node) { return false; };
 };
 

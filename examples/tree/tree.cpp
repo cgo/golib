@@ -24,7 +24,7 @@ int main ()
             };
     };
     PrintTree pt;
-    pt.run(tree->getRoot());
+    pt.depthFirst(tree->getRoot());
 
     delete tree;
     tree = 0;

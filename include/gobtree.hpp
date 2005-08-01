@@ -30,17 +30,41 @@ goBTreeElement<T>::~goBTreeElement ()
  * @return True if successful, false otherwise.
  ----------------------------------------------------------------------------*/
 template<class T>
-bool goBTreeAlgorithm<T>::run (typename goBTree<T>::Element* root)
+bool goBTreeAlgorithm<T>::depthFirst (typename goBTree<T>::Element* root)
 {
     static bool ok = true;
     if (!root)
         return false;
     if (root->leftChild)
-        ok = ok && this->run (root->leftChild);
+        ok = ok && this->depthFirst (root->leftChild);
     if (root->rightChild)
-        ok = ok && this->run (root->rightChild);
+        ok = ok && this->depthFirst (root->rightChild);
     return ok && this->action(root);
 }
+
+/* --------------------------------------------------------------------------
+ * @brief Runs breadth-first (left to right).
+ * 
+ * @param root Node at which to start.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
+//template<class T>
+//bool goBTreeAlgorithm<T>::breadthFirst (typename goBTree<T>::Element* root)
+//{
+//    static bool ok = true;
+//    if (!root)
+//        return false;
+//    if (root->leftChild)
+//    {
+//        ok = ok && this->run (root->leftChild);		
+//    }
+//    if (root->rightChild)
+//    {
+//        ok = ok && this->run (root->rightChild);
+//    }
+//    return ok && this->action(root);
+//}
 
 //============================================
 
@@ -73,7 +97,7 @@ goBTree<T>::~goBTree ()
     };
 
     DeleteTree del;
-    del.run (myRoot);
+    del.depthFirst (myRoot);
 }
 
 template<class T>
