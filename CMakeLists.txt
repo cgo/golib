@@ -32,6 +32,7 @@ SET                 (SOURCES
  src/math/divnormalizedgrad2d.cpp
  src/math/goeigenvalue.cpp
  src/math/cg.cpp
+ src/math/gobiorthowavelet.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
@@ -75,6 +76,8 @@ SET                 (SOURCES
  src/shape/gocurve.cpp
  src/shape/gonurbs.cpp
  src/shape/goshape.cpp
+ src/shape/partial.cpp
+ src/shape/godiscretecurvepartition.cpp
  src/seispack/bakvec.c
  src/seispack/balanc.c
  src/seispack/balbak.c
@@ -157,6 +160,7 @@ SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include)
 SET                 (EXTRA_LIBS "")
 SET                 (GOPATH $ENV{GOPATH})
 # FILE                (GLOB SOURCES *.cpp *.cxx)
+SET                 (GO_GUILE_MULTITHREAD 0)
 
 CHECK_TYPE_SIZE("char"          SIZEOF_CHAR)
 CHECK_TYPE_SIZE("short int"     SIZEOF_SHORT_INT)
@@ -186,9 +190,8 @@ CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
 CHECK_FUNCTION_EXISTS (stat     HAVE_STAT)
 CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
-
 #EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
-#EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (swig ARGS 
 #                        -I./ 
 #                        -I$ENV{GOPATH}/include 
@@ -234,7 +237,8 @@ ENDIF (${HAVE_LIBPTHREAD} MATCHES 1)
 #    SET (HAVE_LIBPTHREAD 1)
 #ENDIF (DEFINED ${CMAKE_USE_PTHREADS_INIT})
 
-INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
+INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
+                     ${EXTRA_INCLUDE_PATH}
                      $ENV{GOPATH}/include
                      ${MATPACK_INCLUDE})
 

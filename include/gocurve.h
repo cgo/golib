@@ -19,19 +19,21 @@ class goCurvePrivate;
 /**
  * @brief Curve representation.
  **/
-class goCurve : public goPointCloud
+template <class pointT>
+class goCurve : public goPointCloud<pointT>
 {
     public:
         goCurve ();
-        goCurve (const goCurve&);
+        goCurve (const goCurve<pointT>&);
         virtual ~goCurve ();
-        goCurve& operator= (const goCurve&);
+        goCurve& operator= (const goCurve<pointT>&);
 
-        bool resample    (goIndex_t pointCount, goCurve& ret);
-        bool getGradNorm (goArray<goFloat>& diffNorm) const;
-        bool getGrad     (goList<go4Vectorf>& diff) const;
-        bool getCurvNorm (goArray<goFloat>& curvNorm) const;
-        bool getAngleFunction (goArray<goFloat>& angles, const go4Vectorf& axis) const;
+        bool     resample         (goIndex_t pointCount, goCurve<pointT>& ret);
+        bool     getGradNorm      (goArray<goFloat>& diffNorm) const;
+        bool     getGrad          (goList<go4Vectorf>& diff) const;
+        bool     getCurvNorm      (goArray<goFloat>& curvNorm) const;
+        bool     getAngleFunction (goArray<goFloat>& angles, const go4Vectorf& axis) const;
+        goDouble getLength        () const;
         
         // bool operator!= (const goCurve& other);
         
@@ -47,4 +49,6 @@ class goCurve : public goPointCloud
         goCurvePrivate* myPrivate;
 };
 
+typedef goCurve<goPointf> goCurvef;
+typedef goCurve<goPointd> goCurved;
 #endif

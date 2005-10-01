@@ -4,12 +4,13 @@
 #ifndef GOMATRIX_H
 # include <gomatrix.h>
 #endif
-#ifndef GOMATRIX_I
-# include <gomatrix.i>
-#endif
+//#ifndef GOMATRIX_HPP
+//# include <gomatrix.hpp>
+//#endif
 #ifndef GOARRAY_H
 # include <goarray.h>
 #endif
+#include <gomath.h>
 
 namespace goMath 
 {
@@ -120,7 +121,7 @@ class goLU
             goRowVector<Real>& LUrowi = LU_[i];
 
             // Most of the time is spent in the following dot product.
-            int kmax = min(i,j);
+            int kmax = goMath::min(i,j);
             double s = 0.0;
             for (k = 0; k < kmax; k++) {
                s += LUrowi[k]*LUcolj[k];

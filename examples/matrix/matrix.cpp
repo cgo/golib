@@ -6,12 +6,44 @@
 #include <goeigenvalue.h>
 #include <govector.h>
 #include <gofixedarray.h>
-
+#include <gotimerobject.h>
 #undef HAVE_MATLAB
 #include <gosparsematrix.h>
 
 int main ()
 {
+    {
+        printf ("\nSparse timing\n");
+        goSparseMatrix m(1000,1000);
+
+        goIndex_t i,j;
+        goTimerObject timer;
+        timer.startTimer();
+        m.fillBegin (1000*1000);
+        for (i = 0; i < 1000; ++i)
+        {
+            for (j = 0; j < 1000; ++j)
+            {
+                m.fillNext (i,j,i+j);
+            }
+        }
+        m.fillEnd();
+        timer.stopTimer();
+        printf ("Seconds for 1000x1000 row-first fill: %.5f\n", timer.getTimerSeconds());
+        timer.startTimer();
+        m.fillBegin (1000*1000);
+        for (i = 0; i < 1000; ++i)
+        {
+            for (j = 0; j < 1000; ++j)
+            {
+                m.fillNext (j,i,i+j);
+            }
+        }
+        m.fillEnd();
+        timer.stopTimer();
+        printf ("Seconds for 1000x1000 col-first fill: %.5f\n", timer.getTimerSeconds());
+        return 1;
+    }
     {
         goVector< goComplex<float> >* test = new goVector< goComplex<float> > [3];
         goMatrix<goComplexf> m (3,3);
@@ -191,5 +223,6 @@ int main ()
     p *= m4;
     std::cout << p << "\n";
 
+    
     return 1;
 }

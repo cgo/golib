@@ -51,7 +51,7 @@ class goFileIO {
   /** @addtogroup signal */
   /** @{ */
   static bool  readImage  (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException);
-  static bool  writeImage (const char* filename, const goObjectBase* signal) throw (goFileIOException, goTypeException);
+  static bool  writeImage (const char* filename, const goSignal3DBase<void>* signal) throw (goFileIOException, goTypeException);
   /** @} */
   static FILE* createTempFile (goString& filenameRet);
   static bool  remove         (const goString& filename);

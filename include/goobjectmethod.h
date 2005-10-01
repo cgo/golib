@@ -13,6 +13,9 @@
 #ifndef GOARRAY_H
 # include <goarray.h>
 #endif
+#ifndef GOTHREAD_H
+# include <gothread.h>
+#endif
 
 enum goObjectMethodID
 {
@@ -36,7 +39,10 @@ goObjectMethodParameters
            myIntegers(), 
            myUnsignedIntegers(), 
            myFloats(), 
-           myDoubles() {};
+           myDoubles(),
+           semaphore(),
+           blocking(false) {};
+
         ~goObjectMethodParameters () {};
  
         /// Void pointers
@@ -49,6 +55,9 @@ goObjectMethodParameters
         goArray<goFloat>  myFloats;
         /// Double parameters
         goArray<goDouble> myDoubles;
+
+        goSemaphore semaphore;
+        bool        blocking;
 };
 /*! @} */
 #endif

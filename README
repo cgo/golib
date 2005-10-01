@@ -65,6 +65,33 @@ To compile the library, it should be sufficient to type
 followed by
 make
 
+
+How to build the Guile module (EXPERIMENTAL)
+--------------------------------------------
+You need to have Guile >= 1.6.7 and SWiG >= 1.3.25 installed.
+See
+http://www.swig.org
+and
+http://www.gnu.org/software/guile
+
+Go to golib's swig directory.
+Create a directory "build", just like for building golib.
+call "cmake .." or "ccmake .." from that directory.
+Set the install path accordingly.
+Call:
+make && make install
+Go to the swig directory again and copy the files
+golib_guile.scm, golib_guile-primitives.scm, and common.scm
+to a directory in the search path of Guile (such as a directory
+pointed to by the environment variable GUILE_LOAD_PATH).
+In a scheme script, add:
+ (primitive-load-path "golib_guile.scm")
+ (use-modules (oop goops describe))
+Guile should load the module and the primitives when the script
+is run.
+Mind that the exported functions and class names may be subject to change.
+
+
 Recognized special options for configure
 ----------------------------------------
 --enable-debug		Sets the compiler option for debugging.

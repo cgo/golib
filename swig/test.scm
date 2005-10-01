@@ -1,4 +1,4 @@
-#!/usr/bin/guile -s 
+#!/home/gosch/Software/bin/guile -s 
 !#
 (primitive-load-path "golib_guile.scm")
 (use-modules (oop goops describe))

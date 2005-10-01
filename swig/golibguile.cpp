@@ -43,6 +43,48 @@ bool goSCMToRealList (SCM l, goList<T>& gol)
     return true;
 }
 
+template <class T>
+SCM goRealArrayToSCM (const goArray<T>& a)
+{
+    SCM ret = SCM_EOL;
+    if (a.getSize() == 0)
+    {
+        return SCM_EOL;
+    }
+    goIndex_t sz = a.getSize();
+    goIndex_t i = 0;
+    for (i = 0; i < sz; ++i)
+    {
+        ret = scm_cons (scm_make_real(a[i]), ret);
+    }
+    return ret;
+    // SCM scm_list_1 (SCM e1);
+    // double scm_num2dbl (SCM d, const char* why);
+    // SCM scm_make_real (double x);
+    // SCM scm_cons (SCM CAR, SCM CDR);
+}
+
+template <class T>
+bool goSCMToRealArray (SCM l, goArray<T>& gov)
+{
+    if (SCM_NULLP(l))
+    {
+        return true;
+    }
+    SCM_ASSERT (SCM_CONSP(l), l, SCM_ARG1, "goSCMToRealArray");
+    gov.resize (scm_num2int(scm_length(l), SCM_ARG1, "goSCMToRealArray"));
+
+    goIndex_t i = 0;
+    while (!SCM_NULLP(l))
+    {
+        SCM_ASSERT(SCM_NUMBERP(SCM_CAR(l)), SCM_CAR(l), SCM_ARG1, "goSCMToRealArray");
+        gov[i] = static_cast<T>(scm_num2dbl(SCM_CAR(l), "goSCMToRealArray"));
+        ++i;
+        l = SCM_CDR(l);
+    }
+    return true;
+}
+
 /*
 SCM golib_test_list ()
 {
@@ -74,3 +116,7 @@ template SCM goRealListToSCM (const goList<goFloat>& l);
 template SCM goRealListToSCM (const goList<goDouble>& l);
 template bool goSCMToRealList (SCM l, goList<goFloat>& l2);
 template bool goSCMToRealList (SCM l, goList<goDouble>& l2);
+template SCM goRealArrayToSCM (const goArray<goFloat>& l);
+template SCM goRealArrayToSCM (const goArray<goDouble>& l);
+template bool goSCMToRealArray (SCM l, goArray<goFloat>& l2);
+template bool goSCMToRealArray (SCM l, goArray<goDouble>& l2);

@@ -61,6 +61,46 @@ namespace goMath
     {
         return myNormFactor * exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
     }
+
+    //===================================================================
+    template <class input_vector, class output_type>
+    goMultiGaussPDF<input_vector, output_type>::goMultiGaussPDF ()
+        : goPDF<input_vector, output_type> (),
+          myMean          (),
+          myCovarianceInv (),
+          myNormFactor    (0.0)
+    {
+    };
+    template<class input_vector, class output_type>
+    goMultiGaussPDF<input_vector, output_type>::~goMultiGaussPDF ()
+    {
+    };
+
+    template<class input_vector, class output_type>
+    output_type goMultiGaussPDF<input_vector, output_type>::operator() (const input_vector& input)
+    {
+        input_vector temp = input - myMean;
+        input_vector temp_t = temp;
+        temp_t.transpose();
+        goDouble f = -0.5 * temp_t * myCovarianceInv * temp;
+        return myNormFactor * exp(f);
+    }
+    
+    template<class input_vector, class output_type>
+    bool goMultiGaussPDF<input_vector, output_type>::fromSamples (const input_vector* vectors, goIndex_t count)
+    {
+        assert (vectors);
+        if (count < 1 || !vectors)
+            return false;
+        
+        myMean.resize (vectors[0].getSize());
+        goIndex_t i;
+        for (i = 0; i < count; ++i)
+        {
+            
+        }
+    }
+   
 };
 
 template class goMath::goGaussPDF <goDouble, goDouble>;

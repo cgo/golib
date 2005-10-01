@@ -24,12 +24,14 @@ class goNURBS
 {
     public:
         goNURBS ();
-        goNURBS (const goCurve* curve);
+        goNURBS (const goCurvef* curve);
+        goNURBS (const goCurved* curve);
         virtual ~goNURBS ();
 
         goDouble getCurveLength () const;
         void     interpolate ();
         bool     interpolate (const goList<goPointf>& points);
+        bool     interpolate (const goList<goPointd>& points);
         goPointf operator() (goFloat u);
 
     private:

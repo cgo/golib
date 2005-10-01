@@ -29,6 +29,7 @@ class goList {
  public:
   ///
   goList ();
+  goList (const goList<T>& other);
   ~goList ();
 
   Element*      getFrontElement ();

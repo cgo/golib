@@ -14,7 +14,7 @@ class goShapePrivate
         goShapePrivate();
         ~goShapePrivate();
 
-        goCurve* curve;
+        goCurvef* curve;
 };
 
 goShapePrivate::goShapePrivate ()
@@ -28,7 +28,7 @@ goShapePrivate::~goShapePrivate ()
 
 // =====================================
 
-goShape::goShape (goCurve* c)
+goShape::goShape (goCurvef* c)
     : goObjectBase (),
       myPrivate (0)
 {
@@ -51,17 +51,17 @@ goShape::~goShape ()
     }
 }
 
-goCurve* goShape::getCurve()
+goCurvef* goShape::getCurve()
 {
     return myPrivate->curve;
 }
 
-const goCurve* goShape::getCurve() const
+const goCurvef* goShape::getCurve() const
 {
     return myPrivate->curve;
 }
 
-void goShape::setCurve(goCurve* c)
+void goShape::setCurve(goCurvef* c)
 {
     if (myPrivate->curve)
     {
@@ -131,7 +131,7 @@ static goDouble procrustesDistance (goList<goPointf>::Element* e1_, goList<goPoi
  *
  * @return True if successful, false otherwise.
  **/
-bool goShape::align (goCurve& curve, const goCurve& other)
+bool goShape::align (goCurvef& curve, const goCurvef& other)
 {
     //= Both curves must have the same number of equally spaces points (do resample() prior to alignment).
     if (other.getPoints().getSize() != curve.getPoints().getSize())
@@ -227,7 +227,7 @@ bool goShape::align (goCurve& curve, const goCurve& other)
  **/
 bool goShape::getWeights (goArray<goFloat>& weights) const
 {
-    const goCurve* curve = this->getCurve();
+    const goCurvef* curve = this->getCurve();
     if (!curve)
         return false;
     if (curve->getPoints().isEmpty())
@@ -332,7 +332,7 @@ bool goShape::getWeights (goArray<goFloat>& weights) const
  *
  * @return True if successful, false otherwise.
  **/
-bool goShape::center (goCurve& curve)
+bool goShape::center (goCurvef& curve)
 {
     if (curve.getPoints().isEmpty())
         return false;
@@ -351,7 +351,7 @@ bool goShape::center (goCurve& curve)
  *
  * @return True if successful, false otherwise.
  **/
-bool goShape::normalize (goCurve& curve)
+bool goShape::normalize (goCurvef& curve)
 {
     if (curve.getPoints().isEmpty())
         return false;
@@ -408,12 +408,12 @@ void goShape::receiveObjectMessage (const goObjectMessage& msg)
 /*
  * @note All shapes and meanRet must be of the same size prior to this call.
  */
-static void meanShape (goList<goCurve*>& shapes, goCurve& meanRet)
+static void meanShape (goList<goCurvef*>& shapes, goCurvef& meanRet)
 {
     goIndex_t size = static_cast<goIndex_t>(shapes.getSize());
     goFixedArray<goList<goPointf>::Element*> shapeEl (size);
     {
-        goList<goCurve*>::Element* el = shapes.getFrontElement();
+        goList<goCurvef*>::Element* el = shapes.getFrontElement();
         for (goIndex_t i = 0; i < size; ++i, el = el->next)
         {
             assert(el);
@@ -452,7 +452,7 @@ static void meanShape (goList<goCurve*>& shapes, goCurve& meanRet)
     }
 }
 
-static goDouble curveSquareDifference (const goCurve& c1, const goCurve& c2)
+static goDouble curveSquareDifference (const goCurvef& c1, const goCurvef& c2)
 {
     goDouble ret = 0.0;
     goList<goPointf>::ConstElement* el1 = c1.getPoints().getFrontElement();
@@ -473,12 +473,12 @@ static goDouble curveSquareDifference (const goCurve& c1, const goCurve& c2)
     return ret;
 }
 
-bool goShape::procrustesFit (goList<goCurve*>& shapes, goCurve& meanShapeRet)
+bool goShape::procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet)
 {
     goIndex_t shapeCount = (goIndex_t)shapes.getSize();
     if (shapeCount <= 0)
         return false;
-    goList<goCurve*>::Element* el = shapes.getFrontElement();
+    goList<goCurvef*>::Element* el = shapes.getFrontElement();
 
     //= Center and normalize all shapes.
     assert(el);
@@ -497,12 +497,12 @@ bool goShape::procrustesFit (goList<goCurve*>& shapes, goCurve& meanShapeRet)
     }
 
     meanShapeRet = *el->elem;
-    goCurve tempCurve;
+    goCurvef tempCurve;
     meanShapeRet.resample (100,tempCurve);
     meanShapeRet = tempCurve;
     goShape::center    (meanShapeRet);
     goShape::normalize (meanShapeRet);
-    goCurve oldMeanShape = meanShapeRet;
+    goCurvef oldMeanShape = meanShapeRet;
     goIndex_t i;
     //= Go until convergence or max. 1000 iterations.
     for (i = 0; i < 1000; ++i)

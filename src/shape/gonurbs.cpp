@@ -39,7 +39,7 @@ goNURBSPrivate::~goNURBSPrivate()
 *               curve is approximated and operator() can be used to evaluate the curve.
 *               The valid parameter range is [0,getCurveLength()).
 **/
-goNURBS::goNURBS(const goCurve* curve)
+goNURBS::goNURBS(const goCurvef* curve)
     : myPrivate (0)
 {
     myPrivate = new goNURBSPrivate;
@@ -49,6 +49,25 @@ goNURBS::goNURBS(const goCurve* curve)
         this->interpolate (curve->getPoints());
     }
 }
+
+/**
+* @brief Constructor.
+* 
+* @param curve  Pointer to the curve object. If 0, no action is taken. If != 0, the
+*               curve is approximated and operator() can be used to evaluate the curve.
+*               The valid parameter range is [0,getCurveLength()).
+**/
+goNURBS::goNURBS(const goCurved* curve)
+    : myPrivate (0)
+{
+    myPrivate = new goNURBSPrivate;
+    assert (myPrivate);
+    if (curve)
+    {
+        this->interpolate (curve->getPoints());
+    }
+}
+
 
 goNURBS::goNURBS ()
     : myPrivate (0)
@@ -265,6 +284,35 @@ bool goNURBS::interpolate (const goList<goPointf>& points)
     pp.w = 1.0f;
     goIndex_t i = 0;
     goList<goPointf>::ConstElement* el = points.getFrontElement();
+    while (true)
+    {
+        pp = el->elem;
+        pp.w = 1.0f;
+        myPrivate->controlPoints.append(pp);
+        if (!el->next)
+            break;
+        el = el->next;
+        ++i;
+    }
+    pp = points.getTailElement()->elem;
+    pp.w = 1.0f;
+    myPrivate->controlPoints.append(pp);
+    this->interpolate ();
+    return true;
+}
+
+bool goNURBS::interpolate (const goList<goPointd>& points)
+{
+    if (points.getSize() < 4)
+        return false;
+
+    myPrivate->controlPoints.erase();
+    const goPointd* p = &points.getFrontElement()->elem;
+    assert (p);
+    goPointf pp;
+    pp.w = 1.0f;
+    goIndex_t i = 0;
+    goList<goPointd>::ConstElement* el = points.getFrontElement();
     while (true)
     {
         pp = el->elem;

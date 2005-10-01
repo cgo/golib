@@ -584,17 +584,14 @@ operator== (const goString& str,const char* s) {
   return true;
 }
 
-bool
-operator== (const goString& str, const goString& str2) {
-  goString tmpStr = str2.toCharPtr();
-  return (str == tmpStr);
-}
-
 bool	  
-operator== (const goString& str, goString& str2) {
+operator== (const goString& str, const goString& str2) 
+{
   goIndex_t i = 0;
   if (str.getSize() != str2.getSize()) { return false; }
-  for (i = 0; i < str.getSize(); i++) {
+  goIndex_t sz = str.getSize();
+  for (i = 0; i < sz; ++i) 
+  {
     if (str[i] != str2[i]) { return false; }
   }
   return true;

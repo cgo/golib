@@ -24,6 +24,16 @@ goList<T>::goList () {
 }
 
 template <class T>
+goList<T>::goList (const goList<T>& other) 
+{
+  front		= 0;
+  tail		= 0;
+  position	= 0;
+  size		= 0;
+  *this = other;
+}
+
+template <class T>
 goList<T>::~goList () {
   position = front;
   this->erase();
@@ -324,6 +334,13 @@ goList<T>::remove () {
     return true;
 }
 
+/**
+ * @brief Erase an element from the list.
+ *
+ * @param el  The element to remove.
+ *
+ * @return  The next element in the list (el->next).
+ **/
 template <class T>
 goListElement<T>* goList<T>::remove (goListElement<T>* el)
 {
@@ -437,17 +454,18 @@ goList<T>::operator< (goList<T>& other) {
 template <class T>
 goList<T>&
 goList<T>::operator= (const goList<T>& other) {
-  erase ();
+  this->erase ();
   if (other.isEmpty())
       return *this;
   
   goList<T>::ConstElement* el = other.getFrontElement();
-  while (true)
+  goIndex_t sz = other.getSize();
+  goIndex_t i = 0;
+  while (i < sz && el)
   {
       this->append(el->elem);
-      if (!el->next)
-          break;
       el = el->next;
+      ++i;
   }
   return *this;
 //  if (!other.isEmpty()) {

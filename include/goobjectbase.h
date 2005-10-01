@@ -57,7 +57,9 @@ goObjectBase
 
     // Generic API for calling methods (reimplement)
  public:
-    virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
+    virtual bool callObjectMethod  (int methodID, goObjectMethodParameters* param = NULL);
+    virtual bool queueObjectMethod (int methodID, goObjectMethodParameters* param = NULL, bool blocking = false);
+    bool         callQueuedMethods ();
             
  protected:
     void sendObjectMessage    (int messageID, void* data = NULL);

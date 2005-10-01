@@ -172,7 +172,7 @@ goSignal3DBase : public goObjectBase
          * Does <strong>not</strong> perform a deep copy, instead copies size and pointer difference
          * values and the <strong>pointer</strong> to the signal data.
          */
-        virtual const goSignal3DBase&	operator= (goSignal3DBase &other);
+        const goSignal3DBase&	operator= (goSignal3DBase &other);
 
         /*!
          * "Deep" comparison of the actual data.

@@ -139,6 +139,9 @@ public:
 	      }
       }
 #endif
+
+  bool isCurrentThread (int threadNumber = 0) const;
+  
 protected:
   void*		threadFunction;
   void*		threadParam;

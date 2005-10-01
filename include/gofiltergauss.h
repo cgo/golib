@@ -9,6 +9,9 @@
  * A simple Gauss filter class. <br>
  * Usage is very simple: make a goSignal2D object and a target object of the same type and size,
  * then call the filter member with the source and target signals as arguments.
+ *
+ * @note DEPRECATED
+ * 
  * @author Christian Gosch
  * @see goSignal2D
  * @see goFilterFIR

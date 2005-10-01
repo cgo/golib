@@ -484,7 +484,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFi
 }
 #else
 bool
-goFileIO::readImage (const char*, goObjectBase*) throw (goFileIOException, goTypeException)
+goFileIO::readImage (const char*, goSignal3D<void>*) throw (goFileIOException, goTypeException)
 {
     return false;
 }
@@ -580,7 +580,7 @@ static bool copySignalToIL (const goSignal3DBase<void>* s)
 }
 
 bool
-goFileIO::writeImage (const char* filename, const goObjectBase* signal) throw (goFileIOException, goTypeException)
+goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) throw (goFileIOException, goTypeException)
 {
     if (!signal)
     {

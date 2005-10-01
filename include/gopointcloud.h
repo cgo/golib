@@ -14,8 +14,22 @@
 # include <go44matrix.h>
 #endif
 
-class goPointCloudPrivate;
+template<class T> class goPointCloudPrivate;
 
+/**
+* \addtogroup shape
+* @{
+*/
+/**
+* @brief Point cloud.
+*
+* @note The only currently supported template parameters are 
+*       goPoint<...>. Add more general vectors when needed.
+*       Same holds for goCurve.
+*
+* @todo See note.
+**/
+template <class pointT>
 class goPointCloud : public goObjectBase
 {
     public:
@@ -26,12 +40,15 @@ class goPointCloud : public goObjectBase
 
         bool operator!= (const goPointCloud& other);
         
-        goList<goPointf>&       getPoints ();
-        const goList<goPointf>& getPoints () const;
-        void              setPoints (goList<goPointf>&);
+        goList<pointT>&       getPoints ();
+        const goList<pointT>& getPoints () const;
+        void              setPoints (const goList<pointT>&);
 
-        bool              getCenterOfMass    (goPointf& comRet) const;
-        bool              translate          (const goPointf& d);
+        void              setChanged         ();
+
+        bool              getMean            (pointT& mean) const;
+        bool              getCenterOfMass    (pointT& comRet) const;
+        bool              translate          (const pointT& d);
         bool              transform          (const go44Matrixf& m);
         bool              getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights = 0) const;
         bool              unitScale          (goFloat factor = 1.0f);
@@ -45,7 +62,10 @@ class goPointCloud : public goObjectBase
         virtual void receiveObjectMessage (const goObjectMessage& message);
 
     private:
-        goPointCloudPrivate* myPrivate;
+        goPointCloudPrivate<pointT>* myPrivate;
 };
 
+typedef goPointCloud<goPointf> goPointCloudf;
+
+/** @} */
 #endif

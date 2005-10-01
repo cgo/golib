@@ -48,6 +48,9 @@
 #cmakedefine HAVE_SWIG ${HAVE_SWIG}
 #cmakedefine HAVE_NASM ${HAVE_NASM}
 
+/* Guile-related */
+#cmakedefine GO_GUILE_MULTITHREAD ${GO_GUILE_MULTITHREAD}
+
 #undef USE_MATPACK
 #define GO_USE_EXCEPTIONS 1
 

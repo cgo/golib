@@ -9,7 +9,7 @@
 #include <golinearalgebra.h>
 #include <goarray.h>
 #include <gomatrix.h>
-#include <gomatrix.i>
+#include <gomatrix.hpp>
 #include <gotypes.h>
 
 #define TINY 1.0e-20;

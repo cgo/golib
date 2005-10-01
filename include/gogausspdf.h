@@ -2,6 +2,9 @@
 #define GOGAUSSPDF_H
 
 #include <gopdf.h>
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
 
 namespace goMath
 {
@@ -26,6 +29,25 @@ namespace goMath
             input_type myVariance;              // sigma^2
             input_type myVarianceReciprocal2;   // 1 / (2 * sigma^2)
             goDouble   myNormFactor;            // 1 / sqrt (2 Pi sigma^2)
+    };
+
+    template <class input_vector, class output_type>
+    class goMultiGaussPDF : public goPDF<input_vector, output_type>
+    {
+        public:
+            goMultiGaussPDF ();
+            virtual ~goMultiGaussPDF ();
+            virtual output_type operator()    (const input_vector& input);
+            bool                fromSamples   (const input_vector* vectors, goIndex_t count);
+            goMatrixd&          getCovariance ();
+            const goMatrixd&    getCovariance () const;
+            input_vector&       getMean       ();
+            const input_vector& getMean       () const;
+
+        private:
+            input_vector myMean;
+            goMatrixd    myCovarianceInv;
+            goDouble     myNormFactor;
     };
     /*! @} */
 };

@@ -93,39 +93,19 @@ goSignal3D<T>::~goSignal3D ()
     }
 }
 
-/*! \brief Copy operator 
- *
- * Resizes this signal to the size of <code>other</code> and
- * copies the content.
- */
-template <class T>
-const goSignal3D<T>&
-goSignal3D<T>::operator= (goSignal3DBase<T>& other)
+void
+goSignal3D<void>::destroy ()
 {
-    std::cout << "goSignal3D::operator=()\n";
-    this->destroy();
-
-    this->make (other.getSizeX(),
-                other.getSizeY(),
-                other.getSizeZ(),
-                other.getBlockSizeX(),
-                other.getBlockSizeY(),
-                other.getBlockSizeZ(),
-                other.getBorderX(),
-                other.getBorderY(),
-                other.getBorderZ(),
-                other.getChannelCount());
-   
-    goSize_t i;
-    for (i = 0; i < this->getChannelCount(); ++i)
-    {
-        this->setChannel(i);
-        other.setChannel(i);
-        GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), other, T, T);
-    }
+    goSignal3DBase<void>::destroy ();
     
-    return *this;
+    if (real_ptr)
+    {
+        delete[] (goUInt8*)real_ptr;
+        real_ptr = NULL;
+        ptr      = NULL;
+    }
 }
+
 
 bool
 goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
@@ -180,24 +160,10 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
     return true;
 }
 
-void
-goSignal3D<void>::destroy ()
-{
-    goSignal3DBase<void>::destroy ();
-    
-    if (real_ptr)
-    {
-        delete[] (goUInt8*)real_ptr;
-        real_ptr = NULL;
-        ptr      = NULL;
-    }
-}
-
-
 const goSignal3D<void>&
 goSignal3D<void>::operator= (goSignal3DBase<void>& other)
 {
-    goLog::message("goSignal3D::operator=()");
+    goLog::message("goSignal3D<void>::operator=()");
     this->destroy();
     this->setDataType (other.getDataType().getID());
     this->make (other.getSizeX(),
@@ -216,13 +182,51 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
     for (i = 0; i < this->getChannelCount(); ++i)
     {
         this->setChannel (i);
-        other.setChannel (i);
+        const_cast<goSignal3DBase<void>&>(other).setChannel (i);
         goCopySignal (&other, this);
     }
     this->setChannel (0);
-    other.setChannel (chan);
+    const_cast<goSignal3DBase<void>&>(other).setChannel (chan);
     return *this;
 }
+
+
+/*! \brief Copy operator 
+ *
+ * Resizes this signal to the size of <code>other</code> and
+ * copies the content.
+ */
+template <class T>
+const goSignal3D<T>&
+goSignal3D<T>::operator= (goSignal3DBase<T>& other)
+{
+    std::cout << "goSignal3D::operator=()\n";
+    this->destroy();
+
+    this->make (other.getSizeX(),
+                other.getSizeY(),
+                other.getSizeZ(),
+                other.getBlockSizeX(),
+                other.getBlockSizeY(),
+                other.getBlockSizeZ(),
+                other.getBorderX(),
+                other.getBorderY(),
+                other.getBorderZ(),
+                other.getChannelCount());
+   
+    goSize_t i;
+    goSize_t otherChannel = other.getChannel();
+    for (i = 0; i < this->getChannelCount(); ++i)
+    {
+        this->setChannel(i);
+        const_cast<goSignal3DBase<T>&>(other).setChannel(i);
+        GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*this), const_cast<goSignal3DBase<T>&>(other), T, T);
+    }
+    const_cast<goSignal3DBase<T>&>(other).setChannel(otherChannel);
+    return *this;
+}
+
+
 
 /*!
  * Deletes the memory used by the block data.
@@ -257,7 +261,7 @@ goSignal3D<T>::memoryUsage()
 /// Copies only the size, NOT THE DATA!
 template< class T >
 bool
-goSignal3D<T>::make (goSignal3D<T> *other) {
+goSignal3D<T>::make (goSignal3DBase<T> *other) {
     return this->make (other->getSizeX(), 
                        other->getSizeY(), 
                        other->getSizeZ(),

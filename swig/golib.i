@@ -17,6 +17,7 @@
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goexception.h>
+#include <goshape.h>
 #include <golibguile.h>
 %}
 
@@ -42,6 +43,7 @@
 %include <gofileio.h>
 %include <gosignalhelper.h>
 %include <goarray.h>
+%include <goshape.h>
 %include <golibguile.h>
 
 // Templates

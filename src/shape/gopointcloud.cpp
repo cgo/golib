@@ -7,51 +7,58 @@
 #include <gomath.h>
 #include <assert.h>
 
+template <class pointT>
 class goPointCloudPrivate
 {
     public:
         goPointCloudPrivate();
         ~goPointCloudPrivate();
 
-        goList<goPointf> points;
+        goList<pointT> points;
 };
 
-goPointCloudPrivate::goPointCloudPrivate ()
+template <class pointT>
+goPointCloudPrivate<pointT>::goPointCloudPrivate ()
     : points ()
 {
 }
 
-goPointCloudPrivate::~goPointCloudPrivate ()
+template <class pointT>
+goPointCloudPrivate<pointT>::~goPointCloudPrivate ()
 {
 }
 
 // =====================================
 
-goPointCloud::goPointCloud ()
+template <class pointT>
+goPointCloud<pointT>::goPointCloud ()
     : goObjectBase (),
       myPrivate (0)
 {
     this->setClassName ("goPointCloud");
-    myPrivate = new goPointCloudPrivate;
+    myPrivate = new goPointCloudPrivate<pointT>;
     assert (myPrivate);
 }
 
-goPointCloud::goPointCloud (const goPointCloud& other)
+template <class pointT>
+goPointCloud<pointT>::goPointCloud (const goPointCloud& other)
     : goObjectBase (),
       myPrivate (0)
 {
-    myPrivate = new goPointCloudPrivate;
+    myPrivate = new goPointCloudPrivate<pointT>;
     assert (myPrivate);
     *this = other;
 }
 
-goPointCloud& goPointCloud::operator= (const goPointCloud& other)
+template <class pointT>
+goPointCloud<pointT>& goPointCloud<pointT>::operator= (const goPointCloud<pointT>& other)
 {
     *myPrivate = *other.myPrivate;
     return *this;
 }
 
-goPointCloud::~goPointCloud ()
+template <class pointT>
+goPointCloud<pointT>::~goPointCloud ()
 {
     if (myPrivate)
     {
@@ -60,38 +67,75 @@ goPointCloud::~goPointCloud ()
     }
 }
 
-bool goPointCloud::operator!= (const goPointCloud& other)
+template <class pointT>
+bool goPointCloud<pointT>::operator!= (const goPointCloud<pointT>& other)
 {
     return myPrivate->points != other.myPrivate->points;
 }
 
-goList<goPointf>& goPointCloud::getPoints ()
+/**
+* @brief Get list of points.
+*
+* @return Reference to the list of goPointf objects constituting the point cloud.
+**/
+template <class pointT>
+goList<pointT>& goPointCloud<pointT>::getPoints ()
 {
     return myPrivate->points;
 }
 
-const goList<goPointf>& goPointCloud::getPoints () const
+/**
+* @brief Get list of points.
+*
+* @return Reference to the list of goPointf objects constituting the point cloud.
+**/
+template <class pointT>
+const goList<pointT>& goPointCloud<pointT>::getPoints () const
 {
     return myPrivate->points;
 }
 
-void goPointCloud::setPoints (goList<goPointf>& points)
+/**
+* @brief Set the point list.
+*
+* @param points  List of points. This list will be deep-copied into the internal list.
+*
+* @return 
+**/
+template <class pointT>
+void goPointCloud<pointT>::setPoints (const goList<pointT>& points)
 {
     myPrivate->points = points;
 }
 
-bool goPointCloud::getCenterOfMass (goPointf& comRet) const
+template <class pointT>
+void goPointCloud<pointT>::setChanged ()
+{
+    this->sendObjectMessage (GO_OBJECTMESSAGE_CHANGED, 0);
+}
+
+/**
+* @brief Calculates the center of mass of the point cloud.
+*
+* No weights are used, all points are weighted with the factor 1.
+* 
+* @param comRet  Center of mass.
+*
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goPointCloud<pointT>::getCenterOfMass (pointT& comRet) const
 {
     if (myPrivate->points.isEmpty())
         return false;
 
-    const goPointf* p = 0;
+    const pointT* p = 0;
     goDouble factor = 1.0 / static_cast<goDouble>(myPrivate->points.getSize());
     goDouble x = 0.0;
     goDouble y = 0.0;
     goDouble z = 0.0;
     goDouble w = 0.0;
-    goList<goPointf>::ConstElement* el = myPrivate->points.getFrontElement();
+    typename goList<pointT>::ConstElement* el = myPrivate->points.getFrontElement();
     assert(el);
     while (true)
     {
@@ -112,13 +156,21 @@ bool goPointCloud::getCenterOfMass (goPointf& comRet) const
     return true;
 }
 
-bool goPointCloud::translate (const goPointf& d)
+/**
+* @brief Translate all points.
+*
+* @param d  Translation.
+*
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goPointCloud<pointT>::translate (const pointT& d)
 {
     if (myPrivate->points.isEmpty())
         return true;
     
     myPrivate->points.resetToFront();
-    goPointf* p = 0;
+    pointT* p = 0;
     while (true)
     {
         p = myPrivate->points.getCurrentPtr();
@@ -131,12 +183,20 @@ bool goPointCloud::translate (const goPointf& d)
     return true;
 }
 
-bool goPointCloud::transform (const go44Matrixf& m)
+/**
+* @brief Transform all points with a 4x4-Matrix m.
+*
+* @param m  Transform matrix.
+*
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goPointCloud<pointT>::transform (const go44Matrixf& m)
 {
     if (myPrivate->points.isEmpty())
         return true;
     
-    goList<goPointf>::Element* el = myPrivate->points.getFrontElement();
+    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
     assert (el);
     while (true)
     {
@@ -160,14 +220,15 @@ bool goPointCloud::transform (const go44Matrixf& m)
  *
  * @return True if successful, false otherwise.
  **/
-bool goPointCloud::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights) const
+template <class pointT>
+bool goPointCloud<pointT>::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights) const
 {
     //= Moment-of-inertia tensor
     goDouble I_00 = 0.0;
     goDouble I_01 = 0.0;
     goDouble I_11 = 0.0;
 
-    goList<goPointf>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
     if (!el)
         return false;
 
@@ -258,13 +319,14 @@ bool goPointCloud::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goA
     return true;
 }
 
-bool goPointCloud::unitScale (goFloat f)
+template <class pointT>
+bool goPointCloud<pointT>::unitScale (goFloat f)
 {
     if (myPrivate->points.isEmpty())
         return false;
-    goList<goPointf>::Element* el = myPrivate->points.getFrontElement();
-    goPointf max = el->elem;
-    goPointf min = el->elem;
+    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
+    pointT max = el->elem;
+    pointT min = el->elem;
     while (true)
     {
         if (el->elem.x > max.x)
@@ -308,7 +370,17 @@ bool goPointCloud::unitScale (goFloat f)
     return true;
 }
 
-bool goPointCloud::writeObjectFile (FILE* f) const
+/**
+* @brief Write the point cloud to a file.
+*
+* Writes all 4 coordinates and the point value to the file.
+* 
+* @param f  Valid, open file.
+*
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goPointCloud<pointT>::writeObjectFile (FILE* f) const
 {
     if (!f)
         return false;
@@ -318,7 +390,7 @@ bool goPointCloud::writeObjectFile (FILE* f) const
     const char cnull = 0;
     fwrite (&cnull, sizeof(char), 1, f);
     fwrite (&s, sizeof(goIndex_t), 1, f);
-    goList<goPointf>::ConstElement* el = myPrivate->points.getFrontElement();
+    typename goList<pointT>::ConstElement* el = myPrivate->points.getFrontElement();
     while (el)
     {
         fwrite (&el->elem.x, sizeof(goFloat), 1, f);
@@ -331,7 +403,17 @@ bool goPointCloud::writeObjectFile (FILE* f) const
     return goObjectBase::writeObjectFile (f);
 }
 
-bool goPointCloud::readObjectFile (FILE* f)
+/**
+* @brief Read the point cloud from a file.
+*
+* Reads all 4 coordinates and the point value from the file.
+* 
+* @param f  Valid, open file.
+*
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goPointCloud<pointT>::readObjectFile (FILE* f)
 {
     if (!f)
         return false;
@@ -347,7 +429,7 @@ bool goPointCloud::readObjectFile (FILE* f)
         return false;
     }
     myPrivate->points.erase();
-    goPointf p;
+    pointT p;
     goSize_t count = 0;
     for (goIndex_t i = 0; i < s; ++i)
     {
@@ -365,12 +447,17 @@ bool goPointCloud::readObjectFile (FILE* f)
     return goObjectBase::readObjectFile (f);
 }
 
-bool goPointCloud::callObjectMethod (int methodID, goObjectMethodParameters* param)
+template <class pointT>
+bool goPointCloud<pointT>::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
     return goObjectBase::callObjectMethod (methodID, param);
 }
 
-void goPointCloud::receiveObjectMessage (const goObjectMessage& msg)
+template <class pointT>
+void goPointCloud<pointT>::receiveObjectMessage (const goObjectMessage& msg)
 {
     goObjectBase::receiveObjectMessage (msg);
 }
+
+template class goPointCloud <goPointf>;
+template class goPointCloud <goPointd>;

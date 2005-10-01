@@ -4,7 +4,7 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -O2
 
 LD		= g++
 LDARGS		=  

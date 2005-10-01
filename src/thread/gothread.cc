@@ -5,8 +5,13 @@
 #include <signal.h>
 #include <unistd.h>
 #endif
+#include <golog.h>
 
 #include <assert.h>
+
+#ifdef GO_GUILE_MULTITHREAD
+# include <libguile/threads.h>
+#endif
 
 goThread::goThread () {
   intCount		= 0;
@@ -58,9 +63,19 @@ goThread::create (void (*function) (void*), void* param, int howMany) {
 void
 goThread::join () {
   int i = 0;
-  for (i = 0; i < numberOfThreads; i++) {
+#ifdef GO_GUILE_MULTITHREAD
+  scm_t_guile_ticket ticket = scm_leave_guile ();
+  for (i = 0; i < numberOfThreads; i++) 
+  {
     pthread_join (threads[i], NULL);
   }
+  scm_enter_guile (ticket);
+#else
+  for (i = 0; i < numberOfThreads; i++) 
+  {
+    pthread_join (threads[i], NULL);
+  }
+#endif
 }
 #else
 #ifdef WIN32
@@ -137,6 +152,33 @@ goThread::howManyProcessors () {
 }
 #endif
 
+#ifdef WIN32
+bool goThread::isCurrentThread (int threadNumber)
+{
+    goLog::warning ("goThread::isCurrentThread() is not implemented for Windows.");
+    return false;
+}
+#else
+//= Assume pthread model
+/** --------------------------------------------------------------------------
+ * @brief Check if the thread currently in control is the given one.
+ * 
+ * @param threadNumber  Number of the thread. Default is 0 (the first one of this goThread object).
+ * 
+ * @return  True if the current thread is the one asked for, false otherwise.
+ ----------------------------------------------------------------------------*/
+bool goThread::isCurrentThread (int threadNumber) const
+{
+    if (threadNumber >= this->numberOfThreads || threadNumber < 0)
+        return false;
+    pthread_t self = pthread_self();
+    if (pthread_equal(self,this->threads[threadNumber]) != 0)
+        return true;
+    else
+        return false;
+}
+#endif
+
 goMutex::goMutex () {
 #ifdef HAVE_LIBPTHREAD  
   pthread_mutex_init (&mutex, NULL);
@@ -153,7 +195,11 @@ goMutex::~goMutex () {
 void
 goMutex::lock () {
 #ifdef HAVE_LIBPTHREAD
-  pthread_mutex_lock (&mutex);
+# ifdef GO_GUILE_MULTITHREAD
+    scm_pthread_mutex_lock (&mutex);
+# else
+    pthread_mutex_lock (&mutex);
+# endif
 #else
 #ifdef WIN32
   WaitForSingleObject (mutex,INFINITE);
@@ -207,7 +253,11 @@ void
 goCondition::wait ()
 {
     mutex.lock();
+#ifdef GO_GUILE_MULTITHREAD
+    scm_pthread_cond_wait (&cond, mutex.getPthreadMutex());
+#else
     pthread_cond_wait (&cond, mutex.getPthreadMutex());
+#endif
     mutex.unlock();
 }
 
@@ -225,7 +275,13 @@ void
 goSemaphore::dec ()
 {
     // cout << "Calling sem_wait" << endl;
+#ifdef GO_GUILE_MULTITHREAD
+    scm_t_guile_ticket ticket = scm_leave_guile();
     sem_wait (&semaphore);
+    scm_enter_guile (ticket);
+#else
+    sem_wait (&semaphore);
+#endif
 }
 
 void

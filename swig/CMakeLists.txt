@@ -1,7 +1,9 @@
 INCLUDE (FindSWIG)
 PROJECT             (golib_guile)
- EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
- EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+# EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
+# EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
+EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
                         ARGS -I../include -Linkage passive -scmstub -guile -c++ -scm -proxy golib.i)

@@ -68,6 +68,11 @@ class goVector : public goFixedArray<T>
             return ret;
         };
 
+        /**
+         * @brief Inner product.
+         *
+         * @return The inner product this * other.
+         **/
         template <class To>
         T operator* (const goVector<To>& other) const
         {

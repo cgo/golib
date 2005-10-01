@@ -23,7 +23,9 @@ class
 go4Vector {
  public:
   go4Vector (T x_ = (T)0, T y_ = (T)0, T z_ = (T)0, T t_ = (T)0) : x(x_), y(y_), z(z_), t(t_) { };
-  go4Vector (const go4Vector& other) { *this = other; };
+
+  template <class To>
+  go4Vector (const go4Vector<To>& other) { *this = other; };
 
   virtual ~go4Vector () {};
  
@@ -44,14 +46,16 @@ go4Vector {
       return !(*this == other);
   };
   
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (const go4Vector<T>& other) 
+  template <class To>
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (const go4Vector<To>& other) 
   { x = other.x; 
     y = other.y; 
     z = other.z; 
     t = other.t; 
     return *this; };
 
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (const go3Vector<T>& other) 
+  template <class To>
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (const go3Vector<To>& other) 
   { x = other.x; 
     y = other.y; 
     z = other.z; 
@@ -78,13 +82,25 @@ go4Vector {
     return *this;
   };
 
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator*= (T other)
+  template <class To>
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator*= (To other)
   {
     x *= other;
     y *= other;
     z *= other;
     t *= other;
     return *this;
+  };
+
+  template <class To>
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator/= (To other)
+  {
+      To frac = To(1.0 / other);
+      x *= frac;
+      y *= frac;
+      z *= frac;
+      t *= frac;
+      return *this;
   };
 
   GO4VECTOR_FUNCTION_PREFIX T operator* (const go4Vector<T>& other) const {
@@ -111,38 +127,35 @@ go4Vector {
       return ret;
   };
 
-  template <typename ScalarType>
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (ScalarType n) const
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (goDouble n) const
   {
-    return go4Vector<T> (this->x * n, this->y * n, this->z * n, this->t * n);
+    return go4Vector<T> (T(this->x * n), T(this->y * n), T(this->z * n), T(this->t * n));
   };
 
-  template <typename ScalarType>
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator/ (ScalarType n) const
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator/ (goDouble n) const
   {
-    return go4Vector<T> (this->x / n, this->y / n, this->z / n, this->t / n);
+    return go4Vector<T> (T(this->x / n), T(this->y / n), T(this->z / n), T(this->t / n));
   };
 
-  template <typename ScalarType>
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator+ (ScalarType n) const
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator+ (goDouble n) const
   {
-    return go4Vector<T> (this->x + n, this->y + n, this->z + n, this->t + n);
+    return go4Vector<T> (T(this->x + n), T(this->y + n), T(this->z + n), T(this->t + n));
   };
 
-  template <typename ScalarType>
-  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator- (ScalarType n) const
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator- (goDouble n) const
   {
-    return go4Vector<T> (this->x - n, this->y - n, this->z - n, this->t - n);
+    return go4Vector<T> (T(this->x - n), T(this->y - n), T(this->z - n), T(this->t - n));
   };
 
   /*!
    * Multiplies matrix to this vector from the left (naturally), i.e.
    * sets *this = matrix * *this;
    */
-  GO4VECTOR_FUNCTION_PREFIX void operator*= (const go44Matrix<T>& matrix)
+  template <class mT>
+  GO4VECTOR_FUNCTION_PREFIX void operator*= (const go44Matrix<mT>& matrix)
   {
     T a1,a2,a3,a4;
-    const T* m = matrix.getPtr();
+    const mT* m = matrix.getPtr();
     a1 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
     m += 4;
     a2 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
@@ -157,7 +170,8 @@ go4Vector {
     x = a1; y = a2; z = a3; t = a4;
   };
 
-  /* Use x,y,z and forget about t. */  
+  /*! @brief Cross-product.
+   * Uses only the first three elements. */
   GO4VECTOR_FUNCTION_PREFIX void cross (const go4Vector<T>& other) 
   { 
       T x0,x1,x2; 

@@ -60,36 +60,53 @@ goMatrix<T>::operator [] (goSize_t row) const
 template <class T> 
 goMatrix<T>::goMatrix (goSignal3DBase<T>* data)
     :
-    externalData (true),
-    matrix       (data),
-    rows         (NULL),
-    rowVectors   (NULL)
+    linearStorage (false),
+    externalData  (true),
+    matrix        (0),
+    rows          (NULL),
+    rowVectors    (NULL)
 {
-    initializeRows ();
+    this->setData (data);
 }
 
 template <class T>
-goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
+goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols, bool linear)
     :
-    externalData (false),
-    matrix       (NULL),
-    rows         (NULL),
-    rowVectors   (NULL)
+    linearStorage (linear),
+    externalData  (false),
+    matrix        (NULL),
+    rows          (NULL),
+    rowVectors    (NULL)
 {
-    matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1);
+    if (linear)
+    {
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1, 1, 1, 1, 0, 0, 0, 1);
+    }
+    else
+    {
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1);
+    }
     initializeRows ();
 }
 
 template<class T>
 goMatrix<T>::goMatrix(const goMatrix<T>& other)
     :
+    linearStorage (other.isLinear()),
     externalData (false),
     matrix       (NULL),
     rows         (NULL),
     rowVectors   (NULL)
 {
     assert (other.matrix != NULL);
-    matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1);
+    if (this->linearStorage)
+    {
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, 1, 1, 1, 0, 0, 0, 1);
+    }
+    else
+    {
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1);
+    }
     if (other.getSizeX() == getSizeX() &&
         other.getSizeY() == getSizeY())
     {
@@ -401,7 +418,14 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t columns)
         return false;
     }
     this->matrix->destroy ();
-    ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1);
+    if (this->linearStorage)
+    {
+        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1, 1, 1, 1, 0, 0, 0, 1);
+    }
+    else
+    {
+        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1);
+    }
     return initializeRows ();
 }
 
@@ -415,6 +439,14 @@ bool goMatrix<T>::setData (goSignal3DBase<T>* data)
     }
     this->matrix = data;
     this->externalData = true;
+    if (data->getBlockSizeX() == 1 && data->getBlockSizeY() == 1 && data->getBlockSizeZ() == 1)
+    {
+        this->linearStorage = true;
+    }
+    else
+    {
+        this->linearStorage = false;  
+    }
     return initializeRows ();
 }
 

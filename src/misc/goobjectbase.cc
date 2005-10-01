@@ -1,5 +1,4 @@
 #include <golist.h>
-#include <golist.hpp>
 #include <gostring.h>
 #ifndef GOOBJECTBASE_H
 # include <goobjectbase.h>
@@ -20,16 +19,23 @@ class goObjectBasePrivate
         goObjectBasePrivate ();
         ~goObjectBasePrivate ();
 
-        goString              className;
-        goString              objectName;
-        goList<goObjectBase*> connectedObjects;
+        goString                         className;
+        goString                         objectName;
+        goList<goObjectBase*>            connectedObjects;
+
+        goMutex                           queuedMethodsMutex;
+        goList<int>                       queuedMethods;
+        goList<goObjectMethodParameters*> queuedMethodParams;
 };
 
 goObjectBasePrivate::goObjectBasePrivate ()
     :
-    className        ("goObjectBase"),
-    objectName       ("NO NAME"),
-    connectedObjects ()
+    className          ("goObjectBase"),
+    objectName         ("NO NAME"),
+    connectedObjects   (),
+    queuedMethodsMutex (),
+    queuedMethods      (),
+    queuedMethodParams ()
 {
 }
 
@@ -266,7 +272,7 @@ goObjectBase::disconnectObject (const goObjectBase* object)
 * The method should return true if the method call was successful.
 * Values can also be returned through the goObjectMethodParameters* param.
 * 
-* @param methodID  ID of the method.
+* @param methodID  ID of the method. See goobjectmethod.h 
 * @param param  Pointer to parameters for the method, if any.
 *
 * @return True if successful, false otherwise.
@@ -275,6 +281,88 @@ bool
 goObjectBase::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
     return false;
+}
+
+/** --------------------------------------------------------------------------
+ * @brief  Enqueue a method call to an internal list of methods.
+ *
+ * The queued methods can be called in one go by a call to callQueuedMethods().
+ * @note This method is thread-safe.
+ * 
+ * @param methodID ID of the method. See goobjectmethod.h 
+ * @param param    Pointer to a parameter structure, if any. The parameters
+ *                 will be deep-copied, so there is no need to worry about 
+ *                 keeping them after the method returned.
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
+bool
+goObjectBase::queueObjectMethod (int methodID, goObjectMethodParameters* param, bool blocking)
+{
+    myPrivate->queuedMethodsMutex.lock();
+        myPrivate->queuedMethods.append(methodID);
+        goObjectMethodParameters* newParm = 0;
+        if (param)
+        {
+            newParm = new goObjectMethodParameters;
+            *newParm = *param;
+            newParm->blocking = blocking;
+        }
+        else
+        {
+            if (blocking)
+            {
+                newParm = new goObjectMethodParameters;
+                newParm->blocking = true;
+            }
+        }
+        myPrivate->queuedMethodParams.append(newParm);
+    myPrivate->queuedMethodsMutex.unlock();
+    if (blocking && newParm)
+    {
+        printf ("Waiting for queued method to return ...\n");
+        newParm->semaphore.dec();
+        printf ("Queued method returned!\n");
+    }
+    return true;
+}
+
+/** --------------------------------------------------------------------------
+ * @brief Call all queued methods.
+ *
+ * Calls all methods queued with queueObjectMethod().
+ * @note This method is thread-safe.
+ * 
+ * @return True if successful, false otherwise. 
+ *         If one of the methods failed, this method returns false.
+ ----------------------------------------------------------------------------*/
+bool
+goObjectBase::callQueuedMethods ()
+{
+    myPrivate->queuedMethodsMutex.lock();
+    bool ok = true;
+    {
+        assert (myPrivate->queuedMethods.getSize() == myPrivate->queuedMethodParams.getSize());
+        goList<int>::Element* el = myPrivate->queuedMethods.getFrontElement();
+        goList<goObjectMethodParameters*>::Element* paramEl = myPrivate->queuedMethodParams.getFrontElement();
+        while (el && paramEl)
+        {
+            printf ("Calling queued method %d\n", el->elem);
+            printf ("\tQueued method is %s.\n", (paramEl->elem && paramEl->elem->blocking) ? "blocking" : "not blocking");
+            ok = ok && this->callObjectMethod (el->elem, paramEl->elem);
+            if (paramEl->elem)
+            {
+                if (paramEl->elem->blocking)
+                {
+                    paramEl->elem->semaphore.inc();
+                }
+                delete paramEl->elem;
+            }
+            el = myPrivate->queuedMethods.remove (el);
+            paramEl = myPrivate->queuedMethodParams.remove (paramEl);
+        }
+    }
+    myPrivate->queuedMethodsMutex.unlock();
+    return ok;
 }
 
 /*! \brief Sends a message to all connected objects. */
@@ -340,3 +428,7 @@ goObjectBase::receiveObjectMessage (const goObjectMessage& message)
     }
     // std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
 }
+
+#include <golist.hpp>
+template class goList<goObjectBase*>;
+template class goList<goObjectMethodParameters*>;

@@ -41,6 +41,12 @@ class goThreadObject : public goObjectBase
      * @return A reference to the goThread object used to run the thread(s).
      */
     goThread& getThread() { return thisThread; }
+
+    /*!
+     * @brief Check if this thread is the current one.
+     * @return True if this thread is the currently running thread, false otherwise.
+     */
+    bool isCurrentThread () const { return this->thisThread.isCurrentThread(0); }
  private:
     goThread thisThread;
     
