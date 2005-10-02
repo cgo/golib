@@ -76,7 +76,9 @@ class goMatrix
    * @return Number of rows
    */
   inline goSize_t	getSizeY() const;
-  
+ 
+  T&                operator() (goIndex_t i, goIndex_t j);
+  const T&          operator() (goIndex_t i, goIndex_t j) const;
   goRowVector<T>&       operator[] (goSize_t y);
   const goRowVector<T>& operator[] (goSize_t y) const;
   goMatrix<T>		operator*  (const goMatrix<T>& other);

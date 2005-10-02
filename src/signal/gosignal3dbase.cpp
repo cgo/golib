@@ -970,6 +970,28 @@ goSignal3DBase<void>::fill (const void* value)
     }
 }
 
+template <class T>
+void goSignal3DBase<T>::shiftLeftDiff  (int n, int axes)
+{
+    goLog::warning ("goSignal3DBase<T>::shift*() methods are not defined.");
+}
+template <class T>
+void goSignal3DBase<T>::shiftRightDiff (int n, int axes)
+{
+    goLog::warning ("goSignal3DBase<T>::shift*() methods are not defined.");
+}
+template <class T>
+void goSignal3DBase<T>::shiftLeftSize  (int n, int axes)
+{
+    goLog::warning ("goSignal3DBase<T>::shift*() methods are not defined.");
+}
+template <class T>
+void goSignal3DBase<T>::shiftRightSize (int n, int axes)
+{
+    goLog::warning ("goSignal3DBase<T>::shift*() methods are not defined.");
+}
+
+
 /*!
  * \brief Sets data type for <void> type signals.
  *

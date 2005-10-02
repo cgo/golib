@@ -40,6 +40,18 @@ goMatrix<T>::initializeRows ()
 }
 
 template <class T>
+T& goMatrix<T>::operator() (goIndex_t i, goIndex_t j)
+{
+    return this->rowVectors[i][j];
+}
+
+template <class T>
+const T& goMatrix<T>::operator() (goIndex_t i, goIndex_t j) const 
+{
+    return this->rowVectors[i][j];
+}
+
+template <class T>
 goRowVector<T>&
 goMatrix<T>::operator [] (goSize_t row)
 {
@@ -80,7 +92,7 @@ goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols, bool linear)
 {
     if (linear)
     {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1, 1, 1, 1, 0, 0, 0, 1);
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1, cols, rows, 1, 0, 0, 0, 1);
     }
     else
     {
@@ -420,7 +432,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t columns)
     this->matrix->destroy ();
     if (this->linearStorage)
     {
-        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1, 1, 1, 1, 0, 0, 0, 1);
+        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1, columns, rows, 1, 0, 0, 0, 1);
     }
     else
     {

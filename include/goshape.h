@@ -21,7 +21,7 @@ class goShape : public goObjectBase
 {
     public:
         goShape (goCurvef* c = 0);
-        goShape (goShape& other);
+        // goShape (goShape& other);
         virtual ~goShape ();
 
         goCurvef*       getCurve ();

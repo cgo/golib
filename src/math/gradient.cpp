@@ -468,8 +468,8 @@ bool goMath::gradient2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& 
 *
 * This function calculates the derivative in x-direction while assuming
 * the signal is 2-dimensional.
-* Currently, the arguments are restricted to signals of type GO_FLOAT.
-* GO_DOUBLE will be implemented.
+* The arguments are restricted to signals of type GO_FLOAT and
+* GO_DOUBLE. 
 *
 * @todo Implement for 3D-signals.
 * 
@@ -559,8 +559,8 @@ bool goMath::ddx2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
 *
 * This function calculates the derivative in y-direction while assuming
 * the signal is 2-dimensional.
-* Currently, the arguments are restricted to signals of type GO_FLOAT.
-* GO_DOUBLE will be implemented.
+* The arguments are restricted to signals of type GO_FLOAT and
+* GO_DOUBLE. 
 *
 * @todo Implement for 3D-signals.
 * 

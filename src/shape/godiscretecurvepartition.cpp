@@ -36,22 +36,12 @@ goDiscreteCurvePartition<T>::~goDiscreteCurvePartition ()
     }
 }
 
-/** --------------------------------------------------------------------------
- * @brief Sets the curve to be partitioned.
- * 
- * @param curve  The curve to be partitioned.
- ----------------------------------------------------------------------------*/
 template <class T>
 void goDiscreteCurvePartition<T>::setCurve (goCurve<goPoint<T> >* curve)
 {
     myPrivate->curve = curve;
 }
 
-/** --------------------------------------------------------------------------
- * @brief Get the currently set curve.
- * 
- * @return The currently set curve.
- ----------------------------------------------------------------------------*/
 template <class T>
 goCurve<goPoint<T> >* goDiscreteCurvePartition<T>::getCurve ()
 {

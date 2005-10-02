@@ -198,10 +198,10 @@ goSignal3DBase : public goObjectBase
          */
         // void  interpolateFromSignal (goSignal3DBase<T>& other, Neighbour n);
 
-        void shiftLeftDiff  (int n, int axes = GO_X | GO_Y | GO_Z);
-        void shiftRightDiff (int n, int axes = GO_X | GO_Y | GO_Z);
-        void shiftLeftSize  (int n, int axes = GO_X | GO_Y | GO_Z);
-        void shiftRightSize (int n, int axes = GO_X | GO_Y | GO_Z);
+        virtual void shiftLeftDiff  (int n, int axes = GO_X | GO_Y | GO_Z);
+        virtual void shiftRightDiff (int n, int axes = GO_X | GO_Y | GO_Z);
+        virtual void shiftLeftSize  (int n, int axes = GO_X | GO_Y | GO_Z);
+        virtual void shiftRightSize (int n, int axes = GO_X | GO_Y | GO_Z);
 
         /*!
          * Not threadsafe

@@ -103,6 +103,8 @@ class goSparseMatrix
         inline bool matrixVectorMult     (goVector<Tv>&       ret, const goVector<Tv>&       v);
         inline bool vectorMatrixMult     (goArray<goDouble>&  ret, const goArray<goDouble>&  v);
         inline bool matrixVectorMult     (goSparseMatrix&     ret, const goArray<goDouble>&  v);
+        template <class Tv>
+        inline bool matrixVectorMult     (goSparseMatrix&     ret, const goVector<Tv>&       v);
         inline bool vectorMatrixMult     (goSparseMatrix&     ret, const goArray<goDouble>&  v);
         inline bool matrixMatrixMult     (goSparseMatrix&     ret, goSparseMatrix& m);
         inline bool matrixMatrixAdd      (goSparseMatrix&     ret, goSparseMatrix& m);
@@ -646,6 +648,61 @@ bool goSparseMatrix::matrixVectorMult (goVector<Tv>& ret, const goVector<Tv>& v)
 * @return 
 **/
 bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goArray<goDouble>& v) 
+{
+    if (mCols != v.getSize())
+    {
+        return false;
+    }
+    goIndex_t elemCount = this->getElementCount();
+
+    //= Sort in ascending row order
+    if (this->mSortType != goSparseMatrix::ROW_WISE)
+    {
+        this->sortRows(true);
+    }
+    ret.setSize (mRows,1);
+    if (elemCount == 0)
+    {
+        return true;
+    }
+    //= Put exactly as many elements in ret as there are rows with nonzero elements in (this)
+    ret.fillBegin (this->getRowStart().getSize()-1);
+    goIndex_t rowIndex = this->row(0);
+    goDouble  value    = 0.0;
+    for (goIndex_t i = 0; i < elemCount; ++i)
+    {
+        if (rowIndex == this->row(i))
+        {
+            value += this->value(i) * v[this->column(i)];
+        }
+        else
+        {
+            if (ret.fillNext (rowIndex,0,value) == 0)
+            {
+                goLog::error("goSparseMatrix::matrixVectorMult(): **************** SOMETHING TERRIBLE HAPPENED! *******************");
+            }
+            rowIndex = this->row(i);
+            value = this->value(i) * v[this->column(i)];
+        }
+    }
+    //= Fill in the last value
+    ret.fillNext (rowIndex,0,value);
+    ret.fillEnd (UNSORTED);
+    ret.setSortType (ROW_WISE);
+    ret.findRows();
+    return true;
+}
+
+/**
+* @brief (this) * v
+*
+* @param ret  
+* @param v  
+*
+* @return 
+**/
+template <class Tv>
+bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goVector<Tv>& v)
 {
     if (mCols != v.getSize())
     {

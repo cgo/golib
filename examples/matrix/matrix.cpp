@@ -42,7 +42,7 @@ int main ()
         m.fillEnd();
         timer.stopTimer();
         printf ("Seconds for 1000x1000 col-first fill: %.5f\n", timer.getTimerSeconds());
-        return 1;
+        // return 1;
     }
     {
         goVector< goComplex<float> >* test = new goVector< goComplex<float> > [3];
@@ -140,16 +140,16 @@ int main ()
         m2.fillEnd();
 
         goSparseMatrix m3;
-        // m1.matrixMatrixAdd (m3, m2);
-        m3 = m1 + m2;
+        m1.matrixMatrixAdd (m3, m2);
+        //m3 = m1 + m2;
         goIndex_t i;
         for (i = 0; i < m3.getElementCount(); ++i)
         {
             printf ("(%d,%d) == %f\n", m3.row(i), m3.column(i), m3.value(i));
         }
         printf ("Sparse subtraction: \n");
-        // m1.matrixMatrixSubtract (m3, m2);
-        m3 = m1 - m2;
+        m1.matrixMatrixSubtract (m3, m2);
+        //m3 = m1 - m2;
         for (i = 0; i < m3.getElementCount(); ++i)
         {
             printf ("(%d,%d) == %f\n", m3.row(i), m3.column(i), m3.value(i));
@@ -161,10 +161,13 @@ int main ()
         printf ("\nSparse vector multiplication\n");
         goSparseMatrix m1 (5, 50);
 
-        m1.fillBegin (3);
+        m1.fillBegin (6);
         m1.fillNext (1, 24, 1);
         m1.fillNext (1, 16, 4);
         m1.fillNext (1, 6,  5);
+        m1.fillNext (2, 6,  1);
+        m1.fillNext (2, 25, 2);
+        m1.fillNext (2, 30, 3);
         m1.fillEnd();
 
         goVectord v(50);
@@ -172,6 +175,8 @@ int main ()
         v(24) = 2;
         v(16) = 3;
         v(6) = 4;
+        v(25) = 5;
+        v(1) = 3;
 
         goVectord v2 = v;
         

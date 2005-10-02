@@ -13,17 +13,6 @@
 
 class goBiorthoWaveletPrivate;
 
-/** @addtogroup signal
- */
-/** @{ */
-
-/** --------------------------------------------------------------------------
- * @brief 1-D (!) biorthogonal wavelet decomposition.
- *
- * For details on the used filter masks, see source code.
- * This can only be used for 1-D signals <b>because I had only use for this</b>.
- * @author Christian Gosch
- ----------------------------------------------------------------------------*/
 class goBiorthoWavelet : public goObjectBase
 {
     public:
@@ -37,5 +26,4 @@ class goBiorthoWavelet : public goObjectBase
         goBiorthoWaveletPrivate* myPrivate;
 };
 
-/** @} */
 #endif
