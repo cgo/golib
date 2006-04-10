@@ -58,9 +58,12 @@ goFilter1D : public goObjectBase
 {
 	public:
 	    goFilter1D ();
+        goFilter1D (const goArray<goFloat>& mask, goIndex_t center = 0, bool normalize = true);
+        goFilter1D (const goFloat* mask, goIndex_t length, goIndex_t center = 0, bool normalize = true);
         virtual ~goFilter1D ();
     
         bool setMask   (const goArray<goFloat>& mask);
+        bool setMask   (const goFloat* mask, goIndex_t length);
         bool setCenter (goIndex_t c);
         bool filter    (goSignal3DBase<void>& sig);
         bool normalize (goDouble constant = 1.0);

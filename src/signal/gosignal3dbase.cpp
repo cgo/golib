@@ -83,45 +83,45 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     } \
 }
 
-bool
+template<> bool
 goSignal3DBase<goInt8>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT8);
-bool
+template<> bool
 goSignal3DBase<goInt16>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT16);
-bool
+template<> bool
 goSignal3DBase<goInt32>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT32);
 #ifdef HAVE_INT64
-bool
+template<> bool
 goSignal3DBase<goInt64>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_INT64);
 #endif
-bool
+template<> bool
 goSignal3DBase<goUInt8>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT8);
-bool
+template<> bool
 goSignal3DBase<goUInt16>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT16);
-bool
+template<> bool
 goSignal3DBase<goUInt32>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT32);
-bool
+template<> bool
 goSignal3DBase<goFloat>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_FLOAT);
-bool
+template<> bool
 goSignal3DBase<goDouble>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_DOUBLE);
-bool
+template<> bool
 goSignal3DBase<void*>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_VOID_POINTER);
 // Initialize the generic container with uint8 -- 
 // the type of the generic container can be changed with setDataType()
-bool
+template<> bool
 goSignal3DBase<void>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_UINT8);
 
-bool
+template<> bool
 goSignal3DBase<goComplexf>::initializeDataType ()
 INITIALIZE_DATATYPE_METHOD(GO_COMPLEX_SINGLE);
 
@@ -136,25 +136,25 @@ goSignal3DBase<T>::initializeDataType ()
     return false;
 }
 
-void*
+template<> void*
 goSignal3DBase<void>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {
     return (goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[myChannel];
 }
 
-const void*
+template<> const void*
 goSignal3DBase<void>::getClosest (go3Vector<goFloat>& point) const
 {
     return ((goUInt8*)getPtr ((int)point.x, (int)point.y, (int)point.z));
 }
 
-goFloat
+template<> goFloat
 goSignal3DBase<void*>::sample(go3Vector<goFloat>& point)
 {
 	return 0.0f;
 }
 
-goFloat
+template<> goFloat
 goSignal3DBase<void>::sample(go3Vector<goFloat>& point)
 {
     goLog::warning ("sample() not implemented for <void>. Contact the author.",this);
@@ -421,7 +421,7 @@ goSignal3DBase<T>::periodize (int axes)
     }
 }
 
-bool
+template<> bool
 goSignal3DBase<void>::initialize (void*    dataptr,
                                   goSize_t x, goSize_t y, goSize_t z,
                                   goSize_t blockSizeX, 
@@ -655,7 +655,7 @@ goSignal3DBase<T>::setChanged ()
     this->sendObjectMessage (GO_OBJECTMESSAGE_CHANGED);
 }
 
-goSize_t
+template<> goSize_t
 goSignal3DBase<void>::memoryUsage()
 {
     if (real_ptr) 
@@ -729,14 +729,14 @@ goSignal3DBase<T>::operator== (goSignal3DBase<T> &other) {
     return true;
 }
 
-bool
+template<> bool
 goSignal3DBase<void>::operator== (goSignal3DBase<void> &other) 
 {
     goError::print(getClassName(), "operator== not implemented for void.");
     return false;
 }
 
-goSize_t
+template<> goSize_t
 goSignal3DBase<void>::getSize() const
 {
     return myChannelCount * myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
@@ -749,19 +749,19 @@ goSignal3DBase<T>::getSize() const
     return myChannelCount * sizeof(T) * (mySize.x * mySize.y * mySize.z);
 }
 
-goDouble
+template<> goDouble
 goSignal3DBase<void*>::getMaximum() const
 {
     return 0.0;
 }
 
-goDouble
+template<> goDouble
 goSignal3DBase<goComplex<goFloat> >::getMaximum() const
 {
     return 0.0;
 }
 
-goDouble
+template<> goDouble
 goSignal3DBase<void>::getMaximum() const
 {
     const goUInt8* p = (goUInt8*)this->getPtr();
@@ -837,20 +837,20 @@ goSignal3DBase<T>::getMaximum() const
     return (goDouble)maxVal;
 }
 
-goDouble
+template<> goDouble
 goSignal3DBase<void*>::getMinimum() const
 {
     return 0.0;
 }
 
-goDouble
+template<> goDouble
 goSignal3DBase<goComplex<goFloat> >::getMinimum() const
 {
     return 0.0;
 }
 
 
-goDouble
+template<> goDouble
 goSignal3DBase<void>::getMinimum() const
 {
     const goUInt8 *p = (goUInt8*)this->getPtr();
@@ -935,7 +935,7 @@ goSignal3DBase<T>::fill (const T* value)
     GO_SIGNAL3D_EACHELEMENT(*__ptr = *value, (*this), T);
 }
 
-void
+template<> void
 goSignal3DBase<void>::fill (const void* value)
 {
     switch (this->getDataType().getID())
@@ -1003,7 +1003,7 @@ void goSignal3DBase<T>::shiftRightSize (int n, int axes)
  *
  * \return  True if successful, false otherwise.
  */
-bool
+template<> bool
 goSignal3DBase<void>::setDataType (goTypeEnum t)
 {
     if (t == myDataType.getID())
@@ -1264,7 +1264,7 @@ goSignal3DBase<T>::getClosest (go3Vector<goFloat>& point) const
 }
 
 
-inline
+template<> inline
 goFloat
 goSignal3DBase<goComplex<goFloat> >::sample (go3Vector<goFloat>& point)
 {
@@ -1548,7 +1548,7 @@ static inline void _signalOperator##OPERATORNAME##_ (goSignal3DBase<void>& sig, 
         default: goLog::warning("goSignal3DBase<void> operator+=: unknown type."); break; \
     } \
 } \
-goSignal3DBase<void>& \
+template<> goSignal3DBase<void>& \
 goSignal3DBase<void>::operator OPERATOR (const goSignal3DBase<void>& other) \
 { \
     switch (this->getDataType().getID()) \
@@ -1588,7 +1588,7 @@ static inline void _signalScalarOperator##OPERATORNAME##_ (goSignal3DBase<void>&
         it.incrementZ(); \
     } \
 } \
-goSignal3DBase<void>& \
+template<> goSignal3DBase<void>& \
 goSignal3DBase<void>::operator OPERATOR (SCALAR scalar) \
 { \
     switch (this->getDataType().getID()) \
@@ -1642,22 +1642,22 @@ goSignal3DBase<T>& goSignal3DBase<T>::operator /= (const goSignal3DBase<T>& othe
     goLog::warning ("operator/= not implemented for this type. Use goSignal3DBase<void> instead!",this);
     return *this;
 }
-goSignal3DBase<void*>& goSignal3DBase<void*>::operator += (goFloat scalar)
+template<> goSignal3DBase<void*>& goSignal3DBase<void*>::operator += (goFloat scalar)
 {
     goLog::warning ("operator [+-*/]= not implemented for void*.",this);
     return *this;
 }
-goSignal3DBase<void*>& goSignal3DBase<void*>::operator -= (goFloat scalar)
+template<> goSignal3DBase<void*>& goSignal3DBase<void*>::operator -= (goFloat scalar)
 {
     goLog::warning ("operator [+-*/]= not implemented for void*.",this);
     return *this;
 }
-goSignal3DBase<void*>& goSignal3DBase<void*>::operator *= (goFloat scalar)
+template<> goSignal3DBase<void*>& goSignal3DBase<void*>::operator *= (goFloat scalar)
 {
     goLog::warning ("operator [+-*/]= not implemented for void*.",this);
     return *this;
 }
-goSignal3DBase<void*>& goSignal3DBase<void*>::operator /= (goFloat scalar)
+template<> goSignal3DBase<void*>& goSignal3DBase<void*>::operator /= (goFloat scalar)
 {
     goLog::warning ("operator [+-*/]= not implemented for void*.",this);
     return *this;

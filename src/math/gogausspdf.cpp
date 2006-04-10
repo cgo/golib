@@ -56,8 +56,7 @@ namespace goMath
     }
     
 //    template <class input_type, class output_type>
-    goDouble
-    goGaussPDF<goDouble, goDouble>::operator () (const goDouble& input)
+template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble& input)
     {
         return myNormFactor * exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
     }

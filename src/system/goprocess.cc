@@ -61,27 +61,33 @@ goProcess::run (const char* filename, char *const argv[]) {
  * @return The PID of the new process.
  **/
 int 
-goProcess::run (const char* filename, goArray<goString* >& argv) {
-  char **tmp;
-  tmp = new char*[argv.getSize() + 2];
-  tmp[0] = new char[strlen(filename)];
-  strcpy (tmp[0], filename);
-  for (int i = 1; i <= argv.getSize(); i++) {
-    tmp[i] = new char[argv[i-1]->getSize()];
-    strcpy (tmp[i], argv[i-1]->toCharPtr());
-  }
-  tmp[argv.getSize() + 1] = NULL;
+goProcess::run (const char* filename, goFixedArray<goString> argv) {
 
-  int id = fork();
+  int id = (int)fork();
   running = true;
-  if (id == 0) {
-    return execvp (filename, (char* const*)tmp);
+  if (id == 0) 
+  {
+      char **tmp;
+      tmp = new char*[argv.getSize() + 2];
+      tmp[0] = new char[strlen(filename)];
+      strcpy (tmp[0], filename);
+      for (int i = 1; i <= (int)argv.getSize(); i++) {
+          tmp[i] = new char[argv[i-1].getSize()];
+          strcpy (tmp[i], argv[i-1].toCharPtr());
+      }
+      tmp[argv.getSize() + 1] = NULL;
+      int temp_id = execvp (filename, (char* const*)tmp);
+
+      for (int i = 1; i < ((int)argv.getSize() + 2); i++) 
+      {
+          delete[] tmp[i];
+          tmp[i] = 0;
+      }
+      delete[] tmp;
+      tmp = 0;
+      return temp_id;
   }
 
-  for (int i = 1; i < (argv.getSize() + 2); i++) {
-    delete[] tmp[i];
-  }
-  delete[] tmp;
   pid = id;
   return id;
 }

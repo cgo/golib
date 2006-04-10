@@ -41,7 +41,7 @@ goPointCloud<pointT>::goPointCloud ()
 }
 
 template <class pointT>
-goPointCloud<pointT>::goPointCloud (const goPointCloud& other)
+goPointCloud<pointT>::goPointCloud (const goPointCloud<pointT>& other)
     : goObjectBase (),
       myPrivate (0)
 {
@@ -50,6 +50,15 @@ goPointCloud<pointT>::goPointCloud (const goPointCloud& other)
     *this = other;
 }
 
+template <class pointT>
+goPointCloud<pointT>::goPointCloud (const goList<pointT>& pl)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    myPrivate = new goPointCloudPrivate<pointT>;
+    assert (myPrivate);
+    this->setPoints (pl);
+}
 template <class pointT>
 goPointCloud<pointT>& goPointCloud<pointT>::operator= (const goPointCloud<pointT>& other)
 {
@@ -73,10 +82,22 @@ bool goPointCloud<pointT>::operator!= (const goPointCloud<pointT>& other)
     return myPrivate->points != other.myPrivate->points;
 }
 
+/** 
+ * @brief Get number of points.
+ * 
+ * @return Number of points in the point cloud.
+ */
+template <class pointT>
+goIndex_t goPointCloud<pointT>::getPointCount () const
+{
+    assert (myPrivate);
+    return myPrivate->points.getSize();
+}
+
 /**
 * @brief Get list of points.
 *
-* @return Reference to the list of goPointf objects constituting the point cloud.
+* @return Reference to the list of pointT objects constituting the point cloud.
 **/
 template <class pointT>
 goList<pointT>& goPointCloud<pointT>::getPoints ()
@@ -99,13 +120,23 @@ const goList<pointT>& goPointCloud<pointT>::getPoints () const
 * @brief Set the point list.
 *
 * @param points  List of points. This list will be deep-copied into the internal list.
-*
-* @return 
 **/
 template <class pointT>
-void goPointCloud<pointT>::setPoints (const goList<pointT>& points)
+bool goPointCloud<pointT>::setPoints (const goList<pointT>& points)
 {
     myPrivate->points = points;
+    return true;
+}
+
+/** 
+ * @brief Adds point to this cloud.
+ * 
+ * @param p Point to be added.
+ */
+template <class pointT>
+void goPointCloud<pointT>::addPoint (const pointT& p)
+{
+    myPrivate->points.append(p);
 }
 
 template <class pointT>
@@ -130,14 +161,16 @@ bool goPointCloud<pointT>::getCenterOfMass (pointT& comRet) const
         return false;
 
     const pointT* p = 0;
-    goDouble factor = 1.0 / static_cast<goDouble>(myPrivate->points.getSize());
+    goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
+    goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
     goDouble x = 0.0;
     goDouble y = 0.0;
     goDouble z = 0.0;
     goDouble w = 0.0;
     typename goList<pointT>::ConstElement* el = myPrivate->points.getFrontElement();
     assert(el);
-    while (true)
+    goIndex_t i = 0;
+    while (el && i < pointCount)
     {
         p = &el->elem;           // myPrivate->points.getCurrentPtr();
         assert (p);
@@ -145,9 +178,8 @@ bool goPointCloud<pointT>::getCenterOfMass (pointT& comRet) const
         y += p->y * factor;
         z += p->z * factor;
         w += p->w * factor;
-        if (!el->next)      // myPrivate->points.isTail())
-            break;
         el = el->next;
+        ++i;
     }
     comRet.x = x;
     comRet.y = y;
@@ -169,21 +201,21 @@ bool goPointCloud<pointT>::translate (const pointT& d)
     if (myPrivate->points.isEmpty())
         return true;
     
-    myPrivate->points.resetToFront();
-    pointT* p = 0;
-    while (true)
+    goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
+    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
+    goIndex_t i = 0;
+    while (el && i < pointCount)
     {
-        p = myPrivate->points.getCurrentPtr();
-        assert (p);
-        *p += d;
-        if (myPrivate->points.isTail())
-            break;
-        myPrivate->points.next();
+        el->elem += d;
+        el = el->next;
+        ++i;
     }
     return true;
 }
 
-/**
+// Now in the header file as template.
+#if 0
+/*
 * @brief Transform all points with a 4x4-Matrix m.
 *
 * @param m  Transform matrix.
@@ -207,6 +239,7 @@ bool goPointCloud<pointT>::transform (const go44Matrixf& m)
     }
     return true;
 }
+#endif
 
 /**
  * @brief  Calculate 2 principal axes.

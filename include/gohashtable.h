@@ -5,6 +5,12 @@
 #include <goarray.h>
 #include <golist.h>
 
+/** @addtogroup data
+ * @{
+ */
+/** 
+ * @brief Entry for the hash table.
+ */
 template <class I, class O>
 class goHashEntry 
 {
@@ -85,5 +91,5 @@ class goHashTable {
   ///
   O		dummy;
 };
-
+/** @} */
 #endif

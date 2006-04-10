@@ -538,7 +538,7 @@ goString::operator+= (const char c) {
 }
 
 goString&
-goString::operator+= (goString& s) {
+goString::operator+= (const goString& s) {
   goIndex_t i = 0;
   for (i = 0; i < s.getSize(); i++) { 
     (*this) += s[i];

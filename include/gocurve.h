@@ -13,6 +13,9 @@
 #ifndef GO4VECTOR_H
 # include <go4vector.h>
 #endif
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 class goCurvePrivate;
 
@@ -25,17 +28,28 @@ class goCurve : public goPointCloud<pointT>
     public:
         goCurve ();
         goCurve (const goCurve<pointT>&);
+        goCurve (const goList<pointT>&);
         virtual ~goCurve ();
         goCurve& operator= (const goCurve<pointT>&);
 
+        virtual bool setPoints (const goList<pointT>&);
+        bool     setPoints        (typename goList<pointT>::ConstElement* sourceBegin, 
+                                   goIndex_t                              sourcePointCount, 
+                                   goIndex_t                              destPointCount, 
+                                   bool                                   closed = false);
+        bool     setPoints        (typename goList<pointT>::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed = false);
         bool     resample         (goIndex_t pointCount, goCurve<pointT>& ret);
         bool     getGradNorm      (goArray<goFloat>& diffNorm) const;
         bool     getGrad          (goList<go4Vectorf>& diff) const;
         bool     getCurvNorm      (goArray<goFloat>& curvNorm) const;
         bool     getAngleFunction (goArray<goFloat>& angles, const go4Vectorf& axis) const;
+        bool     getTurningFunction (goVectord& ret) const;
         goDouble getLength        () const;
+
+        goDouble euclideanDistance (const goCurve<pointT>& other, bool forward = true) const;
         
-        // bool operator!= (const goCurve& other);
+        static bool resample (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);
+        static bool resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
         
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
 

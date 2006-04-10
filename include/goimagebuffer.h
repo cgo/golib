@@ -3,14 +3,15 @@
 
 #include <gotypes.h>
 
-/**
+/*
  * Used to monitor the status of a goImageBuffer
  */
 struct goImageBufferStatus {
   bool created;
 };
 
-/**
+/*
+ * DEPRECATED
  * Used to store image information.
  * Here, a display interface still has to be implemented. 
  * I intend to create a display class and a displayinterface 

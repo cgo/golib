@@ -19,7 +19,8 @@
 
 enum goObjectMethodID
 {
-    GO_OBJECTMETHOD_USER = 0xfff00000
+    GO_OBJECTMETHOD_MATLAB = 0xffefff00,
+    GO_OBJECTMETHOD_USER =   0xfff00000
 };
 
 /*! \addtogroup misc

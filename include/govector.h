@@ -20,6 +20,11 @@ class goVector : public goFixedArray<T>
         goVector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
         virtual ~goVector () {};
 
+        void resize (goSize_t s)
+        {
+            this->setSize (s);
+        }
+        
         template <class To>
         goVector<T> operator- (const goVector<To>& other) const
         {
@@ -222,12 +227,14 @@ class goVector : public goFixedArray<T>
         inline T conjInnerProduct (const goVector<T>&) const;
 };
 
+// inline goComplexf goVector<goComplexf>::square () const;
+
 /**
  * @brief Calculates conj(this) * this.
  *
  * @return The return value is of the form r+i*0, meaning the imaginary part is 0.
  **/
-inline goComplexf goVector<goComplexf>::square () const
+template<> inline goComplexf goVector<goComplexf>::square () const
 {
     const goComplexf* array = this->getPtr();
     goFloat sum = 0.0;
@@ -239,7 +246,7 @@ inline goComplexf goVector<goComplexf>::square () const
     return goComplexf (sum, 0.0f);
 }
 
-inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVector<goComplexf>& v) const
+template<> inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVector<goComplexf>& v) const
 {
     assert (this->getSize() == v.getSize());
     const goComplexf* array = this->getPtr();
@@ -262,7 +269,7 @@ inline T goVector<T>::conjInnerProduct (const goVector<T>& v) const
 template <class T>
 inline T goVector<T>::square () const
 {
-    return *this * this;
+    return *this * *this;
 }
 
 typedef goVector<goFloat>  goVectorf;

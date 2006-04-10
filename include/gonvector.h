@@ -12,7 +12,7 @@
  */
 /**
  * \brief Somewhat deprecated vector class.
- *
+ * @note DEPRECATED -- do not use.
  * This implements a vector of arbitrary length.
  * Do not use this for maths, use goMatrix(n,1) instead.
  * @author Christian Gosch

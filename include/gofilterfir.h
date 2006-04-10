@@ -13,7 +13,9 @@ public:
   void* filterPtr;
 };
 
-/*!
+/*
+ * DEPRECATED
+ *
  * FIR filter. <br>
  */
 template <class T>

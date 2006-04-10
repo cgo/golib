@@ -789,7 +789,7 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 //   exit(2);
 // }
 
-void
+template<> void
 goDWT<goFloat>::haar(goSubSignal3D<goFloat>& signal)
 {
   goDouble tp0 = 0.5;
@@ -811,7 +811,7 @@ goDWT<goFloat>::haar(goSubSignal3D<goFloat>& signal)
   haarFilterZInplace (signal, tp0, tp1);
 }
 
-void
+template<> void
 goDWT<goDouble>::haar(goSubSignal3D<goDouble>& signal)
 {
   goDouble tp0 = 0.5;
@@ -856,7 +856,7 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
   temp2.destroy();
 } 
 
-void
+template<> void
 goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
 {
   goDouble tp0 = 0.5;
@@ -867,7 +867,7 @@ goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
   haarReverseXInplace (haarSignal, tp0, tp1);
 } 
 
-void
+template<> void
 goDWT<goDouble>::unHaar (goSubSignal3D<goDouble>& haarSignal)
 {
   goDouble tp0 = 0.5;
@@ -1279,7 +1279,7 @@ goDWT<T>::unHaar(goSignal3D<T>& signal, int stage)
  * than a floating point transform on some machines.
  */											
 #define GO_DWT_INTEGER_HAAR_METHOD(__TYPE)						 \
-void											 \
+template<> void											 \
 goDWT<__TYPE>::haar (goSubSignal3D<__TYPE> &signal) {					 \
   /* 2D ST of each xy slice */								 \
   goIndex_t i_st;									 \
@@ -1294,7 +1294,7 @@ goDWT<__TYPE>::haar (goSubSignal3D<__TYPE> &signal) {					 \
 }
 
 #define GO_DWT_INTEGER_UNHAAR_METHOD(__TYPE)					\
-void										\
+template<> void										\
 goDWT<__TYPE>::unHaar (goSubSignal3D<__TYPE> &signal) {				\
   goIndex_t i_ts;								\
   ST_REVERSE_XY_BEGIN(signal, __TYPE);						\

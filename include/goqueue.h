@@ -4,6 +4,13 @@
 #include <golist.h>
 #include <gotypes.h>
 
+/** @addtogroup data
+ * @{
+ */
+/** 
+ * @brief Queue class.
+ * @todo Document.
+ */
 template <class T>
 class goQueue {
  public:
@@ -28,5 +35,5 @@ class goQueue {
  protected:
   goList<T> list;
 };
-
+/** @} */
 #endif

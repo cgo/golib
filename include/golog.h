@@ -9,6 +9,15 @@
 #endif 
 #include <fstream>
 
+/** @addtogroup misc
+ * @{
+ */
+/** 
+ * @brief  Logging facility.
+ *
+ * This class enables you to write messages to a log file (golib.log),
+ * which is created every time a golib program is called.
+ */
 class goLog
 {
     public:
@@ -29,5 +38,5 @@ class goLog
         static goString      fileName;
         static std::ofstream outStream;
 };
-
+/** @} */
 #endif

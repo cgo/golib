@@ -205,7 +205,7 @@ static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>
  *
  * @return True if successful, false otherwise.
  **/
-bool
+template<> bool
 goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
                                 goSignal3DBase<void>& outSignal)
 {
@@ -430,4 +430,4 @@ template class goFilter3D<goFloat, goFloat>;
 template class goFilter3D<goFloat, goDouble>;
 template class goFilter3D<goDouble, goFloat>;
 template class goFilter3D<goDouble, goDouble>;
-template class goFilter3D<void, void>;
+// template class goFilter3D<void, void>;

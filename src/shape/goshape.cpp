@@ -125,8 +125,9 @@ static goDouble procrustesDistance (goList<goPointf>::Element* e1_, goList<goPoi
 /**
  * @brief  Procrustes alignment.
  *
- * Assumes that this shape and the other are centred and normalized.
+ * Assumes that this shape and the other are centred and normalised.
  * 
+ * @param curve  Shape to align.
  * @param other  Shape to align to.
  *
  * @return True if successful, false otherwise.
@@ -139,7 +140,7 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
         goLog::warning ("goShape::align(): curves have different numbers of points.");
         return false;
     }
-    //= Align the this shape to the other by finding the position at which
+    //= Align the shape to the other by finding the position at which
     //= the distance between the shapes is minimal.
 
     goIndex_t size = curve.getPoints().getSize();
@@ -347,17 +348,27 @@ bool goShape::center (goCurvef& curve)
 }
 
 /**
- * @brief Normalizes point coordinates so that \f$\sum_limits_i x_i^2 + y_i^2 = 1\f$.
+ * @brief Normalizes point coordinates so that \f$\sum\limits_i x_i^2 + y_i^2 = 1\f$.
  *
  * @return True if successful, false otherwise.
  **/
 bool goShape::normalize (goCurvef& curve)
 {
-    if (curve.getPoints().isEmpty())
+    return goShape::normalize(curve.getPoints());
+}
+
+/**
+ * @brief Normalizes point coordinates so that \f$\sum\limits_i x_i^2 + y_i^2 = 1\f$.
+ *
+ * @return True if successful, false otherwise.
+ **/
+bool goShape::normalize (goList<goPointf>& points)
+{
+    if (points.isEmpty())
         return false;
 
     goDouble sum = 0.0;
-    goList<goPointf>::Element* el = curve.getPoints().getFrontElement();
+    goList<goPointf>::Element* el = points.getFrontElement();
     assert(el);
     while (true)
     {
@@ -369,7 +380,7 @@ bool goShape::normalize (goCurvef& curve)
     if (sum <= 0.0)
         return false;
     sum = 1.0f / sqrt(sum);
-    el = curve.getPoints().getFrontElement();
+    el = points.getFrontElement();
     assert(el);
     while (true)
     {

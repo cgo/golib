@@ -6,8 +6,20 @@
 #endif
 #include <assert.h>
 
-template <class T>
-class goFixedArray
+/** @addtogroup data
+ * @{
+ */
+/** 
+ * @brief Fixed length array.
+ *
+ * This array can be used as a replacement for simple
+ * C++ arrays.
+ * As opposed to goArray<>, it can be used with any data type
+ * that offers new, delete, and = operators.
+ * 
+ * @author Christian Gosch
+ */
+template <class T> class goFixedArray
 {
     public:
         goFixedArray (goSize_t size = 1) : myArray (0), mySize (0)
@@ -47,12 +59,12 @@ class goFixedArray
             {
                 if (myArray)
                 {
-                    // goIndex_t i;
-                    //for (i = 0; i < mySize; ++i)
-                    //{
-                    //    myArray[i] = other(i);
-                    //}
-                    memcpy (myArray, &other(0), sizeof(T) * mySize);
+                    goSize_t i;
+                    for (i = 0; i < mySize; ++i)
+                    {
+                        myArray[i] = other(i);
+                    }
+                    // memcpy (myArray, &other(0), sizeof(T) * mySize);
                 }
             }
             return *this;
@@ -86,7 +98,6 @@ class goFixedArray
 
         void     setSize (goSize_t newSize)
         {
-            // asm("int $3");
             if (mySize == newSize)
                 return;
             if (myArray)
@@ -102,6 +113,26 @@ class goFixedArray
             }
         };
 
+        bool operator== (const goFixedArray<T>& other) const
+        {
+            if (this->getSize() != other.getSize())
+                return false;
+            goSize_t i;
+            const T* oP = other.getPtr();
+            const T* mP = this->getPtr();
+            for (i = 0; i < mySize; ++i,++oP,++mP)
+            {
+                if (*oP != *mP)
+                    return false;
+            }
+            return true;
+        };
+        
+        bool operator!= (const goFixedArray<T>& other) const
+        {
+            return !this->operator==(other);  
+        };
+        
         T*       getPtr  () { return myArray; };
         const T* getPtr  () const { return myArray; };
 
@@ -119,5 +150,5 @@ class goFixedArray
         T*       myArray;
         goSize_t mySize;
 };
-
+/** @} */
 #endif

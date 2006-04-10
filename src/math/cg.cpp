@@ -1,9 +1,28 @@
 #include <gosparsematrix.h>
 #include <govector.h>
 
-/*-------------------------------------------
+/*
  * Schaback, Numerische Mathematik, S. 297
- *------------------------------------------*/
+ */
+ /** @addtogroup math
+ * @{
+ */
+ /** 
+ * @brief Conjugate gradients method for solving linear equation systems.
+ * 
+ * Finde einen Vektor x fuer A*x=b.
+ * Geht momentan nur fuer goSparseMatrix.
+ * @todo Spezialimplementierung fuer goSparseMatrix
+ * (gibts schon) und Standardimplementierung fuer
+ * andere Matrizen.
+ *
+ * @param A  Matrix A
+ * @param b  Vector b
+ * @param x  Solution x
+ * @param epsilon  Error bound.
+ * 
+ * @return Error.
+ */
 template <class MatrixType, class VectorType>
 goDouble goMath::goConjugateGradients (const MatrixType& A, const VectorType& b, VectorType& x, goDouble epsilon)
 {
@@ -47,11 +66,11 @@ goDouble goMath::goConjugateGradients (const MatrixType& A, const VectorType& b,
         if (sigma == 0.0)
             break;
         tau = g*r;
-        if (tau == 0.0)
-            break;
         t = tau / sigma;
         x += r*t;
         g -= p*t;
+        if (tau == 0.0)
+            break;
         gamma = (t*t*rho - tau) / tau;
         r = g + r * gamma;
         abs_r = sqrt (r*r);
@@ -75,6 +94,6 @@ goDouble goMath::goConjugateGradients (const MatrixType& A, const VectorType& b,
     }
     return abs_r;
 }
-
+/** @} */
 template goDouble goMath::goConjugateGradients<goSparseMatrix,goVectord>(const goSparseMatrix& A, const goVectord& b, goVectord& x, goDouble);
 // template goDouble goMath::goConjugateGradients<goSparseMatrix,goSparseMatrix>(const goSparseMatrix& A, const goSparseMatrix& b, goSparseMatrix& x);

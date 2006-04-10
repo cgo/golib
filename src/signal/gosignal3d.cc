@@ -74,11 +74,11 @@ goSignal3D<T>::goSignal3D (goSignal3D<T>& other)
     *this = other;
 }
 
-goSignal3D<void>::~goSignal3D () 
+template<> goSignal3D<void>::~goSignal3D () 
 {
     if (real_ptr)
     {
-        delete[] (goUInt8*)real_ptr;
+        delete[] (goUByte*)real_ptr;
         real_ptr = NULL;
     }
 }
@@ -88,12 +88,12 @@ goSignal3D<T>::~goSignal3D ()
 {
     if (this->real_ptr)
     {
-        delete[] this->real_ptr;
+        delete[] (goUByte*)this->real_ptr;
         this->real_ptr = NULL;
     }
 }
 
-void
+template<> void
 goSignal3D<void>::destroy ()
 {
     goSignal3DBase<void>::destroy ();
@@ -107,7 +107,7 @@ goSignal3D<void>::destroy ()
 }
 
 
-bool
+template<> bool
 goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
                         goSize_t blockSizeX, 
                         goSize_t blockSizeY, 
@@ -160,7 +160,7 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
     return true;
 }
 
-const goSignal3D<void>&
+template<> const goSignal3D<void>&
 goSignal3D<void>::operator= (goSignal3DBase<void>& other)
 {
     goLog::message("goSignal3D<void>::operator=()");
@@ -284,7 +284,7 @@ goSignal3D<T>::fill (const T* element)
     GO_SIGNAL3D_EACHELEMENT (*__ptr = *element, (*this), T);
 }
 
-void
+template<> void
 goSignal3D<void>::fill (const void*)
 {
     goError::print (getClassName(), "fill() not implemented for void.");

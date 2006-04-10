@@ -2,6 +2,9 @@
 #define GOMATH_H
 
 #include <math.h>
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 #ifndef MAX
 #define MAX(_m1,_m2) (_m1 < _m2 ? _m2 : _m1)
@@ -11,6 +14,9 @@
 #define MIN(_m1,_m2) (_m1 < _m2 ? _m1 : _m2)
 #endif
 
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
@@ -94,9 +100,21 @@ bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
+bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, goDouble hx, goDouble hy, goSignal3D<void>& retValue);
+
+bool centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension = 0, goDouble h = 1.0);
+
 template <class MatrixType, class VectorType>
 goDouble goConjugateGradients (const MatrixType& A, const VectorType& b, VectorType& x, goDouble epsilon = 1e-6);
 
+template <class T>
+bool centerOfMass (const goList<goVector<T> >&, goVector<T>& comRet);
+
+template <class pointT>
+bool centerOfMass (const goList<pointT>&, pointT& comRet);
+
+template <class pointT>
+bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, pointT& comRet);
 };
 
 

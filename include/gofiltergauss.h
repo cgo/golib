@@ -4,7 +4,8 @@
 #include <gofilter.h>
 #include <gotypes.h>
 
-/*!
+/*
+ * DEPRECATED
  * Gauss filter. <br>
  * A simple Gauss filter class. <br>
  * Usage is very simple: make a goSignal2D object and a target object of the same type and size,

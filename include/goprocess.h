@@ -2,7 +2,9 @@
 #define GOPROCESS_H
 
 #include <gotypes.h>
-#include <goarray.h>
+#ifndef GOFIXEDARRAY_H
+# include <gofixedarray.h>
+#endif
 #include <gostring.h>
 #include <unistd.h>
 #ifndef GOOBJECTBASE_H
@@ -41,7 +43,7 @@ class goProcess : public goObjectBase {
   ///
   int run (const char* filename, char *const argv[]);
   ///
-  int run (const char* filename, goArray<goString* >& argv);
+  int run (const char* filename, goFixedArray<goString> argv);
   /// Waits until the child returns.
   void wait ();
   /// Kills the child using SIGKILL.

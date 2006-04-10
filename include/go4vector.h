@@ -17,11 +17,20 @@
  */
 /**
  * @brief 4-dimensional vector.
+ * 
  **/
 template< class T >
 class
 go4Vector {
  public:
+     /** 
+      * @brief Constructor.
+      * 
+      * @param x_ 1st entry. Default 0.
+      * @param y_ 2nd entry. Default 0.
+      * @param z_ 3rd entry. Default 0.
+      * @param t_ 4th entry. Default 0.
+      */
   go4Vector (T x_ = (T)0, T y_ = (T)0, T z_ = (T)0, T t_ = (T)0) : x(x_), y(y_), z(z_), t(t_) { };
 
   template <class To>
@@ -170,6 +179,22 @@ go4Vector {
     x = a1; y = a2; z = a3; t = a4;
   };
 
+  template <class mT>
+  GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (const go44Matrix<mT>& matrix) const
+  {
+      go4Vector<T> retValue;
+      T a1,a2,a3,a4;
+      const mT* m = matrix.getPtr();
+      retValue.x = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+      m += 4;
+      retValue.y = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+      m += 4;
+      retValue.z = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+      m += 4;
+      retValue.w = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+      return retValue;
+  };
+
   /*! @brief Cross-product.
    * Uses only the first three elements. */
   GO4VECTOR_FUNCTION_PREFIX void cross (const go4Vector<T>& other) 
@@ -196,7 +221,7 @@ go4Vector {
    */
   GO4VECTOR_FUNCTION_PREFIX void div() 
     {
-      T t_1 = (T)(1 / (goDouble)t);
+      T t_1 = (T)(1.0 / (goDouble)t);
       t = 1;
       x *= t_1;
       y *= t_1;

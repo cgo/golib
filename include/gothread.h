@@ -62,7 +62,16 @@ class goCondition {
 };
 #endif
 
-#ifdef HAVE_LIBPTHREAD
+#if defined HAVE_LIBPTHREAD || defined DOXYGEN
+/** 
+ * @brief Semaphore class.
+ *
+ * This class implements a semaphore.
+ * A semaphore represents a value that can be incremented and decremented.
+ * If the semaphore's value is 0 and decrement is called, the calling thread
+ * is blocked until the semaphore is > 0, then the value is decremented.
+ * Increments and decrements are atomic operations, i.e. they are thread-safe.
+ */
 class goSemaphore {
  public:
     goSemaphore();

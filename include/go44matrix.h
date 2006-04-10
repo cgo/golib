@@ -18,14 +18,53 @@
 template <class T>
 class go44Matrix {
 public:
-  go44Matrix ();
-  go44Matrix (T, T, T, T,
-	      T, T, T, T,
-	      T, T, T, T,
-	      T, T, T, T);
-  go44Matrix (const go44Matrix<T>& other);
-  ~go44Matrix ();
+  go44Matrix ()
+  {
+      matrix = new T[16];
+  };
+  go44Matrix (T i11, T i12, T i13, T i14,
+              T i21, T i22, T i23, T i24,
+              T i31, T i32, T i33, T i34,
+              T i41, T i42, T i43, T i44)
+  {
+      matrix = new T[16];
+      matrix[0] = i11;
+      matrix[1] = i12;	
+      matrix[2] = i13;
+      matrix[3] = i14;
+      matrix[4] = i21;
+      matrix[5] = i22;	
+      matrix[6] = i23;
+      matrix[7] = i24;
+      matrix[8] = i31;
+      matrix[9] = i32;	
+      matrix[10] = i33;
+      matrix[11] = i34;
+      matrix[12] = i41;
+      matrix[13] = i42;	
+      matrix[14] = i43;
+      matrix[15] = i44;
+  };
+  go44Matrix (const go44Matrix<T>& other)
+  {
+      matrix = new T[16];
+      *this = other;
+  };
+  ~go44Matrix ()
+  {
+      delete [] matrix;
+      matrix = 0;
+  };
 
+  inline void unity ()
+  {
+     this->fill(T(0));
+     this->matrix[0]  = T(1);
+     this->matrix[5]  = T(1);
+     this->matrix[10] = T(1);
+     this->matrix[15] = T(1);
+  };
+  
   /*!
    * @return Reference to object at [y][x]
    */

@@ -6,6 +6,63 @@
 %}
 
 %module golib_guile
+// %include exception.i
+
+// Exceptions
+%exception goReadImage {
+    try {
+        $action
+    }
+    catch (goFileIOException ex) {
+        if (ex.code == goFileIOException::NOT_FOUND)
+        {
+            printf ("goReadImage: not found.\n");
+        }
+        if (ex.code == goFileIOException::FAILED)
+        {
+            printf ("goReadImage: failed.\n");
+        }
+    }
+    catch (goTypeException ex) {
+        if (ex.code == goTypeException::WRONG_TYPE)
+        {
+            printf ("goReadImage: wrong data type.\n");
+        }
+        if (ex.code == goTypeException::UNKNOWN_TYPE)
+        {
+            printf ("goReadImage: unknown data type.\n");
+        }
+    }
+}
+
+%exception goWriteImage {
+    try {
+        $action
+    }
+    catch (goFileIOException ex) {
+        if (ex.code == goFileIOException::NOT_FOUND)
+        {
+            printf ("readImage: not found.\n");
+        }
+        if (ex.code == goFileIOException::EXISTS)
+        {
+            printf ("readImage: file exists.\n");
+        }
+        return SCM_BOOL(false);
+    }
+    catch (goTypeException ex) {
+        if (ex.code == goTypeException::WRONG_TYPE)
+        {
+            printf ("readImage: wrong data type.\n");
+        }
+        if (ex.code == goTypeException::UNKNOWN_TYPE)
+        {
+            printf ("readImage: unknown data type.\n");
+        }
+        return SCM_BOOL(false);
+    }
+}
+
 %{
 #include <goconfig.h>
 #include <gotypes.h>
@@ -18,6 +75,7 @@
 #include <gosignalhelper.h>
 #include <goexception.h>
 #include <goshape.h>
+#include <goregionls.h>
 #include <golibguile.h>
 %}
 
@@ -44,6 +102,7 @@
 %include <gosignalhelper.h>
 %include <goarray.h>
 %include <goshape.h>
+%include <goregionls.h>
 %include <golibguile.h>
 
 // Templates
@@ -53,52 +112,3 @@
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
 
-// Exceptions
-%exception goFileIO::readImage {
-    try {
-        $action
-    }
-    catch (goFileIOException ex) {
-        if (ex.code == goFileIOException::NOT_FOUND)
-        {
-            printf ("readImage: not found.\n");
-        }
-    }
-    catch (goTypeException ex) {
-        if (ex.code == goTypeException::WRONG_TYPE)
-        {
-            printf ("readImage: wrong data type.\n");
-        }
-        if (ex.code == goTypeException::UNKNOWN_TYPE)
-        {
-            printf ("readImage: unknown data type.\n");
-        }
-    }
-}
-%exception goFileIO::writeImage {
-    try {
-        $action
-    }
-    catch (goFileIOException ex) {
-        if (ex.code == goFileIOException::NOT_FOUND)
-        {
-            printf ("readImage: not found.\n");
-        }
-        if (ex.code == goFileIOException::EXISTS)
-        {
-            printf ("readImage: file exists.\n");
-        }
-        return false;
-    }
-    catch (goTypeException ex) {
-        if (ex.code == goTypeException::WRONG_TYPE)
-        {
-            printf ("readImage: wrong data type.\n");
-        }
-        if (ex.code == goTypeException::UNKNOWN_TYPE)
-        {
-            printf ("readImage: unknown data type.\n");
-        }
-        return false;
-    }
-}

@@ -3,6 +3,11 @@
 
 #include <gotypes.h>
 
+/** @addtogroup data
+ * @{ */
+/** 
+ * @brief Element of a list of type T.
+ */
 template <class T>
 class goListElement {
  public:
@@ -73,6 +78,7 @@ class goList {
   goListElement<T>* remove (goListElement<T>* el);
   /// Deletes the whole list leaving a zero length list.
   void          erase ();
+  void          reverse ();
 
   /// Makes a cyclic list by connecting front and tail.
   void          close ();
@@ -112,6 +118,9 @@ class goList {
 
 /**
  * @brief Algorithm base class to run through a list.
+ *
+ * Overload the action() methods and call run().
+ * @author Christian Gosch
  */
 template <class T>
 class goListAlgorithm
@@ -123,12 +132,12 @@ class goListAlgorithm
          * @brief Action to perform on each element. Called for each element by run().
          * Reimplement in subclass.
          */
-        virtual bool action (typename goList<T>::Element* el) {};
+        virtual bool action (typename goList<T>::Element* el) {return false;};
         /**
          * @brief Action to perform on each element. Called for each element by run().
          * Reimplement in subclass.
          */
-        virtual bool action (typename goList<T>::ConstElement* el) const {};
+        virtual bool action (typename goList<T>::ConstElement* el) const {return false;};
         /**
          * @brief Calls action() for each element from first to last.
          */
@@ -149,7 +158,7 @@ class goListAlgorithm
         /**
          * @brief Calls action() for each element from first to last.
          */
-        bool run(typename goList<T>::ConstElement* start, typename goList<T>::ConstElement* end) const
+        bool run(typename goList<T>::ConstElement* first, typename goList<T>::ConstElement* last) const
         {
             if (!first || !last)
                 return false;
@@ -164,5 +173,5 @@ class goListAlgorithm
             return (first == last);
         };
 };
-
+/** @} */
 #endif

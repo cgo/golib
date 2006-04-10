@@ -1,6 +1,43 @@
 #include <libguile.h>
 #include <golist.h>
+#include <govector.h>
 #include <golibguile.h>
+
+bool goReadImage (const char* filename, goSignal3D<void>* signal) 
+{
+    if (!signal)
+        return false;
+    if (!filename)
+        return false;
+    bool ok = true;
+    try
+    {
+        ok = goFileIO::readImage (filename, signal);
+    }
+    catch (goException)
+    {
+        throw;
+        return false;
+    }
+    return ok;
+}
+
+bool goWriteImage (const char* filename, const goSignal3DBase<void>* signal)
+{
+    if (!filename || !signal)
+        return false;
+    bool ok = true;
+    try
+    {
+        ok = goFileIO::writeImage (filename, signal);
+    }
+    catch (goException)
+    {
+        throw;
+        return false;
+    }
+    return ok;
+}
 
 template <class T>
 SCM goRealListToSCM (const goList<T>& l)
@@ -43,8 +80,8 @@ bool goSCMToRealList (SCM l, goList<T>& gol)
     return true;
 }
 
-template <class T>
-SCM goRealArrayToSCM (const goArray<T>& a)
+template <class arrayT>
+SCM goRealArrayToSCM (const arrayT& a)
 {
     SCM ret = SCM_EOL;
     if (a.getSize() == 0)
@@ -53,7 +90,7 @@ SCM goRealArrayToSCM (const goArray<T>& a)
     }
     goIndex_t sz = a.getSize();
     goIndex_t i = 0;
-    for (i = 0; i < sz; ++i)
+    for (i = sz-1; i >= 0; --i)
     {
         ret = scm_cons (scm_make_real(a[i]), ret);
     }
@@ -64,8 +101,8 @@ SCM goRealArrayToSCM (const goArray<T>& a)
     // SCM scm_cons (SCM CAR, SCM CDR);
 }
 
-template <class T>
-bool goSCMToRealArray (SCM l, goArray<T>& gov)
+template <class arrayT>
+bool goSCMToRealArray (SCM l, arrayT& gov)
 {
     if (SCM_NULLP(l))
     {
@@ -78,7 +115,7 @@ bool goSCMToRealArray (SCM l, goArray<T>& gov)
     while (!SCM_NULLP(l))
     {
         SCM_ASSERT(SCM_NUMBERP(SCM_CAR(l)), SCM_CAR(l), SCM_ARG1, "goSCMToRealArray");
-        gov[i] = static_cast<T>(scm_num2dbl(SCM_CAR(l), "goSCMToRealArray"));
+        gov[i] = scm_num2dbl(SCM_CAR(l), "goSCMToRealArray");
         ++i;
         l = SCM_CDR(l);
     }
@@ -120,3 +157,7 @@ template SCM goRealArrayToSCM (const goArray<goFloat>& l);
 template SCM goRealArrayToSCM (const goArray<goDouble>& l);
 template bool goSCMToRealArray (SCM l, goArray<goFloat>& l2);
 template bool goSCMToRealArray (SCM l, goArray<goDouble>& l2);
+template SCM goRealArrayToSCM (const goVector<goFloat>& l);
+template SCM goRealArrayToSCM (const goVector<goDouble>& l);
+template bool goSCMToRealArray (SCM l, goVector<goFloat>& l2);
+template bool goSCMToRealArray (SCM l, goVector<goDouble>& l2);

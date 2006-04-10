@@ -1,6 +1,5 @@
 #include <gotypes.h>
 #include <go44matrix.h>
-#include <go44matrix.hpp>
 #include <stdlib.h>
 #include <iostream>
 

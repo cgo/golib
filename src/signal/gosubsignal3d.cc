@@ -323,7 +323,7 @@ goSubSignal3D<T>::shiftRightDiff (int n, int axes)
     // this->setSkip ((skipX + 1) >> n, (skipY + 1) >> n, (skipZ + 1) >> n);
 }
 
-void
+template<> void
 goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
 {
   if (p == 0)

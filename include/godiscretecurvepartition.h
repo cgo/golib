@@ -21,7 +21,10 @@ template<class T> class goDiscreteCurvePartitionPrivate;
  *
  * What this class does is actually removing the
  * "least significant" or "least relevant" points from a digital curve.
- * The relevance is measured as in Longin Jan Latecki's convexity rule paper.
+ * The relevance is measured as in Longin Jan Latecki's convexity rule paper:
+ * L.J. Latecki & R. Lakämper 
+ * Convexity Rule for Shape Decomposition Based on Discrete Contour Evolution 
+ * Computer Vision and Image Understanding, 1999, 73, 441-454
  *
  * @note This is not a fast implementation. It does not sort the points, but searches for the minimum
  *       in each step (it's experimental and may be dropped, that's why I didn't put too much effort
@@ -36,8 +39,8 @@ class goDiscreteCurvePartition : public goObjectBase
         
         void                  setCurve (goCurve<goPoint<T> >* curve);
         goCurve<goPoint<T> >* getCurve ();
-        bool                  partition (goIndex_t minPoints = 3);
-        virtual goDouble      relevanceMeasure (const goPoint<T>& p1, const goPoint<T>& p2, const goPoint<T>& p3, goDouble totalCurveLength, goDouble& betaRet);
+        bool                  lateckiSimplify (goIndex_t minPoints = 3, goDouble maxLength = -1.0);
+        goDouble              lateckiRelevanceMeasure (const goPoint<T>& p1, const goPoint<T>& p2, const goPoint<T>& p3, goDouble totalCurveLength, goDouble& betaRet, goDouble& maxSegmentLength);
 
     private:
         goDiscreteCurvePartition (goDiscreteCurvePartition&);

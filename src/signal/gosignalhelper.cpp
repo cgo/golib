@@ -466,6 +466,124 @@ bool goCopySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* target
     return false;
 }
 
+template <class T, class targetT>
+static bool copySignalLinear (const goSignal3DBase<void>* sig, targetT* targetArray)
+{
+    goSignal3DGenericConstIterator it (sig);
+
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                *targetArray = static_cast<targetT>(*(T*)*it);
+                it.incrementX();
+                ++targetArray;
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+    return true;
+}
+
+template <class T>
+bool goCopySignalArray (const goSignal3DBase<void>* sig, T* targetArray)
+{
+    if (!targetArray)
+    {
+        goLog::warning("goCopySignalArray(): targetArray == 0");
+        return false;                                           
+    }
+    if (!sig)
+    {
+        goLog::warning("goCopySignalArray(): sig == 0");
+        return false;                                           
+    }
+
+//    goString msg = "goCopySignalArray(): Copying to linear array: ";
+//    msg += sig->getObjectName().toCharPtr();
+//    msg += " ("; msg += sig->getDataType().getString().toCharPtr();
+//    msg += ") to linear array."; 
+//    goLog::message (msg.toCharPtr());
+    
+    switch (sig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignalLinear<goInt8,T>     (sig,   targetArray);   break;
+        case   GO_UINT8:    return copySignalLinear<goUInt8,T>    (sig,   targetArray);   break;
+        case   GO_INT16:    return copySignalLinear<goInt16,T>    (sig,   targetArray);   break;
+        case   GO_UINT16:   return copySignalLinear<goUInt16,T>   (sig,   targetArray);   break;
+        case   GO_INT32:    return copySignalLinear<goInt32,T>    (sig,   targetArray);   break;
+        case   GO_UINT32:   return copySignalLinear<goUInt32,T>   (sig,   targetArray);   break;
+        case   GO_FLOAT:    return copySignalLinear<goFloat,T>    (sig,   targetArray);   break;
+        case   GO_DOUBLE:   return copySignalLinear<goDouble,T>   (sig,   targetArray);   break;
+        default: goLog::warning("goCopySignalArray(): unknown type."); break;
+    }
+    return false;
+}
+
+template <class T, class targetT>
+static bool copySignalLinear (const T* array, goSignal3DBase<void>* targetSig)
+{
+    goSignal3DGenericIterator it (targetSig);
+
+    while (!it.endZ())
+    {
+        it.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                *(targetT*)*it = static_cast<targetT>(*array);
+                it.incrementX();
+                ++array;
+            }
+            it.incrementY();
+        }
+        it.incrementZ();
+    }
+    return true;
+}
+
+template <class T>
+bool goCopySignalArray (const T* array, goSignal3DBase<void>* targetSig)
+{
+    if (!targetSig)
+    {
+        goLog::warning("goCopySignalArray(): targetSig == 0");
+        return false;                                           
+    }
+    if (!array)
+    {
+        goLog::warning("goCopySignalArray(): array == 0");
+        return false;                                           
+    }
+
+//    goString msg = "goCopySignalArray(): Copying from linear array: ";
+//    msg += targetSig->getObjectName().toCharPtr();
+//    msg += " ("; msg += targetSig->getDataType().getString().toCharPtr();
+//    msg += ") from linear array."; 
+//    goLog::message (msg.toCharPtr());
+    
+    switch (targetSig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignalLinear<T,goInt8>   (array, targetSig);   break;
+        case   GO_UINT8:    return copySignalLinear<T,goUInt8>  (array, targetSig);   break;
+        case   GO_INT16:    return copySignalLinear<T,goInt16>  (array, targetSig);   break;
+        case   GO_UINT16:   return copySignalLinear<T,goUInt16> (array, targetSig);   break;
+        case   GO_INT32:    return copySignalLinear<T,goInt32>  (array, targetSig);   break;
+        case   GO_UINT32:   return copySignalLinear<T,goUInt32> (array, targetSig);   break;
+        case   GO_FLOAT:    return copySignalLinear<T,goFloat>  (array, targetSig);   break;
+        case   GO_DOUBLE:   return copySignalLinear<T,goDouble> (array, targetSig);   break;
+        default: goLog::warning("goCopySignalArray(): unknown type."); break;
+    }
+    return false;
+}
+
 template <class sourceT, class targetT>
 static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
@@ -842,3 +960,21 @@ void goSignalMeanVariance (const goSignal3DBase<void>& sig,
             break;
     }
 }
+
+
+template bool goCopySignalArray<goInt8>   (const goInt8*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goUInt8>  (const goUInt8*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goInt16>  (const goInt16*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goUInt16> (const goUInt16*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goInt32>  (const goInt32*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goUInt32> (const goUInt32*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goFloat>  (const goFloat*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goDouble> (const goDouble*, goSignal3DBase<void>*);
+template bool goCopySignalArray<goInt8>   (const goSignal3DBase<void>*, goInt8*);
+template bool goCopySignalArray<goUInt8>  (const goSignal3DBase<void>*, goUInt8*);
+template bool goCopySignalArray<goInt16>  (const goSignal3DBase<void>*, goInt16*);
+template bool goCopySignalArray<goUInt16> (const goSignal3DBase<void>*, goUInt16*);
+template bool goCopySignalArray<goInt32>  (const goSignal3DBase<void>*, goInt32*);
+template bool goCopySignalArray<goUInt32> (const goSignal3DBase<void>*, goUInt32*);
+template bool goCopySignalArray<goFloat>  (const goSignal3DBase<void>*, goFloat*);
+template bool goCopySignalArray<goDouble> (const goSignal3DBase<void>*, goDouble*);

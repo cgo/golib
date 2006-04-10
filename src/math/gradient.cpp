@@ -2,6 +2,7 @@
 # include <gomath.h>
 #endif
 #include <gosignal3dbase.h>
+#include <gosignal3dgenericiterator.h>
 #include <golog.h>
 #include <gostring.h>
 
@@ -643,5 +644,150 @@ bool goMath::ddy2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
             break;
     }
     return false;    
+}
+
+template <class Tx, class Tret>
+static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+{
+    if (retValue.getSizeX() != x.getSizeX() ||
+        retValue.getSizeY() != x.getSizeY() ||    
+        retValue.getSizeZ() != x.getSizeZ())
+    {
+        retValue.make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
+                       x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
+                       4, 4, 4);
+    }
+    goSignal3DGenericConstIterator itX (&x);
+    goSignal3DGenericIterator itResult (&retValue);
+
+    goDouble h2 = 1.0 / (2*h);
+    
+    switch (dimension)
+    {
+        case 0:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        while (!itX.endX())
+                        {
+                            *(Tret*)*itResult = (*(const Tx*)itX.rightX() - *(const Tx*)itX.leftX()) * h2;
+                            itX.incrementX();
+                            itResult.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                }
+            }
+            break;
+        case 1:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        while (!itX.endX())
+                        {
+                            *(Tret*)*itResult = (*(const Tx*)itX.rightY() - *(const Tx*)itX.leftY()) * h2;
+                            itX.incrementX();
+                            itResult.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                }
+            }
+            break;
+        case 2:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        while (!itX.endX())
+                        {
+                            *(Tret*)*itResult = (*(const Tx*)itX.rightZ() - *(const Tx*)itX.leftZ()) * h2;
+                            itX.incrementX();
+                            itResult.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                }
+            }
+            break;
+        default:
+            {
+                goLog::error ("goMath::centralDifferences(): Only dimensions 0,1,2 are valid.");
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+template <class T>
+static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+{
+    switch (retValue.getDataType().getID())
+    {
+        case GO_FLOAT: return centralDifferences2_<T, goFloat> (x,retValue,dimension, h); break; 
+        case GO_DOUBLE: return centralDifferences2_<T, goDouble> (x,retValue,dimension, h); break; 
+        default:
+            {
+                goLog::error ("centralDifferencesX(): Unsupported data type for retValue.");
+                return false;
+            }
+    }
+}
+
+/** 
+ * @brief  Calculate central finite differences in a given direction.
+ * 
+ * @param x          Data grid.
+ * @param retValue   Contains finite differences after the function returns true.
+ *                   Will be resized to the size of x, blocksize of x and border of 4 in each direction.
+ * @param dimension  Dimension (0, 1, or 2 for x, y, or z)
+ * @param h          Grid spacing (default 1)
+ * 
+ * @note Only goFloat and goDouble data are supported. The data types of x and retValue may differ.
+ *       Both are given by the user, so the data type of retValue must be set before calling 
+ *       this function.
+ *
+ * @return  True if successful, false otherwise.
+ * @author Christian Gosch
+ */
+bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+{
+    switch (x.getDataType().getID())
+    {
+        case GO_FLOAT: return centralDifferences_<goFloat> (x,retValue,dimension,h); break;
+        case GO_DOUBLE: return centralDifferences_<goDouble> (x,retValue,dimension,h); break;
+        default:
+            {
+                goLog::error ("centralDifferences(): Unsupported data type for x.");
+                return false;
+            }
+    }
 }
 /** @} */

@@ -10,6 +10,12 @@
 #ifndef GOARRAY_H
 # include <goarray.h>
 #endif
+#ifndef GOFILEIO_H
+# include <gofileio.h>
+#endif
+
+bool goReadImage (const char* filename, goSignal3D<void>* signal);
+bool goWriteImage (const char* filename, const goSignal3DBase<void>* signal);
 
 // SCM golib_test_list ();
 // SCM golib_test_list_2 (SCM l);
@@ -20,10 +26,10 @@ SCM goRealListToSCM (const goList<T>& l);
 template <class T>
 bool goSCMToRealList (SCM l, goList<T>& gol);
 
-template <class T>
-SCM goRealArrayToSCM (const goArray<T>& a);
+template <class arrayT>
+SCM goRealArrayToSCM (const arrayT& a);
 
-template <class T>
-bool goSCMToRealArray (SCM l, goArray<T>& gov);
+template <class arrayT>
+bool goSCMToRealArray (SCM l, arrayT& gov);
 
 #endif

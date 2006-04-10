@@ -17,6 +17,7 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/doc\
  golib/examples\
  golib/include\
+ golib/libtool\
  golib/maindocpage.h\
  golib/missing\
  golib/mkinstalldirs\
@@ -24,4 +25,5 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/CMakeLists.txt\
  golib/src\
  golib/swig\
+ golib/matlab\
  golib/tools --exclude="graphics" --exclude=".svn" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la"

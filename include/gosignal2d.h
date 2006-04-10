@@ -9,11 +9,8 @@
 #include <gotypes.h>
 #include <goobjectbase.h>
 
-/*!
- * \addtogroup signal
- * @{
- */
-/*!
+/*
+ * DEPRECATED 
  * \brief Use goSignal3D instead.
  * 
  * 2D signal class, deprecated.

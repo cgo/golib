@@ -31,7 +31,7 @@
                       (make-instance <goSignal3Dv>)))
 
 ;; Test reading an image:
-(if (primitive:goFileIO-readImage "/home/gosch/Documents/fem-level-sets/matlab/person.jpg" sig)
+(if (goReadImage "/home/gosch/Documents/fem-level-sets/matlab/person.jpg" sig)
   (format #t "Read image.~%")
   (begin
     (format #t "Could not read image.~%")
@@ -46,6 +46,7 @@
   (format #t "Successfully converted.~%")
   (format #t "Conversion failed.~%"))
 ;; Try to write the converted image:
-(if (primitive:goFileIO-writeImage "scalar-image.jpg" sig2)
+(delete-file "scalar-image.jpg")
+(if (goWriteImage "scalar-image.jpg" sig2)
   (format #t "Written.~%")
   (format #t "Write failed.~%"))

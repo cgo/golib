@@ -3,6 +3,12 @@
 
 #include <goobjectbase.h>
 
+/** @addtogroup data
+ * @{
+ */
+/** 
+ * @brief Element of a binary tree.
+ */
 template<class T>
 class goBTreeElement : public goObjectBase
 {
@@ -18,6 +24,13 @@ class goBTreeElement : public goObjectBase
 
 template<class T> class goBTree;
 
+/** 
+ * @brief Running through a binary tree.
+ *
+ * Currently only offers depth first order.
+ *
+ * @todo Add breadth first order.
+ */
 template<class T>
 class goBTreeAlgorithm
 {
@@ -29,6 +42,9 @@ class goBTreeAlgorithm
 };
 
 
+/** 
+ * @brief Binary tree.
+ */
 template<class T>
 class goBTree : public goObjectBase
 {
@@ -48,5 +64,5 @@ class goBTree : public goObjectBase
     private:
         goBTreeElement<T>* myRoot;
 };
-
+/** @} */
 #endif

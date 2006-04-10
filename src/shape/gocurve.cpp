@@ -1,7 +1,7 @@
 #include <gocurve.h>
 #include <gopoint.h>
 #include <golist.h>
-#include <gonurbs.h>
+#include <gonubs.h>
 #include <goconfig.h>
 
 #ifndef GOFILEIO_H
@@ -49,6 +49,15 @@ goCurve<pointT>::goCurve (const goCurve<pointT>& other)
 }
 
 template<class pointT>
+goCurve<pointT>::goCurve (const goList<pointT>& pl)
+    : goPointCloud<pointT> (pl),
+      myPrivate (0)
+{
+    myPrivate = new goCurvePrivate;
+    assert (myPrivate);
+}
+
+template<class pointT>
 goCurve<pointT>& goCurve<pointT>::operator= (const goCurve<pointT>& other)
 {
     *myPrivate = *other.myPrivate;
@@ -67,31 +76,232 @@ goCurve<pointT>::~goCurve ()
 }
 
 /**
+ * @bug Check this -- this can't be the right solution.
+ * If this is not present, setPoints() from goPointCloud can not be used because of the overloaded versions in goCurve.
+ */
+template <class pointT>
+bool goCurve<pointT>::setPoints (const goList<pointT>& l)
+{
+    return goPointCloud<pointT>::setPoints(l);
+}
+
+/** 
+ * @brief Resamples new points uniformly from given source points and sets the
+ *        resampled points to this curve.
+ * 
+ * @param sourceBegin       First list element of source points.
+ * @param sourcePointCount  Number of source points.
+ * @param destPointCount    Number of points you want in this goCurve.
+ * @param closed            If true, assume the source and destination shall be closed. If false, they are open.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class pointT>
+bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBegin, 
+                                 goIndex_t                              sourcePointCount, 
+                                 goIndex_t                              destPointCount,
+                                 bool                                   closed)
+{
+    goList<pointT>& points = this->getPoints();
+    points.erase();
+    bool result = goCurve<pointT>::resample(sourceBegin, sourcePointCount, destPointCount, points);
+    if (!result)
+    {
+        return false;
+    }
+    if (closed)
+    {
+        points.close();
+    }
+    return true;
+}
+
+/** 
+ * @brief Set points from source list.
+ * 
+ * @param sourceBegin       First element of a point list.
+ * @param sourcePointCount  Number of points to copy.
+ * @param closed            If true, this curve's point list will be closed.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class pointT>
+bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed)
+{
+    goList<pointT>& points = this->getPoints();
+    points.erase();
+    goIndex_t i;
+    typename goList<pointT>::ConstElement* el = sourceBegin;
+    for (i = 0; i < sourcePointCount && el; ++i)
+    {
+        points.append(el->elem);
+        el = el->next;
+    }
+    if (closed)
+    {
+        points.close();
+    }
+    return true;
+}
+
+/** 
+ * @brief Calculate euclidean distance between two curves.
+ * 
+ * No transformations are applied to either curve, except reversal if the 
+ * forward parameter is false.
+ * The distance is simply the sum of the distances between each point pair of
+ * the two curves.
+ * 
+ * @param other   Other curve. Must have same point count as this curve.
+ * @param forward If false, the other curve will be reversed when calculating (the object itself 
+ *                ist not altered). Default is true.
+ * 
+ * @return Distance between this and other. If negative, an error occured (probably unequal point counts).
+ */
+template <class pointT>
+goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool forward) const
+{
+    goIndex_t pointCount = this->getPointCount();
+    if (other.getPointCount() != pointCount)
+    {
+        return -1.0;
+    }
+    assert (other.getPointCount() == this->getPointCount());
+  
+    //= Calculate square sum of point distances.
+    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<pointT>::ConstElement* otherEl = 0;
+    if (forward)
+    {
+        otherEl = other.getPoints().getFrontElement();
+    }
+    else
+    {
+        otherEl = other.getPoints().getTailElement();
+    }
+    goIndex_t i   = 0;
+    goDouble sum  = 0.0;
+    goFloat temp1 = 0.0f;
+    goFloat temp2 = 0.0f;
+    assert (el && otherEl);
+    while (el && otherEl && i < pointCount)
+    {
+        temp1 = el->elem.x - otherEl->elem.x;
+        ++i;
+        temp2 = el->elem.y - otherEl->elem.y;
+        ++i;
+        sum += sqrt(temp1 * temp1 + temp2 * temp2);
+        el = el->next;
+        if (forward)
+        {
+            otherEl = otherEl->next;
+        }
+        else
+        {
+            otherEl = otherEl->prev;
+        }
+    }
+    return sum;
+}
+
+/**
  * @brief Uniformly resamples the curve with the given number of points.
  *
+ * @note This uses approximating splines. The original points are not interpolated!
+ * 
  * @param pointCount  Number of points. Must be > 1.
  * @param ret         Resampled curve.
  *
  * @return True if successful, false otherwise.
  **/
 template<class pointT>
-bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve& ret)
+bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
 {
     if (pointCount <= 1)
         return false;
 
-    goNURBS nurbs (this);
+    goNUBS nubs (this);
     goList<pointT> newPoints;
     goFloat t = 0.0f;
-    goFloat step = nurbs.getCurveLength() / (float)(pointCount - 1);
+    goFloat step = nubs.getCurveLength() / (float)(pointCount-1);
     goIndex_t i;
     pointT p;
-    for (i = 0; i < pointCount; ++i, t += step)
+    for (i = 0; i < pointCount - 1; ++i, t += step)
     {
-        p = nurbs (t);
+        p = nubs (t);
         newPoints.append (p);
     }
+    p = nubs (t - 1e-5);
+    newPoints.append(p);
+    if (this->getPoints().isClosed())
+    {
+        newPoints.close();
+    }
     ret.setPoints (newPoints);
+    return true;
+}
+
+/** 
+ * @brief 
+ * 
+ * @note This uses approximating splines. The original points are not interpolated!
+ * 
+ * @param begin 
+ * @param end 
+ * @param pointCount 
+ * @param ret 
+ * 
+ * @return 
+ */
+template<class pointT>
+bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret)
+{
+    goNUBS nubs;
+    if (!nubs.setControlPoints(begin,end))
+        return false;
+    goFloat t = 0.0f;
+    goFloat step = nubs.getCurveLength() / (float)(pointCount-1);
+    goIndex_t i;
+    pointT p;
+    for (i = 0; i < pointCount - 1; ++i, t += step)
+    {
+        p = nubs (t);
+        ret.append (p);
+    }
+    p = nubs(t - 1e-5);
+    ret.append(p);
+    return true;
+}
+
+/** 
+ * @brief 
+ *
+ * @note This uses approximating splines. The original points are not interpolated!
+ * 
+ * @param begin 
+ * @param pointCount 
+ * @param resamplePointCount 
+ * @param ret 
+ * 
+ * @return 
+ */
+template<class pointT>
+bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+{
+    goNUBS nubs;
+    if (!nubs.setControlPoints(begin,pointCount))
+        return false;
+    goDouble t = 0.0f;
+    goDouble step = nubs.getCurveLength() / (float)(resamplePointCount-1);
+    goIndex_t i;
+    pointT p;
+    for (i = 0; i < resamplePointCount - 1; ++i, t += step)
+    {
+        p = nubs (t);
+        ret.append (p);
+    }
+    p = nubs(t - 1e-5);
+    ret.append(p);
     return true;
 }
 
@@ -266,6 +476,110 @@ bool goCurve<pointT>::getAngleFunction (goArray<goFloat>& angles, const go4Vecto
         }
         if (el->next)
             el = el->next;
+    }
+    return true;
+}
+
+template <class pointT>
+static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
+{
+    pointT base = p3 - p1;
+    goDouble f = base.abs();
+    if (f == 0.0)
+    {
+        assert ("p3 == p1" == 0);
+        return 0.0;  //= This should not happen. It would mean p3 == p1.
+    }
+    base *= 1.0 / f;
+    pointT s1 = p2 - p1;
+    pointT s2 = p3 - p2;
+    goDouble l1 = s1.abs();
+    goDouble l2 = s2.abs();
+    assert (l1 != 0.0 && l2 != 0.0);
+
+    goDouble alpha1 = (s1 * base) / l1;
+    //= acos seems to result in nan when the argument is exactly 1.0 (contrary to the manpage!).
+    //= Catch that.
+    if (alpha1 <= -1.0)
+    {
+        alpha1 = M_PI;
+    }
+    else
+    {
+        if (alpha1 >= 1.0)
+        {
+            alpha1 = 0.0;
+        }
+        else
+        {
+            alpha1 = acos (alpha1);
+        }
+    }
+    goDouble alpha2 = (s2 * base) / l2;
+    if (alpha2 <= -1.0)
+    {
+        alpha2 = M_PI;
+    }
+    else
+    {
+        if (alpha2 >= 1.0)
+        {
+            alpha2 = 0.0;
+        }
+        else
+        {
+            alpha2 = acos (alpha2);
+        }
+    }
+
+    goDouble beta = alpha1 + alpha2;
+
+    //= The sign of the turn angle is determined by whether the triangle {p1,p2,p3} 
+    //= turns clockwise or counter-clockwise, which in turn is determined
+    //= by the z-component of the cross product {s1 0} x {s2 0}.
+    return beta * ((s1.x * s2.y < s1.y * s2.x) ? -1.0 : 1.0);
+}
+
+/**
+* @brief Turning function.
+*
+* The turning function contains for each point p_i the angle between (p_{i-1},p_i) and
+* (p_i,p_{i+1}). In case of non-closed curves, the first entry is defined to be zero, and
+* there is one less entries than there are points.
+* The turning function can be either positive or negative, depending on whether the corresponding
+* point triple forms a triangle that turns clockwise or counterclockwise.
+* 
+* @return True if successful, false otherwise.
+**/
+template <class pointT>
+bool goCurve<pointT>::getTurningFunction (goVectord& ret) const
+{
+    goIndex_t sz = this->getPoints().getSize();
+
+    if (sz <= 0)
+        return false;
+
+    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    goIndex_t i = 0;
+
+    if (!this->getPoints().isClosed())
+    {
+        if (el)
+            el = el->next;
+        sz -= 1;
+        i = 1;
+        ret.setSize (sz);
+        ret[0] = 0.0;
+    }
+    else
+    {
+        ret.setSize (sz);
+    }
+    while (el && i < sz)
+    {
+        ret[i] = getTurn (el->prev->elem, el->elem, el->next->elem);
+        ++i;
+        el = el->next;
     }
     return true;
 }

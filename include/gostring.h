@@ -10,8 +10,11 @@
 #include <godate.h>
 //#include <linux/types.h>
 
+/** @addtogroup data
+ * @{
+ */
 /** 
- * String class 
+ * @brief String class 
  */
 class goString {
 public:
@@ -71,7 +74,7 @@ public:
   ///
   goString&	  operator+= (const char c);
   ///
-  goString&	  operator+= (goString& s);
+  goString&	  operator+= (const goString& s);
   ///
   goString&	  operator+= (const char* s);
   ///
@@ -112,7 +115,7 @@ protected:
   ///
   goDate		  thisDate;
 };
-
+/** @} */
 #endif 
 
 

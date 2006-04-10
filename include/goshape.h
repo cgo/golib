@@ -32,6 +32,7 @@ class goShape : public goObjectBase
         static bool align         (goCurvef& curve, const goCurvef& other);
         static bool center        (goCurvef& curve);
         static bool normalize     (goCurvef& curve);
+        static bool normalize     (goList<goPointf>& points);
         static bool procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet);
 
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);

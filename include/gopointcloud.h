@@ -34,25 +34,41 @@ class goPointCloud : public goObjectBase
 {
     public:
         goPointCloud ();
-        goPointCloud (const goPointCloud&);
+        goPointCloud (const goPointCloud<pointT>&);
+        goPointCloud (const goList<pointT>&);
         virtual ~goPointCloud ();
         goPointCloud& operator= (const goPointCloud&);
 
         bool operator!= (const goPointCloud& other);
-        
+
+        goIndex_t             getPointCount () const;
         goList<pointT>&       getPoints ();
         const goList<pointT>& getPoints () const;
-        void              setPoints (const goList<pointT>&);
+        virtual bool          setPoints (const goList<pointT>&);
+        void              addPoint (const pointT& p);
 
         void              setChanged         ();
 
         bool              getMean            (pointT& mean) const;
         bool              getCenterOfMass    (pointT& comRet) const;
         bool              translate          (const pointT& d);
-        bool              transform          (const go44Matrixf& m);
         bool              getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights = 0) const;
         bool              unitScale          (goFloat factor = 1.0f);
-        
+
+        template<class matrixT> inline bool transform (const matrixT& m)
+        {
+            typename goList<pointT>::Element* el = this->getPoints().getFrontElement();
+            goIndex_t sz = this->getPointCount();
+            goIndex_t i = 0;
+            while (el && i < sz)
+            {
+                el->elem *= m;
+                el = el->next;
+                ++i;
+            }
+            return true;
+        };
+
         virtual bool writeObjectFile (FILE*) const;
         virtual bool readObjectFile  (FILE*);
         

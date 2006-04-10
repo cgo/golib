@@ -8,6 +8,7 @@ INCLUDE             (CheckFunctionExists)
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
+ src/levelsets/goregionls.cpp
  src/data/goarrayi.cc 
  src/data/golisti.cc 
  src/data/goheapi.cc 
@@ -33,6 +34,7 @@ SET                 (SOURCES
  src/math/goeigenvalue.cpp
  src/math/cg.cpp
  src/math/gobiorthowavelet.cpp
+ src/math/divergence.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
@@ -74,7 +76,9 @@ SET                 (SOURCES
  src/types/gotype.cpp
  src/shape/gopointcloud.cpp
  src/shape/gocurve.cpp
- src/shape/gonurbs.cpp
+ src/shape/gocurvaturediffusion.cpp
+ src/shape/gocurvepartition.cpp
+ src/shape/gonubs.cpp
  src/shape/goshape.cpp
  src/shape/partial.cpp
  src/shape/godiscretecurvepartition.cpp
@@ -156,7 +160,7 @@ SET                 (SOURCES
  src/seispack/r_sign.c)
 
 SET                 (EXTRA_LIB_PATH /home/gosch/Software/lib)
-SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include)
+SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
 SET                 (EXTRA_LIBS "")
 SET                 (GOPATH $ENV{GOPATH})
 # FILE                (GLOB SOURCES *.cpp *.cxx)

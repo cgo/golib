@@ -379,14 +379,40 @@ goListElement<T>* goList<T>::remove (goListElement<T>* el)
 template <class T>
 void
 goList<T>::erase () {
-  resetToFront();
-  if (!isEmpty()) {
-    while (!isTail() && !isEmpty()) {
-      remove();
+    typename goList<T>::Element* el = this->getFrontElement();
+    if (!el)
+    {
+        return;
     }
-    remove();
-    size = 0;
-  }
+    if (this->isClosed())
+    {
+        this->open (this->getFrontElement());
+    }
+    while (el)
+    {
+        el = this->remove(el);
+    }
+    this->size = 0;
+}
+
+template <class T>
+void
+goList<T>::reverse () 
+{
+    typename goList<T>::Element* el = this->getFrontElement();
+    goIndex_t sz = this->getSize();
+    goIndex_t i = 0;
+    while (el && i < sz)
+    {
+        typename goList<T>::Element* temp = el->next;
+        el->next = el->prev;
+        el->prev = temp;
+        el = temp;
+        ++i;
+    }
+    goListElement<T>* temp = this->front;
+    this->front = this->tail;
+    this->tail = temp;
 }
 
 template <class T>
@@ -404,7 +430,7 @@ void goList<T>::open (goList<T>::Element* newFront)
 {
     if (!this->isClosed() || !newFront)
         return;
-    goList<T>::Element* p = newFront->prev;
+    typename goList<T>::Element* p = newFront->prev;
     newFront->prev = 0;
     if (p)
     {
@@ -419,7 +445,7 @@ bool goList<T>::isClosed () const
 {
     if (this->front && this->tail)
     {
-        if (this->front->prev && this->tail->next)
+        if (this->front->prev == this->tail && this->tail->next == this->front)
         {
             return true;
         }
@@ -458,7 +484,7 @@ goList<T>::operator= (const goList<T>& other) {
   if (other.isEmpty())
       return *this;
   
-  goList<T>::ConstElement* el = other.getFrontElement();
+  typename goList<T>::ConstElement* el = other.getFrontElement();
   goIndex_t sz = other.getSize();
   goIndex_t i = 0;
   while (i < sz && el)
@@ -466,6 +492,14 @@ goList<T>::operator= (const goList<T>& other) {
       this->append(el->elem);
       el = el->next;
       ++i;
+  }
+  if (other.isClosed())
+  {
+      this->close();
+  }
+  else
+  {
+      this->open (this->getFrontElement());
   }
   return *this;
 //  if (!other.isEmpty()) {

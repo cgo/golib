@@ -657,7 +657,7 @@ goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) 
 }
 #else
 bool
-goFileIO::writeImage (const char*, const goObjectBase*) throw (goFileIOException)
+goFileIO::writeImage (const char*, const goSignal3DBase<void>*) throw (goFileIOException, goTypeException)
 {
     return false;
 }
@@ -809,7 +809,7 @@ goFileIO::writeASCII (FILE* f, const goString& str)
 {
     if (!f)
         return false;
-    if (fwrite (str.getPtr(), 1, str.getSize(), f) != str.getSize())
+    if (fwrite (str.getPtr(), 1, str.getSize(), f) != (size_t)str.getSize())
         return false;
     return true;
 }

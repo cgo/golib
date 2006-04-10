@@ -38,7 +38,7 @@ class goMemoryException
 {
 };
 
-class goFileIOException
+class goFileIOException : public goException
 {
     public:
     enum
@@ -48,13 +48,13 @@ class goFileIOException
         EXISTS
     };
 
-    goFileIOException (int _code = FAILED) : code (_code) {};
+    goFileIOException (int _code = FAILED) : goException(), code (_code) {};
     ~goFileIOException () {};
 
     int code;
 };
 
-class goTypeException
+class goTypeException : public goException
 {
     public:
     enum
@@ -62,7 +62,7 @@ class goTypeException
         UNKNOWN_TYPE,
         WRONG_TYPE
     };
-    goTypeException (int t = WRONG_TYPE) : code (t) {};
+    goTypeException (int t = WRONG_TYPE) : goException(), code (t) {};
     ~goTypeException () {};
 
     int code;
@@ -72,7 +72,7 @@ class goNullException
 {
 };
 
-class goMathException
+class goMathException : public goException
 {
     public:
         enum
@@ -80,7 +80,7 @@ class goMathException
             SIZE_MISMATCH,
             OTHER
         };
-        goMathException (int t = OTHER) : code (t) {};
+        goMathException (int t = OTHER) : goException(), code (t) {};
         ~goMathException () {};
 
         int code;

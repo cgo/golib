@@ -872,16 +872,16 @@ bool goSparseMatrix::matrixMatrixMult (goSparseMatrix& ret, goSparseMatrix& m)
    // printf("\n");
     
     
-    goIndex_t thisSize = this->getElementCount();
-    goIndex_t otherSize = m.getElementCount();
+    // goIndex_t thisSize = this->getElementCount();
+    // goIndex_t otherSize = m.getElementCount();
     goIndexPair indexPair;
     //= For each non-zero column in matrix m
     goIndex_t j = 0;
     goIndex_t i = 0;
-    goIndex_t j2 = 0;
-    goIndex_t i2 = 0;
-    goIndex_t currentRow = this->row(i);
-    goIndex_t currentCol = m.column(j);
+    // goIndex_t j2 = 0;
+    // goIndex_t i2 = 0;
+    // goIndex_t currentRow = this->row(i);
+    // goIndex_t currentCol = m.column(j);
     goDouble  value      = 0.0;
     goArray<goIndex_t>* thisCols   = &this->getColIndex();
     goArray<goIndex_t>* otherRows  = &m.getRowIndex();
@@ -968,21 +968,21 @@ bool goSparseMatrix::matrixMatrixAdd (goSparseMatrix& ret, goSparseMatrix& m)
    // printf("\n");
     
     
-    goIndex_t thisSize = this->getElementCount();
-    goIndex_t otherSize = m.getElementCount();
+    //goIndex_t thisSize = this->getElementCount();
+    //goIndex_t otherSize = m.getElementCount();
     //= For each non-zero column in matrix m
     goIndex_t j = 0;
     goIndex_t i = 0;
-    goDouble  value = 0.0;
-    goArray<goIndex_t>* thisCols   = &this->getColIndex();
-    goArray<goIndex_t>* otherRows  = &m.getRowIndex();
-    goArray<goDouble>* thisValues  = &this->getValues();
-    goArray<goDouble>* otherValues = &m.getValues();
+    //goDouble  value = 0.0;
+    //goArray<goIndex_t>* thisCols   = &this->getColIndex();
+    //goArray<goIndex_t>* otherRows  = &m.getRowIndex();
+    //goArray<goDouble>* thisValues  = &this->getValues();
+    //goArray<goDouble>* otherValues = &m.getValues();
 
-    const goArray<goIndex_t>* rowStart = &this->getRowStart();
-    const goArray<goIndex_t>* otherRowStart = &m.getRowStart();
-    goIndex_t rowCount = rowStart->getSize() - 1;
-    goIndex_t otherRowCount = otherRowStart->getSize() - 1;
+    //const goArray<goIndex_t>* rowStart = &this->getRowStart();
+    //const goArray<goIndex_t>* otherRowStart = &m.getRowStart();
+    //goIndex_t rowCount = rowStart->getSize() - 1;
+    //goIndex_t otherRowCount = otherRowStart->getSize() - 1;
     i = 0;
     j = 0;
     goIndex_t thisElemCount = this->getElementCount();
@@ -1101,21 +1101,21 @@ bool goSparseMatrix::matrixMatrixSubtract (goSparseMatrix& ret, goSparseMatrix& 
    // printf("\n");
     
     
-    goIndex_t thisSize = this->getElementCount();
-    goIndex_t otherSize = m.getElementCount();
+    //goIndex_t thisSize = this->getElementCount();
+    //goIndex_t otherSize = m.getElementCount();
     //= For each non-zero column in matrix m
     goIndex_t j = 0;
     goIndex_t i = 0;
-    goDouble  value = 0.0;
-    goArray<goIndex_t>* thisCols   = &this->getColIndex();
-    goArray<goIndex_t>* otherRows  = &m.getRowIndex();
-    goArray<goDouble>* thisValues  = &this->getValues();
-    goArray<goDouble>* otherValues = &m.getValues();
+    //goDouble  value = 0.0;
+    //goArray<goIndex_t>* thisCols   = &this->getColIndex();
+    //goArray<goIndex_t>* otherRows  = &m.getRowIndex();
+    //goArray<goDouble>* thisValues  = &this->getValues();
+    //goArray<goDouble>* otherValues = &m.getValues();
 
-    const goArray<goIndex_t>* rowStart = &this->getRowStart();
-    const goArray<goIndex_t>* otherRowStart = &m.getRowStart();
-    goIndex_t rowCount = rowStart->getSize() - 1;
-    goIndex_t otherRowCount = otherRowStart->getSize() - 1;
+    //const goArray<goIndex_t>* rowStart = &this->getRowStart();
+    //const goArray<goIndex_t>* otherRowStart = &m.getRowStart();
+    //goIndex_t rowCount = rowStart->getSize() - 1;
+    //goIndex_t otherRowCount = otherRowStart->getSize() - 1;
     i = 0;
     j = 0;
     goIndex_t thisElemCount = this->getElementCount();

@@ -39,6 +39,45 @@ goFilter1D::goFilter1D ()
     myPrivate = new goFilter1DPrivate;
 }
 
+/** 
+ * @brief Constructor, setting the mask and center.
+ * 
+ * @param mask       Array with mask values.
+ * @param center     Center of the mask.
+ * @param normalize  If true, the mask is normalized to one.
+ */
+goFilter1D::goFilter1D (const goArray<goFloat>& mask, goIndex_t center, bool normalize)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    myPrivate = new goFilter1DPrivate;
+    assert(myPrivate);
+    this->setMask(mask);
+    this->setCenter(center);
+    if (normalize)
+        this->normalize();
+}
+
+/** 
+ * @brief Constructor, setting the mask and center.
+ * 
+ * @param mask       Pointer to mask values.
+ * @param length     Length of the mask.
+ * @param center     Center of the mask.
+ * @param normalize  If true, the mask is normalized to one.
+ */
+goFilter1D::goFilter1D (const goFloat* mask, goIndex_t length, goIndex_t center, bool normalize)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    myPrivate = new goFilter1DPrivate;
+    assert(myPrivate);
+    this->setMask(mask, length);
+    this->setCenter(center);
+    if (normalize)
+        this->normalize();
+}
+
 goFilter1D::~goFilter1D ()
 {
     if (myPrivate)
@@ -61,6 +100,27 @@ goFilter1D::~goFilter1D ()
 bool goFilter1D::setMask (const goArray<goFloat>& m)
 {
     myPrivate->mask = m;
+    return true;
+}
+
+/** 
+ * @brief Set filter mask.
+ * 
+ * Sets the filter mask. Note that you need to set the filter centre with setCenter().
+ * 
+ * @param mask    Pointer to the mask data. Must not be null.
+ * @param length  Length of the mask. Must be larger than zero.
+ * 
+ * @return  True if successful, false otherwise.
+ * */
+bool goFilter1D::setMask (const goFloat* mask, goIndex_t length)
+{
+    if (!mask || length <= 0)
+        return false;
+    assert (length > 0);
+    assert (mask);
+    myPrivate->mask.resize(length);
+    memcpy(myPrivate->mask.getPtr(), mask, length * sizeof(goFloat));
     return true;
 }
 
@@ -143,6 +203,15 @@ inline void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_
  **/
 bool goFilter1D::filter (goSignal3DBase<void>& sig)
 {
+    if (sig.getBorderX() < myPrivate->mask.getSize())
+    {
+        goString msg = "filter(): signal ";
+        msg += sig.getObjectName();
+        msg += " has insufficient border size in X direction. Not filtering.";
+        
+        goLog::warning(msg,this);
+        return false;
+    }
     switch (sig.getDataType().getID())
     {
         case GO_INT8:   _filter<goInt8>   (sig, myPrivate->mask, myPrivate->center); break;
