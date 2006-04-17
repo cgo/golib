@@ -655,7 +655,7 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
     {
         retValue.make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
                        x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
-                       4, 4, 4);
+                       1, 1, 1);
     }
     goSignal3DGenericConstIterator itX (&x);
     goSignal3DGenericIterator itResult (&retValue);
