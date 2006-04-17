@@ -34,8 +34,10 @@ goSignal3DBase<T>::goSignal3DBase ()
     myBlockSize   (1, 1, 1),
     myDataType    (GO_UINT8),
     myChannelCount (1),
-    myChannel     (0)
+    myChannel     (0),
+    myBorderFlags (3)
 {
+    myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
 }
@@ -70,8 +72,10 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myBlockSize  (1, 1, 1),
     myDataType   (GO_UINT8),
     myChannelCount (1),
-    myChannel     (0)
+    myChannel     (0),
+    myBorderFlags (3)
 {
+    myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
     *this = other;
@@ -341,13 +345,87 @@ goSignal3DBase<T>::initialize (T*       dataptr,
     }
 
     // Periodize signal over the border
-    this->periodize();
+    // this->periodicBorders();
+    this->applyBorderFlags();
     return true;
 }
 
 template <class T>
 void
-goSignal3DBase<T>::periodize (int axes)
+goSignal3DBase<T>::constantBorders (int axes)
+{
+    goIndex_t j;
+    goIndex_t i;
+   
+    if (axes & GO_X)
+    {
+        goLog::message ("constantBorders() to X",this);
+        goIndex_t sz = static_cast<goIndex_t>(this->getSizeX());
+        goIndex_t border = this->getBorderX();
+        this->xDiff[sz - 1] = 0;
+        for (i = -border; i < 0; ++i)
+        {
+            xDiff[i]   = 0;
+            myXJump[i] = myXJump[0];
+        }
+
+        j = 0;
+        goIndex_t sz_border = sz + border;
+        for (i = sz; i < sz_border; ++i)
+        {
+            xDiff[i] = 0;
+            myXJump[i] = myXJump[sz-1];
+        }
+//        if (border > 0)
+//        {
+//            xDiff[-1] = myXJump[0] - myXJump[-1];
+//        }
+    }
+    if (axes & GO_Y)
+    {
+        goLog::message ("constantBorders() to Y",this);
+        goIndex_t sz = static_cast<goIndex_t>(this->getSizeY());
+        goIndex_t border = this->getBorderY();
+        this->yDiff[sz - 1] = 0;
+        for (i = -border; i < 0; ++i)
+        {
+            yDiff[i]   = 0;
+            myYJump[i] = myYJump[0];
+        }
+
+        j = 0;
+        goIndex_t sz_border = sz + border;
+        for (i = sz; i < sz_border; ++i)
+        {
+            yDiff[i] = 0;
+            myYJump[i] = myYJump[sz-1];
+        }
+    }
+    if (axes & GO_Z)
+    {
+        goLog::message ("constantBorders() to Z",this);
+        goIndex_t sz = static_cast<goIndex_t>(this->getSizeZ());
+        goIndex_t border = this->getBorderZ();
+        this->zDiff[sz - 1] = 0;
+        for (i = -border; i < 0; ++i)
+        {
+            zDiff[i]   = 0;
+            myZJump[i] = myZJump[0];
+        }
+
+        j = 0;
+        goIndex_t sz_border = sz + border;
+        for (i = sz; i < sz_border; ++i)
+        {
+            zDiff[i] = 0;
+            myZJump[i] = myZJump[sz-1];
+        }
+    }
+}
+
+template <class T>
+void
+goSignal3DBase<T>::periodicBorders (int axes)
 {
     // Periodize signal over the border
 
@@ -559,7 +637,8 @@ goSignal3DBase<void>::initialize (void*    dataptr,
 
 
     // Periodize signal over the border
-    this->periodize();
+    // this->periodicBorders();
+    this->applyBorderFlags();
     return true;
 
 #if 0
@@ -732,7 +811,7 @@ goSignal3DBase<T>::operator== (goSignal3DBase<T> &other) {
 template<> bool
 goSignal3DBase<void>::operator== (goSignal3DBase<void> &other) 
 {
-    goError::print(getClassName(), "operator== not implemented for void.");
+    goLog::warning("goSignal3DBase<void>: operator== not implemented for void.");
     return false;
 }
 
@@ -991,6 +1070,61 @@ void goSignal3DBase<T>::shiftRightSize (int n, int axes)
     goLog::warning ("goSignal3DBase<T>::shift*() methods are not defined.");
 }
 
+/** 
+* @brief Sets the border behaviour.
+*
+* Changes are only valid when done before the signal is created using make(). <br>
+* Not all axes need to have the same behaviour. If you mix behaviours, be aware
+* that the values in the "corners" of the data set may not be what you expect.
+* Currently they are just the values imposed by the last application of 
+* internal periodisation/constantisation functions. I.e. the last behaviour,
+* probably of the z-axis, is mimicked.
+* 
+* @todo If border strategies are mixed, make the corners do something defined.
+* 
+* @param axes Axes to apply borderFlag to. One or more of {GO_X,GO_Y,GO_Z} or'ed together.
+*    Default is all axes.
+* @param borderFlag Flag to apply to the borders. One of {GO_PERIODIC_BORDER,GO_CONSTANT_BORDER}.
+*    Default is periodic for all axes.
+*/
+template <class T>
+void goSignal3DBase<T>::setBorderFlags (int axes, int borderFlag)
+{
+    if (borderFlag != GO_PERIODIC_BORDER &&
+        borderFlag != GO_CONSTANT_BORDER)
+    {
+        goLog::warning("setBorders(): unknown borderFlag value.",this);
+        return;
+    }
+    if (axes & GO_X)
+    {
+        this->myBorderFlags[0] = borderFlag;
+    }
+    if (axes & GO_Y)
+    {
+        this->myBorderFlags[1] = borderFlag;
+    }
+    if (axes & GO_Z)
+    {
+        this->myBorderFlags[2] = borderFlag;
+    }
+}
+
+template <class T>
+void goSignal3DBase<T>::applyBorderFlags ()
+{
+    static const int axesEnums[3] = {GO_X,GO_Y,GO_Z};
+    goIndex_t i;
+    for (i = 0; i < 3; ++i)
+    {
+        switch (this->myBorderFlags[i])
+        {
+            case GO_PERIODIC_BORDER: this->periodicBorders(axesEnums[i]); break;
+            case GO_CONSTANT_BORDER: this->constantBorders(axesEnums[i]); break;
+            default: goLog::warning("applyBorderFlags(): unknown borderFlag value.",this); break;
+        }
+    }
+}
 
 /*!
  * \brief Sets data type for <void> type signals.

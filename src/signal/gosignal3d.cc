@@ -285,9 +285,9 @@ goSignal3D<T>::fill (const T* element)
 }
 
 template<> void
-goSignal3D<void>::fill (const void*)
+goSignal3D<void>::fill (const void* p)
 {
-    goError::print (getClassName(), "fill() not implemented for void.");
+    goSignal3DBase<void>::fill(p);
 }
 
 /*!

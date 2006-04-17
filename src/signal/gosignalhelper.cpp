@@ -444,12 +444,12 @@ bool goCopySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* target
         return false;                                           
     }
 
-    goString msg = "goCopySignal(): Copying ";
-    msg += sig->getObjectName().toCharPtr();
-    msg += " ("; msg += sig->getDataType().getString().toCharPtr();
-    msg += ") to "; msg += targetSig->getObjectName().toCharPtr();
-    msg += " ("; msg += targetSig->getDataType().getString().toCharPtr(); msg += ")";
-    goLog::message (msg.toCharPtr());
+//    goString msg = "goCopySignal(): Copying ";
+//    msg += sig->getObjectName().toCharPtr();
+//    msg += " ("; msg += sig->getDataType().getString().toCharPtr();
+//    msg += ") to "; msg += targetSig->getObjectName().toCharPtr();
+//    msg += " ("; msg += targetSig->getDataType().getString().toCharPtr(); msg += ")";
+//    goLog::message (msg.toCharPtr());
     
     switch (sig->getDataType().getID())
     {
