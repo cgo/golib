@@ -62,6 +62,17 @@ namespace goPlot
                       goString* cmdFileNameRet = 0, 
                       goString* dataFileNameRet = 0, 
                       bool waitfor = false);
+
+    template <class arrayT, class arrayT2>
+        bool gnuplot (const arrayT& array,
+                      const arrayT2& array2,
+                      const char* title = 0, 
+                      const char* gnuplotCommands = 0,
+                      const char* prefixCommands = 0,
+                      const char* shellPostfix = 0,
+                      goString* cmdFileNameRet = 0, 
+                      goString* dataFileNameRet = 0, 
+                      bool waitfor = false);
 #if 0
         static bool gnuplot (const goArray<goFloat>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
         static bool gnuplot (const goArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);

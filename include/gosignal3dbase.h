@@ -27,6 +27,9 @@
 #ifndef GODEFS_H
 # include <godefs.h>
 #endif
+#ifndef GOFIXEDARRAY_H
+# include <gofixedarray.h>
+#endif
 
 /*!
  * @addtogroup signal
@@ -111,8 +114,11 @@ goSignal3DBase : public goObjectBase
             assert (channel < myChannelCount);
             return myChannelOffset[channel];
         };
+
+        virtual void setBorderFlags (int axes = GO_X|GO_Y|GO_Z, int borderFlag = GO_PERIODIC_BORDER);
         
-        // Works only for <void> instantiation.
+        // Works only for <void> instantiation. You should always use void where
+        // there is no good reason to use another type. Void rules.
         bool setDataType (goTypeEnum t);
 
               T* getPtr ();
@@ -186,7 +192,7 @@ goSignal3DBase : public goObjectBase
 
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;
-        void	fill (const T* value);
+        virtual void fill (const T* value);
 
         /// Copies the last valid values from the block data into the borders
         // void  interpolateBorders ();
@@ -223,7 +229,9 @@ goSignal3DBase : public goObjectBase
         
     protected:
         void setBorder (goSize_t x, goSize_t y, goSize_t z);
-        void periodize (int axes = GO_X|GO_Y|GO_Z);
+        void constantBorders (int axes = GO_X|GO_Y|GO_Z);
+        void periodicBorders (int axes = GO_X|GO_Y|GO_Z);
+        void applyBorderFlags ();
         
     protected:
         /* pointer to the first value */
@@ -254,6 +262,8 @@ goSignal3DBase : public goObjectBase
         goType       myDataType;
         goSize_t     myChannelCount;
         goSize_t     myChannel;
+
+        goFixedArray<int> myBorderFlags;
 };
 
 #define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \

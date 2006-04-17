@@ -1,5 +1,5 @@
-#ifndef GOMATRIX_HPP
-#define GOMATRIX_HPP
+#ifndef GOMATRIX_I
+#define GOMATRIX_I
 
 #ifndef GOMATH_H
 # include <gomath.h>
@@ -13,6 +13,7 @@ goMatrix<T>::initializeRows ()
     if (this->rows)
     {
         delete[] this->rows;
+        this->rows = NULL;
     }
     if (this->rowVectors)
     {
@@ -112,7 +113,7 @@ goMatrix<T>::goMatrix(const goMatrix<T>& other)
     assert (other.matrix != NULL);
     if (this->linearStorage)
     {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, other.getColumns(), other.getRows(), 1, 0, 0, 0, 1);
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, 1, 1, 1, 0, 0, 0, 1);
     }
     else
     {
@@ -450,7 +451,7 @@ bool goMatrix<T>::setData (goSignal3DBase<T>* data)
     }
     this->matrix = data;
     this->externalData = true;
-    if (data->getBlockSizeX() == data->getSizeX() && data->getBlockSizeY() == data->getSizeY())
+    if (data->getBlockSizeX() == 1 && data->getBlockSizeY() == 1 && data->getBlockSizeZ() == 1)
     {
         this->linearStorage = true;
     }

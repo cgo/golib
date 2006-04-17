@@ -12,11 +12,19 @@ enum {
 };
 
 /** 
-* Axes definitions
+* Axes or coordinate definitions
 */
 enum {
     GO_X = 1,
     GO_Y = 2,
     GO_Z = 4
+};
+
+/**
+ * Border definitions
+ */
+enum {
+    GO_PERIODIC_BORDER = 1,
+    GO_CONSTANT_BORDER = 2
 };
 #endif

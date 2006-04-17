@@ -56,7 +56,7 @@ goSignal3D : public goSignal3DBase<T>
         virtual void destroy (); 
         void fillByte (goInt8 b);
 
-        void fill (const T* element);
+        virtual void fill (const T* element);
 };
 /** @} */
 

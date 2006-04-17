@@ -62,7 +62,8 @@ goFilter3D : public goObjectBase
         const goFilter3D& operator= (const goFilter3D<T_IN, T_OUT>& other);
 
         bool                      setMask (const goSignal3DBase<void>& mask,
-                                           bool normalize = true);
+                                           bool normalize = true, goDouble factor = 0.0);
+        bool                      setMask (const goFloat* mask, goIndex_t sizeX, goIndex_t sizeY, goIndex_t sizeZ, bool normalize = true, goDouble factor = 0.0);
         void                      setMaskCenter (goIndex_t x,
                                                  goIndex_t y,
                                                  goIndex_t z);

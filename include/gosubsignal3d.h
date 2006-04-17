@@ -35,6 +35,8 @@ goSubSignal3D : public goSignal3DBase<T>
                        goSize_t           sizeZ);
         virtual ~goSubSignal3D();
 
+        virtual void setBorderFlags (int axes = GO_X|GO_Y|GO_Z, int borderFlag = GO_PERIODIC_BORDER);
+
         void               setParent (goSignal3DBase<T>* p);
         goSignal3DBase<T>* getParent ();
         /*!

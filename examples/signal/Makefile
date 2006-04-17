@@ -11,9 +11,9 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
 
 TARGET		= signal3d
 

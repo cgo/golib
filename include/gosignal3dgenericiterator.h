@@ -94,8 +94,8 @@ class goSignal3DGenericIterator
             dy = sig->getYDiff() + y;
             dz = sig->getZDiff() + z;
             px = (goByte*)sig->getPtr(x,y,z);
-            py = (goByte*)sig->getPtr(x,y,z);
-            pz = (goByte*)sig->getPtr(x,y,z);
+            py = px; // (goByte*)sig->getPtr(x,y,z);
+            pz = px; // (goByte*)sig->getPtr(x,y,z);
         }
         
         /**
@@ -195,6 +195,12 @@ class goSignal3DGenericIterator
         inline goByte*  rightX      () { return px + *dx; }
         inline goByte*  rightY      () { return px + *dy; }
         inline goByte*  rightZ      () { return px + *dz; }
+        
+        inline goByte* leftUp    () { return px - *(dx-1) - *(dy-1); }  //= Works because dy at left is the same as at px.
+        inline goByte* leftDown  () { return px - *(dx-1) + *dy; }  
+        inline goByte* rightUp   () { return px + *dx - *(dy-1); }  
+        inline goByte* rightDown () { return px + *dx + *dy; }  
+        
         inline const goByte* operator*   ()  const { return px; };
        
         goSignal3DBase<void>* sig;
@@ -327,6 +333,10 @@ class goSignal3DGenericConstIterator
         inline const goByte*  rightX   () const { return px + *dx; }
         inline const goByte*  rightY   () const { return px + *dy; }
         inline const goByte*  rightZ   () const { return px + *dz; }
+        inline const goByte* leftUp    () const { return px - *(dx-1) - *(dy-1); }  //= Works because dy at left is the same as at px.
+        inline const goByte* leftDown  () const { return px - *(dx-1) + *dy; }  
+        inline const goByte* rightUp   () const { return px + *dx - *(dy-1); }  
+        inline const goByte* rightDown () const { return px + *dx + *dy; }  
         inline const goByte* operator* () const { return px; };
        
         const goSignal3DBase<void>* sig;

@@ -1,11 +1,13 @@
 #ifndef GOMATRIX_H
 #define GOMATRIX_H
 
+
 #include <gotypes.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
 #include <gosubsignal3d.h>
 #include <gosignalmacros.h>
+#include <gomatrix.h>
 #include <goerror.h>
 #ifndef GOROWVECTOR_H
 # include <gorowvector.h>
@@ -22,10 +24,13 @@
  * To enable the [][] indexing, a helper template class for
  * row vectors, goRowVector, was introduced.
  *
+ * If you need to instantiate the template for a new type,
+ * include gomatrix.hpp
+ *
  * \author Christian Gosch
  */
 template <class T>
-class goMatrix
+class goMatrix 
 {
  public:
   /*!
@@ -36,17 +41,15 @@ class goMatrix
    *        linear. True is the default.
    */
   goMatrix (goSize_t y = 4, goSize_t x = 4, bool linear = true);
-  goMatrix (const goMatrixSignal<T>& other);
+  goMatrix (const goMatrix<T>& other);
   virtual ~goMatrix ();
   
   virtual bool             setData   (goSignal3DBase<T>* data);
   virtual bool             resize    (goSize_t rows, goSize_t columns);
   virtual void             transpose ();
-  virtual goMatrixSignal<T>&     operator= (const goMatrixSignal<T>& other);
+  virtual goMatrix<T>&     operator= (const goMatrix<T>& other);
   goSignal3DBase<T>*       getData   () { return matrix; };
   const goSignal3DBase<T>* getData   () const { return matrix; };
-  T*                       getPtr    () { return matrix->getPtr(); }
-  const T*                 getPtr    () const { return matrix->getPtr(); }
   bool                     isLinear  () const { return this->linearStorage; }
   
  protected:
@@ -60,7 +63,7 @@ class goMatrix
   // TNT compatibility methods BEGIN
   inline int        dim1 () const;
   inline int        dim2 () const;
-  inline const goMatrixSignal<T>& copy () const;  // NOTE: Makes a deep copy here
+  inline const goMatrix<T>& copy () const;  // NOTE: Makes a deep copy here
                                             // and a reference in TNT
   // TNT compatibility methods END  
   
@@ -78,14 +81,14 @@ class goMatrix
   const T&          operator() (goIndex_t i, goIndex_t j) const;
   goRowVector<T>&       operator[] (goSize_t y);
   const goRowVector<T>& operator[] (goSize_t y) const;
-  goMatrixSignal<T>		operator*  (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>		operator-  (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>		operator+  (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>&		operator*= (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>&		operator+= (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>&		operator-= (const goMatrixSignal<T>& other);
-  goMatrixSignal<T>&		operator*= (T scalar);
-  goMatrixSignal<T>&		operator/= (T scalar);
+  goMatrix<T>		operator*  (const goMatrix<T>& other);
+  goMatrix<T>		operator-  (const goMatrix<T>& other);
+  goMatrix<T>		operator+  (const goMatrix<T>& other);
+  goMatrix<T>&		operator*= (const goMatrix<T>& other);
+  goMatrix<T>&		operator+= (const goMatrix<T>& other);
+  goMatrix<T>&		operator-= (const goMatrix<T>& other);
+  goMatrix<T>&		operator*= (T scalar);
+  goMatrix<T>&		operator/= (T scalar);
 
   /// Loads identity
   void unity();
@@ -102,9 +105,9 @@ class goMatrix
   goRowVector<T>*    rowVectors;
 };
 
-typedef goMatrixSignal<goDouble> goMatrixSignald;
-typedef goMatrixSignal<goFloat>  goMatrixSignalf;
+typedef goMatrix<goDouble> goMatrixd;
+typedef goMatrix<goFloat>  goMatrixf;
 /** @} */
 
 
-#endif 
+#endif /* __GOMATRIX_H */

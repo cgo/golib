@@ -4,6 +4,8 @@
 #include <gotypes.h>
 #include <iostream>
 #include <gosignalmacros.h>
+#include <gosignal3dgenericiterator.h>
+#include <gofilter3d.h>
 
 void printSignal (goSignal3DBase<void>& signal)
 {
@@ -132,6 +134,72 @@ int main (void)
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
         // object1.disconnectObject (&object2);
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+    }
+
+    {
+        goSignal3D<void> signal;
+        signal.setDataType (GO_INT32);
+        signal.setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
+        signal.make (16, 16, 16, 4, 4, 4, 16, 16, 16);
+        signal.fillByte (0);
+        printf ("Just the signal: \n");
+        
+        goIndex_t x, y;
+
+        goInt32 counter = 0;
+        
+        for (y = 0; y < signal.getSizeY(); ++y)
+        {
+            for (x = 0; x < signal.getSizeX(); ++x)
+            {
+                *(goInt32*)signal.getPtr (x, y, 0) = counter;
+                *(goInt32*)signal.getPtr (x, y, 1) = 200 + counter++;
+                printf ("%d ",*(goInt32*)signal.getPtr(x,y,0));
+            }
+            printf ("\n");
+        }
+
+        printf ("\nWith border 3: \n");
+        for (y = -3; y < (goIndex_t)signal.getSizeY()+3; ++y)
+        {
+            for (x = -3; x < (goIndex_t)signal.getSizeX()+3; ++x)
+            {
+                printf ("%d ", *(goInt32*)signal.getPtr (x, y, 0));
+            }
+            printf ("\n");
+        }
+
+        goSignal3DGenericIterator it (&signal);
+        it.setPosition (0,4,0);
+        printf ("Position 0,4: \n");
+        printf ("leftUp == %d\n",*(goInt32*)it.leftUp());
+        printf ("leftDown == %d\n",*(goInt32*)it.leftDown());
+        printf ("rightUp == %d\n",*(goInt32*)it.rightUp());
+        printf ("rightDown == %d\n",*(goInt32*)it.rightDown());
+       
+        goFilter3D<void,void> filter;
+        const goFloat mask [] = {1.0f, 1.0f, 1.0f,\
+                            1.0f, 1.0f, 1.0f,\
+                            1.0f, 1.0f, 1.0f};
+        filter.setMask (mask, 3, 3, 1, true);
+        filter.setMaskCenter (1,1,0);
+        goSignal3D<void> signal2;
+        signal2.setDataType (GO_FLOAT);
+        signal2.make (&signal);
+        filter.filter (signal, signal2);
+
+        //= Filtered:
+        printf ("Filtered: \n");
+        for (y = 0; y < signal2.getSizeY(); ++y)
+        {
+            for (x = 0; x < signal2.getSizeX(); ++x)
+            {
+                printf ("%d ",(goInt32)*(goFloat*)signal2.getPtr(x,y,0));
+            }
+            printf ("\n");
+        }
+        
+        return 1;
     }
     
     goSignal3D<goInt32> signal (16, 16, 16, 4, 4, 4, 16, 16, 16);

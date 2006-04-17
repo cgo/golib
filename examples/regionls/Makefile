@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -O 
 
 LD		= g++
 LDARGS		=  
 
-LIBS		=  -L$(GOPATH)/lib -lGo
+LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
 
-TARGET		= filter3d
+TARGET		= regionls
 
 %.o: %.cxx
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<

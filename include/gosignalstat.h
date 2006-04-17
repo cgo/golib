@@ -6,6 +6,7 @@
 
 /*!
  * Signal statistics.
+ * DEPRECATED, use functions in gosignalhelper.h.
  * Currently supported signal types:
  * - goSignal3D, scalar type elements
  * @author Christian Gosch
