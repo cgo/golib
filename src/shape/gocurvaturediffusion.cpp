@@ -135,7 +135,7 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
         return false;
     }
 
-    if (f_normal_ret.getSize() != points.getSize())
+    if (f_normal_ret.getSize() != static_cast<goSize_t>(points.getSize()))
     {
         f_normal_ret.setSize (points.getSize());
     }
@@ -163,7 +163,7 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
         //= Calculate e, r, and phi
         {
             pointT p = el->next->elem - el->prev->elem;
-            r[i]     = p.abs();
+            r[i]     = p.abs() * 0.5;
             e[i]     = metricParameter(el->prev->elem, el->elem, el->next->elem);
             phi[i]   = getTurn(el->prev->elem, el->elem, el->next->elem);
         }
@@ -195,20 +195,22 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
         k_star[i] = enumerator / denominator;
 
         //= Calculate the normal force vectors
-        f_normal_ret[i]   = (el->next->elem - el->prev->elem) / (2*r[i]);
+        assert (r[i] != 0.0);
+        // f_normal_ret[i]   = (el->next->elem - el->prev->elem) / (2.0*r[i]); //= Numerically bad for small r[i]?
+        f_normal_ret[i]   = (el->next->elem - el->prev->elem); 
         goDouble temp     = -f_normal_ret[i].y;
         f_normal_ret[i].y = f_normal_ret[i].x;
         f_normal_ret[i].x = temp;
         {
-            goDouble temp = sqrt(f_normal_ret[i].x * f_normal_ret[i].x + f_normal_ret[i].y + f_normal_ret[i].y);
+            goDouble temp = sqrt(f_normal_ret[i].x * f_normal_ret[i].x + f_normal_ret[i].y * f_normal_ret[i].y);
             if (temp == 0.0)
             {
                 goLog::warning("goCurvatureDiffusionFlow(): |normal| == 0.0\n");
             }
             else
             {
-                f_normal_ret[i].x *= temp;
-                f_normal_ret[i].y *= temp;
+                f_normal_ret[i].x /= temp;
+                f_normal_ret[i].y /= temp;
             }
         }
         goDouble phi_star = 0.0;
@@ -216,14 +218,18 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
         {
             phi_star = asin(k_star[i] * r[i]);
         }
-        if (phi_star == 0.0)
-        {
-            phi_star = 1e-5;
-        }
-        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi_star,0.5,vertexNormalComponent(r[i],phi_star,0.5));
-        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi[i],e[i],vertexNormalComponent(r[i],phi[i],e[i]));
-        f_normal_ret[i]  *= vertexNormalComponent(r[i],phi_star,0.5) -
-            vertexNormalComponent(r[i],phi[i],e[i]);
+//        if (phi_star == 0.0)
+//        {
+//            phi_star = 1e-5;
+//        }
+//        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi_star,0.5,vertexNormalComponent(r[i],phi_star,0.5));
+//        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi[i],e[i],vertexNormalComponent(r[i],phi[i],e[i]));
+        
+        goDouble vnc_star = goMath::min<goDouble>(vertexNormalComponent(r[i],phi_star,0.5),2.0);
+        goDouble vnc      = goMath::min<goDouble>(vertexNormalComponent(r[i],phi[i],e[i]),2.0);
+        f_normal_ret[i] *= vnc_star - vnc;
+        //f_normal_ret[i]  *= vertexNormalComponent(r[i],phi_star,0.5) -
+        //    vertexNormalComponent(r[i],phi[i],e[i]);
 
         L_star_abs[i] = vertexNormalComponent(r[i],phi_star,0.5);
         L_abs[i] = vertexNormalComponent(r[i],phi[i],e[i]);
@@ -269,33 +275,15 @@ static goDouble kappa (const pointT& p1, const pointT& p2, const pointT& p3)
 template <class REAL>
 static REAL vertexNormalComponent (REAL r, REAL phi, REAL e)
 {
+    if (phi == 0.0)
+    {
+        return 0.0;
+    }
     REAL mu      = REAL(1.0f);
     REAL abs_phi = fabs(phi);
-    if (abs_phi > M_PI*0.5)
+    //= This sign seems to be flipped in the paper.
+    if (abs_phi < M_PI*0.5)
         mu = REAL(-1.0f);
-
-//    return phi;
-    
-    //= If |phi| is 'close' to 0, assume the distance to be linear in phi.
-//    if (abs_phi < 0.25f)
-//    {
-//        return -phi;
-//    }
-    //= Close to +/- pi/2, use a series expansion (from Mathematica Series[]).
-#if 0
-    if (fabs(abs_phi - M_PI*0.5) < M_PI*0.25)
-    {
-        REAL e_root   = sqrt(4*e-4*e*e);
-        REAL phi_pi_2 = REAL(0.0f); 
-        if (phi > 0.0f)
-            phi_pi_2 = phi - M_PI*0.5;
-        else
-            phi_pi_2 = phi + M_PI*0.5;
-        return -e_root * mu * r - r * phi_pi_2 + 
-            (-1.0/3.0 * e_root * mu - (1 - 8*e/3.0 + 8*e*e/3.0)*mu / (2*e_root)) *
-            r * phi_pi_2 * phi_pi_2;
-    }
-#endif
     goDouble tan_phi = tan(phi);
     return r / tan_phi * (1 + mu * sqrt(1 + 4*e*(1-e)*tan_phi*tan_phi));
 }
@@ -305,6 +293,7 @@ static goDouble metricParameter (pointT p1, pointT p2, pointT p3)
 {
     pointT D = p3 - p1;
     goDouble r2 = D.abs();
+    assert(D.abs() != 0.0);
     D *= 1.0 / D.abs();
     return 1-((p2-p1)*D)/r2;
     // goDouble F = (p2-p1) * D;
@@ -319,7 +308,8 @@ static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
     if (f == 0.0)
     {
         assert ("p3 == p1" == 0);
-        return 0.0;  //= This should not happen. It would mean p3 == p1.
+        goLog::warning("getTurn(): Degenerate, returning M_PI.");
+        return M_PI;  //= This should not happen. It would mean p3 == p1.
     }
     base *= 1.0 / f;
     pointT s1 = p2 - p1;
@@ -328,7 +318,9 @@ static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
     goDouble l2 = s2.abs();
     if (l1 == 0.0 || l2 == 0.0)
     {
-        return 0.0;
+        goLog::warning("getTurn(): Degenerate, returning 0.");
+        //= Can't determine a sign. This would be a slightly degenerated case.
+        return 0;
     }
     assert (l1 != 0.0 && l2 != 0.0);
 
