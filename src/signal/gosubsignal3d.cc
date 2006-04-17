@@ -5,7 +5,9 @@
 #include <gotypes.h>
 #include <gomath.h>
 #include <gocomplex.h>
-
+#ifndef GOLOG_H
+# include <golog.h>
+#endif
 #include <goconfig.h>
 #include <assert.h>
 
@@ -67,6 +69,12 @@ goSubSignal3D<T>::~goSubSignal3D ()
     }
 }
 
+template <class T>
+void goSubSignal3D<T>::setBorderFlags (int,int)
+{
+    goLog::error("setBorderFlags(): Can't do that for this class. FIXME! ",this);
+}
+
 template< class T >
 void
 goSubSignal3D<T>::setPosition (goIndex_t x,
@@ -80,6 +88,14 @@ goSubSignal3D<T>::setPosition (goIndex_t x,
     setPosition (p);
 }
 
+/** 
+ * @brief 
+ * 
+ * @todo Try out if borders are set correctly.
+ * @todo Enable own border flags or borders from parent as option. Should work easily, but try.
+ * 
+ * @param p  Position in the parent signal.
+ */
 template< class T >
 void
 goSubSignal3D<T>::setPosition (goPosition &p) 
@@ -133,6 +149,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         this->xDiff   = parent->getXDiff() + (goPtrdiff_t)p.x;
     }
     else
+        //= Copy diff and jump values from parent and then periodize this sub signal.
     {
         deleteX = true;
         goIndex_t xArraySize = this->getSizeX() + 2*this->getBorderX();
@@ -157,7 +174,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipX;
             parentDiffP = parentDiffP + 1 + skipX;
         }
-        this->periodize (GO_X);
+        this->periodicBorders (GO_X);
     }
     if (skipY == 0)
     {
@@ -189,7 +206,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipY;
             parentDiffP = parentDiffP + 1 + skipY;
         }
-        this->periodize (GO_Y);
+        this->periodicBorders (GO_Y);
     }
     if (skipZ == 0)
     {
@@ -221,7 +238,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipZ;
             parentDiffP = parentDiffP + 1 + skipZ;
         }
-        this->periodize (GO_Z);
+        this->periodicBorders (GO_Z);
     }
 }
 
