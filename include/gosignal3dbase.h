@@ -58,6 +58,12 @@
  *       Add support in gosignalmacros.h and add some of the routines
  *       in gosignal3d and base marked as "not yet implemented".
  *
+ * \todo Add "custom borders" -- 
+ *       - allocate memory for the borders (** here goSignal3dBase has to actually allocate
+ *         memory, but it has to be that way **)
+ *       - fill borders and set jumps and diffs accordingly
+ *       - implement fixed value borders with size-1 custom borders and according jumps and diffs.
+ *
  * \author Christian Gosch
  */
 template <class T>
