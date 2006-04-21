@@ -1,0 +1,3 @@
+Swig needs to be done yet.
+The rest from C++ seems to work.
+./mex contains code for mex-modules to use in matlab.

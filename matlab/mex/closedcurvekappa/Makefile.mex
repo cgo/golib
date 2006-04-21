@@ -1,0 +1,26 @@
+#Makefile automatically created by mkmakefile (C)Christian Gosch
+
+CXX		= mex 
+CXXARGS		=  -DHAVE_MATLAB 
+
+LD		= gcc
+LDARGS		=  -L$(GOPATH)/../lib -L. -lGo 
+
+LIBS		=  
+
+INCLUDE		=  -I$(GOPATH)/include 
+
+TARGET		= 
+
+%.o: %.cxx
+	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
+%.o: %.cpp
+	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
+%.o: %.cc
+	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
+SOURCEDIRS = ./
+SOURCES = closedcurvekappa.cpp
+all: $(SOURCES)
+	$(CXX) $(CXXARGS) $(LDARGS) $(LIBS) $(INCLUDE) $(SOURCES)
+clean:
+	rm -f *~ *.o
