@@ -10,8 +10,6 @@ goString() {
   thisString.resize (1);
   thisString[0] = 0;
   dummyChar = 0;
-  charPtr = (char*) malloc ( (sizeof(char)) * 1);
-  charPtr[0] = 0;
 }
 
 goString::
@@ -19,8 +17,6 @@ goString(const char* n) {
   thisString.resize (1);
   thisString[0] = 0;
   dummyChar = 0;
-  charPtr = (char*) malloc ( (sizeof(char)) * 1);
-  charPtr[0] = 0;
   
   (*this) = n;
 }
@@ -30,8 +26,6 @@ goString(const goString& n) {
     thisString.resize (1);
     thisString[0] = 0;
     dummyChar = 0;
-    charPtr = (char*) malloc ( (sizeof(char)) * 1);
-    charPtr[0] = 0;
     
     (*this) = n;
 }
@@ -65,12 +59,8 @@ goString::operator[](goIndex_t i) const {
 */
 
 goString::
-~goString() {
-  /* Hopefully, we don't need this any longer */
-  // if (charPtr) {
-    // free (charPtr);
-    // cout << "FIX FREE() PROBLEM IN GOSTRING.CC !!!" << endl;
-  // }
+~goString() 
+{
 }
 
 goIndex_t
@@ -414,30 +404,13 @@ goString::toBool () const
 
 
 const char*
-goString::toCharPtr () const {
-  if (!thisString.getPtr()) {
-    return &dummyChar; 
-  }
-  // char c = 0;
-  // thisString += c;
-  return thisString.getPtr();
-  /*
-  goIndex_t i = 0;
-  if (thisString.getSize() > 0) {
-    charPtr = (char*) realloc ((char*) charPtr, (thisString.getSize() + 1) * sizeof(char));
-    for (i = 0; i < thisString.getSize(); i++) {
-      charPtr[i] = (char)thisString[i];
+goString::toCharPtr () const 
+{
+    if (!thisString.getPtr()) 
+    {
+        return &dummyChar; 
     }
-    charPtr[i] = 0;
-    return (const char*) charPtr;
-  } else { 
-    if (charPtr) {
-      charPtr[0] = 0;
-      return charPtr;
-    }
-    return &dummyChar;
-  }
-  */
+    return thisString.getPtr();
 }
 
 goDate&
