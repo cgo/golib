@@ -60,6 +60,7 @@ class goFileIO {
   static bool  readASCII      (FILE* f, goString& target, goSize_t sz);
   static bool  readASCIIMax   (FILE* f, goString& target, goSize_t max);
   static bool  readASCII      (FILE* f, goString& target);
+  static bool  readASCIILine  (FILE* f, goString& target);
   static bool  writeASCII     (const char* filename, const goString& str);
   static bool  writeASCII     (FILE* f, const goString& str);
   static bool  fileExists     (const char* filename);

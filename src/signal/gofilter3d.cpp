@@ -6,7 +6,7 @@
  * assume it is distributable under the GNU General Public License (GPL).
  * $Id$
  * $Log: gofilter3d.cpp,v $
- * Revision 1.1.1.1  2006/04/19 15:26:29  gosch
+ * Revision 1.1.1.1  2006-04-19 15:26:29  gosch
  * golib local cvs
  *
  * Revision 1.1  2002/10/26 15:45:32  christian

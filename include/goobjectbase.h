@@ -20,6 +20,11 @@ class goObjectBasePrivate;
  * It implements class names, class message printing, 
  * and inter-object communication.
  * \author Christian Gosch
+ * \todo Find a replacement for the class name string. Takes too much 
+ *       space and time to allocate for every object!
+ *       Some static solution would be better, or resort to enums.
+ * \todo Do writeObjectFile/readObjectFile as ASCII. Better to port/debug/change.
+ *       Check if libxml is nice enough to use for this.
  * \todo Test object communication
  * \todo Object communication has some problems (deleting objects and 
  *       sending the last 'dying' message)
@@ -55,7 +60,7 @@ goObjectBase
     void connectObject        (goObjectBase*          object);
     void disconnectObject     (const goObjectBase*    object);
 
-    // Generic API for calling methods (reimplement)
+    // Generic API for calling methods (reimplement in derived classes)
  public:
     virtual bool callObjectMethod  (int methodID, goObjectMethodParameters* param = NULL);
     virtual bool queueObjectMethod (int methodID, goObjectMethodParameters* param = NULL, bool blocking = false);

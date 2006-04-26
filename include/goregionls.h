@@ -19,13 +19,13 @@ class goRegionLSPrivate;
 /** @addtogroup levelsets Level set methods
  * @{
  */
-/** --------------------------------------------------------------------------
+/** 
  * @brief Region based level set segmentation (after Chan and Vese).
  *
  * This is an implementation of region based active contours in 2D.
  * Be aware that the PDE involved is solved the explicit way, not implicitly,
  * so there are restrictions on the time step. See e.g. Osher&Fedkiw for details.
- ----------------------------------------------------------------------------*/
+ */
 class goRegionLS : public goObjectBase
 {
     public:
@@ -43,9 +43,6 @@ class goRegionLS : public goObjectBase
         void setDelingette (goDouble d);
         void setLi         (goDouble li);
 
-//        void setHx      (goDouble h);
-//        void setHy      (goDouble h);
-        
         goSignal3DBase<void>* getPhi ();
 
         goDouble getCFLRestriction();
@@ -63,7 +60,7 @@ class goRegionLS : public goObjectBase
         bool velocityFieldTimesGradPhi (const goSignal3DBase<void>& V,
                                         goSignal3DBase<void>& result);
 
-        bool timesDiracPhi (goSignal3DBase<void>&);
+        bool timesDiracPhi (goSignal3DBase<void>& f);
     private:
         goRegionLSPrivate* myPrivate;
 };

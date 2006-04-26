@@ -22,6 +22,8 @@ template class goListElement<goCurvef>;
 template class goListElement<goCurvef*>;
 template class goListElement<go4Vectorf>;
 template class goListElement<goIndexPair>;
+template class goListElement<goFixedArray<goFloat> >;
+template class goListElement<goFixedArray<goDouble> >;
 template class goListElement<goVector<goFloat> >;
 template class goListElement<goVector<goDouble> >;
 
@@ -41,5 +43,7 @@ template class goList<goCurvef>;
 template class goList<goCurvef*>;
 template class goList<go4Vectorf>;
 template class goList<goIndexPair>;
+template class goList<goFixedArray<goFloat> >;
+template class goList<goFixedArray<goDouble> >;
 template class goList<goVector<goFloat> >;
 template class goList<goVector<goDouble> >;

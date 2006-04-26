@@ -762,6 +762,36 @@ goFileIO::readASCIIMax (FILE* f, goString& target, goSize_t max)
     return true;
 }
 
+/** 
+ * @brief Read a line of ascii text.
+ * 
+ * @note The trailing newline is overwritten with a 0 character.
+ * 
+ * @todo Uses a gnu extension function. Replace by something own 
+ * some time (very low priority).
+ * 
+ * @param f FILE pointer.
+ * @param target Target string.
+ * 
+ * @return 
+ */
+bool
+goFileIO::readASCIILine (FILE* f, goString& target)
+{
+    //= This is a gnu extension. Use fgets() on systems without gnu libc.
+    char* lineptr = 0;
+    size_t N = 0;
+    ssize_t numRead = getline (&lineptr, &N, f);
+    if (-1 == numRead)
+    {
+        return false;
+    }
+    lineptr[numRead-1] = 0;
+    target = lineptr;
+    free(lineptr);
+    lineptr = 0;
+    return true;
+}
 
 /**
  * @brief Read until 0 is read or nothing else can be read.

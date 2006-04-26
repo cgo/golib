@@ -39,6 +39,7 @@ class goCurve : public goPointCloud<pointT>
                                    bool                                   closed = false);
         bool     setPoints        (typename goList<pointT>::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed = false);
         bool     resample         (goIndex_t pointCount, goCurve<pointT>& ret);
+        bool     resampleNUBS     (goIndex_t pointCount, goCurve<pointT>& ret);
         bool     getGradNorm      (goArray<goFloat>& diffNorm) const;
         bool     getGrad          (goList<go4Vectorf>& diff) const;
         bool     getCurvNorm      (goArray<goFloat>& curvNorm) const;
@@ -48,8 +49,16 @@ class goCurve : public goPointCloud<pointT>
 
         goDouble euclideanDistance (const goCurve<pointT>& other, bool forward = true) const;
         
-        static bool resample (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);
+        static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);
+        static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
         static bool resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
+        static bool resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
+        
+        static bool readASCII  (FILE* f, goList<pointT>& ret);
+        static bool writeASCII (FILE* f, const goList<pointT>& ret);
+
+        bool readASCII  (FILE* f);
+        bool writeASCII (FILE* f) const;
         
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
 

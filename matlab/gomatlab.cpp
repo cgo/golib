@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gomatlab.cpp,v 1.1.1.1 2006/04/19 15:27:15 gosch Exp $
+ * $Id: gomatlab.cpp,v 1.2 2006-04-25 17:01:53 gosch Exp $
  */
 #include <stdio.h>
 
@@ -178,9 +178,15 @@ bool goMatlab::get2DPoints (goList<goPointf>& l, const char* variableName)
 {
     assert (this->getEngine());
     mxArray* temp = engGetVariable (this->getEngine(), variableName);
-    assert (temp);
     if (!temp)
+    {
+        goString msg = "get2DPoints(): Variable ";
+        msg += variableName;
+        msg += " does not exist.";
+        goLog::warning(msg,this);
         return false;
+    }
+    assert (temp);
     if (mxGetM(temp) != 2)
     {
         mxDestroyArray(temp);
@@ -508,7 +514,7 @@ goMatlab::copyToMatlab (goSignal3DBase<void>* sig, mxArray* m)
 {
     if ((int)sig->getSizeX() != mxGetN(m) || (int)sig->getSizeY() != mxGetM(m))
     {
-        printf ("Signal and matrix are not of the same size\n");
+        goLog::warning("Signal and matrix are not of the same size\n",this);
         return false;
     }
     double* mPtr = mxGetPr (m);
@@ -521,6 +527,16 @@ goMatlab::copyToMatlab (goSignal3DBase<void>* sig, mxArray* m)
     {
         case GO_FLOAT: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goFloat*)__ptr, (*sig)); break;
         case GO_DOUBLE: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goDouble*)__ptr, (*sig)); break;
+        case GO_INT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt8*)__ptr, (*sig)); break;
+        case GO_UINT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt8*)__ptr, (*sig)); break;
+        case GO_INT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt16*)__ptr, (*sig)); break;
+        case GO_UINT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt16*)__ptr, (*sig)); break;
+        case GO_INT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt32*)__ptr, (*sig)); break;
+        case GO_UINT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt32*)__ptr, (*sig)); break;
+        default: goLog::error("copyToMatlab(): unknown data type.",this);
+                 sig->swapXY();
+                 return false;
+                 break;
     }
     sig->swapXY();
     return true;

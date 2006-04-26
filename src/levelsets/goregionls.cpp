@@ -87,6 +87,13 @@ goRegionLS::~goRegionLS ()
     }
 }
 
+/*
+* @brief INCOMPLETE
+* 
+* @param target 
+* 
+* @return 
+*/
 template <class T> 
 static void initStep2 (goSignal3DBase<void>& target)
 {
@@ -116,7 +123,7 @@ static void initStep2 (goSignal3DBase<void>& target)
     }
 }
 
-/** 
+/* @brief INCOMPLETE
 * @todo Write step initialisation for testing
 *       the Li-term and free initialisation from
 *       things like edge detection.
@@ -132,6 +139,16 @@ static void initStep (goSignal3DBase<void>& target)
     }
 }
 
+/*
+* @brief Initialise with circular zero level curve.
+* 
+* Initialises with a circular zero level curve with relative radius r.
+* 
+* @param r Radius.
+* @param hx Grid spacing in x.
+* @param hy Grid spacing in y.
+* @param target Target signal. Must be readily allocated.
+*/
 template <class T>
 static void initCircle (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void>& target)
 {
@@ -163,6 +180,17 @@ static void initCircle (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void
     }
 }
 
+/*
+* @brief Initialise rectangular zero level curve.
+* 
+* Initialises rectangular zero level curve at relative distance r (between 0 and 0.5) from the narrowest
+* borders of the signal.
+* 
+* @param r Relative distance from narrowest borders.
+* @param hx Grid spacing in x.
+* @param hy Grid spacing in y.
+* @param target Target signal. Must be readily allocated.
+*/
 template <class T>
 static void initQuad (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void>& target)
 {
@@ -367,10 +395,6 @@ goDouble goRegionLS::getCFLRestriction()
 static goDouble heaviside (goDouble x, goDouble epsilon)
 {
     static goDouble co = 2.0 / (goDouble)M_PI;
-//    if (x < -epsilon)
-//        return 0.0;
-//    if (x > epsilon)
-//        return 1.0;
     return 0.5*(1.0+co*atan(x/epsilon));
 }
 
@@ -1054,6 +1078,15 @@ bool goRegionLS::velocityFieldTimesGradPhi (const goSignal3DBase<void>& V,
     // return goMath::vectorMult(V,gradPhi,result);
 }
 
+/** 
+* @brief Takes \f$ f \cdot \delta(\Phi)\f$
+* 
+* The dirac function is approximated and is smooth. Check source code.
+* 
+* @param f Some 2D scalar field, after the method returns this contains \f$ f \cdot \delta(\Phi) \f$
+* 
+* @return True if successful, false otherwise.
+*/
 bool goRegionLS::timesDiracPhi (goSignal3DBase<void>& f)
 {
     switch (f.getDataType().getID())
@@ -1068,8 +1101,13 @@ bool goRegionLS::timesDiracPhi (goSignal3DBase<void>& f)
 /** 
  * @brief Evolves one time step.
  * 
+ * If an external 2-D velocity field with a scalar factor, \f$ f \in R, V \f$ are given,
+ * then the evolution equation is augmented by the term \f$ f \cdot V \f$.
+ * 
  * @param deltaT Time step. Note that there is a restriction on the step since
  *               the PDE is solved explicitly.
+ * @param externalVelocity Pointer to an external velocity field (2-channel since it's 2D), may be 0.
+ * @param externalFactor Factor for the velocity field.
  * 
  * @return True if successful, false otherwise.
  */
@@ -1144,6 +1182,7 @@ bool goRegionLS::evolve (goDouble deltaT, const goSignal3DBase<void>* externalVe
  *
  * @note The main part of computation time seems to go to solving
  * the resulting equation system.
+ * @note None of the extra stuff is supported in implicit mode (like Li's and Delingette's extensions).
  * 
  * @param deltaT Time step.
  * 

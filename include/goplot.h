@@ -3,6 +3,9 @@
 #include <goarray.h>
 #include <gofixedarray.h>
 #include <gostring.h>
+#ifndef GOLIST_H
+# include <golist.h>
+#endif
 
 namespace goPlot
 {
@@ -73,6 +76,18 @@ namespace goPlot
                       goString* cmdFileNameRet = 0, 
                       goString* dataFileNameRet = 0, 
                       bool waitfor = false);
+
+    template <class arrayT>
+        bool gnuplotList (const goList<arrayT>* arrayListX,
+                          const goList<arrayT>* arrayListY = 0,
+                          goList<goString>*     title = 0, 
+                          goList<goString>* plotCommands = 0,
+                          const char*       prefixCommands = 0,
+                          const char*       postfixCommands = 0,
+                          const char*       shellPostfix = 0,
+                          goString*         cmdFileNameRet = 0, 
+                          goList<goString>* dataFileNameRet = 0, 
+                          bool waitfor = true);
 #if 0
         static bool gnuplot (const goArray<goFloat>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
         static bool gnuplot (const goArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);

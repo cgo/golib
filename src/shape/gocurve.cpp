@@ -4,6 +4,9 @@
 #include <gonubs.h>
 #include <goconfig.h>
 
+#ifndef GOLOG_H
+# include <golog.h>
+#endif
 #ifndef GOFILEIO_H
 # include <gofileio.h>
 #endif
@@ -215,7 +218,7 @@ goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool 
  * @return True if successful, false otherwise.
  **/
 template<class pointT>
-bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
+bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret)
 {
     if (pointCount <= 1)
         return false;
@@ -241,6 +244,17 @@ bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
     return true;
 }
 
+template<class pointT>
+bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
+{
+    goIndex_t np = this->getPoints().getSize();
+    if (this->getPoints().isClosed())
+    {
+        np += 1;
+    }
+    return goCurve<pointT>::resample (this->getPoints().getFrontElement(), np, pointCount, ret.getPoints()); 
+}
+
 /** 
  * @brief 
  * 
@@ -254,7 +268,7 @@ bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
  * @return 
  */
 template<class pointT>
-bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret)
+bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret)
 {
     goNUBS nubs;
     if (!nubs.setControlPoints(begin,end))
@@ -264,6 +278,44 @@ bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, ty
     goIndex_t i;
     pointT p;
     for (i = 0; i < pointCount - 1; ++i, t += step)
+    {
+        p = nubs (t);
+        ret.append (p);
+    }
+    p = nubs(t - 1e-5);
+    ret.append(p);
+    return true;
+}
+
+template<class pointT>
+bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+{
+    return goCurve<pointT>::resampleLinear (begin,pointCount,resamplePointCount,ret);
+}
+
+/** 
+ * @brief 
+ *
+ * @note This uses approximating splines. The original points are not interpolated!
+ * 
+ * @param begin 
+ * @param pointCount 
+ * @param resamplePointCount 
+ * @param ret 
+ * 
+ * @return 
+ */
+template<class pointT>
+bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+{
+    goNUBS nubs;
+    if (!nubs.setControlPoints(begin,pointCount))
+        return false;
+    goDouble t = 0.0f;
+    goDouble step = nubs.getCurveLength() / (float)(resamplePointCount-1);
+    goIndex_t i;
+    pointT p;
+    for (i = 0; i < resamplePointCount - 1; ++i, t += step)
     {
         p = nubs (t);
         ret.append (p);
@@ -286,23 +338,173 @@ bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, ty
  * @return 
  */
 template<class pointT>
-bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
 {
-    goNUBS nubs;
-    if (!nubs.setControlPoints(begin,pointCount))
+    if (resamplePointCount < 1)
+    {
         return false;
+    }
+    goDouble curveLength = 0.0;
+    goFixedArray<goDouble> accumLength (pointCount);
+    
+    {
+        accumLength[0] = 0.0;
+        typename goList<pointT>::ConstElement* el = begin;
+        goIndex_t i;
+        for (i = 1; i < pointCount; ++i, el = el->next)
+        {
+            pointT p = el->elem - el->next->elem;
+            curveLength += p.abs();
+            accumLength[i] = curveLength;
+        }
+    }
+   
+    goDouble step = curveLength / (float)(resamplePointCount-1);
     goDouble t = 0.0f;
-    goDouble step = nubs.getCurveLength() / (float)(resamplePointCount-1);
-    goIndex_t i;
+    goIndex_t i = 0;
+    goIndex_t j = 0;
     pointT p;
+    typename goList<pointT>::ConstElement* el = begin;
     for (i = 0; i < resamplePointCount - 1; ++i, t += step)
     {
-        p = nubs (t);
+        while (j < pointCount && t >= accumLength[j]) 
+        {
+            ++j;
+            assert (el);
+            el = el->next;
+        }
+        assert (el && el->prev);
+        assert (j > 0 && j < pointCount);
+        pointT p;
+        goDouble e = (t - accumLength[j-1]) / (accumLength[j] - accumLength[j-1]);
+        p = el->elem * e + el->prev->elem * (1-e);
         ret.append (p);
     }
-    p = nubs(t - 1e-5);
-    ret.append(p);
+    {
+        goDouble e = ((t - 1e-5) - accumLength[j-1]) / (accumLength[j] - accumLength[j-1]);
+        pointT p;
+        p = el->elem * e + el->prev->elem * (1-e);
+        ret.append (p);
+    }
     return true;
+}
+
+/** 
+* @brief Read curve points from an ASCII C file stream.
+* 
+* The curve points are expected in this format:
+* 
+* ...
+* curve\\n
+* <integer: number of points>\\n
+* <float: x coordinate point 1> <float: y coordinate point 1>\\n
+* ....
+* 
+* 
+* @param f C stream pointer.
+* @param ret Contains points after method returns with true.
+* 
+* @return True if successful, false otherwise. Check log.
+*/
+template <class pointT>
+bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
+{
+    if (!f)
+    {
+        return false;
+    }
+    goString line;
+    if (!goFileIO::readASCIILine (f, line))
+    {
+        return false;
+    }
+    if (line != "curve")
+    {
+        goString msg = "goCurve::readASCII(): expected 'curve', got '";
+        msg += line;
+        msg += "'";
+        goLog::warning(msg);
+        return false;
+    }
+    unsigned int pointCount = 0;
+    fscanf(f,"%d\n",&pointCount);
+    unsigned int i;
+    pointT p;
+    float x = 0.0f;
+    float y = 0.0f;
+    for (i = 0; i < pointCount; ++i)
+    {
+        if (fscanf(f,"%f %f\n",&x,&y) < 2)
+        {
+            goLog::warning("goCurve::readASCII(): could not read 2 points from a line.");
+            return false;
+        }
+        p.x = x; p.y = y;
+        ret.append(p);
+    }
+    return true;
+}
+
+template <class pointT>
+bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
+{
+    if (pointList.getSize() < 1)
+    {
+        return true;
+    }
+    if (!f)
+    {
+        return false;
+    }
+    if (!goFileIO::writeASCII (f, goString("curve\n")))
+    {
+        return false;
+    }
+    goSize_t pointCount = pointList.getSize();
+    goString line = "";
+    line += (int)pointCount;
+    line += "\n";
+    if (!goFileIO::writeASCII (f, line))
+    {
+        return false;
+    }
+    typename goList<pointT>::ConstElement* el = pointList.getFrontElement();
+    goSize_t i;
+    for (i = 0; i < pointCount; ++i, el = el->next)
+    {
+        assert(el);
+        line = "";
+        line += (float)el->elem.x;
+        line += " ";
+        line += (float)el->elem.y;
+        line += "\n";
+        if (!goFileIO::writeASCII (f, line))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <class pointT>
+bool goCurve<pointT>::writeASCII (FILE* f) const
+{
+    return goCurve<pointT>::writeASCII (f, this->getPoints());
+}
+
+/** 
+* @brief Read curve points from ASCII C file stream into this curve.
+* 
+* @see Static member readASCII.
+* 
+* @param f C file stream.
+* 
+* @return True if successful, false otherwise.
+*/
+template <class pointT>
+bool goCurve<pointT>::readASCII (FILE* f)
+{
+    return goCurve<pointT>::readASCII (f, this->getPoints());
 }
 
 template<class pointT>

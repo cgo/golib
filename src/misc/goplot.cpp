@@ -3,8 +3,11 @@
 #include <gofileio.h>
 #include <gofixedarray.h>
 #include <gomath.h>
+#ifndef GOLOG_H
+# include <golog.h>
+#endif
 
-static bool _gnuplot_do_plot (const goString& filename, goString* cmdFilenameRet, goString* dataFileNameRet, const char* title, bool waitfor, const char* plotCommands, const char* prefixCommands, const char* shellPostfix)
+static bool _gnuplot_do_plot (goString filename, goString* cmdFilenameRet, goString* dataFileNameRet, const char* title, bool waitfor, const char* plotCommands, const char* prefixCommands, const char* shellPostfix)
 {
     goString gnuplotCommands;
     if (prefixCommands)
@@ -67,6 +70,129 @@ static bool _gnuplot_do_plot (const goString& filename, goString* cmdFilenameRet
     return true;
 }
 
+static bool _gnuplot_do_plot_list (goString* cmdFilenameRet, const goList<goString>* dataFileNames, const goList<goString>* titles, bool waitfor, const goList<goString>* plotCommands, const char* prefixCommands, const char* postfixCommands, const char* shellPostfix)
+{
+    if (!dataFileNames)
+    {
+        return false;
+    }
+    if (titles)
+    {
+        if (dataFileNames->getSize() != titles->getSize())
+        {
+            goLog::warning ("goPlot::gnuplot(): (list version) dataFileNameRet and titles are of different sizes.");
+            return false;
+        }
+    }
+    if (plotCommands)
+    {
+        if (dataFileNames->getSize() != plotCommands->getSize())
+        {
+            goLog::warning ("goPlot::gnuplot(): (list version) dataFileNameRet and plotCommands are of different sizes.");
+            return false;
+        }
+    }
+
+    goList<goString>::ConstElement* dataFileNameEl = dataFileNames->getFrontElement();
+    goList<goString>::ConstElement* titlesEl       = 0;
+    if (titles)
+    {
+        titlesEl = titles->getFrontElement();
+    }
+    goList<goString>::ConstElement* plotCommandsEl = 0;
+    if (plotCommands)
+    {
+        plotCommandsEl = plotCommands->getFrontElement();
+    }
+    
+    goString gnuplotCommands;
+    if (prefixCommands)
+    {
+        gnuplotCommands += prefixCommands;
+        gnuplotCommands += "\n";
+    }
+    gnuplotCommands += "plot ";
+    while (dataFileNameEl)
+    {
+        gnuplotCommands += "\"";
+        gnuplotCommands += dataFileNameEl->elem.toCharPtr();
+        gnuplotCommands += "\"";
+        if (!titlesEl)
+        {
+            gnuplotCommands += "notitle ";
+        }
+        else
+        {
+            gnuplotCommands += " title \"";
+            gnuplotCommands += titlesEl->elem.toCharPtr();
+            gnuplotCommands += "\"";
+        }
+        if (plotCommandsEl)
+        {
+            gnuplotCommands += " ";
+            gnuplotCommands += plotCommandsEl->elem.toCharPtr();
+        }   
+        else
+        {
+            gnuplotCommands += " with lines";
+        }
+        if (dataFileNameEl->next)
+        {
+            gnuplotCommands += ", ";
+        }
+        else 
+        {
+            gnuplotCommands += "\n";
+        }
+        dataFileNameEl = dataFileNameEl->next;
+        if (titlesEl)       titlesEl = titlesEl->next;
+        if (plotCommandsEl) plotCommandsEl = plotCommandsEl->next;
+    }
+    // gnuplotCommands += "pause -1\n";
+    if (postfixCommands)
+    {
+        gnuplotCommands += postfixCommands;
+    }
+    else
+    {
+        gnuplotCommands += "\n";
+    }
+    
+    goString cmd_filename;
+    FILE* file = goFileIO::createTempFile(cmd_filename);
+    if (!file)
+    {
+        return false;
+    }
+    fprintf (file, "%s", gnuplotCommands.toCharPtr());
+    fclose (file);
+    goProcess gnuplot;
+    if (shellPostfix)
+    {
+        goFixedArray<goString> cmds(2);
+        goString shellCommand = "/bin/sh";
+        // cmds += &shellCommand;
+        cmds[0] = "-c";
+        goString gpCommand = "gnuplot ";
+        gpCommand += cmd_filename.toCharPtr();
+        gpCommand += shellPostfix;
+        cmds[1] = gpCommand;
+        gnuplot.run (shellCommand.toCharPtr(), cmds);
+    }
+    else
+    {
+        gnuplot.run ("gnuplot", cmd_filename.toCharPtr());
+    }
+    if (cmdFilenameRet)
+        *cmdFilenameRet = cmd_filename;
+    if (waitfor)
+    {
+        gnuplot.wait();
+    }
+    // goFileIO::remove (cmd_filename);
+    return true;
+}
+
 template<class arrayT>
 static bool _gnuplot (const arrayT& a, goString* cmdFilenameRet, goString* dataFileNameRet, const char* title, bool waitfor, const char* plotCommands, const char* prefixCommands, const char* shellPostfix)
 {
@@ -83,6 +209,71 @@ static bool _gnuplot (const arrayT& a, goString* cmdFilenameRet, goString* dataF
     fclose (file);
     
     return _gnuplot_do_plot (filename, cmdFilenameRet, dataFileNameRet, title, waitfor, plotCommands, prefixCommands, shellPostfix);
+}
+
+template<class arrayT>
+static bool _gnuplot_list (const goList<arrayT>* arrayListX, const goList<arrayT>* arrayListY, goString* cmdFilenameRet, goList<goString>* dataFileNameRet, goList<goString>* titles, bool waitfor, goList<goString>* plotCommands, const char* prefixCommands, const char* postfixCommands, const char* shellPostfix)
+{
+    if (!arrayListX)
+    {
+        return false;
+    }
+    if (arrayListY)
+    {
+        if (arrayListX->getSize() != arrayListY->getSize())
+        {
+            goLog::warning("goPlot::gnuplot(): (list version) arrayListX must be of same size as arrayListY.");
+            return false;
+        }
+    }
+    if (!waitfor && !dataFileNameRet)
+    {
+        goLog::warning("goPlot::gnuplot(): (list version) if waitfor is false, dataFileNameRet must be set (or you will get segfaults.)");
+        return false;
+    }
+    goList<goString> filenames_;
+    goList<goString>* filenames = &filenames_;
+    if (dataFileNameRet)
+    {
+        filenames = dataFileNameRet;
+    }
+    filenames->erase(); 
+    typename goList<arrayT>::ConstElement* elX = arrayListX->getFrontElement();
+    typename goList<arrayT>::ConstElement* elY = 0;
+    if (arrayListY)
+    {
+        elY = arrayListY->getFrontElement();
+        assert (arrayListX->getSize() == arrayListY->getSize());
+    }
+    while (elX)
+    {
+        goString filename;
+        FILE* file = goFileIO::createTempFile (filename);
+        if (!file)
+            return false;
+        filenames->append(filename);
+        goIndex_t i;
+        goIndex_t size = elX->elem.getSize();
+        if (arrayListY)
+        {
+            assert (size == static_cast<goIndex_t>(elY->elem.getSize()));
+            for (i = 0; i < size; ++i)
+            {
+                fprintf (file, "%f %f\n", elX->elem[i], elY->elem[i]);
+            }
+        }
+        else
+        {
+            for (i = 0; i < size; ++i)
+            {
+                fprintf (file, "%f\n", elX->elem[i]);
+            }
+        }
+        elX = elX->next;
+        if (elY) elY = elY->next;
+        fclose (file);
+    }
+    return _gnuplot_do_plot_list (cmdFilenameRet, filenames, titles, waitfor, plotCommands, prefixCommands, postfixCommands, shellPostfix);
 }
 
 template<class arrayT, class arrayT2>
@@ -115,11 +306,38 @@ bool goPlot::gnuplot(const arrayT& a, const arrayT2& a2, const char* title, cons
     return _gnuplot< arrayT, arrayT2> (a, a2, cmdFileNameRet, dataFileNameRet, title, waitfor, plotCommands, prefixCommands, shellPostfix);
 }
 
+template <class arrayT>
+bool goPlot::gnuplotList (const goList< arrayT >* arrayListX,
+                          const goList< arrayT >* arrayListY,
+                          goList<goString>*     title, 
+                          goList<goString>* plotCommands,
+                          const char*       prefixCommands,
+                          const char*       postfixCommands,
+                          const char*       shellPostfix,
+                          goString*         cmdFileNameRet, 
+                          goList<goString>* dataFileNameRet, 
+                          bool waitfor)
+{
+    return _gnuplot_list <arrayT> (arrayListX, arrayListY, cmdFileNameRet, dataFileNameRet, title, waitfor, plotCommands, prefixCommands, postfixCommands, shellPostfix);
+}
+
 #define GOPLOT_INSTANTIATE(TYPE) \
 template bool goPlot::gnuplot< TYPE > (const TYPE& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor);
 
 #define GOPLOT_INSTANTIATE2(TYPE,TYPE2) \
 template bool goPlot::gnuplot< TYPE , TYPE2 > (const TYPE& a, const TYPE2& a2, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor);
+
+#define GOPLOT_INSTANTIATE_LIST(TYPE) \
+template bool goPlot::gnuplotList< TYPE > (const goList< TYPE >* arrayListX,\
+              const goList< TYPE >* arrayListY,\
+              goList<goString>*     title,\
+              goList<goString>* plotCommands,\
+              const char*       prefixCommands,\
+              const char*       postfixCommands,\
+              const char*       shellPostfix,\
+              goString*         cmdFileNameRet,\
+              goList<goString>* dataFileNameRet,\
+              bool waitfor);
 
 GOPLOT_INSTANTIATE(goArray<goFloat>);
 GOPLOT_INSTANTIATE(goArray<goDouble>);
@@ -129,6 +347,10 @@ GOPLOT_INSTANTIATE2(goArray<goFloat>,goArray<goFloat>);
 GOPLOT_INSTANTIATE2(goArray<goDouble>,goArray<goDouble>);
 GOPLOT_INSTANTIATE2(goFixedArray<goFloat>,goFixedArray<goFloat>);
 GOPLOT_INSTANTIATE2(goFixedArray<goDouble>,goFixedArray<goDouble>);
+GOPLOT_INSTANTIATE_LIST(goFixedArray<goFloat>);
+GOPLOT_INSTANTIATE_LIST(goFixedArray<goDouble>);
+GOPLOT_INSTANTIATE_LIST(goVectorf);
+GOPLOT_INSTANTIATE_LIST(goVectord);
 
 #if 0
 #define GOPLOT_INSTANTIATE(TYPE) \
