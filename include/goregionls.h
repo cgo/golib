@@ -10,6 +10,9 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 
 class goRegionLSPrivate;
 
@@ -29,7 +32,7 @@ class goRegionLS : public goObjectBase
         goRegionLS ();
         virtual ~goRegionLS ();
 
-        bool setImage   (goSignal3DBase<void>* signal);
+        bool setImage   (goSignal3DBase<void>* signal, goDouble hx, goDouble hy);
         void setMu      (goDouble mu);
         void setNu      (goDouble nu);
         void setLambda1 (goDouble l1);
@@ -40,18 +43,25 @@ class goRegionLS : public goObjectBase
         void setDelingette (goDouble d);
         void setLi         (goDouble li);
 
-        void setHx      (goDouble h);
-        void setHy      (goDouble h);
+//        void setHx      (goDouble h);
+//        void setHy      (goDouble h);
         
         goSignal3DBase<void>* getPhi ();
+
+        goDouble getCFLRestriction();
         
-        bool evolve           (goDouble deltaT);
-        bool evolveImplicitly (goDouble deltaT);
+        bool evolve           (goDouble timeStep, 
+                               const goSignal3DBase<void>* externalVelocity = 0, 
+                               goDouble externalFactor = 1.0);
+        bool evolveImplicitly (goDouble timeStep);
 
         goDouble innerMean ();
         goDouble outerMean ();
 
-        bool chanVeseTerm (goSignal3DBase<void>& result);
+        bool chanVeseTerm  (goSignal3DBase<void>& result);
+        bool getNablaPhi   (goSignal3D<void>& nablaPhi) const;
+        bool velocityFieldTimesGradPhi (const goSignal3DBase<void>& V,
+                                        goSignal3DBase<void>& result);
 
         bool timesDiracPhi (goSignal3DBase<void>&);
     private:

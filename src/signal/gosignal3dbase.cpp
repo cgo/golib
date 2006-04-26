@@ -359,7 +359,7 @@ goSignal3DBase<T>::constantBorders (int axes)
    
     if (axes & GO_X)
     {
-        goLog::message ("constantBorders() to X",this);
+        //goLog::message ("constantBorders() to X",this);
         goIndex_t sz = static_cast<goIndex_t>(this->getSizeX());
         goIndex_t border = this->getBorderX();
         this->xDiff[sz - 1] = 0;
@@ -383,7 +383,7 @@ goSignal3DBase<T>::constantBorders (int axes)
     }
     if (axes & GO_Y)
     {
-        goLog::message ("constantBorders() to Y",this);
+        //goLog::message ("constantBorders() to Y",this);
         goIndex_t sz = static_cast<goIndex_t>(this->getSizeY());
         goIndex_t border = this->getBorderY();
         this->yDiff[sz - 1] = 0;
@@ -403,7 +403,7 @@ goSignal3DBase<T>::constantBorders (int axes)
     }
     if (axes & GO_Z)
     {
-        goLog::message ("constantBorders() to Z",this);
+        //goLog::message ("constantBorders() to Z",this);
         goIndex_t sz = static_cast<goIndex_t>(this->getSizeZ());
         goIndex_t border = this->getBorderZ();
         this->zDiff[sz - 1] = 0;
@@ -598,6 +598,8 @@ goSignal3DBase<void>::initialize (void*    dataptr,
     }
 
     // Du bloeder, kleiner Scheiss-Idiot.  FIXME
+    // I don't think there is anything left here to fix. 
+    // The comment will remain for historic reasons.
 //    blockJump   = myBlockSize.x * myBlockSize.y * myBlockSize.z;
 //    blockJumpY  = blockJump * myBlocks.x; 
 //    blockJumpZ  = blockJumpY * myBlocks.y;
@@ -717,7 +719,7 @@ goSignal3DBase<T>::destroy ()
 
 template<class T>
 goSize_t
-goSignal3DBase<T>::memoryUsage()
+goSignal3DBase<T>::memoryUsage() const
 {
     if (real_ptr) 
     {
@@ -735,7 +737,7 @@ goSignal3DBase<T>::setChanged ()
 }
 
 template<> goSize_t
-goSignal3DBase<void>::memoryUsage()
+goSignal3DBase<void>::memoryUsage() const
 {
     if (real_ptr) 
     {
@@ -813,19 +815,6 @@ goSignal3DBase<void>::operator== (goSignal3DBase<void> &other)
 {
     goLog::warning("goSignal3DBase<void>: operator== not implemented for void.");
     return false;
-}
-
-template<> goSize_t
-goSignal3DBase<void>::getSize() const
-{
-    return myChannelCount * myDataType.getSize() * (mySize.x * mySize.y * mySize.z);
-}
-
-template< class T >
-goSize_t
-goSignal3DBase<T>::getSize() const
-{
-    return myChannelCount * sizeof(T) * (mySize.x * mySize.y * mySize.z);
 }
 
 template<> goDouble

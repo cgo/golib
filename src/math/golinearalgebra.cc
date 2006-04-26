@@ -23,7 +23,7 @@ LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
         std::cout << "Matrix is not quadratic\n";
 		return;
 	}
-	int i,imax,j,k;
+	int i = 0,imax = 0,j = 0,k = 0;
 	double big,dum,sum,temp;
 	
 	

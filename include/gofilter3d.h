@@ -5,7 +5,10 @@
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
  * $Id$
- * $Log$
+ * $Log: gofilter3d.h,v $
+ * Revision 1.1.1.1  2006/04/19 15:27:10  gosch
+ * golib local cvs
+ *
  */
 
 #ifndef GOFILTER3D_H

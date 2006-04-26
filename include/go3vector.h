@@ -23,7 +23,21 @@ go3Vector {
   go3Vector (const go3Vector<T>& other);
   go3Vector (T, T, T);
   virtual ~go3Vector ();
-  
+ 
+  template <class To> bool operator== (const go3Vector<To>& other) const
+  {
+      if (x == static_cast<T>(other.x) &&
+          y == static_cast<T>(other.y) &&
+          z == static_cast<T>(other.z))
+      {
+          return true;
+      }
+      return false;
+  }
+  template <class To> bool operator!= (const go3Vector<To>& other) const
+  {
+      return !this->operator==(other);
+  }
   // GO3VECTOR_FUNCTION_PREFIX T& operator[] (goIndex_t i) { return data[i]; }
   GO3VECTOR_FUNCTION_PREFIX go3Vector<T>& operator= (go3Vector<T> other) 
   { x = other.x; y = other.y; z = other.z; return *this; }

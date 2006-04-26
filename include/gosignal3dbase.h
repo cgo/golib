@@ -6,6 +6,12 @@
  * assume it is distributable under the GNU General Public License (GPL).
  * $Id$
  * $Log: gosignal3dbase.h,v $
+ * Revision 1.2  2006/04/21 18:39:34  gosch
+ * *** empty log message ***
+ *
+ * Revision 1.1.1.1  2006/04/19 15:27:06  gosch
+ * golib local cvs
+ *
  * Revision 1.7  2003/12/30 02:56:26  christian
  * *** empty log message ***
  *
@@ -58,12 +64,6 @@
  *       Add support in gosignalmacros.h and add some of the routines
  *       in gosignal3d and base marked as "not yet implemented".
  *
- * \todo Add "custom borders" -- 
- *       - allocate memory for the borders (** here goSignal3dBase has to actually allocate
- *         memory, but it has to be that way **)
- *       - fill borders and set jumps and diffs accordingly
- *       - implement fixed value borders with size-1 custom borders and according jumps and diffs.
- *
  * \author Christian Gosch
  */
 template <class T>
@@ -106,7 +106,7 @@ goSignal3DBase : public goObjectBase
         virtual void destroy ();
         
         // From goObjectInfo
-        virtual goSize_t memoryUsage();
+        virtual goSize_t memoryUsage() const;
 
         void          setChanged  ();
         
@@ -115,6 +115,15 @@ goSignal3DBase : public goObjectBase
         
         void          setChannel  (goSize_t c);
         goSize_t      getChannel  () const { return this->myChannel; };
+
+        /** 
+         * @brief Get the pointer offset from a channel 0 element to
+         * the corresponding channel <code>channel</code> element.
+         * 
+         * @param channel Channel to which the pointer offset is wanted.
+         * 
+         * @return Pointer offset to <code>channel</code> element.
+         */
         goPtrdiff_t   getChannelOffset (goSize_t channel) const 
         {
             assert (channel < myChannelCount);
@@ -156,7 +165,11 @@ goSignal3DBase : public goObjectBase
         void setSizeX(goSize_t s); 
         void setSizeY(goSize_t s); 
         void setSizeZ(goSize_t s); 
-        
+       
+        const goSize3D& getSize () const { return mySize; };
+        const goSize3D& getBlockSize () const { return myBlockSize; };
+        const goSize3D& getBorderSize () const { return myBorderSize; };
+
         /*!
          * \return Size in samples in x direction.
          */
@@ -190,11 +203,6 @@ goSignal3DBase : public goObjectBase
          * "Deep" comparison of the actual data.
          */ 
         bool		operator== (goSignal3DBase &other);
-
-        /*!
-         * @return The size of the object data (without the object overhead) in bytes.
-         */
-        goSize_t	getSize () const;
 
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;

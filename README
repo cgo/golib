@@ -40,15 +40,24 @@ Directories
 
 What you need
 -------------
-You will need a C++ compiler (tested with gnu c++ 3.3)
-and a current version of CMake (http://www.cmake.org). Earlier versions also
-supported GNU autotools and maybe this will be kept up parallel to CMake.
-For more information and downloads, see http://www.gnu.org.
-The pthreads library must be installed.
-For version 0.2.1, you will also need the SDL library
-(see http://www.libsdl.org).
-For image loading/writing support you need libdevil (http://openil.sourceforge.net/).
-
+- You will need a C++ compiler (tested with gnu c++ 3.3)
+- A current version of CMake (http://www.cmake.org). Earlier versions also
+  supported GNU autotools and maybe this will be kept up parallel to CMake.
+  For more information and downloads, see http://www.gnu.org.
+- The pthreads library must be installed.
+- For version 0.2.1, you will also need the SDL library
+  (see http://www.libsdl.org).
+- For image loading/writing support you need 
+  libdevil (http://openil.sourceforge.net/). You will not be able
+  to read/write images when you don't have libdevil.
+- If you want to use the matlab support library, you
+  need Matlab.
+- If you want to use the guile Scheme scripting interface,
+  you need SWiG and guile (more exactly libguile).
+  http://www.swig.org
+  http://www.gnu.org/software/guile
+Also see the html documentation as is might be more up to date.
+  
 How to build
 ------------
 Set the environment variable GOPATH to the path where golib resides, e.g. in bash
@@ -58,6 +67,10 @@ In the golib directory, do
  cd build
  cmake ..
  make
+Also see the html documentation for details.
+There is also a matlab support library in the matlab directory
+(of course, you need matlab for this) and guile support using SWiG
+in the swig directory.
  
 In earlier versions, with the GNU autotools:
 To compile the library, it should be sufficient to type 

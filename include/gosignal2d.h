@@ -110,7 +110,7 @@ class goSignal2D : goObjectBase {
    */
   inline void sample (goFloat x, goFloat y, goFloat &c);
 
-  goSize_t    memoryUsage () { return total_memory_usage; }
+  goSize_t    memoryUsage () const { return total_memory_usage; }
  protected:
   goSize_t sizeX;
   goSize_t sizeY;

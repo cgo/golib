@@ -377,10 +377,13 @@ bool goMath::laplacian2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 /**
  * @brief Calculates the gradient of a 2D signal (z-size == 1).
  *                  
- * @note  The data type of the arguments is currently restricted to GO_FLOAT,
- *        but GO_DOUBLE will also be implemented.
- *        Multichannel data is not yet supported by libGo.
+ * @note  The data type of the arguments is currently restricted to GO_FLOAT and
+ *        GO_DOUBLE.
  *
+ * @todo Look at the code and find the reference where this is documented.
+ *       It's not simply central differences, but rather central differences 
+ *       including the next neighbours.
+ * 
  * @param sig       Contains the 2D signal.
  * @param retValue  After returning true, retValue contains the 
  *                  x and y components of grad(sig).
@@ -766,7 +769,10 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
  * 
  * @param x          Data grid.
  * @param retValue   Contains finite differences after the function returns true.
- *                   Will be resized to the size of x, blocksize of x and border of 4 in each direction.
+ *                   If the size of retValue does not match the size of
+ *                   x, retValue
+ *                   will be resized to the size of x, 
+ *                   blocksize of x and border of 1 in each direction.
  * @param dimension  Dimension (0, 1, or 2 for x, y, or z)
  * @param h          Grid spacing (default 1)
  * 

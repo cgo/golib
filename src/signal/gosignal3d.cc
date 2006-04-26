@@ -248,7 +248,7 @@ goSignal3D<T>::destroy ()
 
 template<class T>
 goSize_t
-goSignal3D<T>::memoryUsage()
+goSignal3D<T>::memoryUsage() const
 {
     if (this->real_ptr) 
     {
@@ -288,6 +288,30 @@ template<> void
 goSignal3D<void>::fill (const void* p)
 {
     goSignal3DBase<void>::fill(p);
+}
+
+/** 
+ * @brief Allocate memory.
+ * 
+ * @see make()
+ * 
+ * @param size Signal size 
+ * @param blockSize  Block size
+ * @param borderSize  Borde size
+ * @param channelCount  Number of channels
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goSignal3D<T>:: make (const goSize3D& size,
+                           const goSize3D& blockSize,
+                           const goSize3D& borderSize,
+                           goSize_t        channelCount)
+{
+    return this->make(size.x,size.y,size.z,
+                      blockSize.x,blockSize.y,blockSize.z,
+                      borderSize.x,borderSize.y,borderSize.z,
+                      channelCount);
 }
 
 /*!

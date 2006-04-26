@@ -13,6 +13,9 @@ Create a build directory and use cmake from there, e.g.
  make
  make install
 
+See the README file for extra things you need and also
+check the html documentation.
+
 
 Basic Installation
 ==================

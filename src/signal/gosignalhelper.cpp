@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id$
+ * $Id: gosignalhelper.cpp,v 1.2 2006/04/21 18:38:32 gosch Exp $
  */
 
 #include <gosignalhelper.h>
@@ -839,7 +839,7 @@ void goSignalInfoText (const goSignal3DBase<void>& sig, goString& strRet, bool h
         strRet += "<td><b>Channels </b></td><td>"; strRet += (int)sig.getChannelCount(); strRet += "</td>";
         strRet += "</tr>";
         strRet += "<tr>";
-        strRet += "<td><b>Approx. size </b></td><td>"; strRet += (int)sig.getSize(); strRet += " bytes</td>";
+        strRet += "<td><b>Approx. size </b></td><td>"; strRet += (int)sig.memoryUsage(); strRet += " bytes</td>";
         strRet += "</tr>";
         strRet += "</table>";
     }
@@ -852,7 +852,7 @@ void goSignalInfoText (const goSignal3DBase<void>& sig, goString& strRet, bool h
         strRet += ",";              strRet += (int)sig.getSizeZ(); strRet += "\n";
         strRet += "Data type: "; strRet += sig.getDataType().getString().toCharPtr(); strRet += "\n";
         strRet += "Channels: "; strRet += (int)sig.getChannelCount(); strRet += "\n";
-        strRet += "Approx. size: "; strRet += (int)sig.getSize(); strRet += " bytes";
+        strRet += "Approx. size: "; strRet += (int)sig.memoryUsage(); strRet += " bytes";
     }
 }
 

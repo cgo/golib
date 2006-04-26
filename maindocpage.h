@@ -1,5 +1,7 @@
 /*!
  * \mainpage Online source documentation for goLib
+ * <b>A current version is not available online. If you are really interested in
+ *    trying the library, please drop me a line.</b>
  * \latexonly
  * 	This documentation is only a part of the source code documentation,
  * 	describing the namespace Vol and the most important classes used
@@ -54,7 +56,10 @@
  *	 I recently switched from GNU Autotools to CMake, which can be obtained from 
  *	 http://www.cmake.org <br>
  *	 I have not yet decided if I cease using Autotools completely or support both.
- *	 Probably I will drop Autotools in favour of CMake.
+ *	 Probably I will drop Autotools in favour of CMake.<br>
+ *	 In order to use the guile scripting support (which is experimental,
+ *	 see below), you need swig (http://www.swig.org) and libguile
+ *	 (http://www.gnu.org/software/guile).
  *
  *	\subsection build Compilation
  *  Using CMake:
@@ -110,8 +115,15 @@
  * \section state State of development
  * Most of this, except for the src/data tree, is work in progress.
  * The current version number is <strong>0.4.0</strong>.
- * The non-free parts will be removed and the library will get a higher version 
- * number then.
+ * There are currently non-free parts in it which are unlikely to
+ * be released to open public any time soon (if you should receive them,
+ * you must delete them).
+ * Some of the basic features are not very well documented, but I will fix that
+ * in the future. I plan to write some introductory documentation
+ * which explains some concepts.<br>
+ * You should also be aware that this library was created over a long time
+ * in small parts, some of which I used more than others. The parts I
+ * used more are likely to be better documented and better maintained.<br>
  * I remove bugs
  * as soon as I find them. As I only use parts of the library very often, these parts
  * will probably contain less bugs than others.
@@ -119,8 +131,10 @@
  * do not hesitate to send me an email to <code>golib __at__ goschs __ de</code>.
  *
  * \section download How to get the source
- * You should be able to download the source at <a href="http://www.goschs.de">www.goschs.de</a> in the [projects] section. If it's out of date,
- * let me know!
+ * You should be able to download the source at <a href="http://www.goschs.de">www.goschs.de</a> in the [projects] section. 
+ * <b>A current version is not available online. If you are really interested in
+ *    trying the library, please drop me a line.</b>
+ * 
  * 
  * \section license License
  * Please read the files COPYING and README in the distribution directory. 

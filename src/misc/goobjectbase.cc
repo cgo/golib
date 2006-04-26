@@ -84,7 +84,7 @@ goObjectBase::getClassName() const
  * @return Size in bytes of this object.
  */
 goSize_t 
-goObjectBase::memoryUsage ()
+goObjectBase::memoryUsage () const
 {
     return sizeof (goObjectBase);
 }

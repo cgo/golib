@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: plugin_skeleton_cpp.cpp 146 2004-10-07 18:35:52Z christian $
+ * $Id: gomatlab.cpp,v 1.1.1.1 2006/04/19 15:27:15 gosch Exp $
  */
 #include <stdio.h>
 

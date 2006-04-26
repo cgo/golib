@@ -63,7 +63,7 @@ goRegionLSPrivate::goRegionLSPrivate ()
       hy  (1.0)
 {
     phi.setDataType (GO_DOUBLE);
-    phi.setBorderFlags (GO_X|GO_Y|GO_Z, GO_PERIODIC_BORDER);
+    phi.setBorderFlags (GO_X|GO_Y|GO_Z, GO_CONSTANT_BORDER);
 }
 
 goRegionLSPrivate::~goRegionLSPrivate ()
@@ -87,6 +87,51 @@ goRegionLS::~goRegionLS ()
     }
 }
 
+template <class T> 
+static void initStep2 (goSignal3DBase<void>& target)
+{
+    goSignal3DGenericIterator it(&target);
+    const T value1 = T(0.0);
+    const T value2 = T(1.0);
+    T value = value1;
+    while (!it.endY())
+    {
+        it.resetY();
+        while (!it.endX())
+        {
+            if (*(T*)*it == value2)
+            {
+                if (value == value1)
+                    value = value2;
+                else
+                    value = value1;
+            }
+            else
+            {
+                *(T*)*it = value;
+            }
+            it.incrementX();
+        }
+        it.incrementY();
+    }
+}
+
+/** 
+* @todo Write step initialisation for testing
+*       the Li-term and free initialisation from
+*       things like edge detection.
+* @param target 
+*/
+static void initStep (goSignal3DBase<void>& target)
+{
+    switch (target.getDataType().getID())
+    {
+        case GO_FLOAT: initStep2<goFloat>(target); break;
+        case GO_DOUBLE: initStep2<goDouble>(target); break;
+        default: goLog::warning ("goRegionLS, initStep(): target must be float or double."); break;
+    }
+}
+
 template <class T>
 static void initCircle (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void>& target)
 {
@@ -95,6 +140,8 @@ static void initCircle (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void
     goPointf center;
     center.x = target.getSizeX() * 0.5f * hx;
     center.y = target.getSizeY() * 0.5f * hy;
+    printf ("initCircle(): center = (%f %f)\n",center.x,center.y);
+    printf (" (hx,hy) = (%f %f)\n",hx,hy);
     while (!it.endZ())
     {
         goFloat y = -center.y;
@@ -153,16 +200,18 @@ static void initQuad (goFloat r, goDouble hx, goDouble hy, goSignal3DBase<void>&
     }
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Sets the grey value image.
  * 
  * @param signal  Contains the (2D) image data. Must be gray values
  *                and either of type float or double (currently, this MUST be double!)
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
-bool goRegionLS::setImage (goSignal3DBase<void>* signal)
+ */
+bool goRegionLS::setImage (goSignal3DBase<void>* signal, goDouble hx, goDouble hy)
 {
+    myPrivate->hx = hx;
+    myPrivate->hy = hy;
     if (!signal)
     {
         myPrivate->phi.destroy();
@@ -188,46 +237,48 @@ bool goRegionLS::setImage (goSignal3DBase<void>* signal)
         goDouble hx = myPrivate->hx;
         goDouble hy = myPrivate->hy;
         // initCircle (0.25f, hx, hy, myPrivate->phi);
-        initQuad<goDouble> (0.25f, hx, hy, myPrivate->phi);
+        assert (myPrivate->phi.getDataType().getID() == GO_DOUBLE);
+        initCircle<goDouble> (0.25f, hx, hy, myPrivate->phi);
+        printf ("setImage(): phi max == %f, min == %f\n",myPrivate->phi.getMaximum(),myPrivate->phi.getMinimum());
     }
     return true;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Sets the mu parameter.
  * 
  * @param mu  The value multiplied to the curvature term. Defaults to 1.
- ----------------------------------------------------------------------------*/
+ */
 void goRegionLS::setMu (goDouble mu)
 {
     myPrivate->mu = mu;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Sets the nu parameter.
  * 
  * @param nu  Area term. Defaults to 0.
- ----------------------------------------------------------------------------*/
+ */
 void goRegionLS::setNu (goDouble nu)
 {
     myPrivate->nu = nu;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Set multiplier for interior term.
  * 
  * @param l  Defaults to 1.
- ----------------------------------------------------------------------------*/
+ */
 void goRegionLS::setLambda1 (goDouble l)
 {
     myPrivate->lambda1 = l;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Set multiplier for exterior term.
  * 
  * @param l  Defaults to 1.
- ----------------------------------------------------------------------------*/
+ */
 void goRegionLS::setLambda2 (goDouble l)
 {
     myPrivate->lambda2 = l;
@@ -266,35 +317,53 @@ void goRegionLS::setLi (goDouble li)
     myPrivate->liFactor = li;
 }
 
-void goRegionLS::setHx (goDouble h)
-{
-    myPrivate->hx = h;
-}
+//void goRegionLS::setHx (goDouble h)
+//{
+//    myPrivate->hx = h;
+//}
 
-void goRegionLS::setHy (goDouble h)
-{
-    myPrivate->hy = h;
-}
+//void goRegionLS::setHy (goDouble h)
+//{
+//    myPrivate->hy = h;
+//}
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Get the current Phi grid.
  * 
  * @return Reference to the signal (2D) which contains the current Phi
  *         grid values. Should always be of type goDouble.
- ----------------------------------------------------------------------------*/
+ */
 goSignal3DBase<void>* goRegionLS::getPhi ()
 {
     return &myPrivate->phi;
 }
 
-/* --------------------------------------------------------------------------
+/** 
+ * @brief Get time step restriction for explicit evolution.
+ *
+ * The time step is restricted and must meet the
+ * CFL condition \f$ \Delta t \cdot \left( \frac{2\mu}{(\Delta x)^2} + \frac{2\mu}{(\Delta y)^2} \right) < 1 \f$. 
+ * See e.g. the book of Osher and Fedkiw, "Level Set Methods and Dynamic
+ * Implicit Surfaces"
+ * 
+ * @return \f$ \frac{1}{\left( \frac{2\mu}{(\Delta x)^2} + \frac{2\mu}{(\Delta y)^2} \right)} \f$.
+ */
+goDouble goRegionLS::getCFLRestriction()
+{
+    assert (myPrivate->hx != 0.0);
+    assert (myPrivate->hy != 0.0);
+    return 2*myPrivate->mu / (myPrivate->hx * myPrivate->hx)
+         + 2*myPrivate->mu / (myPrivate->hy * myPrivate->hy);
+}
+
+/* 
  * @brief Regularised Heaviside function.
  * 
  * @param x 
  * @param epsilon 
  * 
  * @return 
- ----------------------------------------------------------------------------*/
+ */
 static goDouble heaviside (goDouble x, goDouble epsilon)
 {
     static goDouble co = 2.0 / (goDouble)M_PI;
@@ -305,14 +374,14 @@ static goDouble heaviside (goDouble x, goDouble epsilon)
     return 0.5*(1.0+co*atan(x/epsilon));
 }
 
-/* --------------------------------------------------------------------------
+/* 
  * @brief Regularised dirac pulse.
  * 
  * @param x 
  * @param epsilon 
  * 
  * @return 
- ----------------------------------------------------------------------------*/
+ */
 static inline goDouble dirac (goDouble x, goDouble epsilon)
 {
     return 0.3183098861837907/(epsilon*(1 + x*x/(epsilon*epsilon)));
@@ -359,7 +428,7 @@ static inline void timesDiracPhi (goSignal3DBase<void>& f, const goSignal3DBase<
 }
 
 template <class imageT, class paramT, class resultT, class phiT>
-static inline void chanVeseImageTerm3 (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2, paramT epsilon)
+static inline void chanVeseImageTerm3 (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2)
 {
     goSignal3DGenericIterator itImage (image);
     goSignal3DGenericIterator itResult (result);
@@ -398,18 +467,18 @@ static inline void chanVeseImageTerm3 (goSignal3DBase<void>* image, goSignal3DBa
 }
 
 template <class imageT, class paramT, class resultT>
-static inline void chanVeseImageTerm2 (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2, paramT epsilon)
+static inline void chanVeseImageTerm2 (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2)
 {
     switch (phi->getDataType().getID())
     {
         case GO_FLOAT:
             {
-                chanVeseImageTerm3 <imageT,paramT,resultT,goFloat> (image, result, phi, c1, c2, lambda1, lambda2, epsilon);
+                chanVeseImageTerm3 <imageT,paramT,resultT,goFloat> (image, result, phi, c1, c2, lambda1, lambda2);
             }
             break;
         case GO_DOUBLE:
             {
-                chanVeseImageTerm3 <imageT,paramT,resultT,goDouble> (image, result, phi, c1, c2, lambda1, lambda2, epsilon);
+                chanVeseImageTerm3 <imageT,paramT,resultT,goDouble> (image, result, phi, c1, c2, lambda1, lambda2);
             }
             break;
         default:
@@ -421,18 +490,18 @@ static inline void chanVeseImageTerm2 (goSignal3DBase<void>* image, goSignal3DBa
 }
 
 template <class imageT, class paramT>
-static inline void chanVeseImageTerm (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2, paramT epsilon)
+static inline void chanVeseImageTerm (goSignal3DBase<void>* image, goSignal3DBase<void>* result, goSignal3DBase<void>* phi, paramT c1, paramT c2, paramT lambda1, paramT lambda2)
 {
     switch (result->getDataType().getID())
     {
         case GO_FLOAT:
             {
-                chanVeseImageTerm2 <imageT,paramT,goFloat> (image, result, phi, c1, c2, lambda1, lambda2, epsilon);
+                chanVeseImageTerm2 <imageT,paramT,goFloat> (image, result, phi, c1, c2, lambda1, lambda2);
             }
             break;
         case GO_DOUBLE:
             {
-                chanVeseImageTerm2 <imageT,paramT,goDouble> (image, result, phi, c1, c2, lambda1, lambda2, epsilon);
+                chanVeseImageTerm2 <imageT,paramT,goDouble> (image, result, phi, c1, c2, lambda1, lambda2);
             }
             break;
         default:
@@ -455,7 +524,7 @@ static inline void chanVeseImageTerm (goSignal3DBase<void>* image, goSignal3DBas
  * @note This is for clarity. The term could be calculated 
  * in the same loop with the curvature term, which would be faster.
  * 
- * @param input  Input \f$ Phi \f$.
+ * @param input  Input \f$ \Phi \f$.
  * @param result Resulting values of the regulariser.
  * @param hx     Grid spacing in X.
  * @param hy     Grid spacing in Y.
@@ -526,9 +595,9 @@ static inline bool liTerm (goSignal3DBase<void>& input, goSignal3D<void>& result
 static inline bool curvatureDivNabla (goSignal3DBase<void>& input, goSignal3D<void>& result, goDouble hx, goDouble hy)
 {
     goSignal3D<void> nablaPhiX;
-    nablaPhiX.setDataType (GO_FLOAT);
+    nablaPhiX.setDataType (GO_DOUBLE);
     goSignal3D<void> nablaPhiY;
-    nablaPhiY.setDataType (GO_FLOAT);
+    nablaPhiY.setDataType (GO_DOUBLE);
     if (!goMath::centralDifferences(input, nablaPhiX, 0, hx))
         return false;
     if (!goMath::centralDifferences(input, nablaPhiY, 1, hy))
@@ -547,12 +616,12 @@ static inline bool curvatureDivNabla (goSignal3DBase<void>& input, goSignal3D<vo
             itY.resetX();
             while (!itX.endX())
             {
-                goFloat temp = sqrt(*(goFloat*)*itX * *(goFloat*)*itX + 
-                                *(goFloat*)*itY * *(goFloat*)*itY);
+                goDouble temp = sqrt(*(goDouble*)*itX * *(goDouble*)*itX + 
+                                *(goDouble*)*itY * *(goDouble*)*itY);
                 if (temp != 0.0)
                     temp = 1.0 / temp;
-                *(goFloat*)*itX = *(goFloat*)*itX * temp;
-                *(goFloat*)*itY = *(goFloat*)*itY * temp;
+                *(goDouble*)*itX = *(goDouble*)*itX * temp;
+                *(goDouble*)*itY = *(goDouble*)*itY * temp;
                 itX.incrementX();
                 itY.incrementX();
             }
@@ -571,7 +640,7 @@ static inline bool curvatureDivNabla (goSignal3DBase<void>& input, goSignal3D<vo
     return true;
 }
 
-static inline bool curvatureDirect (goSignal3DBase<void>& input, goSignal3D<void>& result)
+static inline bool curvatureDirect (goSignal3DBase<void>& input, goSignal3D<void>& result, goDouble hx, goDouble hy)
 {
     if (input.getDataType().getID() != GO_DOUBLE)
     {
@@ -600,11 +669,11 @@ static inline bool curvatureDirect (goSignal3DBase<void>& input, goSignal3D<void
             goDouble leftdown  = *(const goDouble*)it1.leftDown();
             goDouble rightup   = *(const goDouble*)it1.rightUp();
             goDouble rightdown = *(const goDouble*)it1.rightDown();
-            goDouble phi_x     = 0.5 * (right - left);
-            goDouble phi_y     = 0.5 * (down - up);
-            goDouble phi_xy    = 0.25 * (leftup - leftdown - rightup + rightdown);
-            goDouble phi_xx    = 0.25 * (left - 2*p + right);
-            goDouble phi_yy    = 0.25 * (up - 2*p + down);
+            goDouble phi_x     = 0.5 * (right - left) / hx;
+            goDouble phi_y     = 0.5 * (down - up) / hy;
+            goDouble phi_xy    = 0.25 * (leftup - leftdown - rightup + rightdown) / (hx*hy);
+            goDouble phi_xx    = 0.25 * (left - 2*p + right) / (hx*hx);
+            goDouble phi_yy    = 0.25 * (up - 2*p + down) / (hy*hy);
             goDouble denom = phi_x*phi_x + phi_y*phi_y;
             denom *= sqrt(denom);
             if (denom != 0.0)
@@ -625,7 +694,7 @@ static inline bool curvatureDirect (goSignal3DBase<void>& input, goSignal3D<void
     return true;    
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Calculate the Chan&Vese term for current Phi and image.
  * 
  * Calculates dirac(Phi) * (mu*div*(nabla(Phi)/|nabla(Phi)| - nu - lambda1*(image - c1) + lambda2*(image - c2))), 
@@ -635,7 +704,7 @@ static inline bool curvatureDirect (goSignal3DBase<void>& input, goSignal3D<void
  *                the above equation. Note that this is not yet multiplied by a time step.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 #define HAVE_MATLAB
 #include <engine.h>
 #include <gomatlab.h>
@@ -645,60 +714,85 @@ bool goRegionLS::chanVeseTerm (goSignal3DBase<void>& result)
     goDouble c1 = this->outerMean();
 
     goSignal3D<void> curvTerm;
-    curvatureDivNabla (myPrivate->phi, curvTerm, myPrivate->hx, myPrivate->hy);
-    //curvatureDirect (myPrivate->phi, div);
-    
-    //= Comparing curvatureDirect and curvatureDivNabla
+    if (myPrivate->mu != 0.0 || myPrivate->delingetteFactor != 0.0)
+    {
+        curvatureDivNabla (myPrivate->phi, curvTerm, myPrivate->hx, myPrivate->hy);
+        // curvatureDirect (myPrivate->phi, curvTerm, myPrivate->hx, myPrivate->hy);
+        
+        //= Comparing curvatureDirect and curvatureDivNabla
 #if 0
-    goSignal3D<void> div;
-    curvatureDivNabla (myPrivate->phi, div, myPrivate->hx, myPrivate->hy);
-    goSignal3D<void> div2;
-    curvatureDirect(myPrivate->phi, div2);
-    static goMatlab matlab;
-    matlab.putSignal (&div2,"div2");
-    div2 -= div;
-    GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goDouble*)__ptr = fabs(*(goDouble*)__ptr), div2);
-    goDouble max = div2.getMaximum();
-    goDouble min = div2.getMinimum();
-    goDouble mean = goSignalMean (div2);
-    printf ("difference max == %f, min == %f, mean == %f\n",max,min,mean);
-   
-    matlab.putSignal (&div,"div");
-    matlab.putSignal (&div2,"difference");
+        goSignal3D<void> div;
+        curvatureDivNabla (myPrivate->phi, div, myPrivate->hx, myPrivate->hy);
+        goSignal3D<void> div2;
+        curvatureDirect(myPrivate->phi, div2);
+        static goMatlab matlab;
+        matlab.putSignal (&div2,"div2");
+        div2 -= div;
+        GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goDouble*)__ptr = fabs(*(goDouble*)__ptr), div2);
+        goDouble max = div2.getMaximum();
+        goDouble min = div2.getMinimum();
+        goDouble mean = goSignalMean (div2);
+        printf ("difference max == %f, min == %f, mean == %f\n",max,min,mean);
+       
+        matlab.putSignal (&div,"div");
+        matlab.putSignal (&div2,"difference");
 
-    matlab.matlabCall ("figure(10); imagesc(div); colormap (gray); colorbar; title('div');");
-    matlab.matlabCall ("figure(11); imagesc(div2); colormap (gray); colorbar; title('div2'); drawnow;");
-    matlab.matlabCall ("figure(12); imagesc(difference); colormap (gray); colorbar; title('difference'); waitforbuttonpress;");
+        matlab.matlabCall ("figure(10); imagesc(div); colormap (gray); colorbar; title('div');");
+        matlab.matlabCall ("figure(11); imagesc(div2); colormap (gray); colorbar; title('div2'); drawnow;");
+        matlab.matlabCall ("figure(12); imagesc(difference); colormap (gray); colorbar; title('difference'); waitforbuttonpress;");
 #endif
 
 #if 0
-    myPrivate->matlab.signalToVariable (&nablaPhiX, "x");
-    myPrivate->matlab.signalToVariable (&nablaPhiY, "y");
-    myPrivate->matlab.signalToVariable (&div, "div");
-    goString matlabResult;
-    matlabResult.resize (1024);
-    myPrivate->matlab.matlabCall ("div2 = divergence(x,y);\
-                                   mean(mean(abs(div-div2))),\
-                                   figure(1),imagesc(div2),colorbar;\
-                                   figure(2),imagesc(div),colorbar;\
-                                   waitforbuttonpress;", &matlabResult);
-  
-    printf ("%s\n",matlabResult.toCharPtr());
-    goSignal3D<void> div2;
-    if (!myPrivate->matlab.variableToSignal (&div2, "div2"))
-    {
-        goLog::error ("Could not get div from matlab.",this);
-        return false;
-    }
+        myPrivate->matlab.signalToVariable (&nablaPhiX, "x");
+        myPrivate->matlab.signalToVariable (&nablaPhiY, "y");
+        myPrivate->matlab.signalToVariable (&div, "div");
+        goString matlabResult;
+        matlabResult.resize (1024);
+        myPrivate->matlab.matlabCall ("div2 = divergence(x,y);\
+                                       mean(mean(abs(div-div2))),\
+                                       figure(1),imagesc(div2),colorbar;\
+                                       figure(2),imagesc(div),colorbar;\
+                                       waitforbuttonpress;", &matlabResult);
+      
+        printf ("%s\n",matlabResult.toCharPtr());
+        goSignal3D<void> div2;
+        if (!myPrivate->matlab.variableToSignal (&div2, "div2"))
+        {
+            goLog::error ("Could not get div from matlab.",this);
+            return false;
+        }
 #endif 
-    
-    //= Now do div - nu - lambda1*(image - c1)^2 + lambda2*(image - c2)^2.
-    if (!goCopySignal(&curvTerm,&result))
-    {
-        goLog::error ("chanVeseTerm(): could not copy div to result.",this);
-        return false;
+        
+        //= Now do div - nu - lambda1*(image - c1)^2 + lambda2*(image - c2)^2.
+        if (!goCopySignal(&curvTerm,&result))
+        {
+            goLog::error ("chanVeseTerm(): could not copy div to result.",this);
+            return false;
+        }
+        result *= myPrivate->mu;
     }
-    result *= myPrivate->mu;
+    else
+    {
+        switch (result.getDataType().getID())
+        {
+            case GO_FLOAT:
+                {
+                    goFloat value = 0.0;
+                    result.fill (&value);
+                }
+                break;
+            case GO_DOUBLE:
+                {
+                    goDouble value = 0.0;
+                    result.fill (&value);
+                }
+                break;
+            default: 
+                goLog::warning("chanVeseTerm(): result data type must be float or double.",this); 
+                return false; 
+                break;
+        }
+    }
 
     //= Delingette/Picinbono:
     if (myPrivate->delingetteFactor != 0.0)
@@ -731,12 +825,12 @@ bool goRegionLS::chanVeseTerm (goSignal3DBase<void>& result)
     {
         case GO_FLOAT:
             {
-                chanVeseImageTerm<goFloat,goDouble> (myPrivate->image, &result, &myPrivate->phi, c1, c2, myPrivate->lambda1, myPrivate->lambda2, myPrivate->epsilon);
+                chanVeseImageTerm<goFloat,goDouble> (myPrivate->image, &result, &myPrivate->phi, c1, c2, myPrivate->lambda1, myPrivate->lambda2);
             }
             break;
         case GO_DOUBLE:
             {
-                chanVeseImageTerm<goDouble,goDouble> (myPrivate->image, &result, &myPrivate->phi, c1, c2, myPrivate->lambda1, myPrivate->lambda2, myPrivate->epsilon);
+                chanVeseImageTerm<goDouble,goDouble> (myPrivate->image, &result, &myPrivate->phi, c1, c2, myPrivate->lambda1, myPrivate->lambda2);
             }
             break;
         default:
@@ -747,6 +841,217 @@ bool goRegionLS::chanVeseTerm (goSignal3DBase<void>& result)
             break;
     }
     return true;
+}
+
+/** 
+* @brief Calculate \f$ \nabla \Phi \f$ with central differences.
+*
+* @see velocityFieldTimesGradPhi()
+* 
+* @param nablaPhi Contains result after the method returned true.
+* 
+* @return True if successful, false otherwise.
+*/
+bool goRegionLS::getNablaPhi (goSignal3D<void>& nablaPhi) const
+{
+    //= Some sanity checks.
+    if (nablaPhi.getChannelCount() != 2)
+    {
+        goLog::warning("getNablaPhi(): nablaPhi must have 2 channels.",this);
+        return false;
+    }
+    const goSignal3DBase<void>& phi = myPrivate->phi;
+    if (nablaPhi.getSizeX() != phi.getSizeX() ||
+        nablaPhi.getSizeY() != phi.getSizeY() ||
+        nablaPhi.getSizeZ() != phi.getSizeZ())
+    {
+        goLog::warning("getNablaPhi(): nablaPhi must be of the same size as Phi.",this);
+        return false;
+    }
+
+    nablaPhi.setChannel(0);
+    bool ok = goMath::centralDifferences(phi,nablaPhi,0,myPrivate->hx);
+    nablaPhi.setChannel(1);
+    ok = ok && goMath::centralDifferences(phi,nablaPhi,1,myPrivate->hy);
+    nablaPhi.setChannel(0);
+    return ok;
+}
+
+template <class TV,class Tphi,class Tresult>
+static bool upwindVTimesGradPhi4 (const goSignal3DBase<void>& V, 
+                                  const goSignal3DBase<void>& phi,
+                                  goDouble                    hx, 
+                                  goDouble                    hy,
+                                  goSignal3DBase<void>&       result)
+{
+    goSize_t tempChanV = V.getChannel();
+    const_cast<goSignal3DBase<void>& >(V).setChannel(0);
+    goSignal3DGenericConstIterator vIt(&V);
+    const_cast<goSignal3DBase<void>& >(V).setChannel(tempChanV);
+    goSignal3DGenericConstIterator it(&phi);
+    goSignal3DGenericIterator resIt(&result);
+    const goDouble hx_ = 1.0 / hx;
+    const goDouble hy_ = 1.0 / hy;
+    while (!it.endZ())
+    {
+        it.resetY();
+        vIt.resetY();
+        resIt.resetY();
+        while (!it.endY())
+        {
+            it.resetX();
+            vIt.resetX();
+            resIt.resetX();
+            while (!it.endX())
+            {
+                goDouble vx = *(const TV*)*vIt;
+                goDouble vy = *((const TV*)*vIt + 1);
+                goDouble gradX = 0.0;
+                goDouble gradY = 0.0;
+                Tphi central = *(const Tphi*)*it;  // saves one dereference and cast per point
+                if (vx < 0.0)
+                {
+                    gradX = (*(const Tphi*)it.rightX() - central) * hx_;
+                }
+                else if (vx > 0.0)
+                {
+                    gradX = (central - *(const Tphi*)it.leftX()) * hx_;
+                }
+                if (vy < 0.0)
+                {
+                    gradY = (*(const Tphi*)it.rightY() - central) * hy_;
+                }
+                else if (vy > 0.0)
+                {
+                    gradY = (central - *(const Tphi*)it.leftY()) * hy_;
+                }
+                *(Tresult*)*resIt = vx * gradX + vy * gradY;
+                it.incrementX();
+                vIt.incrementX();
+                resIt.incrementX();
+            }
+            it.incrementY();
+            vIt.incrementY();
+            resIt.incrementY();
+        }
+        it.incrementZ();
+        vIt.incrementZ();
+        resIt.incrementZ();
+    }
+    return true;
+}
+template <class TV,class Tphi>
+static bool upwindVTimesGradPhi3 (const goSignal3DBase<void>& V, 
+                                  const goSignal3DBase<void>& phi,
+                                  goDouble                    hx,
+                                  goDouble                    hy,
+                                  goSignal3DBase<void>&       result)
+{
+    switch (result.getDataType().getID())
+    {
+        case GO_FLOAT:  return upwindVTimesGradPhi4<TV,Tphi,goFloat>  (V,phi,hx,hy,result); break;
+        case GO_DOUBLE: return upwindVTimesGradPhi4<TV,Tphi,goDouble> (V,phi,hx,hy,result); break;
+        default: goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): bad type for phi.");
+                 return false;
+    }
+}
+template <class TV>
+static bool upwindVTimesGradPhi2 (const goSignal3DBase<void>& V, 
+                                  const goSignal3DBase<void>& phi,
+                                  goDouble                    hx,
+                                  goDouble                    hy,
+                                  goSignal3DBase<void>&       result)
+{
+    switch (phi.getDataType().getID())
+    {
+        case GO_FLOAT:  return upwindVTimesGradPhi3<TV,goFloat>  (V,phi,hx,hy,result); break;
+        case GO_DOUBLE: return upwindVTimesGradPhi3<TV,goDouble> (V,phi,hx,hy,result); break;
+        default: goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): bad type for phi.");
+                 return false;
+    }
+}
+/*
+* @brief Calculate V * grad(phi) using the upwind finite difference scheme.
+* 
+* All signals can be of type GO_FLOAT or GO_DOUBLE, in any combination.
+* Other types are not supported.
+* 
+* @param V 2D vector field
+* @param phi phi
+* @param hx x grid spacing
+* @param hy y grid spacing
+* @param result V * grad(phi)
+* 
+* @return True if successful, false otherwise.
+*/
+static bool upwindVTimesGradPhi (const goSignal3DBase<void>& V, 
+                                 const goSignal3DBase<void>& phi,
+                                 goDouble                    hx,
+                                 goDouble                    hy,
+                                 goSignal3DBase<void>&       result)
+{
+    if (V.getSize() != phi.getSize())
+    {
+        goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): V and phi sizes mismatch");
+        return false;
+    }
+    if (result.getSize() != phi.getSize())
+    {
+        goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): result and phi sizes mismatch");
+        return false;
+    }
+    if (V.getChannelCount() != 2)
+    {
+        goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): V must be 2-channel data");
+        return false;
+    }
+    switch (V.getDataType().getID())
+    {
+        case GO_FLOAT:  return upwindVTimesGradPhi2<goFloat>  (V,phi,hx,hy,result); break;
+        case GO_DOUBLE: return upwindVTimesGradPhi2<goDouble> (V,phi,hx,hy,result); break;
+        default: goLog::warning("goRegionLS::velocityFieldTimesGradPhi(): bad type for V.");
+                 return false;
+    }
+}
+
+/** 
+* @brief Convenience function, multiplies V with nabla(Phi) using upwind scheme.
+* 
+* @param V 2D Vector field. Vector elements are stored in channels.
+* @param result \f$ V \cdot \nabla\Phi \f$
+* 
+* @todo nabla phi is calculated various times during evolution.
+*       Optimise that when it gets crucial.
+* 
+* @return True if successful, false otherwise. Check logfile.
+*/
+bool goRegionLS::velocityFieldTimesGradPhi (const goSignal3DBase<void>& V,
+                                            goSignal3DBase<void>& result)
+{
+    const goSignal3DBase<void>& phi = myPrivate->phi;
+
+#if 0
+    //= Calculate grad(phi).
+    goSignal3D<void> gradPhi;
+    gradPhi.setDataType(GO_DOUBLE);
+    gradPhi.setBorderFlags(GO_X|GO_Y, GO_CONSTANT_BORDER);
+    //= 2-channel signal for a vector field.
+    gradPhi.make(phi.getSizeX(), phi.getSizeY(), phi.getSizeZ(),
+                 16, 16, phi.getBlockSizeZ(), 4, 4, phi.getBorderZ(), 2);
+    if (!this->getNablaPhi (gradPhi))
+    {
+        return false;
+    }
+#endif
+
+    //= NOTE:
+    //= Calculate grad(phi) using upwind finite differences
+    //= (use the direction from which the information flows to calculate
+    //=  the gradient). Central differences would introduce errors.
+    return upwindVTimesGradPhi (V,phi,myPrivate->hx,myPrivate->hy,result);
+    
+    //= Calculate V * grad(phi)
+    // return goMath::vectorMult(V,gradPhi,result);
 }
 
 bool goRegionLS::timesDiracPhi (goSignal3DBase<void>& f)
@@ -760,15 +1065,15 @@ bool goRegionLS::timesDiracPhi (goSignal3DBase<void>& f)
     return true;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Evolves one time step.
  * 
  * @param deltaT Time step. Note that there is a restriction on the step since
  *               the PDE is solved explicitly.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
-bool goRegionLS::evolve (goDouble deltaT)
+ */
+bool goRegionLS::evolve (goDouble deltaT, const goSignal3DBase<void>* externalVelocity, goDouble externalFactor)
 {
     //= delta_phi = chan-vese-term;
     //= phi = phi + deltaT * delta_phi;
@@ -801,6 +1106,22 @@ bool goRegionLS::evolve (goDouble deltaT)
         liTerm (myPrivate->phi, li, myPrivate->hx, myPrivate->hy);
         li *= myPrivate->liFactor;
         chanVese += li;
+    }
+    if (externalVelocity)
+    {
+        //= Make a scalar field of size(Phi)
+        goSignal3D<void> v_times_grad_phi;
+        v_times_grad_phi.setDataType(GO_DOUBLE);
+        v_times_grad_phi.make(&myPrivate->phi);
+        if (!this->velocityFieldTimesGradPhi(*externalVelocity, v_times_grad_phi))
+        {
+            goLog::warning("evolve(): velocityFieldTimesGradPhi() failed.",this);
+        }
+        else
+        {
+            v_times_grad_phi *= externalFactor;
+            chanVese -= v_times_grad_phi;
+        }
     }
     
     //= Everything times dirac(Phi).
@@ -1081,11 +1402,11 @@ static goDouble innerMean_ (const goSignal3DBase<void>& image, const goSignal3DB
     }
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Calculate the inner mean.
  * 
  * @return Inner mean (where Phi > 0)
- ----------------------------------------------------------------------------*/
+ */
 goDouble goRegionLS::innerMean ()
 {
     if (!myPrivate->image)
@@ -1105,11 +1426,11 @@ goDouble goRegionLS::innerMean ()
     return 0.0;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Calculate the outer mean.
  * 
  * @return Outer mean (where Phi < 0)
- ----------------------------------------------------------------------------*/
+ */
 goDouble goRegionLS::outerMean ()
 {
     if (!myPrivate->image)

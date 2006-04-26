@@ -35,6 +35,7 @@ SET                 (SOURCES
  src/math/cg.cpp
  src/math/gobiorthowavelet.cpp
  src/math/divergence.cpp
+ src/math/vectormult.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 

@@ -350,9 +350,9 @@ bool goShape::center (goCurvef& curve)
 /**
  * @brief Normalizes point coordinates so that \f$\sum\limits_i x_i^2 + y_i^2 = 1\f$.
  *
- * @return True if successful, false otherwise.
+ * @return Normalization factor.
  **/
-bool goShape::normalize (goCurvef& curve)
+goDouble goShape::normalize (goCurvef& curve)
 {
     return goShape::normalize(curve.getPoints());
 }
@@ -360,37 +360,39 @@ bool goShape::normalize (goCurvef& curve)
 /**
  * @brief Normalizes point coordinates so that \f$\sum\limits_i x_i^2 + y_i^2 = 1\f$.
  *
- * @return True if successful, false otherwise.
+ * @return Normalization factor.
  **/
-bool goShape::normalize (goList<goPointf>& points)
+goDouble goShape::normalize (goList<goPointf>& points)
 {
     if (points.isEmpty())
-        return false;
+        return 0.0;
 
     goDouble sum = 0.0;
     goList<goPointf>::Element* el = points.getFrontElement();
     assert(el);
-    while (true)
+    const goIndex_t sz = static_cast<goIndex_t>(points.getSize());
+    goIndex_t i = 0;
+    while (el && i < sz)
     {
         sum += el->elem.x * el->elem.x + el->elem.y * el->elem.y;
-        if (!el->next)
-            break;
         el = el->next;
+        ++i;
     }
     if (sum <= 0.0)
-        return false;
+        return 0.0;
     sum = 1.0f / sqrt(sum);
     el = points.getFrontElement();
     assert(el);
-    while (true)
+    i = 0;
+    el = points.getFrontElement();
+    while (el && i < sz)
     {
         el->elem.x *= sum;
         el->elem.y *= sum;
-        if (!el->next)
-            break;
         el = el->next;
+        ++i;
     }
-    return true;
+    return sum;
 }
 
 bool goShape::callObjectMethod (int methodID, goObjectMethodParameters* param)

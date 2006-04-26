@@ -29,11 +29,11 @@ class goShape : public goObjectBase
         void           setCurve (goCurvef*);
         bool           getWeights (goArray<goFloat>& weights) const;
         
-        static bool align         (goCurvef& curve, const goCurvef& other);
-        static bool center        (goCurvef& curve);
-        static bool normalize     (goCurvef& curve);
-        static bool normalize     (goList<goPointf>& points);
-        static bool procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet);
+        static bool     align         (goCurvef& curve, const goCurvef& other);
+        static bool     center        (goCurvef& curve);
+        static goDouble normalize     (goCurvef& curve);
+        static goDouble normalize     (goList<goPointf>& points);
+        static bool     procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet);
 
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
         

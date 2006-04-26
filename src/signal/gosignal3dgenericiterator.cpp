@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id$
+ * $Id: gosignal3dgenericiterator.cpp,v 1.1.1.1 2006/04/19 15:26:30 gosch Exp $
  */
 
 #include <gosignal3dbase.h>

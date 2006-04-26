@@ -40,8 +40,12 @@ goSignal3D : public goSignal3DBase<T>
         const goSignal3D<T>& operator= (goSignal3DBase<T>& other);
 
         // From goObjectBase
-        virtual goSize_t memoryUsage();
+        virtual goSize_t memoryUsage() const;
 
+        bool make (const goSize3D& size,
+                   const goSize3D& blockSize,
+                   const goSize3D& borderSize,
+                   goSize_t        channelCount);
         bool make (goSize_t x, goSize_t y, goSize_t z,
                           goSize_t blocksize_x = 32,
                           goSize_t blocksize_y = 32,

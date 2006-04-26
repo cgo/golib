@@ -35,7 +35,7 @@ goObjectBase
 
  public:
     const char* getClassName () const;
-    virtual goSize_t memoryUsage();
+    virtual goSize_t memoryUsage() const;
 
     void            setObjectName (const char* name);
     void            setObjectName (const goString& name);

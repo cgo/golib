@@ -11,6 +11,17 @@
 # include <gomatrix.h>
 #endif
 
+/** 
+ * @brief General vector class.
+ *
+ * Use this instead of goNVector, which should be deprecated soon.
+ * This may not be optimal yet, but it will be improved when I have
+ * more need for the class.
+ *
+ * @todo Document members.
+ * 
+ * @author Christian Gosch
+ */
 template<class T>
 class goVector : public goFixedArray<T>
 {
