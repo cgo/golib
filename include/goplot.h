@@ -6,6 +6,56 @@
 #ifndef GOLIST_H
 # include <golist.h>
 #endif
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
+#ifndef GOPOINT_H
+# include <gopoint.h>
+#endif
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
+
+class goPlotterPrivate;
+
+class goPlotter : public goObjectBase
+{
+    public:
+        goPlotter ();
+        virtual ~goPlotter ();
+        goPlotter (const goPlotter&);
+        const goPlotter& operator= (const goPlotter&);
+
+        template <class pointT>
+            bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
+            {
+                typename goList<pointT>::ConstElement* el = points.getFrontElement();
+                goSize_t sz = points.getSize();
+                goVectord x(sz);
+                goVectord y(sz);
+                goSize_t i = 0;
+                while (i < sz && el)
+                {
+                    x[i] = el->elem.x;
+                    y[i] = el->elem.y;
+                    ++i;
+                    el = el->next;
+                }
+                return this->addCurve (x,y,title,plotOptions);
+            };
+        bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
+
+        void setWaitFlag (bool w);
+        bool getWaitFlag () const;
+        void setPauseFlag (bool p);
+        bool getPauseFlag () const;
+        
+        virtual bool plot ();
+        virtual bool plotPostscript (const goString& filename);
+        
+    private:
+        goPlotterPrivate* myPrivate;
+};
 
 namespace goPlot
 {

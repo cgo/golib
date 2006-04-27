@@ -7,6 +7,123 @@
 # include <golog.h>
 #endif
 
+class goPlotterPrivate
+{
+    public:
+        goPlotterPrivate() : plotX(), plotY(), titles(), plotCommands(), prefixCommands(""), shellPostfix(""),
+                             waitFlag(true), pauseFlag(false), cmdFilename(""), dataFilenames(){};
+        ~goPlotterPrivate() {};
+
+        goList<goVectord> plotX;
+        goList<goVectord> plotY;
+        goList<goString>  titles;
+        goList<goString>  plotCommands;
+        goString          prefixCommands;
+        goString          shellPostfix;
+
+        bool              waitFlag;
+        bool              pauseFlag;
+        goString          cmdFilename;
+        goList<goString>  dataFilenames;
+};
+
+goPlotter::goPlotter ()
+    :  goObjectBase (),
+       myPrivate (0)
+{
+    this->setClassName ("goPlotter");
+    myPrivate = new goPlotterPrivate;
+}
+
+goPlotter::~goPlotter ()
+{
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = 0;
+    }
+}
+
+goPlotter::goPlotter (const goPlotter& other)
+{
+    this->setClassName ("goPlotter");
+    myPrivate = new goPlotterPrivate;
+    *this = other;
+}
+
+const goPlotter& goPlotter::operator= (const goPlotter& other)
+{
+    *myPrivate = *other.myPrivate;
+    return *this;
+}
+
+bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions)
+{
+    if (x.getSize() != y.getSize())
+    {
+        return false;
+    }
+    myPrivate->plotX.append(x);
+    myPrivate->plotY.append(y);
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
+void goPlotter::setWaitFlag (bool w)
+{
+    myPrivate->waitFlag = w;
+}
+
+bool goPlotter::getWaitFlag () const
+{
+    return myPrivate->waitFlag;
+}
+
+void goPlotter::setPauseFlag (bool w)
+{
+    myPrivate->pauseFlag = w;
+}
+
+bool goPlotter::getPauseFlag () const
+{
+    return myPrivate->pauseFlag;
+}
+
+bool goPlotter::plot ()
+{
+    return goPlot::gnuplotList (&myPrivate->plotX, 
+                                &myPrivate->plotY, 
+                                &myPrivate->titles, 
+                                &myPrivate->plotCommands, 
+                                myPrivate->prefixCommands.toCharPtr(), 
+                                myPrivate->pauseFlag ? "pause -1\n" : 0, 
+                                myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
+                                myPrivate->waitFlag ? 0 : &myPrivate->cmdFilename, 
+                                myPrivate->waitFlag ? 0 : &myPrivate->dataFilenames, 
+                                myPrivate->waitFlag);
+}
+
+bool goPlotter::plotPostscript (const goString& filename)
+{
+    goString backup1 = myPrivate->prefixCommands;
+    myPrivate->prefixCommands = "set terminal postscript color\n";
+    goString backup2 = myPrivate->shellPostfix;
+    myPrivate->shellPostfix = " > ";
+    myPrivate->shellPostfix += filename;
+    bool ok = this->plot();
+    myPrivate->prefixCommands = backup1;
+    myPrivate->shellPostfix = backup2;
+    return ok;
+}
+
 static bool _gnuplot_do_plot (goString filename, goString* cmdFilenameRet, goString* dataFileNameRet, const char* title, bool waitfor, const char* plotCommands, const char* prefixCommands, const char* shellPostfix)
 {
     goString gnuplotCommands;
