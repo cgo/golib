@@ -315,6 +315,32 @@ goString::copy (goString& target, goIndex_t start, goIndex_t end) const
     return false;
 }
 
+bool
+goString::getWords (goList<goString>& wordsRet) const
+{
+    goIndex_t index = 0;
+    goIndex_t sz = static_cast<goIndex_t>(this->getSize());
+    while (index < sz)
+    {
+        while (index < sz && (*this)[index] == ' ' || (*this)[index] == '\n') 
+        {
+            ++index;
+        }
+        goIndex_t indexStart = index;
+        while (index < sz && (*this)[index] != ' ' && (*this)[index] != '\n')
+        {
+            ++index;
+        }
+        goString word;
+        this->copy (word,indexStart,index-1);
+        if (word.getSize() > 0)
+        {
+            wordsRet.append(word);
+        }
+    }
+    return true;
+}
+
 void
 goString::fill (char c)
 {

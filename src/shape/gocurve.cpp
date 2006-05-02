@@ -107,7 +107,7 @@ bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBe
 {
     goList<pointT>& points = this->getPoints();
     points.erase();
-    bool result = goCurve<pointT>::resample(sourceBegin, sourcePointCount, destPointCount, points);
+    bool result = goCurve<pointT>::resample(sourceBegin, sourcePointCount, destPointCount, points, closed);
     if (!result)
     {
         return false;
@@ -218,7 +218,7 @@ goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool 
  * @return True if successful, false otherwise.
  **/
 template<class pointT>
-bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret)
+bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret) const
 {
     if (pointCount <= 1)
         return false;
@@ -245,14 +245,21 @@ bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret)
 }
 
 template<class pointT>
-bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret)
+bool goCurve<pointT>::resample (goIndex_t pointCount, goList<pointT>& ret) const
 {
     goIndex_t np = this->getPoints().getSize();
-    if (this->getPoints().isClosed())
+    bool ok = goCurve<pointT>::resample (this->getPoints().getFrontElement(), np, pointCount, ret, this->getPoints().isClosed());
+    if (ok && this->getPoints().isClosed())
     {
-        np += 1;
+        ret.close();
     }
-    return goCurve<pointT>::resample (this->getPoints().getFrontElement(), np, pointCount, ret.getPoints()); 
+    return ok;
+}
+
+template<class pointT>
+bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret) const
+{
+    return this->resample (pointCount, ret.getPoints());
 }
 
 /** 
@@ -288,9 +295,9 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
 }
 
 template<class pointT>
-bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve)
 {
-    return goCurve<pointT>::resampleLinear (begin,pointCount,resamplePointCount,ret);
+    return goCurve<pointT>::resampleLinear (begin,pointCount,resamplePointCount,ret,closedCurve);
 }
 
 /** 
@@ -338,13 +345,21 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
  * @return 
  */
 template<class pointT>
-bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve)
 {
-    if (resamplePointCount < 1)
+    if (resamplePointCount < 2)
     {
         return false;
     }
     goDouble curveLength = 0.0;
+
+    //= If the curve is closed, the point list must be closed (or contain one more point)
+    //= and we must resample from the last to the first point too.
+    if (closedCurve)
+    {
+        ++pointCount;
+    }
+    
     goFixedArray<goDouble> accumLength (pointCount);
     
     {
@@ -358,34 +373,49 @@ bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* beg
             accumLength[i] = curveLength;
         }
     }
-   
-    goDouble step = curveLength / (float)(resamplePointCount-1);
+
+    goDouble step = 0.0;
+    if (closedCurve)
+    {
+        step = curveLength / (double)(resamplePointCount);
+    }
+    else
+    {
+        step = curveLength / (double)(resamplePointCount-1);
+    }
     goDouble t = 0.0f;
     goIndex_t i = 0;
     goIndex_t j = 0;
     pointT p;
     typename goList<pointT>::ConstElement* el = begin;
-    for (i = 0; i < resamplePointCount - 1; ++i, t += step)
+    for (i = 0; i < resamplePointCount; ++i)
     {
-        while (j < pointCount && t >= accumLength[j]) 
+        assert (el && el->next);
+        assert (j >= 0 && j < pointCount - 1);
+        pointT p;
+        goDouble e = (t - accumLength[j]) / (accumLength[j+1] - accumLength[j]);
+        p = el->next->elem * e + el->elem * (1-e);
+        ret.append (p);
+        t += step;
+        while (j < pointCount - 2 && t > accumLength[j+1])
         {
             ++j;
             assert (el);
             el = el->next;
         }
-        assert (el && el->prev);
-        assert (j > 0 && j < pointCount);
-        pointT p;
-        goDouble e = (t - accumLength[j-1]) / (accumLength[j] - accumLength[j-1]);
-        p = el->elem * e + el->prev->elem * (1-e);
-        ret.append (p);
     }
+#if 0
     {
+        if (j >= pointCount)
+        {
+            j = pointCount - 1;
+        }
         goDouble e = ((t - 1e-5) - accumLength[j-1]) / (accumLength[j] - accumLength[j-1]);
         pointT p;
         p = el->elem * e + el->prev->elem * (1-e);
         ret.append (p);
     }
+#endif
     return true;
 }
 
@@ -413,18 +443,43 @@ bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
     {
         return false;
     }
+
+    bool closed = false;
+    
     goString line;
     if (!goFileIO::readASCIILine (f, line))
     {
         return false;
     }
-    if (line != "curve")
     {
-        goString msg = "goCurve::readASCII(): expected 'curve', got '";
-        msg += line;
-        msg += "'";
-        goLog::warning(msg);
-        return false;
+        goList<goString> words;
+        line.getWords(words);
+        if (words.getSize() < 1)
+        {
+            goString msg = "goCurve::readASCII(): expected 'curve ...', got '";
+            msg += line;
+            msg += "'";
+            goLog::warning(msg);
+            return false;
+        }
+        goList<goString>::Element* el = words.getFrontElement();
+        if (el->elem != "curve")
+        {
+            goString msg = "goCurve::readASCII(): expected 'curve ...', got '";
+            msg += line;
+            msg += "'";
+            goLog::warning(msg);
+            return false;
+        }
+        while (el)
+        {
+            if (el->elem == "closed")
+            {
+                closed = true;
+            }
+            //= ... add more keywords here as needed
+            el = el->next;
+        }
     }
     unsigned int pointCount = 0;
     fscanf(f,"%d\n",&pointCount);
@@ -441,6 +496,10 @@ bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
         }
         p.x = x; p.y = y;
         ret.append(p);
+    }
+    if (closed)
+    {
+        ret.close();
     }
     return true;
 }

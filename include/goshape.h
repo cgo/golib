@@ -15,25 +15,32 @@
 #endif
 #include <gocurve.h>
 
-class goShapePrivate;
+template <class pointT> class goShapePrivate;
 
+template <class pointT>
 class goShape : public goObjectBase
 {
     public:
-        goShape (goCurvef* c = 0);
-        // goShape (goShape& other);
+        goShape ();
+        goShape (const goShape<pointT>& other);
         virtual ~goShape ();
+        const goShape<pointT>& operator= (const goShape<pointT>&);
 
-        goCurvef*       getCurve ();
-        const goCurvef* getCurve () const;
-        void           setCurve (goCurvef*);
-        bool           getWeights (goArray<goFloat>& weights) const;
+        void addCurve (const goCurve<pointT>& curve);
+        void addCurve (const goList<pointT>&  curve);
+        goList< goCurve<pointT> >&       getCurves ();
+        const goList< goCurve<pointT> >& getCurves () const;
+
+        goSize_t getCurveCount () const;
+        bool     readASCII     (const goString& filename);
         
-        static bool     align         (goCurvef& curve, const goCurvef& other);
-        static bool     center        (goCurvef& curve);
-        static goDouble normalize     (goCurvef& curve);
-        static goDouble normalize     (goList<goPointf>& points);
-        static bool     procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet);
+        // DEPRECATED bool           getWeights (goArray<goFloat>& weights) const;
+        
+        static bool     align         (goCurve<pointT>& curve, const goCurve<pointT>& other);
+        static bool     center        (goCurve<pointT>& curve);
+        static goDouble normalize     (goCurve<pointT>& curve);
+        static goDouble normalize     (goList<pointT>& points);
+        static bool     procrustesFit (goList<goCurve<pointT>*>& shapes, goCurve<pointT>& meanShapeRet);
 
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
         
@@ -41,7 +48,7 @@ class goShape : public goObjectBase
         virtual void receiveObjectMessage (const goObjectMessage& message);
 
     private:
-        goShapePrivate* myPrivate;
+        goShapePrivate<pointT>* myPrivate;
 };
 
 template <class pointT>

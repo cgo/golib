@@ -4,18 +4,13 @@
 #include <golog.h>
 #include <gostring.h>
 #include <goplot.h>
-
+#include <gocurvature.h>
 #include <gocurvaturediffusion.h>
 
-static goDouble kappa (goDouble phi, goDouble r);
-template <class pointT>
-static goDouble kappa (const pointT& p1, const pointT& p2, const pointT& p3);
 template <class REAL>
 static REAL vertexNormalComponent (REAL r, REAL phi, REAL e);
 template <class pointT>
 static goDouble metricParameter (pointT p1, pointT p2, pointT p3);
-template <class pointT>
-static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3);
 
 //====================================================================
 
@@ -62,7 +57,7 @@ bool goCurvatureDiffusionFlowTest (goList<pointT>& points, int sigma, goFixedArr
             pointT p = el->next->elem - el->prev->elem;
             r[i]     = p.abs();
             e[i]     = metricParameter(el->prev->elem, el->elem, el->next->elem);
-            phi[i]   = getTurn(el->prev->elem, el->elem, el->next->elem);
+            phi[i]   = goTurnAngle(el->prev->elem, el->elem, el->next->elem);
         }
         
         //= Calculate normal vectors n.
@@ -82,8 +77,8 @@ bool goCurvatureDiffusionFlowTest (goList<pointT>& points, int sigma, goFixedArr
             l_left += p.abs();
             p = el_right->elem - el_right->prev->elem;
             l_right += p.abs();
-            goDouble k_left = kappa(el_left->prev->elem, el_left->elem, el_left->next->elem);
-            goDouble k_right = kappa(el_right->prev->elem, el_right->elem, el_right->next->elem);
+            goDouble k_left = goCurvature(el_left->prev->elem, el_left->elem, el_left->next->elem);
+            goDouble k_right = goCurvature(el_right->prev->elem, el_right->elem, el_right->next->elem);
             enumerator += k_left*l_right + k_right*l_left;
             denominator += l_left + l_right;
             
@@ -101,7 +96,7 @@ bool goCurvatureDiffusionFlowTest (goList<pointT>& points, int sigma, goFixedArr
         f_normal_ret[i].x = temp;
         f_normal_ret[i]  *= phi[i] < 0.0 ? 1.0 : -1.0;
         // goDouble phi_star = asin(k_star[i] * r[i]);
-        f_normal_ret[i]  *= k_star[i] - kappa(el->prev->elem, el->elem, el->next->elem);
+        f_normal_ret[i]  *= k_star[i] - goCurvature(el->prev->elem, el->elem, el->next->elem);
 
         el = el->next;
         ++i;
@@ -117,27 +112,37 @@ bool goCurvatureDiffusionFlowTest (goList<pointT>& points, int sigma, goFixedArr
     return true;
 }
 
-/* Backup of the original version, Thu Jan 26 12:16:40 CET 2006 */
 /*
  * After Delingette et al.
  */
 template <class pointT>
-bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<pointT>& f_normal_ret)
+bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<pointT>& f_normal_ret, goFixedArray<pointT>& f_tangent_ret, goFixedArray<goDouble>* Lret, goFixedArray<goDouble>* phiRet, goFixedArray<goDouble>* rRet)
 {
     if (!points.isClosed())
     {
-        goLog::warning ("goCurveDiffusionRegularisation(): points must be a closed list (for a closed curve).\nIf you need open curves, change the implementation.");
+        goLog::warning ("goCurvatureDiffusionFlow(): points must be a closed list (for a closed curve).\nIf you need open curves, change the implementation.");
         return false;
     }
     if (sigma > points.getSize() / 2)
     {
-        goLog::warning ("goCurveDiffusionRegularisation(): try a smaller sigma.");
+        goLog::warning ("goCurvatureDiffusionFlow(): try a smaller sigma.");
         return false;
     }
 
     if (f_normal_ret.getSize() != static_cast<goSize_t>(points.getSize()))
     {
         f_normal_ret.setSize (points.getSize());
+    }
+    if (f_tangent_ret.getSize() != static_cast<goSize_t>(points.getSize()))
+    {
+        f_tangent_ret.setSize (points.getSize());
+    }
+    if (Lret)
+    {
+        if (Lret->getSize() != f_normal_ret.getSize())
+        {
+            Lret->setSize (f_normal_ret.getSize());
+        }
     }
     
     assert(f_normal_ret.getSize() == (goSize_t)points.getSize());
@@ -165,7 +170,7 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
             pointT p = el->next->elem - el->prev->elem;
             r[i]     = p.abs() * 0.5;
             e[i]     = metricParameter(el->prev->elem, el->elem, el->next->elem);
-            phi[i]   = getTurn(el->prev->elem, el->elem, el->next->elem);
+            phi[i]   = goTurnAngle(el->prev->elem, el->elem, el->next->elem);
         }
         
         //= Calculate k*
@@ -182,8 +187,8 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
             l_left += p.abs();
             p = el_right->elem - el_right->prev->elem;
             l_right += p.abs();
-            goDouble k_left = kappa(el_left->prev->elem, el_left->elem, el_left->next->elem);
-            goDouble k_right = kappa(el_right->prev->elem, el_right->elem, el_right->next->elem);
+            goDouble k_left = goCurvature(el_left->prev->elem, el_left->elem, el_left->next->elem);
+            goDouble k_right = goCurvature(el_right->prev->elem, el_right->elem, el_right->next->elem);
             enumerator += k_left*l_right + k_right*l_left;
             denominator += l_left + l_right;
             
@@ -197,10 +202,9 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
         //= Calculate the normal force vectors
         assert (r[i] != 0.0);
         // f_normal_ret[i]   = (el->next->elem - el->prev->elem) / (2.0*r[i]); //= Numerically bad for small r[i]?
-        f_normal_ret[i]   = (el->next->elem - el->prev->elem); 
-        goDouble temp     = -f_normal_ret[i].y;
-        f_normal_ret[i].y = f_normal_ret[i].x;
-        f_normal_ret[i].x = temp;
+        f_tangent_ret[i]   = (el->next->elem - el->prev->elem); 
+        f_normal_ret[i].y =  f_tangent_ret[i].x;
+        f_normal_ret[i].x = -f_tangent_ret[i].y;
         {
             goDouble temp = sqrt(f_normal_ret[i].x * f_normal_ret[i].x + f_normal_ret[i].y * f_normal_ret[i].y);
             if (temp == 0.0)
@@ -209,8 +213,11 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
             }
             else
             {
-                f_normal_ret[i].x /= temp;
-                f_normal_ret[i].y /= temp;
+                temp = 1.0 / temp;
+                f_normal_ret[i].x *= temp;
+                f_normal_ret[i].y *= temp;
+                f_tangent_ret[i].x *= temp;
+                f_tangent_ret[i].y *= temp;
             }
         }
         goDouble phi_star = 0.0;
@@ -225,9 +232,19 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
 //        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi_star,0.5,vertexNormalComponent(r[i],phi_star,0.5));
 //        printf ("vertexNormalComponent(%f,%f,%f): %f\n",r[i],phi[i],e[i],vertexNormalComponent(r[i],phi[i],e[i]));
         
-        goDouble vnc_star = goMath::min<goDouble>(vertexNormalComponent(r[i],phi_star,0.5),2.0);
-        goDouble vnc      = goMath::min<goDouble>(vertexNormalComponent(r[i],phi[i],e[i]),2.0);
+        goDouble vnc_star = vertexNormalComponent(r[i],phi_star,0.5); // goMath::min<goDouble>(vertexNormalComponent(r[i],phi_star,0.5),2.0);
+        goDouble vnc      = vertexNormalComponent(r[i],phi[i],e[i]); // goMath::min<goDouble>(vertexNormalComponent(r[i],phi[i],e[i]),2.0);
+        // vnc_star = goMath::min<goDouble> (goMath::max<goDouble>(vnc_star,-2.0),2.0);
+        // vnc = goMath::min<goDouble> (goMath::max<goDouble>(vnc,-2.0),2.0);
+        if (Lret)
+        {
+            (*Lret)[i] = vertexNormalComponent(r[i],phi[i],e[i]);
+            (*phiRet)[i] = phi[i];
+            (*rRet)[i] = r[i];
+        }
         f_normal_ret[i] *= vnc_star - vnc;
+        f_tangent_ret[i] *= ((el->prev->elem + el->next->elem)*0.5 - el->elem) * f_tangent_ret[i];
+        
         //f_normal_ret[i]  *= vertexNormalComponent(r[i],phi_star,0.5) -
         //    vertexNormalComponent(r[i],phi[i],e[i]);
 
@@ -250,26 +267,7 @@ bool goCurvatureDiffusionFlow (goList<pointT>& points, int sigma, goFixedArray<p
     return true;
 }
 
-template <class pointT>
-bool goCurvatureDiffusion (goList<pointT>& points, int sigma)
-{
-    return false;
-}
-
 //====================================================================
-
-static goDouble kappa (goDouble phi, goDouble r)
-{
-    return sin(phi) / r;
-}
-
-template <class pointT>
-static goDouble kappa (const pointT& p1, const pointT& p2, const pointT& p3)
-{
-    goDouble phi = getTurn(p1,p2,p3);
-    pointT p = p3 - p1;
-    return kappa(phi,p.abs()*0.5);
-}
 
 /* Here lies the rabbit in the pepper. Haha. */
 template <class REAL>
@@ -300,80 +298,8 @@ static goDouble metricParameter (pointT p1, pointT p2, pointT p3)
     // return 1 - F / (2.0f*r);
 }
 
-template <class pointT>
-static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
-{
-    pointT base = p3 - p1;
-    goDouble f = base.abs();
-    if (f == 0.0)
-    {
-        assert ("p3 == p1" == 0);
-        goLog::warning("getTurn(): Degenerate, returning M_PI.");
-        return M_PI;  //= This should not happen. It would mean p3 == p1.
-    }
-    base *= 1.0 / f;
-    pointT s1 = p2 - p1;
-    pointT s2 = p3 - p2;
-    goDouble l1 = s1.abs();
-    goDouble l2 = s2.abs();
-    if (l1 == 0.0 || l2 == 0.0)
-    {
-        goLog::warning("getTurn(): Degenerate, returning 0.");
-        //= Can't determine a sign. This would be a slightly degenerated case.
-        return 0;
-    }
-    assert (l1 != 0.0 && l2 != 0.0);
-
-    goDouble alpha1 = (s1 * base) / l1;
-    //= acos seems to result in nan when the argument is exactly 1.0 (contrary to the manpage!).
-    //= Catch that.
-    if (alpha1 <= -1.0)
-    {
-        alpha1 = M_PI;
-    }
-    else
-    {
-        if (alpha1 >= 1.0)
-        {
-            alpha1 = 0.0;
-        }
-        else
-        {
-            alpha1 = acos (alpha1);
-        }
-    }
-    goDouble alpha2 = (s2 * base) / l2;
-    if (alpha2 <= -1.0)
-    {
-        alpha2 = M_PI;
-    }
-    else
-    {
-        if (alpha2 >= 1.0)
-        {
-            alpha2 = 0.0;
-        }
-        else
-        {
-            alpha2 = acos (alpha2);
-        }
-    }
-
-    goDouble beta = alpha1 + alpha2;
-
-    //= The sign of the turn angle is determined by whether the triangle {p1,p2,p3} 
-    //= turns clockwise or counter-clockwise, which in turn is determined
-    //= by the z-component of the cross product {s1 0} x {s2 0}.
-    return beta * ((s1.x * s2.y < s1.y * s2.x) ? -1.0 : 1.0);
-}
+template 
+bool goCurvatureDiffusionFlow<goPointf> (goList<goPointf>& points, int sigma, goFixedArray<goPointf>& f_normal_ret, goFixedArray<goPointf>&, goFixedArray<goDouble>*, goFixedArray<goDouble>*, goFixedArray<goDouble>*);
 
 template 
-bool goCurvatureDiffusionFlow<goPointf> (goList<goPointf>& points, int sigma, goFixedArray<goPointf>& f_normal_ret);
-
-template 
-bool goCurvatureDiffusionFlow<goPointd> (goList<goPointd>& points, int sigma, goFixedArray<goPointd>& f_normal_ret);
-
-template 
-bool goCurvatureDiffusion (goList<goPointf>& points, int sigma);
-template 
-bool goCurvatureDiffusion (goList<goPointd>& points, int sigma);
+bool goCurvatureDiffusionFlow<goPointd> (goList<goPointd>& points, int sigma, goFixedArray<goPointd>& f_normal_ret, goFixedArray<goPointd>&, goFixedArray<goDouble>*, goFixedArray<goDouble>*, goFixedArray<goDouble>*);

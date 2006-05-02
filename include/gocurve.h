@@ -38,8 +38,9 @@ class goCurve : public goPointCloud<pointT>
                                    goIndex_t                              destPointCount, 
                                    bool                                   closed = false);
         bool     setPoints        (typename goList<pointT>::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed = false);
-        bool     resample         (goIndex_t pointCount, goCurve<pointT>& ret);
-        bool     resampleNUBS     (goIndex_t pointCount, goCurve<pointT>& ret);
+        bool     resample         (goIndex_t pointCount, goList<pointT>& ret) const;
+        bool     resample         (goIndex_t pointCount, goCurve<pointT>& ret) const;
+        bool     resampleNUBS     (goIndex_t pointCount, goCurve<pointT>& ret) const;
         bool     getGradNorm      (goArray<goFloat>& diffNorm) const;
         bool     getGrad          (goList<go4Vectorf>& diff) const;
         bool     getCurvNorm      (goArray<goFloat>& curvNorm) const;
@@ -51,8 +52,8 @@ class goCurve : public goPointCloud<pointT>
         
         static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);
         static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
-        static bool resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
-        static bool resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
+        static bool resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve);
+        static bool resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve);
         
         static bool readASCII  (FILE* f, goList<pointT>& ret);
         static bool writeASCII (FILE* f, const goList<pointT>& ret);

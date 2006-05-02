@@ -82,6 +82,7 @@ SET                 (SOURCES
  src/shape/gonubs.cpp
  src/shape/goshape.cpp
  src/shape/partial.cpp
+ src/shape/gocurvature.cpp
  src/shape/godiscretecurvepartition.cpp
  src/seispack/bakvec.c
  src/seispack/balanc.c

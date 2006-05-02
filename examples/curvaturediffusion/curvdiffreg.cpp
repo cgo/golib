@@ -5,6 +5,10 @@
 #include <gotimerobject.h>
 #include <gofixedarray.h>
 #include <gocurvepartition.h>
+#include <gocurve.h>
+#include <gomath.h>
+#include <goplot.h>
+
 #include <stdio.h>
 
 #include <engine.h>
@@ -80,52 +84,98 @@ int main (int argc, char* argv[])
      const int numIterations = atoi(argv[2]);
 
      goList<goPointf> points;
-     if (!readPointsFile (filename,points))
+     // if (!readPointsFile (filename,points))
+     FILE* f = fopen (filename,"r");
+     if (!f)
      {
-        printf ("Could not read file %s\n",filename);
+        printf ("Could not open file %s\n",filename);
         return 2;
      }
-     points.close();
-
-     const int neighSize = 3; // points.getSize() / 6;
-     
-     goMatlab matlab;
-     matlab.put2DPoints(points, "p");
-     matlab.matlabCall("figure(1); plot(p(1,1:end),p(2,1:end)); waitforbuttonpress;");
-
+     goList<goPointf> tempPoints;
+     if (!goCurvef::readASCII(f,tempPoints))
      {
-        goFixedArray<goDouble> curvatureBefore;
-        goCurveCurvature (points,curvatureBefore);
-        matlab.putArray (curvatureBefore.getPtr(), curvatureBefore.getSize(), "curvBef");
+        printf ("Could not read curve from %s\n",filename);
+        return 2;
+     }
+     fclose(f);
+     // tempPoints.close();
+     goCurvef::resample (tempPoints.getFrontElement(), tempPoints.getSize(), tempPoints.getSize() / 2, points, tempPoints.isClosed());
+     if (tempPoints.isClosed())
+     {
+        points.close();
      }
 
-     goFixedArray<goPointf> normalFlow;
+     const int neighSize = goMath::min<int>(10, goMath::max<int>(static_cast<int>((float)points.getSize() * 0.05),5));
+     
+     // const int neighSize = 5;
+     
+     goPlotter plotter;
+     plotter.addCurve (points, "original");
+     plotter.setWaitFlag(false);
+     plotter.setPauseFlag(true);
+//     plotter.plot();
+   
+     goFixedArray<goDouble> curvatureBefore;
+     goCurveCurvature (points,curvatureBefore);
+
+     goFixedArray<goPointf> normalFlow (points.getSize());
+     goFixedArray<goPointf> tangentFlow (points.getSize());
+     goFixedArray<goDouble> L (points.getSize());
+     goFixedArray<goDouble> phi (points.getSize());
+     goFixedArray<goDouble> r (points.getSize());
      goTimerObject timer;
      timer.startTimer();
      for (goIndex_t j = 0; j < numIterations; ++j)
      {
-        goCurvatureDiffusionFlow (points, neighSize, normalFlow);
+        goCurvatureDiffusionFlow (points, neighSize, normalFlow, tangentFlow, &L, &phi, &r);
         assert (normalFlow.getSize() == points.getSize());
         goList<goPointf>::Element* el = points.getFrontElement();
         for (goIndex_t i = 0; i < normalFlow.getSize() && el; ++i, el = el->next)
         {
-            el->elem += normalFlow[i] * 0.2;
+            el->elem += normalFlow[i] * 0.1 + tangentFlow[i] * 0.1;
             // printf ("%f %f    %f\n", normalFlow[i].x, normalFlow[i].y, normalFlow[i].abs());
         }
         //matlab.put2DPoints(points, "p");
         //matlab.matlabCall("plot(p(1,1:end),p(2,1:end)); drawnow;");
-        printf ("Iteration %d\n",j);
+        // printf ("Iteration %d\n",j);
      }
      timer.stopTimer();
      printf ("Time: %f\n",timer.getTimerSeconds());
-     matlab.put2DPoints(points, "p");
-     matlab.matlabCall("figure(2); plot(p(1,1:end),p(2,1:end)); drawnow;");
 
+     goString title = "after ";
+     title += (int)numIterations;
+     title += " iterations, ";
+     title += "\\sigma = ";
+     title += (int)neighSize;
+     plotter.addCurve (points, title.toCharPtr());
+     goString psFilename = filename;
+     psFilename += "_delingette.ps";
+     plotter.plotPostscript(psFilename);
+
+
+     //goPlot::gnuplot (L,"L");
+     //goPlot::gnuplot (phi,"phi");
+     //goPlot::gnuplot (r,"r");
+     
      goFixedArray<goDouble> curvatureAfter;
      goCurveCurvature (points,curvatureAfter);
-     matlab.putArray (curvatureAfter.getPtr(), curvatureAfter.getSize(), "curvAft");
-     matlab.matlabCall("figure(3); hold on; subplot(2,1,1); plot(curvAft); subplot(2,1,2); plot(curvBef);");
-     matlab.matlabCall("save('workspace.mat');");
-     matlab.matlabCall("waitforbuttonpress;");
+
+     goPlotter plotter2;
+     title = "curv. after ";
+     title += (int)numIterations;
+     title += " Delingette iterations, \\sigma = ";
+     title += (int)neighSize;
+     plotter2.addCurve(curvatureAfter, title.toCharPtr());
+     plotter2.addCurve(curvatureBefore, "original curvature");
+     psFilename = filename;
+     psFilename += "_curvature.ps";
+     plotter2.plotPostscript(psFilename);
+
+     // goMatlab matlab;
+     // matlab.putArray (curvatureBefore.getPtr(), curvatureBefore.getSize(), "curvBef");
+     // matlab.putArray (curvatureAfter.getPtr(), curvatureAfter.getSize(), "curvAft");
+     // matlab.matlabCall("figure; hold on; subplot(2,1,1); plot(curvAft); subplot(2,1,2); plot(curvBef);");
+     // matlab.matlabCall("save('workspace.mat');");
+     // matlab.matlabCall("waitforbuttonpress;");
      return 1;
 }

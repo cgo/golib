@@ -31,8 +31,13 @@ class goPlotter : public goObjectBase
             {
                 typename goList<pointT>::ConstElement* el = points.getFrontElement();
                 goSize_t sz = points.getSize();
-                goVectord x(sz);
-                goVectord y(sz);
+                goSize_t szVec = sz;
+                if (points.isClosed())
+                {
+                    ++szVec;
+                }
+                goVectord x(szVec);
+                goVectord y(szVec);
                 goSize_t i = 0;
                 while (i < sz && el)
                 {
@@ -41,9 +46,30 @@ class goPlotter : public goObjectBase
                     ++i;
                     el = el->next;
                 }
+                if (points.isClosed())
+                {
+                    x[szVec-1] = x[0];
+                    y[szVec-1] = y[0];
+                }
                 return this->addCurve (x,y,title,plotOptions);
             };
+
         bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
+
+        template <class vectorT>
+            bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)
+            {
+                goSize_t sz = v.getSize();
+                goVectord x (sz);
+                goVectord y (sz);
+                goSize_t i = 0;
+                for (i = 0; i < sz; ++i)
+                {
+                    x[i] = i;
+                    y[i] = v[i];
+                }
+                return this->addCurve (x,y,title,plotOptions);
+            };
 
         void setWaitFlag (bool w);
         bool getWaitFlag () const;

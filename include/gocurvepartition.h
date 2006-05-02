@@ -43,6 +43,13 @@ bool goCurvePartitionLocalMeanCurvature(const goList<pointT>& curvePoints,
                                         goFixedArray<goDouble>* meanCurvatureRet = 0);
 
 template <class pointT>
+bool goCurvePartitionDelingette (const goList<pointT>& curvePoints, 
+                                 goSize_t neighSize,
+                                 goSize_t iterations,
+                                 goList<pointT>& ret,
+                                 goList<goIndex_t>& indexRet);
+
+template <class pointT>
 bool goCurvePartitionTrigger(const goList<pointT>& curvePoints,
                              goDouble              triggerLevelPos,
                              goDouble              triggerLevelNeg,

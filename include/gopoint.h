@@ -22,11 +22,11 @@ class goPoint : public go4Vector<T>
          * @param xf x coordinate. Default 0.0.
          * @param yf y coordinate. Default 0.0.
          * @param zf z coordinate. Default 0.0.
-         * @param wf w or t coordinate. Default 1.0.
+         * @param wf w or t coordinate. Default 0.0.
          * @param v  Value (misc.) for this point. This is not used for calculations 
          * with matrices, i.e. it is not interpreted as coordinate value. Default 0.0.
          */
-        goPoint (T xf = T(0.0), T yf = T(0.0), T zf = T(0.0), T wf = T(1.0), goDouble v = 0.0);
+        goPoint (T xf = T(0.0), T yf = T(0.0), T zf = T(0.0), T wf = T(0.0), goDouble v = 0.0);
         template <class To>
         goPoint (const goPoint<To>& other)
             : go4Vector<T> (other)

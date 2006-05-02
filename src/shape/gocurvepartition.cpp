@@ -15,30 +15,39 @@
 #include <gofilter1d.h>
 #include <goplot.h>
 #include <gofixedarray.h>
+#include <gocurvaturediffusion.h>
+#include <gocurvature.h>
 
-/*
- * @brief Get the turn angle between two segments.
- * 
- * @param p1 Point 1 (leftmost point)
- * @param p2 Point 2 (middle point)
- * @param p3 Point 3 (rightmost point)
- * 
- * @return Turn angle in radians.
- */
 template <class pointT>
-static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3);
+static bool findInflexionPoints (const goFixedArray<goDouble>& curvature, 
+                                 const goList<pointT>& curvePoints, 
+                                 goList<pointT>& ret, 
+                                 goList<goIndex_t>& indexRet)
+{
+    //= Find possible inflection points.
+    typename goList<pointT>::ConstElement* el = curvePoints.getFrontElement();
+    goIndex_t i = 0;
+    goIndex_t nPoints = curvePoints.getSize();
+    while (el && i < nPoints - 1)
+    {
+        if (curvature[i] * curvature[i+1] < 0.0f)
+        {
+            //ret.append((el->elem + el->next->elem) * 0.5);
+            ret.append(el->elem);
+            indexRet.append(i);
+        }
+        el = el->next;
+        ++i;
+    }
+    if (curvature[nPoints-1] * curvature[0] < 0.0f)
+    {
+        //ret.append((el->next->elem + el->next->next->elem) * 0.5);
+        ret.append(el->next->elem);
+        indexRet.append(nPoints-1);
+    }
+    return true;
+}
 
-/*
- * @brief Approximation of the local curvature.
- * 
- * @param p1 Point 1 (leftmost point)
- * @param p2 Point 2 (middle point)
- * @param p3 Point 3 (rightmost point)
- * 
- * @return Approximation of the curvature in the 3-point segment.
- */
-template <class pointT>
-static goDouble kappa (const pointT& p1, const pointT& p2, const pointT& p3);
 
 /*
  * Finds a partitioning by
@@ -172,74 +181,6 @@ bool goCurvePartitionLabelFiltering(const goList<pointT>& curvePoints,
     return true;
 }
 
-/*
- * @brief Approximate local curvature of a curve.
- * 
- * @param begin       First list element of curve points.
- * @param pointCount  Number of points.
- * @param curvRet     Curvature (size will be pointCount).
- * @param assumeConstantBoundary If true (default), one boundary point each at
- *                               beginning and end of the list will be 
- *                               assumed to be the boundary points. This is like for
- *                               open curves.
- *                               If false, there must be one point in 
- *                               begin->prev and one next to the last point.
- * 
- * @return True if successful, false otherwise.
- */
-// FIXME: What the hell is wrong with this template???
-template <class pointT>
-bool goCurveCurvature (typename goList<pointT>::ConstElement* begin,
-                       goIndex_t pointCount,
-                       goFixedArray<goDouble>& curvRet,
-                       bool assumeConstantBoundary)
-{
-    if (curvRet.getSize() != static_cast<goSize_t>(pointCount))
-    {
-        curvRet.setSize(pointCount);
-    }
-    //= "Closed curves"
-    if (!assumeConstantBoundary)
-    {
-        goIndex_t i = 0;
-        typename goList<pointT>::ConstElement* el = begin;
-        //goList<goPointf>::ConstElement* el = begin;
-        while (el && i < pointCount)
-        {
-            curvRet[i] = kappa(el->prev->elem, 
-                    el->elem, 
-                    el->next->elem);
-            el = el->next;
-            ++i;
-        }
-        return true;
-    }
-    //= "Open curves"
-    else
-    {
-        goIndex_t i = 0;
-        if (pointCount < 3)
-        {
-            for (i = 0; i < pointCount; ++i)
-            {
-                curvRet[i] = 0.0;
-            }
-            return true;
-        }
-        typename goList<pointT>::ConstElement* el = begin;
-        //goList<goPointf>::ConstElement* el = begin;
-        assert (el);
-        curvRet[0] = kappa(el->elem, el->elem, el->next->elem);
-        el = el->next;
-        for (i = 1; i < pointCount - 1 && el; ++i)
-        {
-            curvRet[i] = kappa(el->prev->elem, el->elem, el->next->elem);
-            el = el->next;
-        }
-        curvRet[pointCount-1] = kappa(el->prev->elem, el->elem, el->elem);
-        return true;
-    }
-}
 
 template <class pointT>
 bool goLocalMeanCurvature (typename goList<pointT>::ConstElement* curvePointsBegin,
@@ -342,8 +283,6 @@ bool goCurvePartitionLocalMeanCurvature(const goList<pointT>& curvePoints,
 //        *curvatureRet = curvature;
 //    }
     
-    goIndex_t nPoints = (goIndex_t)curvePoints.getSize();
-
     if (!goLocalMeanCurvature<pointT> (curvePoints.getFrontElement(), curvePoints.getSize(), curvePoints.isClosed(), neighSize, filterCount, curvature))
     {
         return false;
@@ -372,27 +311,49 @@ bool goCurvePartitionLocalMeanCurvature(const goList<pointT>& curvePoints,
     }
 //    goPlot::gnuplot(curvature,"Curvature","with lines\n","set terminal postscript","> /home/christian/curvature_mean.ps");
     
-    //= Find possible inflection points.
-    typename goList<pointT>::ConstElement* el = curvePoints.getFrontElement();
-    goIndex_t i = 0;
-    while (el && i < nPoints - 1)
-    {
-        if (curvature[i] * curvature[i+1] < 0.0f)
-        {
-            //ret.append((el->elem + el->next->elem) * 0.5);
-            ret.append(el->elem);
-            indexRet.append(i);
-        }
-        el = el->next;
-        ++i;
-    }
-    if (curvature[nPoints-1] * curvature[0] < 0.0f)
-    {
-        //ret.append((el->next->elem + el->next->next->elem) * 0.5);
-        ret.append(el->next->elem);
-        indexRet.append(nPoints-1);
-    }
+    return findInflexionPoints (curvature, 
+                                curvePoints, 
+                                ret, 
+                                indexRet);
     return true;
+}
+
+template <class pointT>
+bool goCurvePartitionDelingette (const goList<pointT>& curvePoints, 
+                                 goSize_t neighSize,
+                                 goSize_t iterations,
+                                 goList<pointT>& ret,
+                                 goList<goIndex_t>& indexRet)
+{
+    goFixedArray<pointT> normalFlow;
+    goFixedArray<pointT> tangentFlow;
+    goList<pointT> points;
+    points = curvePoints;
+    for (goIndex_t j = 0; j < (goIndex_t)iterations; ++j)
+    {
+        goCurvatureDiffusionFlow (points, neighSize, normalFlow, tangentFlow);
+        assert (normalFlow.getSize() == (goSize_t)points.getSize());
+        typename goList<pointT>::Element* el = points.getFrontElement();
+        goIndex_t sz = normalFlow.getSize();
+        for (goIndex_t i = 0; i < sz && el; ++i, el = el->next)
+        {
+            el->elem += normalFlow[i] * 0.1 + tangentFlow[i] * 0.1;
+            // printf ("%f %f    %f\n", normalFlow[i].x, normalFlow[i].y, normalFlow[i].abs());
+        }
+        //matlab.put2DPoints(points, "p");
+        //matlab.matlabCall("plot(p(1,1:end),p(2,1:end)); drawnow;");
+        // printf ("Iteration %d\n",j);
+    }
+    goFixedArray<goDouble> curvature(points.getSize());
+    if (!goCurveCurvature(points, curvature))
+    {
+        return false;
+    }
+
+    return findInflexionPoints (curvature, 
+                                curvePoints, 
+                                ret, 
+                                indexRet);
 }
 
 /*
@@ -486,69 +447,6 @@ bool goCurvePartitionTrigger(const goList<pointT>& curvePoints,
 }
 
 /*
- * @brief Approximate local curvature of a curve.
- * 
- * @note Works for closed lists, hast not been tested for open.
- * 
- * @param curvePoints Curve points (must be a closed list).
- * @param curvRet     Curvature (same size as points).
- * 
- * @return True if successful, false otherwise.
- */
-template <class pointT>
-bool goCurveCurvature (const goList<pointT>&   curvePoints,
-                       goFixedArray<goDouble>& curvRet)
-{
-    if (curvRet.getSize() != (goSize_t)curvePoints.getSize())
-    {
-        curvRet.setSize(curvePoints.getSize());
-    }
-    //= Closed curves
-    if (curvePoints.isClosed())
-    {
-        goIndex_t i = 0;
-        goIndex_t nPoints = static_cast<goIndex_t>(curvePoints.getSize());
-        typename goList<pointT>::ConstElement* el = curvePoints.getFrontElement();
-        while (el && i < nPoints)
-        {
-            curvRet[i] = kappa(el->prev->elem, 
-                    el->elem, 
-                    el->next->elem);
-            el = el->next;
-            ++i;
-        }
-        return true;
-    }
-    //= Open curves
-    else
-    {
-        goIndex_t i = 0;
-        goIndex_t nPoints = static_cast<goIndex_t>(curvePoints.getSize());
-        if (nPoints < 3)
-        {
-            for (i = 0; i < nPoints; ++i)
-            {
-                curvRet[i] = 0.0;
-            }
-            return true;
-        }
-        typename goList<pointT>::ConstElement* el = curvePoints.getFrontElement();
-        assert (el);
-        curvRet[0] = kappa(el->elem, el->elem, el->next->elem);
-        el = el->next;
-        for (i = 1; i < nPoints - 1 && el; ++i)
-        {
-            curvRet[i] = kappa(el->prev->elem, el->elem, el->next->elem);
-            el = el->next;
-        }
-        el = curvePoints.getTailElement();
-        curvRet[nPoints-1] = kappa(el->prev->elem, el->elem, el->elem);
-        return true;
-    }
-}
-
-
-/*
  * @brief Calculate local mean curvature.
  *
  * As in Delingette et al.
@@ -594,10 +492,10 @@ bool goCurveCurvature (const goList<pointT>&   curvePoints,
             l_left  += p.abs();
             p        = el_right->elem - el_right->prev->elem;
             l_right += p.abs();
-            goDouble k_left = kappa(el_left->prev->elem, 
+            goDouble k_left = goCurvature(el_left->prev->elem, 
                                     el_left->elem, 
                                     el_left->next->elem);
-            goDouble k_right = kappa(el_right->prev->elem, 
+            goDouble k_right = goCurvature(el_right->prev->elem, 
                                      el_right->elem, 
                                      el_right->next->elem);
             enumerator += k_left*l_right + k_right*l_left;
@@ -616,83 +514,6 @@ bool goCurveCurvature (const goList<pointT>&   curvePoints,
     return true;
 }
 
-static goDouble kappa (goDouble phi, goDouble r)
-{
-    return sin(phi) / r;
-}
-
-template <class pointT>
-static goDouble kappa (const pointT& p1, const pointT& p2, const pointT& p3)
-{
-    goDouble phi = getTurn(p1,p2,p3);
-    pointT p = p3 - p1;
-    return kappa(phi,p.abs()*0.5);
-}
-
-template <class pointT>
-static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
-{
-    pointT base = p3 - p1;
-    goDouble f = base.abs();
-    if (f == 0.0)
-    {
-        assert ("p3 == p1" == 0);
-        return 0.0;  //= This should not happen. It would mean p3 == p1.
-    }
-    base *= 1.0 / f;
-    pointT s1 = p2 - p1;
-    pointT s2 = p3 - p2;
-    goDouble l1 = s1.abs();
-    goDouble l2 = s2.abs();
-    if (l1 == 0.0 || l2 == 0.0)
-    {
-        return 0.0;
-    }
-    assert (l1 != 0.0 && l2 != 0.0);
-
-    goDouble alpha1 = (s1 * base) / l1;
-    //= acos seems to result in nan when the argument is exactly 1.0 (contrary to the manpage!).
-    //= Catch that.
-    if (alpha1 <= -1.0)
-    {
-        alpha1 = M_PI;
-    }
-    else
-    {
-        if (alpha1 >= 1.0)
-        {
-            alpha1 = 0.0;
-        }
-        else
-        {
-            alpha1 = acos (alpha1);
-        }
-    }
-    goDouble alpha2 = (s2 * base) / l2;
-    if (alpha2 <= -1.0)
-    {
-        alpha2 = M_PI;
-    }
-    else
-    {
-        if (alpha2 >= 1.0)
-        {
-            alpha2 = 0.0;
-        }
-        else
-        {
-            alpha2 = acos (alpha2);
-        }
-    }
-
-    goDouble beta = alpha1 + alpha2;
-
-    //= The sign of the turn angle is determined by whether the triangle {p1,p2,p3} 
-    //= turns clockwise or counter-clockwise, which in turn is determined
-    //= by the z-component of the cross product {s1 0} x {s2 0}.
-
-    return beta * ((s1.x * s2.y < s1.y * s2.x) ? 1.0 : -1.0);
-}
 
 
 template 
@@ -723,6 +544,19 @@ bool goCurvePartitionLocalMeanCurvature(const goList<goPointd>& curvePoints,
                              goList<goIndex_t>&      indexRet,
                              goFixedArray<goDouble>*,
                              goFixedArray<goDouble>*);
+
+template 
+bool goCurvePartitionDelingette (const goList<goPointf>& , 
+                                 goSize_t ,
+                                 goSize_t ,
+                                 goList<goPointf>& ,
+                                 goList<goIndex_t>& );
+template 
+bool goCurvePartitionDelingette (const goList<goPointd>& , 
+                                 goSize_t ,
+                                 goSize_t ,
+                                 goList<goPointd>& ,
+                                 goList<goIndex_t>& );
 
 template 
 bool goCurvePartitionTrigger(const goList<goPointf>& curvePoints,

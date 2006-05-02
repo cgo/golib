@@ -8,6 +8,9 @@
 #include <iostream>
 #include <gotypes.h>
 #include <godate.h>
+#ifndef GOLIST_H
+# include <golist.h>
+#endif
 //#include <linux/types.h>
 
 /** @addtogroup data
@@ -40,6 +43,7 @@ public:
   goIndex_t replace     (const char* str, const char* replacement);
   goIndex_t getLine     (goString& ret, goIndex_t start);
   bool      copy        (goString& target, goIndex_t start, goIndex_t end) const;
+  bool      getWords    (goList<goString>& wordsRet) const;
   
   void      fill        (char c);
   

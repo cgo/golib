@@ -8,69 +8,7 @@
 #include <golog.h>
 #include <assert.h>
 
-class goShapePrivate
-{
-    public:
-        goShapePrivate();
-        ~goShapePrivate();
-
-        goCurvef* curve;
-};
-
-goShapePrivate::goShapePrivate ()
-    : curve (0)
-{
-}
-
-goShapePrivate::~goShapePrivate ()
-{
-}
-
-// =====================================
-
-goShape::goShape (goCurvef* c)
-    : goObjectBase (),
-      myPrivate (0)
-{
-    this->setClassName ("goShape");
-    myPrivate = new goShapePrivate;
-    assert (myPrivate);
-    this->setCurve (c);
-}
-
-goShape::~goShape ()
-{
-    if (myPrivate)
-    {
-        if (myPrivate->curve)
-        {
-            myPrivate->curve->disconnectObject (this);
-        }
-        delete myPrivate;
-        myPrivate = 0;
-    }
-}
-
-goCurvef* goShape::getCurve()
-{
-    return myPrivate->curve;
-}
-
-const goCurvef* goShape::getCurve() const
-{
-    return myPrivate->curve;
-}
-
-void goShape::setCurve(goCurvef* c)
-{
-    if (myPrivate->curve)
-    {
-        myPrivate->curve->disconnectObject (this);
-    }
-    myPrivate->curve = c;
-    if (myPrivate->curve)
-        myPrivate->curve->connectObject (this);
-}
+//=========================================================
 
 static void conj (goVector<goComplexf>& v)
 {
@@ -81,17 +19,12 @@ static void conj (goVector<goComplexf>& v)
     }
 }
 
-static goDouble procrustesDistance (const goVector<goComplexf>& v1, const goVector<goComplexf>& v2)
-{
-    goDouble d = v1.conjInnerProduct(v2).abs();
-    return 1 - d*d;
-}
-
-static void listToVector (const goList<goPointf>& l, goVector<goComplexf>& v)
+template <class pointT>
+static void listToVector (const goList<pointT>& l, goVector<goComplexf>& v)
 {
     if (l.isEmpty())
         return;
-    goList<goPointf>::ConstElement* el = l.getFrontElement();
+    typename goList<pointT>::ConstElement* el = l.getFrontElement();
     goIndex_t size = (goIndex_t)l.getSize();
     v.setSize (size);
     for (goIndex_t i = 0; i < size; ++i)
@@ -103,12 +36,22 @@ static void listToVector (const goList<goPointf>& l, goVector<goComplexf>& v)
     }
 }
 
-static goDouble procrustesDistance (goList<goPointf>::Element* e1_, goList<goPointf>::ConstElement* e2_, goIndex_t size)
+static goDouble procrustesDistance (const goVector<goComplexf>& v1, 
+                                    const goVector<goComplexf>& v2)
+{
+    goDouble d = v1.conjInnerProduct(v2).abs();
+    return 1 - d*d;
+}
+
+template <class pointT>
+static goDouble procrustesDistance (typename goList<pointT>::Element* e1_, 
+                                    typename goList<pointT>::ConstElement* e2_, 
+                                    goIndex_t size)
 {
     goVector<goComplexf> v1 (size);
     goVector<goComplexf> v2 (size);
-    goList<goPointf>::Element* e1 = e1_;
-    goList<goPointf>::ConstElement* e2 = e2_;
+    typename goList<pointT>::Element* e1 = e1_;
+    typename goList<pointT>::ConstElement* e2 = e2_;
     for (goIndex_t i = 0; i < size; ++i)
     {
         assert (e1 && e2);
@@ -122,6 +65,197 @@ static goDouble procrustesDistance (goList<goPointf>::Element* e1_, goList<goPoi
     return procrustesDistance (v1,v2);
 }
 
+/*
+ * @note All shapes and meanRet must be of the same size prior to this call.
+ */
+template <class pointT>
+static void meanShape (goList<goCurve<pointT>*>& shapes, goCurve<pointT>& meanRet)
+{
+    goIndex_t size = static_cast<goIndex_t>(shapes.getSize());
+    goFixedArray<typename goList<pointT>::Element*> shapeEl (size);
+    {
+        typename goList<goCurve<pointT>*>::Element* el = shapes.getFrontElement();
+        for (goIndex_t i = 0; i < size; ++i, el = el->next)
+        {
+            assert(el);
+            shapeEl[i] = el->elem->getPoints().getFrontElement();
+        }
+    }
+    
+    typename goList<pointT>::Element* meanEl = meanRet.getPoints().getFrontElement();
+    assert(meanEl);
+    goIndex_t i = 0;
+    while (true)
+    {
+        meanEl->elem.x = 0.0f;
+        meanEl->elem.y = 0.0f;
+        for (i = 0; i < size; ++i)
+        {
+            assert (shapeEl[i]);
+            meanEl->elem.x += shapeEl[i]->elem.x;
+            meanEl->elem.y += shapeEl[i]->elem.y;
+            shapeEl[i] = shapeEl[i]->next;
+        }
+        if (!meanEl->next)
+            break;
+        meanEl = meanEl->next;
+    }
+    goFloat factor = 1.0f / static_cast<float>(size);
+
+    meanEl = meanRet.getPoints().getFrontElement();
+    while (true)
+    {
+        meanEl->elem.x *= factor;
+        meanEl->elem.y *= factor;
+        if (!meanEl->next)
+            break;
+        meanEl = meanEl->next;
+    }
+}
+
+template <class pointT>
+static goDouble curveSquareDifference (const goCurve<pointT>& c1, const goCurve<pointT>& c2)
+{
+    goDouble ret = 0.0;
+    typename goList<pointT>::ConstElement* el1 = c1.getPoints().getFrontElement();
+    typename goList<pointT>::ConstElement* el2 = c2.getPoints().getFrontElement();
+    assert (el1 && el2);
+    goDouble temp1;
+    goDouble temp2;
+    while (true)
+    {
+        temp1 = el1->elem.x - el2->elem.x;
+        temp2 = el1->elem.y - el2->elem.y;
+        ret += temp1 * temp1 + temp2 * temp2;
+        if (!el1->next || !el2->next)
+            break;
+        el1 = el1->next;
+        el2 = el2->next;
+    }
+    return ret;
+}
+
+
+//=========================================================
+
+template <class pointT>
+class goShapePrivate
+{
+    public:
+        goShapePrivate();
+        ~goShapePrivate();
+
+        goList < goCurve<pointT> > curves;
+};
+
+template <class pointT>
+goShapePrivate<pointT>::goShapePrivate ()
+    : curves ()
+{
+}
+
+template <class pointT>
+goShapePrivate<pointT>::~goShapePrivate ()
+{
+}
+
+// =====================================
+
+template <class pointT>
+goShape<pointT>::goShape ()
+    : goObjectBase (),
+      myPrivate (0)
+{
+    this->setClassName ("goShape");
+    myPrivate = new goShapePrivate<pointT>;
+    assert (myPrivate);
+}
+
+template <class pointT>
+goShape<pointT>::goShape (const goShape<pointT>& other)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    this->setClassName ("goShape");
+    myPrivate = new goShapePrivate<pointT>;
+    assert (myPrivate);
+    *this = other;
+}
+
+template <class pointT>
+const goShape<pointT>& goShape<pointT>::operator= (const goShape<pointT>& other)
+{
+    *myPrivate = *other.myPrivate;
+    return *this;
+}
+
+template <class pointT>
+goShape<pointT>::~goShape ()
+{
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = 0;
+    }
+}
+
+template <class pointT>
+void goShape<pointT>::addCurve (const goCurve<pointT>& curve)
+{
+    myPrivate->curves.append(curve);
+}
+
+template <class pointT>
+void goShape<pointT>::addCurve (const goList<pointT>& curve)
+{
+    goCurve<pointT> c;
+    myPrivate->curves.append(c);
+    assert (myPrivate->curves.getTailElement());
+    //= Avoids copying the point list twice.
+    myPrivate->curves.getTailElement()->elem.setPoints (curve);
+}
+
+template <class pointT>
+goList < goCurve<pointT> >& goShape<pointT>::getCurves ()
+{
+    return myPrivate->curves;
+}
+
+template <class pointT>
+const goList < goCurve<pointT> >& goShape<pointT>::getCurves () const
+{
+    return myPrivate->curves;
+}
+
+template <class pointT>
+goSize_t goShape<pointT>::getCurveCount () const
+{
+    return myPrivate->curves.getSize();
+}
+
+template <class pointT>
+bool goShape<pointT>::readASCII (const goString& filename)
+{
+    FILE* f = fopen (filename.toCharPtr(), "r");
+    if (!f)
+    {
+        goString msg = "readASCII(): Could not open file ";
+        msg += filename;
+        msg += " for reading.";
+        goLog::warning (msg,this);
+        return false;
+    }
+    goList<pointT> pl;
+    while (goCurve<pointT>::readASCII (f,pl))
+    {
+        goCurve<pointT> c;
+        this->addCurve(pl);
+        pl.erase();
+    }
+    fclose(f);
+    return true;
+}
+
 /**
  * @brief  Procrustes alignment.
  *
@@ -132,7 +266,8 @@ static goDouble procrustesDistance (goList<goPointf>::Element* e1_, goList<goPoi
  *
  * @return True if successful, false otherwise.
  **/
-bool goShape::align (goCurvef& curve, const goCurvef& other)
+template <class pointT>
+bool goShape<pointT>::align (goCurve<pointT>& curve, const goCurve<pointT>& other)
 {
     //= Both curves must have the same number of equally spaces points (do resample() prior to alignment).
     if (other.getPoints().getSize() != curve.getPoints().getSize())
@@ -146,8 +281,8 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
     goIndex_t size = curve.getPoints().getSize();
     goVector<goComplexf> z1 (size);
     goVector<goComplexf> z2 (size);
-    goList<goPointf>::Element*      el      = curve.getPoints().getFrontElement();
-    goList<goPointf>::ConstElement* elOther = other.getPoints().getFrontElement();
+    typename goList<pointT>::Element*      el      = curve.getPoints().getFrontElement();
+    typename goList<pointT>::ConstElement* elOther = other.getPoints().getFrontElement();
     assert (el && elOther);
     //= Copy the point coordinates to complex number vectors.
     for (goIndex_t i = 0; i < size; ++i)
@@ -165,12 +300,12 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
     
     //= Permutate the starting point of this curve and find
     //= the starting point with the smallest Procrustes distance.
-    goList<goPointf>* pointList = &curve.getPoints();
+    goList<pointT>* pointList = &curve.getPoints();
     assert (pointList);
     pointList->close();
     el = pointList->getFrontElement();
     elOther = other.getPoints().getFrontElement();
-    goList<goPointf>::Element* newFront = el;
+    typename goList<pointT>::Element* newFront = el;
     assert (el && elOther);
     assert (pointList->isClosed());
     goVectorf distances (size);
@@ -178,7 +313,7 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
     for (goIndex_t i = 0; i < size; ++i)
     {
         assert (el);
-        distances[i] = procrustesDistance (el, elOther, size);
+        distances[i] = procrustesDistance<pointT> (el, elOther, size);
         // printf ("Distance: %f\n", distances[i]);
         if (distances[i] < minDistance)
         {
@@ -217,8 +352,9 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
     return true;
 }
 
-/**
- * @brief 
+#if 0
+/*
+ * @brief DEPRECATED
  *
  * @note The curve of this shape must be moved to its center of mass before this.
  * 
@@ -226,9 +362,10 @@ bool goShape::align (goCurvef& curve, const goCurvef& other)
  *
  * @return 
  **/
-bool goShape::getWeights (goArray<goFloat>& weights) const
+template <class pointT>
+bool goShape<pointT>::getWeights (goArray<goFloat>& weights) const
 {
-    const goCurvef* curve = this->getCurve();
+    const goCurve<pointT>* curve = this->getCurve();
     if (!curve)
         return false;
     if (curve->getPoints().isEmpty())
@@ -257,7 +394,7 @@ bool goShape::getWeights (goArray<goFloat>& weights) const
         weights[i] *= 3 * maxCurv;
     }
 
-    goList<goPointf>::ConstElement* el = curve->getPoints().getFrontElement();
+    typename goList<pointT>::ConstElement* el = curve->getPoints().getFrontElement();
     assert (el);
     go4Vectorf meanDelta (0.0,0.0);
     //= Assume all points are translated with (-center of mass).
@@ -327,18 +464,20 @@ bool goShape::getWeights (goArray<goFloat>& weights) const
     }
     return true;
 }
+#endif
 
 /**
  * @brief Translates all points so the origin is in the center of mass.
  *
  * @return True if successful, false otherwise.
  **/
-bool goShape::center (goCurvef& curve)
+template <class pointT>
+bool goShape<pointT>::center (goCurve<pointT>& curve)
 {
     if (curve.getPoints().isEmpty())
         return false;
 
-    goPointf com;
+    pointT com;
     if (!curve.getCenterOfMass (com))
         return false;
 
@@ -352,9 +491,10 @@ bool goShape::center (goCurvef& curve)
  *
  * @return Normalization factor.
  **/
-goDouble goShape::normalize (goCurvef& curve)
+template <class pointT>
+goDouble goShape<pointT>::normalize (goCurve<pointT>& curve)
 {
-    return goShape::normalize(curve.getPoints());
+    return goShape<pointT>::normalize(curve.getPoints());
 }
 
 /**
@@ -362,13 +502,14 @@ goDouble goShape::normalize (goCurvef& curve)
  *
  * @return Normalization factor.
  **/
-goDouble goShape::normalize (goList<goPointf>& points)
+template <class pointT>
+goDouble goShape<pointT>::normalize (goList<pointT>& points)
 {
     if (points.isEmpty())
         return 0.0;
 
     goDouble sum = 0.0;
-    goList<goPointf>::Element* el = points.getFrontElement();
+    typename goList<pointT>::Element* el = points.getFrontElement();
     assert(el);
     const goIndex_t sz = static_cast<goIndex_t>(points.getSize());
     goIndex_t i = 0;
@@ -395,21 +536,19 @@ goDouble goShape::normalize (goList<goPointf>& points)
     return sum;
 }
 
-bool goShape::callObjectMethod (int methodID, goObjectMethodParameters* param)
+template <class pointT>
+bool goShape<pointT>::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
     return goObjectBase::callObjectMethod (methodID, param);
 }
 
-void goShape::receiveObjectMessage (const goObjectMessage& msg)
+template <class pointT>
+void goShape<pointT>::receiveObjectMessage (const goObjectMessage& msg)
 {
     switch (msg.myMessageID)
     {
         case GO_OBJECTMESSAGE_DESTRUCTING:
             {
-                if (msg.mySender == myPrivate->curve)
-                {
-                    myPrivate->curve = 0;
-                }
             }
             break;
         default:
@@ -418,80 +557,13 @@ void goShape::receiveObjectMessage (const goObjectMessage& msg)
     goObjectBase::receiveObjectMessage (msg);
 }
 
-/*
- * @note All shapes and meanRet must be of the same size prior to this call.
- */
-static void meanShape (goList<goCurvef*>& shapes, goCurvef& meanRet)
-{
-    goIndex_t size = static_cast<goIndex_t>(shapes.getSize());
-    goFixedArray<goList<goPointf>::Element*> shapeEl (size);
-    {
-        goList<goCurvef*>::Element* el = shapes.getFrontElement();
-        for (goIndex_t i = 0; i < size; ++i, el = el->next)
-        {
-            assert(el);
-            shapeEl[i] = el->elem->getPoints().getFrontElement();
-        }
-    }
-    
-    goList<goPointf>::Element* meanEl = meanRet.getPoints().getFrontElement();
-    assert(meanEl);
-    goIndex_t i = 0;
-    while (true)
-    {
-        meanEl->elem.x = 0.0f;
-        meanEl->elem.y = 0.0f;
-        for (i = 0; i < size; ++i)
-        {
-            assert (shapeEl[i]);
-            meanEl->elem.x += shapeEl[i]->elem.x;
-            meanEl->elem.y += shapeEl[i]->elem.y;
-            shapeEl[i] = shapeEl[i]->next;
-        }
-        if (!meanEl->next)
-            break;
-        meanEl = meanEl->next;
-    }
-    goFloat factor = 1.0f / static_cast<float>(size);
-
-    meanEl = meanRet.getPoints().getFrontElement();
-    while (true)
-    {
-        meanEl->elem.x *= factor;
-        meanEl->elem.y *= factor;
-        if (!meanEl->next)
-            break;
-        meanEl = meanEl->next;
-    }
-}
-
-static goDouble curveSquareDifference (const goCurvef& c1, const goCurvef& c2)
-{
-    goDouble ret = 0.0;
-    goList<goPointf>::ConstElement* el1 = c1.getPoints().getFrontElement();
-    goList<goPointf>::ConstElement* el2 = c2.getPoints().getFrontElement();
-    assert (el1 && el2);
-    goDouble temp1;
-    goDouble temp2;
-    while (true)
-    {
-        temp1 = el1->elem.x - el2->elem.x;
-        temp2 = el1->elem.y - el2->elem.y;
-        ret += temp1 * temp1 + temp2 * temp2;
-        if (!el1->next || !el2->next)
-            break;
-        el1 = el1->next;
-        el2 = el2->next;
-    }
-    return ret;
-}
-
-bool goShape::procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet)
+template <class pointT>
+bool goShape<pointT>::procrustesFit (goList<goCurve<pointT>*>& shapes, goCurve<pointT>& meanShapeRet)
 {
     goIndex_t shapeCount = (goIndex_t)shapes.getSize();
     if (shapeCount <= 0)
         return false;
-    goList<goCurvef*>::Element* el = shapes.getFrontElement();
+    typename goList<goCurve<pointT>*>::Element* el = shapes.getFrontElement();
 
     //= Center and normalize all shapes.
     assert(el);
@@ -510,12 +582,12 @@ bool goShape::procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet)
     }
 
     meanShapeRet = *el->elem;
-    goCurvef tempCurve;
+    goCurve<pointT> tempCurve;
     meanShapeRet.resample (100,tempCurve);
     meanShapeRet = tempCurve;
-    goShape::center    (meanShapeRet);
-    goShape::normalize (meanShapeRet);
-    goCurvef oldMeanShape = meanShapeRet;
+    goShape<pointT>::center    (meanShapeRet);
+    goShape<pointT>::normalize (meanShapeRet);
+    goCurve<pointT> oldMeanShape = meanShapeRet;
     goIndex_t i;
     //= Go until convergence or max. 1000 iterations.
     for (i = 0; i < 1000; ++i)
@@ -552,5 +624,11 @@ bool goShape::procrustesFit (goList<goCurvef*>& shapes, goCurvef& meanShapeRet)
     return true;
 }
 
+template class goShapePrivate<goPointf>;
+template class goShapePrivate<goPointd>;
+template class goShape<goPointf>;
+template class goShape<goPointd>;
+//= Specialisations of lists
 #include <golist.hpp>
-template class goList<goShape*>;
+template class goList<goShape<goPointf>*>;
+template class goList<goShape<goPointd>*>;
