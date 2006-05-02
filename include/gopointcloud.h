@@ -39,7 +39,8 @@ class goPointCloud : public goObjectBase
         virtual ~goPointCloud ();
         goPointCloud& operator= (const goPointCloud&);
 
-        bool operator!= (const goPointCloud& other);
+        bool operator!= (const goPointCloud& other) const;
+        bool operator== (const goPointCloud& other) const;
 
         goIndex_t             getPointCount () const;
         goList<pointT>&       getPoints ();

@@ -4,7 +4,7 @@
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
- * $Id: gomatlab.cpp,v 1.2 2006-04-25 17:01:53 gosch Exp $
+ * $Id: gomatlab.cpp,v 1.2 2006/04/25 17:01:53 gosch Exp $
  */
 #include <stdio.h>
 

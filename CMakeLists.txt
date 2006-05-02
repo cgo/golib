@@ -8,7 +8,6 @@ INCLUDE             (CheckFunctionExists)
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
- src/levelsets/goregionls.cpp
  src/data/goarrayi.cc 
  src/data/golisti.cc 
  src/data/goheapi.cc 
@@ -75,15 +74,9 @@ SET                 (SOURCES
  src/thread/gosynchronized.cc 
  src/thread/gothreadobject.cc
  src/types/gotype.cpp
- src/shape/gopointcloud.cpp
- src/shape/gocurve.cpp
- src/shape/gocurvaturediffusion.cpp
- src/shape/gocurvepartition.cpp
- src/shape/gonubs.cpp
- src/shape/goshape.cpp
- src/shape/partial.cpp
- src/shape/gocurvature.cpp
- src/shape/godiscretecurvepartition.cpp
+ src/math/gopointcloud.cpp
+ src/math/gocurve.cpp
+ src/math/gonubs.cpp
  src/seispack/bakvec.c
  src/seispack/balanc.c
  src/seispack/balbak.c

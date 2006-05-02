@@ -96,9 +96,9 @@ class goList {
   goList<T>&        operator= (const goList<T>& other);
 
   /// UNTESTED
-  bool          operator== (goList<T>& other);
+  bool          operator== (const goList<T>& other) const;
   /// UNTESTED
-  bool          operator!= (goList<T>& other);
+  bool          operator!= (const goList<T>& other) const;
   bool          operator< (goList<T>& other);
   bool          operator> (goList<T>& other);
 

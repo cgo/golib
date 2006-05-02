@@ -514,20 +514,31 @@ goList<T>::operator= (const goList<T>& other) {
 
 template <class T>
 bool
-goList<T>::operator== (goList<T>& other) {
-  if (!other.isEmpty() && !isEmpty()) {
-    other.resetToFront ();
-    resetToFront();
-    while (!other.isTail()) {
-      if (other.getNext() != getNext()) return false;
+goList<T>::operator== (const goList<T>& other) const {
+    if (other.isEmpty() || this->isEmpty())
+    {
+        return false;
     }
-    if (other.getCurrent() != getCurrent()) return false;
-  }
-  return true;
+    if (other.getSize() != this->getSize())
+    {
+        return false;
+    }
+    typename goList<T>::ConstElement* el = this->getFrontElement();
+    typename goList<T>::ConstElement* oEl = other.getFrontElement();
+    goSize_t sz = this->getSize();
+    goSize_t i = 0;
+    for (i = 0; i < sz; ++i, el = el->next, oEl = oEl->next)
+    {
+        if (el->elem != oEl->elem)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 template <class T>
 bool
-goList<T>::operator!= (goList<T>& other) {
+goList<T>::operator!= (const goList<T>& other) const {
   return !( (*this) == other );
 }
