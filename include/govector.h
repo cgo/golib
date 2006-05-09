@@ -26,14 +26,15 @@ template<class T>
 class goVector : public goFixedArray<T>
 {
     public:
-        goVector () : goFixedArray<T> (1) {};
-        goVector (goSize_t s)           : goFixedArray<T> (s) {};
+        goVector () : goFixedArray<T> (1,0,0) {};
+        goVector (goSize_t s, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0) 
+            : goFixedArray<T> (s,leftBorder,rightBorder) {};
         goVector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
         virtual ~goVector () {};
 
         void resize (goSize_t s)
         {
-            this->setSize (s);
+            this->setSize (s,this->getLeftBorder(),this->getRightBorder());
         }
         
         template <class To>

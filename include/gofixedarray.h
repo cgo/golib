@@ -22,12 +22,16 @@
 template <class T> class goFixedArray
 {
     public:
-        goFixedArray (goSize_t size = 1) : myArray (0), mySize (0)
+        goFixedArray (goSize_t size = 1, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0) 
+            : myArray (0), mySize (0), myLeftBorder (leftBorder), myRightBorder (rightBorder)
         {
             if (size > 0)
-                myArray = new T [size];
+                myArray = new T [size + myLeftBorder + myRightBorder];
             if (myArray)
+            {
                 mySize = size;
+                myArray += myLeftBorder;
+            }
         };
         goFixedArray (const goFixedArray<T>& other) : myArray (0), mySize (0)
         {
@@ -46,21 +50,15 @@ template <class T> class goFixedArray
         {
             if (mySize != other.getSize())
             {
-                if (myArray)
-                {
-                    delete[] myArray;
-                    myArray = 0;
-                    mySize = 0;
-                }
-                myArray = new T [other.getSize()];
-                mySize = other.getSize();
+                this->setSize (other.getSize(), other.myLeftBorder, other.myRightBorder);
             }
             if (other.getSize() > 0)
             {
                 if (myArray)
                 {
-                    goSize_t i;
-                    for (i = 0; i < mySize; ++i)
+                    goIndex_t i;
+                    goIndex_t end = static_cast<goIndex_t>(mySize) + myRightBorder;
+                    for (i = -myLeftBorder; i < end; ++i)
                     {
                         myArray[i] = other(i);
                     }
@@ -72,44 +70,49 @@ template <class T> class goFixedArray
 
         T&       operator() (goIndex_t i)
         {
-            assert (i >= 0 && i < (goIndex_t)mySize);
+            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i];
         };
 
         T&       operator[] (goIndex_t i)
         {
-            assert (i >= 0 && i < (goIndex_t)mySize);
+            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i];
         };
 
         const T& operator() (goIndex_t i) const
         {
-            assert (i >= 0 && i < (goIndex_t)mySize);
+            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i];
         };
 
         const T& operator[] (goIndex_t i) const
         {
-            assert (i >= 0 && i < (goIndex_t)mySize);
+            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i];
         };
 
-        goSize_t getSize () const { return mySize; };
+        goSize_t  getSize        () const { return mySize; };
+        goIndex_t getLeftBorder  () const { return myLeftBorder; };
+        goIndex_t getRightBorder () const { return myLeftBorder; };
 
-        void     setSize (goSize_t newSize)
+        void     setSize (goSize_t newSize, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0)
         {
             if (mySize == newSize)
                 return;
             if (myArray)
             {
-                delete[] myArray;
+                delete[] (myArray - myLeftBorder);
                 myArray = 0;
                 mySize = 0;
             }
+            myLeftBorder = leftBorder;
+            myRightBorder = rightBorder;
             if (newSize > 0)
             {
-                myArray = new T [newSize];
+                myArray = new T [newSize + leftBorder + rightBorder];
                 mySize = newSize;
+                myArray = myArray + leftBorder;
             }
         };
 
@@ -147,8 +150,10 @@ template <class T> class goFixedArray
         };
         
     private:
-        T*       myArray;
-        goSize_t mySize;
+        T*        myArray;
+        goSize_t  mySize;
+        goIndex_t myLeftBorder;
+        goIndex_t myRightBorder;
 };
 /** @} */
 #endif
