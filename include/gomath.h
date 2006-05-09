@@ -118,6 +118,21 @@ bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t point
 
 bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
+template <class vectorT, class T>
+T mean (const vectorT&, goSize_t sz);
+template <class vectorT, class T>
+T fastMean (const vectorT&, goSize_t sz);
+
+template <class vectorT, class T>
+T variance (const vectorT&, goSize_t sz, T mean);
+template <class vectorT, class T>
+T fastVariance (const vectorT&, goSize_t sz, T mean);
+
+template <class vectorT, class T>
+T integrate (const vectorT& x, const vectorT& y, goSize_t sz);
+template <class vectorT, class T>
+T integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t sz);
+
 };
 
 
