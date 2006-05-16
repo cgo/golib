@@ -61,6 +61,7 @@ bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* ti
 {
     if (x.getSize() != y.getSize())
     {
+        goLog::warning("addCurve(): x and y array sizes mismatch.",this);
         return false;
     }
     myPrivate->plotX.append(x);

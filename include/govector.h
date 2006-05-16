@@ -237,6 +237,11 @@ class goVector : public goFixedArray<T>
 
         inline T square () const;
         inline T conjInnerProduct (const goVector<T>&) const;
+
+        T abs () const
+        {
+            return sqrt(this->square());
+        };
 };
 
 // inline goComplexf goVector<goComplexf>::square () const;
