@@ -362,6 +362,11 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
 template<class pointT>
 bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve)
 {
+    if (pointCount < 2)
+    {
+        goLog::warning("goCurve::resampleLinear(): point count is < 2.");
+        return false;
+    }
     if (resamplePointCount < 2)
     {
         return false;
@@ -516,6 +521,7 @@ bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
     {
         ret.close();
     }
+    goCurve<pointT>::removeDuplicates (ret);
     return true;
 }
 
@@ -558,6 +564,39 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
         }
     }
     return true;
+}
+
+template <class pointT>
+goSize_t goCurve<pointT>::removeDuplicates (goList<pointT>& pl)
+{
+    typename goList<pointT>::Element* el = pl.getFrontElement();
+    goSize_t sz = pl.getSize();
+    if (!pl.isClosed())
+    {
+        --sz;
+    }
+    goSize_t i = 0;
+    goSize_t removed = 0;
+    while (i < sz && el)
+    {
+        if (el->elem == el->next->elem)
+        {
+            el = pl.remove(el);
+            ++removed;
+        }
+        else
+        {
+            el = el->next;
+        }
+        ++i;
+    }
+    return removed;
+}
+
+template <class pointT>
+goSize_t goCurve<pointT>::removeDuplicates ()
+{
+    return goCurve<pointT>::removeDuplicates (this->getPoints());
 }
 
 template <class pointT>

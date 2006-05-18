@@ -58,8 +58,13 @@ class goCurve : public goPointCloud<pointT>
         static bool readASCII  (FILE* f, goList<pointT>& ret);
         static bool writeASCII (FILE* f, const goList<pointT>& ret);
 
+        static goSize_t removeDuplicates (goList<pointT>& pl);
+
         bool readASCII  (FILE* f);
         bool writeASCII (FILE* f) const;
+
+        goSize_t removeDuplicates ();
+
         
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
 

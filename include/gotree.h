@@ -5,10 +5,16 @@
 #include <goqueue.h>
 
 template <class T>
-class goTreeNode {
+class goTreeNode 
+{
 public:
   goTreeNode ();
   virtual ~goTreeNode ();
+  
+  T		                  elem;
+  goList<goTreeNode<T>* > sons;
+  goTreeNode<T>*          parent;
+
   
   goTreeNode<T>* getParentPtr () { return parent; }
   void		     setParentPtr (goTreeNode<T>*);
@@ -18,11 +24,6 @@ public:
   T		         getContent () { return (T)content; }
   void		     setContent (T newCont) { content = newCont; }
 
-  goList<void*>* getSonsListPtr ();
-protected:
-  T		 content;
-  goList<void*>  sons;
-  goTreeNode<T>* parent;
 };
 
 /*!

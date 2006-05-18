@@ -11,7 +11,7 @@ SET                 (SOURCES
  src/data/goarrayi.cc 
  src/data/golisti.cc 
  src/data/goheapi.cc 
- src/data/gotreei.cc 
+ # src/data/gotreei.cc 
  src/data/gobtreei.cpp 
  src/data/goqueuei.cc
  src/data/gostring.cc
@@ -38,6 +38,7 @@ SET                 (SOURCES
  src/math/mean.cpp
  src/math/variance.cpp
  src/math/integrate.cpp
+ src/math/getroots.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
