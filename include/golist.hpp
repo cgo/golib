@@ -52,6 +52,40 @@ typename goList<T>::Element* goList<T>::getTailElement ()
 }
 
 template <class T>
+typename goList<T>::Element* goList<T>::find (const T& e)
+{
+    Element* el = this->getFrontElement();
+    goSize_t sz = this->getSize();
+    goSize_t i;
+    for (i = 0; i < sz; ++i)
+    {
+        if (el->elem == e)
+        {
+            return el;
+        }
+        el = el->next;
+    }
+    return 0;
+}
+
+template <class T>
+typename goList<T>::ConstElement* goList<T>::find (const T& e) const
+{
+    ConstElement* el = this->getFrontElement();
+    goSize_t sz = this->getSize();
+    goSize_t i;
+    for (i = 0; i < sz; ++i)
+    {
+        if (el->elem == e)
+        {
+            return el;
+        }
+        el = el->next;
+    }
+    return 0;
+}
+
+template <class T>
 typename goList<T>::ConstElement* goList<T>::getFrontElement () const
 {
     return this->front;

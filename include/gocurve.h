@@ -48,6 +48,8 @@ class goCurve : public goPointCloud<pointT>
         bool     getTurningFunction (goVectord& ret) const;
         goDouble getLength        () const;
 
+        void     affineTransform  (const go44Matrixd& m);
+
         goDouble euclideanDistance (const goCurve<pointT>& other, bool forward = true) const;
         
         static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);

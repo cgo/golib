@@ -934,6 +934,22 @@ goDouble goCurve<pointT>::getLength () const
     return length;
 }
 
+template <class pointT>
+void goCurve<pointT>::affineTransform (const go44Matrixd& m)
+{
+    typename goList<pointT>::Element* el = this->getPoints().getFrontElement();
+    goSize_t sz = this->getPoints().getSize();
+    goSize_t i;
+    for (i = 0; i < sz; ++i)
+    {
+        el->elem.t = 1.0;
+        el->elem *= m;
+        el->elem /= el->elem.t;
+        el->elem.t = 0.0;
+        el = el->next;
+    }
+}
+
 template<class pointT>
 bool goCurve<pointT>::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {

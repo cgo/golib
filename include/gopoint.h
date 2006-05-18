@@ -4,9 +4,7 @@
 #ifndef GOTYPES_H
 # include <gotypes.h>
 #endif
-#ifndef GO4VECTOR_H
-# include <go4vector.h>
-#endif
+#include <go4vector.h>
 
 template <class T>
 class goPoint : public go4Vector<T>

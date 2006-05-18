@@ -41,6 +41,8 @@ class goList {
   Element*      getTailElement  ();
   ConstElement* getFrontElement () const;
   ConstElement* getTailElement  () const;
+  Element*      find            (const T& el);
+  ConstElement* find            (const T& el) const;
   
   void      next ();
   void      prev ();

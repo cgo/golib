@@ -1,12 +1,12 @@
 /*!
  * \mainpage Online source documentation for goLib
+ * - \subpage main Main, general documentation (READ THIS!)
+ * - \subpage signal Signal module documentation
+ */
+/*!
+ * \page main Main Documentation
  * <b>A current version is not available online. If you are really interested in
  *    trying the library, please drop me a line.</b>
- * \latexonly
- * 	This documentation is only a part of the source code documentation,
- * 	describing the namespace Vol and the most important classes used
- *  by those. For a complete documentation, please refer to the HTML version.
- * \endlatexonly 
  * \section intro What it is
  * \subsection intro2 Introduction
  * goLib is a C++ class library written by 

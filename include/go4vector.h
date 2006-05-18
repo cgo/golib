@@ -91,6 +91,29 @@ go4Vector {
     return *this;
   };
 
+  /*!
+   * Multiplies matrix to this vector from the left (naturally), i.e.
+   * sets *this = matrix * *this;
+   */
+  template <class mT>
+  GO4VECTOR_FUNCTION_PREFIX void operator*= (const go44Matrix<mT>& matrix)
+  {
+    T a1,a2,a3,a4;
+    const mT* m = matrix.getPtr();
+    a1 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+    m += 4;
+    a2 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+    m += 4;
+    a3 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+    m += 4;
+    a4 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
+/*      a1 = *(m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
+/*      a2 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
+/*      a3 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
+/*      a4 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
+    x = a1; y = a2; z = a3; t = a4;
+  };
+
   template <class To>
   GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator*= (To other)
   {
@@ -156,28 +179,6 @@ go4Vector {
     return go4Vector<T> (T(this->x - n), T(this->y - n), T(this->z - n), T(this->t - n));
   };
 
-  /*!
-   * Multiplies matrix to this vector from the left (naturally), i.e.
-   * sets *this = matrix * *this;
-   */
-  template <class mT>
-  GO4VECTOR_FUNCTION_PREFIX void operator*= (const go44Matrix<mT>& matrix)
-  {
-    T a1,a2,a3,a4;
-    const mT* m = matrix.getPtr();
-    a1 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
-    m += 4;
-    a2 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
-    m += 4;
-    a3 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
-    m += 4;
-    a4 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
-/*      a1 = *(m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
-/*      a2 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
-/*      a3 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
-/*      a4 = *(++m) * x + *(++m) * y + *(++m) * z + *(++m) * t; */
-    x = a1; y = a2; z = a3; t = a4;
-  };
 
   template <class mT>
   GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (const go44Matrix<mT>& matrix) const

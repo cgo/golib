@@ -22,4 +22,4 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/src\
  golib/swig\
  golib/matlab\
- golib/tools --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la"
+ golib/tools --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la" --exclude="doc/html"
