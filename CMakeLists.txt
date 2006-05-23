@@ -52,6 +52,7 @@ SET                 (SOURCES
  src/misc/goglobal.cpp 
  src/misc/golog.cpp
  src/misc/goplot.cpp
+ src/misc/govideocapture.cpp
  src/network/goconnection.cc
  src/network/gonetobject.cc 
  src/network/gonetwork.cc 

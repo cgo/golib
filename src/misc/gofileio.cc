@@ -540,6 +540,7 @@ static bool copySignalToIL (const goSignal3DBase<void>* s)
         }
         ilT* data = (ilT*)ilGetData();
         GO_SIGNAL3D_EACHELEMENT_GENERIC (*(data++) = *(const T*)__ptr, (*s));
+        return true;
     }
     if (s->getChannelCount() == 4)
     {
@@ -575,8 +576,45 @@ static bool copySignalToIL (const goSignal3DBase<void>* s)
             it.incrementZ();
         }
         const_cast<goSignal3DBase<void>*>(s)->setChannel(chan);
+        return true;
     }
-    return true;
+    if (s->getChannelCount() == 3)
+    {
+        ilTexImage (s->getSizeX(), s->getSizeY(), s->getSizeZ(), sizeof(ilT) * 4, IL_RGBA, iltype, NULL);
+        if (ilGetError() != IL_NO_ERROR)
+        {
+            goLog::warning("goFileIO::writeImage(): IL ERROR.");
+            throw goFileIOException(goFileIOException::FAILED);
+            return false;
+        }
+        goIndex_t chan = s->getChannel();
+        const_cast<goSignal3DBase<void>*>(s)->setChannel(0);
+        ilT* data = (ilT*)ilGetData();
+        //= NOTE: This assumes the channel data are stored linearly for each element.
+        goSignal3DGenericConstIterator it (s);
+        while (!it.endZ())
+        {
+            it.resetY();
+            while (!it.endY())
+            {
+                it.resetX();
+                while (!it.endX())
+                {
+                    *data = *(const T*)*it;
+                    *(data + 1) = *((const T*)*it + 1);
+                    *(data + 2) = *((const T*)*it + 2);
+                    *(data + 3) = 0;
+                    data += 4;
+                    it.incrementX();
+                }
+                it.incrementY();
+            }
+            it.incrementZ();
+        }
+        const_cast<goSignal3DBase<void>*>(s)->setChannel(chan);
+        return true;
+    }
+    return false;
 }
 
 bool
