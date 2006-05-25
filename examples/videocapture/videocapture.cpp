@@ -13,12 +13,14 @@ int main()
         printf ("YES!\n");
         goSignal3D<void> sig;
         sig.setDataType (GO_UINT8);
-        goSize_t w = 320;
-        goSize_t h = 240;
+        goSize_t w = 640;
+        goSize_t h = 480;
         vc.setCaptureSize (w,h);
+        vc.setColourMode (goVideoCapture::RGB);
         sig.make (goSize3D(w,h,1),goSize3D(w,h,1),goSize3D(0,0,0),3);
         //= Give the camera a little time to adjust ...
         // sleep(4);
+        vc.initDevice();
         goString filebase = "grabbed-";
         goString fileext = ".jpg";
         goString num;

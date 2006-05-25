@@ -569,28 +569,34 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
 template <class pointT>
 goSize_t goCurve<pointT>::removeDuplicates (goList<pointT>& pl)
 {
-    typename goList<pointT>::Element* el = pl.getFrontElement();
-    goSize_t sz = pl.getSize();
-    if (!pl.isClosed())
-    {
-        --sz;
-    }
-    goSize_t i = 0;
     goSize_t removed = 0;
-    while (i < sz && el)
+    goSize_t removed_total = 0;
+    do
     {
-        if (el->elem == el->next->elem)
+        goSize_t i = 0;
+        removed = 0;
+        goSize_t sz = pl.getSize();
+        typename goList<pointT>::Element* el = pl.getFrontElement();
+        if (!pl.isClosed())
         {
-            el = pl.remove(el);
-            ++removed;
+            --sz;
         }
-        else
+        while (i < sz && el)
         {
-            el = el->next;
+            if (el->elem == el->next->elem)
+            {
+                el = pl.remove(el);
+                ++removed;
+            }
+            else
+            {
+                el = el->next;
+            }
+            ++i;
         }
-        ++i;
-    }
-    return removed;
+        removed_total += removed;
+    } while (removed > 0 );
+    return removed_total;
 }
 
 template <class pointT>

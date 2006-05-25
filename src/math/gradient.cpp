@@ -102,33 +102,31 @@ static bool gradient2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& 
     }
     if (retValue.getSizeX() != sig.getSizeX() ||
         retValue.getSizeY() != sig.getSizeY() ||
-        retValue.getSizeZ() != 2)
+        retValue.getChannelCount() != 2)
     {
         goString msg = "goMath::gradient2D: return signal size not correct.";
         msg += "Size is ";
         msg += (int)retValue.getSizeX(); msg += " "; msg += (int)retValue.getSizeY(); msg += " "; msg += (int)retValue.getSizeZ();
-        msg += " but should be "; (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 2";
+        msg += " but should be "; (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1 and 2 channels";
         goLog::warning (msg);
         return false;
     }
-    
+
+    retValue.setChannel(0);
     const goPtrdiff_t* sigDx = NULL;
     const goPtrdiff_t* sigDy = sig.getYDiff();
     goPtrdiff_t*  retDx = NULL;
     goPtrdiff_t*  retDy = retValue.getYDiff();
-    const goByte* sigP;
-    goByte*       retP1;
-    goByte*       retP2;
+    const goByte* sigP = 0;
+    goByte*       retP1 = 0;
 
     goSize_t i,j;
-    // goFloat u[9];
     goFloat lambda = sqrt(2.0f) - 1.0f;
     goFloat _lambda = (1.0f - lambda) * 0.5f;
     for (j = 0; j < sig.getSizeY(); ++j)
     {
         sigP  = (const goByte*)sig.getPtr(0,j,0);
         retP1 = (goByte*)retValue.getPtr(0,j,0);
-        retP2 = (goByte*)retValue.getPtr(0,j,1);
         sigDx = sig.getXDiff();
         retDx = retValue.getXDiff();
         for (i = 0; i < sig.getSizeX(); ++i)
@@ -139,14 +137,13 @@ static bool gradient2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& 
                                           *(T*)(sigP - *(sigDx-1) + *sigDy) + 
                                           *(T*)(sigP + *sigDx - *(sigDy-1)) - 
                                           *(T*)(sigP - *(sigDx-1) - *(sigDy-1))) * 0.5f;
-            *(T_RET*)retP2 = lambda * (*(T*)(sigP + *sigDy) - 
+            *((T_RET*)retP1 + 1) = lambda * (*(T*)(sigP + *sigDy) - 
                                          *(T*)(sigP - *(sigDy-1))) + 
                                _lambda * (*(T*)(sigP + *sigDx + *sigDy) - 
                                           *(T*)(sigP - *(sigDy-1) + *sigDx) + 
                                           *(T*)(sigP + *sigDy - *(sigDx-1)) - 
                                           *(T*)(sigP - *(sigDx-1) - *(sigDy-1))) * 0.5f;
             retP1 += *retDx;
-            retP2 += *retDx;
             sigP += *sigDx;
             ++retDx;
             ++sigDx;
@@ -388,7 +385,7 @@ bool goMath::laplacian2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
  * @param retValue  After returning true, retValue contains the 
  *                  x and y components of grad(sig).
  *                  retValue must be of the same size as 
- *                  sig in x and y dimensions and its z dimension must
+ *                  sig in x and y dimensions and its channel-count must
  *                  be 2.
  *
  * @return True if successful, false otherwise.

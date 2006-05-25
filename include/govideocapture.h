@@ -13,15 +13,35 @@ class goVideoCapturePrivate;
 class goVideoCapture : public goObjectBase
 {
     public:
+        
+        enum ColourMode
+        {
+            RGB,
+            GREY
+        };
+        
         goVideoCapture();
         virtual ~goVideoCapture();
 
-        bool setDevice      (const char* name);
-        bool setCaptureSize (goSize_t width, goSize_t height);
-        bool open           ();
-        void close          ();
-        bool grab           (goSignal3DBase<void>& signal);
+        bool setDevice         (const char* name);
+        void setFileDescriptor (int fd);
+        int  getFileDescriptor () const;
+        bool setCaptureSize    (goSize_t width, goSize_t height);
+        goSize_t getCaptureWidth  () const;
+        goSize_t getCaptureHeight () const;
+        void setColourMode     (enum ColourMode vm);
+        bool open              ();
+        void close             ();
+        bool initDevice        ();
+        bool grab              (goSignal3DBase<void>& signal);
+        bool grab              (void* buffer, goSize_t size);
 
+        bool checkCapture      () const;
+
+    protected:
+        void getCapabilities   ();
+        void getCaptureWindow  ();
+        
     private:
         goVideoCapturePrivate* myPrivate;
 };
