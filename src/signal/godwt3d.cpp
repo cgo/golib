@@ -352,7 +352,7 @@ goDWT3D::downsampleFilter (goSignal3DBase<void>& sig,
     goSize_t sx = sig.getSizeX();
     sx = sx <= 1 ? sx : sx >> 1;
     goSignal3D<void> temp;
-    temp = sig;
+    temp.copy(sig);
     goSubSignal3D<void> subsignal;
     L.make (sx, sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
     H.make (sx, sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
@@ -363,7 +363,7 @@ goDWT3D::downsampleFilter (goSignal3DBase<void>& sig,
     subsignal.setSkip (1,0,0);
     goCopySignal (&subsignal, &L);
 
-    temp = sig;
+    temp.copy(sig);
     myPrivate->highPass.filter (temp);
     subsignal.setSize (H.getSizeX(), H.getSizeY(), H.getSizeZ());
     subsignal.setParent (&temp);
@@ -383,9 +383,9 @@ goDWT3D::filter (goSignal3DBase<void>& sig,
     // L.make (sig.getSizeX(), sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
     // H.make (sig.getSizeX(), sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
    
-    L = sig;
+    L.copy(sig);
     myPrivate->lowPass.filter (L);
-    H = sig;
+    H.copy(sig);
     myPrivate->highPass.filter (H);
 
     return true;

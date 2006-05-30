@@ -374,7 +374,7 @@ bool goConvertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* tar
 }
 
 template <class T, class targetT>
-static bool copySignal2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+static bool copySignalChannel2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     goSignal3DGenericIterator targetIt (targetSig);
     goSignal3DGenericConstIterator it (sig);
@@ -390,6 +390,106 @@ static bool copySignal2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* 
             while (!it.endX() && !targetIt.endX())
             {
                 *(targetT*)*targetIt = static_cast<targetT>(*(T*)*it);
+                it.incrementX();
+                targetIt.incrementX();
+            }
+            it.incrementY();
+            targetIt.incrementY();
+        }
+        it.incrementZ();
+        targetIt.incrementZ();
+    }
+    return true;
+}
+
+template <class T>
+static bool copySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    switch (targetSig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignalChannel2<T,goInt8>     (sig,   targetSig);   break;
+        case   GO_UINT8:    return copySignalChannel2<T,goUInt8>    (sig,   targetSig);   break;
+        case   GO_INT16:    return copySignalChannel2<T,goInt16>    (sig,   targetSig);   break;
+        case   GO_UINT16:   return copySignalChannel2<T,goUInt16>   (sig,   targetSig);   break;
+        case   GO_INT32:    return copySignalChannel2<T,goInt32>    (sig,   targetSig);   break;
+        case   GO_UINT32:   return copySignalChannel2<T,goUInt32>   (sig,   targetSig);   break;
+        case   GO_FLOAT:    return copySignalChannel2<T,goFloat>    (sig,   targetSig);   break;
+        case   GO_DOUBLE:   return copySignalChannel2<T,goDouble>   (sig,   targetSig);   break;
+        default: return false;
+    }
+}
+
+/** --------------------------------------------------------------------------
+ * @brief Copies a channel from a signal to another signal.
+ * 
+ * The signals do not have to have the same data type.
+ * The size is not checked, but each dimension is only copied until
+ * the smallest size is reached.
+ * The currently active channel from sig is copied to the currently 
+ * active channel of targetSig.
+ * 
+ * @param sig       Signal to copy.
+ * @param targetSig Signal to hold the target.
+ * 
+ * @return True if successful, false otherwise.
+ ----------------------------------------------------------------------------*/
+bool goCopySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    if (!targetSig)
+    {
+        goLog::warning("goCopySignal(): targetSig == 0");
+        return false;                                           
+    }
+    if (!sig)
+    {
+        goLog::warning("goCopySignal(): sig == 0");
+        return false;                                           
+    }
+
+//    goString msg = "goCopySignal(): Copying ";
+//    msg += sig->getObjectName().toCharPtr();
+//    msg += " ("; msg += sig->getDataType().getString().toCharPtr();
+//    msg += ") to "; msg += targetSig->getObjectName().toCharPtr();
+//    msg += " ("; msg += targetSig->getDataType().getString().toCharPtr(); msg += ")";
+//    goLog::message (msg.toCharPtr());
+    
+    switch (sig->getDataType().getID())
+    {
+        case   GO_INT8:     return copySignalChannel<goInt8>     (sig,   targetSig);   break;
+        case   GO_UINT8:    return copySignalChannel<goUInt8>    (sig,   targetSig);   break;
+        case   GO_INT16:    return copySignalChannel<goInt16>    (sig,   targetSig);   break;
+        case   GO_UINT16:   return copySignalChannel<goUInt16>   (sig,   targetSig);   break;
+        case   GO_INT32:    return copySignalChannel<goInt32>    (sig,   targetSig);   break;
+        case   GO_UINT32:   return copySignalChannel<goUInt32>   (sig,   targetSig);   break;
+        case   GO_FLOAT:    return copySignalChannel<goFloat>    (sig,   targetSig);   break;
+        case   GO_DOUBLE:   return copySignalChannel<goDouble>   (sig,   targetSig);   break;
+        default: goLog::warning("goCopySignal(): unknown type."); break;
+    }
+    return false;
+}
+
+template <class T, class targetT>
+static bool copySignal2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    goSignal3DGenericIterator targetIt (targetSig);
+    goSignal3DGenericConstIterator it (sig);
+
+    goIndex_t chanCount = goMath::min<goIndex_t>(sig->getChannelCount(),targetSig->getChannelCount());
+    goIndex_t j = 0;
+    while (!it.endZ() && !targetIt.endZ())
+    {
+        it.resetY();
+        targetIt.resetY();
+        while (!it.endY() && !targetIt.endY())
+        {
+            it.resetX();
+            targetIt.resetX();
+            while (!it.endX() && !targetIt.endX())
+            {
+                for (j = 0; j < chanCount; ++j)
+                {
+                    *(((targetT*)*targetIt) + j) = static_cast<targetT>(*(((const T*)*it) + j));
+                }
                 it.incrementX();
                 targetIt.incrementX();
             }
@@ -425,6 +525,7 @@ static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* t
  * The signals do not have to have the same data type.
  * The size is not checked, but each dimension is only copied until
  * the smallest size is reached.
+ * Same holds for channels. All channels are copied until one of the signals runs out of channels.
  * 
  * @param sig       Signal to copy.
  * @param targetSig Signal to hold the target.
@@ -794,6 +895,12 @@ static inline void _signalOperator##OPERATORNAME (goSignal3DBase<void>& sig, con
 MAKE_SIGNAL_SIGNAL_OPERATOR1(+=,PlusEqual);
 MAKE_SIGNAL_SIGNAL_OPERATOR2(+=,PlusEqual);
 MAKE_SIGNAL_SIGNAL_OPERATOR3(+=,PlusEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR1(-=,MinusEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR2(-=,MinusEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR3(-=,MinusEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR1(*=,TimesEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR2(*=,TimesEqual);
+// MAKE_SIGNAL_SIGNAL_OPERATOR3(*=,TimesEqual);
 
 /** --------------------------------------------------------------------------
  * @brief Adds two signals.

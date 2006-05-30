@@ -71,7 +71,7 @@ goSignal3D<T>::goSignal3D (goSignal3D<T>& other)
     : goSignal3DBase<T> ()
 {
     this->setClassName ("goSignal3D");
-    *this = other;
+    this->copy(other);
 }
 
 template<> goSignal3D<void>::~goSignal3D () 
@@ -161,7 +161,7 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
 }
 
 template<> const goSignal3D<void>&
-goSignal3D<void>::operator= (goSignal3DBase<void>& other)
+goSignal3D<void>::copy (const goSignal3DBase<void>& other)
 {
     goLog::message("goSignal3D<void>::operator=()");
     this->destroy();
@@ -177,16 +177,17 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
                 other.getBorderZ(),
                 other.getChannelCount());
 
-    goIndex_t chan = other.getChannel();
-    goSize_t i;
-    for (i = 0; i < this->getChannelCount(); ++i)
-    {
-        this->setChannel (i);
-        const_cast<goSignal3DBase<void>&>(other).setChannel (i);
-        goCopySignal (&other, this);
-    }
-    this->setChannel (0);
-    const_cast<goSignal3DBase<void>&>(other).setChannel (chan);
+    goCopySignal (&other,this);
+//    goIndex_t chan = other.getChannel();
+//    goSize_t i;
+//    for (i = 0; i < this->getChannelCount(); ++i)
+//    {
+//        this->setChannel (i);
+//        const_cast<goSignal3DBase<void>&>(other).setChannel (i);
+//        goCopySignalChannel (&other, this);
+//    }
+//    this->setChannel (0);
+//    const_cast<goSignal3DBase<void>&>(other).setChannel (chan);
     return *this;
 }
 
@@ -198,7 +199,7 @@ goSignal3D<void>::operator= (goSignal3DBase<void>& other)
  */
 template <class T>
 const goSignal3D<T>&
-goSignal3D<T>::operator= (goSignal3DBase<T>& other)
+goSignal3D<T>::copy (const goSignal3DBase<T>& other)
 {
     std::cout << "goSignal3D::operator=()\n";
     this->destroy();

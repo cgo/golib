@@ -6,7 +6,7 @@
  * assume it is distributable under the GNU General Public License (GPL).
  * $Id$
  * $Log: gosignal3dbase.h,v $
- * Revision 1.2  2006-04-21 18:39:34  gosch
+ * Revision 1.2  2006/04/21 18:39:34  gosch
  * *** empty log message ***
  *
  * Revision 1.1.1.1  2006/04/19 15:27:06  gosch
@@ -197,12 +197,12 @@ goSignal3DBase : public goObjectBase
          * Does <strong>not</strong> perform a deep copy, instead copies size and pointer difference
          * values and the <strong>pointer</strong> to the signal data.
          */
-        const goSignal3DBase&	operator= (goSignal3DBase &other);
+        const goSignal3DBase<T>& reference (goSignal3DBase<T> &other);
 
         /*!
          * "Deep" comparison of the actual data.
          */ 
-        bool		operator== (goSignal3DBase &other);
+        bool		operator== (goSignal3DBase<T> &other);
 
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;
@@ -278,6 +278,9 @@ goSignal3DBase : public goObjectBase
         goSize_t     myChannel;
 
         goFixedArray<int> myBorderFlags;
+
+    private:
+        goSignal3DBase<T>& operator= (goSignal3DBase<T>&);
 };
 
 #define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \

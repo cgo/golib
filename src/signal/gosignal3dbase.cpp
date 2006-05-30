@@ -78,7 +78,7 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
     this->setClassName ("goSignal3DBase");
-    *this = other;
+    this->reference(other);
 }
 
 #define INITIALIZE_DATATYPE_METHOD(TYPEENUM) {\
@@ -756,9 +756,9 @@ goSignal3DBase<T>::setPtr(T *p)
 
 template< class T >
 const goSignal3DBase<T>&
-goSignal3DBase<T>::operator= (goSignal3DBase<T> &other) {
+goSignal3DBase<T>::reference (goSignal3DBase<T> &other) {
     this->destroy();
-   
+    goLog::warning("reference(): Referencing another goSignal3DBase. This is NOT a operator=().",this); 
     this->initialize (other.getRealPtr (),
                       other.getSizeX(), other.getSizeY(), other.getSizeZ(),
                       other.getBlockSizeX(), other.getBlockSizeY(), other.getBlockSizeZ(),
@@ -1693,23 +1693,51 @@ goSignal3DBase<void>::operator OPERATOR (const goSignal3DBase<void>& other) \
 template <class T> \
 static inline void _signalScalarOperator##OPERATORNAME##_ (goSignal3DBase<void>& sig, SCALAR scalar) \
 { \
-    goSignal3DGenericIterator it (&sig); \
-     \
-    while (!it.endZ()) \
-    { \
-        it.resetY(); \
-        while (!it.endY()) \
-        { \
-            it.resetX(); \
-            while (!it.endX()) \
+    if (sig.getChannelCount() == 1)\
+    {\
+        goSignal3DGenericIterator it (&sig); \
+            \
+            while (!it.endZ()) \
             { \
-                *(T*)*it OPERATOR (T)scalar; \
-                it.incrementX(); \
+                it.resetY(); \
+                    while (!it.endY()) \
+                    { \
+                        it.resetX(); \
+                            while (!it.endX()) \
+                            { \
+                                *(T*)*it OPERATOR (T)scalar; \
+                                    it.incrementX(); \
+                            } \
+                        it.incrementY(); \
+                    } \
+                it.incrementZ(); \
             } \
-            it.incrementY(); \
-        } \
-        it.incrementZ(); \
-    } \
+    }\
+    else\
+    {\
+        goSignal3DGenericIterator it (&sig); \
+        goIndex_t i = 0;\
+        goIndex_t chanCount = sig.getChannelCount();\
+            \
+            while (!it.endZ()) \
+            { \
+                it.resetY(); \
+                    while (!it.endY()) \
+                    { \
+                        it.resetX(); \
+                            while (!it.endX()) \
+                            { \
+                                for (i = 0; i < chanCount; ++i)\
+                                {\
+                                    *(((T*)*it) + i) OPERATOR (T)scalar; \
+                                }\
+                                it.incrementX(); \
+                            } \
+                        it.incrementY(); \
+                    } \
+                it.incrementZ(); \
+            } \
+    }\
 } \
 template<> goSignal3DBase<void>& \
 goSignal3DBase<void>::operator OPERATOR (SCALAR scalar) \
@@ -1785,24 +1813,68 @@ template<> goSignal3DBase<void*>& goSignal3DBase<void*>::operator /= (goFloat sc
     goLog::warning ("operator [+-*/]= not implemented for void*.",this);
     return *this;
 }
+
+/** 
+ * @brief Add a scalar to each element in the signal.
+ * 
+ * Adds a scalar to each element in the signal.
+ * Implemented for all types, but please use void. The others may be discontinued in the future.
+ *
+ * @note For void type signals (use them!), the operation is carried out for all channels, 
+ * since this seemed more natural to me,
+ * especially for *= operations. All ?= operators behave the same in this respect.
+ * Operators which accept another goSignal3D[Base] do NOT behave like this.
+ * That may change in the future. Also see the helper functions (namely, goMath::vectorMult()) in gomath.h.
+ *
+ * @param scalar  Scalar.
+ * 
+ * @return *this
+ */
 template <class T>
 goSignal3DBase<T>& goSignal3DBase<T>::operator += (goFloat scalar)
 {
     GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr + scalar), (*this), T);
     return *this;
 }
+/** 
+ * @brief -= Operator.
+ *
+ * @see operator+=
+ * 
+ * @param scalar 
+ * 
+ * @return *this 
+ */
 template <class T>
 goSignal3DBase<T>& goSignal3DBase<T>::operator -= (goFloat scalar)
 {
     GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr - scalar), (*this), T);
     return *this;
 }
+/** 
+ * @brief *= Operator.
+ *
+ * @see operator+=
+ * 
+ * @param scalar 
+ * 
+ * @return *this 
+ */
 template <class T>
 goSignal3DBase<T>& goSignal3DBase<T>::operator *= (goFloat scalar)
 {
     GO_SIGNAL3D_EACHELEMENT (*__ptr = (T)(*__ptr * scalar), (*this), T);
     return *this;
 }
+/** 
+ * @brief /= Operator.
+ *
+ * @see operator+=
+ * 
+ * @param scalar 
+ * 
+ * @return *this 
+ */
 template <class T>
 goSignal3DBase<T>& goSignal3DBase<T>::operator /= (goFloat scalar)
 {

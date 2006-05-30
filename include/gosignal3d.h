@@ -37,7 +37,7 @@ goSignal3D : public goSignal3DBase<T>
                     goSize_t channelCount = 1);
         goSignal3D (goSignal3D<T>& other);
         virtual ~goSignal3D ();
-        const goSignal3D<T>& operator= (goSignal3DBase<T>& other);
+        const goSignal3D<T>& copy (const goSignal3DBase<T>& other);
 
         // From goObjectBase
         virtual goSize_t memoryUsage() const;
@@ -61,6 +61,8 @@ goSignal3D : public goSignal3DBase<T>
         void fillByte (goInt8 b);
 
         virtual void fill (const T* element);
+    private:
+        goSignal3D<T>& operator= (goSignal3D<T>& other);
 };
 /** @} */
 
