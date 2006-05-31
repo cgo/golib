@@ -14,9 +14,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <asm/types.h>          /* for videodev2.h */
-#if HAVE_LINUX_VIDEODEV2_H
-# include <linux/videodev2.h>
-#endif
+//#if HAVE_LINUX_VIDEODEV2_H
+//# include <linux/videodev2.h>
+//#endif
 #if HAVE_LINUX_VIDEODEV_H
 # include <linux/videodev.h>
 #endif
@@ -39,7 +39,7 @@ class goVideoCapturePrivate
             fileDescriptor (-1), 
             captureWidth   (640), 
             captureHeight  (480), 
-            colourMode     (goVideoCapture::RGB) 
+            colourMode     (goVideoCapture::RGB24) 
         {
 #if HAVE_LINUX_VIDEODEV_H
             memset (&this->cap, 0, sizeof(struct video_capability));
@@ -83,8 +83,9 @@ bool goVideoCapture::setDevice (const char* name)
 void goVideoCapture::setFileDescriptor (int fd)
 {
     myPrivate->fileDescriptor = fd;
-    this->getCapabilities ();
-    this->getCaptureWindow ();
+    this->getSettings();
+    // this->getCapabilities ();
+    // this->getCaptureWindow ();
 }
 
 int goVideoCapture::getFileDescriptor () const
@@ -112,6 +113,11 @@ goSize_t goVideoCapture::getCaptureHeight () const
 void goVideoCapture::setColourMode (enum goVideoCapture::ColourMode m)
 {
     myPrivate->colourMode = m;
+}
+
+enum goVideoCapture::ColourMode goVideoCapture::getColourMode () const
+{
+    return myPrivate->colourMode;
 }
 
 bool goVideoCapture::open ()
@@ -149,7 +155,9 @@ bool goVideoCapture::initDevice ()
     }
     switch (myPrivate->colourMode)
     {
-        case RGB: vp.palette = VIDEO_PALETTE_RGB24; break;
+        case RGB24: vp.palette = VIDEO_PALETTE_RGB24; break;
+        case YUV422P: vp.palette = VIDEO_PALETTE_YUV422P; break;
+        case YUV420P: vp.palette = VIDEO_PALETTE_YUV420P; break;
         case GREY: vp.palette = VIDEO_PALETTE_GREY; break;
         default: goLog::warning ("initDevice(): unknown colour mode.",this); return false; break;
     }
@@ -189,11 +197,14 @@ bool goVideoCapture::grab (void* target, goSize_t sz)
     {
         goSize_t captureSize = 0;
         captureSize = myPrivate->captureWidth*myPrivate->captureHeight;
-        if (myPrivate->colourMode == RGB)
+        if (myPrivate->colourMode == RGB24 ||
+            myPrivate->colourMode == YUV422P ||
+            myPrivate->colourMode == YUV420P)
         {
             captureSize *= 3;
         }
         ::read (myPrivate->fileDescriptor, target, goMath::min<goSize_t>(captureSize, sz));
+        // printf ("Read %d bytes.\n",s);
         return true;
     }
     else
@@ -241,7 +252,7 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
     }
     switch (myPrivate->colourMode)
     {
-        case RGB:
+        case RGB24:
             {
                 if (target.getChannelCount() != 3)
                 {
@@ -285,8 +296,32 @@ void goVideoCapture::getCapabilities ()
                     myPrivate->deviceName.toCharPtr());
         }
         ::perror(0);
+    }
+#endif
+}
+
+void goVideoCapture::getSettings()
+{
+#if HAVE_LINUX_VIDEODEV_H
+    this->getCapabilities();
+    //= Get other settings.
+    struct video_picture vp;
+    if (ioctl (myPrivate->fileDescriptor, VIDIOCGPICT, &vp) < 0)
+    {
+        printf ("VIDIOCGPICT:");
+        perror(0);
         return;
     }
+    switch (vp.palette)
+    {
+        case VIDEO_PALETTE_RGB24: myPrivate->colourMode = RGB24; break;
+        case VIDEO_PALETTE_YUV422P: myPrivate->colourMode = YUV422P; break;
+        case VIDEO_PALETTE_YUV420P: myPrivate->colourMode = YUV420P; break;
+        case VIDEO_PALETTE_GREY: myPrivate->colourMode = GREY; break;
+        default: goLog::warning ("getCapabilities(): unsupported colour mode.",this); return; break;
+    }
+    //= Get capture window size
+    this->getCaptureWindow();
 #endif
 }
 

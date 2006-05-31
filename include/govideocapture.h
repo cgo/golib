@@ -16,8 +16,10 @@ class goVideoCapture : public goObjectBase
         
         enum ColourMode
         {
-            RGB,
-            GREY
+            RGB24,          // 24 bits RGB (8 bits each channel)
+            YUV422P,        // YUV 4:2:2 planar
+            YUV420P,        // YUV 4:2:0 planar
+            GREY            // 8 bits grey
         };
         
         goVideoCapture();
@@ -30,6 +32,7 @@ class goVideoCapture : public goObjectBase
         goSize_t getCaptureWidth  () const;
         goSize_t getCaptureHeight () const;
         void setColourMode     (enum ColourMode vm);
+        enum ColourMode getColourMode () const;
         bool open              ();
         void close             ();
         bool initDevice        ();
@@ -37,6 +40,8 @@ class goVideoCapture : public goObjectBase
         bool grab              (void* buffer, goSize_t size);
 
         bool checkCapture      () const;
+        
+        void getSettings       ();
 
     protected:
         void getCapabilities   ();
