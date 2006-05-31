@@ -36,13 +36,14 @@ void mexFunction (int            nlhs,
     height = (int)mxGetScalar(prhs[2]);
     goVideoCapture vc;
     vc.setDevice (deviceName);
-    vc.setCaptureSize (width,height);
-    vc.setColourMode (goVideoCapture::RGB);
     if (!vc.open())
     {
         plhs[0] = mxCreateDoubleScalar (-1.0);
         mexErrMsgTxt ("Could not open device.");
     }
+    vc.getSettings();  // get settings from device instead of trying to initialise it.
+    vc.setCaptureSize (width,height);
+    // vc.setColourMode (goVideoCapture::RGB24);
     if (!vc.initDevice())
     {
         plhs[0] = mxCreateDoubleScalar (-1.0);
