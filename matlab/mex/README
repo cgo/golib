@@ -1,0 +1,11 @@
+Golib mex modules for use with Matlab(R)
+----------------------------------------
+You need the "mex" compile script provided by Matlab, Matlab itself
+and golib compiled and ready.
+
+Wed May 31 23:44:44 CEST 2006
+videocapture*: Video capture with v4l devices supported by
+               the goVideoCapture class.
+               There is one open, one close function and one for
+               grabbing a frame from the device.
+               -- Christian

@@ -1,3 +1,8 @@
 Swig needs to be done yet.
 The rest from C++ seems to work.
 ./mex contains code for mex-modules to use in matlab.
+To build them, go to the specific directory and
+type 
+ make -f Makefile.mex
+You may have to adapt the Makefile a little for your environment.
+The makefiles are not too complicated.
