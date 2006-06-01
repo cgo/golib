@@ -1,4 +1,0 @@
-goSBlockRenderer: Verwendung von hashtables koennte schieflaufen.
-----------------  Ersetzen. Fehler nach einigen Ersetzungen 
-				  (loeschen/neu erstellen) von subImages, Segfault. 
-				  Hashtables sind ausserdem evtl. zu langsam. Mache neue Bilder 				  fuer jeden Durchlauf.
