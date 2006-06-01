@@ -11,11 +11,24 @@
  * \subsection intro2 Introduction
  * goLib is a C++ class library written by 
  * Christian Gosch</a>.
- * It contains some useful classes for everyday use, like arrays, strings, lists, hashtables,
- * and so forth. Other functionalities are
- * - Classes for signal processing, especially image processing and processing
- * of 3D grid data (source tree under src/signal)
- * - Some limited matrix and vector classes, and (more recently added) a sparse matrix class.
+ * It contains some classes which have proven useful to me, like 
+ * - Arrays, strings, lists, hashtables, and so forth
+ * - Multithreading wrappers (goThreadObject and related) and a process
+ *   class (goProcess) to start new processes
+ * - A class for grabbing frames from a video4linux device (recent, goVideoCapture)
+ * - Some small matlab modules to use some functionality under matlab
+ * - A matlab interface to use matlab engines from C++ and swap data
+ *   between the two (you need matlab for the latter two, of course)
+ * - Classes for image processing, like container classes for 3D grid data 
+ *   (source tree under src/signal), wrapper for writing and reading images (goFileIO)
+ *   which rely on libdevil
+ * - Some limited matrix and vector classes, and (more recently added) a sparse matrix class
+ * - Few numerical routines, like the ones from the free TNT library (incorporated in the code
+ *   and marked as such) and the standard conjugate gradients method for sparse matrices
+ * - An interface to gnuplot (goPlot)
+ * - A few networking classes (not well tested)
+ * - ... it's slowly growing as I find use for more stuff :)
+ *
  * \par 
  * <strong>Important notice:</strong> All of this was made because I had
  * a use for it. If you want to make your own contributions, please see further 

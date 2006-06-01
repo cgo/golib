@@ -4,11 +4,11 @@
 #include <gothread.h>
 #include <goproducer.h>
 
-/*!
+/*
  * \addtogroup thread
  * @{
  */
-/*!
+/*
  * Simple consumer object.
  * In this implementation, each consumer can only be connected to one producer.
  *
@@ -25,14 +25,14 @@ goConsumer
     goConsumer();
     virtual ~goConsumer();
 
-	/*!
+	/*
 	 * Waits for an internal semaphore and returns as soon as it was incremented by 
 	 * another thread (a producer). The semaphore is decremented.
 	 * @note If using pthreads (which should normally be true), this is a cancellation point.
 	 */
     void waitProduction();
 
-	/*!
+	/*
 	 * Sets the internal semaphore to the semaphore provided by the given producer.
 	 * @attention If the producer gets deleted, the semaphore is no longer valid.
 	 * This is a potential source of faults, so make sure no consumer is using any
@@ -42,5 +42,5 @@ goConsumer
  private:
     goSemaphore *semaphore;
 };
-/*! @} */
+/* @} */
 #endif

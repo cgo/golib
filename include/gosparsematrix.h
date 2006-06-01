@@ -24,6 +24,9 @@
 # include <gosort.h>
 #endif
 
+/*!
+ * \addtogroup math
+ * @{ */
 /**
  * @brief Basic sparse matrix class with Matlab mxArray support.
  *
@@ -1737,5 +1740,6 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
     // this->matlabFillEnd();
     return true;
 }
+/*! @} */
 #endif
 #endif

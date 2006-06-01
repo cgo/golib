@@ -4,6 +4,7 @@
 #ifndef GOMATH_H
 # include <gomath.h>
 #endif
+#include <golog.h>
 
 template <class T>
 bool
@@ -243,7 +244,7 @@ goMatrix<T>::operator* (const goMatrix<T>& other)
 {
   if (getColumns() != other.getRows())
   {
-      goError::print ("goMatrix::operator*","Matrix dimensions do not match.");
+      goLog::warning ("goMatrix::operator*: Matrix dimensions do not match.");
       return goMatrix<T> (1,1);
   }
   goMatrix<T> retval (getRows(), other.getColumns());

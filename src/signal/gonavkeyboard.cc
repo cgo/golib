@@ -1,10 +1,7 @@
 #include <gonavkeyboard.h>
 #include <SDL/SDL.h>
-#include <goerror.h>
-#include <govol.h>
+#include <golog.h>
 #include <gothread.h>
-
-namespace Vol {
 
 goNavKeyboard::goNavKeyboard()
 	: goNavDevice()
@@ -50,7 +47,7 @@ goNavKeyboard::runThread()
 		SDL_Event event;
 		if (SDL_WaitEvent(&event) == 0)
 		{
-			goError::print("goNavKeyboard::runThread()","There was an error waiting for an SDL event.. returning");
+			goLog::warning("goNavKeyboard::runThread() There was an error waiting for an SDL event.. returning");
 			return;
 		}
 		// cout << "joystickthread returned from waitevent\n";
@@ -145,6 +142,4 @@ goNavKeyboard::navDeviceUpdate()
 	vr.y = (volFloat)rotY; // (volFloat)a0;  // Rotation um die y-Achse
 	vr.z = (volFloat)rotZ;
 	getNavSlot()->motion(goNavSlot::ROTATION,(void*)&vr);
-}
-
 }

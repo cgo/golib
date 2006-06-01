@@ -7,8 +7,6 @@
 #include <gosignal3d.h>
 #include <gosubsignal3d.h>
 #include <gosignalmacros.h>
-#include <gomatrix.h>
-#include <goerror.h>
 #ifndef GOROWVECTOR_H
 # include <gorowvector.h>
 #endif

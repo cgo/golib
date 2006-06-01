@@ -233,6 +233,11 @@ goCondition::~goCondition ()
 	}
 }
 
+/** 
+ * @brief Signals the condition is met.
+ * Signalling the condition is met restarts exactly one waiting thread,
+ * if there is any. Use broadcast to restart all waiting threads.
+ */
 void
 goCondition::signal ()
 {
@@ -241,6 +246,10 @@ goCondition::signal ()
     mutex.unlock();
 }
 
+/** 
+ * @brief Broadcast the condition is met to all waiting threads.
+ * Restarts all waiting threads, if any.
+ */
 void
 goCondition::broadcast ()
 {
@@ -249,6 +258,11 @@ goCondition::broadcast ()
     mutex.unlock();
 }
 
+/** 
+ * @brief Wait for the condition to be met.
+ * The calling thread waits until signal() chooses it to
+ * be continued or until broadcast() is called.
+ */
 void
 goCondition::wait ()
 {
@@ -271,6 +285,10 @@ goSemaphore::~goSemaphore()
     sem_destroy (&semaphore);
 }
 
+/** 
+ * @brief Decrement semaphore.
+ * Waits until the semaphore is > 0 and atomically decrements it by one.
+ */
 void
 goSemaphore::dec ()
 {
@@ -284,6 +302,9 @@ goSemaphore::dec ()
 #endif
 }
 
+/** 
+ * @brief Atomically increment the semaphore.
+ */
 void
 goSemaphore::inc ()
 {
@@ -292,7 +313,3 @@ goSemaphore::inc ()
 }
 
 #endif
-
-
-
-

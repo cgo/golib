@@ -2,7 +2,7 @@
 #define GOSPECIALARRAYS_H
 
 #include <string.h>
-#include <goerror.h>
+#include <golog.h>
 
 typedef goUInt32 goNibbleArray_t;
 typedef goUInt32 goBitArray_t;
@@ -73,7 +73,7 @@ goBitArray::ANDNOT (goBitArray& other)
 {
 	if (other.getArray().getSize() != array.getSize())
 	{
-		goError::print("goBitArray::ANDNOT()","differing array sizes");
+		goLog::warning("goBitArray::ANDNOT()","differing array sizes");
 		return;
 	}
 	goBitArray_t *p  = array.getPtr();

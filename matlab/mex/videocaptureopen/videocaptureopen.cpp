@@ -44,10 +44,10 @@ void mexFunction (int            nlhs,
     vc.getSettings();  // get settings from device instead of trying to initialise it.
     vc.setCaptureSize (width,height);
     // vc.setColourMode (goVideoCapture::RGB24);
-    if (!vc.initDevice())
+    if (!vc.setSettings())
     {
         plhs[0] = mxCreateDoubleScalar (-1.0);
-        mexErrMsgTxt ("Could not initialise device.");
+        mexErrMsgTxt ("Could not set settings to device.");
     }
     plhs[0] = mxCreateDoubleScalar ((double)vc.getFileDescriptor());
 }

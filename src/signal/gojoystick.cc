@@ -1,10 +1,7 @@
 #include <gojoystick.h>
 #include <SDL/SDL.h>
-#include <goerror.h>
-#include <govol.h>
 #include <gothread.h>
-
-namespace Vol {
+#include <golog.h>
 
 goJoystick::goJoystick(int joyIndex)
 	: goNavDevice()
@@ -12,7 +9,7 @@ goJoystick::goJoystick(int joyIndex)
 	stick = SDL_JoystickOpen(joyIndex);
 	if (!stick)
 	{
-		goError::print("goJoystick::goJoystick()","Could not open joystick");
+		goLog::warning("goJoystick::goJoystick(): Could not open joystick");
 	}
 	else
 	{
@@ -51,7 +48,7 @@ goJoystick::run()
 	if (stick)
 		thread.create(gojoystick_thread,(void*)this,1);
 	else
-		goError::print("goJoystick::run()","Joystick initialization error. No thread started.");	
+		goLog::warning("goJoystick::run(): Joystick initialization error. No thread started.");	
 }
 
 void
@@ -62,7 +59,7 @@ goJoystick::runThread()
 		SDL_Event event;
 		if (SDL_WaitEvent(&event) == 0)
 		{
-			goError::print("goJoystick::runThread()","There was an error waiting for an SDL event.. returning");
+			goLog::warning("goJoystick::runThread(): There was an error waiting for an SDL event.. returning");
 			return;
 		}
 		// cout << "joystickthread returned from waitevent\n";
@@ -153,6 +150,4 @@ goJoystick::navDeviceUpdate()
 	}
 	getNavSlot()->motion(goNavSlot::TRANSLATION,(void*)&vt);
 	getNavSlot()->motion(goNavSlot::ROTATION,(void*)&vr);
-}
-
 }

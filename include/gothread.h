@@ -49,6 +49,9 @@ class goMutex {
 };
 
 #ifdef HAVE_LIBPTHREAD
+/** 
+* @brief Condition variable.
+*/
 class goCondition {
  public:
     goCondition();

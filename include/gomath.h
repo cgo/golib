@@ -92,7 +92,6 @@ Real abs(const Real &a)
 {
 	return  (a > 0 ? a : -a);
 }
-/*! @} */
 
 bool gradient2D          (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool laplacian2D         (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
@@ -100,10 +99,45 @@ bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
+/** 
+ * @brief Divergence of a 2D vector field.
+ * 
+ * @param x x component.
+ * @param y y component.
+ * @param hx x grid size.
+ * @param hy y grid size.
+ * @param retValue divergence field.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, goDouble hx, goDouble hy, goSignal3D<void>& retValue);
 
+/** 
+ * @brief Central differences of a signal.
+ * 
+ * @param x Input signal.
+ * @param retValue Central difference values.
+ * @param dimension One of {0,1,2}
+ * @param h Grid spacing.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension = 0, goDouble h = 1.0);
 
+/** 
+ * @brief Conjugate gradients solver.
+ * 
+ * Solves A*x=b iteratively for x.
+ *
+ * @note Currently implemented for goSparseMatrix and goVector.
+ * 
+ * @param A Matrix A
+ * @param b Vector b
+ * @param x Solution
+ * @param epsilon Stop when abs(Ax-b) < epsilon.
+ * 
+ * @return final abs(A*x-b).
+ */
 template <class MatrixType, class VectorType>
 goDouble goConjugateGradients (const MatrixType& A, const VectorType& b, VectorType& x, goDouble epsilon = 1e-6);
 
@@ -138,7 +172,7 @@ bool getRoots (const vectorT& fX,
                const vectorT& fY,
                vectorT&       retX,
                goVector<goIndex_t>* retRootIndex = 0);
-
+/*! @} */
 };
 
 

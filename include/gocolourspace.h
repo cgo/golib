@@ -46,6 +46,10 @@ static inline goFloat goYUV422_Blue (goUInt8 y, goUInt8 u, goUInt8 v)
 }
 
 /** 
+ * \addtogroup video
+ * @{
+ */
+/*!
  * @brief Converts a planar YUV420 image to RGB.
  *
  * Converts a planar YUV420 image, stored linearly in memory,
@@ -116,4 +120,5 @@ static inline void goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height,
         it.incrementY();
     }
 }
+/*! @} */
 #endif

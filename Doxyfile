@@ -361,7 +361,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ./doc/groups.h ./ src/signal src/system src/misc src/data src/network src/math
+INPUT                  = ./doc/groups.h ./ src/signal src/system src/misc src/data src/network src/math ./include
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -382,7 +382,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = src/siemens 
+EXCLUDE                = src/siemens src/graphics include/goerror.h include/gohashcache.h include/govolumerenderer.h include/goblockrenderer.h include/goblockstore.h include/gojoystick.h include/gonavdevice.h include/gonavkeyboard.h include/gosblockrenderer.h include/gojoystick.h src/signal/gojoystick.cc src/signal/gonavkeyboard.cc exp
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or directories 
 # that are symbolic links (a Unix filesystem feature) are excluded from the input.
@@ -875,7 +875,8 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed.
 
-PREDEFINED             = 
+# HAVE_LIBPTHREAD to include the pthreads dependent classes in gothread.h...
+PREDEFINED             = HAVE_LIBPTHREAD
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

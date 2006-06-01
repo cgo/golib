@@ -57,6 +57,7 @@ class goVideoCapturePrivate
 #endif
 };
 
+
 goVideoCapture::goVideoCapture ()
     : goObjectBase (),
       myPrivate (0)
@@ -74,12 +75,27 @@ goVideoCapture::~goVideoCapture ()
     }
 }
 
+/** 
+ * @brief Set device file name.
+ * 
+ * @param name Device file name, e.g. "/dev/video0"
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goVideoCapture::setDevice (const char* name)
 {
     myPrivate->deviceName = name;
     return true;
 }
 
+/** 
+ * @brief Set file discriptor of an already open device.
+ * 
+ * Sets the descriptor and automatically reads settings from the device
+ * to update the settings stored in the goVideoCapture object.
+ *
+ * @param fd File descriptor.
+ */
 void goVideoCapture::setFileDescriptor (int fd)
 {
     myPrivate->fileDescriptor = fd;
@@ -88,11 +104,24 @@ void goVideoCapture::setFileDescriptor (int fd)
     // this->getCaptureWindow ();
 }
 
+/** 
+ * @brief Get file descriptor for open device.
+ * 
+ * @return File descriptor. Negative means no device is open.
+ */
 int goVideoCapture::getFileDescriptor () const
 {
     return myPrivate->fileDescriptor;
 }
 
+/** 
+ * @brief Set capture frame size.
+ * 
+ * @param width Width in pixels.
+ * @param height Height in pixels.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goVideoCapture::setCaptureSize (goSize_t width, goSize_t height)
 {
     myPrivate->captureWidth = width;
@@ -100,26 +129,57 @@ bool goVideoCapture::setCaptureSize (goSize_t width, goSize_t height)
     return true;
 }
 
+/** 
+ * @brief Capture frame width.
+ * 
+ * @return Frame width in pixels.
+ */
 goSize_t goVideoCapture::getCaptureWidth () const
 {
     return myPrivate->captureWidth;
 }
 
+/** 
+ * @brief Capture frame height.
+ * 
+ * @return Frame height in pixels.
+ */
 goSize_t goVideoCapture::getCaptureHeight () const
 {
     return myPrivate->captureHeight;
 }
 
+/** 
+ * @brief Sets the colour mode.
+ *
+ * @note Care should be taken when forcing a colour mode and setting it with setSettings().
+ * Apparently some devices don't support most colour modes or I'm not using the v4l interface right.
+ * Either way, it didn't work with my cameras. So just use the format provided by the camera for now.
+ * 
+ * @param m Colour mode enumerator.
+ */
 void goVideoCapture::setColourMode (enum goVideoCapture::ColourMode m)
 {
     myPrivate->colourMode = m;
 }
 
+/** 
+ * @brief Get the colour mode this object is currently set to.
+ * 
+ * @return The colour mode enumerator.
+ */
 enum goVideoCapture::ColourMode goVideoCapture::getColourMode () const
 {
     return myPrivate->colourMode;
 }
 
+/** 
+ * @brief Open the device.
+ * 
+ * @see setDevice()
+ *
+ * @return True if successful, false otherwise.
+ */
 bool goVideoCapture::open ()
 {
     int result = ::open (myPrivate->deviceName.toCharPtr(), O_RDWR); 
@@ -131,6 +191,9 @@ bool goVideoCapture::open ()
     return true;
 }
 
+/** 
+ * @brief Close the open device.
+ */
 void goVideoCapture::close ()
 {
     if (myPrivate->fileDescriptor >= 0)
@@ -140,56 +203,17 @@ void goVideoCapture::close ()
     }
 }
 
-bool goVideoCapture::initDevice ()
-{
-#if HAVE_LINUX_VIDEODEV_H
-    //= This is for V4L version 1 (soon deprecated)
-    this->getCapabilities ();
-    //= Set image format (RGB24)
-    struct video_picture vp;
-    if (ioctl (myPrivate->fileDescriptor, VIDIOCGPICT, &vp) < 0)
-    {
-        printf ("VIDIOCGPICT:");
-        perror(0);
-        return false;
-    }
-    switch (myPrivate->colourMode)
-    {
-        case RGB24: vp.palette = VIDEO_PALETTE_RGB24; break;
-        case YUV422P: vp.palette = VIDEO_PALETTE_YUV422P; break;
-        case YUV420P: vp.palette = VIDEO_PALETTE_YUV420P; break;
-        case GREY: vp.palette = VIDEO_PALETTE_GREY; break;
-        default: goLog::warning ("initDevice(): unknown colour mode.",this); return false; break;
-    }
-    if (ioctl (myPrivate->fileDescriptor, VIDIOCSPICT, &vp) < 0)
-    {
-        printf ("VIDIOCSPICT:");
-        perror(0);
-        return false;
-    }
 
-    //= Set capture window size
-    struct video_window vw;
-    if (ioctl (myPrivate->fileDescriptor, VIDIOCGWIN, &vw) < 0)
-    {
-        printf ("VIDIOCGWIN:");
-        perror(0);
-        return false;
-    }
-    vw.width = myPrivate->captureWidth;
-    vw.height = myPrivate->captureHeight;
-    if (ioctl (myPrivate->fileDescriptor, VIDIOCSWIN, &vw) < 0)
-    {
-        printf ("VIDIOCSWIN:");
-        perror(0);
-        return false;
-    }
-    return true;
-#else
-    return false;
-#endif
-}
-
+/** 
+ * @brief Grab a frame from the open device.
+ * 
+ * @note No data conversion is done. The data is as-is from the video device.
+ *
+ * @param target Target pointer to memory of size sz bytes.
+ * @param sz Maximum of sz bytes is read from the open device.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goVideoCapture::grab (void* target, goSize_t sz)
 {
     //= Read RGB image
@@ -240,6 +264,14 @@ bool goVideoCapture::grab (void* target, goSize_t sz)
 #endif
 }
 
+/** 
+ * @brief Grab a frame from the open device.
+ * 
+ * @param target Target. Must currently be linear in memory (block size == signal size), of type GO_UINT8 and
+ * must have 3 channels if the colour mode is RGB24.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goVideoCapture::grab (goSignal3DBase<void>& target)
 {
 #if HAVE_LINUX_VIDEODEV_H
@@ -269,6 +301,11 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
 #endif
 }
 
+/** 
+ * @brief Check if video capture is available by the open device.
+ * 
+ * @return True if capture is available, false otherwise.
+ */
 bool goVideoCapture::checkCapture () const
 {
 #if HAVE_LINUX_VIDEODEV_H
@@ -283,6 +320,10 @@ bool goVideoCapture::checkCapture () const
 #endif
 }
 
+/** 
+ * @brief Gets device capabilities and stores them internally.
+ * Called, amongst others, by getSettings().
+ */
 void goVideoCapture::getCapabilities ()
 {
 #if HAVE_LINUX_VIDEODEV_H
@@ -300,6 +341,67 @@ void goVideoCapture::getCapabilities ()
 #endif
 }
 
+/** 
+ * @brief Store settings from this object to the open device.
+ * 
+ * @return True if successful, false otherwise. Also check the logfile.
+ */
+bool goVideoCapture::setSettings ()
+{
+#if HAVE_LINUX_VIDEODEV_H
+    //= This is for V4L version 1 (soon deprecated)
+    this->getCapabilities ();
+    //= Set image format (RGB24)
+    struct video_picture vp;
+    if (ioctl (myPrivate->fileDescriptor, VIDIOCGPICT, &vp) < 0)
+    {
+        printf ("VIDIOCGPICT:");
+        perror(0);
+        return false;
+    }
+    switch (myPrivate->colourMode)
+    {
+        case RGB24: vp.palette = VIDEO_PALETTE_RGB24; break;
+        case YUV422P: vp.palette = VIDEO_PALETTE_YUV422P; break;
+        case YUV420P: vp.palette = VIDEO_PALETTE_YUV420P; break;
+        case GREY: vp.palette = VIDEO_PALETTE_GREY; break;
+        default: goLog::warning ("setSettings(): unknown colour mode.",this); return false; break;
+    }
+    if (ioctl (myPrivate->fileDescriptor, VIDIOCSPICT, &vp) < 0)
+    {
+        printf ("VIDIOCSPICT:");
+        perror(0);
+        return false;
+    }
+
+    //= Set capture window size
+    struct video_window vw;
+    if (ioctl (myPrivate->fileDescriptor, VIDIOCGWIN, &vw) < 0)
+    {
+        printf ("VIDIOCGWIN:");
+        perror(0);
+        return false;
+    }
+    vw.width = myPrivate->captureWidth;
+    vw.height = myPrivate->captureHeight;
+    if (ioctl (myPrivate->fileDescriptor, VIDIOCSWIN, &vw) < 0)
+    {
+        printf ("VIDIOCSWIN:");
+        perror(0);
+        return false;
+    }
+    return true;
+#else
+    return false;
+#endif
+}
+
+/** 
+ * @brief Get settings from device and store them internally.
+ * It is a good idea to call this after opening a device.
+ * It is also called by setFileDescriptor().
+ * This method calls getCapabilities() and getCaptureWindow().
+ */
 void goVideoCapture::getSettings()
 {
 #if HAVE_LINUX_VIDEODEV_H
@@ -325,6 +427,11 @@ void goVideoCapture::getSettings()
 #endif
 }
 
+/** 
+ * @brief Get the size of the capture frame from the device
+ * and store it internally.
+ * It can be retrieved with getCapture[Width|Height]().
+ */
 void goVideoCapture::getCaptureWindow ()
 {
 #if HAVE_LINUX_VIDEODEV_H

@@ -3,11 +3,11 @@
 
 #include <gothread.h>
 
-/*! 
+/*
  * \addtogroup thread
  * @{
  */
-/*!
+/*
  * Simple producer object.
  * In this implementation, each consumer can only be connected to one producer.
  *
@@ -24,14 +24,14 @@ goProducer
     goProducer();
     virtual ~goProducer();
 
-    /*!
+    /*
      * Internally, increments the object's semaphore variable to notify threads waiting for data that data is available.
      * Each consumer waiting for data decrements the semaphore atomically before doing something with any data
      * or waits until the semaphore becomes larger than zero and then decrements it.
      */
     void signalProduction();
     
-    /*!
+    /*
      * @return A pointer to the goSemaphore object used as semaphore variable. This is used by
      * goConsumer to "connect" a consumer to a producer.
      * @see goConsumer::setProducer()
@@ -40,5 +40,5 @@ goProducer
  private:
     goSemaphore semaphore;
 };
-/*! @} */
+/* @} */
 #endif

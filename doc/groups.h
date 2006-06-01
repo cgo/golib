@@ -107,4 +107,5 @@
  * \defgroup system System
  * \defgroup net Network classes
  * \defgroup thread Multithreading classes
+ * \defgroup video Video capture and related
  */
