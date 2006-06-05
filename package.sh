@@ -17,7 +17,6 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/examples\
  golib/include\
  golib/maindocpage.h\
- golib/namespacedoc.h\
  golib/CMakeLists.txt\
  golib/src\
  golib/swig\

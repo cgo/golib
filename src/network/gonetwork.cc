@@ -1,5 +1,5 @@
 #include <gonetwork.h>
-#include <goerror.h>
+#include <golog.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -21,11 +21,11 @@ goNetwork::sendData (const void* data, size_t size, int sock) {
   int s = 0;
   goNetwork::fail (0);
   if ( (s = ::write (sock, data, size)) == -1 ) {
-    goError::print("goNetwork::sendData()","Cannot send data to socket");
+      goLog::warning("goNetwork::sendData(): Cannot send data to socket");
     goNetwork::fail (1);
     return false;
   }
-  goError::note("goNetwork::sendData()","");
+  goLog::message("goNetwork::sendData()");
   std::cout << "\tSent data of size " << s << " to socket " << sock << std::endl;
   return true;
 }
@@ -59,7 +59,7 @@ goNetwork::receiveDataMax (unsigned int recvsize, int sock) {
   char* data;
 
   goNetwork::fail (0);
-  goError::note("goNetwork::receiveDataMax()","");
+  goLog::message("goNetwork::receiveDataMax()");
   std::cout << "\trecvsize is " << recvsize << std::endl;
   data  = (char*)malloc (recvsize);
   do {
@@ -69,7 +69,7 @@ goNetwork::receiveDataMax (unsigned int recvsize, int sock) {
       return NULL;
     }
     size += (unsigned int)s;
-    goError::note("goNetwork::receiveDataMax()","");
+    goLog::message("goNetwork::receiveDataMax()");
     std::cout << "Received " << s << " bytes" << std::endl;
     if ((unsigned int)size >= recvsize) {
       s = 0;

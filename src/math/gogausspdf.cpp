@@ -1,6 +1,6 @@
 #include <gogausspdf.h>
 #include <gotypes.h>
-#include <goerror.h>
+#include <golog.h>
 #include <gostring.h>
 #include <assert.h>
 #include <math.h>
@@ -36,7 +36,7 @@ namespace goMath
     {
         if (variance <= 0.0)
         {
-            goError::print (this->getClassName(), "Variance is zero or lower than zero");
+            goLog::warning ("goGaussPDF::setVariance(): Variance is zero or lower than zero");
             return;
         }
         assert (variance > 0.0);
@@ -50,7 +50,7 @@ namespace goMath
     output_type
     goGaussPDF<input_type, output_type>::operator () (const input_type& input)
     {
-        goError::print (this->getClassName(), "operator() not defined for this input/output type combination.");
+        goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
         assert (false);
         return (output_type)0;
     }

@@ -1,7 +1,6 @@
 #include <gofileio.h>
 #include <stdio.h>
 #include <goconfig.h>
-#include <goerror.h>
 #include <goglobal.h>
 #include <golog.h>
 #ifdef HAVE_LIBJPEG
@@ -169,7 +168,7 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 
 	if ((file = fopen(filename, "rb")) == NULL) 
 	{
-		goError::print("goFileIO::readJPEG()","Could not open file");
+        goLog::warning("goFileIO::readJPEG(): Could not open file");
     }
     jpeg_stdio_src(&cinfo, file);
 	jpeg_read_header(&cinfo, TRUE);
@@ -181,7 +180,7 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 	int colorComponents  = cinfo.output_components;
 	if (colorComponents > 1)
 	{
-		goError::print("goFileIO::readJPEG()","Currently only supports one\
+        goLog::warning("goFileIO::readJPEG(): Currently only supports one\
 				color component images (gray scale)");
 		jpeg_finish_decompress (&cinfo);
 		return;

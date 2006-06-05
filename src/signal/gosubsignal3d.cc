@@ -1,7 +1,6 @@
 #include <gosubsignal3d.h>
 #include <gosignal3dbase.h>
 #include <godefs.h>
-#include <goerror.h>
 #include <gotypes.h>
 #include <gomath.h>
 #include <gocomplex.h>
@@ -110,7 +109,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     position = p;
 #ifdef GO_SUBSIGNAL3D_DEBUG
     if (!parent) {
-        goError::print ("goSubSignal3D::setPosition()","No parent set.");
+        goLog::warning("setPosition(): No parent set.", this);
         return;
     }
 #endif

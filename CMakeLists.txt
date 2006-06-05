@@ -16,6 +16,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/gokmeans.cpp 
  src/math/go3vectori.cc 
  src/math/go44matrix.cc 
  src/math/go4vectori.cc 
@@ -42,7 +43,6 @@ SET                 (SOURCES
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
- src/misc/goerror.cc 
  src/misc/goexception.cc 
  src/misc/gofileio.cc 
  src/misc/goobjectbase.cc 
@@ -159,10 +159,14 @@ SET                 (SOURCES
  src/seispack/tsturm.c
  src/seispack/r_sign.c)
 
-SET                 (EXTRA_LIB_PATH /home/gosch/Software/lib)
-SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
-SET                 (EXTRA_LIBS "")
-SET                 (GOPATH $ENV{GOPATH})
+IF($ENV{MATLAB})
+    SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
+ENDIF($ENV{MATLAB})
+#SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
+#SET                 (EXTRA_LIBS "")
+# SET                 (GOPATH $ENV{GOPATH})
+# Don't rely on $GOPATH to build the library itself.
+SET                 (GOPATH ${PROJECT_SOURCE_DIR})
 # FILE                (GLOB SOURCES *.cpp *.cxx)
 SET                 (GO_GUILE_MULTITHREAD 0)
 
@@ -246,8 +250,7 @@ ENDIF (${HAVE_LIBPTHREAD} MATCHES 1)
 
 INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
                      ${EXTRA_INCLUDE_PATH}
-                     $ENV{GOPATH}/include
-                     ${MATPACK_INCLUDE})
+                     ${GOPATH}/include)
 
                      
 # Add -MT flag!

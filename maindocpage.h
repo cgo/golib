@@ -1,7 +1,6 @@
 /*!
  * \mainpage Online source documentation for goLib
  * - \subpage main Main, general documentation (READ THIS!)
- * - \subpage signal Signal module documentation
  */
 /*!
  * \page main Main Documentation
@@ -60,6 +59,19 @@
  * 
  * \section howto How to build and use
  *	\subsection pre Prerequisites
+ *	 You will need:
+ *	 - A recent cmake: http://www.cmake.org
+ *
+ *	 Optional, but recommended:
+ *	 - Developer's Image Library: http://openil.sourceforge.net
+ *
+ *	 You <b>may</b> need:
+ *	 - libsdl: http://www.libsdl.org
+ *
+ *	 Completely optional:
+ *	 - SWiG: http://www.swig.org
+ *	 - Guile: http://www.gnu.org/software/guile
+ *
  *	 You will always need the pthread library to compile goLib. It is
  *	 available in many modern Unix environments.
  *	 Depending on the version you are compiling, libSDL might also
@@ -99,6 +111,21 @@
  *	for the configure script. To get a list, type ./configure --help in the
  * 	shell.
  * 	\subsection env Environment variables
+ * 	You need to set:
+ * 	- GOPATH to the golib base directory.
+ * 	  E.g., if you have unpacked the source to /home/user/golib, then set
+ * 	  GOPATH to that.<br>
+ * 	  E.g. in csh, do<br>
+ * 	  <code>setenv GOPATH /home/user/golib</code><br>
+ * 	  in bash, you would do<br>
+ * 	  <code>export GOPATH=/home/user/golib</code><br>
+ *
+ * 	You may have to set:
+ * 	- LD_LIBRARY_PATH accordingly, depending on where you install golib
+ * 	- LDFLAGS for any non standard library directories
+ * 	- Add any non standard include directories to CPPFLAGS.<br>
+ * 	If you don't know what the latter two are, you probably don't need them.
+ *
  *	 To be able to run programs linked to goLib, add 
  *	 the path to the shared library to your LD_LIBRARY_PATH environment
  *	 variable. It would also be wise to set the
@@ -107,7 +134,12 @@
  * 	 The example programs in the distribution need this variable to be set.
  *	\subsection examples Examples
  *	 There are several little example programs in $(GO_PATH)/examples.
- *	 For each example program, there should be a makefile called
+ *	 For more recent examples, there is a subdirectory for each example.
+ *	 Makefiles are provided but may need small modifications (like 
+ *	 -L linker options). Just try them, if they don't work, you need to
+ *	 modify them. They are very small and easy to understand.
+ *	 For very old example programs,
+ *	 there should be a makefile called
  *	 Makefile.NAME_OF_THE_EXAMPLE_PROGRAM. Use these makefiles
  * 	 to compile the examples. Be sure to have the environment variables
  *	 mentioned above set correctly.

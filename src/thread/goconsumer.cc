@@ -1,5 +1,5 @@
 #include <goconsumer.h>
-#include <goerror.h>
+#include <golog.h>
 
 goConsumer::goConsumer()
 {
@@ -19,6 +19,6 @@ goConsumer::waitProduction ()
 	}
     else
 	{
-	    goError::print("goConsumer::waitProduction()","No semaphore set/no producer set");
+        goLog::message("goConsumer::waitProduction(): No semaphore set/no producer set");
 	}
 }

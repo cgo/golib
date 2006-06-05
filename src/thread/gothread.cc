@@ -1,5 +1,4 @@
 #include <goconfig.h>
-#include <goerror.h>
 #include <gothread.h>
 #ifndef WIN32
 #include <signal.h>
@@ -229,7 +228,7 @@ goCondition::~goCondition ()
 {
     if (pthread_cond_destroy (&cond) != 0)
 	{
-	    goError::print("goCondition::~goCondition()","condition variable seems to be busy");
+        goLog::warning("goCondition::~goCondition(): condition variable seems to be busy");
 	}
 }
 

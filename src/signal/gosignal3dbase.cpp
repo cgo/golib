@@ -1,7 +1,6 @@
 //#include <gosignal3d.h>
 //#include <gosubsignal3d.h>
 #include <gosignal3dbase.h>
-#include <goerror.h>
 #include <gosignalmacros.h>
 #include <go3vector.h>
 #include <golog.h>
@@ -870,7 +869,7 @@ goSignal3DBase<void>::getMaximum() const
         case GO_UINT32:       return (goDouble)*(const goUInt32*)maxVal; break;
         case GO_FLOAT:        return (goDouble)*(const goFloat*)maxVal; break;
         case GO_DOUBLE:       return (goDouble)*(const goDouble*)maxVal; break;
-        default: goError::print (getClassName(), "getMaximum() not implemented for this type."); return 0.0; break;
+        default: goLog::warning ("getMaximum() not implemented for this type.",this); return 0.0; break;
     }
     return 0.0;
 }
@@ -959,7 +958,7 @@ goSignal3DBase<void>::getMinimum() const
         case GO_UINT32:       return (goDouble)*(const goUInt32*)minVal; break;
         case GO_FLOAT:        return (goDouble)*(const goFloat*)minVal; break;
         case GO_DOUBLE:       return (goDouble)*(const goDouble*)minVal; break;
-        default: goError::print (getClassName(), "getMinimum() not implemented for this type."); return 0.0; break;
+        default: goLog::warning ("getMinimum() not implemented for this type.",this); return 0.0; break;
     }
     return 0.0;
 }
