@@ -195,7 +195,19 @@ const goFixedArray<elementT>& goKMeans<elementT>::getMeans () const
 }
 
 template <class elementT>
+goFixedArray<elementT>& goKMeans<elementT>::getMeans () 
+{
+    return myPrivate->means;
+}
+
+template <class elementT>
 const goFixedArray<goIndex_t>& goKMeans<elementT>::getCluster () const
+{
+    return myPrivate->cluster;
+}
+
+template <class elementT>
+goFixedArray<goIndex_t>& goKMeans<elementT>::getCluster () 
 {
     return myPrivate->cluster;
 }

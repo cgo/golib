@@ -18,15 +18,20 @@ class goKMeans : public goObjectBase
         bool     initialise (const goFixedArray<elementT>& initMeans);
         //= Specialise this for a distance measure.
         goDouble distance   (const elementT& e1, const elementT& e2) const;
-        goSize_t assignment ();
+        virtual goSize_t assignment ();
 
         //= Specialise this when standard mean calculation is not appropriate.
-        bool     update     ();
+        virtual bool update ();
 
         bool                           addElement  (const elementT& e);
         const goList<elementT>&        getElements () const;
         const goFixedArray<elementT>&  getMeans    () const;
         const goFixedArray<goIndex_t>& getCluster  () const;
+
+    protected:
+        goFixedArray<elementT>&  getMeans   ();
+        goFixedArray<goIndex_t>& getCluster ();
+
     private:
         goKMeansPrivate<elementT>* myPrivate;
 };

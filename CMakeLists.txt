@@ -17,6 +17,7 @@ SET                 (SOURCES
  src/data/gostring.cc
  src/data/gohashtablei.cpp
  src/math/gokmeans.cpp 
+ src/math/gokmeansspatial.cpp 
  src/math/go3vectori.cc 
  src/math/go44matrix.cc 
  src/math/go4vectori.cc 
