@@ -189,6 +189,12 @@ const goList<elementT>& goKMeans<elementT>::getElements() const
 }
 
 template <class elementT>
+goList<elementT>& goKMeans<elementT>::getElements() 
+{
+    return myPrivate->elementList;
+}
+
+template <class elementT>
 const goFixedArray<elementT>& goKMeans<elementT>::getMeans () const
 {
     return myPrivate->means;

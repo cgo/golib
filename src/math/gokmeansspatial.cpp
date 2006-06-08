@@ -56,13 +56,13 @@ goSize_t goKMeansSpatial<elementT>::assignment ()
         goIndex_t c = 0;
         goIndex_t c_min = this->getCluster()[i];
         goDouble spatialFactor = (elPos->elem - myPrivate->meanPositions[c_min]).abs();
-        spatialFactor = spatialFactor * spatialFactor * spatialFactor;
+        spatialFactor = exp(-spatialFactor); // spatialFactor * spatialFactor * spatialFactor;
         goDouble minDist = this->distance(el->elem,this->getMeans()[c_min])
             * spatialFactor;
         for (c = 0; c < K; ++c)
         {
             spatialFactor = (elPos->elem - myPrivate->meanPositions[c]).abs();
-            spatialFactor = spatialFactor * spatialFactor * spatialFactor;
+            spatialFactor = exp(-spatialFactor); // spatialFactor * spatialFactor * spatialFactor;
             goDouble dist = this->distance(el->elem,this->getMeans()[c])
                 * spatialFactor;
             if (dist < minDist)

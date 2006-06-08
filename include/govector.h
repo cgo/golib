@@ -235,6 +235,27 @@ class goVector : public goFixedArray<T>
             return true;
         };
 
+        template <class To>
+        bool copy (goVector<To>& target, goIndex_t startIndex, goIndex_t skip) const
+        {
+            assert (this->getSize() > startIndex);
+            assert (skip >= 0);
+            goSize_t sz = (this->getSize() - startIndex + skip) / (skip + 1);
+            if (target.getSize() != sz)
+            {
+                target.setSize(sz);
+            }
+            goIndex_t i = 0;
+            goIndex_t szi = static_cast<goIndex_t>(sz);
+            goIndex_t ithis = startIndex;
+            for (i = 0; i < szi; ++i)
+            {
+                target[i] = (*this)[ithis];
+                ithis += skip + 1;
+            }
+            return true;
+        };
+
         inline T square () const;
         inline T conjInnerProduct (const goVector<T>&) const;
 
