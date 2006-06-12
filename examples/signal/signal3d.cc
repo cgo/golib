@@ -134,6 +134,8 @@ int main (void)
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
         // object1.disconnectObject (&object2);
 //        object1.sendObjectMessage (GO_OBJECTMESSAGE_DESTRUCTING);
+        printf ("Name: %s\n",object1.getClassName());
+        exit(1);
     }
 
     {

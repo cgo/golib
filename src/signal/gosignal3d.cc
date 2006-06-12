@@ -27,7 +27,7 @@ template< class T >
 goSignal3D<T>::goSignal3D () 
     : goSignal3DBase<T> ()
 {
-    this->setClassName ("goSignal3D");
+    this->setClassID(GO_SIGNAL3D);
 }
 
 /*! \brief Constructor
@@ -55,7 +55,7 @@ goSignal3D<T>::goSignal3D (goSize_t x,
         goSize_t channelCount)
   : goSignal3DBase<T> ()
 {
-    this->setClassName ("goSignal3D");
+    this->setClassID(GO_SIGNAL3D);
     this->make (x,y,z, 
             blocksize_x, blocksize_y, blocksize_z,
             border_x, border_y, border_z, channelCount);
@@ -70,7 +70,7 @@ template <class T>
 goSignal3D<T>::goSignal3D (goSignal3D<T>& other)
     : goSignal3DBase<T> ()
 {
-    this->setClassName ("goSignal3D");
+    this->setClassID(GO_SIGNAL3D);
     this->copy(other);
 }
 

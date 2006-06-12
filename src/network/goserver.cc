@@ -3,6 +3,7 @@
 #include <gonetwork.h>
 #include <gostring.h>
 #include <gotypes.h>
+#include <godefs.h>
 
 #include <unistd.h>
 #include <netdb.h>
@@ -71,7 +72,7 @@ requestHandler (void* p)
 goServer::goServer (int p) 
     : goObjectBase () 
 {
-  this->setClassName ("goServer");
+  this->setClassID(GO_SERVER);
   port = p;
 
   socklen_t namelen;

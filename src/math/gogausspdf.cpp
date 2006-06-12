@@ -15,7 +15,7 @@ namespace goMath
           myVarianceReciprocal2 ((input_type)1.0)
     {
         this->setVariance ((input_type)1.0);
-        this->setClassName ("goGaussPDF");
+        this->setClassID(GO_GAUSSPDF);
     }
 
     template <class input_type, class output_type>

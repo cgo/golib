@@ -1,5 +1,8 @@
 #include <golist.h>
 #include <gostring.h>
+#ifndef GODEFS_H
+# include <godefs.h>
+#endif
 #ifndef GOOBJECTBASE_H
 # include <goobjectbase.h>
 #endif
@@ -12,6 +15,7 @@
 #ifndef GOFILEIO_H
 # include <gofileio.h>
 #endif
+#include <goglobal.h>
 
 class goObjectBasePrivate
 {
@@ -20,6 +24,7 @@ class goObjectBasePrivate
         ~goObjectBasePrivate ();
 
         goString                         className;
+        int                              classID;
         goString                         objectName;
         goList<goObjectBase*>            connectedObjects;
 
@@ -31,7 +36,8 @@ class goObjectBasePrivate
 goObjectBasePrivate::goObjectBasePrivate ()
     :
     className          ("goObjectBase"),
-    objectName         ("NO NAME"),
+    classID            (GO_OBJECTBASE),
+    objectName         (""),
     connectedObjects   (),
     queuedMethodsMutex (),
     queuedMethods      (),
@@ -74,7 +80,14 @@ goObjectBase::~goObjectBase ()
 const char*
 goObjectBase::getClassName() const
 {
-    return myPrivate->className.toCharPtr();
+    // return myPrivate->className.toCharPtr();  // DEPRECATED. Use IDs instead.
+    return goGlobal::classNames[this->getClassID()].toCharPtr();
+}
+
+int
+goObjectBase::getClassID() const
+{
+    return myPrivate->classID;
 }
 
 /*! \brief Returns the size of this object or some measure of its memory
@@ -171,18 +184,24 @@ bool goObjectBase::readObjectFile (FILE* f)
 }
 
 /*! \brief Sets the class name */
-void
-goObjectBase::setClassName (const char* name)
+//void
+//goObjectBase::setClassName (const char* name)
+//{
+//    myPrivate->className = name;
+//}
+
+void 
+goObjectBase::setClassID (int id)
 {
-    myPrivate->className = name;
+    myPrivate->classID = id;
 }
 
 /*! \brief Sets the class name */
-void
-goObjectBase::setClassName (goString& name)
-{
-    myPrivate->className = name;
-}
+//void
+//goObjectBase::setClassName (goString& name)
+//{
+//    myPrivate->className = name;
+//}
 
 /*! \brief Prints an informational message to the calling console.
  *

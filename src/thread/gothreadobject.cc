@@ -1,11 +1,12 @@
 #include <gothread.h>
+#include <godefs.h>
 #include <gothreadobject.h>
 
 
 goThreadObject::goThreadObject() 
     : goObjectBase()
 {
-    setClassName("goThreadObject");
+    this->setClassID(GO_THREADOBJECT);
 }
 
 goThreadObject::~goThreadObject()

@@ -184,7 +184,6 @@ go4Vector {
   GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (const go44Matrix<mT>& matrix) const
   {
       go4Vector<T> retValue;
-      T a1,a2,a3,a4;
       const mT* m = matrix.getPtr();
       retValue.x = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
       m += 4;

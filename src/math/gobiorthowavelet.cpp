@@ -16,7 +16,7 @@ goBiorthoWavelet::goBiorthoWavelet ()
     : goObjectBase (),
       myPrivate (0)
 {
-    this->setClassName ("goBiorthoWavelet");
+    this->setClassID(GO_BIORTHOWAVELET);
     myPrivate = new goBiorthoWaveletPrivate;
     assert (myPrivate);
 }

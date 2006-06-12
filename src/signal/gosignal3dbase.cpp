@@ -5,6 +5,7 @@
 #include <go3vector.h>
 #include <golog.h>
 #include <goconfig.h>
+#include <godefs.h>
 #include <gocomplex.h>
 #include <string.h> // bzero()
 #include <iostream>
@@ -38,7 +39,8 @@ goSignal3DBase<T>::goSignal3DBase ()
 {
     myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
-    this->setClassName ("goSignal3DBase");
+    // this->setClassName ("goSignal3DBase");
+    this->setClassID(GO_SIGNAL3DBASE);
 }
 
 template< class T >
@@ -76,7 +78,8 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
 {
     myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
-    this->setClassName ("goSignal3DBase");
+    // this->setClassName ("goSignal3DBase");
+    this->setClassID(GO_SIGNAL3DBASE);
     this->reference(other);
 }
 

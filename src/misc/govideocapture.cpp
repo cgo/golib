@@ -62,7 +62,7 @@ goVideoCapture::goVideoCapture ()
     : goObjectBase (),
       myPrivate (0)
 {
-    this->setClassName ("goVideoCapture");
+    this->setClassID(GO_VIDEOCAPTURE);
     myPrivate = new goVideoCapturePrivate;
 }
 

@@ -1,4 +1,5 @@
 #include <gopdf.h>
+#include <godefs.h>
 #ifndef GOTYPES_H
 # include <gotypes.h>
 #endif
@@ -9,7 +10,7 @@ namespace goMath
     goPDF<input_type, output_type>::goPDF ()
         : goObjectBase ()
     {
-        this->setClassName ("goPDF");
+        this->setClassID(GO_PDF);
     }
 
     template <class input_type, class output_type>

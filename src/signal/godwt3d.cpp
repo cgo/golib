@@ -60,7 +60,7 @@ goDWT3D::goDWT3D ()
     : goObjectBase (),
       myPrivate    (0)
 {
-    this->setClassName ("goDWT3D");
+    this->setClassID(GO_DWT3D);
     myPrivate = new goDWT3DPrivate;
     assert (myPrivate);
     this->setFilter (D4);

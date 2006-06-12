@@ -35,7 +35,7 @@ goRowVector<T>::goRowVector (goSignal3DBase<T>* data)
       myBasePointer (NULL),
       myJumpTable   (NULL)
 {
-    setClassName  ("goRowVector");
+    this->setClassID(GO_ROWVECTOR);
     this->setData (data);
 }
 

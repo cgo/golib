@@ -36,7 +36,7 @@ goFilter3D<T_IN, T_OUT>::goFilter3D ()
       myMaskCenterY  (0),
       myMaskCenterZ  (0)
 {
-    setClassName ("goFilter3D");
+    this->setClassID(GO_FILTER3D);
     myMask.setDataType (GO_FLOAT);
     myMask.make (3, 3, 3);
     GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goFloat*)__ptr = 0.33333333f, myMask);

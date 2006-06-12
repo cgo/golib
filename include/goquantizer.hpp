@@ -2,12 +2,15 @@
 #define GOQUANTIZER_HPP
 #include <goquantizer.h>
 #include <gouniformquantizer.h>
+#ifndef GODEFS_H
+# include <godefs.h>
+#endif
 
 template <class _input_type, class _output_type>
 goQuantizer<_input_type, _output_type>::goQuantizer ()
     : goObjectBase ()
 {
-    setClassName ("goQuantizer");
+    this->setClassID(GO_QUANTIZER);
 }
 
 template <class _input_type, class _output_type>

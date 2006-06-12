@@ -48,7 +48,7 @@ goHistogram<level_type>::goHistogram ()
       myLevels     (),
       myPrivate    (NULL)
 {
-    this->setClassName ("goHistogram");
+    this->setClassID(GO_HISTOGRAM);
     myPrivate = new goHistogramPrivate;
     assert (myPrivate);
 }

@@ -150,7 +150,7 @@ goHaar3D::goHaar3D ()
     : goObjectBase (),
       myPrivate    (0)
 {
-    this->setClassName ("goHaar3D");
+    this->setClassID(GO_HAAR3D);
     myPrivate = new goHaar3DPrivate;
     assert (myPrivate);
 }

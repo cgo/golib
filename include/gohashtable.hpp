@@ -25,7 +25,7 @@ goHashTable<I,O>::goHashTable (goUInt32 mod_value)
 {
     setModValue (mod_value);
     lastFailed = false;
-    dummy = (O)0;
+//    dummy = (O)0;   // This doesn't work for strings and the like. Don't use.
 //    theTable.resize(0);
 }
 
@@ -55,7 +55,7 @@ goHashTable<I,O>::setModValue (goUInt32 i)
     theTable.resize (this->modValue + 1);
     goList<void*>* list;
 
-    printf("hash table generating %d lists.\n", theTable.getSize());
+    // printf("hash table generating %d lists.\n", theTable.getSize());
     goIndex_t c;
     for (c = 0; c < theTable.getSize(); c++)
     {

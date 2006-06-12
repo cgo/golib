@@ -5,7 +5,7 @@ template <class _input_type, class _output_type>
 goQuantizer<_input_type, _output_type>::goQuantizer ()
     : goObjectBase ()
 {
-    setClassName ("goQuantizer");
+    this->setClassID(GO_QUANTIZER);
 }
 
 template <class _input_type, class _output_type>

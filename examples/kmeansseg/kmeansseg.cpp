@@ -64,8 +64,6 @@ int main (int argc, char* argv[])
     goVectord v (nx*ny);
     goSize_t x;
     goSize_t y;
-    goFloat width_ = 1.0f / (goFloat)image.getSizeX();
-    goFloat height_ = 1.0f / (goFloat)image.getSizeY();
     for (y = 0; y < image.getSizeY(); ++y)
     {
         for (x = 0; x < image.getSizeX(); ++x)
@@ -74,8 +72,8 @@ int main (int argc, char* argv[])
             goCopySignalArray (&window, v.getPtr());
             goSort (v.getPtr(), v.getSize());
             goVectord pos(2);
-            pos(0) = (goFloat)x * width_;
-            pos(1) = (goFloat)y * height_;
+            pos(0) = x;
+            pos(1) = y;
             kmeans.addElement (v);
             kmeansspatial.addElement (v);
             kmeansspatial.addPosition (pos);

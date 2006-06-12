@@ -36,7 +36,7 @@ goCurve<pointT>::goCurve ()
     : goPointCloud<pointT> (),
       myPrivate (0)
 {
-    this->setClassName ("goCurve");
+    this->setClassID(GO_CURVE);
     myPrivate = new goCurvePrivate;
     assert (myPrivate);
 }

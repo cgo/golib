@@ -1,5 +1,7 @@
 #include <goarray.h>
 #include <goconnection.h>
+#include <godefs.h>
+
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -10,7 +12,7 @@ namespace goNet {
 goConnection::goConnection () 
     : goObjectBase () 
 {
-  this->setClassName ("goConnection");
+  this->setClassID(GO_CONNECTION);
   maxConnections 	= 0;
   currentConnections 	= 0;
   lastFailed 		= false;

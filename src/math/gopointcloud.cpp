@@ -35,7 +35,7 @@ goPointCloud<pointT>::goPointCloud ()
     : goObjectBase (),
       myPrivate (0)
 {
-    this->setClassName ("goPointCloud");
+    this->setClassID(GO_POINTCLOUD);
     myPrivate = new goPointCloudPrivate<pointT>;
     assert (myPrivate);
 }

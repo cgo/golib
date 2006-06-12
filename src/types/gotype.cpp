@@ -7,6 +7,7 @@
 #include <gouniformquantizer.hpp>
 #include <gocomplex.h>
 #include <goconfig.h>
+#include <godefs.h>
 
 template <class T> static bool      lowerThanFunction   (const void* v1, const void* v2);
 template <class T> static bool      greaterThanFunction (const void* v1, const void* v2);
@@ -226,7 +227,7 @@ goType::goType (goTypeEnum t)
     : goObjectBase (),
       myPrivate    (NULL)
 {
-    setClassName ("goType");
+    this->setClassID(GO_TYPE);
     myPrivate = new goTypePrivate (t);
     setID (t);
     assert (myPrivate);
@@ -236,7 +237,7 @@ goType::goType (const goType& other)
     : goObjectBase (),
       myPrivate (NULL)
 {
-    setClassName ("goType");
+    this->setClassID(GO_TYPE);
     myPrivate = new goTypePrivate (other.getID());
     assert (myPrivate);
     setID (other.getID());

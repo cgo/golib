@@ -27,7 +27,7 @@ template <class elementT>
 goKMeans<elementT>::goKMeans()
     : myPrivate (0)
 {
-    this->setClassName("goKMeans");
+    this->setClassID(GO_KMEANS);
     myPrivate = new goKMeansPrivate<elementT>;
     assert(myPrivate);
 }

@@ -31,7 +31,7 @@ goPlotter::goPlotter ()
     :  goObjectBase (),
        myPrivate (0)
 {
-    this->setClassName ("goPlotter");
+    this->setClassID(GO_PLOTTER);
     myPrivate = new goPlotterPrivate;
 }
 
@@ -46,7 +46,7 @@ goPlotter::~goPlotter ()
 
 goPlotter::goPlotter (const goPlotter& other)
 {
-    this->setClassName ("goPlotter");
+    this->setClassID(GO_PLOTTER);
     myPrivate = new goPlotterPrivate;
     *this = other;
 }

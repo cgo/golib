@@ -705,7 +705,7 @@ goMatlab::goMatlab ()
  : goObjectBase (),
    myPrivate (NULL)
 {
-    this->setClassName ("goMatlab");
+    this->setClassID(GO_MATLAB);
     myPrivate = new goMatlabPrivate;
     assert (myPrivate);
 

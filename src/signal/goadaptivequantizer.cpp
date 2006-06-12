@@ -27,7 +27,7 @@ template <class _input_type, class _output_type>
 goAdaptiveQuantizer<_input_type, _output_type>::goAdaptiveQuantizer ()
     : goQuantizer ()
 {
-    setClassName ("goAdaptiveQuantizer");
+    this->setClassID(GO_ADAPTIVEQUANTIZER);
     myPrivate = new _goAdaptiveQuantizer;
 }
 

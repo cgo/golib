@@ -13,6 +13,7 @@ template<class T>
 class goBTreeElement : public goObjectBase
 {
     public:
+        goBTreeElement ();
         goBTreeElement (const T&);
         virtual ~goBTreeElement ();
 
@@ -38,7 +39,9 @@ class goBTreeAlgorithm
         goBTreeAlgorithm () {};
         virtual ~goBTreeAlgorithm () {};
         bool depthFirst (typename goBTree<T>::Element* root);
+        bool depthFirst (typename goBTree<T>::ConstElement* root) const;
         virtual bool action (typename goBTree<T>::Element* node) { return false; };
+        virtual bool action (typename goBTree<T>::ConstElement* node) const { return false; };
 };
 
 
@@ -58,9 +61,12 @@ class goBTree : public goObjectBase
         virtual ~goBTree ();
 
         bool          isEmpty () const;
+        void          setRoot (typename goBTree<T>::Element* e);
         Element*      getRoot ();
         ConstElement* getRoot () const;
-        
+       
+        bool          writeDOT (FILE* f) const;
+
     private:
         goBTreeElement<T>* myRoot;
 };

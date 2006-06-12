@@ -40,6 +40,7 @@ goObjectBase
 
  public:
     const char* getClassName () const;
+    int         getClassID   () const;
     virtual goSize_t memoryUsage() const;
 
     void            setObjectName (const char* name);
@@ -50,8 +51,9 @@ goObjectBase
     virtual bool readObjectFile  (FILE*);
 
  protected:
-    void setClassName(const char* name);
-    void setClassName(goString& name);
+    void setClassID(int id);
+    //void setClassName(const char* name);
+    //void setClassName(goString& name);
     void printClassMessage (const char* msg);
     void printClassMessage (goString& msg);
 

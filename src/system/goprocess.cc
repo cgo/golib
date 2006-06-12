@@ -1,4 +1,6 @@
 #include <goprocess.h>
+#include <godefs.h>
+
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -7,7 +9,7 @@
 goProcess::goProcess ()
     : goObjectBase ()
 {
-    this->setClassName ("goProcess");
+    this->setClassID(GO_PROCESS);
     running = false;
 }
 

@@ -23,6 +23,7 @@ goSubSignal3D<T>::goSubSignal3D ()
     deleteY  (false),
     deleteZ  (false)
 {
+    this->setClassID(GO_SUBSIGNAL3D);
 }
 
 template< class T >
@@ -38,6 +39,7 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
     deleteY  (false),
     deleteZ  (false)
 {
+    this->setClassID(GO_SUBSIGNAL3D);
   assert (b);
   this->setParent   (b);
   this->setSize     (x, y, z, b->getChannelCount());
