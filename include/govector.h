@@ -256,6 +256,29 @@ class goVector : public goFixedArray<T>
             return true;
         };
 
+        template <class To, class To2>
+        bool cat (const goVector<To>& other, goVector<To2>& target) const
+        {
+            goSize_t sz1 = this->getSize();
+            goSize_t sz2 = other.getSize();
+            goSize_t targetSize = sz1+sz2;
+            if (target.getSize() != targetSize)
+            {
+                target.setSize(targetSize);
+            }
+            goSize_t i = 0;
+            goSize_t j;
+            for (j = 0; j < sz1; ++j,++i)
+            {
+                target[i] = (*this)[j];
+            }
+            for (j = 0; j < sz2; ++j,++i)
+            {
+                target[i] = other[j];
+            }
+            return true;
+        };
+
         inline T square () const;
         inline T conjInnerProduct (const goVector<T>&) const;
 
