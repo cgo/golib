@@ -104,6 +104,18 @@
 /*!
  * \defgroup math Mathematics
  * \defgroup misc Miscellaneous and basic classes
+ *  \section misc-intro Introduction
+ *   This group contains miscellaneous and basic classes, like the goObjectBase class.
+ *   This class provides for
+ *   - Generic method calls
+ *   - Inter-object "communication"
+ *   - Interfaces for writing and reading to and from files (this is not being used much
+ *    but is indended to provide for a mechanism for storing and retrieving 
+ *    objects from secondary memory)
+ *   - Identification of classes by numeric IDs, objects by names.
+ *    Class names exist through a hash table in goGlobal, that takes a numeric class ID
+ *    as input and returns a goString.
+ *   
  * \defgroup system System
  * \defgroup net Network classes
  * \defgroup thread Multithreading classes
