@@ -23,7 +23,6 @@ class goObjectBasePrivate
         goObjectBasePrivate ();
         ~goObjectBasePrivate ();
 
-        goString                         className;
         int                              classID;
         goString                         objectName;
         goList<goObjectBase*>            connectedObjects;
@@ -35,7 +34,6 @@ class goObjectBasePrivate
 
 goObjectBasePrivate::goObjectBasePrivate ()
     :
-    className          ("goObjectBase"),
     classID            (GO_OBJECTBASE),
     objectName         (""),
     connectedObjects   (),
