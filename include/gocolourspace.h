@@ -11,6 +11,11 @@
 # include <gomath.h>
 #endif
 
+//= The goYUV422_* functions are not used and probably don't have an application.
+//= They were made on the way while figuring out how our camera
+//= stores YUV data.
+//= goYUV420P_RGB() is actually doing the job.
+
 static inline goFloat goYUV422_Red (goUInt8 yuv)
 {
     // Y + 1.14 * V
@@ -64,6 +69,8 @@ static inline goFloat goYUV422_Blue (goUInt8 y, goUInt8 u, goUInt8 v)
  * @param ret    The goSignal3D<void> containing the RGB image after 
  * the function returned. If it is not of appropriate size/type, it will be 
  * reallocated.
+ *
+ * @author Christian Gosch
  */
 static inline void goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3D<void>& ret)
 {
@@ -94,12 +101,13 @@ static inline void goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height,
         it.resetX();
         while (!it.endX())
         {
-            goFloat cr = (static_cast<float>(*cr_p) - 128);
-            goFloat cb = (static_cast<float>(*cb_p) - 128);
-            goFloat Y  = (static_cast<float>(*y_p) - 16);
-            goFloat R = Y * 1.164 + cr * 1.596;
-            goFloat G = Y * 1.164 - cr * 0.813 - cb * 0.392;
-            goFloat B = Y * 1.164 + cb * 2.017;
+            goFloat cr = (static_cast<float>(*cr_p) - 128.0f);
+            goFloat cb = (static_cast<float>(*cb_p) - 128.0f);
+            goFloat Y  = (static_cast<float>(*y_p) - 16.0f);
+            goFloat R = Y * 1.164f + cr * 1.596f;
+            goFloat G = Y * 1.164f - cr * 0.813f - cb * 0.392f;
+            goFloat B = Y * 1.164f + cb * 2.017f;
+            //= Clamp values to [0,255]
             R = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,R),255.0f);
             G = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,G),255.0f);
             B = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,B),255.0f);

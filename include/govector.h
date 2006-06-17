@@ -7,9 +7,7 @@
 #ifndef GOCOMPLEX_H
 # include <gocomplex.h>
 #endif
-#ifndef GOMATRIX_H
-# include <gomatrix.h>
-#endif
+#include <gomatrix.h>
 
 /** 
  * @brief General vector class.
@@ -255,6 +253,24 @@ class goVector : public goFixedArray<T>
             }
             return true;
         };
+
+        template <class To>
+        bool copy (To* target, goIndex_t startIndex, goIndex_t skip) const
+        {
+            assert (this->getSize() > startIndex);
+            assert (skip >= 0);
+            goSize_t sz = (this->getSize() - startIndex + skip) / (skip + 1);
+            goIndex_t i = 0;
+            goIndex_t szi = static_cast<goIndex_t>(sz);
+            goIndex_t ithis = startIndex;
+            for (i = 0; i < szi; ++i)
+            {
+                target[i] = (*this)[ithis];
+                ithis += skip + 1;
+            }
+            return true;
+        };
+
 
         template <class To, class To2>
         bool cat (const goVector<To>& other, goVector<To2>& target) const

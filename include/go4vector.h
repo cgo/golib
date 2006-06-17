@@ -17,7 +17,8 @@
  */
 /**
  * @brief 4-dimensional vector.
- * 
+ * @todo make this a descendant of goVector, fix size to 4, provide
+ *  x,y,z,t/w as references.
  **/
 template< class T >
 class

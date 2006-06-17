@@ -254,7 +254,7 @@ bool goMatlab::startEngine ()
 {
     if (myPrivate->matlabEngine)
         this->stopEngine();
-    myPrivate->matlabEngine = engOpen ("matlab -nodesktop -nosplash -nojvm");
+    myPrivate->matlabEngine = engOpen ("matlab -nodesktop -nojvm");
     if (!myPrivate->matlabEngine)
     {
         printf ("Could not open matlab engine.\n");

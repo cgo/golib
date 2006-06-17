@@ -1,5 +1,7 @@
 #include <govideocapture.h>
 #include <gosignal3d.h>
+#include <gosubsignal3d.h>
+#include <gosignalhelper.h>
 #include <gofileio.h>
 #include <stdio.h>
 
@@ -15,10 +17,10 @@ int main()
     goVideoCapture vc;
 
     //= Set device.
-    vc.setDevice ("/dev/video0");
+    vc.setDevice ("/dev/video1");
     if (vc.open())
     {
-        printf ("Opened the device /dev/video0\n");
+        printf ("Opened the device /dev/video1\n");
         goSize_t w = 640;
         goSize_t h = 480;
         goSignal3D<void> sig;
@@ -35,14 +37,32 @@ int main()
         goString fileext = ".jpg";
         goString num;
         num.resize(3);
-        //= Take 100 pictures and save them (this needs libdevil support to be enabled in golib).
-        for (goIndex_t j = 0; j < 100; ++j)
+        //= Give the camera some time to adjust.
+        sleep(10);
+        //= Take 10 pictures and save them (this needs libdevil support to be enabled in golib).
+        for (goIndex_t j = 0; j < 1; ++j)
         {
             //= NOTE: This assumes the camera is providing data as RGB24.
             //= If your camera happens to return YUV420P (planar) data, you can use
             //= the function goYUV420P_RGB() in gocolourspace.h to convert to RGB. If your camera
             //= supports a different format, please write a conversion routine if you can!
             vc.grab(sig);
+
+            //= Swap R and B channels (seem to come in different byte order from 
+            //= our logitech camera).
+            {
+                goSubSignal3D<void> sub0 (&sig,sig.getSizeX(),sig.getSizeY(),sig.getSizeZ());
+                goSignal3D<void> temp;
+                temp.setDataType(sig.getDataType().getID());
+                temp.make(sig.getSize(),sig.getBlockSize(),sig.getBorderSize(),1);
+
+                sig.setChannel(0);
+                goCopySignalChannel(&sig,&temp);
+                sub0.setChannel(2);
+                goCopySignalChannel(&sub0,&sig);
+                goCopySignalChannel(&temp,&sub0);
+            }
+
             goString name = filebase;
             sprintf(num.getPtr(),"%3d",j);
             name += num;

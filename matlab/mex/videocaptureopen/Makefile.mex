@@ -4,11 +4,11 @@ CXX		= mex
 CXXARGS		=  -DHAVE_MATLAB 
 
 LD		= gcc
-LDARGS		=  -L$(GOPATH)/../lib -L. -lGo 
+LDARGS		=  $(LDFLAGS) -lGo 
 
 LIBS		=  
 
-INCLUDE		=  -I$(GOPATH)/include 
+INCLUDE		=  $(CPPFLAGS)
 
 TARGET		= 
 

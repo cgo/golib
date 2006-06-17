@@ -5,6 +5,9 @@
 # include <gomath.h>
 #endif
 #include <golog.h>
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 template <class T>
 bool
@@ -114,7 +117,7 @@ goMatrix<T>::goMatrix(const goMatrix<T>& other)
     assert (other.matrix != NULL);
     if (this->linearStorage)
     {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, 1, 1, 1, 0, 0, 0, 1);
+        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, other.getColumns(), other.getRows(), 1, 0, 0, 0, 1);
     }
     else
     {
@@ -232,7 +235,6 @@ goMatrix<T>::operator= (const goMatrix<T>& other)
     {
         this->resize (other.getRows(), other.getColumns());
     }
-    std::cout << "goMatrix<> operator=()...\n";
     GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*matrix), (*other.matrix), T, T);
     initializeRows ();
     return *this;
@@ -354,6 +356,38 @@ goMatrix<T>::operator-= (const goMatrix<T>& other) {
 }
 
 template <class T>
+goVector<T> 
+goMatrix<T>::operator* (const goVector<T>& v)
+{
+    goSize_t sz = v.getSize();
+    if (getColumns() != sz)
+    {
+        goLog::warning ("goMatrix::operator*: Matrix dimensions do not match vector.");
+        return goVector<T> (1,1);
+    }
+    goSize_t retSz = this->getRows();
+    goVector<T> retval (retSz);
+    goSize_t x, y;
+    // goSize_t columns = retval.getColumns();
+    for (y = 0; y < retSz; ++y) 
+    {
+        T* p  = this->matrix->getPtr (0, y, 0);
+        goPtrdiff_t* pDiff = this->matrix->getXDiff();
+        const T* pv = v.getPtr ();
+        T value = (T)0; 
+        for (x = 0; x < sz; ++x) 
+        {
+            value += *p * *pv;
+            p += *pDiff;
+            ++pv;
+            ++pDiff;
+        }
+        retval[y] = value;
+    } 
+    return retval;
+}
+
+template <class T>
 goMatrix<T>&
 goMatrix<T>::operator*= (T scalar) 
 {
@@ -388,6 +422,20 @@ goMatrix<T>::identity ()
 		(*this)[i][i] = (T)1;
 	}
 }
+
+/** 
+ * @brief L2 norm.
+ *
+ * @return \f$ \sqrt{tr(M^\top \cdot M)}\f$
+ */
+template<class T>
+T goMatrix<T>::norm () const
+{
+    T retValue = T(0);
+    GO_SIGNAL3D_EACHELEMENT (retValue += *__ptr * *__ptr, (*this->matrix), T);
+    return T(sqrt(retValue));
+}
+
 
 template<class T>
 void
@@ -427,7 +475,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t columns)
     assert (this->matrix);
     if (this->externalData)
     {
-        // Will not resize external data -- data organization is unknown!
+        // Will not resize external data 
         return false;
     }
     this->matrix->destroy ();
@@ -452,7 +500,7 @@ bool goMatrix<T>::setData (goSignal3DBase<T>* data)
     }
     this->matrix = data;
     this->externalData = true;
-    if (data->getBlockSizeX() == 1 && data->getBlockSizeY() == 1 && data->getBlockSizeZ() == 1)
+    if (data->getBlockSizeX() == data->getSizeX() && data->getBlockSizeY() == data->getSizeY() && data->getBlockSizeZ() == data->getSizeY())
     {
         this->linearStorage = true;
     }

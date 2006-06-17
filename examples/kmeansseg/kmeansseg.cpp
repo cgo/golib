@@ -7,7 +7,7 @@
 #include <gosort.h>
 #include <govector.h>
 #include <gostring.h>
-
+#include <gorandom.h>
 
 /*
 * Example for image segmentation using k-means.
@@ -64,6 +64,10 @@ int main (int argc, char* argv[])
     goVectord v (nx*ny);
     goSize_t x;
     goSize_t y;
+    goDouble imageMax = image.getMaximum();
+    goDouble imageMin = image.getMinimum();
+    goDouble xPosScale = (imageMax - imageMin) / static_cast<float>(image.getSizeX());// * nx * 1.0;
+    goDouble yPosScale = (imageMax - imageMin) / static_cast<float>(image.getSizeY());// * ny * 1.0;
     for (y = 0; y < image.getSizeY(); ++y)
     {
         for (x = 0; x < image.getSizeX(); ++x)
@@ -72,9 +76,11 @@ int main (int argc, char* argv[])
             goCopySignalArray (&window, v.getPtr());
             goSort (v.getPtr(), v.getSize());
             goVectord pos(2);
-            pos(0) = x;
-            pos(1) = y;
-            kmeans.addElement (v);
+            pos(0) = imageMin + (float)x * xPosScale;
+            pos(1) = imageMin + (float)y * yPosScale;
+            goVectord augmented_v;
+            v.cat(pos, augmented_v);
+            kmeans.addElement (augmented_v);
             kmeansspatial.addElement (v);
             kmeansspatial.addPosition (pos);
         }
@@ -87,11 +93,17 @@ int main (int argc, char* argv[])
     goList<goVectord>::ConstElement* elPos = kmeansspatial.getPositions().getFrontElement();
     for (goSize_t i = 0; i < K; ++i)
     {
+        el = kmeans.getElements().getFrontElement();
+        goSize_t j = (int)(goRandom() * (kmeans.getElements().getSize()-1)) + 1;
+        for (;j > 0; --j)
+        {
+            el = el->next;
+        }
         assert (el && elPos && els);
         initMeans[i] = el->elem;
         initMeansSpatial[i] = els->elem;
         initPos[i] = elPos->elem;
-        el = el->next;
+        // el = el->next;
         els = els->next;
         elPos = elPos->next;
     }
@@ -104,14 +116,14 @@ int main (int argc, char* argv[])
     kmeansspatial.assignment();
     kmeansspatial.update();
     goSize_t changes = 1;
-    goSize_t changes2 = 1;
+    goSize_t changes2 = 0;
     //= Iterate assignment and update steps until no changes in labelling occur
     while (changes > 0 || changes2 > 0)
     {
         changes = kmeans.assignment();
-        changes2 = kmeansspatial.assignment();
+        // changes2 = kmeansspatial.assignment();
         kmeans.update();
-        kmeansspatial.update();
+        // kmeansspatial.update();
         printf ("Changes, spatial changes: %d, %d\n",changes,changes2);
     }
 

@@ -11,6 +11,8 @@
 # include <gorowvector.h>
 #endif
 
+template <class T> class goVector;
+
 /** \addtogroup math 
  * @{ */
 
@@ -85,8 +87,11 @@ class goMatrix
   goMatrix<T>&		operator*= (const goMatrix<T>& other);
   goMatrix<T>&		operator+= (const goMatrix<T>& other);
   goMatrix<T>&		operator-= (const goMatrix<T>& other);
+  goVector<T>       operator*  (const goVector<T>& v);
   goMatrix<T>&		operator*= (T scalar);
   goMatrix<T>&		operator/= (T scalar);
+
+  T                 norm () const;
 
   /// Loads identity
   void unity();
