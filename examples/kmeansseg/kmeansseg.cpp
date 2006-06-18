@@ -44,10 +44,12 @@ int main (int argc, char* argv[])
         }
 
         image.setDataType(GO_FLOAT);
-        image.make(temp.getSize(),temp.getBlockSize(),goSize3D(15,15,0),1);
+        image.make (&temp);
+        // image.make(temp.getSize(),temp.getBlockSize(),goSize3D(15,15,0),1);
         if (temp.getChannelCount() > 1)
         {
-            goRGBAtoScalar (&temp,&image);
+            // goRGBAtoScalar (&temp,&image);
+            goCopySignal (&temp, &image);
         }
         else
         {
@@ -61,7 +63,7 @@ int main (int argc, char* argv[])
     goKMeans<goVectord> kmeans;
     goSize_t N = image.getSizeX() * image.getSizeY();
     goSubSignal3D<void> window (&image, nx, ny, 1);
-    goVectord v (nx*ny);
+    goVectord v (nx*ny * image.getChannelCount());
     goSize_t x;
     goSize_t y;
     goDouble imageMax = image.getMaximum();
@@ -73,14 +75,20 @@ int main (int argc, char* argv[])
         for (x = 0; x < image.getSizeX(); ++x)
         {
             window.setPosition(x - nx/2,y - ny/2,0);
-            goCopySignalArray (&window, v.getPtr());
-            goSort (v.getPtr(), v.getSize());
+            for (goSize_t i = 0; i < window.getChannelCount(); ++i)
+            {
+                window.setChannel(i);
+                goCopySignalArray (&window, v.getPtr() + nx*ny*i);
+            }
+            window.setChannel(0);
+            // goSort (v.getPtr(), v.getSize());
             goVectord pos(2);
             pos(0) = imageMin + (float)x * xPosScale;
             pos(1) = imageMin + (float)y * yPosScale;
-            goVectord augmented_v;
-            v.cat(pos, augmented_v);
-            kmeans.addElement (augmented_v);
+            //goVectord augmented_v;
+            //v.cat(pos, augmented_v);
+            // kmeans.addElement (augmented_v);
+            kmeans.addElement (v);
             kmeansspatial.addElement (v);
             kmeansspatial.addPosition (pos);
         }
@@ -143,17 +151,31 @@ int main (int argc, char* argv[])
     goString filename2;
     filename.getFileName(filename2);
     filename2 += "-cluster-kmeans.pgm";
-    if (!goFileIO::writeImage(filename2.toCharPtr(),&labelImage))
+    try 
     {
-        printf ("Could not write image %s\n",filename.toCharPtr());
-        exit(2);
+        goFileIO::writeImage(filename2.toCharPtr(),&labelImage);
+    }
+    catch (goFileIOException& ex)
+    {
+        if (ex.code == goFileIOException::EXISTS)
+        {
+            goFileIO::remove(filename2.toCharPtr());
+            goFileIO::writeImage(filename2.toCharPtr(),&labelImage);
+        }
     }
     filename.getFileName(filename2);
     filename2 += "-cluster-kmeansspatial.pgm";
-    if (!goFileIO::writeImage(filename2.toCharPtr(),&labelImageSpatial))
+    try 
     {
-        printf ("Could not write image %s\n",filename.toCharPtr());
-        exit(2);
+        goFileIO::writeImage(filename2.toCharPtr(),&labelImageSpatial);
+    }
+    catch (goFileIOException& ex)
+    {
+        if (ex.code == goFileIOException::EXISTS)
+        {
+            goFileIO::remove(filename2.toCharPtr());
+            goFileIO::writeImage(filename2.toCharPtr(),&labelImageSpatial);
+        }
     }
     exit(1);
 }
