@@ -693,7 +693,7 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     // goPtrdiff_t redOffset = 0 * sizeof(sourceT);
     goPtrdiff_t greenOffset = 1 * sizeof(sourceT);
     goPtrdiff_t blueOffset = 2 * sizeof(sourceT);
-    goDouble third = 1.0 / 3.0;
+    // goDouble third = 1.0 / 3.0;
     while (!sourceIt.endZ())
     {
         sourceIt.resetY();
@@ -704,9 +704,14 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
             targetIt.resetX();
             while (!sourceIt.endX())
             {
-                *(targetT*)*targetIt = static_cast<targetT>((*(sourceT*)*sourceIt + 
-                                        *(sourceT*)(*sourceIt + greenOffset) +
-                                        *(sourceT*)(*sourceIt + blueOffset)) * third);
+                //*(targetT*)*targetIt = static_cast<targetT>((*(sourceT*)*sourceIt + 
+                //                        *(sourceT*)(*sourceIt + greenOffset) +
+                //                        *(sourceT*)(*sourceIt + blueOffset)) * third);
+                //= This is RGB to luminance after ITU CCR 601
+                *(targetT*)*targetIt = static_cast<targetT>(
+                  static_cast<goFloat>(*(sourceT*)*sourceIt) * 0.299f + 
+                  static_cast<goFloat>(*(sourceT*)(*sourceIt + greenOffset)) * 0.587f + 
+                  static_cast<goFloat>(*(sourceT*)(*sourceIt + blueOffset)) * 0.114f);
                 sourceIt.incrementX();
                 targetIt.incrementX();
             }
@@ -723,7 +728,9 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
  * @brief Converts a RGBA 4-channel signal to a scalar 1-channel signal.
  * 
  * The source signal must have 3 or 4 channels that are interpreted as
- * RGB(A).
+ * RGB(A). The alpha channel is currently not taken into account.
+ * The conversion is to luminance after ITU CCR 601:<br>
+ * Y = 0.299 * R + 0.587 * G + 0.114 * B
  * 
  * @param sig       Source signal, must be of type GO_UINT8 and have >= 3 channels.
  * @param targetSig Target signal. Data type must be set and the size must be the same as

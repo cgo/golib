@@ -242,6 +242,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
     if (ilConvertImage (format, type) == IL_FALSE)
     {
         ilDeleteImages (1, &imageName);
+        goLog::warning("ILtoGOSIGNAL() failed.");
         return false;
     }
     T* data = (T*)ilGetData ();
@@ -323,14 +324,16 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  * @return  True if successful, false otherwise.
  **/
 bool
-goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException)
+goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileIOException, goTypeException)
 {
-    if (!signal)
+    if (!sig)
     {
+        goLog::warning("goFileIO::readImage(): sig == 0.");
         return false;
     }
-    if (!signal)
+    if (!filename)
     {
+        goLog::warning("goFileIO::readImage(): filename == 0.");
         return false;
     }
     if (!goGlobal::ILInitialized)
@@ -347,6 +350,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFi
     if (ilLoadImage (fn.getPtr()) == IL_FALSE)
     {
         ilDeleteImages (1, &imageName);
+        goLog::warning("goFileIO::readImage(): IL could not load image.");
         throw goFileIOException(goFileIOException::FAILED);
         return false;
     }
@@ -363,15 +367,15 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFi
 
     //  NOTE: It is quietly assumed that the caller provides us with a goSignal3D object.
     /// \todo Add a sanity check here.
-    if (goString(signal->getClassName()) != "goSignal3D")
+    if (goString(sig->getClassName()) != "goSignal3D")
     {
-        goString msg = "goFileIO::readImage(): signal must be a goSignal3D but is ";
-        msg += signal->getClassName();
+        goString msg = "goFileIO::readImage(): sig must be a goSignal3D but is ";
+        msg += sig->getClassName();
         msg += ". Not loading.";
         goLog::warning (msg);
         return false;
     }
-    goSignal3D<void>* s = signal;
+    goSignal3D<void>* s = sig;
     switch (imageFormat)
     {
         case IL_LUMINANCE: break;
@@ -473,6 +477,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFi
         default:
             {
                 ilDeleteImages (1, &imageName);
+                goLog::warning("goFileIO::readImage(): unknown signal type.");
                 throw goTypeException(goTypeException::UNKNOWN_TYPE);
                 return false;
             }
@@ -485,6 +490,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* signal) throw (goFi
 bool
 goFileIO::readImage (const char*, goSignal3D<void>*) throw (goFileIOException, goTypeException)
 {
+    goLog::warning("goFileIO::readImage(): HAVE_LIBIL was not defined when building golib -- did you install libIL? (http://openil.sourceforge.net)");
     return false;
 }
 #endif
@@ -696,6 +702,7 @@ goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) 
 bool
 goFileIO::writeImage (const char*, const goSignal3DBase<void>*) throw (goFileIOException, goTypeException)
 {
+    goLog::warning("goFileIO::writeImage(): HAVE_LIBIL was not defined when building golib -- did you install libIL? (http://openil.sourceforge.net)");
     return false;
 }
 #endif
