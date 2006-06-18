@@ -536,10 +536,18 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
     {
         return false;
     }
-    if (!goFileIO::writeASCII (f, goString("curve\n")))
+    if (!goFileIO::writeASCII (f, goString("curve")))
     {
         return false;
     }
+    if (pointList.isClosed())
+    {
+        if (!goFileIO::writeASCII (f, goString(" closed")))
+        {
+            return false;
+        }
+    }
+    goFileIO::writeASCII (f, goString("\n"));
     goSize_t pointCount = pointList.getSize();
     goString line = "";
     line += (int)pointCount;
