@@ -74,8 +74,8 @@
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goexception.h>
-#include <goshape.h>
-#include <goregionls.h>
+#include <gomatrix.hpp>
+#include <gomatrix.h>
 #include <golibguile.h>
 %}
 
@@ -87,6 +87,12 @@
 // Renaming
 // %rename(re_size) goString::resize;
 // %rename(re_size) goArray<goFloat>::resize;
+// %rename("goString-eq") operator==(const goString& str,const goString& s);
+// %rename("goString-eq?") bool operator==(const goString& str,const char* s);
+%rename("set") goString::operator=(const char*);
+%rename("to-string") goString::toCharPtr() const;
+%rename("mult") goMatrix<goFloat>::operator*(const goMatrix<goFloat>& other);
+%rename("set") goMatrix<goFloat>::operator=(const goMatrix<goFloat>&);
 %rename(go_sort) goArray::sort;
 %rename(make_signal) goSignal3D<void>::make;
 //%rename(golib_readImage) goFileIO::readImage;
@@ -101,8 +107,7 @@
 %include <gofileio.h>
 %include <gosignalhelper.h>
 %include <goarray.h>
-%include <goshape.h>
-%include <goregionls.h>
+%include <gomatrix.h>
 %include <golibguile.h>
 
 // Templates
@@ -111,4 +116,5 @@
 %template(goArrayi)        goArray<goInt32>;
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
-
+%template(goMatrixf)       goMatrix<goFloat>;
+%template(goMatrixd)       goMatrix<goDouble>;
