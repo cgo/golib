@@ -94,9 +94,9 @@ class goMatrix
   T                 norm () const;
 
   /// Loads identity
-  void unity();
+  void setUnity();
   /// Loads identity
-  void identity();
+  void setIdentity();
   void fill(T v);
   void print();
 

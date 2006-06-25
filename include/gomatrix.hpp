@@ -412,7 +412,7 @@ goMatrix<T>::transpose()
 
 template<class T>
 void
-goMatrix<T>::identity ()
+goMatrix<T>::setIdentity ()
 {
 	fill(0);
 	goSize_t n = MAX(matrix->getSizeX(),matrix->getSizeY());
@@ -439,9 +439,9 @@ T goMatrix<T>::norm () const
 
 template<class T>
 void
-goMatrix<T>::unity ()
+goMatrix<T>::setUnity ()
 {
-    this->identity ();
+    this->setIdentity ();
 }
 
 template<class T>
