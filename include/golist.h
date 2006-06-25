@@ -74,10 +74,16 @@ class goList {
   bool          prepend  (T& elem);
   ///
   bool          insert  (T& elem);
+  ///   
+  bool          append  (goListElement<T>* el, goListElement<T>* here);
+  ///
+  bool          prepend (goListElement<T>* el, goListElement<T>* here);
   /// Removes the current Item.
   bool          remove  ();
   /// Removes element and returns next if any.
   goListElement<T>* remove (goListElement<T>* el);
+  /// Just unhooks, does NOT delete el.
+  goListElement<T>* unhook (goListElement<T>* el);
   /// Deletes the whole list leaving a zero length list.
   void          erase ();
   void          reverse ();

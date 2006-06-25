@@ -1,6 +1,7 @@
 // #include <golist.h>
 // #include <gostring.h>
 // #include <gohashtable.h>
+#include <assert.h>
 
 template<class T>
 goListElement<T>::goListElement ()
@@ -322,6 +323,76 @@ goList<T>::insert (T& elem) {
   return true;
 }
 
+/** 
+ * @brief Append element after another element.
+ * 
+ * @param el Element to append 
+ * @param here Point in list where to append el.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goList<T>::append (goListElement<T>* el, goListElement<T>* here)
+{
+    if (here->next)
+    {
+        here->next->prev = el;
+        el->prev = here;
+        el->next = here->next;
+        here->next = el;
+        ++this->size;
+    }
+    else
+    {
+        assert (here == this->tail);
+        here->next = el;
+        el->prev = here;
+        el->next = 0;
+        ++this->size;
+    }
+    //= In closed lists, front and tail must be adjacent. Therefore, change tail.
+    if (here == this->tail)
+    {
+        this->tail = el;
+    }
+    return true;
+}
+
+/** 
+ * @brief Prepend element before another element.
+ * 
+ * @param el Element to prepend
+ * @param here Point in list where to prepend el.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goList<T>::prepend (goListElement<T>* el, goListElement<T>* here)
+{
+    if (here->prev)
+    {
+        here->prev->next = el;
+        el->next = here;
+        el->prev = here->prev;
+        here->prev = el;
+        ++this->size;
+    }
+    else
+    {
+        assert (here == this->front);
+        here->prev = el;
+        el->next = here;
+        el->prev = 0;
+        ++this->size;
+    }
+    //= In closed lists, front and tail must be adjacent. Therefore, change front.
+    if (here == this->front)
+    {
+        this->front = el;
+    }
+    return true;
+}
+
 template <class T>
 bool
 goList<T>::remove () {
@@ -378,6 +449,14 @@ goList<T>::remove () {
 template <class T>
 goListElement<T>* goList<T>::remove (goListElement<T>* el)
 {
+    goListElement<T>* n = this->unhook(el);
+    if (el)
+    {
+        delete el;
+    }
+    el = 0;
+    return n;
+#if 0
     if (!el)
         return 0;
     if (el->prev)
@@ -407,6 +486,52 @@ goListElement<T>* goList<T>::remove (goListElement<T>* el)
     --this->size;
     delete el;
     el = 0;
+    return n;
+#endif
+}
+
+/** 
+ * @brief Unhook an element.
+ * 
+ * The element is not deleted, as opposed to remove(). It can be re-inserted with the prepend and append methods
+ * or put into another list.
+ * However, if it is not re-inserted into a list, the user must make sure
+ * it gets deleted using the standard C++ delete operator.
+ *
+ * @param el Element to unhook.
+ * 
+ * @return The next element in the list after el, or 0.
+ */
+template <class T>
+goListElement<T>* goList<T>::unhook (goListElement<T>* el)
+{
+    if (!el)
+        return 0;
+    if (el->prev)
+    {
+        el->prev->next = el->next;
+    }
+    if (el->next)
+    {
+        el->next->prev = el->prev;
+    }
+    if (el == front)
+    {
+        front = el->next;
+    }
+    if (el == tail)
+    {
+        tail = el->prev;
+    }
+    if (position == el)
+    {
+        if (el->next)
+            position = el->next;
+        else
+            position = el->prev;
+    }
+    goListElement<T>* n = el->next;
+    --this->size;
     return n;
 }
 
