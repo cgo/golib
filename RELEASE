@@ -4,10 +4,16 @@ On the way to 0.5!
 
 Plans for version 0.5
 ---------------------
+TODO:
+- Change license to "free only for research and private use"
 - Clean up the code, e.g. with respect to const usage
 - Bug fixes
-- Remove unused code
+- Remove unused code (unused classes, functions, Siemens/DA stuff)
 - Make the rest of the code usable
+- Guile: add operators to guile code (see guile/swig documentation 
+  for how that works)
+- Documentation: more examples and tutorial-like introductions to the 
+  modules
 (- Make it compile under Windows)
 
 IMPORTANT NOTE FOR VERSION 0.2.1:
