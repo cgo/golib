@@ -3,9 +3,37 @@
 #include <gofileio.h>
 #include <gofixedarray.h>
 #include <gomath.h>
+#include <golist.h>
 #ifndef GOLOG_H
 # include <golog.h>
 #endif
+
+class goPlotterLabel
+{
+    public:
+        goPlotterLabel (const char* l, goDouble x_, goDouble y_) 
+            : label(l), x(x_), y(y_) {};
+        goPlotterLabel ()
+            : label(""), x(0.0), y(0.0) {};
+        goPlotterLabel (const goPlotterLabel& other)
+        {
+            *this = other;
+        };
+        virtual ~goPlotterLabel () {};
+
+        bool operator== (const goPlotterLabel& other) const
+        {
+            return label == other.label && x == other.x && y == other.y;
+        };
+        bool operator!= (const goPlotterLabel& other) const
+        {
+            return !this->operator== (other);
+        };
+
+        goString label;
+        goDouble x;
+        goDouble y;
+};
 
 class goPlotterPrivate
 {
@@ -14,12 +42,13 @@ class goPlotterPrivate
                              waitFlag(true), pauseFlag(false), cmdFilename(""), dataFilenames(){};
         ~goPlotterPrivate() {};
 
-        goList<goVectord> plotX;
-        goList<goVectord> plotY;
-        goList<goString>  titles;
-        goList<goString>  plotCommands;
-        goString          prefixCommands;
-        goString          shellPostfix;
+        goList<goVectord>      plotX;
+        goList<goVectord>      plotY;
+        goList<goString>       titles;
+        goList<goPlotterLabel> labels;
+        goList<goString>       plotCommands;
+        goString               prefixCommands;
+        goString               shellPostfix;
 
         bool              waitFlag;
         bool              pauseFlag;
@@ -78,6 +107,11 @@ bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* ti
     return true;
 }
 
+bool goPlotter::addLabel (const goString& l, goDouble x, goDouble y)
+{
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y));
+}
+
 void goPlotter::setWaitFlag (bool w)
 {
     myPrivate->waitFlag = w;
@@ -100,12 +134,36 @@ bool goPlotter::getPauseFlag () const
 
 bool goPlotter::plot ()
 {
+    goString prefix = myPrivate->prefixCommands;
+    if (!myPrivate->labels.isEmpty())
+    {
+        assert (!myPrivate->labels.isClosed());
+        goList<goPlotterLabel>::Element* el = myPrivate->labels.getFrontElement();
+        while (el)
+        {
+            prefix += "set label \"";
+            prefix += el->elem.label;
+            prefix += "\" at ";
+            prefix += (float)el->elem.x;
+            prefix += ",";
+            prefix += (float)el->elem.y;
+            prefix += "\n";
+            el = el->next;
+        }
+        // prefix += "replot\n";
+    }
+    goString postfix = "";
+    if (myPrivate->pauseFlag)
+    {
+        postfix += "pause -1\n";
+    }
     return goPlot::gnuplotList (&myPrivate->plotX, 
                                 &myPrivate->plotY, 
                                 &myPrivate->titles, 
                                 &myPrivate->plotCommands, 
-                                myPrivate->prefixCommands.toCharPtr(), 
-                                myPrivate->pauseFlag ? "pause -1\n" : 0, 
+                                prefix.toCharPtr(),
+                                // myPrivate->prefixCommands.toCharPtr(), 
+                                postfix.toCharPtr(),
                                 myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
                                 myPrivate->waitFlag ? 0 : &myPrivate->cmdFilename, 
                                 myPrivate->waitFlag ? 0 : &myPrivate->dataFilenames, 
@@ -114,8 +172,15 @@ bool goPlotter::plot ()
 
 bool goPlotter::plotPostscript (const goString& filename)
 {
+    return this->plotFile (filename, goString("postscript color"));
+}
+
+bool goPlotter::plotFile (const goString& filename, const goString& type)
+{
     goString backup1 = myPrivate->prefixCommands;
-    myPrivate->prefixCommands = "set terminal postscript color\n";
+    myPrivate->prefixCommands = "set terminal ";
+    myPrivate->prefixCommands += type;
+    myPrivate->prefixCommands += "\n";
     goString backup2 = myPrivate->shellPostfix;
     myPrivate->shellPostfix = " > ";
     myPrivate->shellPostfix += filename;
@@ -505,4 +570,9 @@ bool goPlot::gnuplot (const goFixedArray<goDouble>& a, const char* title, goStri
 {
     return _gnuplot<goFixedArray<goDouble> > (a, cmdFileNameRet, dataFileNameRet, title, waitfor);
 }
+#endif
+
+#ifndef GOLIST_HPP
+#include <golist.hpp>
+template class goList<goPlotterLabel>;
 #endif

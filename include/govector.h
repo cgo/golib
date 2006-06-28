@@ -236,7 +236,7 @@ class goVector : public goFixedArray<T>
         template <class To>
         bool copy (goVector<To>& target, goIndex_t startIndex, goIndex_t skip) const
         {
-            assert (this->getSize() > startIndex);
+            assert (static_cast<goIndex_t>(this->getSize()) > startIndex);
             assert (skip >= 0);
             goSize_t sz = (this->getSize() - startIndex + skip) / (skip + 1);
             if (target.getSize() != sz)

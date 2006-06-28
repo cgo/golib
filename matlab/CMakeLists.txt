@@ -9,7 +9,9 @@ SET (TARGET Gomatlab)
 
 # Matlab base path
 SET          (MATLAB $ENV{MATLAB})
-SET          (MATLAB_LIB_PATH ${MATLAB}/extern/lib/glnx86;${MATLAB}/bin/glnx86)
+SET          (MATLAB_ARCH glnxa64)
+# SET          (MATLAB_ARCH glnx86)
+SET          (MATLAB_LIB_PATH ${MATLAB}/extern/lib/${MATLAB_ARCH};${MATLAB}/bin/${MATLAB_ARCH})
 SET          (MATLAB_INC_PATH ${MATLAB}/extern/include)
 SET          (GOPATH $ENV{GOPATH})
 

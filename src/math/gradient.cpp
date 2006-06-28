@@ -235,7 +235,7 @@ static bool ddy2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
         goString msg = "goMath::ddx2D: return signal size not correct.";
         msg += "Size is ";
         msg += (int)retValue.getSizeX(); msg += " "; msg += (int)retValue.getSizeY(); msg += " "; msg += (int)retValue.getSizeZ();
-        msg += " but should be "; (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1";
+        msg += " but should be "; msg += (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1";
         goLog::warning (msg);
         return false;
     }

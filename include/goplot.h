@@ -71,6 +71,8 @@ class goPlotter : public goObjectBase
                 return this->addCurve (x,y,title,plotOptions);
             };
 
+        bool addLabel (const goString& l, goDouble x, goDouble y);
+
         void setWaitFlag (bool w);
         bool getWaitFlag () const;
         void setPauseFlag (bool p);
@@ -78,6 +80,7 @@ class goPlotter : public goObjectBase
         
         virtual bool plot ();
         virtual bool plotPostscript (const goString& filename);
+        virtual bool plotFile (const goString& filename, const goString& type);
         
     private:
         goPlotterPrivate* myPrivate;

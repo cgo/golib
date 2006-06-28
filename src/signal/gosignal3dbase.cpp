@@ -1245,6 +1245,7 @@ inline
 void
 goSignal3DBase<T>::rotateAxes ()
 {
+#if 0
     goString msg;
     msg = "Rotate axes ---\n";
     msg += "\tdiffs == "; 
@@ -1281,7 +1282,8 @@ goSignal3DBase<T>::rotateAxes ()
     msg += (int)myBlocks.z; 
     
     goLog::message(msg,this);
-    
+   #endif
+ 
   goPtrdiff_t* tempDiff = zDiff;
   goSize_t tempSize = mySize.z;
   goPtrdiff_t* tempJump = myZJump;
