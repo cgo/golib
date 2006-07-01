@@ -56,13 +56,18 @@ public:
       matrix = 0;
   };
 
-  inline void unity ()
+  inline void setUnity ()
   {
      this->fill(T(0));
      this->matrix[0]  = T(1);
      this->matrix[5]  = T(1);
      this->matrix[10] = T(1);
      this->matrix[15] = T(1);
+  };
+
+  inline void setIdentity ()
+  {
+     this->setUnity ();
   };
   
   /*!
