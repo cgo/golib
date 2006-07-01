@@ -11,12 +11,13 @@
 template <class T>
 class goListElement {
  public:
-     goListElement ();
+     goListElement  ();
      ~goListElement ();
 
   T                 elem;
   goListElement*    next;
   goListElement*    prev;
+  goIndex_t         index;
 };
 
 /**
@@ -43,6 +44,7 @@ class goList {
   ConstElement* getTailElement  () const;
   Element*      find            (const T& el);
   ConstElement* find            (const T& el) const;
+  void          index           ();
   
   void      next ();
   void      prev ();

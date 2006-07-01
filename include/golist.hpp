@@ -5,9 +5,10 @@
 
 template<class T>
 goListElement<T>::goListElement ()
-    : elem (),
-      next (0),
-      prev (0)
+    : elem  (),
+      next  (0),
+      prev  (0),
+      index (0)
 {
 }
 
@@ -84,6 +85,22 @@ typename goList<T>::ConstElement* goList<T>::find (const T& e) const
         el = el->next;
     }
     return 0;
+}
+
+/** 
+ * @brief Fill the index field of the list elements with indices starting at 0.
+ */
+template <class T>
+void goList<T>::index ()
+{
+    Element* el = this->getFrontElement();
+    goSize_t sz = this->getSize();
+    goSize_t i;
+    for (i = 0; i < sz; ++i)
+    {
+        el->index = i;
+        el = el->next;
+    }
 }
 
 template <class T>
