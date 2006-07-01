@@ -1,4 +1,6 @@
 #include <gostring.h>
+#include <goconfig.h>
+#include <golog.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -390,6 +392,28 @@ goString::toInt () const
   return atoi(tmp);
 }
 
+goUInt32
+goString::toUInt32 () const
+{
+    goUInt32 ret = 0;
+    sscanf (this->toCharPtr(), "%u", &ret);
+    return ret;
+}
+
+goUInt64
+goString::toUInt64 () const
+{
+    goUInt64 ret = 0;
+#if SIZEOF_LONG_INT == 8
+    sscanf (this->toCharPtr(), "%lu", &ret);
+#elif SIZEOF_LONG_LONG_INT == 8
+    sscanf (this->toCharPtr(), "%llu", &ret);
+#else
+    goLog::error ("goString::toUInt64(): neither long int nor long long int are 8 bytes long.");
+#endif
+    return ret;
+}
+
 float
 goString::toFloat () const
 {
@@ -558,6 +582,29 @@ goString::operator+= (int i) {
     sprintf(&s[0], "%d", i);
     (*this) += &s[0];
     return (*this);
+}
+
+goString&
+goString::operator+= (goUInt32 i) {
+    char s[250];
+    sprintf(&s[0], "%u", i);
+    (*this) += &s[0];
+    return (*this);
+}
+
+goString&
+goString::operator+= (goUInt64 i) {
+    char s[250];
+#if SIZEOF_LONG_INT == 8
+    sprintf(&s[0], "%lu", i);
+#elif SIZEOF_LONG_LONG_INT == 8
+    sprintf(&s[0], "%llu", i);
+#else
+    goLog::error ("goString::operator+= (goUInt64): neither long int nor long long int are 8 bytes long.");
+    return *this;
+#endif
+    (*this) += &s[0];
+    return *this;
 }
 
 goString&

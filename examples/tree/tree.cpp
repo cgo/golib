@@ -24,8 +24,10 @@ int main ()
             };
     };
     PrintTree pt;
+    printf ("depth first:\n");
     pt.depthFirst(tree->getRoot());
-
+    printf ("breadth first:\n");
+    pt.breadthFirst(tree->getRoot());
     delete tree;
     tree = 0;
     exit(1);

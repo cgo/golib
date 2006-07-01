@@ -7,3 +7,4 @@
 template class goHashTable<goIndexPair, goDouble>;
 template class goHashTable<goIndexPair, goUInt8>;
 template class goHashTable<int, goString>;
+template class goHashTable<goUInt64, void*>;
