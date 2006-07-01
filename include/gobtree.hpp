@@ -79,22 +79,61 @@ bool goBTreeAlgorithm<T>::depthFirst (typename goBTree<T>::ConstElement* root) c
  * 
  * @return True if successful, false otherwise.
  ----------------------------------------------------------------------------*/
-//template<class T>
-//bool goBTreeAlgorithm<T>::breadthFirst (typename goBTree<T>::Element* root)
-//{
-//    static bool ok = true;
-//    if (!root)
-//        return false;
-//    if (root->leftChild)
-//    {
-//        ok = ok && this->run (root->leftChild);		
-//    }
-//    if (root->rightChild)
-//    {
-//        ok = ok && this->run (root->rightChild);
-//    }
-//    return ok && this->action(root);
-//}
+template<class T>
+bool goBTreeAlgorithm<T>::breadthFirst (typename goBTree<T>::Element* root)
+{
+    bool ok = true;
+    goList<void*> Q;
+    Q.append (root);
+
+    goList<void*>::Element* Qhead = Q.getFrontElement();
+
+    typename goBTree<T>::Element* node = 0;
+    while (!Q.isEmpty())
+    {
+        node = static_cast<typename goBTree<T>::Element*>(Qhead->elem);
+        assert (node);
+        if (node->leftChild)
+        {
+            Q.append (node->leftChild);
+        }
+        if (node->rightChild)
+        {
+            Q.append (node->rightChild);
+        }
+        ok = ok & this->action (node);
+        Qhead = Q.remove (Qhead);
+    }
+    return ok;
+}
+
+template<class T>
+bool goBTreeAlgorithm<T>::breadthFirst (typename goBTree<T>::ConstElement* root) const
+{
+    bool ok = true;
+    goList<const void*> Q;
+    Q.append (root);
+
+    goList<const void*>::Element* Qhead = Q.getFrontElement();
+
+    typename goBTree<T>::ConstElement* node = 0;
+    while (!Q.isEmpty())
+    {
+        node = static_cast<typename goBTree<T>::ConstElement*>(Qhead->elem);
+        assert (node);
+        if (node->leftChild)
+        {
+            Q.append (node->leftChild);
+        }
+        if (node->rightChild)
+        {
+            Q.append (node->rightChild);
+        }
+        ok = ok & this->action (node);
+        Qhead = Q.remove (Qhead);
+    }
+    return ok;
+}
 
 //============================================
 
@@ -117,6 +156,12 @@ goBTree<T>::goBTree (typename goBTree<T>::Element* root)
 template<class T>
 goBTree<T>::~goBTree ()
 {
+    this->erase ();
+}
+
+template <class T>
+void goBTree<T>::erase ()
+{
     class DeleteTree : public goBTreeAlgorithm<T>
     {
         public:
@@ -130,6 +175,7 @@ goBTree<T>::~goBTree ()
 
     DeleteTree del;
     del.depthFirst (myRoot);
+    this->setRoot (0);
 }
 
 template<class T>

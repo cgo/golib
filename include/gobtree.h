@@ -38,6 +38,8 @@ class goBTreeAlgorithm
     public:
         goBTreeAlgorithm () {};
         virtual ~goBTreeAlgorithm () {};
+        bool breadthFirst (typename goBTree<T>::Element* root);
+        bool breadthFirst (typename goBTree<T>::ConstElement* root) const;
         bool depthFirst (typename goBTree<T>::Element* root);
         bool depthFirst (typename goBTree<T>::ConstElement* root) const;
         virtual bool action (typename goBTree<T>::Element* node) { return false; };
@@ -64,6 +66,8 @@ class goBTree : public goObjectBase
         void          setRoot (typename goBTree<T>::Element* e);
         Element*      getRoot ();
         ConstElement* getRoot () const;
+
+        void          erase   ();
        
         bool          writeDOT (FILE* f) const;
 
