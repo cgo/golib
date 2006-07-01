@@ -50,6 +50,10 @@ public:
   ///
   int         toInt () const;
   ///
+  goUInt32    toUInt32 () const;
+  ///
+  goUInt64    toUInt64 () const;
+  ///
   float	      toFloat () const;
   ///
   double      toDouble () const;
@@ -83,6 +87,10 @@ public:
   goString&	  operator+= (const char* s);
   ///
   goString&   operator+= (int i);
+  ///
+  goString&   operator+= (goUInt32 i);
+  ///
+  goString&   operator+= (goUInt64 i);
   ///
   goString&   operator+= (float f);
 
