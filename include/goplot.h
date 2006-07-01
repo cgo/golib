@@ -18,6 +18,71 @@
 
 class goPlotterPrivate;
 
+class goSinglePlotPrivate;
+
+/** 
+ * @brief 
+ * @todo Make this the object that is drawn by goPlotter.
+ */
+class goSinglePlot : public goObjectBase
+{
+    public:
+        goSinglePlot ();
+        virtual ~goSinglePlot ();
+        goSinglePlot (const goSinglePlot&);
+        const goSinglePlot& operator= (const goSinglePlot&);
+
+        template <class pointT>
+            bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
+            {
+                typename goList<pointT>::ConstElement* el = points.getFrontElement();
+                goSize_t sz = points.getSize();
+                goSize_t szVec = sz;
+                if (points.isClosed())
+                {
+                    ++szVec;
+                }
+                goVectord x(szVec);
+                goVectord y(szVec);
+                goSize_t i = 0;
+                while (i < sz && el)
+                {
+                    x[i] = el->elem.x;
+                    y[i] = el->elem.y;
+                    ++i;
+                    el = el->next;
+                }
+                if (points.isClosed())
+                {
+                    x[szVec-1] = x[0];
+                    y[szVec-1] = y[0];
+                }
+                return this->addCurve (x,y,title,plotOptions);
+            };
+
+        bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
+
+        template <class vectorT>
+            bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)
+            {
+                goSize_t sz = v.getSize();
+                goVectord x (sz);
+                goVectord y (sz);
+                goSize_t i = 0;
+                for (i = 0; i < sz; ++i)
+                {
+                    x[i] = i;
+                    y[i] = v[i];
+                }
+                return this->addCurve (x,y,title,plotOptions);
+            };
+
+        bool addLabel (const goString& l, goDouble x, goDouble y);
+
+    private:
+        goSinglePlotPrivate* myPrivate;
+};
+
 class goPlotter : public goObjectBase
 {
     public:
@@ -167,6 +232,22 @@ namespace goPlot
                           goString*         cmdFileNameRet = 0, 
                           goList<goString>* dataFileNameRet = 0, 
                           bool waitfor = true);
+
+    bool callGnuplot (const goString& gnuplotCommands, 
+                      const char*     shellPostfix, 
+                      bool            waitfor, 
+                      goString*       cmdFilenameRet);
+
+    bool addGnuplotCommands (goString& gnuplotCommands,
+                             const goList<goString>* dataFileNames, 
+                             const goList<goString>* titles, 
+                             const goList<goString>* plotCommands, 
+                             const char* prefixCommands,
+                             const char* postfixCommands);
+    template <class arrayT>
+        bool writeGnuplotDataFiles (const goList<arrayT>* arrayListX, 
+                                    const goList<arrayT>* arrayListY, 
+                                    goList<goString>& dataFileNameRet);
 #if 0
         static bool gnuplot (const goArray<goFloat>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
         static bool gnuplot (const goArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
