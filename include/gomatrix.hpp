@@ -402,6 +402,25 @@ goMatrix<T>::operator/= (T scalar) {
     return *this;
 }
 
+/** 
+ * @brief Element-wise multiplication: this(i,j) = this(i,j) * other(i,j).
+ * 
+ * @param other Other matrix.
+ * 
+ * @return True if successful, false otherwise, e.g. when dimensions do not match (check logfile).
+ */
+template <class T>
+bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
+{
+    if (this->getRows() != other.getRows() || this->getColumns() != other.getColumns())
+    {
+        goLog::warning ("goMatrix::multiplyElements(): dimensions mismatch.\n");
+        return false;
+    }
+    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr_target *= *__ptr, (*other.getData()), (*this->getData()), const T, T);
+    return true;
+}
+
 template <class T>
 void
 goMatrix<T>::transpose() 

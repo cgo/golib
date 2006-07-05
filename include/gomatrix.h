@@ -91,6 +91,8 @@ class goMatrix
   goMatrix<T>&		operator*= (T scalar);
   goMatrix<T>&		operator/= (T scalar);
 
+  bool              multiplyElements (const goMatrix<T>& other);
+
   T                 norm () const;
 
   /// Loads identity

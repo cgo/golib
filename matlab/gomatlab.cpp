@@ -32,7 +32,7 @@ goMatlabPrivate::~goMatlabPrivate ()
 {
 }
 
-bool goMatlab::putSignal(goSignal3DBase<void>* sig, const char* name)
+bool goMatlab::putSignal(const goSignal3DBase<void>* sig, const char* name)
 {
     return this->signalToVariable (sig, name);
 }
@@ -285,7 +285,7 @@ goMatlab::sparseToMatlabSparse (goSparseMatrix* sp, const char* name)
 }
 
 bool 
-goMatlab::signalToVariable (goSignal3DBase<void>* sig, const char* name)
+goMatlab::signalToVariable (const goSignal3DBase<void>* sig, const char* name)
 {
     if (!myPrivate->matlabEngine)
     {
@@ -387,7 +387,7 @@ goMatlab::variableToSignal (goSignal3D<void>* sig, const char* name)
     }
     if (sig->getDataType().getID() != GO_FLOAT ||
         sig->getSizeX() != (goSize_t)mxGetN(temp) ||
-        sig->getSizeZ() != (goSize_t)mxGetM(temp))
+        sig->getSizeY() != (goSize_t)mxGetM(temp))
     {
         sig->setDataType (GO_FLOAT);
         sig->make (mxGetN(temp), mxGetM(temp), 1, 32, 32, 1, 16, 16, 0);
@@ -510,7 +510,7 @@ goMatlab::matlabCreateMatrix (int rows, int columns)
 
 
 bool
-goMatlab::copyToMatlab (goSignal3DBase<void>* sig, mxArray* m)
+goMatlab::copyToMatlab (const goSignal3DBase<void>* sig, mxArray* m)
 {
     if ((int)sig->getSizeX() != mxGetN(m) || (int)sig->getSizeY() != mxGetM(m))
     {
@@ -522,23 +522,27 @@ goMatlab::copyToMatlab (goSignal3DBase<void>* sig, mxArray* m)
     {
         return false;
     }
-    sig->swapXY();
+    //= This is NOT nice --- but we need to swap. I could also use a subsignal, 
+    //= but that would be slower.
+    const_cast<goSignal3DBase<void>*>(sig)->swapXY();
     switch (sig->getDataType().getID())
     {
-        case GO_FLOAT: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goFloat*)__ptr, (*sig)); break;
-        case GO_DOUBLE: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goDouble*)__ptr, (*sig)); break;
-        case GO_INT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt8*)__ptr, (*sig)); break;
-        case GO_UINT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt8*)__ptr, (*sig)); break;
-        case GO_INT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt16*)__ptr, (*sig)); break;
-        case GO_UINT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt16*)__ptr, (*sig)); break;
-        case GO_INT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goInt32*)__ptr, (*sig)); break;
-        case GO_UINT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(goUInt32*)__ptr, (*sig)); break;
+        case GO_FLOAT: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goFloat*)__ptr, (*sig)); break;
+        case GO_DOUBLE: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goDouble*)__ptr, (*sig)); break;
+        case GO_INT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goInt8*)__ptr, (*sig)); break;
+        case GO_UINT8: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goUInt8*)__ptr, (*sig)); break;
+        case GO_INT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goInt16*)__ptr, (*sig)); break;
+        case GO_UINT16: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goUInt16*)__ptr, (*sig)); break;
+        case GO_INT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goInt32*)__ptr, (*sig)); break;
+        case GO_UINT32: GO_SIGNAL3D_EACHELEMENT_GENERIC (*(mPtr++) = *(const goUInt32*)__ptr, (*sig)); break;
         default: goLog::error("copyToMatlab(): unknown data type.",this);
-                 sig->swapXY();
+                 const_cast<goSignal3DBase<void>*>(sig)->swapXY();
                  return false;
                  break;
     }
-    sig->swapXY();
+    //= This is NOT nice --- but we need to swap. I could also use a subsignal, 
+    //= but that would be slower.
+    const_cast<goSignal3DBase<void>*>(sig)->swapXY();
     return true;
 }
 

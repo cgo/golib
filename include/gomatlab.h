@@ -6,6 +6,7 @@
 #endif
 #include <gosignal3d.h>
 #include <gosignalmacros.h>
+#include <gosignalhelper.h>
 #include <gostring.h>
 #include <gosparsematrix.h>
 #ifndef GOPOINT_H
@@ -81,7 +82,7 @@ class goMatlab : public goObjectBase
         goMatlab ();
         virtual ~goMatlab ();
 
-        bool     putSignal (goSignal3DBase<void>* sig, const char* name);
+        bool     putSignal (const goSignal3DBase<void>* sig, const char* name);
         bool     getSignal (goSignal3D<void>* sig, const char* name);
         bool     putArray  (const goDouble* p, goSize_t length, const char* name);
         bool     putArray  (const goArray<goDouble>* array, const char* name);
@@ -91,6 +92,51 @@ class goMatlab : public goObjectBase
         bool     putDouble (goDouble d, const char* name);
         bool     getDouble (goDouble& d, const char* name);
         bool     putSparse (goSparseMatrix* sm, const char* name);
+
+        template <class T>
+            bool     putMatrix (const goMatrix<T>& matrix, const char* name)
+            {
+                goIndex_t M = matrix.getRows();
+                goIndex_t N = matrix.getColumns();
+                mxArray* mMatrix = this->matlabCreateMatrix (M,N);
+                if (!mMatrix)
+                {
+                    return false;
+                }
+                goIndex_t i;
+                goIndex_t j;
+                double* mP = mxGetPr (mMatrix);
+                for (j = 0; j < N; ++j)
+                {
+                    for (i = 0; i < M; ++i)
+                    {
+                        *mP = matrix(i,j);
+                        ++mP;
+                    }
+                }
+                engPutVariable (this->getEngine(), name, mMatrix);
+                mxDestroyArray (mMatrix);
+                return true;
+            };
+        template <class T>
+            bool getMatrix (goMatrix<T>& matrix, const char* name)
+            {
+                mxArray* temp = engGetVariable (this->getEngine(), name);
+                if (!temp)
+                {
+                    goString msg = "goMatlab::getMatrix(): engGetVariable() failed for ";
+                    msg += name;
+                    goLog::warning(msg);
+                    return false;
+                }
+                if (!matrix.resize (mxGetM(temp), mxGetN(temp)))
+                {
+                    return false;
+                }
+                double* mP = mxGetPr (temp);
+                GO_SIGNAL3D_EACHELEMENT (*__ptr = T(*mP); ++mP;, (*matrix.getData()), T);
+                return true;
+            };
 
         bool     put2DPoints (const goList<goPointf>& l, const char* variableName);
         bool     get2DPoints (goList<goPointf>& l, const char* variableName);
@@ -106,7 +152,7 @@ class goMatlab : public goObjectBase
         mxArray* matlabCreateSparse   (int rows, int columns, int elements);
 
         
-        bool     copyToMatlab         (goSignal3DBase<void>* sig, mxArray* matrix);
+        bool     copyToMatlab         (const goSignal3DBase<void>* sig, mxArray* matrix);
         bool     copyToMatlab         (const goArray<goDouble>* array, mxArray* matrix);
         bool     copyToMatlab         (const goVectord* array, mxArray* matrix);
         bool     copyToMatlab         (const goDouble* array, goSize_t length, mxArray* matrix);
@@ -115,7 +161,7 @@ class goMatlab : public goObjectBase
         bool     copyFromMatlab       (mxArray* matrix, goArray<goDouble>* array);
         bool     copyFromMatlab       (mxArray* matrix, goVectord* array);
         bool     sparseToMatlabSparse (goSparseMatrix* sp, const char* name);
-        bool     signalToVariable     (goSignal3DBase<void>* sig, const char* name);
+        bool     signalToVariable     (const goSignal3DBase<void>* sig, const char* name);
         bool     arrayToVariable      (const goArray<goDouble>* array, const char* name);
         bool     arrayToVariable      (const goDouble* array, goSize_t length, const char* name);
         bool     doubleToVariable     (goDouble d, const char* name);
