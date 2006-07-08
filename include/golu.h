@@ -127,7 +127,7 @@ class goLU
                s += LUrowi[k]*LUcolj[k];
             }
 
-            LUrowi[j] = LUcolj[i] -= s;
+            LUrowi[j] = LUcolj[i] -= Real(s);
          }
 
          // Find pivot and exchange if necessary.
@@ -141,7 +141,7 @@ class goLU
             for (k = 0; k < n; k++) {
                double t = LU_[p][k]; 
 			   LU_[p][k] = LU_[j][k]; 
-			   LU_[j][k] = t;
+			   LU_[j][k] = Real(t);
             }
             k = piv[p]; 
 			piv[p] = piv[j]; 
