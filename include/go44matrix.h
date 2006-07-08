@@ -5,7 +5,10 @@
 
 #include <gotypes.h>
 // #include <go4vector.h>
-
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+#include <golu.h>
 #include <iostream>
 
 /*! \addtogroup math
@@ -103,6 +106,8 @@ public:
    */
   inline void   transpose ();
 
+  inline bool   invert ();
+
   /*!
    * stream output for float matrices
    */
@@ -181,6 +186,39 @@ go44Matrix<T>::transpose ()
       *(m)  = r3[i]; m++;
       *(m) = r4[i]; m++;
     }
+}
+
+template <class T>
+inline
+bool
+go44Matrix<T>::invert ()
+{
+    //= FIXME: This is a quick hack.
+    goMatrix<T> M (4,4);
+    for (goIndex_t i = 0; i < 4; ++i)
+    {
+        for (goIndex_t j = 0; j < 4; ++j)
+        {
+            M(i,j) = (*this)(i,j);
+        }
+    }
+    goMatrix<T> B (4,4);
+    B.setIdentity ();
+    goMatrix<T> X (4,4);
+    goMath::goLU<T> lu (M);
+    if (!lu.solve (B,X))
+    {
+        return false;
+    }
+    
+    for (goIndex_t i = 0; i < 4; ++i)
+    {
+        for (goIndex_t j = 0; j < 4; ++j)
+        {
+            (*this)(i,j) = X(i,j);
+        }
+    }
+    return true;
 }
 
 template <class T>
