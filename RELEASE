@@ -6,6 +6,7 @@ Plans for version 0.5
 ---------------------
 TODO:
 - Change license to "free only for research and private use"
+  - Alternatively, call GPL version "free edition" or "GPL edition"
 - Clean up the code, e.g. with respect to const usage
 - Bug fixes
 - Remove unused code (unused classes, functions, Siemens/DA stuff)
@@ -14,6 +15,9 @@ TODO:
   for how that works)
 - Documentation: more examples and tutorial-like introductions to the 
   modules
+- Add cblas support for matrix and vector operations
+- Simplify matrix access for linearly stored matrices
+  - Measure time penalty for overhead of using goSignal* classes here
 (- Make it compile under Windows)
 
 IMPORTANT NOTE FOR VERSION 0.2.1:
