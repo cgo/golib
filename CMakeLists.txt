@@ -162,6 +162,7 @@ SET                 (SOURCES
 
 IF($ENV{MATLAB})
     SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
+    SET (HAVE_MATLAB 1)
 ENDIF($ENV{MATLAB})
 #SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
 #SET                 (EXTRA_LIBS "")
@@ -253,7 +254,10 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
                      ${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include)
 
-                     
+IF (${HAVE_MATLAB} MATCHES 1)
+    ADD_SUBDIRECTORY (matlab EXCLUDE_FROM_ALL)
+ENDIF (${HAVE_MATLAB} MATCHES 1)
+                 
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
