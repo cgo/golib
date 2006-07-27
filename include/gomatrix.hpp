@@ -9,525 +9,163 @@
 # include <govector.h>
 #endif
 
-template <class T>
-bool
-goMatrix<T>::initializeRows ()
+extern "C" 
 {
-    assert (this->matrix);
-    if (this->rows)
-    {
-        delete[] this->rows;
-        this->rows = NULL;
-    }
-    if (this->rowVectors)
-    {
-        delete[] this->rowVectors;
-        this->rowVectors = NULL;
-    }
-    this->rows       = new goSubSignal3D<T> [this->getRows()];
-    this->rowVectors = new goRowVector<T>   [this->getRows()];
-    if (!this->rows || !this->rowVectors)
-    {
-        assert (false);
-        return false;
-    }
-    goSize_t i;
-    goSize3D rowSize (this->getColumns(), 1, 1);
-    for (i = 0; i < this->getRows(); ++i)
-    {
-        this->rows[i].setSize        (rowSize);
-        this->rows[i].setParent      (this->matrix);
-        this->rows[i].setPosition    (0, i, 0);
-        this->rowVectors[i].setData  (&this->rows[i]);
-    }
-    return true;
+ #include <cblas.h>
 }
 
-template <class T>
-T& goMatrix<T>::operator() (goIndex_t i, goIndex_t j)
+template<>
+goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& other)
 {
-    return this->rowVectors[i][j];
-}
-
-template <class T>
-const T& goMatrix<T>::operator() (goIndex_t i, goIndex_t j) const 
+    //= This is not quite right. Handle transposition right and read what LDA exactly must be.
+    //= http://www.inf.bv.tum.de/~heisserer/softwarelab04/index.html
+    //=  "Note that for cblas-functions the leading dimension (for 2D arrays in C-fashion, i.e. row major order) 
+    //=   is the number of columns of the matrix (not the rows as in Fortran).
+    //=   The leading dimension is the number of entries in memory that separate the e.g. 
+    //=   first elements of rows in c-fashion storage 
+    //=   (row major order, i.e. elements of one row are contiguous in memory).
+    //=   As Fortran stores in column major order the leading dimension is the number of rows."
+    goSize_t M = this->getRows();
+    goSize_t N = other.getColumns();
+    goSize_t K = this->getColumns();
+    goMatrix<goDouble> C (this->getRows(), other.getColumns());
+    C.fill (0.0);
+    cblas_dgemm (CblasRowMajor, 
+                 CblasNoTrans, 
+                 CblasNoTrans,
+                 M, N, K, 1.0,
+                 this->getData(), this->getLeadingDimension(),
+                 other.getData(), other.getLeadingDimension(),
+                 0.0, C.getData(), C.getLeadingDimension());
+    return C;
+};
+template<>
+goMatrix<goFloat> goMatrix<goFloat>::operator* (const goMatrix<goFloat>& other)
 {
-    return this->rowVectors[i][j];
-}
+    goSize_t M = this->getRows();
+    goSize_t N = other.getColumns();
+    goSize_t K = this->getColumns();
+    goMatrix<goFloat> C (this->getRows(), other.getColumns());
+    C.fill (0.0);
+    cblas_sgemm (CblasRowMajor, 
+                 CblasNoTrans, 
+                 CblasNoTrans,
+                 M, N, K, 1.0,
+                 this->getData(), this->getLeadingDimension(),
+                 other.getData(), other.getLeadingDimension(),
+                 0.0, C.getData(), C.getLeadingDimension());
+    return C;
+};
 
-template <class T>
-goRowVector<T>&
-goMatrix<T>::operator [] (goSize_t row)
+template<>
+goMatrix<goFloat>& goMatrix<goFloat>::operator*= (const goMatrix<goFloat>& other)
 {
-    assert (this->rowVectors);
-    return this->rowVectors [row];
-}
-
-template <class T>
-const goRowVector<T>&
-goMatrix<T>::operator [] (goSize_t row) const
-{
-    assert (this->rowVectors);
-    return this->rowVectors [row];
-}
-
-//===================================================================
-
-template <class T> 
-goMatrix<T>::goMatrix (goSignal3DBase<T>* data)
-    :
-    linearStorage (false),
-    externalData  (true),
-    matrix        (0),
-    rows          (NULL),
-    rowVectors    (NULL)
-{
-    this->setData (data);
-}
-
-template <class T>
-goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols, bool linear)
-    :
-    linearStorage (linear),
-    externalData  (false),
-    matrix        (NULL),
-    rows          (NULL),
-    rowVectors    (NULL)
-{
-    if (linear)
-    {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1, cols, rows, 1, 0, 0, 0, 1);
-    }
-    else
-    {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (cols, rows, 1);
-    }
-    initializeRows ();
-}
-
-template<class T>
-goMatrix<T>::goMatrix(const goMatrix<T>& other)
-    :
-    linearStorage (other.isLinear()),
-    externalData (false),
-    matrix       (NULL),
-    rows         (NULL),
-    rowVectors   (NULL)
-{
-    assert (other.matrix != NULL);
-    if (this->linearStorage)
-    {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1, other.getColumns(), other.getRows(), 1, 0, 0, 0, 1);
-    }
-    else
-    {
-        matrix = (goSignal3DBase<T>*) new goSignal3D<T> (other.getColumns(), other.getRows(), 1);
-    }
-    if (other.getSizeX() == getSizeX() &&
-        other.getSizeY() == getSizeY())
-    {
-        // std::cout << "Copy constructor...\n";
-        GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*matrix), (*other.matrix), T, T);
-    }
-    initializeRows ();
-}
-
-template <class T>
-goMatrix<T>::~goMatrix () 
-{
-    if (!externalData && matrix)
-    {
-        delete matrix;
-        matrix = NULL;
-    }
-    if (this->rows)
-    {
-        delete [] this->rows;
-        this->rows = NULL;
-    }
-    if (this->rowVectors)
-    {
-        delete [] this->rowVectors;
-        this->rowVectors = NULL;
-    }
-}
-
-
-template <class T> 
-goSize_t
-goMatrix<T>::getColumns() const
-{
-    return getSizeX();
-}
-
-template <class T>  
-goSize_t
-goMatrix<T>::getRows() const
-{
-    return getSizeY();
-}
-
-
-// TNT compatibility methods BEGIN
-
-template <class T>
-int
-goMatrix<T>::dim1 () const
-{
-    return (int)getRows ();
-}
-
-template <class T>
-int
-goMatrix<T>::dim2 () const
-{
-    return (int)getColumns ();
-}
-
-template <class T>
-const goMatrix<T>&
-goMatrix<T>::copy () const
-{
+    goSize_t M = this->getRows();
+    goSize_t N = other.getColumns();
+    goSize_t K = this->getColumns();
+    goMatrix<goFloat> C (this->getRows(), other.getColumns());
+    C.fill (0.0);
+    cblas_sgemm (CblasRowMajor, 
+                 CblasNoTrans, 
+                 CblasNoTrans,
+                 M, N, K, 1.0,
+                 this->getData(), this->getLeadingDimension(),
+                 other.getData(), other.getLeadingDimension(),
+                 0.0, C.getData(), C.getLeadingDimension());
+    *this = C;             
     return *this;
 }
 
-// TNT compatibility methods END  
-
-template <class T>
-T&
-goMatrix<T>::elem (goSize_t i, goSize_t j)
+template<>
+goMatrix<goDouble>& goMatrix<goDouble>::operator*= (const goMatrix<goDouble>& other)
 {
-    return *(T*)matrix->getPtr (j,i,0);
-}
-
-template <class T>
-goSize_t
-goMatrix<T>::getSizeX() const
-{
-    if (matrix)
-    {
-        return matrix->getSizeX();
-    }
-    return 0;
-}
-
-template <class T>
-goSize_t
-goMatrix<T>::getSizeY() const
-{
-    if (matrix)
-    {
-        return matrix->getSizeY();
-    }
-    return 0;
-}
-
-//===================================================================
-
-
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator= (const goMatrix<T>& other) 
-{
-    assert (matrix);
-    if (other.getSizeX() != getSizeX() ||
-        other.getSizeY() != getSizeY())
-    {
-        this->resize (other.getRows(), other.getColumns());
-    }
-    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr = *__ptr_target, (*matrix), (*other.matrix), T, T);
-    initializeRows ();
+    goSize_t M = this->getRows();
+    goSize_t N = other.getColumns();
+    goSize_t K = this->getColumns();
+    goMatrix<goDouble> C (this->getRows(), other.getColumns());
+    C.fill (0.0);
+    cblas_dgemm (CblasRowMajor, 
+                 CblasNoTrans, 
+                 CblasNoTrans,
+                 M, N, K, 1.0,
+                 this->getData(), this->getLeadingDimension(),
+                 other.getData(), other.getLeadingDimension(),
+                 0.0, C.getData(), C.getLeadingDimension());
+    *this = C;             
     return *this;
 }
 
-template <class T>
-goMatrix<T>
-goMatrix<T>::operator* (const goMatrix<T>& other) 
+template<>
+goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v)
 {
-  if (getColumns() != other.getRows())
-  {
-      goLog::warning ("goMatrix::operator*: Matrix dimensions do not match.");
-      return goMatrix<T> (1,1);
-  }
-  goMatrix<T> retval (getRows(), other.getColumns());
-  goSize_t x, y, x2;
-  goSize_t columns = retval.getColumns();
-  goSize_t thisColumns = this->getColumns();
-  for (y = 0; y < retval.getRows(); ++y) 
-  {
-    for (x = 0; x < columns; ++x) 
+    assert (v.getSize() == this->getColumns());
+    goVector<goFloat> y (v.getSize());
+    y.fill (0.0f);
+    cblas_sgemv (CblasRowMajor, CblasNoTrans, 
+                 this->getRows(), this->getColumns(), 
+                 1.0, this->matrix, this->getLeadingDimension(), 
+                 v.getPtr(), v.getStride(), 
+                 0.0f, y.getPtr(), y.getStride());
+    return y;
+}
+
+template<>
+goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v)
+{
+    assert (v.getSize() == this->getColumns());
+    goVector<goDouble> y (v.getSize());
+    y.fill (0.0f);
+    cblas_dgemv (CblasRowMajor, CblasNoTrans, 
+                 this->getRows(), this->getColumns(), 
+                 1.0, this->matrix, this->getLeadingDimension(), 
+                 v.getPtr(), v.getStride(), 
+                 0.0f, y.getPtr(), y.getStride());
+    return y;
+}
+
+template<>
+void goMatrixMult<goFloat> (goFloat alpha, const goMatrix<goFloat>& A, bool transA, 
+                                           const goMatrix<goFloat>& B, bool transB, 
+                            goFloat beta, goMatrix<goFloat>& C)
+{
+    goSize_t M = transA ? A.getColumns() : A.getRows();
+    goSize_t N = transB ? B.getRows() : B.getColumns();
+    goSize_t K = transA ? A.getRows() : A.getColumns();
+    if (C.getRows() != M || C.getColumns() != N)
     {
-      T* p  = this->matrix->getPtr (0, y, 0);
-      T* po = other.matrix->getPtr (x, 0, 0);
-      goPtrdiff_t* pDiff = this->matrix->getXDiff();
-      goPtrdiff_t* poDiff = other.matrix->getYDiff();
-      T value = (T)0; 
-      for (x2 = 0; x2 < thisColumns; ++x2)
-      {
-          value += *p * *po;
-          p += *pDiff;
-          po += *poDiff;
-          ++pDiff;
-          ++poDiff;
-      }
-      retval.elem(y,x) = value;      
+        C.resize (M,N);
+        C.fill (0.0f);
     }
-  } 
-  return retval;
+    cblas_sgemm (CblasRowMajor, 
+                 transA ? CblasTrans : CblasNoTrans, 
+                 transB ? CblasTrans : CblasNoTrans,
+                 M, N, K, alpha,
+                 A.getData(), A.getLeadingDimension(),
+                 B.getData(), B.getLeadingDimension(),
+                 beta, C.getData(), C.getLeadingDimension());
 }
 
-// FIXME
-template <class T>
-goMatrix<T>
-goMatrix<T>::operator- (const goMatrix<T>& other) {
-  goMatrix<T> retval(getRows(), getColumns());
-  goSize_t x, y;
-  goSize_t columns = this->getColumns();
-  for (y = 0; y < retval.getRows(); y++) 
-  {
-      T* p  = this->matrix->getPtr  (0, y, 0);
-      T* po = other.matrix->getPtr  (0, y, 0);
-      T* pr = retval.matrix->getPtr (0, y, 0);
-      goPtrdiff_t* pDiff = this->matrix->getXDiff();
-      goPtrdiff_t* poDiff = other.matrix->getXDiff();
-      goPtrdiff_t* prDiff = retval.matrix->getXDiff();
-      for (x = 0; x < columns; ++x)
-      {
-          *pr = *p - *po;
-          p += *pDiff; po += *poDiff; pr += *prDiff;
-          ++prDiff;
-          ++poDiff;
-          ++pDiff;
-      }
-  } 
-  return retval;
-}
-
-template <class T>
-goMatrix<T>
-goMatrix<T>::operator+ (const goMatrix<T>& other) {
-  goMatrix<T> retval(getRows(), getColumns());
-  goSize_t x, y;
-  goSize_t columns = this->getColumns();
-  for (y = 0; y < retval.getRows(); y++) 
-  {
-      T* p  = this->matrix->getPtr  (0, y, 0);
-      T* po = other.matrix->getPtr  (0, y, 0);
-      T* pr = retval.matrix->getPtr (0, y, 0);
-      goPtrdiff_t* pDiff = this->matrix->getXDiff();
-      goPtrdiff_t* poDiff = other.matrix->getXDiff();
-      goPtrdiff_t* prDiff = retval.matrix->getXDiff();
-      for (x = 0; x < columns; ++x)
-      {
-          *pr = *p + *po;
-          p += *pDiff; po += *poDiff; pr += *prDiff;
-          ++prDiff;
-          ++poDiff;
-          ++pDiff;
-      }
-  } 
-  return retval;
-}
-
-// FIXME
-// This is a quick hack, very slow
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator*= (const goMatrix<T>& other) 
+template<>
+void goMatrixMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, bool transA, 
+                                           const goMatrix<goDouble>& B, bool transB, 
+                            goDouble beta, goMatrix<goDouble>& C)
 {
-   goMatrix<T> m = *this * other;
-   *this = m;
-   return *this;
-}
-
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator+= (const goMatrix<T>& other) 
-{
-    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr += *__ptr_target, (*this->matrix), (*other.matrix), T, T);
-    return *this;
-}
-
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator-= (const goMatrix<T>& other) {
-    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr += *__ptr_target, (*this->matrix), (*other.matrix), T, T);
-    return *this;
-}
-
-template <class T>
-goVector<T> 
-goMatrix<T>::operator* (const goVector<T>& v)
-{
-    goSize_t sz = v.getSize();
-    if (getColumns() != sz)
+    goSize_t M = transA ? A.getColumns() : A.getRows();
+    goSize_t N = transB ? B.getRows() : B.getColumns();
+    goSize_t K = transA ? A.getRows() : A.getColumns();
+    if (C.getRows() != M || C.getColumns() != N)
     {
-        goLog::warning ("goMatrix::operator*: Matrix dimensions do not match vector.");
-        return goVector<T> (1,1);
+        C.resize (M,N);
+        C.fill (0.0);
     }
-    goSize_t retSz = this->getRows();
-    goVector<T> retval (retSz);
-    goSize_t x, y;
-    // goSize_t columns = retval.getColumns();
-    for (y = 0; y < retSz; ++y) 
-    {
-        T* p  = this->matrix->getPtr (0, y, 0);
-        goPtrdiff_t* pDiff = this->matrix->getXDiff();
-        const T* pv = v.getPtr ();
-        T value = (T)0; 
-        for (x = 0; x < sz; ++x) 
-        {
-            value += *p * *pv;
-            p += *pDiff;
-            ++pv;
-            ++pDiff;
-        }
-        retval[y] = value;
-    } 
-    return retval;
+    cblas_dgemm (CblasRowMajor, 
+                 transA ? CblasTrans : CblasNoTrans, 
+                 transB ? CblasTrans : CblasNoTrans,
+                 M, N, K, alpha,
+                 A.getData(), A.getLeadingDimension(),
+                 B.getData(), B.getLeadingDimension(),
+                 beta, C.getData(), C.getLeadingDimension());
 }
 
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator*= (T scalar) 
-{
-    GO_SIGNAL3D_EACHELEMENT (*__ptr *= scalar, (*matrix), T);
-    return *this;
-}
-
-template <class T>
-goMatrix<T>&
-goMatrix<T>::operator/= (T scalar) {
-    GO_SIGNAL3D_EACHELEMENT (*__ptr /= scalar, (*matrix), T);
-    return *this;
-}
-
-/** 
- * @brief Element-wise multiplication: this(i,j) = this(i,j) * other(i,j).
- * 
- * @param other Other matrix.
- * 
- * @return True if successful, false otherwise, e.g. when dimensions do not match (check logfile).
- */
-template <class T>
-bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
-{
-    if (this->getRows() != other.getRows() || this->getColumns() != other.getColumns())
-    {
-        goLog::warning ("goMatrix::multiplyElements(): dimensions mismatch.\n");
-        return false;
-    }
-    GO_SIGNAL3D_EACHELEMENT_2 (*__ptr_target *= *__ptr, (*other.getData()), (*this->getData()), const T, T);
-    return true;
-}
-
-template <class T>
-void
-goMatrix<T>::transpose() 
-{
-    matrix->swapXY();
-    initializeRows ();
-}
-
-template<class T>
-void
-goMatrix<T>::setIdentity ()
-{
-	fill(0);
-	goSize_t n = MAX(matrix->getSizeX(),matrix->getSizeY());
-	goSize_t i;
-	for (i = 0; i < n; ++i)
-	{
-		(*this)[i][i] = (T)1;
-	}
-}
-
-/** 
- * @brief L2 norm.
- *
- * @return \f$ \sqrt{tr(M^\top \cdot M)}\f$
- */
-template<class T>
-T goMatrix<T>::norm () const
-{
-    T retValue = T(0);
-    GO_SIGNAL3D_EACHELEMENT (retValue += *__ptr * *__ptr, (*this->matrix), T);
-    return T(sqrt(retValue));
-}
-
-
-template<class T>
-void
-goMatrix<T>::setUnity ()
-{
-    this->setIdentity ();
-}
-
-template<class T>
-void
-goMatrix<T>::fill(T v)
-{
-    GO_SIGNAL3D_EACHELEMENT (*__ptr = v, (*matrix), T);
-}
-
-template<class T>
-void
-goMatrix<T>::print()
-{
-	unsigned int i,j;
-    goSize_t sizeX = matrix->getSizeX();
-    goSize_t sizeY = matrix->getSizeY();
-	for (i = 0; i < sizeY; i++)
-	{
-		for (j = 0; j < sizeX; j++)
-		{
-            std::cout << *(T*)matrix->getPtr(j,i,0) << " ";
-		}
-        std::cout << "\n";
-	}
-    std::cout << std::endl;
-}
-
-template <class T>
-bool goMatrix<T>::resize (goSize_t rows, goSize_t columns)
-{
-    assert (this->matrix);
-    if (this->externalData)
-    {
-        // Will not resize external data 
-        return false;
-    }
-    this->matrix->destroy ();
-    if (this->linearStorage)
-    {
-        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1, columns, rows, 1, 0, 0, 0, 1);
-    }
-    else
-    {
-        ((goSignal3D<T>*)this->matrix)->make (columns, rows, 1);
-    }
-    return initializeRows ();
-}
-
-template <class T>
-bool goMatrix<T>::setData (goSignal3DBase<T>* data)
-{
-    if (!this->externalData && this->matrix)
-    {
-        delete this->matrix;
-        this->matrix = NULL;
-    }
-    this->matrix = data;
-    this->externalData = true;
-    if (data->getBlockSizeX() == data->getSizeX() && data->getBlockSizeY() == data->getSizeY() && data->getBlockSizeZ() == data->getSizeY())
-    {
-        this->linearStorage = true;
-    }
-    else
-    {
-        this->linearStorage = false;  
-    }
-    return initializeRows ();
-}
 
 #endif
