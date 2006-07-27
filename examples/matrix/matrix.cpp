@@ -10,8 +10,28 @@
 #undef HAVE_MATLAB
 #include <gosparsematrix.h>
 
+#define HAVE_MATLAB
+#include <engine.h>
+#include <gomatlab.h>
+
 int main ()
 {
+    {
+        goMatlab mat;
+        goString buffer;
+        // mat.matlabCall ("M1 = rand(10,10); M2 = rand(10,10);",0);
+        // printf ("%s\n", buffer.toCharPtr());
+        // mat.matlabCall ("M3 = M1 * M2;",0);
+        // printf ("%s\n", buffer.toCharPtr());
+        goMatrixd M1,M2,M3;
+        mat.getMatrix (M1,"M1");
+        mat.getMatrix (M2,"M2");
+        mat.getMatrix (M3,"M3");
+        M3 = M1 * M2;
+        M3.print();
+        exit(1);
+    }
+
     {
         printf ("\nSparse timing\n");
         goSparseMatrix m(1000,1000);
@@ -47,11 +67,11 @@ int main ()
     {
         goVector< goComplex<float> >* test = new goVector< goComplex<float> > [3];
         goMatrix<goComplexf> m (3,3);
-        m[0][0] = goComplexf (1,1);
-        m[1][1] = goComplexf (3,2);
-        m[2][2] = goComplexf (3,5);
-        m[2][1] = goComplexf (2,1);
-        m[1][2] = goComplexf (2,-1);
+        m(0,0) = goComplexf (1,1);
+        m(1,1) = goComplexf (3,2);
+        m(2,2) = goComplexf (3,5);
+        m(2,1) = goComplexf (2,1);
+        m(1,2) = goComplexf (2,-1);
         m.print();
 
         goVector<goComplexf> v1 (3);
@@ -196,7 +216,7 @@ int main ()
     {
         int j;
         for (j = 0; j < 3; ++j)
-            m[i][j] = i;
+            m(i,j) = i;
     }
     m.print();
     goMatrix<goFloat> m2 (3,10);
@@ -204,7 +224,7 @@ int main ()
     {
         int j;
         for (j = 0; j < m2.getColumns(); ++j)
-            m2[i][j] = j;
+            m2(i,j) = j;
     }
     m2.print ();
     m2.transpose ();
@@ -215,10 +235,6 @@ int main ()
     goMatrix<goFloat> m3;
     m3 = m2_2 * m2;
     m3.print(); 
-    for (i = 0; i < 3; ++i)
-    {
-        m3[i].print ();
-    }
 
     goPointf p (1.0f, 1.0f, 1.0f, 1.0f);
     go44Matrix<goFloat> m4 (2, 0, 0, 0,

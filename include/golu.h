@@ -60,7 +60,7 @@ class goLU
 
          for (int i = 0; i < piv_length; i++) 
             for (int j = j0; j <= j1; j++) 
-               retValue[i][j-j0] = A[piv[i]][j];
+               retValue(i,j-j0) = A(piv[i],j);
 		// return X;
 	}
 
@@ -113,12 +113,13 @@ class goLU
       {
          // Make a copy of the j-th column to localize references.
          for (i = 0; i < m; i++) {
-            LUcolj[i] = LU_[i][j];
+            LUcolj[i] = LU_(i,j);
          }
 
          // Apply previous transformations.
          for (i = 0; i < m; i++) {
-            goRowVector<Real>& LUrowi = LU_[i];
+            goVector<Real> LUrowi;
+            LU_.refRow(i, LUrowi);
 
             // Most of the time is spent in the following dot product.
             int kmax = goMath::min(i,j);
@@ -139,9 +140,9 @@ class goLU
          }
          if (p != j) {
             for (k = 0; k < n; k++) {
-               double t = LU_[p][k]; 
-			   LU_[p][k] = LU_[j][k]; 
-			   LU_[j][k] = Real(t);
+               double t = LU_(p,k); 
+			   LU_(p,k) = LU_(j,k); 
+			   LU_(j,k) = Real(t);
             }
             k = piv[p]; 
 			piv[p] = piv[j]; 
@@ -151,11 +152,11 @@ class goLU
 
          // Compute multipliers.
          
-         if ((j < m) && (LU_[j][j] != 0.0)) 
+         if ((j < m) && (LU_(j,j) != 0.0)) 
          {
             for (i = j+1; i < m; i++) 
             {
-               LU_[i][j] /= LU_[j][j];
+               LU_(i,j) /= LU_(j,j);
             }
          }
       }
@@ -169,7 +170,7 @@ class goLU
 
    int isNonsingular () {
       for (int j = 0; j < n; j++) {
-         if (LU_[j][j] == 0)
+         if (LU_(j,j) == 0)
             return 0;
       }
       return 1;
@@ -184,11 +185,11 @@ class goLU
       for (int i = 0; i < m; i++) {
          for (int j = 0; j < n; j++) {
             if (i > j) {
-               L_[i][j] = LU_[i][j];
+               L_(i,j) = LU_(i,j);
             } else if (i == j) {
-               L_[i][j] = 1.0;
+               L_(i,j) = 1.0;
             } else {
-               L_[i][j] = 0.0;
+               L_(i,j) = 0.0;
             }
          }
       }
@@ -204,9 +205,9 @@ class goLU
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
             if (i <= j) {
-               U_[i][j] = LU_[i][j];
+               U_(i,j) = LU_(i,j);
             } else {
-               U_[i][j] = 0.0;
+               U_(i,j) = 0.0;
             }
          }
       }
@@ -232,7 +233,7 @@ class goLU
       }
       Real d = Real(pivsign);
       for (int j = 0; j < n; j++) {
-         d *= LU_[j][j];
+         d *= LU_(j,j);
       }
       return d;
    }
@@ -264,18 +265,18 @@ class goLU
       for (int k = 0; k < n; k++) {
          for (int i = k+1; i < n; i++) {
             for (int j = 0; j < nx; j++) {
-               retValue[i][j] -= retValue[k][j]*LU_[i][k];
+               retValue(i,j) -= retValue(k,j)*LU_(i,k);
             }
          }
       }
       // Solve U*X = Y;
       for (int k = n-1; k >= 0; k--) {
          for (int j = 0; j < nx; j++) {
-            retValue[k][j] /= LU_[k][k];
+            retValue(k,j) /= LU_(k,k);
          }
          for (int i = 0; i < k; i++) {
             for (int j = 0; j < nx; j++) {
-               retValue[i][j] -= retValue[k][j]*LU_[i][k];
+               retValue(i,j) -= retValue(k,j)*LU_(i,k);
             }
          }
       }
@@ -312,15 +313,15 @@ class goLU
       // Solve L*Y = B(piv)
       for (int k = 0; k < n; k++) {
          for (int i = k+1; i < n; i++) {
-               retValue[i] -= retValue[k]*LU_[i][k];
+               retValue[i] -= retValue[k]*LU_(i,k);
             }
          }
       
 	  // Solve U*X = Y;
       for (int k = n-1; k >= 0; k--) {
-            retValue[k] /= LU_[k][k];
+            retValue[k] /= LU_(k,k);
       		for (int i = 0; i < k; i++) 
-            	retValue[i] -= retValue[k]*LU_[i][k];
+            	retValue[i] -= retValue[k]*LU_(i,k);
       }
       return true;
    }

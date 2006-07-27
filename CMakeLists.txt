@@ -16,6 +16,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/govector.cpp
  src/math/gokmeans.cpp 
  src/math/gokmeansspatial.cpp 
  src/math/go3vectori.cc 
@@ -162,7 +163,6 @@ SET                 (SOURCES
 
 IF($ENV{MATLAB})
     SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
-    SET (HAVE_MATLAB 1)
 ENDIF($ENV{MATLAB})
 #SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
 #SET                 (EXTRA_LIBS "")
@@ -215,10 +215,18 @@ EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTP
 #                      "$ENV{LD_LIBRARY_PATH};/usr/lib;/usr/local/lib;${EXTRA_LIB_PATH}"
 #                      HAVE_LIBIL)
 
-CHECK_LIBRARY_EXISTS (atlas ATL_cputime "" HAVE_LIBATLAS)
-IF (${HAVE_LIBATLAS} MATCHES 1)
-    SET (EXTRA_LIBS "${EXTRA_LIBS} -latlas")
-ENDIF (${HAVE_LIBATLAS} MATCHES 1)
+FIND_LIBRARY        (ATLAS NAMES atlas PATHS /usr/lib ${GOPATH}/extra/lib)
+FIND_LIBRARY        (CBLAS NAMES cblas PATHS /usr/lib ${GOPATH}/extra/lib)
+
+
+#CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
+#IF (${HAVE_LIBATLAS} MATCHES 1)
+#    SET (EXTRA_LIBS "${EXTRA_LIBS} -latlas")
+#ENDIF (${HAVE_LIBATLAS} MATCHES 1)
+#CHECK_LIBRARY_EXISTS (cblas cblas_dgemm "${GOPATH}/extra" HAVE_LIBCBLAS)
+#IF (${HAVE_LIBATLAS} MATCHES 1)
+#    SET (EXTRA_LIBS "${EXTRA_LIBS} -lcblas")
+#ENDIF (${HAVE_LIBATLAS} MATCHES 1)
 CHECK_LIBRARY_EXISTS (IL ilInit "" HAVE_LIBIL)
 IF (${HAVE_LIBIL} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lIL")
@@ -254,16 +262,19 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
                      ${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include)
 
-IF (${HAVE_MATLAB} MATCHES 1)
-    ADD_SUBDIRECTORY (matlab EXCLUDE_FROM_ALL)
-ENDIF (${HAVE_MATLAB} MATCHES 1)
-                 
+                     
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
+IF (CBLAS)
+    LINK_LIBRARIES (${CBLAS})
+ENDIF (CBLAS)
+IF (ATLAS)
+    LINK_LIBRARIES (${ATLAS})
+ENDIF (ATLAS)
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 # SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")

@@ -1,5 +1,6 @@
 #include <gokmeansspatial.h>
 #include <golog.h>
+#include <godefs.h>
 
 class goKMeansSpatialPrivate
 {

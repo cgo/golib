@@ -7,8 +7,13 @@
 #ifndef GOCOMPLEX_H
 # include <gocomplex.h>
 #endif
-#include <gomatrix.h>
 
+template <class T> class goMatrix;
+
+/**
+ * @addtogroup math
+ * @{
+ */
 /** 
  * @brief General vector class.
  *
@@ -48,12 +53,14 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             T* retArray = ret.getPtr();
             const T* array = this->getPtr();
+            goIndex_t stride = this->getStride();
             const To* otherArray = other.getPtr();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *retArray = *array - *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
                 ++retArray;
             }
             return ret;
@@ -73,11 +80,13 @@ class goVector : public goFixedArray<T>
             T* retArray = ret.getPtr();
             const T* array = this->getPtr();
             const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *retArray = *array + *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
                 ++retArray;
             }
             return ret;
@@ -101,11 +110,13 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             const T* array = this->getPtr();
             const T* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 ret += *array * *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
             }
             return ret;
         };
@@ -117,10 +128,11 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             const T* array = this->getPtr();
             T* retArray = ret.getPtr();
+            goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *retArray = *array * n;
-                ++array;
+                array += stride;
                 ++retArray;
             }
             return ret;
@@ -131,10 +143,11 @@ class goVector : public goFixedArray<T>
         {
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
+            goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *array *= n;
-                ++array;
+                array += stride;
             }
             return *this;
         };
@@ -151,11 +164,13 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
             const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *array -= *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
             }
             return *this;
         };
@@ -172,11 +187,13 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
             const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *array += *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
             }
             return *this;
         };
@@ -194,11 +211,13 @@ class goVector : public goFixedArray<T>
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
             const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
                 *array *= *otherArray;
-                ++array;
-                ++otherArray;
+                array += stride;
+                otherArray += otherStride;
             }
             return *this;
         };
@@ -218,16 +237,17 @@ class goVector : public goFixedArray<T>
                 return false;
             T temp;
             To tempi;
+            goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < sz; ++i)
             {
                 tempi = other[i];
                 const T* array = this->getPtr();
                 //= NOTE: To account for complex numbers, we run through the whole matrix.
                 //= --> FIXME!
-                for (goIndex_t j = 0; j < sz; ++j, ++array)
+                for (goIndex_t j = 0; j < sz; ++j, array += stride)
                 {
                     temp = tempi * *array;
-                    ret[j][i] = temp;
+                    ret(j,i) = temp;
                 }
             }
             return true;
@@ -348,6 +368,8 @@ inline T goVector<T>::square () const
 {
     return *this * *this;
 }
+
+/** @} */
 
 typedef goVector<goFloat>  goVectorf;
 typedef goVector<goDouble> goVectord;

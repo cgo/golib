@@ -23,7 +23,7 @@ template <class T> class goFixedArray
 {
     public:
         goFixedArray (goSize_t size = 1, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0) 
-            : myArray (0), mySize (0), myLeftBorder (leftBorder), myRightBorder (rightBorder)
+            : myArray (0), mySize (0), myLeftBorder (leftBorder), myRightBorder (rightBorder), myStride(1), myExternal(false)
         {
             if (size > 0)
                 myArray = new T [size + myLeftBorder + myRightBorder];
@@ -33,13 +33,18 @@ template <class T> class goFixedArray
                 myArray += myLeftBorder;
             }
         };
-        goFixedArray (const goFixedArray<T>& other) : myArray (0), mySize (0)
+        goFixedArray (const goFixedArray<T>& other) 
+            : myArray (0), mySize (0), myLeftBorder (0), myRightBorder (0), myStride(1), myExternal(false)
         {
             this->operator= (other);
         };
+        goFixedArray (T* ptr, goSize_t size, goIndex_t stride)
+            : myArray (ptr), mySize (size), myLeftBorder (0), myRightBorder (0), myStride(stride), myExternal(true)
+        {
+        };
         virtual ~goFixedArray ()
         {
-            if (myArray)
+            if (myArray && !myExternal)
             {
                 delete[] myArray;
                 myArray = 0;
@@ -60,7 +65,7 @@ template <class T> class goFixedArray
                     goIndex_t end = static_cast<goIndex_t>(mySize) + myRightBorder;
                     for (i = -myLeftBorder; i < end; ++i)
                     {
-                        myArray[i] = other(i);
+                        (*this)(i) = other(i);
                     }
                     // memcpy (myArray, &other(0), sizeof(T) * mySize);
                 }
@@ -68,33 +73,47 @@ template <class T> class goFixedArray
             return *this;
         };
 
+        void setData (T* ptr, goSize_t size, goIndex_t stride)
+        {
+            if (!this->myExternal && this->myArray)
+            {
+                delete[] this->myArray;
+                this->myArray = 0;
+                this->mySize = 0;
+            }
+            this->myExternal = true;
+            this->myArray = ptr;
+            this->myStride = stride;
+        };
+
         T&       operator() (goIndex_t i)
         {
             assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
-            return myArray[i];
+            return myArray[i * myStride];
         };
 
         T&       operator[] (goIndex_t i)
         {
             assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
-            return myArray[i];
+            return myArray[i * myStride];
         };
 
         const T& operator() (goIndex_t i) const
         {
             assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
-            return myArray[i];
+            return myArray[i * myStride];
         };
 
         const T& operator[] (goIndex_t i) const
         {
             assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
-            return myArray[i];
+            return myArray[i * myStride];
         };
 
         goSize_t  getSize        () const { return mySize; };
         goIndex_t getLeftBorder  () const { return myLeftBorder; };
         goIndex_t getRightBorder () const { return myLeftBorder; };
+        goIndex_t getStride      () const { return myStride; };
 
         void     setSize (goSize_t newSize, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0)
         {
@@ -102,7 +121,10 @@ template <class T> class goFixedArray
                 return;
             if (myArray)
             {
-                delete[] (myArray - myLeftBorder);
+                if (!myExternal)
+                {
+                    delete[] (myArray - myLeftBorder);
+                }
                 myArray = 0;
                 mySize = 0;
             }
@@ -113,6 +135,7 @@ template <class T> class goFixedArray
                 myArray = new T [newSize + leftBorder + rightBorder];
                 mySize = newSize;
                 myArray = myArray + leftBorder;
+                myExternal = false;
             }
         };
 
@@ -121,11 +144,9 @@ template <class T> class goFixedArray
             if (this->getSize() != other.getSize())
                 return false;
             goSize_t i;
-            const T* oP = other.getPtr();
-            const T* mP = this->getPtr();
-            for (i = 0; i < mySize; ++i,++oP,++mP)
+            for (i = 0; i < mySize; ++i)
             {
-                if (*oP != *mP)
+                if ((*this)(i) != other(i))
                     return false;
             }
             return true;
@@ -143,7 +164,7 @@ template <class T> class goFixedArray
         {
             goIndex_t size = (goIndex_t)mySize;
             T* array = myArray;
-            for (goIndex_t i = 0; i < size; ++i, ++array)
+            for (goIndex_t i = 0; i < size; ++i, array += myStride)
             {
                 *array = value;
             }
@@ -154,6 +175,8 @@ template <class T> class goFixedArray
         goSize_t  mySize;
         goIndex_t myLeftBorder;
         goIndex_t myRightBorder;
+        goIndex_t myStride;
+        bool      myExternal;
 };
 /** @} */
 #endif

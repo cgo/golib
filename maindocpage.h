@@ -1,6 +1,7 @@
 /*!
  * \mainpage Online source documentation for goLib
  * - \subpage main Main, general documentation (READ THIS!)
+ * - \subpage notes Notes
  */
 /*!
  * \page main Main Documentation
@@ -209,4 +210,23 @@
  * If you would like to make contributions to goLib, you are more
  * than welcome to! Please send suggestions or source (or both ;-) ) to
  * <code>christian __at__ goschs __ de</code>.
+ */
+
+ /**
+ * \page notes Notes
+ * - \subpage notes_atlas Notes on CBLAS and ATLAS
+ */
+
+ /**
+ * \page notes_atlas Notes on CBLAS and ATLAS
+ *  - For explanations about "leading dimension", see e.g. here:
+ *    http://www.inf.bv.tum.de/~heisserer/softwarelab04/index.html
+ *
+ *  "Note that for cblas-functions the leading dimension 
+ *  (for 2D arrays in C-fashion, i.e. row major order) is the number of 
+ *  columns of the matrix (not the rows as in Fortran).
+ *  The leading dimension is the number of entries in 
+ *  memory that separate the e.g. first elements of rows in c-fashion 
+ *  storage (row major order, i.e. elements of one row are contiguous in memory).
+ *  As Fortran stores in column major order the leading dimension is the number of rows."
  */

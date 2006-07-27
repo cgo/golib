@@ -124,9 +124,6 @@ class goMatlab : public goObjectBase
                 mxArray* temp = engGetVariable (this->getEngine(), name);
                 if (!temp)
                 {
-                    goString msg = "goMatlab::getMatrix(): engGetVariable() failed for ";
-                    msg += name;
-                    goLog::warning(msg);
                     return false;
                 }
                 if (!matrix.resize (mxGetM(temp), mxGetN(temp)))
@@ -134,7 +131,15 @@ class goMatlab : public goObjectBase
                     return false;
                 }
                 double* mP = mxGetPr (temp);
-                GO_SIGNAL3D_EACHELEMENT (*__ptr = T(*mP); ++mP;, (*matrix.getData()), T);
+                goSize_t i;
+                goSize_t sz = matrix.getRows() * matrix.getColumns();
+                T* p = matrix.getData();
+                for (i = 0; i < sz; ++i)
+                {
+                    *p = *mP;
+                    ++p;
+                    ++mP;
+                }
                 return true;
             };
 

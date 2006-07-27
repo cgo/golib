@@ -9,7 +9,7 @@
 #include <golinearalgebra.h>
 #include <goarray.h>
 #include <gomatrix.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 #include <gotypes.h>
 
 #define TINY 1.0e-20;
@@ -18,7 +18,7 @@ template<class T>
 void
 LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 {
-	if (a.getSizeX() != a.getSizeY())
+	if (a.getRows() != a.getColumns())
 	{
         std::cout << "Matrix is not quadratic\n";
 		return;
@@ -27,14 +27,14 @@ LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 	double big,dum,sum,temp;
 	
 	
-	int n = a.getSizeX();
+	int n = a.getColumns();
 	goArray<double> vv(n);
 
 	*d=1.0;
 	for (i=0;i<n;i++) {
 		big=0.0;
 		for (j=0;j<n;j++)
-			if ((temp=fabs((double)a.elem(i,j))) > big) big=temp;
+			if ((temp=fabs((double)a(i,j))) > big) big=temp;
 		if (big == 0.0) 
 		{ 
             std::cout << "Singular matrix\n";
@@ -44,16 +44,16 @@ LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 	}
 	for (j=0;j<n;j++) {
 		for (i=0;i<j;i++) {
-			sum=a.elem(i,j);
-			for (k=0;k<i;k++) sum -= (double)(a.elem(i,k)*a.elem(k,j));
-			a.elem(i,j)=sum;
+			sum=a(i,j);
+			for (k=0;k<i;k++) sum -= (double)(a(i,k)*a(k,j));
+			a(i,j)=sum;
 		}
 		big=0.0;
 		for (i=j;i<n;i++) {
-			sum=(double)a.elem(i,j);
+			sum=(double)a(i,j);
 			for (k=0;k<j;k++)
-				sum -= (double)(a.elem(i,k)*a.elem(k,j));
-			a.elem(i,j)=(T)sum;
+				sum -= (double)(a(i,k)*a(k,j));
+			a(i,j)=(T)sum;
 			if ( (dum=vv[i]*fabs(sum)) >= big) {
 				big=dum;
 				imax=i;
@@ -61,18 +61,18 @@ LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 		}
 		if (j != imax) {
 			for (k=0;k<n;k++) {
-				dum=a.elem(imax,k);
-				a.elem(imax,k)=a.elem(j,k);
-				a.elem(j,k)=dum;
+				dum=a(imax,k);
+				a(imax,k)=a(j,k);
+				a(j,k)=dum;
 			}
 			*d = -(*d);
 			vv[imax]=vv[j];
 		}
 		indx[j]=imax;
-		if (a.elem(j,j) == 0.0) a.elem(j,j)=TINY;
+		if (a(j,j) == 0.0) a(j,j)=TINY;
 		if (j != n) {
-			dum=1.0/(a.elem(j,j));
-			for (i=j+1;i<n;i++) a.elem(i,j) *= dum;
+			dum=1.0/(a(j,j));
+			for (i=j+1;i<n;i++) a(i,j) *= dum;
 		}
 	}
 }
@@ -82,33 +82,33 @@ void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b)
 {
 	int i,ii=-1,ip,j;
 	double sum;
-	int n = a.getSizeX();
+	int n = a.getColumns();
 
 	for (i=0;i<n;i++) {
 		ip=indx[i];
 		sum=(double)b[ip];
 		b[ip]=b[i];
 		if (ii >= 0)
-			for (j=ii;j<=i-1;j++) sum -= (double)(a.elem(i,j)*b[j]);
+			for (j=ii;j<=i-1;j++) sum -= (double)(a(i,j)*b[j]);
 		else if (sum) ii=i;
 		b[i]=(T)sum;
 	}
 	for (i=n-1;i>-1;i--) {
 		sum=b[i];
-		for (j=i+1;j<n;j++) sum -= (double)(a.elem(i,j)*b[j]);
-		b[i]=(T)(sum/a.elem(i,i));
+		for (j=i+1;j<n;j++) sum -= (double)(a(i,j)*b[j]);
+		b[i]=(T)(sum/a(i,i));
 	}
 }
 
 template<class T>
 void matrixInversion(goMatrix<T>& a)
 {
-	if (a.getSizeX() != a.getSizeY())
+	if (a.getColumns() != a.getRows())
 	{
         std::cout << "Matrix inversion: Matrix must be quadratic." << std::endl;
 		return;
 	}
-	int n = a.getSizeX();
+	int n = a.getColumns();
 	goMatrix<T> y(n,n);
 	double d;
 	goArray<int> index(n);
@@ -122,7 +122,7 @@ void matrixInversion(goMatrix<T>& a)
 		column[j] = 1;
 		LUBackSubst<T>(a,index,column);
 		for (i = 0; i < n; i++)
-			y.elem(i,j) = column[i];	
+			y(i,j) = column[i];	
 	}
 	a = y;
 }

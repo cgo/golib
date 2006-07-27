@@ -4,15 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -O2
+CXXARGS		= -c   -D HAVE_CONFIG_H -g
 
 LD		= g++
 LDARGS		=  
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include
-
+INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/../include -I$(MATLAB)/extern/include
 TARGET		= matrix
 
 %.o: %.cxx
@@ -33,7 +32,7 @@ OBJECTS2 := $(subst .cc,.o,$(OBJECTS1))
 OBJECTS = $(OBJECTS2)
 all: $(TARGET)
 $(TARGET): $(OBJECTS)
-	$(LD) $(LDARGS) $(LIBS) -o $(TARGET) $(OBJECTS)
+	$(LD) $(LDARGS) $(LIBS) $(OBJECTS) -o $(TARGET) 
 clean:
 	rm -f *~ *.o
 

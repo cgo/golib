@@ -1,5 +1,6 @@
 #include <gokmeans.h>
 #include <golog.h>
+#include <godefs.h>
 #include <gofixedarray.h>
 #include <golist.h>
 #include <govector.h>

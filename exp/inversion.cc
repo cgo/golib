@@ -12,6 +12,17 @@
 
 #define TINY 1.0e-20;
 namespace goMath {
+    /** 
+     * @brief REMOVE THIS AND RELATED IN golinearalgebra.h/.cc
+     * 
+     * @todo REMOVE THIS AND RELATED IN golinearalgebra.h/.cc
+     *
+     * @param a 
+     * @param indx 
+     * @param d 
+     * 
+     * @return 
+     */
 template<class T>
 void
 LUDecomp(goMatrix<T>& a, goNVector<int>& indx, double *d)

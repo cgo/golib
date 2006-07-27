@@ -27,13 +27,21 @@ bool goMath::goComplexEigenvaluesHermite (const goMatrix<goComplexf>&          m
     real* ar = new real [nm * nm];
     real* ai = new real [nm * nm];
     //= I suppose we store in row-major.
-    const goSignal3DBase<goComplexf>* matrix = m.getData();
+    const goComplexf* matrix = m.getData();
     real* ar_p = ar;
     real* ai_p = ai;
-    GO_SIGNAL3D_EACHELEMENT (*ar_p = __ptr->re();
-                             *ai_p = __ptr->im();
-                             ++ar_p; ++ai_p;,
-                             (*matrix), const goComplexf);
+    {
+        goSize_t i;
+        goSize_t j;
+        for (j = 0; j < m.getColumns(); ++j)
+        {
+            for (i = 0; i < m.getRows(); ++i)
+            {
+                *ar_p = m(i,j).re();
+                *ai_p = m(i,j).im();
+            }
+        }
+    }
     eigenvaluesRet.setSize (n);
     real* zr = 0;
     real* zi = 0;

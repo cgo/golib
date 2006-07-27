@@ -23,7 +23,7 @@ namespace goMath
    an m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and
    an n-by-n orthogonal matrix V so that A = U*S*V'.
    <P>
-   The singular values, sigma[k] = S[k][k], are ordered so that
+   The singular values, sigma[k] = S(k,k), are ordered so that
    sigma[0] >= sigma[1] >= ... >= sigma[n-1].
    <P>
    The singular value decompostion always exists, so the constructor will
@@ -70,16 +70,16 @@ class goSVD
             // Compute 2-norm of k-th column without under/overflow.
             s[k] = 0;
             for (i = k; i < m; i++) {
-               s[k] = hypot(s[k],A[i][k]);
+               s[k] = hypot(s[k],A(i,k));
             }
             if (s[k] != 0.0) {
-               if (A[k][k] < 0.0) {
+               if (A(k,k) < 0.0) {
                   s[k] = -s[k];
                }
                for (i = k; i < m; i++) {
-                  A[i][k] /= s[k];
+                  A(i,k) /= s[k];
                }
-               A[k][k] += 1.0;
+               A(k,k) += 1.0;
             }
             s[k] = -s[k];
          }
@@ -90,18 +90,18 @@ class goSVD
 
                double t = 0;
                for (i = k; i < m; i++) {
-                  t += A[i][k]*A[i][j];
+                  t += A(i,k)*A(i,j);
                }
-               t = -t/A[k][k];
+               t = -t/A(k,k);
                for (i = k; i < m; i++) {
-                  A[i][j] += t*A[i][k];
+                  A(i,j) += t*A(i,k);
                }
             }
 
             // Place the k-th row of A into e for the
             // subsequent calculation of the row transformation.
 
-            e[j] = A[k][j];
+            e[j] = A(k,j);
          }
          if (wantu & (k < nct)) {
 
@@ -109,7 +109,7 @@ class goSVD
             // multiplication.
 
             for (i = k; i < m; i++) {
-               U[i][k] = A[i][k];
+               U(i,k) = A(i,k);
             }
          }
          if (k < nrt) {
@@ -140,13 +140,13 @@ class goSVD
                }
                for (j = k+1; j < n; j++) {
                   for (i = k+1; i < m; i++) {
-                     work[i] += e[j]*A[i][j];
+                     work[i] += e[j]*A(i,j);
                   }
                }
                for (j = k+1; j < n; j++) {
                   double t = -e[j]/e[k+1];
                   for (i = k+1; i < m; i++) {
-                     A[i][j] += t*work[i];
+                     A(i,j) += t*work[i];
                   }
                }
             }
@@ -156,7 +156,7 @@ class goSVD
             // back multiplication.
 
                for (i = k+1; i < n; i++) {
-                  V[i][k] = e[i];
+                  V(i,k) = e[i];
                }
             }
          }
@@ -166,13 +166,13 @@ class goSVD
 
       int p = min(n,m+1);
       if (nct < n) {
-         s[nct] = A[nct][nct];
+         s[nct] = A(nct,nct);
       }
       if (m < p) {
          s[p-1] = 0.0;
       }
       if (nrt+1 < p) {
-         e[nrt] = A[nrt][p-1];
+         e[nrt] = A(nrt,p-1);
       }
       e[p-1] = 0.0;
 
@@ -181,34 +181,34 @@ class goSVD
       if (wantu) {
          for (j = nct; j < nu; j++) {
             for (i = 0; i < m; i++) {
-               U[i][j] = 0.0;
+               U(i,j) = 0.0;
             }
-            U[j][j] = 1.0;
+            U(j,j) = 1.0;
          }
          for (k = nct-1; k >= 0; k--) {
             if (s[k] != 0.0) {
                for (j = k+1; j < nu; j++) {
                   double t = 0;
                   for (i = k; i < m; i++) {
-                     t += U[i][k]*U[i][j];
+                     t += U(i,k)*U(i,j);
                   }
-                  t = -t/U[k][k];
+                  t = -t/U(k,k);
                   for (i = k; i < m; i++) {
-                     U[i][j] += t*U[i][k];
+                     U(i,j) += t*U(i,k);
                   }
                }
                for (i = k; i < m; i++ ) {
-                  U[i][k] = -U[i][k];
+                  U(i,k) = -U(i,k);
                }
-               U[k][k] = 1.0 + U[k][k];
+               U(k,k) = 1.0 + U(k,k);
                for (i = 0; i < k-1; i++) {
-                  U[i][k] = 0.0;
+                  U(i,k) = 0.0;
                }
             } else {
                for (i = 0; i < m; i++) {
-                  U[i][k] = 0.0;
+                  U(i,k) = 0.0;
                }
-               U[k][k] = 1.0;
+               U(k,k) = 1.0;
             }
          }
       }
@@ -221,18 +221,18 @@ class goSVD
                for (j = k+1; j < nu; j++) {
                   double t = 0;
                   for (i = k+1; i < n; i++) {
-                     t += V[i][k]*V[i][j];
+                     t += V(i,k)*V(i,j);
                   }
-                  t = -t/V[k+1][k];
+                  t = -t/V(k+1,k);
                   for (i = k+1; i < n; i++) {
-                     V[i][j] += t*V[i][k];
+                     V(i,j) += t*V(i,k);
                   }
                }
             }
             for (i = 0; i < n; i++) {
-               V[i][k] = 0.0;
+               V(i,k) = 0.0;
             }
-            V[k][k] = 1.0;
+            V(k,k) = 1.0;
          }
       }
 
@@ -312,9 +312,9 @@ class goSVD
                   }
                   if (wantv) {
                      for (i = 0; i < n; i++) {
-                        t = cs*V[i][j] + sn*V[i][p-1];
-                        V[i][p-1] = -sn*V[i][j] + cs*V[i][p-1];
-                        V[i][j] = t;
+                        t = cs*V(i,j) + sn*V(i,p-1);
+                        V(i,p-1) = -sn*V(i,j) + cs*V(i,p-1);
+                        V(i,j) = t;
                      }
                   }
                }
@@ -335,9 +335,9 @@ class goSVD
                   e[j] = cs*e[j];
                   if (wantu) {
                      for (i = 0; i < m; i++) {
-                        t = cs*U[i][j] + sn*U[i][k-1];
-                        U[i][k-1] = -sn*U[i][j] + cs*U[i][k-1];
-                        U[i][j] = t;
+                        t = cs*U(i,j) + sn*U(i,k-1);
+                        U(i,k-1) = -sn*U(i,j) + cs*U(i,k-1);
+                        U(i,j) = t;
                      }
                   }
                }
@@ -386,9 +386,9 @@ class goSVD
                   s[j+1] = cs*s[j+1];
                   if (wantv) {
                      for (i = 0; i < n; i++) {
-                        t = cs*V[i][j] + sn*V[i][j+1];
-                        V[i][j+1] = -sn*V[i][j] + cs*V[i][j+1];
-                        V[i][j] = t;
+                        t = cs*V(i,j) + sn*V(i,j+1);
+                        V(i,j+1) = -sn*V(i,j) + cs*V(i,j+1);
+                        V(i,j) = t;
                      }
                   }
                   t = hypot(f,g);
@@ -401,9 +401,9 @@ class goSVD
                   e[j+1] = cs*e[j+1];
                   if (wantu && (j < m-1)) {
                      for (i = 0; i < m; i++) {
-                        t = cs*U[i][j] + sn*U[i][j+1];
-                        U[i][j+1] = -sn*U[i][j] + cs*U[i][j+1];
-                        U[i][j] = t;
+                        t = cs*U(i,j) + sn*U(i,j+1);
+                        U(i,j+1) = -sn*U(i,j) + cs*U(i,j+1);
+                        U(i,j) = t;
                      }
                   }
                }
@@ -422,7 +422,7 @@ class goSVD
                   s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
                   if (wantv) {
                      for (i = 0; i <= pp; i++) {
-                        V[i][k] = -V[i][k];
+                        V(i,k) = -V(i,k);
                      }
                   }
                }
@@ -438,12 +438,12 @@ class goSVD
                   s[k+1] = t;
                   if (wantv && (k < n-1)) {
                      for (i = 0; i < n; i++) {
-                        t = V[i][k+1]; V[i][k+1] = V[i][k]; V[i][k] = t;
+                        t = V(i,k+1); V(i,k+1) = V(i,k); V(i,k) = t;
                      }
                   }
                   if (wantu && (k < m-1)) {
                      for (i = 0; i < m; i++) {
-                        t = U[i][k+1]; U[i][k+1] = U[i][k]; U[i][k] = t;
+                        t = U(i,k+1); U(i,k+1) = U(i,k); U(i,k) = t;
                      }
                   }
                   k++;
@@ -465,7 +465,7 @@ class goSVD
 
 	  for (int i=0; i<m; i++)
 	  	for (int j=0; j<minm; j++)
-			A[i][j] = U[i][j];
+			A(i,j) = U(i,j);
    	
    }
 
@@ -491,9 +491,9 @@ class goSVD
    	  A = goMatrix<Real>(n,n);
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
-            A[i][j] = 0.0;
+            A(i,j) = 0.0;
          }
-         A[i][i] = s[i];
+         A(i,i) = s[i];
       }
    }
 
