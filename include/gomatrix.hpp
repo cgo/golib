@@ -17,14 +17,6 @@ extern "C"
 template<>
 goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& other)
 {
-    //= This is not quite right. Handle transposition right and read what LDA exactly must be.
-    //= http://www.inf.bv.tum.de/~heisserer/softwarelab04/index.html
-    //=  "Note that for cblas-functions the leading dimension (for 2D arrays in C-fashion, i.e. row major order) 
-    //=   is the number of columns of the matrix (not the rows as in Fortran).
-    //=   The leading dimension is the number of entries in memory that separate the e.g. 
-    //=   first elements of rows in c-fashion storage 
-    //=   (row major order, i.e. elements of one row are contiguous in memory).
-    //=   As Fortran stores in column major order the leading dimension is the number of rows."
     goSize_t M = this->getRows();
     goSize_t N = other.getColumns();
     goSize_t K = this->getColumns();
@@ -166,6 +158,5 @@ void goMatrixMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, bool t
                  B.getData(), B.getLeadingDimension(),
                  beta, C.getData(), C.getLeadingDimension());
 }
-
 
 #endif

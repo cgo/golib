@@ -322,6 +322,21 @@ class goVector : public goFixedArray<T>
         {
             return sqrt(this->square());
         };
+
+        T sum (goSize_t start = 0, goSize_t end = -1) const
+        {
+            if (end == -1)
+            {
+                end = this->getSize() - 1;
+            }
+            goSize_t i;
+            T retValue = T(0);
+            for (i = start; i <= end; ++i)
+            {
+                retValue += (*this)[i];
+            }
+            return retValue;
+        };
 };
 
 // inline goComplexf goVector<goComplexf>::square () const;

@@ -213,7 +213,14 @@ class goMatrix
   /** 
   * @brief Get the leading dimension.
   * In row major order, this is the number of columns.
-  * This can be directly used as LDX parameter in CBLAS routines.
+  * This can be directly used as LDX parameter in CBLAS routines.<br>
+  *  From http://www.inf.bv.tum.de/~heisserer/softwarelab04/index.html<br>
+  *    "Note that for cblas-functions the leading dimension (for 2D arrays in C-fashion, i.e. row major order) 
+  *     is the number of columns of the matrix (not the rows as in Fortran).
+  *     The leading dimension is the number of entries in memory that separate the e.g. 
+  *     first elements of rows in c-fashion storage 
+  *     (row major order, i.e. elements of one row are contiguous in memory).
+  *     As Fortran stores in column major order the leading dimension is the number of rows."
   * 
   * @return Leading dimension.
   */
@@ -241,6 +248,22 @@ class goMatrix
   {
     v.setData (&this->matrix[row * this->getColumns()], this->getColumns(), 1);
   };
+
+  /** 
+   * @brief Const reference to row.
+   * 
+   * @note Argument <b>v will be changed</b> even though it is const.
+   * This is just to provide a consistent way to reference rows and columns in const matrices.
+   * It may be bad style from one point of view, on the other hand it enables referencing
+   * without further hassle.
+   * 
+   * @param row Row index.
+   * @param v   WILL BE CHANGED and contains the reference.
+   */
+  void              refRow    (goSize_t row, const goVector<T>& v) const
+  {
+    const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[row * this->getColumns()], this->getColumns(), 1);
+  };
   /** 
   * @brief Makes a vector reference a column from this matrix.
   * 
@@ -252,6 +275,21 @@ class goMatrix
   void              refColumn (goSize_t column, goVector<T>& v)
   {
     v.setData (&this->matrix[column], this->getRows(), this->getColumns());
+  };
+  /** 
+   * @brief Const reference to column.
+   * 
+   * @note Argument <b>v will be changed</b> even though it is const.
+   * This is just to provide a consistent way to reference rows and columns in const matrices.
+   * It may be bad style from one point of view, on the other hand it enables referencing
+   * without further hassle.
+   * 
+   * @param column Column index.
+   * @param v   WILL BE CHANGED and contains the reference.
+   */
+  void              refColumn    (goSize_t column, const goVector<T>& v) const
+  {
+    const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[column], this->getRows(), this->getColumns());
   };
 
   T&                operator() (goIndex_t i, goIndex_t j)
@@ -505,6 +543,9 @@ class goMatrix
 * 
 * A and B can optionally be used as transpose.
 * This function uses CBLAS functions.
+*
+* This function is implemented for goFloat and goDouble,
+* using cblas_[s|d]gemm functions from CBLAS.
 *
 * @param alpha    Multiplicative factor for A
 * @param A        Matrix A

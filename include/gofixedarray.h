@@ -46,7 +46,7 @@ template <class T> class goFixedArray
         {
             if (myArray && !myExternal)
             {
-                delete[] myArray;
+                delete[] (myArray - myLeftBorder);
                 myArray = 0;
                 mySize = 0;
             }
@@ -77,13 +77,14 @@ template <class T> class goFixedArray
         {
             if (!this->myExternal && this->myArray)
             {
-                delete[] this->myArray;
+                delete[] (this->myArray - this->myLeftBorder);
                 this->myArray = 0;
                 this->mySize = 0;
             }
             this->myExternal = true;
-            this->myArray = ptr;
-            this->myStride = stride;
+            this->myArray    = ptr;
+            this->myStride   = stride;
+            this->mySize     = size;
         };
 
         T&       operator() (goIndex_t i)
@@ -135,6 +136,7 @@ template <class T> class goFixedArray
                 myArray = new T [newSize + leftBorder + rightBorder];
                 mySize = newSize;
                 myArray = myArray + leftBorder;
+                myStride = 1;
                 myExternal = false;
             }
         };
