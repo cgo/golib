@@ -62,16 +62,19 @@
  *	\subsection pre Prerequisites
  *	 You will need:
  *	 - A recent cmake: http://www.cmake.org
+ *	 - GNU compiler collection (gcc) with C++ -- other compilers may work but were not tested.
+ *	 - ATLAS generated CBLAS library: http://math-atlas.sourceforge.net/  for some matrix and vector operations<br>
+ *	 You may replace ATLAS with another CBLAS implementation. In that case, you have to remove the ATLAS library from
+ *	 CMakeFiles.txt and only leave CBLAS.
  *
  *	 Optional, but recommended:
- *	 - Developer's Image Library: http://openil.sourceforge.net
- *
- *	 You <b>may</b> need:
- *	 - libsdl: http://www.libsdl.org
+ *	 - Developer's Image Library: http://openil.sourceforge.net<br>
+ *	 You need this in order to load and store image files with goFileIO:: methods.
  *
  *	 Completely optional:
  *	 - SWiG: http://www.swig.org
- *	 - Guile: http://www.gnu.org/software/guile
+ *	 - Guile: http://www.gnu.org/software/guile<br>
+*	 These are both needed to build the golib_guile module for guile.
  *
  *	 You will always need the pthread library to compile goLib. It is
  *	 available in many modern Unix environments.
