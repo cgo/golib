@@ -948,6 +948,34 @@ goDouble goCurve<pointT>::getLength () const
     return length;
 }
 
+template< class pointT>
+goDouble goCurve<pointT>::getLength (const goList<pointT>& pl) 
+{
+    if (pl.isEmpty())
+        return 0.0;
+
+    typename goList<pointT>::ConstElement* el = pl.getFrontElement();
+    assert (el);
+    goIndex_t count = pl.getSize();
+    goDouble length = 0.0;
+    pointT lastPoint = el->elem;
+    pointT d;
+    while (count > 0 && el)
+    {
+        d = el->elem - lastPoint;
+        length += d.abs();
+        lastPoint = el->elem;
+        el = el->next;
+        --count;
+    }
+    if (pl.isClosed())
+    {
+        d = pl.getFrontElement()->elem - pl.getTailElement()->elem;
+        length += d.abs();
+    }
+    return length;
+}
+
 template <class pointT>
 void goCurve<pointT>::affineTransform (const go44Matrixd& m)
 {

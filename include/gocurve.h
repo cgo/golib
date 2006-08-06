@@ -51,7 +51,8 @@ class goCurve : public goPointCloud<pointT>
         void     affineTransform  (const go44Matrixd& m);
 
         goDouble euclideanDistance (const goCurve<pointT>& other, bool forward = true) const;
-        
+
+        static goDouble getLength (const goList<pointT>& pl);
         static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret);
         static bool resampleNUBS (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret);
         static bool resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve);

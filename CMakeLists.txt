@@ -16,6 +16,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/getknee.cpp
  src/math/goresample.cpp
  src/math/govector.cpp
  src/math/gokmeans.cpp 

@@ -107,6 +107,33 @@ bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* ti
     return true;
 }
 
+#if 0
+bool goPlotter::addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions)
+{
+    if (x.getSize() != y.getSize())
+    {
+        goLog::warning("addCurve(): x and y array sizes mismatch.",this);
+        return false;
+    }
+    goVectord xx;
+    xx = x;
+    goVectord yy;
+    yy = y;
+    myPrivate->plotX.append(xx);
+    myPrivate->plotY.append(yy);
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+#endif
+
 bool goPlotter::addLabel (const goString& l, goDouble x, goDouble y)
 {
     return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y));

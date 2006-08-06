@@ -305,7 +305,7 @@ class goMatrix
   const T& operator[] (goSize_t index) const { return this->matrix[index]; };
   inline goMatrix<T>		operator*  (const goMatrix<T>& other);
 
-  //= Extremely slow, quick hack.
+  //= Quite slow, quick hack.
   goMatrix<T>		operator-  (const goMatrix<T>& other)
   {
     assert (this->getRows() == other.getRows());
@@ -323,7 +323,7 @@ class goMatrix
     return C;
   };
 
-  //= Extremely slow, quick hack.
+  //= Quite slow, quick hack.
   goMatrix<T>		operator+  (const goMatrix<T>& other)
   {
     assert (this->getRows() == other.getRows());

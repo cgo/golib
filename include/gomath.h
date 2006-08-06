@@ -99,6 +99,9 @@ bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
+template <class T>
+goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
+
 /** 
  * @brief Divergence of a 2D vector field.
  * 

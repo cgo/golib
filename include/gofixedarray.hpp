@@ -30,6 +30,7 @@ goFixedArray<T>::~goFixedArray ()
     }
 }
 
+#if 0
 template <class T>
 goFixedArray<T>& goFixedArray<T>::operator= (const goFixedArray<T>& other)
 {
@@ -53,6 +54,7 @@ goFixedArray<T>& goFixedArray<T>::operator= (const goFixedArray<T>& other)
     }
     return *this;
 }
+#endif
 
 template <class T>
 T& goFixedArray<T>::operator() (goIndex_t i)
