@@ -217,8 +217,8 @@ EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTP
 #                      "$ENV{LD_LIBRARY_PATH};/usr/lib;/usr/local/lib;${EXTRA_LIB_PATH}"
 #                      HAVE_LIBIL)
 
-FIND_LIBRARY        (ATLAS NAMES atlas PATHS /usr/lib ${GOPATH}/extra/lib)
-FIND_LIBRARY        (CBLAS NAMES cblas PATHS /usr/lib ${GOPATH}/extra/lib)
+FIND_LIBRARY        (ATLAS NAMES atlas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY        (CBLAS NAMES cblas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
 
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
