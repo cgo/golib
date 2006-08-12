@@ -7,6 +7,11 @@
 #ifndef GOCOMPLEX_H
 # include <gocomplex.h>
 #endif
+extern "C"
+{
+#include <cblas.h>
+}
+
 
 template <class T> class goMatrix;
 
@@ -120,6 +125,27 @@ class goVector : public goFixedArray<T>
             }
             return ret;
         };
+#if 0
+        template<> 
+            goFloat operator* (const goVector<goFloat>& other) const
+            {
+                assert (other.getSize() == this->getSize());
+                return cblas_sdot (this->getSize(), 
+                        this->getPtr(), this->getStride(),
+                        other.getPtr(),
+                        other.getStride());
+            };
+
+        template<> 
+            goDouble operator* (const goVector<goDouble>& other) const
+            {
+                assert (other.getSize() == this->getSize());
+                return cblas_ddot (this->getSize(), 
+                        this->getPtr(), this->getStride(),
+                        other.getPtr(),
+                        other.getStride());
+            };
+#endif
 
         template <class ScalarType>
         goVector<T> operator* (ScalarType n) const
@@ -338,6 +364,7 @@ class goVector : public goFixedArray<T>
             return retValue;
         };
 };
+
 
 // inline goComplexf goVector<goComplexf>::square () const;
 
