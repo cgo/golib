@@ -17,23 +17,15 @@
 class goCurvePrivate
 {
     public:
-        goCurvePrivate();
-        ~goCurvePrivate();
+        goCurvePrivate() {}; 
+        ~goCurvePrivate() {};
 };
-
-goCurvePrivate::goCurvePrivate ()
-{
-}
-
-goCurvePrivate::~goCurvePrivate ()
-{
-}
 
 // =====================================
 
-template<class pointT>
-goCurve<pointT>::goCurve ()
-    : goPointCloud<pointT> (),
+template<class T>
+goCurve<T>::goCurve (goSize_t dim)
+    : goPointCloud<T> (dim),
       myPrivate (0)
 {
     this->setClassID(GO_CURVE);
@@ -41,9 +33,9 @@ goCurve<pointT>::goCurve ()
     assert (myPrivate);
 }
 
-template<class pointT>
-goCurve<pointT>::goCurve (const goCurve<pointT>& other)
-    : goPointCloud<pointT> (other),
+template<class T>
+goCurve<T>::goCurve (const goCurve<T>& other)
+    : goPointCloud<T> (other),
       myPrivate (0)
 {
     myPrivate = new goCurvePrivate;
@@ -51,25 +43,25 @@ goCurve<pointT>::goCurve (const goCurve<pointT>& other)
     *this = other;
 }
 
-template<class pointT>
-goCurve<pointT>::goCurve (const goList<pointT>& pl)
-    : goPointCloud<pointT> (pl),
+template<class T>
+goCurve<T>::goCurve (const goList<goVector<T> >& pl)
+    : goPointCloud<T> (pl),
       myPrivate (0)
 {
     myPrivate = new goCurvePrivate;
     assert (myPrivate);
 }
 
-template<class pointT>
-goCurve<pointT>& goCurve<pointT>::operator= (const goCurve<pointT>& other)
+template<class T>
+goCurve<T>& goCurve<T>::operator= (const goCurve<T>& other)
 {
     *myPrivate = *other.myPrivate;
-    goPointCloud<pointT>::operator= (other);
+    goPointCloud<T>::operator= (other);
     return *this;
 }
 
-template<class pointT>
-goCurve<pointT>::~goCurve ()
+template<class T>
+goCurve<T>::~goCurve ()
 {
     if (myPrivate)
     {
@@ -97,10 +89,10 @@ bool goCurve<pointT>::operator!= (const goCurve<pointT>& other) const
  * @bug Check this -- this can't be the right solution.
  * If this is not present, setPoints() from goPointCloud can not be used because of the overloaded versions in goCurve.
  */
-template <class pointT>
-bool goCurve<pointT>::setPoints (const goList<pointT>& l)
+template <class T>
+bool goCurve<T>::setPoints (const goList<goVector<T> >& l)
 {
-    return goPointCloud<pointT>::setPoints(l);
+    return goPointCloud<T>::setPoints(l);
 }
 
 /** 
@@ -114,15 +106,15 @@ bool goCurve<pointT>::setPoints (const goList<pointT>& l)
  * 
  * @return True if successful, false otherwise.
  */
-template <class pointT>
-bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBegin, 
-                                 goIndex_t                              sourcePointCount, 
-                                 goIndex_t                              destPointCount,
-                                 bool                                   closed)
+template <class T>
+bool goCurve<T>::setPoints (typename goList<goVector<T> >::ConstElement* sourceBegin, 
+                            goIndex_t                         sourcePointCount, 
+                            goIndex_t                         destPointCount,
+                            bool                              closed)
 {
-    goList<pointT>& points = this->getPoints();
+    goList<goVector<T> >& points = this->getPoints();
     points.erase();
-    bool result = goCurve<pointT>::resample(sourceBegin, sourcePointCount, destPointCount, points, closed);
+    bool result = goCurve<T>::resample(sourceBegin, sourcePointCount, destPointCount, points, closed);
     if (!result)
     {
         return false;
@@ -143,13 +135,13 @@ bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBe
  * 
  * @return True if successful, false otherwise.
  */
-template <class pointT>
-bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed)
+template <class T>
+bool goCurve<T>::setPoints (typename goList<goVector<T> >::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed)
 {
-    goList<pointT>& points = this->getPoints();
+    goList<goVector<T> >& points = this->getPoints();
     points.erase();
     goIndex_t i;
-    typename goList<pointT>::ConstElement* el = sourceBegin;
+    typename goList<goVector<T> >::ConstElement* el = sourceBegin;
     for (i = 0; i < sourcePointCount && el; ++i)
     {
         points.append(el->elem);
@@ -176,8 +168,8 @@ bool goCurve<pointT>::setPoints (typename goList<pointT>::ConstElement* sourceBe
  * 
  * @return Distance between this and other. If negative, an error occured (probably unequal point counts).
  */
-template <class pointT>
-goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool forward) const
+template <class T>
+goDouble goCurve<T>::euclideanDistance (const goCurve<T>& other, bool forward) const
 {
     goIndex_t pointCount = this->getPointCount();
     if (other.getPointCount() != pointCount)
@@ -187,8 +179,8 @@ goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool 
     assert (other.getPointCount() == this->getPointCount());
   
     //= Calculate square sum of point distances.
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
-    typename goList<pointT>::ConstElement* otherEl = 0;
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* otherEl = 0;
     if (forward)
     {
         otherEl = other.getPoints().getFrontElement();
@@ -199,16 +191,16 @@ goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool 
     }
     goIndex_t i   = 0;
     goDouble sum  = 0.0;
-    goFloat temp1 = 0.0f;
-    goFloat temp2 = 0.0f;
+//    goFloat temp1 = 0.0f;
+//    goFloat temp2 = 0.0f;
     assert (el && otherEl);
     while (el && otherEl && i < pointCount)
     {
-        temp1 = el->elem.x - otherEl->elem.x;
+//        temp1 = el->elem.x - otherEl->elem.x;
+//        ++i;
+//        temp2 = el->elem.y - otherEl->elem.y;
         ++i;
-        temp2 = el->elem.y - otherEl->elem.y;
-        ++i;
-        sum += sqrt(temp1 * temp1 + temp2 * temp2);
+        sum += (el->elem - otherEl->elem).abs (); // sqrt(temp1 * temp1 + temp2 * temp2);
         el = el->next;
         if (forward)
         {
@@ -232,14 +224,15 @@ goDouble goCurve<pointT>::euclideanDistance (const goCurve<pointT>& other, bool 
  *
  * @return True if successful, false otherwise.
  **/
-template<class pointT>
-bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret) const
+#if 0
+template<class T>
+bool goCurve<T>::resampleNUBS (goIndex_t pointCount, goCurve<T>& ret) const
 {
     if (pointCount <= 1)
         return false;
 
     goNUBS nubs (this);
-    goList<pointT> newPoints;
+    goList<goVector<T> > newPoints;
     goFloat t = 0.0f;
     goFloat step = nubs.getCurveLength() / (float)(pointCount-1);
     goIndex_t i;
@@ -258,12 +251,13 @@ bool goCurve<pointT>::resampleNUBS (goIndex_t pointCount, goCurve<pointT>& ret) 
     ret.setPoints (newPoints);
     return true;
 }
+#endif
 
-template<class pointT>
-bool goCurve<pointT>::resample (goIndex_t pointCount, goList<pointT>& ret) const
+template<class T>
+bool goCurve<T>::resample (goIndex_t pointCount, goList<goVector<T> >& ret) const
 {
     goIndex_t np = this->getPoints().getSize();
-    bool ok = goCurve<pointT>::resample (this->getPoints().getFrontElement(), np, pointCount, ret, this->getPoints().isClosed());
+    bool ok = goCurve<T>::resample (this->getPoints().getFrontElement(), np, pointCount, ret, this->getPoints().isClosed());
     if (ok && this->getPoints().isClosed())
     {
         ret.close();
@@ -271,8 +265,8 @@ bool goCurve<pointT>::resample (goIndex_t pointCount, goList<pointT>& ret) const
     return ok;
 }
 
-template<class pointT>
-bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret) const
+template<class T>
+bool goCurve<T>::resample (goIndex_t pointCount, goCurve<T>& ret) const
 {
     return this->resample (pointCount, ret.getPoints());
 }
@@ -289,8 +283,9 @@ bool goCurve<pointT>::resample (goIndex_t pointCount, goCurve<pointT>& ret) cons
  * 
  * @return 
  */
-template<class pointT>
-bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin, typename goList<pointT>::ConstElement* end, goIndex_t pointCount, goList<pointT>& ret)
+#if 0
+template<class T>
+bool goCurve<T>::resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, typename goList<goVector<T> >::ConstElement* end, goIndex_t pointCount, goList<goVector<T> >& ret)
 {
     goNUBS nubs;
     if (!nubs.setControlPoints(begin,end))
@@ -308,11 +303,12 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
     ret.append(p);
     return true;
 }
+#endif
 
-template<class pointT>
-bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve)
+template<class T>
+bool goCurve<T>::resample (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve)
 {
-    return goCurve<pointT>::resampleLinear (begin,pointCount,resamplePointCount,ret,closedCurve);
+    return goCurve<T>::resampleLinear (begin,pointCount,resamplePointCount,ret,closedCurve);
 }
 
 /** 
@@ -327,8 +323,9 @@ bool goCurve<pointT>::resample (typename goList<pointT>::ConstElement* begin, go
  * 
  * @return 
  */
+#if 0
 template<class pointT>
-bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret)
+bool goCurve<pointT>::resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret)
 {
     goNUBS nubs;
     if (!nubs.setControlPoints(begin,pointCount))
@@ -346,6 +343,7 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
     ret.append(p);
     return true;
 }
+#endif
 
 /** 
  * @brief 
@@ -359,8 +357,8 @@ bool goCurve<pointT>::resampleNUBS (typename goList<pointT>::ConstElement* begin
  * 
  * @return 
  */
-template<class pointT>
-bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<pointT>& ret, bool closedCurve)
+template<class T>
+bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve)
 {
     if (pointCount < 2)
     {
@@ -384,11 +382,11 @@ bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* beg
     
     {
         accumLength[0] = 0.0;
-        typename goList<pointT>::ConstElement* el = begin;
+        typename goList<goVector<T> >::ConstElement* el = begin;
         goIndex_t i;
         for (i = 1; i < pointCount; ++i, el = el->next)
         {
-            pointT p = el->elem - el->next->elem;
+            goVector<T> p = el->elem - el->next->elem;
             curveLength += p.abs();
             accumLength[i] = curveLength;
         }
@@ -406,13 +404,12 @@ bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* beg
     goDouble t = 0.0f;
     goIndex_t i = 0;
     goIndex_t j = 0;
-    pointT p;
-    typename goList<pointT>::ConstElement* el = begin;
+    typename goList<goVector<T> >::ConstElement* el = begin;
     for (i = 0; i < resamplePointCount; ++i)
     {
         assert (el && el->next);
         assert (j >= 0 && j < pointCount - 1);
-        pointT p;
+        goVector<T> p;
         goDouble e = (t - accumLength[j]) / (accumLength[j+1] - accumLength[j]);
         p = el->next->elem * e + el->elem * (1-e);
         ret.append (p);
@@ -443,7 +440,8 @@ bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* beg
 * @brief Read curve points from an ASCII C file stream.
 * 
 * The curve points are expected in this format:
-* 
+*
+* Silently assumes dimension is 2.
 * ...
 * curve\\n
 * <integer: number of points>\\n
@@ -456,8 +454,8 @@ bool goCurve<pointT>::resampleLinear (typename goList<pointT>::ConstElement* beg
 * 
 * @return True if successful, false otherwise. Check log.
 */
-template <class pointT>
-bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
+template <class T>
+bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
 {
     if (!f)
     {
@@ -501,32 +499,83 @@ bool goCurve<pointT>::readASCII (FILE* f, goList<pointT>& ret)
             el = el->next;
         }
     }
+
+    goSize_t dim = 0;
+
+    if (!goFileIO::readASCIILine (f, line))
+    {
+        return false;
+    }
+    {
+        goList<goString> words;
+        line.getWords(words);
+        if (words.getSize() < 2)
+        {
+            goString msg = "goCurve::readASCII(): expected dimensionality, got '";
+            msg += line;
+            msg += "'";
+            goLog::warning(msg);
+            return false;
+        }
+        goList<goString>::Element* el = words.getFrontElement();
+        if (el->elem != "dimension")
+        {
+            goString msg = "goCurve::readASCII(): expected 'dimension ...', got '";
+            msg += line;
+            msg += "'";
+            goLog::warning(msg);
+            return false;
+        }
+
+        dim = el->next->elem.toInt();
+    }
     unsigned int pointCount = 0;
     fscanf(f,"%d\n",&pointCount);
     unsigned int i;
-    pointT p;
+    goVector<T> p(dim);
     float x = 0.0f;
-    float y = 0.0f;
+    // assert (p.getSize() >= 2);
     for (i = 0; i < pointCount; ++i)
     {
-        if (fscanf(f,"%f %f\n",&x,&y) < 2)
+        goSize_t j;
+        for (j = 0; j < dim - 1; ++j)
         {
-            goLog::warning("goCurve::readASCII(): could not read 2 points from a line.");
+            if (fscanf(f,"%f ",&x) < 1)
+            {
+                goLog::warning("goCurve::readASCII(): could not read point from a line.");
+                return false;
+            }
+            p[j] = x;
+        }
+        if (fscanf(f,"%f\n",&x) < 1)
+        {
+            goLog::warning("goCurve::readASCII(): could not read point from a line.");
             return false;
         }
-        p.x = x; p.y = y;
+        p[dim-1] = x;
         ret.append(p);
     }
     if (closed)
     {
         ret.close();
     }
-    goCurve<pointT>::removeDuplicates (ret);
+    goCurve<T>::removeDuplicates (ret);
     return true;
 }
 
-template <class pointT>
-bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
+/** 
+ * @brief Write point list in ASCII.
+ *
+ * Like readASCII(), assumes pointT is of size 2 at least (e.g. goPoint).
+ * This is sufficient so far, but extend if needed.
+ * 
+ * @param f 
+ * @param pointList 
+ * 
+ * @return 
+ */
+template <class T>
+bool goCurve<T>::writeASCII (FILE* f, const goList<goVector<T> >& pointList)
 {
     if (pointList.getSize() < 1)
     {
@@ -548,7 +597,20 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
         }
     }
     goFileIO::writeASCII (f, goString("\n"));
+    goString dimString = "dimension ";
+    goSize_t dim = 0;
     goSize_t pointCount = pointList.getSize();
+    if (pointCount > 0)
+    {
+        dim = pointList.getFrontElement()->elem.getSize();
+        dimString += static_cast<int> (dim);
+    }
+    else
+    {
+        dimString += "0";
+    }
+    dimString += "\n";
+    goFileIO::writeASCII (f, dimString);
     goString line = "";
     line += (int)pointCount;
     line += "\n";
@@ -556,15 +618,19 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
     {
         return false;
     }
-    typename goList<pointT>::ConstElement* el = pointList.getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = pointList.getFrontElement();
     goSize_t i;
     for (i = 0; i < pointCount; ++i, el = el->next)
     {
         assert(el);
+        goSize_t j;
         line = "";
-        line += (float)el->elem.x;
-        line += " ";
-        line += (float)el->elem.y;
+        for (j = 0; j < dim - 1; ++j)
+        {
+            line += (float)el->elem[j];
+            line += " ";
+        }
+        line += (float)el->elem[dim-1];
         line += "\n";
         if (!goFileIO::writeASCII (f, line))
         {
@@ -574,8 +640,8 @@ bool goCurve<pointT>::writeASCII (FILE* f, const goList<pointT>& pointList)
     return true;
 }
 
-template <class pointT>
-goSize_t goCurve<pointT>::removeDuplicates (goList<pointT>& pl)
+template <class T>
+goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
 {
     goSize_t removed = 0;
     goSize_t removed_total = 0;
@@ -584,7 +650,7 @@ goSize_t goCurve<pointT>::removeDuplicates (goList<pointT>& pl)
         goSize_t i = 0;
         removed = 0;
         goSize_t sz = pl.getSize();
-        typename goList<pointT>::Element* el = pl.getFrontElement();
+        typename goList<goVector<T> >::Element* el = pl.getFrontElement();
         if (!pl.isClosed())
         {
             --sz;
@@ -607,16 +673,16 @@ goSize_t goCurve<pointT>::removeDuplicates (goList<pointT>& pl)
     return removed_total;
 }
 
-template <class pointT>
-goSize_t goCurve<pointT>::removeDuplicates ()
+template <class T>
+goSize_t goCurve<T>::removeDuplicates ()
 {
-    return goCurve<pointT>::removeDuplicates (this->getPoints());
+    return goCurve<T>::removeDuplicates (this->getPoints());
 }
 
-template <class pointT>
-bool goCurve<pointT>::writeASCII (FILE* f) const
+template <class T>
+bool goCurve<T>::writeASCII (FILE* f) const
 {
-    return goCurve<pointT>::writeASCII (f, this->getPoints());
+    return goCurve<T>::writeASCII (f, this->getPoints());
 }
 
 /** 
@@ -628,24 +694,24 @@ bool goCurve<pointT>::writeASCII (FILE* f) const
 * 
 * @return True if successful, false otherwise.
 */
-template <class pointT>
-bool goCurve<pointT>::readASCII (FILE* f)
+template <class T>
+bool goCurve<T>::readASCII (FILE* f)
 {
-    return goCurve<pointT>::readASCII (f, this->getPoints());
+    return goCurve<T>::readASCII (f, this->getPoints());
 }
 
-template<class pointT>
-bool goCurve<pointT>::getGradNorm (goArray<goFloat>& diffNorm) const
+template<class T>
+bool goCurve<T>::getGradNorm (goArray<goFloat>& diffNorm) const
 {
     if (this->getPoints().isEmpty())
         return false;
 
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     
-    const pointT* p1 = 0;
-    const pointT* p2 = 0;
-    goFloat temp1 = 0.0f;
-    goFloat temp2 = 0.0f;
+    const goVector<T>* p1 = 0;
+    const goVector<T>* p2 = 0;
+//    goFloat temp1 = 0.0f;
+//    goFloat temp2 = 0.0f;
     diffNorm.resize (this->getPoints().getSize());
     goIndex_t i = 0;
     goIndex_t size = diffNorm.getSize();
@@ -657,9 +723,9 @@ bool goCurve<pointT>::getGradNorm (goArray<goFloat>& diffNorm) const
             p2 = &el->next->elem;
         else
             p2 = p1;
-        temp1 = p2->x - p1->x;
-        temp2 = p2->y - p1->y;
-        diffNorm[i] = sqrt(temp1*temp1+temp2*temp2);
+//        temp1 = p2->x - p1->x;
+//        temp2 = p2->y - p1->y;
+        diffNorm[i] = (*p2 - *p1).abs(); // sqrt(temp1*temp1+temp2*temp2);
         if (!el->next)
             break;
         el = el->next;
@@ -668,47 +734,50 @@ bool goCurve<pointT>::getGradNorm (goArray<goFloat>& diffNorm) const
     return true;
 }
 
-template<class pointT>
-bool goCurve<pointT>::getGrad (goList<go4Vectorf>& diff) const
+template<class T>
+bool goCurve<T>::getGrad (goList<goVector<T> >& diff) const
 {
     if (this->getPoints().isEmpty())
         return false;
     
     diff.erase();
-    go4Vectorf d (0.0f, 0.0f, 0.0f, 0.0f);
+    goVector<T> d(this->getDim());
+    d.fill (T(0));
     
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
-    const pointT* p1 = 0;
-    const pointT* p2 = 0;
-    while (true)
+    const goVector<T>* p1 = 0;
+    const goVector<T>* p2 = 0;
+    goSize_t pointCount = this->getPointCount ();
+    goSize_t j = 0;
+    while (el && j < pointCount)
     {
         p1 = &el->elem;
         if (el->next)
             p2 = &el->next->elem;
         else
             p2 = p1;
-        d.x = p2->x - p1->x;
-        d.y = p2->y - p1->y;
+        d = p2 - p1;
+        // d.x = p2->x - p1->x;
+        // d.y = p2->y - p1->y;
         diff.append (d);
-        if (!el->next)
-            break;
         el = el->next;
+        ++j;
     }
     return true;
 }
 
-template<class pointT>
-bool goCurve<pointT>::getCurvNorm (goArray<goFloat>& curvNorm) const
+template<class T>
+bool goCurve<T>::getCurvNorm (goArray<goFloat>& curvNorm) const
 {
     if (this->getPoints().isEmpty())
         return false;
 
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     
-    const pointT* p1 = 0;
-    const pointT* p  = 0;
-    const pointT* p2 = 0;
+    const goVector<T>* p1 = 0;
+    const goVector<T>* p  = 0;
+    const goVector<T>* p2 = 0;
     goFloat temp1 = 0.0f;
     goFloat temp2 = 0.0f;
     curvNorm.resize (this->getPoints().getSize());
@@ -727,8 +796,8 @@ bool goCurve<pointT>::getCurvNorm (goArray<goFloat>& curvNorm) const
             p2 = &el->next->elem;
         else
             p2 = p;
-        temp1 = 0.5*p2->x - p->x + 0.5*p1->x;
-        temp2 = 0.5*p2->y - p->y + 0.5*p1->y;
+        temp1 = 0.5*(*p2)[0] - (*p)[0] + 0.5*(*p1)[0];
+        temp2 = 0.5*(*p2)[1] - (*p)[1] + 0.5*(*p1)[1];
         curvNorm[i] = sqrt(temp1*temp1+temp2*temp2);
         if (!el->next)
             break;
@@ -746,13 +815,14 @@ bool goCurve<pointT>::getCurvNorm (goArray<goFloat>& curvNorm) const
  *
  * @return True if successful, false otherwise.
  **/
-template<class pointT>
-bool goCurve<pointT>::getAngleFunction (goArray<goFloat>& angles, const go4Vectorf& axis) const
+#if 0
+template<class T>
+bool goCurve<T>::getAngleFunction (goArray<goFloat>& angles, const goVector<T>& axis) const
 {
     if (this->getPoints().isEmpty())
         return false;
     angles.resize (this->getPoints().getSize());
-    go4Vectorf a = axis;
+    goVector<T> a = axis;
     goFloat a_abs = a.abs();
     if (a_abs == 0.0f)
     {
@@ -775,7 +845,7 @@ bool goCurve<pointT>::getAngleFunction (goArray<goFloat>& angles, const go4Vecto
 
     goIndex_t i;
     goIndex_t size = angles.getSize();
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
     const pointT* p1 = 0;
     const pointT* p2 = 0;
@@ -788,8 +858,8 @@ bool goCurve<pointT>::getAngleFunction (goArray<goFloat>& angles, const go4Vecto
             p2 = &el->next->elem;
         else
             p2 = p1;
-        delta.x = p2->x - p1->x;
-        delta.y = p2->y - p1->y;
+        delta[0] = (*p2)[0] - (*p1)[0];
+        delta[1] = (*p2)[1] - (*p1)[1];
         delta_abs = delta.abs();
         if (delta_abs != 0.0f)
         {
@@ -808,11 +878,12 @@ bool goCurve<pointT>::getAngleFunction (goArray<goFloat>& angles, const go4Vecto
     }
     return true;
 }
+#endif
 
-template <class pointT>
-static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
+template <class T>
+static goDouble getTurn (const goVector<T>& p1, const goVector<T>& p2, const goVector<T>& p3)
 {
-    pointT base = p3 - p1;
+    goVector<T> base = p3 - p1;
     goDouble f = base.abs();
     if (f == 0.0)
     {
@@ -820,8 +891,8 @@ static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
         return 0.0;  //= This should not happen. It would mean p3 == p1.
     }
     base *= 1.0 / f;
-    pointT s1 = p2 - p1;
-    pointT s2 = p3 - p2;
+    goVector<T> s1 = p2 - p1;
+    goVector<T> s2 = p3 - p2;
     goDouble l1 = s1.abs();
     goDouble l2 = s2.abs();
     assert (l1 != 0.0 && l2 != 0.0);
@@ -866,7 +937,7 @@ static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
     //= The sign of the turn angle is determined by whether the triangle {p1,p2,p3} 
     //= turns clockwise or counter-clockwise, which in turn is determined
     //= by the z-component of the cross product {s1 0} x {s2 0}.
-    return beta * ((s1.x * s2.y < s1.y * s2.x) ? -1.0 : 1.0);
+    return beta * ((s1[0] * s2[1] < s1[1] * s2[0]) ? -1.0 : 1.0);
 }
 
 /**
@@ -880,15 +951,15 @@ static goDouble getTurn (const pointT& p1, const pointT& p2, const pointT& p3)
 * 
 * @return True if successful, false otherwise.
 **/
-template <class pointT>
-bool goCurve<pointT>::getTurningFunction (goVectord& ret) const
+template <class T>
+bool goCurve<T>::getTurningFunction (goVector<T>& ret) const
 {
     goIndex_t sz = this->getPoints().getSize();
 
     if (sz <= 0)
         return false;
 
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     goIndex_t i = 0;
 
     if (!this->getPoints().isClosed())
@@ -920,18 +991,18 @@ bool goCurve<pointT>::getTurningFunction (goVectord& ret) const
  *         If the point list is closed, the curve is treated as closed and the line segment connecting
  *         the first and last point is added to the sum.
  **/
-template< class pointT>
-goDouble goCurve<pointT>::getLength () const
+template< class T>
+goDouble goCurve<T>::getLength () const
 {
     if (this->getPoints().isEmpty())
         return 0.0;
 
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
     goIndex_t count = this->getPoints().getSize();
     goDouble length = 0.0;
-    pointT lastPoint = el->elem;
-    pointT d;
+    goVector<T> lastPoint = el->elem;
+    goVector<T> d;
     while (count > 0 && el)
     {
         d = el->elem - lastPoint;
@@ -948,18 +1019,18 @@ goDouble goCurve<pointT>::getLength () const
     return length;
 }
 
-template< class pointT>
-goDouble goCurve<pointT>::getLength (const goList<pointT>& pl) 
+template< class T>
+goDouble goCurve<T>::getLength (const goList<goVector<T> >& pl) 
 {
     if (pl.isEmpty())
         return 0.0;
 
-    typename goList<pointT>::ConstElement* el = pl.getFrontElement();
+    typename goList<goVector<T> >::ConstElement* el = pl.getFrontElement();
     assert (el);
     goIndex_t count = pl.getSize();
     goDouble length = 0.0;
-    pointT lastPoint = el->elem;
-    pointT d;
+    goVector<T> lastPoint = el->elem;
+    goVector<T> d;
     while (count > 0 && el)
     {
         d = el->elem - lastPoint;
@@ -976,30 +1047,15 @@ goDouble goCurve<pointT>::getLength (const goList<pointT>& pl)
     return length;
 }
 
-template <class pointT>
-void goCurve<pointT>::affineTransform (const go44Matrixd& m)
-{
-    typename goList<pointT>::Element* el = this->getPoints().getFrontElement();
-    goSize_t sz = this->getPoints().getSize();
-    goSize_t i;
-    for (i = 0; i < sz; ++i)
-    {
-        el->elem.t = 1.0;
-        el->elem *= m;
-        el->elem /= el->elem.t;
-        el->elem.t = 0.0;
-        el = el->next;
-    }
-}
 
-template<class pointT>
-bool goCurve<pointT>::callObjectMethod (int methodID, goObjectMethodParameters* param)
+template<class T>
+bool goCurve<T>::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
     return goObjectBase::callObjectMethod (methodID, param);
 }
 
-template<class pointT>
-void goCurve<pointT>::receiveObjectMessage (const goObjectMessage& msg)
+template<class T>
+void goCurve<T>::receiveObjectMessage (const goObjectMessage& msg)
 {
     goObjectBase::receiveObjectMessage (msg);
 }
@@ -1011,8 +1067,8 @@ void goCurve<pointT>::receiveObjectMessage (const goObjectMessage& msg)
 *
 * @return True if successful, false otherwise.
 **/
-template<class pointT>
-bool goCurve<pointT>::writeObjectFile (FILE* f) const
+template<class T>
+bool goCurve<T>::writeObjectFile (FILE* f) const
 {
     if (!f)
         return false;
@@ -1022,7 +1078,7 @@ bool goCurve<pointT>::writeObjectFile (FILE* f) const
     }
     const char cnull = 0;
     fwrite (&cnull, sizeof(char), 1, f);
-    return goPointCloud<pointT>::writeObjectFile (f);
+    return goPointCloud<T>::writeObjectFile (f);
 }
 
 /**
@@ -1032,8 +1088,8 @@ bool goCurve<pointT>::writeObjectFile (FILE* f) const
 *
 * @return True if successful, false otherwise.
 **/
-template<class pointT>
-bool goCurve<pointT>::readObjectFile  (FILE* f)
+template<class T>
+bool goCurve<T>::readObjectFile  (FILE* f)
 {
     if (!f)
         return false;
@@ -1046,9 +1102,8 @@ bool goCurve<pointT>::readObjectFile  (FILE* f)
     {
         return false;
     }
-    return goPointCloud<pointT>::readObjectFile (f);
+    return goPointCloud<T>::readObjectFile (f);
 }
 
-
-template class goCurve <goPointf>;
-template class goCurve <goPointd>;
+template class goCurve <goFloat>;
+template class goCurve <goDouble>;

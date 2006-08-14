@@ -137,18 +137,18 @@ bool goMatlab::putSparse (goSparseMatrix* sm, const char* name)
  * 
  * @return True if successful, false otherwise.
  */
-bool goMatlab::put2DPoints (const goList<goPointf>& l, const char* variableName)
+bool goMatlab::put2DPoints (const goList<goVectorf>& l, const char* variableName)
 {
     assert(this->getEngine());
     mxArray* array = mxCreateDoubleMatrix(2,l.getSize(),mxREAL);
     goIndex_t sz = 2 * static_cast<goIndex_t>(l.getSize());
     goIndex_t i;
     double* a = mxGetPr(array);
-    goList<goPointf>::ConstElement* el = l.getFrontElement();
+    goList<goVectorf>::ConstElement* el = l.getFrontElement();
     for (i = 0; i < sz && el; i+=2)
     {
-        a[i] = el->elem.x;
-        a[i+1] = el->elem.y;
+        a[i] = el->elem[0];
+        a[i+1] = el->elem[1];
         el = el->next;
     }
     if (engPutVariable(this->getEngine(),variableName,array) != 0)
@@ -174,7 +174,7 @@ bool goMatlab::put2DPoints (const goList<goPointf>& l, const char* variableName)
  * 
  * @return True if successful, false otherwise.
  */
-bool goMatlab::get2DPoints (goList<goPointf>& l, const char* variableName)
+bool goMatlab::get2DPoints (goList<goVectorf>& l, const char* variableName)
 {
     assert (this->getEngine());
     mxArray* temp = engGetVariable (this->getEngine(), variableName);
@@ -196,16 +196,19 @@ bool goMatlab::get2DPoints (goList<goPointf>& l, const char* variableName)
     goIndex_t i;
     double* ptr = mxGetPr(temp);
     assert(ptr);
+    goVectorf tempv (2);
     for (i = 0; i < sz; ++i, ptr+=2)
     {
-        l.append(goPointf(*ptr,*(ptr+1)));
+        tempv[0] = *ptr;
+        tempv[1] = *(ptr + 1);
+        l.append(tempv);
     }
     assert (l.getSize() == sz);
     mxDestroyArray(temp);
     return true;
 }
 
-bool goMatlab::put2DPoints (goList<goPointf>::ConstElement* begin, 
+bool goMatlab::put2DPoints (goList<goVectorf>::ConstElement* begin, 
                             goIndex_t size, 
                             const char* variableName)
 {
@@ -214,11 +217,11 @@ bool goMatlab::put2DPoints (goList<goPointf>::ConstElement* begin,
     goIndex_t sz = 2 * size;
     goIndex_t i;
     double* a = mxGetPr(array);
-    goList<goPointf>::ConstElement* el = begin;
+    goList<goVectorf>::ConstElement* el = begin;
     for (i = 0; i < sz && el; i+=2)
     {
-        a[i] = el->elem.x;
-        a[i+1] = el->elem.y;
+        a[i] = el->elem[0];
+        a[i+1] = el->elem[1];
         el = el->next;
     }
     if (engPutVariable(this->getEngine(),variableName,array) != 0)

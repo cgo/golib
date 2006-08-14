@@ -19,6 +19,118 @@
  * @todo Either throw this class away or rework it a bit.
  */
 template <class T>
+class go44Matrix : public goMatrix<T> 
+{
+public:
+  go44Matrix ()
+      : goMatrix<T> (4,4)
+  {
+  };
+  go44Matrix (T i11, T i12, T i13, T i14,
+              T i21, T i22, T i23, T i24,
+              T i31, T i32, T i33, T i34,
+              T i41, T i42, T i43, T i44)
+      : goMatrix<T> (4,4)
+  {
+      T* matrix = this->getData ();
+      matrix[0] = i11;
+      matrix[1] = i12;	
+      matrix[2] = i13;
+      matrix[3] = i14;
+      matrix[4] = i21;
+      matrix[5] = i22;	
+      matrix[6] = i23;
+      matrix[7] = i24;
+      matrix[8] = i31;
+      matrix[9] = i32;	
+      matrix[10] = i33;
+      matrix[11] = i34;
+      matrix[12] = i41;
+      matrix[13] = i42;	
+      matrix[14] = i43;
+      matrix[15] = i44;
+  };
+  go44Matrix (const go44Matrix<T>& other)
+  {
+      *this = other;
+  };
+  go44Matrix (const goMatrix<T>& other)
+  {
+      if (other.getRows() == 4 && other.getColumns() == 4)
+      {
+        *this = other;
+      }
+      else
+      {
+          assert (false);
+      }
+  };
+  virtual ~go44Matrix ()
+  {
+  };
+
+#if 0
+  /*!
+   * @return Reference to object at [y][x]
+   */
+  inline T& 	elem (goIndex_t y, goIndex_t x) 
+  { 
+    return matrix[(y << 2) + x]; 
+  }
+  inline const T& 	elem (goIndex_t y, goIndex_t x)  const
+  { 
+    return matrix[(y << 2) + x]; 
+  }
+
+  inline T& operator() (goIndex_t y, goIndex_t x)
+  {
+    return matrix[(y << 2) + x]; 
+  }
+  inline const T& operator() (goIndex_t y, goIndex_t x) const
+  {
+    return matrix[(y << 2) + x]; 
+  }
+  
+  /*!
+   * Fills the matrix with data found at source.
+   */
+  inline void 	fill (const T* source);
+
+  inline void	fill (T value);
+
+  /*!
+   *
+   */
+  inline void   transpose ();
+
+  inline bool   invert ();
+
+  /*!
+   * stream output for float matrices
+   */
+  friend std::ostream&        operator<< (std::ostream& o, go44Matrix<goFloat>&);
+  friend std::ostream&        operator<< (std::ostream& o, go44Matrix<goDouble>&);
+  friend std::ostream&        operator<< (std::ostream& o, const go44Matrix<goDouble>&);
+
+  inline void operator= (const go44Matrix<T>& other);
+  /*
+   * Arithmetic operators
+   */
+  inline void  operator+= (const go44Matrix<T>& other);
+  inline void  operator*= (goDouble r);
+  inline void  operator*= (goInt32 r);
+  inline void  operator*= (const go44Matrix<T>& other);
+  // go4Vector<T>	operator* (go4Vector<T>& v);
+
+  inline T* getPtr () { return matrix; }
+  inline const T* getPtr () const { return (const T*)matrix; }
+protected:
+  T* matrix;
+#endif
+};
+
+#if 0
+template <class T>
 class go44Matrix {
 public:
   go44Matrix ()
@@ -302,6 +414,7 @@ go44Matrix<T>::operator*= (const go44Matrix<T>& other)
         o -= 4;
     }
 } 
+#endif
 
 typedef go44Matrix<goFloat> go44Matrixf;
 typedef go44Matrix<goDouble> go44Matrixd;

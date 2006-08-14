@@ -22,11 +22,9 @@ class goObjectBase;
  * @{
  */
 /*!
- * \brief Reading/writing specific file formats.
+ * \brief Reading/writing files and some utility functions.
  *
  * Provides file reading/writing facilities. <br>
- * This class contains static members to read and write various file formats into 
- * different data types. Currently, the only files handled are 8 bit raw PGM files.
  */
 class goFileIO {
  public:

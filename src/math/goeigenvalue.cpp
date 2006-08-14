@@ -27,7 +27,7 @@ bool goMath::goComplexEigenvaluesHermite (const goMatrix<goComplexf>&          m
     real* ar = new real [nm * nm];
     real* ai = new real [nm * nm];
     //= I suppose we store in row-major.
-    const goComplexf* matrix = m.getData();
+    // const goComplexf* matrix = m.getData();
     real* ar_p = ar;
     real* ai_p = ai;
     {

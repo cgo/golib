@@ -22,7 +22,7 @@ std::ostream& operator<< (std::ostream& o, const go44Matrix<goFloat>& mat) {
   goIndex_t i = 0, j = 0;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
-      o << mat.elem(i,j) << " ";
+      o << mat(i,j) << " ";
     }
     o << "\n";
   }
@@ -34,7 +34,7 @@ std::ostream& operator<< (std::ostream& o, const go44Matrix<goDouble>& mat) {
   goIndex_t i = 0, j = 0;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
-      o << mat.elem(i,j) << " ";
+      o << mat(i,j) << " ";
     }
     o << "\n";
   }

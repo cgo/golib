@@ -50,10 +50,10 @@ template <class T>
 bool
 goPoint<T>::operator== (const goPoint<T>& other) const
 {
-    return (this->x == other.x &&
-            this->y == other.y &&
-            this->z == other.z &&
-            this->w == other.w);
+    return (this->x() == other.x() &&
+            this->y() == other.y() &&
+            this->z() == other.z() &&
+            this->w() == other.w());
 }
 
 template <class T>
@@ -63,14 +63,15 @@ goPoint<T>::operator!= (const goPoint<T>& other) const
     return !this->operator== (other);
 }
 
+#if 0
 template <class T>
 goPoint<T>
 goPoint<T>::operator- (const goPoint<T>& other) const
 {
-    goPoint<T> ret (this->x - other.x,
-                    this->y - other.y,
-                    this->z - other.z,
-                    this->w - other.w);
+    goPoint<T> ret (this->x() - other.x(),
+                    this->y() - other.y(),
+                    this->z() - other.z(),
+                    this->w() - other.w());
     return ret;
 }
 
@@ -78,31 +79,31 @@ template <class T>
 goPoint<T>
 goPoint<T>::operator+ (const goPoint<T>& other) const
 {
-    goPoint<T> ret (this->x + other.x,
-                    this->y + other.y,
-                    this->z + other.z,
-                    this->w + other.w);
+    goPoint<T> ret (this->x() + other.x(),
+                    this->y() + other.y(),
+                    this->z() + other.z(),
+                    this->w() + other.w());
     return ret;
 }
 
 template <class T>
 void goPoint<T>::operator-= (const goPoint<T>& other)
 {
-    this->x -= other.x;
-    this->y -= other.y;
-    this->z -= other.z;
-    this->w -= other.w;
+    this->x() -= other.x();
+    this->y() -= other.y();
+    this->z() -= other.z();
+    this->w() -= other.w();
 }
 
 template <class T>
 void goPoint<T>::operator+= (const goPoint<T>& other)
 {
-    this->x += other.x;
-    this->y += other.y;
-    this->z += other.z;
-    this->w += other.w;
+    this->x() += other.x();
+    this->y() += other.y();
+    this->z() += other.z();
+    this->w() += other.w();
 }
-
+#endif
 //template <class T>
 //void goPoint<T>::operator*= (T scalar)
 //{

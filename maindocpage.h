@@ -67,7 +67,7 @@
  *	 You may replace ATLAS with another CBLAS implementation. In that case, you have to remove the ATLAS library from
  *	 CMakeFiles.txt and only leave CBLAS.
  *
- *	 Optional, but recommended:
+ *	 Optional, but highly recommended:
  *	 - Developer's Image Library: http://openil.sourceforge.net<br>
  *	 You need this in order to load and store image files with goFileIO:: methods.
  *
@@ -163,7 +163,8 @@
  *
  * \section state State of development
  * Most of this, except for the src/data tree, is work in progress.
- * The current version number is <strong>0.4.0</strong>.
+ * The current version number is <strong>0.5</strong>.
+ * Some significant changes are imminent.
  * There are currently non-free parts in it which are unlikely to
  * be released to open public any time soon (if you should receive them,
  * you must delete them).

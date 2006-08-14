@@ -33,7 +33,12 @@ class goPoint : public go4Vector<T>
         };
         template <class To>
         goPoint (const go4Vector<To>& other)
-            : go4Vector<T> (other)
+            : go4Vector<T> (other), value (T(0))
+        {
+        };
+        template <class To>
+        goPoint (const goVector<To>& other)
+            : go4Vector<T> (other), value (T(0))
         {
         };
         virtual ~goPoint ();
@@ -43,15 +48,21 @@ class goPoint : public go4Vector<T>
         bool operator>  (const goPoint<T>& other) const;
         bool operator== (const goPoint<T>& other) const;
         bool operator!= (const goPoint<T>& other) const;
-        goPoint<T> operator- (const goPoint<T>& other) const;
-        goPoint<T> operator+ (const goPoint<T>& other) const;
-        void       operator-= (const goPoint<T>& other);
-        void       operator+= (const goPoint<T>& other);
+//        goPoint<T> operator- (const goPoint<T>& other) const;
+//        goPoint<T> operator+ (const goPoint<T>& other) const;
+//        void       operator-= (const goPoint<T>& other);
+//        void       operator+= (const goPoint<T>& other);
         template <class To>
         goPoint<T>& operator= (const goPoint<To>& other)
         {
             go4Vector<T>::operator= (other);
             this->value = other.value;
+            return *this;
+        };
+        template <class To>
+        goPoint<T>& operator= (const goVector<To>& other)
+        {
+            go4Vector<T>::operator= (other);
             return *this;
         };
             

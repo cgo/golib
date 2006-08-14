@@ -178,16 +178,16 @@ bool goFindZeroCrossings__ (const goSignal3DBase<void>* sig, goArray<goPointf>& 
     GO_SIGNAL3D_EACHELEMENT_GENERIC (
             if (*(const T*)__ptr * *(const T*)(__ptr + *__dx) < T(0))
             {
-                point.x = (goFloat)__k;
-                point.y = (goFloat)__j + 0.5f;
-                point.x += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dx));
+                point[0] = (goFloat)__k;
+                point[1] = (goFloat)__j + 0.5f;
+                point[0] += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dx));
                 pointsRet += point;
             }
             if (*(const T*)__ptr * *(const T*)(__ptr + *__dy) < T(0))
             {
-                point.x = (goFloat)__k + 0.5f;
-                point.y = (goFloat)__j;
-                point.y += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dy));
+                point[0] = (goFloat)__k + 0.5f;
+                point[1] = (goFloat)__j;
+                point[1] += *(const T*)(__ptr) / (*(const T*)(__ptr) - *(const T*)(__ptr  + *__dy));
                 pointsRet += point;
             }, (*sig));
     return true;

@@ -13,6 +13,12 @@
 #ifndef GO44MATRIX_H
 # include <go44matrix.h>
 #endif
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 template<class T> class goPointCloudPrivate;
 
@@ -23,42 +29,46 @@ template<class T> class goPointCloudPrivate;
 /**
 * @brief Point cloud.
 *
+* Points are represented using goVector<T> objects.
+* 
 * @note The only currently supported template parameters are 
-*       goPoint<...>. Add more general vectors when needed.
-*       Same holds for goCurve.
+*       goFloat and goDouble. 
 *
-* @todo See note.
+* @todo Add function to create a configuration matrix goMatrix (N,getDim()) and/or a configuration vector
+* from a point cloud.
 **/
-template <class pointT>
+template <class T>
 class goPointCloud : public goObjectBase
 {
     public:
-        goPointCloud ();
-        goPointCloud (const goPointCloud<pointT>&);
-        goPointCloud (const goList<pointT>&);
+        goPointCloud (goSize_t dim = 2);
+        goPointCloud (const goPointCloud<T>&);
+        goPointCloud (const goList<goVector<T> >&);
         virtual ~goPointCloud ();
-        goPointCloud& operator= (const goPointCloud&);
+        goPointCloud<T>& operator= (const goPointCloud<T>&);
 
-        bool operator!= (const goPointCloud& other) const;
-        bool operator== (const goPointCloud& other) const;
+        bool operator!= (const goPointCloud<T>& other) const;
+        bool operator== (const goPointCloud<T>& other) const;
 
-        goIndex_t             getPointCount () const;
-        goList<pointT>&       getPoints ();
-        const goList<pointT>& getPoints () const;
-        virtual bool          setPoints (const goList<pointT>&);
-        void              addPoint (const pointT& p);
+        goIndex_t                   getPointCount () const;
+        goList<goVector<T> >&       getPoints ();
+        const goList<goVector<T> >& getPoints () const;
+        virtual bool                setPoints (const goList<goVector<T> >&);
+        void                        addPoint (const goVector<T>& p);
 
         void              setChanged         ();
 
-        bool              getMean            (pointT& mean) const;
-        bool              getCenterOfMass    (pointT& comRet) const;
-        bool              translate          (const pointT& d);
-        bool              getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights = 0) const;
+        goSize_t          getDim             () const;
+
+        bool              getMean            (goVector<T>& mean) const;
+        bool              getCenterOfMass    (goVector<T>& comRet) const;
+        bool              translate          (const goVector<T>& d);
+        bool              getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const goArray<goFloat>* weights = 0) const;
         bool              unitScale          (goFloat factor = 1.0f);
 
         template<class matrixT> inline bool transform (const matrixT& m)
         {
-            typename goList<pointT>::Element* el = this->getPoints().getFrontElement();
+            typename goList<goVector<T> >::Element* el = this->getPoints().getFrontElement();
             goIndex_t sz = this->getPointCount();
             goIndex_t i = 0;
             while (el && i < sz)
@@ -70,6 +80,8 @@ class goPointCloud : public goObjectBase
             return true;
         };
 
+        void    affineTransform (const goMatrix<T>& m);
+
         virtual bool writeObjectFile (FILE*) const;
         virtual bool readObjectFile  (FILE*);
         
@@ -79,10 +91,10 @@ class goPointCloud : public goObjectBase
         virtual void receiveObjectMessage (const goObjectMessage& message);
 
     private:
-        goPointCloudPrivate<pointT>* myPrivate;
+        goPointCloudPrivate<T>* myPrivate;
 };
 
-typedef goPointCloud<goPointf> goPointCloudf;
+typedef goPointCloud<goFloat> goPointCloudf;
 
 /** @} */
 #endif

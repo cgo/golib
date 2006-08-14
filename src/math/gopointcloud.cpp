@@ -7,19 +7,20 @@
 #include <gomath.h>
 #include <assert.h>
 
-template <class pointT>
+template <class T>
 class goPointCloudPrivate
 {
     public:
         goPointCloudPrivate();
         ~goPointCloudPrivate();
 
-        goList<pointT> points;
+        goList<goVector<T> > points;
+        goSize_t             dim;
 };
 
-template <class pointT>
-goPointCloudPrivate<pointT>::goPointCloudPrivate ()
-    : points ()
+template <class T>
+goPointCloudPrivate<T>::goPointCloudPrivate ()
+    : points (), dim (2)
 {
 }
 
@@ -30,44 +31,45 @@ goPointCloudPrivate<pointT>::~goPointCloudPrivate ()
 
 // =====================================
 
-template <class pointT>
-goPointCloud<pointT>::goPointCloud ()
+template <class T>
+goPointCloud<T>::goPointCloud (goSize_t dim)
     : goObjectBase (),
       myPrivate (0)
 {
     this->setClassID(GO_POINTCLOUD);
-    myPrivate = new goPointCloudPrivate<pointT>;
+    myPrivate = new goPointCloudPrivate<T>;
     assert (myPrivate);
+    myPrivate->dim = dim;
 }
 
-template <class pointT>
-goPointCloud<pointT>::goPointCloud (const goPointCloud<pointT>& other)
+template <class T>
+goPointCloud<T>::goPointCloud (const goPointCloud<T>& other)
     : goObjectBase (),
       myPrivate (0)
 {
-    myPrivate = new goPointCloudPrivate<pointT>;
+    myPrivate = new goPointCloudPrivate<T>;
     assert (myPrivate);
     *this = other;
 }
 
-template <class pointT>
-goPointCloud<pointT>::goPointCloud (const goList<pointT>& pl)
+template <class T>
+goPointCloud<T>::goPointCloud (const goList<goVector<T> >& pl)
     : goObjectBase (),
       myPrivate (0)
 {
-    myPrivate = new goPointCloudPrivate<pointT>;
+    myPrivate = new goPointCloudPrivate<T>;
     assert (myPrivate);
     this->setPoints (pl);
 }
-template <class pointT>
-goPointCloud<pointT>& goPointCloud<pointT>::operator= (const goPointCloud<pointT>& other)
+template <class T>
+goPointCloud<T>& goPointCloud<T>::operator= (const goPointCloud<T>& other)
 {
     *myPrivate = *other.myPrivate;
     return *this;
 }
 
-template <class pointT>
-goPointCloud<pointT>::~goPointCloud ()
+template <class T>
+goPointCloud<T>::~goPointCloud ()
 {
     if (myPrivate)
     {
@@ -76,14 +78,14 @@ goPointCloud<pointT>::~goPointCloud ()
     }
 }
 
-template <class pointT>
-bool goPointCloud<pointT>::operator!= (const goPointCloud<pointT>& other) const
+template <class T>
+bool goPointCloud<T>::operator!= (const goPointCloud<T>& other) const
 {
     return myPrivate->points != other.myPrivate->points;
 }
 
-template <class pointT>
-bool goPointCloud<pointT>::operator== (const goPointCloud<pointT>& other) const
+template <class T>
+bool goPointCloud<T>::operator== (const goPointCloud<T>& other) const
 {
     return !(*this != other);
 }
@@ -93,8 +95,8 @@ bool goPointCloud<pointT>::operator== (const goPointCloud<pointT>& other) const
  * 
  * @return Number of points in the point cloud.
  */
-template <class pointT>
-goIndex_t goPointCloud<pointT>::getPointCount () const
+template <class T>
+goIndex_t goPointCloud<T>::getPointCount () const
 {
     assert (myPrivate);
     return myPrivate->points.getSize();
@@ -105,10 +107,38 @@ goIndex_t goPointCloud<pointT>::getPointCount () const
 *
 * @return Reference to the list of pointT objects constituting the point cloud.
 **/
-template <class pointT>
-goList<pointT>& goPointCloud<pointT>::getPoints ()
+template <class T>
+goList<goVector<T> >& goPointCloud<T>::getPoints ()
 {
     return myPrivate->points;
+}
+
+template <class T>
+void goPointCloud<T>::affineTransform (const goMatrix<T>& m)
+{
+    typename goList<goVector<T> >::Element* el = this->getPoints().getFrontElement();
+    goSize_t sz = this->getPoints().getSize();
+    goSize_t i;
+    if (el)
+    {
+        assert (el->elem.getSize() == m.getRows() - 1 && m.getRows() == m.getColumns());
+    }
+    for (i = 0; i < sz; ++i)
+    {
+        goVector<T> temp (this->getDim() + 1);
+        el->elem.copy (temp, 0, 0);
+        // temp = el->elem;
+        temp[temp.getSize()-1] = 1.0;
+        //temp *= m;
+        temp = m * temp;
+        temp *= 1.0 / temp[temp.getSize()-1];
+        temp.copy (el->elem, 0, 0, el->elem.getSize()-1);
+        //el->elem[3] = 1.0;
+        //el->elem *= m;
+        //el->elem *= 1.0 / el->elem[3];
+        //el->elem[3] = 0.0;
+        el = el->next;
+    }
 }
 
 /**
@@ -116,8 +146,8 @@ goList<pointT>& goPointCloud<pointT>::getPoints ()
 *
 * @return Reference to the list of goPointf objects constituting the point cloud.
 **/
-template <class pointT>
-const goList<pointT>& goPointCloud<pointT>::getPoints () const
+template <class T>
+const goList<goVector<T> >& goPointCloud<T>::getPoints () const
 {
     return myPrivate->points;
 }
@@ -127,10 +157,15 @@ const goList<pointT>& goPointCloud<pointT>::getPoints () const
 *
 * @param points  List of points. This list will be deep-copied into the internal list.
 **/
-template <class pointT>
-bool goPointCloud<pointT>::setPoints (const goList<pointT>& points)
+template <class T>
+bool goPointCloud<T>::setPoints (const goList<goVector<T> >& points)
 {
     myPrivate->points = points;
+    if (!points.isEmpty())
+    {
+        assert (points.getFrontElement());
+        myPrivate->dim = points.getFrontElement()->elem.getSize();
+    }
     return true;
 }
 
@@ -139,16 +174,23 @@ bool goPointCloud<pointT>::setPoints (const goList<pointT>& points)
  * 
  * @param p Point to be added.
  */
-template <class pointT>
-void goPointCloud<pointT>::addPoint (const pointT& p)
+template <class T>
+void goPointCloud<T>::addPoint (const goVector<T>& p)
 {
+    assert (p.getSize() == this->getDim());
     myPrivate->points.append(p);
 }
 
-template <class pointT>
-void goPointCloud<pointT>::setChanged ()
+template <class T>
+void goPointCloud<T>::setChanged ()
 {
     this->sendObjectMessage (GO_OBJECTMESSAGE_CHANGED, 0);
+}
+
+template <class T>
+goSize_t goPointCloud<T>::getDim () const
+{
+    return myPrivate->dim;
 }
 
 /**
@@ -160,37 +202,40 @@ void goPointCloud<pointT>::setChanged ()
 *
 * @return True if successful, false otherwise.
 **/
-template <class pointT>
-bool goPointCloud<pointT>::getCenterOfMass (pointT& comRet) const
+template <class T>
+bool goPointCloud<T>::getCenterOfMass (goVector<T>& comRet) const
 {
     if (myPrivate->points.isEmpty())
         return false;
 
-    const pointT* p = 0;
     goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
     goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
-    goDouble x = 0.0;
-    goDouble y = 0.0;
-    goDouble z = 0.0;
-    goDouble w = 0.0;
-    typename goList<pointT>::ConstElement* el = myPrivate->points.getFrontElement();
+//    goDouble x = 0.0;
+//    goDouble y = 0.0;
+//    goDouble z = 0.0;
+//    goDouble w = 0.0;
+    goVector<T> temp (this->getDim());
+    temp.fill (0.0);
+    typename goList<goVector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
     assert(el);
     goIndex_t i = 0;
     while (el && i < pointCount)
     {
-        p = &el->elem;           // myPrivate->points.getCurrentPtr();
-        assert (p);
-        x += p->x * factor;
-        y += p->y * factor;
-        z += p->z * factor;
-        w += p->w * factor;
+//        p = &el->elem;           // myPrivate->points.getCurrentPtr();
+//        assert (p);
+        temp += el->elem * factor;        
+//        x += p->x * factor;
+//        y += p->y * factor;
+//        z += p->z * factor;
+//        w += p->w * factor;
         el = el->next;
         ++i;
     }
-    comRet.x = x;
-    comRet.y = y;
-    comRet.z = z;
-    comRet.w = w;
+    comRet = temp;
+//    comRet.x = x;
+//    comRet.y = y;
+//    comRet.z = z;
+//    comRet.w = w;
     return true;
 }
 
@@ -201,14 +246,14 @@ bool goPointCloud<pointT>::getCenterOfMass (pointT& comRet) const
 *
 * @return True if successful, false otherwise.
 **/
-template <class pointT>
-bool goPointCloud<pointT>::translate (const pointT& d)
+template <class T>
+bool goPointCloud<T>::translate (const goVector<T>& d)
 {
     if (myPrivate->points.isEmpty())
         return true;
     
     goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
-    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
+    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
     goIndex_t i = 0;
     while (el && i < pointCount)
     {
@@ -234,7 +279,7 @@ bool goPointCloud<pointT>::transform (const go44Matrixf& m)
     if (myPrivate->points.isEmpty())
         return true;
     
-    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
+    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
     assert (el);
     while (true)
     {
@@ -259,15 +304,18 @@ bool goPointCloud<pointT>::transform (const go44Matrixf& m)
  *
  * @return True if successful, false otherwise.
  **/
-template <class pointT>
-bool goPointCloud<pointT>::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, const goArray<goFloat>* weights) const
+template <class T>
+bool goPointCloud<T>::getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const goArray<goFloat>* weights) const
 {
     //= Moment-of-inertia tensor
     goDouble I_00 = 0.0;
     goDouble I_01 = 0.0;
     goDouble I_11 = 0.0;
 
-    typename goList<pointT>::ConstElement* el = this->getPoints().getFrontElement();
+    a1.setSize (2);
+    a2.setSize (2);
+
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     if (!el)
         return false;
 
@@ -288,9 +336,9 @@ bool goPointCloud<pointT>::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, c
         goIndex_t size = weights->getSize();
         while (true && i < size)
         {
-            I_00 += (*weights)[i] * el->elem.x*el->elem.x;
-            I_11 += (*weights)[i] * el->elem.y*el->elem.y;
-            I_01 += (*weights)[i] * el->elem.x*el->elem.y;
+            I_00 += (*weights)[i] * el->elem[0] * el->elem[0];
+            I_11 += (*weights)[i] * el->elem[1] * el->elem[1];
+            I_01 += (*weights)[i] * el->elem[0] * el->elem[1];
             totalWeight += (*weights)[i];
             if (!el->next)
                 break;
@@ -302,9 +350,9 @@ bool goPointCloud<pointT>::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, c
     {
         while (true)
         {
-            I_00 += el->elem.x*el->elem.x;
-            I_11 += el->elem.y*el->elem.y;
-            I_01 += el->elem.x*el->elem.y;
+            I_00 += el->elem[0] * el->elem[0];
+            I_11 += el->elem[1] * el->elem[1];
+            I_01 += el->elem[0] * el->elem[1];
             if (!el->next)
                 break;
             el = el->next;
@@ -337,80 +385,100 @@ bool goPointCloud<pointT>::getPrincipalAxes2D (go4Vectorf& a1, go4Vectorf& a2, c
         l1 = l2;
         l2 = temp;
     }
-    a1.x = 1.0f;
-    a1.y = (l1-I_00)/I_01;
-    a1.z = 0.0f;
-    a1.w = 0.0f;
+    a1.fill (0.0);
+    a1[0] = 1.0f;
+    a1[1] = (l1-I_00)/I_01;
     a1 *= 1.0f / a1.abs();
-    a2.x = 1.0f;
-    a2.y = (l2-I_00)/I_01;
-    a2.z = 0.0f;
-    a2.w = 0.0f;
+    a2.fill (0.0);
+    a2[0] = 1.0f;
+    a2[1] = (l2-I_00)/I_01;
     a2 *= 1.0f / a2.abs();
 
     //= Make sure they are orthogonal.
-    go4Vectorf temp;
-    temp = a2;
-    temp.cross(a1);
-    a2 = a1;
-    a2.cross (temp);
-    a2 *= 1.0f / a1.abs();
+    //= Removed when removing goPoint dependencies
+//    go4Vectorf temp;
+//    temp = a2;
+//    temp.cross(a1);
+//    a2 = a1;
+//    a2.cross (temp);
+//    a2 *= 1.0f / a1.abs();
     return true;
 }
 
-template <class pointT>
-bool goPointCloud<pointT>::unitScale (goFloat f)
+template <class T>
+bool goPointCloud<T>::unitScale (goFloat f)
 {
     if (myPrivate->points.isEmpty())
         return false;
-    typename goList<pointT>::Element* el = myPrivate->points.getFrontElement();
-    pointT max = el->elem;
-    pointT min = el->elem;
-    while (true)
+    assert (f >= 0.0f);
+    if (f < 0.0)
     {
-        if (el->elem.x > max.x)
-        {
-            max.x = el->elem.x;
-        }
-        if (el->elem.y > max.y)
-        {
-            max.y = el->elem.y;
-        }
-        if (el->elem.x < min.x)
-        {
-            min.x = el->elem.x;
-        }
-        if (el->elem.y < min.y)
-        {
-            min.y = el->elem.y;
-        }
-        if (!el->next)
-            break;
-        el = el->next;
+        return false;
     }
-    el = myPrivate->points.getFrontElement();
-    goPointf trans (min.x, min.y);
-    goPointf factorv (f, f);
-    if (max.x != min.x)
-        factorv.x = f / (max.x - min.x);
-    if (max.y != min.y)
-        factorv.y = f / (max.y - min.y);
-    goFloat factor = goMath::min (factorv.x, factorv.y);
-    while (true)
+    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
+    goVector<T> max = el->elem;
+    goVector<T> min = el->elem;
+    const goSize_t N = max.getSize ();
+    goSize_t i;
+    goSize_t j = 0;
+    const goSize_t pointCount = this->getPointCount();
+    while (el && j < pointCount)
     {
-        el->elem.x -= trans.x;
-        el->elem.x *= factor;
-        el->elem.y -= trans.y;
-        el->elem.y *= factor;
-        if (!el->next)
-            break;
+        for (i = 0; i < N; ++i)
+        {
+            if (el->elem[i] > max[i])
+            {
+                max[i] = el->elem[i];
+            }
+            if (el->elem[i] < min[i])
+            {
+                min[i] = el->elem[i];
+            }
+        }
         el = el->next;
+        ++j;
+    }
+    goVector<T> trans (min);
+    goVector<T> factorv (this->getDim());
+    factorv.fill (f);
+    for (i = 0; i < N; ++i)
+    {
+        if (max[i] != min[i])
+        {
+            factorv[i] = f / (max[i] - min[i]);
+        }
+    }
+//    if (max.x != min.x)
+//        factorv.x = f / (max.x - min.x);
+//    if (max.y != min.y)
+//        factorv.y = f / (max.y - min.y);
+    goFloat factor = factorv[0];
+    for (i = 0; i < N; ++i)
+    {
+        if (factorv[i] < factor)
+        {
+            factor = factorv[i];
+        }
+    }
+//    goMath::min (factorv.x, factorv.y);
+    el = myPrivate->points.getFrontElement();
+    j = 0;
+    while (el && j < pointCount)
+    {
+        el->elem -= trans;
+        el->elem *= factor;
+//        el->elem.x -= trans.x;
+//        el->elem.x *= factor;
+//        el->elem.y -= trans.y;
+//        el->elem.y *= factor;
+        el = el->next;
+        ++j;
     }
     return true;
 }
 
 /**
-* @brief Write the point cloud to a file.
+* @brief DO NOT USE Write the point cloud to a file.
 *
 * Writes all 4 coordinates and the point value to the file.
 * 
@@ -418,32 +486,54 @@ bool goPointCloud<pointT>::unitScale (goFloat f)
 *
 * @return True if successful, false otherwise.
 **/
-template <class pointT>
-bool goPointCloud<pointT>::writeObjectFile (FILE* f) const
+template <class T>
+bool goPointCloud<T>::writeObjectFile (FILE* f) const
 {
     if (!f)
         return false;
-    goIndex_t s = myPrivate->points.getSize();
-    if (!goFileIO::writeASCII (f, goString("goPointCloud")))
+    if (!goFileIO::writeASCII (f, goString("goPointCloud\n")))
         return false;
-    const char cnull = 0;
-    fwrite (&cnull, sizeof(char), 1, f);
-    fwrite (&s, sizeof(goIndex_t), 1, f);
-    typename goList<pointT>::ConstElement* el = myPrivate->points.getFrontElement();
-    while (el)
+//    const char cnull = 0;
+//    fwrite (&cnull, sizeof(char), 1, f);
+//    fwrite (&s, sizeof(goIndex_t), 1, f);
+    typename goList<goVector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
+    goSize_t j = 0;
+    goSize_t pointCount = this->getPointCount ();
+    const goSize_t N = (el ? el->elem.getSize() : 0);
+    goString numString = "";
+    numString += (int)N;
+    numString += "\n";
+    if (!goFileIO::writeASCII (f, numString))
     {
-        fwrite (&el->elem.x, sizeof(goFloat), 1, f);
-        fwrite (&el->elem.y, sizeof(goFloat), 1, f);
-        fwrite (&el->elem.z, sizeof(goFloat), 1, f);
-        fwrite (&el->elem.w, sizeof(goFloat), 1, f);
-        fwrite (&el->elem.value, sizeof(goDouble), 1, f);
+        return false;
+    }
+    numString = "";
+    numString += (int)pointCount;
+    numString += "\n";
+    if (!goFileIO::writeASCII (f, numString))
+    {
+        return false;
+    }
+    goSize_t i;
+    while (el && j < pointCount)
+    {
+        for (i = 0; i < N; ++i)
+        {
+            fwrite (&el->elem[i], sizeof(goFloat), 1, f);
+        }
+//        fwrite (&el->elem.x, sizeof(goFloat), 1, f);
+//        fwrite (&el->elem.y, sizeof(goFloat), 1, f);
+//        fwrite (&el->elem.z, sizeof(goFloat), 1, f);
+//        fwrite (&el->elem.w, sizeof(goFloat), 1, f);
+//        fwrite (&el->elem.value, sizeof(goDouble), 1, f);
         el = el->next;
+        ++j;
     }
     return goObjectBase::writeObjectFile (f);
 }
 
 /**
-* @brief Read the point cloud from a file.
+* @brief DO NOT USE Read the point cloud from a file.
 *
 * Reads all 4 coordinates and the point value from the file.
 * 
@@ -451,34 +541,48 @@ bool goPointCloud<pointT>::writeObjectFile (FILE* f) const
 *
 * @return True if successful, false otherwise.
 **/
-template <class pointT>
-bool goPointCloud<pointT>::readObjectFile (FILE* f)
+template <class T>
+bool goPointCloud<T>::readObjectFile (FILE* f)
 {
     if (!f)
         return false;
-    goIndex_t s = 0;
+    goSize_t s = 0;
     goString name;
-    if (!goFileIO::readASCII (f, name))
+    if (!goFileIO::readASCIILine (f, name))
         return false;
     if (name != "goPointCloud")
         return false;
-    fread (&s, sizeof(goIndex_t), 1, f);
-    if (s < 0)
+ //   fread (&s, sizeof(goIndex_t), 1, f);
+    goString line = "";
+    if (!goFileIO::readASCIILine (f, line))
     {
         return false;
     }
+    goSize_t N = 0;
+    N = line.toInt ();
+    if (!goFileIO::readASCIILine (f, line))
+    {
+        return false;
+    }
+    s = line.toInt ();
     myPrivate->points.erase();
-    pointT p;
+    goVector<T> p (N);
     goSize_t count = 0;
-    for (goIndex_t i = 0; i < s; ++i)
+    goSize_t i;
+    goSize_t j;
+    for (i = 0; i < s; ++i)
     {
         count = 0;
-        count += fread (&p.x, sizeof(goFloat), 1, f);
-        count += fread (&p.y, sizeof(goFloat), 1, f);
-        count += fread (&p.z, sizeof(goFloat), 1, f);
-        count += fread (&p.w, sizeof(goFloat), 1, f);
-        count += fread (&p.value, sizeof(goDouble), 1, f);
-        if (count != 5)
+        for (j = 0; j < N; ++j)
+        {
+            count += fread (&p[j], sizeof(goFloat), 1, f);
+        }
+//        count += fread (&p.x, sizeof(goFloat), 1, f);
+//        count += fread (&p.y, sizeof(goFloat), 1, f);
+//        count += fread (&p.z, sizeof(goFloat), 1, f);
+//        count += fread (&p.w, sizeof(goFloat), 1, f);
+//        count += fread (&p.value, sizeof(goDouble), 1, f);
+        if (count != N)
             return false;
         myPrivate->points.append (p);
     }
@@ -486,17 +590,17 @@ bool goPointCloud<pointT>::readObjectFile (FILE* f)
     return goObjectBase::readObjectFile (f);
 }
 
-template <class pointT>
-bool goPointCloud<pointT>::callObjectMethod (int methodID, goObjectMethodParameters* param)
+template <class T>
+bool goPointCloud<T>::callObjectMethod (int methodID, goObjectMethodParameters* param)
 {
     return goObjectBase::callObjectMethod (methodID, param);
 }
 
-template <class pointT>
-void goPointCloud<pointT>::receiveObjectMessage (const goObjectMessage& msg)
+template <class T>
+void goPointCloud<T>::receiveObjectMessage (const goObjectMessage& msg)
 {
     goObjectBase::receiveObjectMessage (msg);
 }
 
-template class goPointCloud <goPointf>;
-template class goPointCloud <goPointd>;
+template class goPointCloud <goFloat>;
+template class goPointCloud <goDouble>;

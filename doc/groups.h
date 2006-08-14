@@ -103,6 +103,28 @@
  */
 /*!
  * \defgroup math Mathematics
+ *  \section math-la Linear Algebra Objects
+ *  Use goMatrix and goVector for matrix and vector operations.
+ *  Others, like go4Vector and such will be deprecated and replaced
+ *  solely by the former two classes.
+ *  goMatrix and goVector use CBLAS routines for some operations
+ *  and more will be added. Using CBLAS moves the matter of optimisation
+ *  for a specific platform outside of golib.
+ *  The operator* and operator*= operators use CBLAS.
+ *  For best performance, when you want to do something like
+ *  \f$C = A^\top \cdot B + C\f$, use goMatrixMult().
+ *  Explicitly transposing a matrix should not be necessary,
+ *  if I find it is for some operation, I will add functions
+ *  that overcome this. Transposition of a goMatrix is possible
+ *  with getTranspose() or transpose(), but is very slow since
+ *  the data are copied.
+ *
+ *  Singular value decomposition can be done using goSVD.
+ *  Eigenvalues and eigenvectors can be calculated with goEigenvalue.
+ *  Both are adapted versions from the Template Numerical Toolkit, 
+ *  a freely available implementation of a few linear algebra 
+ *  algorithms.
+ *  
  * \defgroup misc Miscellaneous and basic classes
  *  \section misc-intro Introduction
  *   This group contains miscellaneous and basic classes, like the goObjectBase class.
@@ -115,6 +137,19 @@
  *   - Identification of classes by numeric IDs, objects by names.
  *    Class names exist through a hash table in goGlobal, that takes a numeric class ID
  *    as input and returns a goString.
+ *
+ *   \section misc-goobjectbase goObjectBase
+ * 
+ *    \section misc-gofileio File Operations With goFileIO
+ *     \subsection misc-gofileio-images Loading and Writing Images
+ *     goFileIO::readImage() and goFileIO::writeImage() can be used to
+ *     read and write images to and from goSignal3D objects.
+ *     This works only if the use of libdevil was enabled when golib
+ *     was compiled (see building instructions).
+ *     Naturally, golib can read and write any file format that
+ *     can be read and written by the installed libdevil.
+ *     There are also functions for reading and writing
+ *     ASCII strings from and to files. See goFileIO for details.
  *   
  * \defgroup system System
  * \defgroup net Network classes

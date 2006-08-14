@@ -85,7 +85,7 @@ SET                 (SOURCES
  src/types/gotype.cpp
  src/math/gopointcloud.cpp
  src/math/gocurve.cpp
- src/math/gonubs.cpp
+ # src/math/gonubs.cpp
  src/seispack/bakvec.c
  src/seispack/balanc.c
  src/seispack/balbak.c
@@ -163,15 +163,18 @@ SET                 (SOURCES
  src/seispack/tsturm.c
  src/seispack/r_sign.c)
 
+# If the the environment variable MATLAB is set, assume the matlab module
+# should be built. This creates the build directory, but it is not
+# automatically descended into. The user has to do that.
 IF($ENV{MATLAB})
     SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
+    ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab EXCLUDE_FROM_ALL)
 ENDIF($ENV{MATLAB})
-#SET                 (EXTRA_INCLUDE_PATH /home/gosch/Software/include $ENV{MATLAB}/extern/include)
-#SET                 (EXTRA_LIBS "")
-# SET                 (GOPATH $ENV{GOPATH})
-# Don't rely on $GOPATH to build the library itself.
+
 SET                 (GOPATH ${PROJECT_SOURCE_DIR})
-# FILE                (GLOB SOURCES *.cpp *.cxx)
+
+# This was introduced for guile 1.6.x. 1.8 should be threadsafe. Not tried
+# though.
 SET                 (GO_GUILE_MULTITHREAD 0)
 
 CHECK_TYPE_SIZE("char"          SIZEOF_CHAR)
@@ -205,21 +208,10 @@ CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
 CHECK_FUNCTION_EXISTS (stat     HAVE_STAT)
 CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
-#EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
 EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
-#EXEC_PROGRAM        (swig ARGS 
-#                        -I./ 
-#                        -I$ENV{GOPATH}/include 
-#                        -I$ENV{SWSPATH}/include 
-#                        -guile -c++ -Linkage module -scm ${IFILE})
-# FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
-#CHECK_LIBRARY_EXISTS (IL ilInit 
-#                      "$ENV{LD_LIBRARY_PATH};/usr/lib;/usr/local/lib;${EXTRA_LIB_PATH}"
-#                      HAVE_LIBIL)
 
 FIND_LIBRARY        (ATLAS NAMES atlas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY        (CBLAS NAMES cblas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
-
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
 #IF (${HAVE_LIBATLAS} MATCHES 1)

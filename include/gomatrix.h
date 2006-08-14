@@ -190,7 +190,16 @@ class goMatrix
   * @return Const pointer to the matrix array.
   */
   const T* getData   () const { return this->matrix; };
-  
+ 
+  /** 
+   * @brief Get data pointer. Same as getData().
+   */
+  T*       getPtr    () { return this->matrix; };
+  /** 
+   * @brief Get data pointer. Same as getData().
+   */
+  const T* getPtr    () const { return this->matrix; };
+
   /** 
   * @brief Get number of columns.
   * 
@@ -303,7 +312,18 @@ class goMatrix
 
   T&       operator[] (goSize_t index) { return this->matrix[index]; };
   const T& operator[] (goSize_t index) const { return this->matrix[index]; };
-  inline goMatrix<T>		operator*  (const goMatrix<T>& other);
+
+
+  /** 
+   * @brief Matrix multiplication.
+   * @note Uses CBLAS for goFloat and goDouble types.
+   * @see goMatrixMult()
+   *
+   * @param other A matrix.
+   * 
+   * @return this * other
+   */
+  goMatrix<T>		operator*  (const goMatrix<T>& other) const;
 
   //= Quite slow, quick hack.
   goMatrix<T>		operator-  (const goMatrix<T>& other)
@@ -341,7 +361,16 @@ class goMatrix
     return C;
   };
 
-  inline goMatrix<T>&		operator*= (const goMatrix<T>& other);
+
+  /** 
+   * @brief this = this * other
+   * @note Uses CLBLAS for goFloat and goDouble types.
+   * @see goMatrixMult()
+   * @param other A Matrix.
+   * 
+   * @return Reference to this.
+   */
+  goMatrix<T>&		operator*= (const goMatrix<T>& other);
 
   /** 
   * @brief Element-wise addition.
@@ -391,17 +420,18 @@ class goMatrix
 
   /** 
   * @brief Matrix vector multiplication.
-  * 
-  * @param v 
+  * @note Uses CBLAS for goFloat and goDouble types.
+  * @param v A vector.
   * 
   * @return this * v
   */
-  inline goVector<T>       operator*  (const goVector<T>& v);
+  goVector<T>       operator*  (const goVector<T>& v) const;
+//  goVector<T>       operator*  (const goVector<goDouble>& v) const;
 
   /** 
   * @brief Multiplication by a scalar.
   * 
-  * @param scalar 
+  * @param scalar A scalar.
   * 
   * @return this .* scalar.
   */

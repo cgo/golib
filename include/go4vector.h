@@ -4,6 +4,7 @@
 #include <gotypes.h>
 #include <go44matrix.h>
 #include <go3vector.h>
+#include <golog.h>
 #include <math.h>
 #include <ostream>
 
@@ -13,42 +14,53 @@
 // template <class T> class go44Matrix;
 
 //= New version of go4Vector -- remplase old when this is done.
-#if 0
+#if 1
 template <class T>
 class go4Vector : public goVector<T>
 {
     public:
         go4Vector (T x_ = (T)0, T y_ = (T)0, T z_ = (T)0, T t_ = (T)0) 
-            : goVector<T>(4), x((*this)[0]), y((*this)[1]), z((*this)[2]), t((*this)[3]) 
+            : goVector<T>(4) 
         {
-//            x = static_cast<T&>((*this)[0]);
-//            y = static_cast<T&>((*this)[1]);
-//            z = static_cast<T&>((*this)[2]);
-//            t = static_cast<T&>((*this)[3]);
-            x = x_;
-            y = y_;
-            z = z_;
-            t = t_;
+            (*this)[0] = x_;
+            (*this)[1] = y_;
+            (*this)[2] = z_;
+            (*this)[3] = t_;
         };
-        go4Vector (const go4Vector<T>& other)
-            : goVector<T>(4), x((*this)[0]), y((*this)[1]), z((*this)[2]), t((*this)[3]) 
+        template <class To>
+        go4Vector (const go4Vector<To>& other)
+            : goVector<T>(4)
         {
-            (*this)[0] = other.x;
-            (*this)[1] = other.y;
-            (*this)[2] = other.z;
-            (*this)[3] = other.t;
+            *this = other;
+        };
+
+        template <class To>
+        go4Vector (const goVector<To>& other)
+            : goVector<T>(4)
+        {
+            if (other.getSize() == 4)
+            {
+                *this = other;
+            }
+            else
+            {
+                goLog::warning ("go4Vector::go4Vector(other): Tried to initialise with goVector of size != 4");
+            }
         };
         virtual ~go4Vector () {};
 
-        T& x;
-        T& y;
-        T& z;
-        union
-        { 
-            T& t;
-            T& w;
-        };
+        T& x() { return (*this)[0]; };
+        T& y() { return (*this)[1]; };
+        T& z() { return (*this)[2]; };
+        T& t() { return (*this)[3]; };
+        T& w() { return (*this)[3]; };
+        const T& x() const { return (*this)[0]; };
+        const T& y() const { return (*this)[1]; };
+        const T& z() const { return (*this)[2]; };
+        const T& t() const { return (*this)[3]; };
+        const T& w() const { return (*this)[3]; };
 
+#if 0
         template <class To>
             GO4VECTOR_FUNCTION_PREFIX go4Vector<T>& operator= (const go4Vector<To>& other) 
             {   (*this)[0] = other.x; 
@@ -56,7 +68,8 @@ class go4Vector : public goVector<T>
                 (*this)[2] = other.z; 
                 (*this)[3] = 1; 
                 return *this; };
-
+#endif
+#if 0
       /*!
        * Multiplies matrix to this vector from the left (naturally), i.e.
        * sets *this = matrix * *this;
@@ -75,7 +88,6 @@ class go4Vector : public goVector<T>
         a4 = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
         x = a1; y = a2; z = a3; t = a4;
       };
-
       template <class mT>
           GO4VECTOR_FUNCTION_PREFIX go4Vector<T> operator* (const go44Matrix<mT>& matrix) const
           {
@@ -90,18 +102,18 @@ class go4Vector : public goVector<T>
               retValue.w = *(m) * x + *(m + 1) * y + *(m + 2) * z + *(m + 3) * t;
               return retValue;
           };
-
+#endif
       /*! @brief Cross-product.
        * Uses only the first three elements. */
       GO4VECTOR_FUNCTION_PREFIX void cross (const go4Vector<T>& other) 
       { 
           T x0,x1,x2; 
-          x0 = y * other.z - z * other.y; 
-          x1 = z * other.x - other.z * x; 
-          x2 = x * other.y - other.x * y; 
-          x = x0; 
-          y = x1; 
-          z = x2; 
+          x0 = y() * other.z() - z() * other.y(); 
+          x1 = z() * other.x() - other.z() * x(); 
+          x2 = x() * other.y() - other.x() * y(); 
+          x() = x0; 
+          y() = x1; 
+          z() = x2; 
       };
 
       /*!
@@ -109,11 +121,11 @@ class go4Vector : public goVector<T>
        */
       GO4VECTOR_FUNCTION_PREFIX void div() 
       {
-          T t_1 = (T)(1.0 / (goDouble)t);
-          t = 1;
-          x *= t_1;
-          y *= t_1;
-          z *= t_1;
+          T t_1 = (T)(1.0 / (goDouble)t());
+          t() = 1;
+          x() *= t_1;
+          y() *= t_1;
+          z() *= t_1;
       };
 };
 #endif
@@ -125,7 +137,7 @@ class go4Vector : public goVector<T>
  * @todo make this a descendant of goVector, fix size to 4, provide
  *  x,y,z,t/w as references.
  **/
-#if 1
+#if 0
 template< class T >
 class
 go4Vector {

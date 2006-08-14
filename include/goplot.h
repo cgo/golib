@@ -106,8 +106,8 @@ class goPlotter : public goObjectBase
                 goSize_t i = 0;
                 while (i < sz && el)
                 {
-                    x[i] = el->elem.x;
-                    y[i] = el->elem.y;
+                    x[i] = el->elem[0];
+                    y[i] = el->elem[1];
                     ++i;
                     el = el->next;
                 }

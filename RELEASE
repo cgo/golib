@@ -1,8 +1,7 @@
-This is golib 0.4.1
+This is golib 0.5
 -------------------
-On the way to 0.5!
 
-Plans for version 0.5
+Plans 
 ---------------------
 TODO:
 - Change license to "free only for research and private use"
@@ -15,9 +14,9 @@ TODO:
   for how that works)
 - Documentation: more examples and tutorial-like introductions to the 
   modules
-- Add cblas support for matrix and vector operations
-- Simplify matrix access for linearly stored matrices
-  - Measure time penalty for overhead of using goSignal* classes here
+- Add cblas support for matrix and vector operations                    --- partly done
+- Simplify matrix access for linearly stored matrices                   --- done, replaced old goMatrix
+  - Measure time penalty for overhead of using goSignal* classes here   --- not done yet, seems to be huge though
 (- Make it compile under Windows)
 
 IMPORTANT NOTE FOR VERSION 0.2.1:

@@ -127,8 +127,8 @@ bool goNUBS::calculate ()
     //= Create an array with the accumulated distances between the points:
     for (i = 1; i <= controlPointCount; ++i)
     {
-        goFloat temp1 = pointList2->elem.x - pointList->elem.x;
-        goFloat temp2 = pointList2->elem.y - pointList->elem.y;
+        goFloat temp1 = pointList2->elem[0] - pointList->elem[0];
+        goFloat temp2 = pointList2->elem[1] - pointList->elem[1];
         accumDist += sqrt(temp1 * temp1 + temp2 * temp2);
         myPrivate->knotValues [i + 3] = accumDist;
         // printf ("Knotvalue %f\n", accumDist);
@@ -270,22 +270,22 @@ goPointf goNUBS::operator() (goFloat u)
     }
     
     goDouble* t   = myPrivate->knotValues.getPtr();
-    p.x = points[3].x * B_(u,t,i-3,3) + 
-          points[2].x * B_(u,t,i-2,3) +   
-          points[1].x * B_(u,t,i-1,3) +   
-          points[0].x * B_(u,t,i,3);
-    p.y = points[3].y * B_(u,t,i-3,3) + 
-          points[2].y * B_(u,t,i-2,3) +   
-          points[1].y * B_(u,t,i-1,3) +   
-          points[0].y * B_(u,t,i,3);
-    p.w = points[3].w * B_(u,t,i-3,3) + 
-          points[2].w * B_(u,t,i-2,3) +   
-          points[1].w * B_(u,t,i-1,3) +   
-          points[0].w * B_(u,t,i,3);
+    p[0] = points[3][0] * B_(u,t,i-3,3) + 
+          points[2][0] * B_(u,t,i-2,3) +   
+          points[1][0] * B_(u,t,i-1,3) +   
+          points[0][0] * B_(u,t,i,3);
+    p[1] = points[3][1] * B_(u,t,i-3,3) + 
+          points[2][1] * B_(u,t,i-2,3) +   
+          points[1][1] * B_(u,t,i-1,3) +   
+          points[0][1] * B_(u,t,i,3);
+    p[3] = points[3][3] * B_(u,t,i-3,3) + 
+          points[2][3] * B_(u,t,i-2,3) +   
+          points[1][3] * B_(u,t,i-1,3) +   
+          points[0][3] * B_(u,t,i,3);
    
     goFloat f = 1.0f;
-    if (p.w != 0.0)
-        f /= p.w;
+    if (p[3] != 0.0)
+        f /= p[3];
     p *= f;
     return p;
 }
@@ -310,7 +310,7 @@ bool goNUBS::setControlPoints (const goList<goPointf>& points)
     const goPointf* p = &points.getFrontElement()->elem;
     assert (p);
     goPointf pp = *p;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t sz = points.getSize();
     goIndex_t i = 0;
     goList<goPointf>::ConstElement* el = points.getFrontElement();
@@ -329,7 +329,7 @@ bool goNUBS::setControlPoints (const goList<goPointf>& points)
     while (i < sz)
     {
         pp = el->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
         if (!el->next)
             break;
@@ -356,7 +356,7 @@ bool goNUBS::setControlPoints (const goList<goPointf>& points)
     else
     {
         pp = points.getTailElement()->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();
@@ -372,14 +372,14 @@ bool goNUBS::setControlPoints (const goList<goPointd>& points)
     const goPointd* p = &points.getFrontElement()->elem;
     assert (p);
     goPointf pp;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t sz = points.getSize();
     goIndex_t i = 0;
     goList<goPointd>::ConstElement* el = points.getFrontElement();
     while (i < sz)
     {
         pp = el->elem;
-        pp.w = 1.0;
+        pp[3] = 1.0;
         myPrivate->controlPoints.append(pp);
         if (!el->next)
             break;
@@ -393,7 +393,7 @@ bool goNUBS::setControlPoints (const goList<goPointd>& points)
     else
     {
         pp = points.getTailElement()->elem;
-        pp.w = 1.0;
+        pp[3] = 1.0;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();
@@ -420,13 +420,13 @@ bool goNUBS::setControlPoints (goList<goPointf>::ConstElement* begin, goList<goP
     const goPointf* p = &begin->elem;
     assert (p);
     goPointf pp = *p;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t i = 0;
     goList<goPointf>::ConstElement* el = begin;
     while (el != end)
     {
         pp = el->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
         ++i;
         el = el->next;
@@ -441,7 +441,7 @@ bool goNUBS::setControlPoints (goList<goPointf>::ConstElement* begin, goList<goP
     else
     {
         pp = myPrivate->controlPoints.getTailElement()->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();
@@ -460,13 +460,13 @@ bool goNUBS::setControlPoints (goList<goPointd>::ConstElement* begin, goList<goP
     const goPointd* p = &begin->elem;
     assert (p);
     goPointf pp = *p;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t i = 0;
     goList<goPointd>::ConstElement* el = begin;
     while (el != end)
     {
         pp = el->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
         ++i;
         el = el->next;
@@ -481,7 +481,7 @@ bool goNUBS::setControlPoints (goList<goPointd>::ConstElement* begin, goList<goP
     else
     {
         pp = myPrivate->controlPoints.getTailElement()->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();
@@ -508,13 +508,13 @@ bool goNUBS::setControlPoints (goList<goPointf>::ConstElement* begin, goIndex_t 
     const goPointf* p = &begin->elem;
     assert (p);
     goPointf pp = *p;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t i = 0;
     goList<goPointf>::ConstElement* el = begin;
     while (el && i < count)
     {
         pp = el->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
         ++i;
         el = el->next;
@@ -529,7 +529,7 @@ bool goNUBS::setControlPoints (goList<goPointf>::ConstElement* begin, goIndex_t 
     else
     {
         pp = myPrivate->controlPoints.getTailElement()->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();
@@ -556,13 +556,13 @@ bool goNUBS::setControlPoints (goList<goPointd>::ConstElement* begin, goIndex_t 
     const goPointd* p = &begin->elem;
     assert (p);
     goPointf pp = *p;
-    pp.w = 1.0f;
+    pp[3] = 1.0f;
     goIndex_t i = 0;
     goList<goPointd>::ConstElement* el = begin;
     while (el && i < count)
     {
         pp = el->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
         ++i;
         el = el->next;
@@ -577,7 +577,7 @@ bool goNUBS::setControlPoints (goList<goPointd>::ConstElement* begin, goIndex_t 
     else
     {
         pp = myPrivate->controlPoints.getTailElement()->elem;
-        pp.w = 1.0f;
+        pp[3] = 1.0f;
         myPrivate->controlPoints.append(pp);
     }
     this->calculate ();

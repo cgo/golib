@@ -15,7 +15,7 @@ extern "C"
 }
 
 template<>
-goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& other)
+goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& other) const
 {
     goSize_t M = this->getRows();
     goSize_t N = other.getColumns();
@@ -32,7 +32,7 @@ goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& othe
     return C;
 };
 template<>
-goMatrix<goFloat> goMatrix<goFloat>::operator* (const goMatrix<goFloat>& other)
+goMatrix<goFloat> goMatrix<goFloat>::operator* (const goMatrix<goFloat>& other) const
 {
     goSize_t M = this->getRows();
     goSize_t N = other.getColumns();
@@ -88,7 +88,7 @@ goMatrix<goDouble>& goMatrix<goDouble>::operator*= (const goMatrix<goDouble>& ot
 }
 
 template<>
-goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v)
+goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v) const
 {
     assert (v.getSize() == this->getColumns());
     goVector<goFloat> y (v.getSize());
@@ -101,8 +101,9 @@ goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v)
     return y;
 }
 
+
 template<>
-goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v)
+goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v) const
 {
     assert (v.getSize() == this->getColumns());
     goVector<goDouble> y (v.getSize());
@@ -114,6 +115,51 @@ goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v)
                  0.0f, y.getPtr(), y.getStride());
     return y;
 }
+
+#if 0
+template<>
+goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goFloat>& v) const
+{
+    assert (v.getSize() == this->getColumns());
+    goVector<goDouble> y (v.getSize());
+    y.fill (0.0f);
+    matrixVectorMult (*this, v, y);
+    return y;
+}
+#endif
+
+template <class Tm, class Tv, class Tr>
+static void matrixVectorMult (const goMatrix<Tm>& m, const goVector<Tv>& v, goVector<Tr>& r)
+{
+    goSize_t N = m.getRows();
+    goSize_t M = m.getColumns();
+    goSize_t i;
+    goSize_t j;
+    if (r.getSize() != N)
+    {
+        r.setSize (N);
+    }
+    for (i = 0; i < N; ++i)
+    {
+        r[i] = Tr(0);
+        for (j = 0; j < M; ++j)
+        {
+            r[i] += m(i,j) * v[j];
+        }
+    }
+}
+#if 1
+template<class T>
+goVector<T> goMatrix<T>::operator* (const goVector<T>& v) const
+{
+    assert (v.getSize() == this->getColumns());
+    goVector<T> y (v.getSize());
+    y.fill (T(0));
+    matrixVectorMult (*this, v, y);
+    return y;
+}
+#endif
+
 
 template<>
 void goMatrixMult<goFloat> (goFloat alpha, const goMatrix<goFloat>& A, bool transA, 

@@ -97,7 +97,8 @@ goHistogram<level_type>::calculate (const goSignal3DBase<void>& sig, bool normal
         _binStep = 1.0 / binStep;
         for (i = 0; i < myLevels.getSize(); ++i)
         {
-            myLevels[i] = minValue + binStep * (i+1);
+            // myLevels[i] = minValue + binStep * (i+1);
+            myLevels[i] = minValue + binStep * (float)(i);
         }
     }
     else
@@ -354,6 +355,10 @@ static bool _equalizeHistogram (goSignal3DBase<void>* sig, goCDF<cdfT>& targetCD
                 level0 = targetLevels[(goIndex_t)indexf];
                 level1 = targetLevels[(goIndex_t)ceil(indexf)];
                 r      = indexf - (goIndex_t)indexf;
+                if ((goIndex_t)(indexf) <= 0 || (goIndex_t)(indexf) >= targetLevels.getSize() - 2)
+                {
+                    // printf ("indexf == %f, level0 == %f, level1 == %f, r == %f\n", indexf, level0, level1, r);
+                }
                 *(T*)*it = (T)(level0 + (level1-level0)*r);
                 it.incrementX();
             }
@@ -364,6 +369,18 @@ static bool _equalizeHistogram (goSignal3DBase<void>* sig, goCDF<cdfT>& targetCD
     return true;
 }
 
+/** 
+ * @brief Equalise histogram of a signal to a given CDF.
+ *
+ * @note This does not work quite right now. 
+ * Check.
+ * @bug Histogram gets distorted. See example output.
+ * 
+ * @param sig 
+ * @param targetCDF 
+ * 
+ * @return 
+ */
 template <class T>
 bool goEqualizeHistogram (goSignal3DBase<void>* sig, goCDF<T>& targetCDF)
 {

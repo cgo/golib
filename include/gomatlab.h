@@ -9,8 +9,8 @@
 #include <gosignalhelper.h>
 #include <gostring.h>
 #include <gosparsematrix.h>
-#ifndef GOPOINT_H
-# include <gopoint.h>
+#ifndef GOVECTOR_H
+# include <govector.h>
 #endif
 #ifndef GOLIST_H
 # include <golist.h>
@@ -96,6 +96,11 @@ class goMatlab : public goObjectBase
         template <class T>
             bool     putMatrix (const goMatrix<T>& matrix, const char* name)
             {
+                if (!this->getEngine())
+                {
+                    goLog::warning ("goMatlab::putMatrix(): No matlab engine.");
+                    return false;
+                }
                 goIndex_t M = matrix.getRows();
                 goIndex_t N = matrix.getColumns();
                 mxArray* mMatrix = this->matlabCreateMatrix (M,N);
@@ -121,6 +126,11 @@ class goMatlab : public goObjectBase
         template <class T>
             bool getMatrix (goMatrix<T>& matrix, const char* name)
             {
+                if (!this->getEngine())
+                {
+                    goLog::warning ("goMatlab::putMatrix(): No matlab engine.");
+                    return false;
+                }
                 mxArray* temp = engGetVariable (this->getEngine(), name);
                 if (!temp)
                 {
@@ -143,9 +153,9 @@ class goMatlab : public goObjectBase
                 return true;
             };
 
-        bool     put2DPoints (const goList<goPointf>& l, const char* variableName);
-        bool     get2DPoints (goList<goPointf>& l, const char* variableName);
-        bool     put2DPoints (goList<goPointf>::ConstElement* begin, 
+        bool     put2DPoints (const goList<goVectorf>& l, const char* variableName);
+        bool     get2DPoints (goList<goVectorf>& l, const char* variableName);
+        bool     put2DPoints (goList<goVectorf>::ConstElement* begin, 
                               goIndex_t size, 
                               const char* variableName);
 
