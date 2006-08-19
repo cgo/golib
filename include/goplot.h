@@ -20,9 +20,36 @@ class goPlotterPrivate;
 
 class goSinglePlotPrivate;
 
+//= Internal use.
+class goPlotterLabel
+{
+    public:
+        goPlotterLabel (const char* l, goDouble x_, goDouble y_) 
+            : label(l), x(x_), y(y_) {};
+        goPlotterLabel ()
+            : label(""), x(0.0), y(0.0) {};
+        goPlotterLabel (const goPlotterLabel& other)
+        {
+            *this = other;
+        };
+        virtual ~goPlotterLabel () {};
+
+        bool operator== (const goPlotterLabel& other) const
+        {
+            return label == other.label && x == other.x && y == other.y;
+        };
+        bool operator!= (const goPlotterLabel& other) const
+        {
+            return !this->operator== (other);
+        };
+
+        goString label;
+        goDouble x;
+        goDouble y;
+};
+
 /** 
- * @brief 
- * @todo Make this the object that is drawn by goPlotter.
+ * @brief Single plot class used for goMultiPlotter.
  */
 class goSinglePlot : public goObjectBase
 {
@@ -31,6 +58,13 @@ class goSinglePlot : public goObjectBase
         virtual ~goSinglePlot ();
         goSinglePlot (const goSinglePlot&);
         const goSinglePlot& operator= (const goSinglePlot&);
+
+        bool operator== (const goSinglePlot&) const;    //= Just for the goList to work.
+        bool operator!= (const goSinglePlot&) const;
+
+        void setPosition (goSize_t row, goSize_t col);
+        goSize_t getRow () const;
+        goSize_t getColumn () const;
 
         template <class pointT>
             bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
@@ -77,10 +111,56 @@ class goSinglePlot : public goObjectBase
                 return this->addCurve (x,y,title,plotOptions);
             };
 
-        bool addLabel (const goString& l, goDouble x, goDouble y);
+        bool addLabel    (const goString& l, goDouble x, goDouble y);
+        bool makePlot    (goString& plotCommandsRet) const;
+        void removeFiles () const;
+        void clear       ();
 
     private:
         goSinglePlotPrivate* myPrivate;
+};
+
+class goMultiPlotterPrivate;
+
+/** 
+ * @brief Plotting multiple plots in one window (or on one page).
+ *
+ * This is the plotting facility that should be used generally.
+ * It uses Gnuplot.
+ *
+ * @see goSinglePlot
+ * @see goPlotter
+ * 
+ * @author Christian Gosch
+ */
+class goMultiPlotter : public goObjectBase
+{
+    public:
+        goMultiPlotter (goSize_t rows, goSize_t cols);
+        virtual ~goMultiPlotter ();
+        goMultiPlotter (goMultiPlotter&);
+        goMultiPlotter & operator= (goMultiPlotter&);
+
+        void addPlot (const goSinglePlot&, goSize_t row, goSize_t col);
+
+        goSize_t getRows () const;
+        goSize_t getColumns () const;
+
+        void setWaitFlag (bool w);
+        bool getWaitFlag () const;
+        void setPauseFlag (bool p);
+        bool getPauseFlag () const;
+       
+        void setPrefix (const goString&);
+
+        virtual bool plot ();
+        virtual bool plotPostscript (const goString& filename);
+        virtual bool plotFile (const goString& filename, const goString& type);
+
+        void clear ();
+
+    private:
+        goMultiPlotterPrivate* myPrivate;
 };
 
 class goPlotter : public goObjectBase

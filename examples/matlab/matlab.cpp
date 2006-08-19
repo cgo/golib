@@ -1,5 +1,6 @@
 #define HAVE_MATLAB 1
 
+#include <engine.h>
 #include <gomatlab.h>
 #include <stdlib.h>
 

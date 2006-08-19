@@ -28,6 +28,8 @@ goGlobal::goClassNameTable::goClassNameTable ()
     this->add (GO_PDF                ,goString("goPDF"));
     this->add (GO_POINTCLOUD         ,goString("goPointCloud"));
     this->add (GO_PLOTTER            ,goString("goPlotter"));
+    this->add (GO_MULTIPLOTTER       ,goString("goMultiPlotter"));
+    this->add (GO_SINGLEPLOT         ,goString("goSinglePlot"));
     this->add (GO_VIDEOCAPTURE       ,goString("goVideoCapture"));
     this->add (GO_CONNECTION         ,goString("goConnection"));
     this->add (GO_NETOBJECT          ,goString("goNetObject"));

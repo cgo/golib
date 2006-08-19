@@ -96,7 +96,7 @@ class goVector : public goFixedArray<T>
             goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
-                *retArray = *array * n;
+                *retArray = static_cast<T>(*array * n);
                 array += stride;
                 ++retArray;
             }
@@ -111,7 +111,7 @@ class goVector : public goFixedArray<T>
             goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
-                *retArray = *array * n;
+                *retArray = static_cast<T>(*array * n);
                 array += stride;
                 ++retArray;
             }
@@ -125,7 +125,8 @@ class goVector : public goFixedArray<T>
             goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
-                *array *= n;
+                *array = static_cast<T>(*array * n);
+                // *array *= n;
                 array += stride;
             }
             return *this;
@@ -137,7 +138,8 @@ class goVector : public goFixedArray<T>
             goIndex_t stride = this->getStride();
             for (goIndex_t i = 0; i < max; ++i)
             {
-                *array *= n;
+                *array = static_cast<T>(*array * n);
+                // *array *= n;
                 array += stride;
             }
             return *this;
@@ -350,7 +352,7 @@ class goVector : public goFixedArray<T>
 
 template<class T> inline T goVector<T>::abs () const
 {
-    return sqrt(this->square());
+    return static_cast<T>(sqrt(this->square()));
 };
 
 

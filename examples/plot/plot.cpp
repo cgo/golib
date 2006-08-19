@@ -71,6 +71,22 @@ int main ()
     plotter.addCurve(x,d_minus,"mean - deviation");
     plotter.setPauseFlag(true);
     plotter.plot();
-    
+   
+    {
+        printf ("Testing goMultiPlotter\n");
+        goMultiPlotter mp (2,3);
+        goSinglePlot sp1;
+        sp1.addCurve(x,y,"random");
+        sp1.addCurve(x,m,"mean");
+        mp.addPlot (sp1,0,0);
+        sp1.clear ();
+        sp1.addCurve(x,d_plus,"mean + deviation");
+        sp1.addCurve(x,d_minus,"mean - deviation");
+        mp.addPlot (sp1,1,1);
+        mp.setPauseFlag (true);
+        mp.plot ();
+        // mp.plotPostscript ("test.ps");
+    }
+
     exit(1);
 }

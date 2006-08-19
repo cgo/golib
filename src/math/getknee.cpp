@@ -20,7 +20,7 @@ goSize_t goMath::getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y)
 {
     if (x.getSize() <= 2)
     {
-        return x.getSize() == 0 ? 0 : 1;
+        return x.getSize() <= 1 ? 0 : 1;
     }
     assert (x.getSize() == y.getSize());
     //= Fit all possible line pairs y_k = alpha_k * x + beta_k to the data

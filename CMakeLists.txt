@@ -44,6 +44,8 @@ SET                 (SOURCES
  src/math/variance.cpp
  src/math/integrate.cpp
  src/math/getroots.cpp
+ src/misc/gosingleplot.cpp
+ src/misc/gomultiplotter.cpp
  src/misc/goconfigfile.cc 
  src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 

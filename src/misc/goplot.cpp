@@ -8,32 +8,6 @@
 # include <golog.h>
 #endif
 
-class goPlotterLabel
-{
-    public:
-        goPlotterLabel (const char* l, goDouble x_, goDouble y_) 
-            : label(l), x(x_), y(y_) {};
-        goPlotterLabel ()
-            : label(""), x(0.0), y(0.0) {};
-        goPlotterLabel (const goPlotterLabel& other)
-        {
-            *this = other;
-        };
-        virtual ~goPlotterLabel () {};
-
-        bool operator== (const goPlotterLabel& other) const
-        {
-            return label == other.label && x == other.x && y == other.y;
-        };
-        bool operator!= (const goPlotterLabel& other) const
-        {
-            return !this->operator== (other);
-        };
-
-        goString label;
-        goDouble x;
-        goDouble y;
-};
 
 class goPlotterPrivate
 {
@@ -550,6 +524,10 @@ bool goPlot::addGnuplotCommands
     if (!dataFileNames)
     {
         return false;
+    }
+    if (dataFileNames->getSize() == 0)
+    {
+        return true;
     }
     if (titles)
     {
