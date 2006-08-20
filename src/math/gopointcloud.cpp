@@ -264,6 +264,68 @@ bool goPointCloud<T>::translate (const goVector<T>& d)
     return true;
 }
 
+/** 
+ * @brief Get matrix containing the point coordinates.
+ * 
+ * Fill a matrix \f$M \in R^{k\times n}\f$, where
+ * with the k points of dimension n from this point cloud.
+ *
+ * @param cmRet Configuration matrix. Resized if necessary.
+ */
+template <class T>
+void goPointCloud<T>::getConfigurationMatrix (goMatrix<T>& cmRet) const
+{
+    goSize_t k = this->getPointCount();
+    goSize_t n = this->getDim();
+    if (cmRet.getRows() != k || cmRet.getColumns() != n)
+    {
+        cmRet.resize (k, n);
+    }
+    goSize_t i = 0, j = 0;
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    while (el && i < k)
+    {
+        for (j = 0; j < n; ++j)
+        {
+            cmRet(i,j) = el->elem[j];
+        }
+        el = el->next;
+        ++i;
+    }
+    assert (i == k);
+}
+
+/** 
+ * @brief Get configuration vector.
+ *
+ * Get a vector \f$v = (p_0,\dots,p_{k-1})^\top \in R^{k \cdot n}\f$ containing
+ * the coordinates of all k points p of dimension n in this point cloud concatenated.
+ * 
+ * @param cvRet Configuration vector. Resized if necessary.
+ */
+template <class T>
+void goPointCloud<T>::getConfigurationVector (goVector<T>& cvRet) const
+{
+    goSize_t k = this->getPointCount();
+    goSize_t n = this->getDim();
+    if (cvRet.getSize() != n * k)
+    {
+        cvRet.resize (k * n);
+    }
+    goSize_t i = 0;
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    while (el && i < k * n)
+    {
+        goSize_t j;
+        for (j = 0; j < n; ++j, ++i)
+        {
+            cvRet(i) = el->elem[j];
+        }
+        el = el->next;
+    }
+    assert (i == k * n);
+}
+
 // Now in the header file as template.
 #if 0
 /*
