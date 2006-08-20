@@ -11,15 +11,12 @@
 namespace goMath
 {
 
-    /** \addtogoup math
-     * @{
-     */
-    bool goComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
-    
 /** 
  * \addtogroup math
  * @{
  */
+    goSize_t goComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
+    
 /*!
  * \internal
  *  \brief Eigenvalue computation of real matrices.
