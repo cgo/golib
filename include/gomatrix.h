@@ -42,22 +42,14 @@ class goMatrix
    * @param y Number of rows.
    * @param x Number of columns.
    */
-  goMatrix (goSize_t rows = 4, goSize_t cols = 4)
-    : externalData (false), matrix (0), rows (rows), columns (cols)
-  {
-    this->matrix = new T[rows * cols];
-  };
+  goMatrix (goSize_t rows = 4, goSize_t cols = 4);
 
   /** 
   * @brief Copy constructor.
   * 
   * @param other Other matrix. Will be deep copied.
   */
-  goMatrix (const goMatrix<T>& other)
-    : externalData (false), matrix (0), rows (0), columns (0)
-  {
-    *this = other;
-  };
+  goMatrix (const goMatrix<T>& other);
 
   /** 
   * @brief Constructor for using external data.
@@ -66,146 +58,49 @@ class goMatrix
   * @param r Rows
   * @param c Columns
   */
-  goMatrix (T* data, goSize_t r, goSize_t c)
-    : externalData (true), matrix (data), rows (r), columns (c)
-  {
-  };
+  goMatrix (T* data, goSize_t r, goSize_t c);
 
-  virtual ~goMatrix ()
-  {
-    if (!this->externalData && this->matrix)
-    {
-        delete[] this->matrix;
-        this->matrix = 0;
-        this->rows = 0;
-        this->columns = 0;
-    }
-  };
+  virtual ~goMatrix ();
   
-  /** 
-  * @brief Set external data.
-  * 
-  * @param data Pointer to the external data.
-  * @param r    Rows 
-  * @param c    Columns
-  * 
-  * @return True.
-  */
-  bool setData   (T* data, goSize_t r, goSize_t c)
-  {
-    if (this->matrix && !this->externalData)
-    {
-        delete[] this->matrix;
-    }
-    this->externalData = true;
-    this->matrix = data;
-    this->rows = r;
-    this->columns = c;
-    return true; 
-  };
+  bool setData (T* data, goSize_t r, goSize_t c);
 
-  /** 
-  * @brief Resize (re-allocate) the matrix.
-  * 
-  * Memory is newly allocated, so all former data is lost.
-  *
-  * @param rows Rows.
-  * @param cols Columns.
-  * 
-  * @return  True if successful, false otherwise. Currently always true.
-  */
-  bool resize (goSize_t rows, goSize_t cols)
-  {
-    if (!this->externalData && this->matrix)
-    {
-        delete[] this->matrix;
-    }
-    this->matrix = new T[rows * cols];
-    this->rows = rows;
-    this->columns = cols;
-    this->externalData = false;
-    return true;
-  };
+  bool resize (goSize_t rows, goSize_t cols);
 
-  /** 
-  * @brief Transpose the data.
-  * This is very slow and should be used scarcely.
-  * For Multiplication with transposition, use goMatrixMult().
-  */
-  void transpose ()
-  {
-    goMatrix<T> temp;
-    this->getTranspose(temp);
-    *this = temp;
-  };
+  void transpose ();
 
-  /** 
-  * @brief Get a transposed copy of this matrix.
-  *
-  * @param trans Contains the transpose after the method returned.
-  */
-  void getTranspose (goMatrix<T>& trans)
-  {
-    if (trans.getColumns() != this->getRows() || trans.getRows() != this->getColumns())
-    {
-        trans.resize (this->getColumns(), this->getRows());
-    }
-    goSize_t i;
-    goSize_t j;
-    goSize_t M = this->getRows();
-    goSize_t N = this->getColumns();
-    for (j = 0; j < N; ++j)
-    {
-        for (i = 0; i < M; ++i)
-        {
-            trans(j,i) = (*this)(i,j);
-        }
-    }
-  };
+  void getTranspose (goMatrix<T>& trans);
 
-  /** 
-  * @brief Deep copy operator.
-  * 
-  * @param other Other matrix.
-  * 
-  * @return Reference to this matrix.
-  */
-  goMatrix<T>& operator= (const goMatrix<T>& other)
-  {
-    if (this->rows != other.getRows() || this->columns != other.getColumns())
-    {
-        this->resize (other.getRows(), other.getColumns());
-    }
-    memcpy (this->matrix, other.getData(), this->rows * this->columns * sizeof(T));
-    return *this;
-  };
+  goMatrix<T>& operator= (const goMatrix<T>& other);
+
+  bool operator== (const goMatrix<T>& other) const;
+  bool operator!= (const goMatrix<T>& other) const;
 
   /** 
   * @brief Get data pointer.
   * @return Pointer to the matrix array.
   */
-  T*       getData   () { return this->matrix; };
+  inline T*       getData   () { return this->matrix; };
   /** 
   * @brief Get data pointer.
   * @return Const pointer to the matrix array.
   */
-  const T* getData   () const { return this->matrix; };
+  inline const T* getData   () const { return this->matrix; };
  
   /** 
    * @brief Get data pointer. Same as getData().
    */
-  T*       getPtr    () { return this->matrix; };
+  inline T*       getPtr    () { return this->matrix; };
   /** 
    * @brief Get data pointer. Same as getData().
    */
-  const T* getPtr    () const { return this->matrix; };
+  inline const T* getPtr    () const { return this->matrix; };
 
   /** 
   * @brief Get number of columns.
   * 
   * @return Number of columns.
   */
-  goSize_t   getColumns () const 
+  inline goSize_t   getColumns () const 
   { 
     return this->columns;
   };
@@ -214,7 +109,7 @@ class goMatrix
   * 
   * @return Number of rows.
   */
-  goSize_t   getRows () const 
+  inline goSize_t   getRows () const 
   { 
     return this->rows;
   };
@@ -233,7 +128,7 @@ class goMatrix
   * 
   * @return Leading dimension.
   */
-  goSize_t getLeadingDimension () const
+  inline goSize_t getLeadingDimension () const
   {
     return this->columns;
   };
@@ -253,7 +148,7 @@ class goMatrix
   * @param row Row to reference
   * @param v   Vector that holds the reference after the method returns.
   */
-  void              refRow    (goSize_t row, goVector<T>& v)
+  inline void              refRow    (goSize_t row, goVector<T>& v)
   {
     v.setData (&this->matrix[row * this->getColumns()], this->getColumns(), 1);
   };
@@ -269,7 +164,7 @@ class goMatrix
    * @param row Row index.
    * @param v   WILL BE CHANGED and contains the reference.
    */
-  void              refRow    (goSize_t row, const goVector<T>& v) const
+  inline void              refRow    (goSize_t row, const goVector<T>& v) const
   {
     const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[row * this->getColumns()], this->getColumns(), 1);
   };
@@ -281,9 +176,9 @@ class goMatrix
   * @param column Column to reference
   * @param v   Vector that holds the reference after the method returns.
   */
-  void              refColumn (goSize_t column, goVector<T>& v)
+  inline void              refColumn (goSize_t column, goVector<T>& v)
   {
-    v.setData (&this->matrix[column], this->getRows(), this->getColumns());
+      v.setData (&this->matrix[column], this->getRows(), this->getLeadingDimension());
   };
   /** 
    * @brief Const reference to column.
@@ -296,22 +191,72 @@ class goMatrix
    * @param column Column index.
    * @param v   WILL BE CHANGED and contains the reference.
    */
-  void              refColumn    (goSize_t column, const goVector<T>& v) const
+  inline void              refColumn    (goSize_t column, const goVector<T>& v) const
   {
-    const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[column], this->getRows(), this->getColumns());
+      const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[column], this->getRows(), this->getLeadingDimension());
   };
 
-  T&                operator() (goIndex_t i, goIndex_t j)
+  /** 
+   * @brief Copies a row to vector vRet.
+   *
+   * vRet is resized if it vRet.getSize() != this->getColumns().
+   * 
+   * @param row   Row to copy.
+   * @param vRet  Vector.
+   */
+  template <class To>
+   inline void              copyRow      (goSize_t row, goVector<To>& vRet) const
+    {
+        if (vRet.getSize() != this->getColumns())
+        {
+            vRet.resize (this->getColumns());
+        }
+        goSize_t sz = vRet.getSize();
+        goSize_t i;
+        for (i = 0; i < sz; ++i)
+        {
+            vRet[i] = (*this)(row, i);
+        }
+    };
+
+  /** 
+   * @brief Copied a column to vector vRet.
+   *
+   * vRet is resized if it vRet.getSize() != this->getRows().
+   * 
+   * @param col   Column to copy.
+   * @param vRet  Vector.
+   */
+  template <class To>
+    inline void              copyColumn      (goSize_t col, goVector<To>& vRet) const
+    {
+        if (vRet.getSize() != this->getRows())
+        {
+            vRet.resize (this->getRows());
+        }
+        goSize_t sz = vRet.getSize();
+        goSize_t i;
+        for (i = 0; i < sz; ++i)
+        {
+            vRet[i] = (*this)(i, col);
+        }
+    };
+
+  inline T&                operator() (goIndex_t i, goIndex_t j)
   {
+    assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
+    assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
     return this->matrix[i * this->columns + j];
   };
-  const T&          operator() (goIndex_t i, goIndex_t j) const
+  inline const T&          operator() (goIndex_t i, goIndex_t j) const
   {
+    assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
+    assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
     return this->matrix[i * this->columns + j];
   };
 
-  T&       operator[] (goSize_t index) { return this->matrix[index]; };
-  const T& operator[] (goSize_t index) const { return this->matrix[index]; };
+  inline T&       operator[] (goSize_t index) { return this->matrix[index]; };
+  inline const T& operator[] (goSize_t index) const { return this->matrix[index]; };
 
 
   /** 
@@ -325,106 +270,14 @@ class goMatrix
    */
   goMatrix<T>		operator*  (const goMatrix<T>& other) const;
 
-  //= Quite slow, quick hack.
-  goMatrix<T>		operator-  (const goMatrix<T>& other)
-  {
-    assert (this->getRows() == other.getRows());
-    assert (this->getColumns() == other.getColumns());
-    goSize_t i;
-    goSize_t j;
-    goMatrix<T> C (this->getRows(), this->getColumns());
-    for (i = 0; i < this->getRows(); ++i)
-    {
-        for (j = 0; j < this->getColumns(); ++j)
-        {
-            C(i,j) = (*this)(i,j) - other(i,j);
-        }
-    }
-    return C;
-  };
+  goMatrix<T>		operator-  (const goMatrix<T>& other) const;
 
-  //= Quite slow, quick hack.
-  goMatrix<T>		operator+  (const goMatrix<T>& other)
-  {
-    assert (this->getRows() == other.getRows());
-    assert (this->getColumns() == other.getColumns());
-    goSize_t i;
-    goSize_t j;
-    goMatrix<T> C (this->getRows(), this->getColumns());
-    for (i = 0; i < this->getRows(); ++i)
-    {
-        for (j = 0; j < this->getColumns(); ++j)
-        {
-            C(i,j) = (*this)(i,j) + other(i,j);
-        }
-    }
-    return C;
-  };
+  goMatrix<T>		operator+  (const goMatrix<T>& other) const;
 
-
-  /** 
-   * @brief this = this * other
-   * @note Uses CLBLAS for goFloat and goDouble types.
-   * @see goMatrixMult()
-   * @param other A Matrix.
-   * 
-   * @return Reference to this.
-   */
   goMatrix<T>&		operator*= (const goMatrix<T>& other);
+  goMatrix<T>&		operator+= (const goMatrix<T>& other);
+  goMatrix<T>&		operator-= (const goMatrix<T>& other);
 
-  /** 
-  * @brief Element-wise addition.
-  * 
-  * @param other 
-  * 
-  * @return this = this + other
-  */
-  goMatrix<T>&		operator+= (const goMatrix<T>& other)
-  {
-    assert (this->getRows() == other.getRows());
-    assert (this->getColumns() == other.getColumns());
-    goSize_t i;
-    goSize_t j;
-    for (i = 0; i < this->getRows(); ++i)
-    {
-        for (j = 0; j < this->getColumns(); ++j)
-        {
-            (*this)(i,j) += other(i,j);
-        }
-    }
-    return *this;
-  };
-
-  /** 
-  * @brief Element-wise subtraction.
-  * 
-  * @param other 
-  * 
-  * @return this = this - other
-  */
-  goMatrix<T>&		operator-= (const goMatrix<T>& other)
-  {
-    assert (this->getRows() == other.getRows());
-    assert (this->getColumns() == other.getColumns());
-    goSize_t i;
-    goSize_t j;
-    for (i = 0; i < this->getRows(); ++i)
-    {
-        for (j = 0; j < this->getColumns(); ++j)
-        {
-            (*this)(i,j) -= other(i,j);
-        }
-    }
-    return *this;
-  };
-
-  /** 
-  * @brief Matrix vector multiplication.
-  * @note Uses CBLAS for goFloat and goDouble types.
-  * @param v A vector.
-  * 
-  * @return this * v
-  */
   goVector<T>       operator*  (const goVector<T>& v) const;
 //  goVector<T>       operator*  (const goVector<goDouble>& v) const;
 
@@ -435,7 +288,7 @@ class goMatrix
   * 
   * @return this .* scalar.
   */
-  goMatrix<T>&		operator*= (T scalar)
+  inline goMatrix<T>&		operator*= (T scalar)
   {
     goSize_t i;
     goSize_t j;
@@ -456,7 +309,7 @@ class goMatrix
   * 
   * @return this ./ scalar.
   */
-  goMatrix<T>&		operator/= (T scalar)
+  inline goMatrix<T>&		operator/= (T scalar)
   {
     if (scalar != T(0))
     {
@@ -465,88 +318,23 @@ class goMatrix
     return *this;
   };
 
-  /** 
-  * @brief Element-wise multiplication.
-  * 
-  * *this .* other
-  *
-  * @param other Other matrix.
-  * 
-  * @return True
-  */
-  bool              multiplyElements (const goMatrix<T>& other)
-  {
-    assert (this->getRows() == other.getRows() && this->getColumns() == other.getColumns());
-    goSize_t i;
-    goSize_t j;
-    for (j = 0; j < this->getColumns(); ++j)
-    {
-        for (i = 0; i < this->getRows(); ++i)
-        {
-            (*this)(i,j) *= other(i,j);
-        }
-    }
-    return true;
-  };
+  bool multiplyElements (const goMatrix<T>& other);
 
-  /** 
-  * @brief Calculate the Frobenius norm \f$ \left( \sum_i\sum_j |a_{i,j}|^2 \right)^{\frac{1}{2}} = \mathrm{trace} (A A^T) = \sum_i \sigma_i^2 \f$
-  * where \f$ \sigma_i \f$ is the \f$ i\f$'th singular value.
-  *
-  * @return The Frobenius norm of this matrix.
-  */
-  T norm () const
-  {
-    goSize_t sz = this->getRows() * this->getColumns();
-    goSize_t i;
-    double retValue = 0.0;
-    T* mptr = this->matrix;
-    for (i = 0; i < sz; ++i)
-    {
-        retValue += *mptr * *mptr;
-        ++mptr;
-    }
-    return static_cast<T>(sqrt(retValue));
-  };
+  T norm () const;
 
   /** 
   * @brief Load identity matrix.
   */
-  void setUnity()
+  inline void setUnity()
   {
     this->setIdentity();
   };
-  /** 
-  * @brief Load identity matrix.
-  */
-  void setIdentity()
-  {
-	this->fill(T(0));
-	goSize_t n = goMath::min(this->getRows(), this->getColumns());
-	goSize_t i;
-	for (i = 0; i < n; ++i)
-	{
-		(*this)(i,i) = T(1);
-	}
-  };
-  /** 
-  * @brief Fill matrix with a value v.
-  * 
-  * @param v Value to fill with.
-  */
-  void fill(T v)
-  {
-    goSize_t sz = this->getRows() * this->getColumns();
-    goSize_t i;
-    T* mptr = this->matrix;
-    for (i = 0; i < sz; ++i)
-    {
-        *mptr = v;
-        ++mptr;
-    }
-  };
 
-  void print()
+  void setIdentity();
+
+  void fill(T v);
+
+  inline void print()
     {
         goSize_t i;
         goSize_t j;
