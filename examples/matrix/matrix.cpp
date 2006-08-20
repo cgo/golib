@@ -17,6 +17,24 @@
 int main ()
 {
     {
+        goList<goMatrixf> ml;
+        ml.append (goMatrixf (100,2));
+        ml.append (goMatrixf (100,2));
+        ml.append (goMatrixf (100,2));
+        ml.append (goMatrixf (100,2));
+
+        goMatrix<goComplexf> x1 (1,100);
+        goMatrix<goComplexf> x2 (100,1);
+        goMatrix<goComplexf> M (100,100);
+        goList<goMatrixf>::Element * el = ml.getFrontElement();
+        while (el)
+        {
+            M += x2 * x1;
+            el = el->next;
+        }
+        exit(1);
+    }
+    {
         goMatlab mat;
         goString buffer;
         // mat.matlabCall ("M1 = rand(10,10); M2 = rand(10,10);",0);
@@ -24,6 +42,9 @@ int main ()
         // mat.matlabCall ("M3 = M1 * M2;",0);
         // printf ("%s\n", buffer.toCharPtr());
         goMatrixd M1,M2,M3;
+        M1.setIdentity();
+        M2.setIdentity();
+        M3.setIdentity();
         mat.getMatrix (M1,"M1");
         mat.getMatrix (M2,"M2");
         mat.getMatrix (M3,"M3");
@@ -236,14 +257,17 @@ int main ()
     m3 = m2_2 * m2;
     m3.print(); 
 
-    goPointf p (1.0f, 1.0f, 1.0f, 1.0f);
-    go44Matrix<goFloat> m4 (2, 0, 0, 0,
-                            0, 2, 0, 0,
-                            0, 0, 2, 0,
-                            0, 0, 0, 0);
-    p *= m4;
-    std::cout << p << "\n";
+//    goPointf p (1.0f, 1.0f, 1.0f, 1.0f);
+//    go44Matrix<goFloat> m4 (2, 0, 0, 0,
+//                            0, 2, 0, 0,
+//                            0, 0, 2, 0,
+//                            0, 0, 0, 0);
+//    p *= m4;
+//    std::cout << p << "\n";
 
     
     return 1;
 }
+
+#include <golist.hpp>
+template class goList<goMatrixf>;
