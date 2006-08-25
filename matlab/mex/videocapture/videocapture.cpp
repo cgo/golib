@@ -54,7 +54,7 @@ void mexFunction (int            nlhs,
         free(buffer);
         mexErrMsgTxt ("Could not grab image (vc.grab() failed).");
     }
-    //= Copy to matlab (I HATE Matlab and it's "everything must be a bloody matrix in bloody
+    //= Copy to matlab (I HATE Matlab and its "everything must be a bloody matrix in bloody
     //= mathematical storage" philosophy. Costs some time in copying here :-((( ).
     switch(vc.getColourMode())
     {
@@ -66,7 +66,7 @@ void mexFunction (int            nlhs,
                 int y;
                 int z;
                 int yJump = dims[1] * dims[2];
-                for (z = 0; z < dims[2]; ++z)
+                for (z = dims[2]-1; z >= 0; --z)
                 {
                     bp = buffer + z;
                     unsigned char* bpy = bp;

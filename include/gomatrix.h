@@ -57,18 +57,22 @@ class goMatrix
   * @param data Pointer to the external data.
   * @param r Rows
   * @param c Columns
+  * @param leadingDim leading dimension -- if 0, is set to c.
   */
-  goMatrix (T* data, goSize_t r, goSize_t c);
+  goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
 
   virtual ~goMatrix ();
   
-  bool setData (T* data, goSize_t r, goSize_t c);
+  bool setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
+  bool setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0) const;
 
   bool resize (goSize_t rows, goSize_t cols);
 
   void transpose ();
 
   void getTranspose (goMatrix<T>& trans);
+
+  void flip (goSize_t dim = 0);
 
   goMatrix<T>& operator= (const goMatrix<T>& other);
 
@@ -130,7 +134,7 @@ class goMatrix
   */
   inline goSize_t getLeadingDimension () const
   {
-    return this->columns;
+    return this->leadingDimension;
   };
  
   // TNT compatibility methods BEGIN
@@ -150,7 +154,20 @@ class goMatrix
   */
   inline void              refRow    (goSize_t row, goVector<T>& v)
   {
-    v.setData (&this->matrix[row * this->getColumns()], this->getColumns(), 1);
+    v.setData (&(*this)(row,0), this->getColumns(), 1);
+  };
+  /** 
+   * @brief Reference to a sub row.
+   * 
+   * @param row    Start element row
+   * @param column Start element column
+   * @param length length of vector
+   * @param v      Vector that contains the reference after the method call.
+   */
+  inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, goVector<T>& v)
+  {
+      assert (length <= this->getColumns());
+      v.setData (&(*this)(row,column), length, 1);
   };
 
   /** 
@@ -166,8 +183,21 @@ class goMatrix
    */
   inline void              refRow    (goSize_t row, const goVector<T>& v) const
   {
-    const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[row * this->getColumns()], this->getColumns(), 1);
+    const_cast<goVector<T>&>(v).setData (const_cast<T*>(&(*this)(row,0)), this->getColumns(), 1);
   };
+  /** 
+   * @brief Reference to a sub row.
+   * 
+   * @param row    Start element row
+   * @param column Start element column
+   * @param length length of vector
+   * @param v      Vector that contains the reference after the method call.
+   */
+  inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, const goVector<T>& v) const
+  {
+    const_cast<goVector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, 1);
+  };
+
   /** 
   * @brief Makes a vector reference a column from this matrix.
   * 
@@ -178,8 +208,21 @@ class goMatrix
   */
   inline void              refColumn (goSize_t column, goVector<T>& v)
   {
-      v.setData (&this->matrix[column], this->getRows(), this->getLeadingDimension());
+      v.setData (&(*this)(0,column), this->getRows(), this->getLeadingDimension());
   };
+  /** 
+   * @brief Reference to a sub column.
+   * 
+   * @param row    Start element row
+   * @param column Start element column
+   * @param length length of vector
+   * @param v      Vector that contains the reference after the method call.
+   */
+  inline void              refColumn (goSize_t row, goSize_t column, goSize_t length, goVector<T>& v)
+  {
+      v.setData (&(*this)(row,column), length, this->getLeadingDimension());
+  };
+
   /** 
    * @brief Const reference to column.
    * 
@@ -193,7 +236,19 @@ class goMatrix
    */
   inline void              refColumn    (goSize_t column, const goVector<T>& v) const
   {
-      const_cast<goVector<T>&>(v).setData (&const_cast<T*>(this->matrix)[column], this->getRows(), this->getLeadingDimension());
+      const_cast<goVector<T>&>(v).setData (const_cast<T*>(&(*this)(0,column)), this->getRows(), this->getLeadingDimension());
+  };
+  /** 
+   * @brief Reference to a sub column.
+   * 
+   * @param row    Start element row
+   * @param column Start element column
+   * @param length length of vector
+   * @param v      Vector that contains the reference after the method call.
+   */
+  inline void              refColumn    (goSize_t row, goSize_t column, goSize_t length, const goVector<T>& v) const
+  {
+      const_cast<goVector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, this->getLeadingDimension());
   };
 
   /** 
@@ -246,15 +301,19 @@ class goMatrix
   {
     assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
     assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
-    return this->matrix[i * this->columns + j];
+    return this->matrix[i * this->leadingDimension + j];
   };
   inline const T&          operator() (goIndex_t i, goIndex_t j) const
   {
     assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
     assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
-    return this->matrix[i * this->columns + j];
+    return this->matrix[i * this->leadingDimension + j];
   };
 
+  void operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, goMatrix<T>& target) const;
+  void operator () (const goMatrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2);
+
+  //= Handle these with care. They use the plain pointer, no leading dimension.
   inline T&       operator[] (goSize_t index) { return this->matrix[index]; };
   inline const T& operator[] (goSize_t index) const { return this->matrix[index]; };
 
@@ -334,7 +393,7 @@ class goMatrix
 
   void fill(T v);
 
-  inline void print()
+  inline void print() const
     {
         goSize_t i;
         goSize_t j;
@@ -354,6 +413,7 @@ class goMatrix
   T*                 matrix;
   goSize_t           rows;
   goSize_t           columns;
+  goSize_t           leadingDimension;
 };
 
 /** 

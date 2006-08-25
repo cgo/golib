@@ -55,7 +55,7 @@ goSignal3D : public goSignal3DBase<T>
                           goSize_t border_z    = 0,
                           goSize_t channelCount = 1);
 
-        bool make (goSignal3DBase<T> *other);
+        bool make (const goSignal3DBase<T> *other);
 
         virtual void destroy (); 
         void fillByte (goInt8 b);

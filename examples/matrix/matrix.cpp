@@ -17,6 +17,64 @@
 int main ()
 {
     {
+        goMatrixf M1 (5,5);
+        M1.setIdentity();
+        for (goSize_t i = 0; i < 5*5; ++i)
+        {
+            M1[i] = i;
+        }
+        {
+            goMatrixf M2;
+            M2.setData (&M1(1,1), 3, 3, M1.getLeadingDimension());
+            goMatrixf M3 (&M1(2,0), 3, 4, M1.getLeadingDimension());
+            printf ("M1:\n"); M1.print ();
+            printf ("M2:\n"); M2.print ();
+            printf ("M3:\n"); M3.print ();
+            goVectorf v (3);
+            v(0) = 2;
+            v(1) = 3;
+            v(2) = 4;
+            goVectorf v2 = M2 * v;
+            printf ("v2 == %f %f %f\n", v2(0), v2(1), v2(2));
+
+            goMatrixf M4 = M2 * M3;
+            printf ("M4:\n"); M4.print ();
+
+            goMatrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
+            printf ("M4:\n"); M4.print ();
+        } 
+        {
+            goMatrixf M2;
+            M1 (1,1,3,3,M2);
+            goMatrixf M3;
+            M1 (2,0,4,3,M3);
+            printf ("M1:\n"); M1.print ();
+            printf ("M2:\n"); M2.print ();
+            printf ("M3:\n"); M3.print ();
+            goVectorf v (3);
+            v(0) = 2;
+            v(1) = 3;
+            v(2) = 4;
+            goVectorf v2 = M2 * v;
+            printf ("v2 == %f %f %f\n", v2(0), v2(1), v2(2));
+
+            goMatrixf M4 = M2 * M3;
+            printf ("M4:\n"); M4.print ();
+
+            goMatrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
+            printf ("M4:\n"); M4.print ();
+
+            M4.refColumn (0, 2, 3, v);
+            printf ("v:\n");
+            for (goSize_t i = 0; i < v.getSize(); ++i)
+            {
+                printf ("%f ",v(i));
+            }
+            printf ("\n");
+        }
+        exit (1);
+    }
+    {
         goList<goMatrixf> ml;
         ml.append (goMatrixf (100,2));
         ml.append (goMatrixf (100,2));
@@ -32,6 +90,37 @@ int main ()
             M += x2 * x1;
             el = el->next;
         }
+
+        {
+            goMatrixf M;
+            M.resize (5,2);
+
+            for (goSize_t i = 0; i < M.getRows(); ++i)
+            {
+                for (goSize_t j = 0; j < M.getColumns(); ++j)
+                {
+                    M(i,j) = i + 1 + (j + 1) * 10;
+                }
+            }
+
+            M.print();
+            M.flip();
+            M.print();
+
+            goVectorf v (10);
+            for (goSize_t i = 0; i < v.getSize(); ++i)
+            {
+                v[i] = i + 1;
+            }
+            {
+                goMatrixf M2;
+                M2.setData (v.getPtr(), 5, 2);
+                M2.print();
+                M2.flip();
+                M2.print();
+            }
+        }
+
         exit(1);
     }
     {

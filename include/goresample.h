@@ -8,6 +8,8 @@ template <class T>
 bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount);
 
 //= Check where this class is used if at all, if not, REMOVE THIS CLASS
+//= Used in the filterbank/reverse classes. Remove all this from 0.5.
+#if 0
 template <class T>
 class goResample {
  public:
@@ -30,6 +32,6 @@ class goResample {
   goInt32 MX;
   goInt32 MY;
 };
-
 #endif
 
+#endif

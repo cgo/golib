@@ -262,7 +262,7 @@ goSignal3D<T>::memoryUsage() const
 /// Copies only the size, NOT THE DATA!
 template< class T >
 bool
-goSignal3D<T>::make (goSignal3DBase<T> *other) {
+goSignal3D<T>::make (const goSignal3DBase<T> *other) {
     return this->make (other->getSizeX(), 
                        other->getSizeY(), 
                        other->getSizeZ(),

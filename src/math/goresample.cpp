@@ -1,6 +1,18 @@
 #include <goresample.h>
 #include <golog.h>
 
+/** 
+ * @brief Linear resampling of a curve represented by a configuration matrix.
+ *
+ * The source matrix contains a point in each row, so does the target matrix
+ * after successful completion of the function.
+ *
+ * @param source Source points.
+ * @param target Target points.
+ * @param resamplePointCount Point count intended for target.
+ * 
+ * @return True if successful, false otherwise.
+ */
 template <class T>
 bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount)
 {

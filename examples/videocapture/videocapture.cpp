@@ -17,7 +17,7 @@ int main()
     goVideoCapture vc;
 
     //= Set device.
-    vc.setDevice ("/dev/video1");
+    vc.setDevice ("/dev/video0");
     if (vc.open())
     {
         printf ("Opened the device /dev/video1\n");
@@ -38,9 +38,9 @@ int main()
         goString num;
         num.resize(3);
         //= Give the camera some time to adjust.
-        sleep(10);
+        sleep(5);
         //= Take 10 pictures and save them (this needs libdevil support to be enabled in golib).
-        for (goIndex_t j = 0; j < 1; ++j)
+        for (goIndex_t j = 0; j < 50; ++j)
         {
             //= NOTE: This assumes the camera is providing data as RGB24.
             //= If your camera happens to return YUV420P (planar) data, you can use

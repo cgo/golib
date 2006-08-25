@@ -1,5 +1,5 @@
-#ifndef GOMATRIX_I
-#define GOMATRIX_I
+#ifndef GOMATRIX_HPP
+#define GOMATRIX_HPP
 
 #ifndef GOMATH_H
 # include <gomath.h>
@@ -7,6 +7,9 @@
 #include <golog.h>
 #ifndef GOVECTOR_H
 # include <govector.h>
+#endif
+#ifndef GOLOG_H
+# include <golog.h>
 #endif
 
 extern "C" 
@@ -20,7 +23,7 @@ extern "C"
 */
 template <class T>
 goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
-    : externalData (false), matrix (0), rows (rows), columns (cols)
+    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
 {
     this->matrix = new T[rows * cols];
 }
@@ -32,7 +35,7 @@ goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
 */
 template <class T>
 goMatrix<T>::goMatrix (const goMatrix<T>& other)
-    : externalData (false), matrix (0), rows (0), columns (0)
+    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0)
 {
     *this = other;
 }
@@ -45,9 +48,13 @@ goMatrix<T>::goMatrix (const goMatrix<T>& other)
 * @param c Columns
 */
 template <class T>
-goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c)
-    : externalData (true), matrix (data), rows (r), columns (c)
+goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
+    : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim)
 {
+    if (leadingDim == 0)
+    {
+        leadingDimension = columns;
+    }
 }
 
 template <class T>
@@ -82,6 +89,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     this->matrix = new T[rows * cols];
     this->rows = rows;
     this->columns = cols;
+    this->leadingDimension = cols;
     this->externalData = false;
     return true;
 }
@@ -96,7 +104,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
  * @return True.
  */
 template <class T>
-bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c)
+bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
 {
     if (this->matrix && !this->externalData)
     {
@@ -106,6 +114,49 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c)
     this->matrix = data;
     this->rows = r;
     this->columns = c;
+    if (leadingDim == 0)
+    {
+        this->leadingDimension = c;
+    }
+    else
+    {
+        this->leadingDimension = leadingDim;
+    }
+    return true; 
+}
+
+/* 
+ * @brief Set external data.
+ * 
+ * Please forgive me this. I needed a way to reference const data ...
+ *
+ * @param data Pointer to the external data.
+ * @param r    Rows 
+ * @param c    Columns
+ * 
+ * @return True.
+ */
+template <class T>
+bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim) const
+{
+    //= FORGIVE ME PLEASE PLEASE PLEASE PLEASE ....
+    if (this->matrix && !this->externalData)
+    {
+        delete[] const_cast<T*>(this->matrix);
+    }
+
+    const_cast<goMatrix<T>*>(this)->externalData = true;
+    const_cast<goMatrix<T>*>(this)->matrix = const_cast<T*>(data);
+    const_cast<goMatrix<T>*>(this)->rows = r;
+    const_cast<goMatrix<T>*>(this)->columns = c;
+    if (leadingDim == 0)
+    {
+        const_cast<goMatrix<T>*>(this)->leadingDimension = c;
+    }
+    else
+    {
+        const_cast<goMatrix<T>*>(this)->leadingDimension = leadingDim;
+    }
     return true; 
 }
 
@@ -130,6 +181,58 @@ void goMatrix<T>::getTranspose (goMatrix<T>& trans)
         for (i = 0; i < M; ++i)
         {
             trans(j,i) = (*this)(i,j);
+        }
+    }
+}
+
+/** 
+ * @brief Flip in row or column direction.
+ * 
+ * @param dim If 0, flips rows, otherwise flips columns.
+ */
+template <class T>
+void goMatrix<T>::flip (goSize_t dim)
+{
+    if (dim == 0)
+    {
+        //= Flip rows.
+        goSize_t r = this->getRows();
+        goSize_t c = this->getColumns();
+        goSize_t i,i2,j;
+        T temp;
+        i = 0;
+        i2 = r - 1;
+        while (i < i2)
+        {
+            for (j = 0; j < c; ++j)
+            {
+                temp = (*this)(i,j);
+                (*this)(i,j) = (*this)(i2, j);
+                (*this)(i2, j) = temp;
+            }
+            ++i;
+            --i2;
+        }
+    }
+    else 
+    {
+        //= Flip columns.
+        goSize_t r = this->getRows();
+        goSize_t c = this->getColumns();
+        goSize_t i,j,j2;
+        T temp;
+        for (i = 0; i < r; ++i)
+        {
+            j = 0;
+            j2 = c - 1;
+            while (j < j2)
+            {
+                temp = (*this)(i, j);
+                (*this)(i, j) = (*this)(i, j2);
+                (*this)(i, j2) = temp;
+                ++j;
+                --j2;
+            }
         }
     }
 }
@@ -174,6 +277,53 @@ template <class T>
 bool goMatrix<T>::operator!= (const goMatrix<T>& other) const
 {
     return !(*this == other);
+}
+
+/*
+ * @brief Convenience method for in-line use in calculations.
+ * 
+ * THIS DOES NOT WORK AS SOON AS SOMETHING LIKE THIS APPEARS: goMatrixf M4 = M1(1,1,3,3) * M1(2,0,4,3);
+ * THEREFORE IT IS DUMPED AND LEFT HERE AS WARNING FOR THE FUTURE.
+ */
+//template <class T>
+//const goMatrix<T>& goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2) const
+//{
+//    static const goMatrix<T> retRef;
+//    retRef.setData (&(*this)(i1,j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
+//    return retRef;
+//}
+
+/** 
+ * @brief Copy sub-matrix from i1,j1 to i2,j2 into target.
+ *
+ * For referencing, use the setData() method.
+ */
+template <class T>
+void goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, goMatrix<T>& target) const
+{
+    assert (i1 <= i2 && j1 <= j2);
+    const goMatrix<T> temp;
+    temp.setData (&(*this)(i1, j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
+    target = temp;
+}
+
+/** 
+ * @brief Copy source to sub-matrix from i1,j1 to i2,j2 in this matrix.
+ *
+ * @note Dimensions must agree and are assert()ed. Check logfile for warnings.
+ */
+template <class T>
+void goMatrix<T>::operator () (const goMatrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2)
+{
+    assert (source.getRows() == i2-i1+1);
+    assert (source.getColumns() == j2-j1+1);
+    if (source.getRows() != i2-i1+1 || source.getColumns() != j2-j1+1)
+    {
+        goLog::warning ("goMatrix::operator(): source dimensions do not agree with sub-matrix. Not copying.");
+        return;
+    }
+    goMatrix<T> temp (&(*this)(i1, j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
+    temp = source;
 }
 
 template<>
