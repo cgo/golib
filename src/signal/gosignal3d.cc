@@ -120,6 +120,8 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
     assert (blockSizeX > 0);
     assert (blockSizeY > 0);
     assert (blockSizeZ > 0);
+
+    this->destroy ();
     
     //= NOTE: In order for the iterator classes not to
     //=       cause illegal reads at the end of a zero-border
@@ -347,6 +349,8 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
     assert (blockSizeY > 0);
     assert (blockSizeZ > 0);
     
+    this->destroy ();
+
     //= NOTE: In order for the iterator classes not to
     //=       cause illegal reads at the end of a zero-border
     //=       signal, make the border min. 1.

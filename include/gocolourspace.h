@@ -67,17 +67,17 @@ static inline goFloat goYUV422_Blue (goUInt8 y, goUInt8 u, goUInt8 v)
  * @param width  Width of the image
  * @param height Height of the image
  * @param ret    The goSignal3D<void> containing the RGB image after 
- * the function returned. If it is not of appropriate size/type, it will be 
- * reallocated.
+ * the function returned. If it is not of appropriate size/type, nothing will be converted.
  *
  * @author Christian Gosch
  */
-static inline void goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3D<void>& ret)
+static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3DBase<void>& ret)
 {
     if (ret.getSizeX() != width || ret.getSizeY() != height || ret.getChannelCount() < 3 || ret.getDataType().getID() != GO_UINT8)
     {
-        ret.setDataType(GO_UINT8);
-        ret.make (goSize3D(width,height,1),goSize3D(32,32,1),goSize3D(4,4,0),3);
+        return false;
+//        ret.setDataType(GO_UINT8);
+//        ret.make (goSize3D(width,height,1),goSize3D(32,32,1),goSize3D(4,4,0),3);
     }
     assert(yuv);
  
@@ -127,6 +127,35 @@ static inline void goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height,
         y = y ^ 1;
         it.incrementY();
     }
+    return true;
+}
+
+/*!
+ * @brief Converts a planar YUV420 image to RGB.
+ *
+ * Converts a planar YUV420 image, stored linearly in memory,
+ * to an RGB goSignal3D (goUInt8, 3 channels).
+ *     @note: This does not really upsample the downsampled 
+ *          U/V (Cr/Cb) values but just uses the left neighbour for
+ *          non-existent samples.
+ * @param yuv Pointer to the planar yuv420 data, e.g. from the video4linux driver
+ * of Philips webcams (and probably others).
+ * @param width  Width of the image
+ * @param height Height of the image
+ * @param ret    The goSignal3D<void> containing the RGB image after 
+ * the function returned. If it is not of appropriate size/type, it will be 
+ * reallocated.
+ *
+ * @author Christian Gosch
+ */
+static inline bool goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3D<void>& ret)
+{
+    if (ret.getSizeX() != width || ret.getSizeY() != height || ret.getChannelCount() < 3 || ret.getDataType().getID() != GO_UINT8)
+    {
+        ret.setDataType(GO_UINT8);
+        ret.make (goSize3D(width,height,1),goSize3D(32,32,1),goSize3D(8,8,0),3);
+    }
+    return goYUV420P_RGB_base (yuv, width, height, ret);
 }
 /*! @} */
 #endif

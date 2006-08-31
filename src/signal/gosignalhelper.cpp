@@ -734,7 +734,8 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
  * 
  * @param sig       Source signal, must be of type GO_UINT8 and have >= 3 channels.
  * @param targetSig Target signal. Data type must be set and the size must be the same as
- *                  that of the source signal.
+ *                  that of the source signal. If the target type is GO_FLOAT or GO_DOUBLE,
+ *                  goNormalizeSignal() is called on targetSig.
  * 
  * @return True if successful, false otherwise.
  ----------------------------------------------------------------------------*/

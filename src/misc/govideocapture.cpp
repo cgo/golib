@@ -3,6 +3,8 @@
 #include <golog.h>
 #include <goconfig.h>
 #include <gomath.h>
+#include <gofixedarray.h>
+#include <gocolourspace.h>
 
 #include <fcntl.h>
 #if HAVE_SYS_STAT_H
@@ -39,7 +41,8 @@ class goVideoCapturePrivate
             fileDescriptor (-1), 
             captureWidth   (640), 
             captureHeight  (480), 
-            colourMode     (goVideoCapture::RGB24) 
+            colourMode     (goVideoCapture::RGB24),
+            grabBuffer     (0)
         {
 #if HAVE_LINUX_VIDEODEV_H
             memset (&this->cap, 0, sizeof(struct video_capability));
@@ -55,6 +58,7 @@ class goVideoCapturePrivate
 #if HAVE_LINUX_VIDEODEV_H
         struct video_capability cap;
 #endif
+        goFixedArray<goUInt8> grabBuffer;
 };
 
 
@@ -275,27 +279,46 @@ bool goVideoCapture::grab (void* target, goSize_t sz)
 bool goVideoCapture::grab (goSignal3DBase<void>& target)
 {
 #if HAVE_LINUX_VIDEODEV_H
-    if (target.getSizeX() < myPrivate->captureWidth || target.getSizeY() < myPrivate->captureHeight ||
-        target.getDataType().getID() != GO_UINT8 ||
-        target.getBlockSizeX() != target.getSizeX() || target.getBlockSizeY() != target.getSizeY())
-    {
-        goLog::warning ("grab(): Unsupported target.",this);
-        return false;
-    }
     switch (myPrivate->colourMode)
     {
         case RGB24:
             {
+                if (target.getSizeX() < myPrivate->captureWidth || target.getSizeY() < myPrivate->captureHeight ||
+                        target.getDataType().getID() != GO_UINT8 ||
+                        target.getBlockSizeX() != target.getSizeX() || target.getBlockSizeY() != target.getSizeY())
+                {
+                    goLog::warning ("grab RGB24 : Unsupported target.",this);
+                    return false;
+                }
                 if (target.getChannelCount() != 3)
                 {
                     goLog::warning ("grab(): channel count must be 3 for rgb grabbing.",this);
                     return false;
                 }
+                else
+                {
+                    return this->grab (target.getPtr(), target.getSizeX() * target.getSizeY() * target.getChannelCount());
+                }
+            }
+            break;
+        case YUV422P:
+        case YUV420P:
+            {
+                if (myPrivate->grabBuffer.getSize() != myPrivate->captureWidth * myPrivate->captureHeight * 3)
+                {
+                    myPrivate->grabBuffer.setSize (myPrivate->captureWidth * myPrivate->captureHeight * 3);
+                }
+                if (!this->grab (myPrivate->grabBuffer.getPtr(), myPrivate->grabBuffer.getSize()))
+                {
+                    return false;
+                }
+                goYUV420P_RGB_base (myPrivate->grabBuffer.getPtr(), myPrivate->captureWidth, myPrivate->captureHeight, target);
+                return true;
             }
             break;
         default: break;
     }
-    return this->grab (target.getPtr(), target.getSizeX() * target.getSizeY() * target.getChannelCount());
+    return false;
 #else
     return false;
 #endif

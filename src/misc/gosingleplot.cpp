@@ -12,13 +12,14 @@ class goSinglePlotPrivate
               prefixCommands(""), 
               dataFilenames(),
               row(0),
-              column(0)
+              column(0),
+              title("")
         {};
         ~goSinglePlotPrivate() {};
 
         goList<goVectord>      plotX;
         goList<goVectord>      plotY;
-        goList<goString>       titles;
+        goList<goString>       titles;          // These are titles for each of the individual curves
         goList<goPlotterLabel> labels;
         goList<goString>       plotCommands;
         goString               prefixCommands;
@@ -27,6 +28,8 @@ class goSinglePlotPrivate
 
         goSize_t          row;
         goSize_t          column;
+
+        goString          title;               // This is the title of the whole plot.
 };
 
 goSinglePlot::goSinglePlot ()
@@ -155,6 +158,11 @@ bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y)
     return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y));
 }
 
+void goSinglePlot::setTitle (const goString& s)
+{
+    myPrivate->title = s;
+}
+
 /** 
  * @brief Create all necessary temporary files and create gnuplot command string.
  * 
@@ -165,6 +173,12 @@ bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y)
 bool goSinglePlot::makePlot (goString& plotCommandsRet) const
 {
     goString prefix = myPrivate->prefixCommands;
+    if (myPrivate->title != "")
+    {
+        prefix += "set title \"";
+        prefix += myPrivate->title;
+        prefix += "\"\n";
+    }
     if (!myPrivate->labels.isEmpty())
     {
         assert (!myPrivate->labels.isClosed());
