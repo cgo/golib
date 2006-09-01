@@ -98,8 +98,11 @@ typedef float	goFloat;
 
 /** Misc types: */
 typedef size_t	goSize_t;
+
+#ifndef GO3VECTOR_H_INSIDE
 #include <go3vector.h>
-#define goSize3D go3Vector<goSize_t>
+typedef go3Vector<goSize_t> goSize3D;
+#endif
 
 /** Pointer types: */
 ///

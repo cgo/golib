@@ -19,10 +19,28 @@ class goObjectBasePrivate;
  * This is a base for all objects that we felt needed a common base.
  * It implements class names, class message printing, 
  * and inter-object communication.
+ *
+ * @note The communication takes place by "message" functions.
+ * Each object can be connected to other objects using
+ * connectObject() and disconnectObject() calls.
+ * There are problems arising internally which I will describe now.
+ * The connected objects are maintained as a list of goObjectBase pointers.
+ * Problems arise in cases when sendObjectMessage() traverses the list
+ * and calls receiveObjectMessage() for each connected object.
+ * When somewhere during the call of receiveObjectMessage(), which can be
+ * arbitrarily complicated, the internal list gets changed with disconnectObject(),
+ * the initial list traversal will produce undefined results (i.e. segfault).
+ * To avoid this, the list is protected with a mutex together with a flag, and
+ * if the mutex is locked and an object gets disconnected, its pointer
+ * is simply set to NULL. Later, in case the list mutex is unlocked,
+ * the list gets cleaned by another internal function. See source code
+ * for details.
+ * However, if undefined behaviour should still appear, this is a possible source
+ * for problems.
+ * connectObject() should not be as problematic, because it simply appends
+ * to the end of the list.
+ *
  * \author Christian Gosch
- * \todo Find a replacement for the class name string. Takes too much 
- *       space and time to allocate for every object!
- *       Some static solution would be better, or resort to enums.
  * \todo Do writeObjectFile/readObjectFile as ASCII. Better to port/debug/change.
  *       Check if libxml is nice enough to use for this.
  * \todo Test object communication
@@ -52,8 +70,6 @@ goObjectBase
 
  protected:
     void setClassID(int id);
-    //void setClassName(const char* name);
-    //void setClassName(goString& name);
     void printClassMessage (const char* msg);
     void printClassMessage (goString& msg);
 

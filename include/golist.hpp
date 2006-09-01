@@ -18,20 +18,15 @@ goListElement<T>::~goListElement ()
 }
 
 template <class T>
-goList<T>::goList () {
-  front		= 0;
-  tail		= 0;
-  position	= 0;
-  size		= 0;
+goList<T>::goList () 
+    : size (0), front (0), tail (0), position (0), dummy ()
+{
 }
 
 template <class T>
 goList<T>::goList (const goList<T>& other) 
+    : size (0), front (0), tail (0), position (0), dummy ()
 {
-  front		= 0;
-  tail		= 0;
-  position	= 0;
-  size		= 0;
   *this = other;
 }
 
