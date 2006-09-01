@@ -23,8 +23,13 @@ class goObjectBasePrivate
         goObjectBasePrivate ();
         ~goObjectBasePrivate ();
 
+        void cleanupConnectedObjects ();
+
         int                              classID;
         goString                         objectName;
+        goMutex                          connectedObjectsMutex;
+        bool                             connectedObjectsLocked;
+        bool                             connectedObjectsCleanupNeeded;
         goList<goObjectBase*>            connectedObjects;
 
         goMutex                           queuedMethodsMutex;
@@ -36,6 +41,9 @@ goObjectBasePrivate::goObjectBasePrivate ()
     :
     classID            (GO_OBJECTBASE),
     objectName         (""),
+    connectedObjectsMutex (),
+    connectedObjectsLocked (false),
+    connectedObjectsCleanupNeeded (false),
     connectedObjects   (),
     queuedMethodsMutex (),
     queuedMethods      (),
@@ -46,6 +54,40 @@ goObjectBasePrivate::goObjectBasePrivate ()
 goObjectBasePrivate::~goObjectBasePrivate ()
 {
 }
+
+/*
+ * @brief Remove all connected objects from list which are 
+ *    NULL. Do nothing if the list is locked.
+ */
+void goObjectBasePrivate::cleanupConnectedObjects ()
+{
+    if (this->connectedObjectsLocked || !this->connectedObjectsCleanupNeeded)
+    {
+        //= Do nothing if list is locked.
+        return;
+    }
+
+    this->connectedObjectsLocked = true;
+    this->connectedObjectsMutex.lock();
+    
+    goList<goObjectBase*>::Element* el = this->connectedObjects.getFrontElement ();
+    while (el)
+    {
+        if (el->elem == 0)
+        {
+            el = this->connectedObjects.remove (el);
+        }
+        else
+        {
+            el = el->next;
+        }
+    }
+
+    this->connectedObjectsCleanupNeeded = false;
+    this->connectedObjectsMutex.unlock();
+    this->connectedObjectsLocked = false;
+}
+
 
 /*! \brief Constructor */
 goObjectBase::goObjectBase ()
@@ -236,15 +278,16 @@ goObjectBase::connectObject (goObjectBase* object)
     {
         return;
     }
-    goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
     if (!myPrivate->connectedObjects.isEmpty())
     {
-        while (true)
+        goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
+        while (el)
         {
             if (object == el->elem)
+            {
+                //= Already connected.
                 return;
-            if (!el->next)
-                break;
+            }
             el = el->next;
         }
     }
@@ -264,16 +307,25 @@ goObjectBase::disconnectObject (const goObjectBase* object)
         return;
     }
     goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
-    while (true)
+    while (el)
     {
         if (el->elem == object)
         {
-            el = myPrivate->connectedObjects.remove (el);
-            return;
+            if (myPrivate->connectedObjectsLocked)
+            {
+                //= Do not alter the list, just set element to NULL.
+                myPrivate->connectedObjectsCleanupNeeded = true;
+                el->elem = 0;
+            }
+            else
+            {
+                el = myPrivate->connectedObjects.remove (el);
+            }
         }
-        if (!el->next)
-            break;
-        el = el->next;
+        else
+        {
+            el = el->next;
+        }
     }
 }
 
@@ -300,7 +352,7 @@ goObjectBase::callObjectMethod (int methodID, goObjectMethodParameters* param)
     return false;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief  Enqueue a method call to an internal list of methods.
  *
  * The queued methods can be called in one go by a call to callQueuedMethods().
@@ -311,7 +363,7 @@ goObjectBase::callObjectMethod (int methodID, goObjectMethodParameters* param)
  *                 will be deep-copied, so there is no need to worry about 
  *                 keeping them after the method returned.
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 bool
 goObjectBase::queueObjectMethod (int methodID, goObjectMethodParameters* param, bool blocking)
 {
@@ -390,6 +442,16 @@ goObjectBase::sendObjectMessage (int messageID, void* data)
     {
         return;
     }
+
+    bool locked = false;
+
+    if (!myPrivate->connectedObjectsLocked)
+    {
+        myPrivate->connectedObjectsMutex.lock();
+        myPrivate->connectedObjectsLocked = true;
+        locked = true;
+    }
+
     goList<goObjectBase*>::Element* el = myPrivate->connectedObjects.getFrontElement();
     goObjectBase* o = NULL;
     goObjectMessage message;
@@ -397,17 +459,28 @@ goObjectBase::sendObjectMessage (int messageID, void* data)
     message.myMessageID     = messageID;
     message.myMessageString = NULL;
     message.myData          = data;
-    while (true)
+    assert (!myPrivate->connectedObjects.isClosed());
+    goSize_t sz = myPrivate->connectedObjects.getSize();
+    goSize_t i = 0;
+    while (el && i < sz)
     {
         o = el->elem;
         if (o)
         {
             o->receiveObjectMessage (message);
         }
-        if (!el->next)
-            break;
         el = el->next;
+        ++i;
     }
+
+    if (locked)
+    {
+        myPrivate->connectedObjectsMutex.unlock();
+        myPrivate->connectedObjectsLocked = false;
+    }
+
+    //= Check if cleanup is needed and do so.
+    myPrivate->cleanupConnectedObjects ();
 }
 
 /*! \brief Sends a message to a specific object. */
