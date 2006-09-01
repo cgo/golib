@@ -1,6 +1,7 @@
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
 #include <gosubsignal3d.h>
+#include <gofilter1d.h>
 #include <gotypes.h>
 #include <iostream>
 #include <gosignalmacros.h>
@@ -22,6 +23,24 @@ void printSignal (goSignal3DBase<void>& signal)
         std::cout << "\n";
     }
     std::cout << "\n";
+}
+
+template <class T>
+void printGenericSignal (goSignal3DBase<void>& signal)
+{
+    goIndex_t x, y;
+   
+//    GO_SIGNAL3D_EACHELEMENT (std::cout << *__ptr << " ", signal, T);
+    
+    for (y = 0; y < signal.getSizeY(); ++y)
+    {
+        for (x = 0; x < signal.getSizeX(); ++x)
+        {
+            printf("%.3f ",(goFloat)*(T*)signal.getPtr (x, y, 0));
+        }
+        printf ("\n");
+    }
+    printf ("\n");
 }
 
 template<class T>
@@ -124,6 +143,37 @@ void printWithPointers (goSignal3D<void>& signal)
 
 int main (void)
 {
+    {
+        goSignal3D<void> s1;
+        goSignal3D<void> s2;
+
+        s1.setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
+        s1.setDataType (GO_FLOAT);
+        s1.make (goSize3D(16,16,1), goSize3D(8,8,1), goSize3D(8,8,0), 1);
+        goSignal3DGenericIterator it (&s1);
+        goFloat v = 10.0f;
+        while (!it.endY())
+        {
+            it.resetX();
+            while (!it.endX())
+            {
+                *(goFloat*)*it = v;
+                it.incrementX();
+            }
+            it.incrementY();
+            v += 1.0f;
+        }
+
+        const goFloat mask[] = {1.0f, 1.0f, 1.0f};
+        goFilter1D f (mask, 3, 1, false);
+        // f.filter (s1);
+        s1.swapXY();
+        f.filter (s1);
+        s1.swapXY();
+        printGenericSignal<goFloat> (s1);
+        exit (1);
+    }
+
     {
         goSignal3D<goInt32> object1;
         goSignal3D<goInt32> object2;
