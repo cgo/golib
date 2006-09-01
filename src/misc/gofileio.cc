@@ -39,6 +39,7 @@
 #endif
 
 #include <gosignal3dgenericiterator.h>
+#include <gomath.h>
 
 #if 0
 static void readLine (FILE* f, goString& str) {
@@ -231,13 +232,14 @@ template <class T>
 static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s)
 {
     s->destroy ();
+    goSize3D border (goMath::min<int> (width-1, 32), goMath::min<int> (height - 1, 32), 0);
     if (format == IL_RGBA)
     {
-        s->make (width, height, 1, 32, 32, 1, 32, 32, 0, 4);
+        s->make (goSize3D(width, height, 1), goSize3D(32, 32, 1), border, 4);
     }
     else
     {
-        s->make (width, height, 1, 32, 32, 1, 32, 32, 0, 1);
+        s->make (goSize3D(width, height, 1), goSize3D(32, 32, 1), border, 1);
     }
     if (ilConvertImage (format, type) == IL_FALSE)
     {
