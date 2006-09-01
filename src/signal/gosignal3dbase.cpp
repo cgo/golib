@@ -1064,7 +1064,9 @@ void goSignal3DBase<T>::shiftRightSize (int n, int axes)
 /** 
 * @brief Sets the border behaviour.
 *
-* Changes are only valid when done before the signal is created using make(). <br>
+* @note Changes only become valid when the data is newly allocated using make() after a call to setBorderFlags(),
+* or when applyBorderFlags() is called after setBorderFlags().
+*
 * Not all axes need to have the same behaviour. If you mix behaviours, be aware
 * that the values in the "corners" of the data set may not be what you expect.
 * Currently they are just the values imposed by the last application of 

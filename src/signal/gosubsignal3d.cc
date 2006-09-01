@@ -46,6 +46,26 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
   this->setPosition (0,0,0);
 }
 
+template <class T>
+goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, const goSize3D& size)
+  : 
+    goSignal3DBase<T>(),
+    position (0, 0, 0),
+    parent   (NULL),
+    skipX    (0),
+    skipY    (0),
+    skipZ    (0),
+    deleteX  (false),
+    deleteY  (false),
+    deleteZ  (false)
+{
+    this->setClassID(GO_SUBSIGNAL3D);
+    assert (b);
+    this->setParent   (b);
+    this->setSize     (size.x, size.y, size.z, b->getChannelCount());
+    this->setPosition (0,0,0);
+}
+
 template< class T >
 goSubSignal3D<T>::~goSubSignal3D () 
 {
