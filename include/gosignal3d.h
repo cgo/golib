@@ -16,6 +16,14 @@
 /*!
  * \brief Up to 3-dimensional (signal) data container.
  *
+ * @todo The size is initially (0,0,0). That may lead to
+ * segfaults where getPtr() is used on zero-size signals.
+ * Maybe it is better to set size to (1,1,1) by default.
+ *
+ * @bug The size is initially (0,0,0). That may lead to
+ * segfaults where getPtr() is used on zero-size signals.
+ * Maybe it is better to set size to (1,1,1) by default.
+ *
  * The memory layout is sort of optimized to get some
  * data locality when accessing the data locally in all
  * dimensions.
