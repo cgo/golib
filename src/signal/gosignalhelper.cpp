@@ -724,21 +724,23 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     return true;
 }
 
-/** --------------------------------------------------------------------------
- * @brief Converts a RGBA 4-channel signal to a scalar 1-channel signal.
+/** 
+ * @brief Converts an RGBA 3- or 4-channel signal to a scalar 1-channel signal.
  * 
  * The source signal must have 3 or 4 channels that are interpreted as
  * RGB(A). The alpha channel is currently not taken into account.
  * The conversion is to luminance after ITU CCR 601:<br>
  * Y = 0.299 * R + 0.587 * G + 0.114 * B
- * 
+ *
+ * @note The target signal used to be normalised for GO_FLOAT and GO_DOUBLE types.
+ * This is no longer the case.
+ *
  * @param sig       Source signal, must be of type GO_UINT8 and have >= 3 channels.
  * @param targetSig Target signal. Data type must be set and the size must be the same as
- *                  that of the source signal. If the target type is GO_FLOAT or GO_DOUBLE,
- *                  goNormalizeSignal() is called on targetSig.
+ *                  that of the source signal. 
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!sig || !targetSig)
@@ -778,20 +780,20 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
         case GO_FLOAT:  
                   {
                       bool ok = _RGBAtoScalar<goUInt8,goFloat>  (sig, targetSig); 
-                      if (ok)
-                      {
-                          goNormalizeSignal(targetSig);
-                      }
+//                      if (ok)
+//                      {
+//                          goNormalizeSignal(targetSig);
+//                      }
                       return ok;
                   }
                   break;
         case GO_DOUBLE: 
                   {
                       bool ok = _RGBAtoScalar<goUInt8,goDouble> (sig, targetSig); 
-                      if (ok)
-                      {
-                          goNormalizeSignal(targetSig);
-                      }
+//                      if (ok)
+//                      {
+//                          goNormalizeSignal(targetSig);
+//                      }
                       return ok;
                   }
                   break;
