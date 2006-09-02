@@ -7,8 +7,10 @@
 #include <goconfig.h>
 #include <godefs.h>
 #include <gocomplex.h>
+#include <gomath.h>
 #include <string.h> // bzero()
 #include <iostream>
+
 
 template< class T >
 goSignal3DBase<T>::goSignal3DBase () 
@@ -1637,28 +1639,65 @@ goSignal3DBase<T>::setChannel (goSize_t c)
 template <class T, class T2> \
 static inline void _signalOperator##OPERATORNAME##__ (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other) \
 { \
-    goSignal3DGenericIterator      it (&sig); \
-    goSignal3DGenericConstIterator ot (&other); \
-     \
-    while (!it.endZ() && !ot.endZ()) \
+    if (sig.getChannelCount() == 1) \
     { \
-        it.resetY(); \
-        ot.resetY(); \
-        while (!it.endY() && !ot.endY()) \
+        goSignal3DGenericIterator      it (&sig); \
+        goSignal3DGenericConstIterator ot (&other); \
+        \
+        while (!it.endZ() && !ot.endZ()) \
         { \
-            it.resetX(); \
-            ot.resetX(); \
-            while (!it.endX() && !ot.endX()) \
+            it.resetY(); \
+            ot.resetY(); \
+            while (!it.endY() && !ot.endY()) \
             { \
-                *(T*)*it OPERATOR (T)*(T2*)*ot; \
-                it.incrementX(); \
-                ot.incrementX(); \
+                it.resetX(); \
+                ot.resetX(); \
+                while (!it.endX() && !ot.endX()) \
+                { \
+                    *(T*)*it OPERATOR (T)*(T2*)*ot; \
+                    it.incrementX(); \
+                    ot.incrementX(); \
+                } \
+                it.incrementY(); \
+                ot.incrementY(); \
             } \
-            it.incrementY(); \
-            ot.incrementY(); \
+            it.incrementZ(); \
+            ot.incrementZ(); \
         } \
-        it.incrementZ(); \
-        ot.incrementZ(); \
+    } \
+    else \
+    { \
+        goSize_t chan_backup_1 = sig.getChannel(); \
+        goSize_t chan_2 = other.getChannel(); \
+        goSize_t chan_count = goMath::min (sig.getChannelCount(), other.getChannelCount()); \
+        goSize_t i = 0; \
+        goSignal3DGenericIterator      it (&sig); \
+        goSignal3DGenericConstIterator ot (&other); \
+        \
+        while (!it.endZ() && !ot.endZ()) \
+        { \
+            it.resetY(); \
+            ot.resetY(); \
+            while (!it.endY() && !ot.endY()) \
+            { \
+                it.resetX(); \
+                ot.resetX(); \
+                while (!it.endX() && !ot.endX()) \
+                { \
+                    for (i = 0; i < chan_count; ++i) \
+                    { \
+                        *((T*)*it + i) OPERATOR (T)*((T2*)*ot + i - chan_2); \
+                    } \
+                    it.incrementX(); \
+                    ot.incrementX(); \
+                } \
+                it.incrementY(); \
+                ot.incrementY(); \
+            } \
+            it.incrementZ(); \
+            ot.incrementZ(); \
+        } \
+        sig.setChannel (chan_backup_1); \
     } \
 } \
 template <class T>  \
