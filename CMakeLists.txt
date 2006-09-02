@@ -64,6 +64,7 @@ SET                 (SOURCES
  src/network/gonetwork.cc 
  src/network/goserver.cc
  src/nifty/gorandom.cc
+ src/signal/gogaussimage.cpp
  src/signal/gosignal3dbase.cpp 
  src/signal/gosubsignal3d.cc 
  src/signal/gosignal3d.cc 
