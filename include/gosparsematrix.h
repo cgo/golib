@@ -1626,8 +1626,8 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
     int      mMatlabFillCurrentColumn = 0;
     int      mMatlabFillCurrentIndex = 0;
     
-    int mRows = matrix.getRowCount();
-    int mCols = matrix.getColumnCount();
+    unsigned int mRows = matrix.getRowCount();
+    unsigned int mCols = matrix.getColumnCount();
     int mElementCount = matrix.getElementCount();
     // Be conservative about the size of the target matrix. 
     // It must match exactly and be sparse.
@@ -1636,11 +1636,11 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
         return false;
     }
    
-    if (mxGetM(target) != mRows)
+    if (mxGetM(target) != (int)mRows)
     {
         return false;
     }
-    if (mxGetN(target) != mCols)
+    if (mxGetN(target) != (int)mCols)
     {
         return false;
     }
@@ -1660,8 +1660,9 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
     
     // Sort in ascending column order
     goArray<int> indexArray (mRowIndex->getSize());
-    int i;
-    for (i = 0; i < indexArray.getSize(); ++i)
+    unsigned int i;
+    unsigned int sz = indexArray.getSize();
+    for (i = 0; i < sz; ++i)
     {
         indexArray[i] = i;
     }
@@ -1670,7 +1671,7 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
     goArray<goIndex_t> sortedRows (mRowIndex->getSize());
     goArray<goDouble>  sortedValues (mValues->getSize());
 
-    goIndex_t sz = sortedRows.getSize();
+    sz = sortedRows.getSize();
     for (i = 0; i < sz; ++i)
     {
         sortedRows[i]   = (*mRowIndex)[indexArray[i]];
@@ -1696,8 +1697,8 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
     {
         assert (sortedRows[i] >= 0);
         assert (sortedCols[i] >= 0);
-        assert (sortedRows[i] < mRows);
-        assert (sortedCols[i] < mCols);
+        assert (sortedRows[i] < static_cast<goIndex_t>(mRows));
+        assert (sortedCols[i] < static_cast<goIndex_t>(mCols));
 
         //= fillNext
         if (mMatlabFillElementCount <= 0)
