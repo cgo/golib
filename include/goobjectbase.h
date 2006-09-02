@@ -41,11 +41,15 @@ class goObjectBasePrivate;
  * to the end of the list.
  *
  * \author Christian Gosch
+ *
+ * \todo The object messaging must be stable against re-entries and changing connections during message sending.
+ * There is no way to control what connected classes do during a receive call, so this is the place where everything must
+ * be stable. Already hardened against disconnecting while receiving, see sendObjectMessage() in the source code.
+ * Mutexes alone are of little help since they will lead to deadlocks here. The pointer in the connection list is therefore
+ * first set to NULL and later the list is cleaned up. Test this on multi-processor machines.
+ *
  * \todo Do writeObjectFile/readObjectFile as ASCII. Better to port/debug/change.
  *       Check if libxml is nice enough to use for this.
- * \todo Test object communication
- * \todo Object communication has some problems (deleting objects and 
- *       sending the last 'dying' message)
  *
  * \author Christian Gosch
  */
