@@ -32,6 +32,9 @@ goSignal3D<T>::goSignal3D ()
 
 /*! \brief Constructor
  * 
+ * @note This does not make sense for VOID type signals.
+ * Use setDataType() there first.
+ *
  * \param x Size in x direction
  * \param y Size in y direction
  * \param z Size in z direction
