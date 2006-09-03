@@ -317,7 +317,7 @@ void goMatrix<T>::operator () (const goMatrix<T>& source, goIndex_t i1, goIndex_
 {
     assert (source.getRows() == i2-i1+1);
     assert (source.getColumns() == j2-j1+1);
-    if (source.getRows() != i2-i1+1 || source.getColumns() != j2-j1+1)
+    if (source.getRows() != static_cast<goSize_t>(i2-i1+1) || source.getColumns() != static_cast<goSize_t>(j2-j1+1))
     {
         goLog::warning ("goMatrix::operator(): source dimensions do not agree with sub-matrix. Not copying.");
         return;
