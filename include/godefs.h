@@ -64,7 +64,19 @@ enum {
  * Border definitions
  */
 enum {
+    /** 
+     * Periodic borders for goSignal3DBase type objects.
+     */
     GO_PERIODIC_BORDER = 1,
-    GO_CONSTANT_BORDER = 2
+    /** 
+     * Constant border for goSignal3DBase type objects.
+     */
+    GO_CONSTANT_BORDER = 2,
+    /** 
+     * Constant border for goSubSignal3D type objects.
+     * Does not work with other goSignal3DBase type objects.
+     * THIS IS NOT YET IMPLEMENTED.
+     */
+    GO_PARENT_BORDER = 3
 };
 #endif
