@@ -1085,8 +1085,9 @@ void goSignal3DBase<T>::shiftRightSize (int n, int axes)
 template <class T>
 void goSignal3DBase<T>::setBorderFlags (int axes, int borderFlag)
 {
-    if (borderFlag != GO_PERIODIC_BORDER &&
-        borderFlag != GO_CONSTANT_BORDER)
+    if ((borderFlag != GO_PERIODIC_BORDER &&
+         borderFlag != GO_CONSTANT_BORDER) ||
+        (borderFlag == GO_PARENT_BORDER && this->getClassID() != GO_SUBSIGNAL3D))
     {
         goLog::warning("setBorders(): unknown borderFlag value.",this);
         return;
@@ -1106,6 +1107,54 @@ void goSignal3DBase<T>::setBorderFlags (int axes, int borderFlag)
 }
 
 template <class T>
+void goSignal3DBase<T>::setBorderFlags (const goFixedArray<int>& flags)
+{
+    if (flags.getSize() != this->myBorderFlags.getSize())
+    {
+        return;
+    }
+    goSize_t sz = flags.getSize();
+    goSize_t i;
+    //= Check for legal values.
+    for (i = 0; i < sz; ++i)
+    {
+        if ((flags[i] != GO_PERIODIC_BORDER && flags[i] != GO_CONSTANT_BORDER) ||
+                (flags[i] == GO_PARENT_BORDER && this->getClassID() != GO_SUBSIGNAL3D))
+        {
+            return;
+        }
+    }
+    
+    this->myBorderFlags = flags;
+}
+
+template <class T>
+const goFixedArray<int>& goSignal3DBase<T>::getBorderFlags () const
+{
+    return this->myBorderFlags;
+}
+
+template <class T>
+void goSignal3DBase<T>::applyBorderFlags (int axis)
+{
+    goIndex_t i;
+    switch (axis)
+    {
+        case GO_X: i = 0; break;
+        case GO_Y: i = 1; break;
+        case GO_Z: i = 2; break;
+        default: return; break;
+    }
+    switch (this->myBorderFlags[i])
+    {
+        case GO_PERIODIC_BORDER: this->periodicBorders(axis); break;
+        case GO_CONSTANT_BORDER: this->constantBorders(axis); break;
+        case GO_PARENT_BORDER: goLog::error ("GO_PARENT_BORDER not yet implemented.", this); break; // No need for action.
+        default: goLog::warning("applyBorderFlags(): unknown borderFlag value.",this); break;
+    }
+}
+
+template <class T>
 void goSignal3DBase<T>::applyBorderFlags ()
 {
     static const int axesEnums[3] = {GO_X,GO_Y,GO_Z};
@@ -1116,6 +1165,7 @@ void goSignal3DBase<T>::applyBorderFlags ()
         {
             case GO_PERIODIC_BORDER: this->periodicBorders(axesEnums[i]); break;
             case GO_CONSTANT_BORDER: this->constantBorders(axesEnums[i]); break;
+            case GO_PARENT_BORDER: goLog::error ("GO_PARENT_BORDER not yet implemented.", this); break; // No need for action.
             default: goLog::warning("applyBorderFlags(): unknown borderFlag value.",this); break;
         }
     }

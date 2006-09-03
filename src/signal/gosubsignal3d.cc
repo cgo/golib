@@ -10,6 +10,12 @@
 #include <goconfig.h>
 #include <assert.h>
 
+/** 
+ * @brief Constructor.
+ * 
+ * Default border is currently GO_CONSTANT_BORDER and standard bordersize is zero.
+ * GO_PARENT_BORDER should be default in the future and must still be implemented.
+ */
 template< class T >
 goSubSignal3D<T>::goSubSignal3D ()
   : 
@@ -24,6 +30,9 @@ goSubSignal3D<T>::goSubSignal3D ()
     deleteZ  (false)
 {
     this->setClassID(GO_SUBSIGNAL3D);
+    // this->setBorderFlags (GO_X|GO_Y|GO_Z, GO_SUBSIGNAL_NO_BORDER);
+    this->setBorder (0, 0, 0);
+    this->setBorderFlags (GO_X|GO_Y|GO_Z, GO_CONSTANT_BORDER);
 }
 
 template< class T >
@@ -40,10 +49,13 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, goSize_t x, goSize_t y, g
     deleteZ  (false)
 {
     this->setClassID(GO_SUBSIGNAL3D);
-  assert (b);
-  this->setParent   (b);
-  this->setSize     (x, y, z, b->getChannelCount());
-  this->setPosition (0,0,0);
+    assert (b);
+    // this->setBorderFlags (GO_X|GO_Y|GO_Z, GO_SUBSIGNAL_NO_BORDER);
+    this->setBorderFlags (GO_X|GO_Y|GO_Z, GO_CONSTANT_BORDER);
+    this->setBorder (0, 0, 0);
+    this->setParent   (b);
+    this->setSize     (x, y, z, b->getChannelCount());
+    this->setPosition (0,0,0);
 }
 
 template <class T>
@@ -60,6 +72,8 @@ goSubSignal3D<T>::goSubSignal3D (goSignal3DBase<T> *b, const goSize3D& size)
     deleteZ  (false)
 {
     this->setClassID(GO_SUBSIGNAL3D);
+    this->setBorderFlags (GO_X|GO_Y|GO_Z, GO_CONSTANT_BORDER);
+    this->setBorder (0, 0, 0);
     assert (b);
     this->setParent   (b);
     this->setSize     (size.x, size.y, size.z, b->getChannelCount());
@@ -91,9 +105,17 @@ goSubSignal3D<T>::~goSubSignal3D ()
 }
 
 template <class T>
-void goSubSignal3D<T>::setBorderFlags (int,int)
+void goSubSignal3D<T>::setBorderFlags (int axes, int flag)
 {
-    goLog::error("setBorderFlags(): Can't do that for this class. FIXME! ",this);
+    // goLog::error("setBorderFlags(): Can't do that for this class. FIXME! ",this);
+    goSignal3DBase<T>::setBorderFlags (axes, flag);
+}
+
+template <class T>
+void goSubSignal3D<T>::setBorderFlags (const goFixedArray<int>& flags)
+{
+    // goLog::error("setBorderFlags(): Can't do that for this class. FIXME! ",this);
+    goSignal3DBase<T>::setBorderFlags (flags);
 }
 
 template< class T >
@@ -136,6 +158,16 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     }
 #endif
     
+    //= Check if my border flags or skip values require own jump and diff arrays:
+    bool newX = false;
+    bool newY = false;
+    bool newZ = false;
+    const goFixedArray<int>& myBF = this->getBorderFlags();
+    const goFixedArray<int>& pBF = this->parent->getBorderFlags();
+    if ( (myBF[0] != GO_PARENT_BORDER && myBF[0] != pBF[0] && this->getBorderX() != 0) || this->skipX != 0 ) newX = true;
+    if ( (myBF[1] != GO_PARENT_BORDER && myBF[1] != pBF[1] && this->getBorderY() != 0) || this->skipY != 0 ) newY = true;
+    if ( (myBF[2] != GO_PARENT_BORDER && myBF[2] != pBF[2] && this->getBorderZ() != 0) || this->skipZ != 0 ) newZ = true;
+    
     if (deleteX)
     {
         delete[] this->real_myXJump;
@@ -163,7 +195,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
         this->zDiff = NULL;
         this->real_zDiff = NULL;
     }
-    if (skipX == 0)
+    if (!newX)
     {
         deleteX = false;
         this->myXJump = parent->getXJump() + (goPtrdiff_t)p.x;
@@ -195,9 +227,9 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipX;
             parentDiffP = parentDiffP + 1 + skipX;
         }
-        this->periodicBorders (GO_X);
+        this->applyBorderFlags (GO_X);
     }
-    if (skipY == 0)
+    if (!newY)
     {
         deleteY = false;
         this->myYJump = parent->getYJump() + (goPtrdiff_t)p.y;
@@ -227,9 +259,9 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipY;
             parentDiffP = parentDiffP + 1 + skipY;
         }
-        this->periodicBorders (GO_Y);
+        this->applyBorderFlags (GO_Y);
     }
-    if (skipZ == 0)
+    if (!newZ)
     {
         deleteZ = false;
         this->myZJump = parent->getZJump() + (goPtrdiff_t)p.z;
@@ -259,7 +291,7 @@ goSubSignal3D<T>::setPosition (goPosition &p)
             parentJumpP = parentJumpP + 1 + skipZ;
             parentDiffP = parentDiffP + 1 + skipZ;
         }
-        this->periodicBorders (GO_Z);
+        this->applyBorderFlags (GO_Z);
     }
 }
 
@@ -368,9 +400,9 @@ goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
   {
       return;
   }
-  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)32),
-                   goMath::min(this->getSizeY(),(goSize_t)32),
-                   goMath::min(this->getSizeZ(),(goSize_t)32));
+//  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)32),
+//                   goMath::min(this->getSizeY(),(goSize_t)32),
+//                   goMath::min(this->getSizeZ(),(goSize_t)32));
   this->setDataType (p->getDataType().getID());
   this->parent   = p;
   this->real_ptr = p->getRealPtr();
@@ -395,26 +427,30 @@ template< class T >
 void
 goSubSignal3D<T>::setParent (goSignal3DBase<T> *p)
 {
-  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)4),
-                   goMath::min(this->getSizeY(),(goSize_t)4),
-                   goMath::min(this->getSizeZ(),(goSize_t)4));
-  this->parent   = p;
-  this->real_ptr = p->getRealPtr();
-  this->ptr      = p->getPtr(0, 0, 0);
-  this->setPosition (0, 0, 0);
-  this->myChannelCount = p->getChannelCount();
-  this->myChannel = p->getChannel();
-  if (this->myChannelOffset)
-  {
-      delete [] this->myChannelOffset;
-      this->myChannelOffset = NULL;
-  }
-  this->myChannelOffset = new goPtrdiff_t[this->getChannelCount()];
-  goSize_t i;
-  for (i = 0; i < this->getChannelCount(); ++i)
-  {
-    this->myChannelOffset[i] = p->getChannelOffset(i);
-  }
+    if (!p)
+    {
+        return;
+    }
+//    this->setBorder (goMath::min(this->getSizeX(),(goSize_t)4),
+//            goMath::min(this->getSizeY(),(goSize_t)4),
+//            goMath::min(this->getSizeZ(),(goSize_t)4));
+    this->parent   = p;
+    this->real_ptr = p->getRealPtr();
+    this->ptr      = p->getPtr(0, 0, 0);
+    this->setPosition (0, 0, 0);
+    this->myChannelCount = p->getChannelCount();
+    this->myChannel = p->getChannel();
+    if (this->myChannelOffset)
+    {
+        delete [] this->myChannelOffset;
+        this->myChannelOffset = NULL;
+    }
+    this->myChannelOffset = new goPtrdiff_t[this->getChannelCount()];
+    goSize_t i;
+    for (i = 0; i < this->getChannelCount(); ++i)
+    {
+        this->myChannelOffset[i] = p->getChannelOffset(i);
+    }
 }
 
 template <class T>
