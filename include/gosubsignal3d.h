@@ -9,6 +9,9 @@
  * @{ */
 /*! \brief Access to sub-areas of <code>goSignal3DBase</code> objects
  *
+ * @todo Implement GO_PARENT_BORDER as copying jumps and diffs on the border from
+ * the parent. Currently, CONSTANT_BORDER is default.
+ * 
  * Enables access to sub signals of a given <CODE>goSignal3DBase</CODE>.
  * Being derived from it, <CODE>goSubSignal3D</CODE> can do anything a 
  * <CODE>goSignal3D</CODE> can.
@@ -37,6 +40,7 @@ goSubSignal3D : public goSignal3DBase<T>
         virtual ~goSubSignal3D();
 
         virtual void setBorderFlags (int axes = GO_X|GO_Y|GO_Z, int borderFlag = GO_PERIODIC_BORDER);
+        virtual void setBorderFlags (const goFixedArray<int>& flags);
 
         void               setParent (goSignal3DBase<T>* p);
         goSignal3DBase<T>* getParent ();
