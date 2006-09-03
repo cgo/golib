@@ -320,6 +320,7 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
     }
     return false;
 #else
+    goLog::warning ("grab(): compiled without HAVE_VIDEODEV_H.", this);
     return false;
 #endif
 }
