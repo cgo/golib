@@ -130,7 +130,9 @@ goSignal3DBase : public goObjectBase
             return myChannelOffset[channel];
         };
 
-        virtual void setBorderFlags (int axes = GO_X|GO_Y|GO_Z, int borderFlag = GO_PERIODIC_BORDER);
+        virtual void             setBorderFlags (int axes = GO_X|GO_Y|GO_Z, int borderFlag = GO_PERIODIC_BORDER);
+        virtual void             setBorderFlags (const goFixedArray<int>& flags);
+        const goFixedArray<int>& getBorderFlags () const;
         
         // Works only for <void> instantiation. You should always use void where
         // there is no good reason to use another type. Void rules.
@@ -245,6 +247,7 @@ goSignal3DBase : public goObjectBase
         void setBorder (goSize_t x, goSize_t y, goSize_t z);
         void constantBorders (int axes = GO_X|GO_Y|GO_Z);
         void periodicBorders (int axes = GO_X|GO_Y|GO_Z);
+        void applyBorderFlags (int axis);
         void applyBorderFlags ();
         
     protected:
