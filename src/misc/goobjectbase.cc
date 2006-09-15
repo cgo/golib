@@ -395,7 +395,7 @@ goObjectBase::queueObjectMethod (int methodID, goObjectMethodParameters* param, 
     return true;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Call all queued methods.
  *
  * Calls all methods queued with queueObjectMethod().
@@ -403,7 +403,7 @@ goObjectBase::queueObjectMethod (int methodID, goObjectMethodParameters* param, 
  * 
  * @return True if successful, false otherwise. 
  *         If one of the methods failed, this method returns false.
- ----------------------------------------------------------------------------*/
+ */ 
 bool
 goObjectBase::callQueuedMethods ()
 {
