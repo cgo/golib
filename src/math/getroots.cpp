@@ -1,6 +1,22 @@
 #include <gomath.h>
 #include <golist.h>
 
+/** 
+ * @brief Find the roots (zero crossings) of a function curve
+ * approximated as polygonal curve.
+ * 
+ * @param fX X coordinates of the points of the polygonal approximation of
+ * a function curve.
+ * @param fY X coordinates of the points of the polygonal approximation of
+ * a function curve.
+ * @param retX X coordinates of the roots.
+ * @param retIndex If not 0, contains the indices of the Y input points
+ * which are closer to zero for each root. If 0, this is ignored.
+ * 
+ * Instantiated for <goVectord, goDouble>
+ *
+ * @return True if successful, false otherwise.
+ */
 template <class vectorT, class T>
 bool goMath::getRoots (const vectorT& fX, 
                        const vectorT& fY,

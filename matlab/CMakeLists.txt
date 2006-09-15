@@ -1,3 +1,5 @@
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab/mex)
+
 SET (SOURCES gomatlab.cpp)
 # SET (QTHEADERS your_files_here)
 # SET (QTINTERFACES your_files_here) 

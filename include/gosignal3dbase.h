@@ -60,9 +60,10 @@
  * \note Although instances for many explicit data types
  *       are provided, it is recommended to use the special void type instantiation.
  * 
- * \todo The <code>void</code> implementation is not completely done.
- *       Add support in gosignalmacros.h and add some of the routines
- *       in gosignal3d and base marked as "not yet implemented".
+ * \todo The <code>void</code> implementation may not completely be done.
+ *       Check if some of the routines
+ *       in gosignal3d and base are still marked as "not yet implemented".
+ * \todo typedef the void instantiation to something else and use that.
  *
  * \author Christian Gosch
  */

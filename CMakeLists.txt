@@ -28,7 +28,7 @@ SET                 (SOURCES
  src/math/gocomplex.cc 
  src/math/goposition.cc 
  src/math/goquaternion.cc 
- src/math/golinearalgebra.cc 
+ # src/math/golinearalgebra.cc 
  src/math/gopdf.cpp 
  src/math/gogausspdf.cpp 
  src/math/gopoint.cpp 
@@ -169,10 +169,13 @@ SET                 (SOURCES
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not
 # automatically descended into. The user has to do that.
-IF($ENV{MATLAB})
+IF(DEFINED ENV{MATLAB})
+    MESSAGE ("MATLAB path is $ENV{MATLAB}")
     SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
     ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab EXCLUDE_FROM_ALL)
-ENDIF($ENV{MATLAB})
+ELSE(DEFINED ENV{MATLAB})
+    MESSAGE ("*** MATLAB environment variable was not declared. ***")
+ENDIF(DEFINED ENV{MATLAB})
 
 SET                 (GOPATH ${PROJECT_SOURCE_DIR})
 
@@ -202,7 +205,7 @@ CHECK_INCLUDE_FILE (sys/types.h  HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE (errno.h  HAVE_ERRNO_H)
 CHECK_INCLUDE_FILE (linux/videodev2.h  HAVE_LINUX_VIDEODEV2_H)
 CHECK_INCLUDE_FILE (linux/videodev.h  HAVE_LINUX_VIDEODEV_H)
-#SET (HAVE_LINUX_VIDEODEV_H 1)
+SET (HAVE_LINUX_VIDEODEV_H 1)
 
 CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
