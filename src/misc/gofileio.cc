@@ -309,11 +309,11 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  * The image type is selected by the filename's suffix.
  * 
  * @param filename  Name of the file containing the image.
- * @param signal    Must be a pointer to a goSignal3D<void>.
+ * @param sig       Must be a pointer to a goSignal3D<void>.
  *                  The data type of signal determines
  *                  the type to which the image data are
  *                  converted <b>if</b> the image is not RGB/RGBA.
- *                  In that case, signal will always contain
+ *                  In that case, sig will always contain
  *                  GO_UINT8, 4 channel data containing
  *                  red, green, blue, and alpha values.
  *        
@@ -624,6 +624,22 @@ static bool copySignalToIL (const goSignal3DBase<void>* s)
     return false;
 }
 
+/** 
+ * @brief Write an image, contained in a goSignal3DBase, to a file.
+ * 
+ * @param filename           File name to store in. The extension defines the file format (e.g. .jpg means jpeg).
+ * @param signal             goSignal3DBase<void> that contains the image.
+ *                           The data may be of any scalar type and may contain 1, 3 (RGB), or 4 (RGBA) channels.
+ *                           Currently, RGBA and RGB are treated the same. If an image can not
+ *                           be stored (there may be problems with floating point data, for example),
+ *                           try to convert everything to GO_UINT8 before saving. Bytes are always
+ *                           very likely to be written as you woul expect.
+ *
+ * @throws goFileIOException if writing failed (code == FAILED) or if the file exists (code == EXISTS)
+ * @throws goTypeException
+ * 
+ * @return 
+ */
 bool
 goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) throw (goFileIOException, goTypeException)
 {
@@ -709,6 +725,13 @@ goFileIO::writeImage (const char*, const goSignal3DBase<void>*) throw (goFileIOE
 }
 #endif
 
+/** 
+ * @brief Creates a temporary file.
+ * 
+ * @param filenameRet The name of the file.
+ * 
+ * @return The FILE pointer to the open file. You can close it with the standard C function fclose().
+ */
 FILE*
 goFileIO::createTempFile (goString& filenameRet)
 {
@@ -725,6 +748,15 @@ goFileIO::createTempFile (goString& filenameRet)
 #endif
 }
 
+/** 
+ * @brief Removes a file.
+ * 
+ * Under Unix, uses unlink().
+ *
+ * @param filename File to be removed.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool
 goFileIO::remove (const goString& filename)
 {
@@ -739,6 +771,17 @@ goFileIO::remove (const goString& filename)
 #endif
 }
 
+/** 
+ * @brief Uses fseek() to find out the file size.
+ * 
+ * @note BEHOLD this does not work for 64 bit file sizes!
+ * @bug Fix for 64 bit file offsets
+ * @todo Fix for 64 bit file offsets
+ *
+ * @param filename File name.
+ * 
+ * @return File size.
+ */
 goSize_t goFileIO::fileSize (const char* filename)
 {
     FILE* f = NULL;
@@ -751,6 +794,16 @@ goSize_t goFileIO::fileSize (const char* filename)
     return (goSize_t)pos;
 }
 
+/** 
+ * @brief Read ASCII string from file.
+ * 
+ * Opens a file, reads it into a given goString, and closes it again.
+ *
+ * @param filename File name.
+ * @param target   goString to read into.
+ * 
+ * @return True is successful, false otherwise.
+ */
 bool  
 goFileIO::readASCII (const char* filename, goString& target)
 {
@@ -765,6 +818,16 @@ goFileIO::readASCII (const char* filename, goString& target)
     return true;
 }
 
+/** 
+ * @brief Read a fixed number of characters from an ASCII file.
+ * 
+ * @param f      Open file.
+ * @param target Target string to hold the read ASCII characters.
+ * @param sz     Size of string to read (in bytes == characters).
+ * 
+ * @return True if successful, false otherwise, if the number of read characters is not 
+ * sz.
+ */
 bool  
 goFileIO::readASCII (FILE* f, goString& target, goSize_t sz)
 {
@@ -868,6 +931,14 @@ goFileIO::readASCII (FILE* f, goString& target)
     return true;
 }
 
+/** 
+ * @brief Write ASCII string to file.
+ * 
+ * @param filename File name.
+ * @param str      String to write to the file.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool  
 goFileIO::writeASCII (const char* filename, const goString& str)
 {
@@ -880,6 +951,14 @@ goFileIO::writeASCII (const char* filename, const goString& str)
     return true;
 }
 
+/** 
+ * @brief Write a string to an already open file.
+ * 
+ * @param f   FILE pointer to the open file.
+ * @param str String to write.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool  
 goFileIO::writeASCII (FILE* f, const goString& str)
 {
@@ -890,6 +969,15 @@ goFileIO::writeASCII (FILE* f, const goString& str)
     return true;
 }
 
+/** 
+ * @brief Check if a file exists.
+ * 
+ * Under Unix, uses stat() to check for existence.
+ *
+ * @param filename File name.
+ * 
+ * @return True if filename exists, false otherwise.
+ */
 bool
 goFileIO::fileExists (const char* filename)
 {
@@ -906,6 +994,13 @@ goFileIO::fileExists (const char* filename)
 #endif
 }
 
+/** 
+ * @brief Create a directory.
+ * 
+ * @param pathname Directory to create.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool
 goFileIO::mkdir (const char* pathname)
 {
