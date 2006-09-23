@@ -166,18 +166,19 @@ SET                 (SOURCES
  src/seispack/tsturm.c
  src/seispack/r_sign.c)
 
-# If the the environment variable MATLAB is set, assume the matlab module
-# should be built. This creates the build directory, but it is not
-# automatically descended into. The user has to do that.
-IF(DEFINED ENV{MATLAB})
-    MESSAGE ("MATLAB path is $ENV{MATLAB}")
-    SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
-    ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab EXCLUDE_FROM_ALL)
-ELSE(DEFINED ENV{MATLAB})
-    MESSAGE ("*** MATLAB environment variable was not declared. ***")
-ENDIF(DEFINED ENV{MATLAB})
+SET (GOPATH ${PROJECT_SOURCE_DIR})
 
-SET                 (GOPATH ${PROJECT_SOURCE_DIR})
+#
+# Find out the machine type. Currently, assume only 
+# x86 and amd64 machines are supported.
+#
+EXEC_PROGRAM        (uname ARGS -m OUTPUT_VARIABLE UNAME_M)
+IF (UNAME_M MATCHES x86_64)
+    SET (MACHINE_TYPE "amd64")
+ELSE (UNAME_M MATCHES x86_64)
+    SET (MACHINE_TYPE "x86")
+ENDIF (UNAME_M MATCHES x86_64)
+MESSAGE ("Machine type is ${MACHINE_TYPE}")
 
 # This was introduced for guile 1.6.x. 1.8 should be threadsafe. Not tried
 # though.
@@ -214,7 +215,7 @@ CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
 CHECK_FUNCTION_EXISTS (stat     HAVE_STAT)
 CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
-EXEC_PROGRAM        (/home/christian/Software/bin/guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 
 FIND_LIBRARY        (ATLAS NAMES atlas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY        (CBLAS NAMES cblas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
@@ -259,9 +260,17 @@ ENDIF (${HAVE_LIBPTHREAD} MATCHES 1)
 #ENDIF (DEFINED ${CMAKE_USE_PTHREADS_INIT})
 
 INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
-                     ${EXTRA_INCLUDE_PATH}
+    # ${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include)
 
+##                 
+## If your system compiler is a gcc 4.x,
+## set this explicitly to a 3.x version if using Matlab.
+## Matlab links to the old libstdc++ version 5 which
+## causes severe crashes when using it with libstdc++ version 6.
+##                 
+# SET (CMAKE_CXX_COMPILER g++-3.3.6)
+# SET (CMAKE_C_COMPILER gcc-3.3.6)
                      
 # Add -MT flag!
 IF(UNIX)
@@ -279,3 +288,13 @@ ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 # SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")
 INSTALL_TARGETS     (/lib ${TARGETNAME})
+# If the the environment variable MATLAB is set, assume the matlab module
+# should be built. This creates the build directory, but it is not
+# automatically descended into. The user has to do that.
+IF(DEFINED ENV{MATLAB})
+    MESSAGE ("MATLAB path is $ENV{MATLAB}")
+    SET (EXTRA_INCLUDE_PATH $ENV{HOME}/Software/include)
+    ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab EXCLUDE_FROM_ALL)
+ELSE(DEFINED ENV{MATLAB})
+    MESSAGE ("*** MATLAB environment variable was not declared. ***")
+ENDIF(DEFINED ENV{MATLAB})
