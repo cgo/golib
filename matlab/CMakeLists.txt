@@ -1,5 +1,3 @@
-ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab/mex)
-
 SET (SOURCES gomatlab.cpp)
 # SET (QTHEADERS your_files_here)
 # SET (QTINTERFACES your_files_here) 
@@ -11,8 +9,14 @@ SET (TARGET Gomatlab)
 
 # Matlab base path
 SET          (MATLAB $ENV{MATLAB})
-# SET          (MATLAB_ARCH glnxa64)
-SET          (MATLAB_ARCH glnx86)
+IF (MACHINE_TYPE MATCHES amd64)
+    SET (MATLAB_ARCH glnxa64)
+    SET (MEX_EXTENSION .mexa64)
+ELSE (MACHINE_TYPE MATCHES amd64)
+    SET (MATLAB_ARCH glnx86)
+    SET (MEX_EXTENSION .mexglx)
+ENDIF (MACHINE_TYPE MATCHES amd64)
+
 SET          (MATLAB_LIB_PATH ${MATLAB}/extern/lib/${MATLAB_ARCH};${MATLAB}/bin/${MATLAB_ARCH})
 SET          (MATLAB_INC_PATH ${MATLAB}/extern/include)
 SET          (GOPATH $ENV{GOPATH})
@@ -39,3 +43,5 @@ LINK_LIBRARIES (${GOLIB}
 ADD_LIBRARY (${TARGET} MODULE ${SOURCES})
 INSTALL_TARGETS (/lib ${TARGET})
 # SUBDIRS (swig)
+
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab/mex)
