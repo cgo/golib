@@ -19,23 +19,12 @@ SET                 (SOURCES src/control.cpp
 #FIND_LIBRARY (GOMATLAB NAMES Gomatlab PATHS ${GOPATH}/../lib /usr/local/lib)
 #SET (EXTRA_LIBS ${GOLIB} ${GOMATLAB})
 
-SET (GTKMM_GUI 1)
-
-IF(${GTKMM_GUI})
     PKGCONFIG (gtkmm-2.4 GTKMM_INCLUDE_DIR GTKMM_LIB_DIR GTKMM_LDFLAGS GTKMM_CFLAGS)
     IF (NOT GTKMM_CFLAGS)
-        PKGCONFIG (gtkmm-2.0 GTKMM_INCLUDE_DIR GTKMM_LIB_DIR GTKMM_LDFLAGS GTKMM_CFLAGS)
-        ADD_DEFINITIONS (-DHAVE_GTK_2)
-    ELSE (NOT GTKMM_CFLAGS) 
-        ADD_DEFINITIONS (-DHAVE_GTK_2_4)
-    ENDIF (NOT GTKMM_CFLAGS)
-    IF (NOT GTKMM_CFLAGS)
-        MESSAGE ("Did not find gtkmm-2.0 or gtkmm-2.4. Unset GTKMM_GUI in CMakeLists.txt.")
+        MESSAGE ("Did not find gtkmm-2.4, but it is necessary.")
     ENDIF (NOT GTKMM_CFLAGS)
 
     SET (EXTRA_LIBS ${EXTRA_LIBS} ${GTKMM_LDFLAGS})
-ENDIF(${GTKMM_GUI})
-
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${Gogui_SOURCE_DIR}/include
