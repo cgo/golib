@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include <gostring.h>
+#include "logo.xpm"
 
 namespace goGUI
 {
@@ -11,7 +12,9 @@ MainWindow::MainWindow ()
     : Gtk::Window (), 
       myMenuBar (),
       myControlBox (),
-      myPaned ()
+      myPaned (),
+      myFileMenu (0),
+      myAboutText ("<b>Golib GUI</b>\n\n<i>by Christian Gosch\n</i>\n\nUsing Golib 0.5 and Gtkmm")
 {
     Gtk::Tooltips* toolTips = Gtk::manage (new Gtk::Tooltips);
     toolTips->enable ();
@@ -20,25 +23,9 @@ MainWindow::MainWindow ()
     assert (vbox);
     Gtk::MenuItem* menuItem = 0;
 
-    Gtk::Menu* menu = 0;
+    myFileMenu = this->addMenu ("File");
 
-    //= File menu
-    menu = this->addMenu ("File");
-
-    menuItem = this->addMenuItem (menu, "About");
-#ifdef HAVE_GTK_2
-    menuItem->signal_activate().connect (SigC::slot (*this, &MainWindow::fileAbout));
-#elif defined HAVE_GTK_2_4
-    menuItem->signal_activate().connect (sigc::mem_fun (*this, &MainWindow::fileAbout));
-#endif
-    menuItem = this->addMenuItem (menu, "Quit");
-#ifdef HAVE_GTK_2
-    menuItem->signal_activate().connect (SigC::slot (*this, &MainWindow::fileQuit));
-#elif defined HAVE_GTK_2_4
-    menuItem->signal_activate().connect (sigc::mem_fun (*this, &MainWindow::fileQuit));
-#endif
-
-    menu->append (*Gtk::manage(new Gtk::SeparatorMenuItem));
+    // myFileMenu->append (*Gtk::manage(new Gtk::SeparatorMenuItem));
 
     //= Align the menu to the top and add it.
     {
@@ -84,6 +71,29 @@ void MainWindow::addControl (goGUI::Control& c)
 #endif
 }
 
+void MainWindow::addFileAbout (const char* aboutText)
+{
+    myAboutText = aboutText;
+    //= File menu
+    Gtk::MenuItem* menuItem = this->addMenuItem (myFileMenu, "About");
+#ifdef HAVE_GTK_2
+    menuItem->signal_activate().connect (SigC::slot (*this, &MainWindow::fileAbout));
+#elif defined HAVE_GTK_2_4
+    menuItem->signal_activate().connect (sigc::mem_fun (*this, &MainWindow::fileAbout));
+#endif
+}
+
+void MainWindow::addFileQuit ()
+{
+    //= File menu
+    Gtk::MenuItem* menuItem = this->addMenuItem (myFileMenu, "Quit");
+#ifdef HAVE_GTK_2
+    menuItem->signal_activate().connect (SigC::slot (*this, &MainWindow::fileQuit));
+#elif defined HAVE_GTK_2_4
+    menuItem->signal_activate().connect (sigc::mem_fun (*this, &MainWindow::fileQuit));
+#endif
+}
+
 Gtk::Menu* MainWindow::addMenu (const char* label)
 {
     Gtk::Menu* menu = Gtk::manage (new Gtk::Menu);
@@ -103,9 +113,14 @@ Gtk::MenuItem* MainWindow::addMenuItem (Gtk::Menu* menu, const char* label)
     return menuItem;
 }
 
+void MainWindow::setAboutText (const char* t)
+{
+    myAboutText = t;
+}
+
 void MainWindow::fileAbout ()
 {
-    goGUI::about (goString(""));
+    goGUI::about (myAboutText, logo_xpm);
 }
 
 void MainWindow::fileQuit ()

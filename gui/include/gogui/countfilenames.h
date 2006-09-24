@@ -12,6 +12,13 @@
 namespace goGUI
 {
 
+    /** 
+     * @brief Widget that lets the user enter a base file name
+     * and an extension and provides for a spin button to enter
+     * numbers. The numbers are appended to the base file name and the whole
+     * file name can be retrieved with getFilename().
+     * increment() increments the number in the spin button.
+     */
     class CountFilenames : public Gtk::HBox
     {
         public:

@@ -12,6 +12,8 @@ class ControlPrivate;
 
 /** 
  * @brief Control frame base class.
+ * This is a frame that can be used as a base for all sorts of 
+ * control widgets, like "image control", "process control", ...
  */
 class Control : public Gtk::Frame 
 {

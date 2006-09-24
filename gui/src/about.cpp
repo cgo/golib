@@ -1,16 +1,12 @@
 #include <gogui/helper.h>
 #include <gtkmm.h>
-#include "logo.xpm"
 
-void goGUI::about (const goString& text)
+void goGUI::about (const goString& text, char* logo[])
 {
     Gtk::Dialog msg;
     Gtk::Label label;
-    if (text == "")
-    {
-        label.set_markup ("<b>Golib GUI</b>\n\n<i>by Christian Gosch\n</i>\n\nUsing Golib 0.5 and Gtkmm");
-    }
-    Gtk::Image image (Gdk::Pixbuf::create_from_xpm_data (logo_xpm));
+    label.set_markup (text.toCharPtr());
+    Gtk::Image image (Gdk::Pixbuf::create_from_xpm_data (logo));
     Gtk::HBox hbox;
     Gtk::VSeparator sep;
 

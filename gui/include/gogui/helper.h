@@ -16,7 +16,7 @@ namespace goGUI
     bool getFoldername   (goString& fname, const goString& start, const goString& title = "");
     bool getFilenames (goFixedArray<goString>& filenames, const goString& start = "", const goString& title = "");
 
-    void about (const goString& text);
+    void about (const goString& text, char* logo[]);
 };
 
 #endif
