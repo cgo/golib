@@ -37,7 +37,7 @@ class MainWindow : public Gtk::Window
         Gtk::Menu*     addMenu     (const char* label);
         Gtk::MenuItem* addMenuItem (Gtk::Menu*, const char* label);
 
-        void           addFileAbout (const char* aboutText);
+        void           addFileAbout (const char* aboutText = 0);
         void           addFileQuit  ();
 
         void           setAboutText (const char*);
@@ -47,6 +47,7 @@ class MainWindow : public Gtk::Window
 
         Gtk::HPaned&  getPaned ();
         Gtk::MenuBar& getMenuBar ();
+        Gtk::Menu*    getFileMenu ();
 
     protected:
         Gtk::MenuBar     myMenuBar;

@@ -73,7 +73,10 @@ void MainWindow::addControl (goGUI::Control& c)
 
 void MainWindow::addFileAbout (const char* aboutText)
 {
-    myAboutText = aboutText;
+    if (aboutText)
+    {
+        myAboutText = aboutText;
+    }
     //= File menu
     Gtk::MenuItem* menuItem = this->addMenuItem (myFileMenu, "About");
 #ifdef HAVE_GTK_2
@@ -144,6 +147,11 @@ Gtk::HPaned& MainWindow::getPaned ()
 Gtk::MenuBar& MainWindow::getMenuBar ()
 {
     return myMenuBar;
+}
+
+Gtk::Menu* MainWindow::getFileMenu ()
+{
+    return myFileMenu;
 }
 
 };

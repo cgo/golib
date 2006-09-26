@@ -18,6 +18,19 @@ goComplexd goMatrix<goComplexd>::norm () const
     return goComplexd(0.0f,0.0f);
 }
 
+template <>
+bool goMatrix<goComplexf>::writeASCII (FILE* f) const
+{
+    goLog::error ("read/write for goMatrix not implemented for complex types.");
+    return false;
+};
+template <>
+bool goMatrix<goComplexf>::readASCII (FILE* f)
+{
+    goLog::error ("read/write for goMatrix not implemented for complex types.");
+    return false;
+};
+
 /* Instantiation */
 template class goMatrix<goDouble>;
 template class goMatrix<goFloat>;

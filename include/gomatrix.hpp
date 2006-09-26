@@ -11,6 +11,9 @@
 #ifndef GOLOG_H
 # include <golog.h>
 #endif
+#ifndef GOFILEIO_H
+# include <gofileio.h>
+#endif
 
 extern "C" 
 {
@@ -668,6 +671,92 @@ void goMatrix<T>::fill(T v)
     }
 }
 
+template<class T>
+bool goMatrix<T>::writeASCII (FILE* f) const
+{
+    if (!f)
+    {
+        return false;
+    }
+
+    goSize_t R = this->getRows();
+    goSize_t C = this->getColumns();
+    goSize_t r, c;
+    fprintf (f, "goMatrix\n");
+    fprintf (f, "size %d %d\n", (int)R, (int)C);
+    goDouble d;
+    for (r = 0; r < R; ++r)
+    {
+        for (c = 0; c < C; ++c)
+        {
+            d = (goDouble)(*this)(r,c);
+            fprintf (f, "%lf ", d);
+        }
+        fprintf (f, "\n");
+    }
+}
+
+template<class T>
+bool goMatrix<T>::readASCII (FILE* f)
+{
+    if (!f)
+    {
+        return false;
+    }
+
+    goString s = "";
+    
+    if (!goFileIO::readASCIILine (f, s))
+    {
+        return false;
+    }
+
+    if (s != "goMatrix")
+    {
+        goString msg = "goMatrix::readASCII: expected goMatrix, got ";
+        msg += s.toCharPtr ();
+        goLog::warning (msg);
+        return false;
+    }
+
+    if (!goFileIO::readASCIILine (f,s))
+    {
+        return false;
+    }
+
+    goList<goString> words;
+    s.getWords (words);
+
+    if (words.getSize() != 3 || words.getFrontElement()->elem != "size")
+    {
+        goString msg = "goMatrix::readASCII: expected size x y, got ";
+        msg += s.toCharPtr ();
+        goLog::warning (msg);
+        return false;
+    }
+
+    goSize_t R = 0;
+    goSize_t C = 0;
+
+    R = words.getFrontElement()->next->elem.toInt();
+    C = words.getFrontElement()->next->next->elem.toInt();
+
+    this->resize (R,C);
+    goSize_t r, c;
+    goDouble d = 0.0;
+    for (r = 0; r < R; ++r)
+    {
+        for (c = 0; c < C; ++c)
+        {
+            fscanf (f, "%lf ", &d);
+            (*this)(r,c) = T(d);
+        }
+        fscanf (f, "\n");
+    }
+
+    return true;
+}
+
 #if 0
 template<>
 goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goFloat>& v) const
@@ -718,6 +807,7 @@ goVector<T> goMatrix<T>::operator* (const goVector<T>& v) const
     return y;
 }
 #endif
+
 
 
 template<>

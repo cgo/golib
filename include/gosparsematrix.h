@@ -1636,11 +1636,11 @@ static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
         return false;
     }
    
-    if (mxGetM(target) != (int)mRows)
+    if (mxGetM(target) != mRows)
     {
         return false;
     }
-    if (mxGetN(target) != (int)mCols)
+    if (mxGetN(target) != mCols)
     {
         return false;
     }

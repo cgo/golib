@@ -1,5 +1,5 @@
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef GOGUI_CONTROL_H
+#define GOGUI_CONTROL_H
 #include <gtkmm.h>
 #ifndef GOSTRING_H
 # include <gostring.h>

@@ -408,6 +408,9 @@ class goMatrix
         std::cout << std::endl;
     };
 
+  bool writeASCII (FILE* f) const;
+  bool readASCII  (FILE* f);
+
  protected:
   bool               externalData;
   T*                 matrix;

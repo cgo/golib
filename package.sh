@@ -11,8 +11,6 @@ tar czvhf golib-`date +%Y%m%d`.tar.gz \
  golib/NEWS\
  golib/README\
  golib/RELEASE\
- golib/bootstrap\
- golib/configure.in\
  golib/doc\
  golib/examples\
  golib/include\
