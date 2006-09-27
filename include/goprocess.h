@@ -53,8 +53,15 @@ class goProcess : public goObjectBase {
   ///
   void resume ();
  protected:
+
+  void deleteTemp ();
+
   bool running;
   int pid;
+    
+ private:
+  char **tempArgs;
+  int argCount;
 };
 /*!
  * @}

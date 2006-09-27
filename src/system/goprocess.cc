@@ -7,13 +7,33 @@
 #include <string.h>
 
 goProcess::goProcess ()
-    : goObjectBase ()
+    : goObjectBase (),
+      running (false),
+      pid (0),
+      tempArgs (0),
+      argCount (0)
 {
     this->setClassID(GO_PROCESS);
     running = false;
 }
 
-goProcess::~goProcess () {
+goProcess::~goProcess () 
+{
+    this->deleteTemp ();
+}
+
+void goProcess::deleteTemp ()
+{
+    if (tempArgs)
+    {
+        for (int i = 0; i < argCount; ++i) 
+        {
+            delete[] tempArgs[i];
+            tempArgs[i] = 0;
+        }
+        delete[] tempArgs;
+        tempArgs = 0;
+    }
 }
 
 /**
@@ -29,7 +49,12 @@ goProcess::run (const char* filename, const char* arg) {
   int id = fork();
   running = true;
   if (id == 0) {
-    return execlp (filename, filename, arg, NULL);
+    if (execlp (filename, filename, arg, NULL) < 0)
+    {
+        //= An error has occurred.
+        running = false;
+        exit (-1);
+    }
   }
   pid = id;
   return id;
@@ -48,7 +73,12 @@ goProcess::run (const char* filename, char *const argv[]) {
   int id = fork();
   running = true;
   if (id == 0) {
-    return execvp (filename, argv);
+    if (execvp (filename, argv) < 0)
+    {
+        //= An error has occurred.
+        running = false;
+        exit (-1);
+    }
   }
   pid = id;
   return id;
@@ -69,27 +99,24 @@ goProcess::run (const char* filename, goFixedArray<goString> argv) {
   running = true;
   if (id == 0) 
   {
-      char **tmp;
-      tmp = new char*[argv.getSize() + 2];
-      tmp[0] = new char[strlen(filename)];
-      strcpy (tmp[0], filename);
+      this->deleteTemp ();
+      tempArgs = new char*[argv.getSize() + 2];
+      tempArgs[0] = new char[strlen(filename)];
+      this->argCount = argv.getSize() + 2;
+      strcpy (tempArgs[0], filename);
       for (int i = 1; i <= (int)argv.getSize(); i++) {
-          tmp[i] = new char[argv[i-1].getSize()];
-          strcpy (tmp[i], argv[i-1].toCharPtr());
+          tempArgs[i] = new char[argv[i-1].getSize()];
+          strcpy (tempArgs[i], argv[i-1].toCharPtr());
       }
-      tmp[argv.getSize() + 1] = NULL;
-      int temp_id = execvp (filename, (char* const*)tmp);
-
-      for (int i = 1; i < ((int)argv.getSize() + 2); i++) 
+      tempArgs[argv.getSize() + 1] = NULL;
+      if (execvp (filename, (char* const*)tempArgs) < 0)
       {
-          delete[] tmp[i];
-          tmp[i] = 0;
+          //= Returns at all, so this must be an error.
+          running = false;
+          this->deleteTemp ();
+          exit (-1);
       }
-      delete[] tmp;
-      tmp = 0;
-      return temp_id;
   }
-
   pid = id;
   return id;
 }

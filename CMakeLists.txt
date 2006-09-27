@@ -264,8 +264,8 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
 ##                 
-# SET (CMAKE_CXX_COMPILER g++-3.3.6)
-# SET (CMAKE_C_COMPILER gcc-3.3.6)
+SET (CMAKE_CXX_COMPILER g++-3.3.6)
+SET (CMAKE_C_COMPILER gcc-3.3.6)
                      
 # Add -MT flag!
 IF(UNIX)

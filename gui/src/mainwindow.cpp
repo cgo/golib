@@ -3,10 +3,24 @@
 #include <assert.h>
 
 #include <gostring.h>
+#include <golist.h>
 #include "logo.xpm"
 
 namespace goGUI
 {
+
+    class MainWindowPrivate
+    {
+        public:
+            MainWindowPrivate () 
+                : controls ()
+            {
+            };
+
+            ~MainWindowPrivate () {};
+
+            goList<void*> controls;
+    };
 
 MainWindow::MainWindow ()
     : Gtk::Window (), 
@@ -14,8 +28,12 @@ MainWindow::MainWindow ()
       myControlBox (),
       myPaned (),
       myFileMenu (0),
-      myAboutText ("<b>Golib GUI</b>\n\n<i>by Christian Gosch\n</i>\n\nUsing Golib 0.5 and Gtkmm")
+      myControlsMenu (0),
+      myAboutText ("<b>Golib GUI</b>\n\n<i>by Christian Gosch\n</i>\n\nUsing Golib 0.5 and Gtkmm"),
+      myPrivate (0)
 {
+    myPrivate = new MainWindowPrivate;
+
     Gtk::Tooltips* toolTips = Gtk::manage (new Gtk::Tooltips);
     toolTips->enable ();
 
@@ -24,6 +42,7 @@ MainWindow::MainWindow ()
     Gtk::MenuItem* menuItem = 0;
 
     myFileMenu = this->addMenu ("File");
+    myControlsMenu = this->addMenu ("Controls");
 
     // myFileMenu->append (*Gtk::manage(new Gtk::SeparatorMenuItem));
 
@@ -57,11 +76,26 @@ MainWindow::MainWindow ()
 
 MainWindow::~MainWindow ()
 {
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = 0;
+    }
 }
 
 void MainWindow::addControl (goGUI::Control& c)
 {
     myControlBox.pack_start (c, Gtk::PACK_SHRINK);
+    myPrivate->controls.append (&c);
+    
+    Gtk::CheckMenuItem* item = Gtk::manage (new Gtk::CheckMenuItem (c.get_label()));
+    item->set_active (true);
+    this->getControlsMenu()->append (*item);
+#ifdef HAVE_GTK_2_4
+    item->signal_toggled().connect (sigc::bind<goGUI::Control*, Gtk::CheckMenuItem*> (sigc::mem_fun (this, &MainWindow::controlsToggled), &c, item));
+#elif HAVE_GTK_2
+    item->signal_toggled().connect (SigC::bind<goGUI::Control*, Gtk::CheckMenuItem*> (SigC::slot (this, &MainWindow::controlsToggled), &c, item));
+#endif
 
     // Add standard connections if any come up.
 #ifdef HAVE_GTK_2
@@ -131,6 +165,41 @@ void MainWindow::fileQuit ()
     Gtk::Main::quit ();
 }
 
+void MainWindow::controlsToggled (goGUI::Control* control, Gtk::CheckMenuItem* item)
+{
+    if (!control)
+    {
+        return;
+    }
+    assert (myPrivate->controls.getSize() == this->getControlsMenu()->items().size());
+    if (!item)
+    {
+        //= This case should only be used when the corresponding check items
+        //= are held in sync otherwise. This should be changed when
+        //= there is need to hide/show the controls from other instances than
+        //= the user himself.
+        if (control->is_visible ())
+        {
+            control->hide ();
+        }
+        else
+        {
+            control->show ();
+        }
+    }
+    else
+    {
+        if (item->get_active())
+        {
+            control->show ();
+        }
+        else
+        {
+            control->hide ();
+        }
+    }
+}
+
 /** 
  * @brief Get Gtk::HPaned that is supposed to be the main widget.
  *
@@ -152,6 +221,11 @@ Gtk::MenuBar& MainWindow::getMenuBar ()
 Gtk::Menu* MainWindow::getFileMenu ()
 {
     return myFileMenu;
+}
+
+Gtk::Menu* MainWindow::getControlsMenu ()
+{
+    return myControlsMenu;
 }
 
 };

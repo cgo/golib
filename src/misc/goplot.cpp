@@ -156,7 +156,8 @@ bool goPlotter::plot ()
     goString postfix = "";
     if (myPrivate->pauseFlag)
     {
-        postfix += "pause -1\n";
+        // postfix += "pause -1\n";
+        postfix += "pause mouse\n";
     }
     if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
                                         &myPrivate->plotY,

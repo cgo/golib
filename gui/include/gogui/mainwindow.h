@@ -7,6 +7,8 @@
 namespace goGUI
 {
 
+    class MainWindowPrivate;
+
     /** 
      * @brief Base class for a main application window.
      * Provides a menu bar, a standard File menu with about and quit items,
@@ -44,17 +46,23 @@ class MainWindow : public Gtk::Window
 
         virtual void fileAbout ();
         virtual void fileQuit ();
+        
+        void controlsToggled (goGUI::Control* control, Gtk::CheckMenuItem* item = 0);
 
         Gtk::HPaned&  getPaned ();
         Gtk::MenuBar& getMenuBar ();
         Gtk::Menu*    getFileMenu ();
+        Gtk::Menu*    getControlsMenu ();
 
     protected:
         Gtk::MenuBar     myMenuBar;
         Gtk::VBox        myControlBox;
         Gtk::HPaned      myPaned;
         Gtk::Menu*       myFileMenu;
+        Gtk::Menu*       myControlsMenu;
         goString         myAboutText;
+
+        MainWindowPrivate* myPrivate;
 };
 };
 
