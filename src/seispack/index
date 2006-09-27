@@ -1,0 +1,290 @@
+file	seispack/readme
+for	overview of seispack
+
+lib	seispack/ex
+for	This directory contains a complete set of
+,	testing routines for seispack.
+
+file	seispack/bakvec.f
+gams	D4c4
+for	back transformation, sign-symmetric matrix
+
+file	seispack/balanc.f
+gams	D4c1a
+for	scaling, general matrix
+
+file	seispack/balbak.f
+gams	D4c4
+for	back scaling, general matrix
+
+file	seispack/bandr.f
+gams	D4c1b1
+for	reduction, symmetric band matrix
+
+file	seispack/bandv.f
+gams	D4c3
+for	some eigenvectors, symmetric band matrix
+
+file	seispack/bisect.f
+gams	D4a5,D4c2a
+for	some eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/bqr.f
+gams	D4a6
+for	some eigenvalues, symmetric band matrix
+
+file	seispack/cbabk2.f
+gams	D4c4
+for	back scaling, complex matrix
+
+file	seispack/cbal.f
+gams	D4c1a
+for	scaling, complex matrix
+
+file	seispack/cg.f
+gams	D4a4
+for	find eigenvalues and eigenvectors, complex general matrix
+
+file	seispack/ch.f
+gams	D4a3
+for	find eigenvalues and eigenvectors, complex Hermitian matrix
+
+file	seispack/cinvit.f
+gams	D4c2b
+for	some eigenvectors, complex Hessenberg matrix
+
+file	seispack/combak.f
+gams	D4c4
+for	back transformation, complex matrix
+
+file	seispack/comhes.f
+gams	D4c1b2
+for	reduction, complex matrix
+
+file	seispack/comlr.f
+gams	D4c2b
+for	all eigenvalues, complex Hessenberg matrix
+
+file	seispack/comlr2.f
+gams	D4c2b
+for	all eigenvalues and eigenvectors, complex Hessenberg matrix
+
+file	seispack/comqr.f
+gams	D4c2b
+for	all eigenvalues, complex Hessenberg matrix
+
+file	seispack/comqr2.f
+gams	D4c2b
+for	all eigenvalues and eigenvectors, complex Hessenberg matrix
+
+file	seispack/cortb.f
+gams	D4c4
+for	back transformation, complex matrix
+
+file	seispack/corth.f
+gams	D4c1b2
+for	reduction, complex matrix
+
+file	seispack/elmbak.f
+gams	D4c4
+for	back transformation, real matrix
+
+file	seispack/elmhes.f
+gams	D4c1b2
+for	reduction, real matrix
+
+file	seispack/eltran.f
+gams	D4c4
+for	reduction, real matrix
+
+file	seispack/figi.f
+gams	D4c1c
+for	reduction, sign-symmetric matrix
+
+file	seispack/figi2.f
+gams	D4c1c
+for	reduction, sign-symmetric matrix
+
+file	seispack/hqr.f
+gams	D4c2b
+for	all eigenvalues, real Hessenberg matrix
+
+file	seispack/hqr2.f
+gams	D4c2b
+for	all eigenvalues and eigenvectors, real Hessenberg matrix
+
+file	seispack/htrib3.f
+gams	D4c4
+for	back transformation, Hermitian packed matrix
+
+file	seispack/htribk.f
+gams	D4c4
+for	back transformation, Hermitian matrix
+
+file	seispack/htrid3.f
+gams	D4c1b1
+for	reduction, Hermitian packed matrix
+
+file	seispack/htridi.f
+gams	D4c1b1
+for	reduction, Hermitian matrix
+
+file	seispack/imtql1.f
+gams	D4a5,D4c2a
+for	all eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/imtql2.f
+gams	D4a5,D4c2a
+for	all eigenvalues and eigenvectors, symmetric tridiagonal matrix
+
+file	seispack/imtqlv.f
+gams	D4a5,D4c2a
+for	all eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/invit.f
+gams	D4c2b
+for	some eigenvectors, real Hessenberg matrix
+
+file	seispack/minfit.f
+gams	D6
+for	least squares, real matrix
+
+file	seispack/ortbak.f
+gams	D4c4
+for	back transformation, real matrix
+
+file	seispack/orthes.f
+gams	D4c1b2
+for	reduction, real matrix
+
+file	seispack/ortran.f
+gams	D4c4
+for	reduction, real matrix
+
+file	seispack/qzhes.f
+gams	D4c1b3
+for	reduction, generalized matrix
+
+file	seispack/qzit.f
+gams	D4c1b3
+for	further reduction, generalized Hessenberg matrix
+
+file	seispack/qzval.f
+gams	D4c2c
+for	all eigenvalues, generalized Hessenberg matrix
+
+file	seispack/qzvec.f
+gams	D4c3
+for	all eigenvectors, generalized Hessenberg matrix
+
+file	seispack/ratqr.f
+gams	D4a5,D4c2a
+for	some eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/rebak.f
+gams	D4c4
+for	back transformation, symmetric generalized matrix
+
+file	seispack/rebakb.f
+gams	D4c4
+for	back transformation, symmetric generalized matrix
+
+file	seispack/reduc.f
+gams	D4c1c
+for	reduction, symmetric generalized matrix
+
+file	seispack/reduc2.f
+gams	D4c1c
+for	reduction, symmetric generalized matrix
+
+file	seispack/rg.f
+gams	D4a2
+for	find eigenvalues and eigenvectors, general matrix
+
+file	seispack/rgg.f
+gams	D4b2
+for	find eigenvalues and eigenvectors, generalized matrix
+
+file	seispack/rs.f
+gams	D4a1
+for	find eigenvalues and eigenvectors, symmetric matrix
+
+file	seispack/rsb.f
+gams	D4a6
+for	find eigenvalues and eigenvectors, band symmetric matrix
+
+file	seispack/rsg.f
+gams	D4b1
+for	find eigenvalues and eigenvectors, generalized symmetric matrix
+
+file	seispack/rsgab.f
+gams	D4b1
+for	find eigenvalues and eigenvectors, generalized symmetric matrix
+
+file	seispack/rsgba.f
+gams	D4b1
+for	find eigenvalues and eigenvectors, generalized symmetric matrix
+
+file	seispack/rsm.f
+for	find eigenvalues and eigenvectors, symmetric matrix
+
+file	seispack/rsp.f
+gams	D4a1
+for	find eigenvalues and eigenvectors, packed symmetric matrix
+
+file	seispack/rst.f
+gams	D4a5
+for	find eigenvalues and eigenvectors, tridiagonal symmetric matrix
+
+file	seispack/rt.f
+gams	D4a5
+for	find eigenvalues and eigenvectors, sign-symmetric tridiagonal matrix
+
+file	seispack/svd.f
+gams	D6
+for	singular value decomposition, real matrix
+
+file	seispack/tinvit.f
+gams	D4c3
+for	some eigenvectors, symmetric tridiagonal matrix
+
+file	seispack/tql1.f
+gams	D4a5,D4c2a
+for	all eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/tql2.f
+gams	D4a5,D4c2a
+for	all eigenvalues and eigenvectors, symmetric tridiagonal matrix
+
+file	seispack/tqlrat.f
+gams	D4a5,D4c2a
+for	all eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/trbak1.f
+gams	D4c4
+for	back transformation, symmetric matrix
+
+file	seispack/trbak3.f
+gams	D4c4
+for	back transformation, packed symmetric matrix
+
+file	seispack/tred1.f
+gams	D4c1b1
+for	reduction, symmetric matrix
+
+file	seispack/tred2.f
+gams	D4c1b1
+for	reduction, symmetric matrix
+
+file	seispack/tred3.f
+gams	D4c1b1
+for	reduction, packed symmetric matrix
+
+file	seispack/tridib.f
+gams	D4a5,D4c2a
+for	some eigenvalues, symmetric tridiagonal matrix
+
+file	seispack/tsturm.f
+gams	D4a5,D4c2a
+for	some eigenvalues and eigenvectors, symmetric tridiagonal matrix
+

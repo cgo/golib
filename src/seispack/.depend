@@ -1,0 +1,337 @@
+F bakvec.f
+D bakvec_
+
+F balanc.f
+D balanc_
+
+F balbak.f
+D balbak_
+
+F bandr.f
+D bandr_
+D comlr2_
+D comqr2_
+D hqr_
+R cdiv_
+R csroot_
+R pythag_
+
+F bandv.f
+D bandv_
+R epslon_
+R pythag_
+
+F bisect.f
+D bisect_
+R epslon_
+
+F bqr.f
+D bqr_
+R pythag_
+
+F cbabk2.f
+D cbabk2_
+
+F cbal.f
+D cbal_
+
+F cdiv.f
+D cdiv_
+
+F cg.f
+D cg_
+R cbabk2_
+R cbal_
+R comqr2_
+R comqr_
+R corth_
+
+F ch.f
+D ch_
+R htribk_
+R htridi_
+R tql2_
+R tqlrat_
+
+F cinvit.f
+D cinvit_
+R cdiv_
+R epslon_
+R pythag_
+
+F combak.f
+D combak_
+
+F comhes.f
+D comhes_
+R cdiv_
+
+F comlr.f
+D comlr_
+R cdiv_
+R csroot_
+
+F comlr2.f
+D comlr2_
+R cdiv_
+R csroot_
+
+F comqr.f
+D comqr_
+R cdiv_
+R csroot_
+R pythag_
+
+F comqr2.f
+D comqr2_
+R cdiv_
+R csroot_
+R pythag_
+
+F cortb.f
+D cortb_
+
+F corth.f
+D corth_
+R pythag_
+
+F csroot.f
+D csroot_
+R pythag_
+
+F elmbak.f
+D elmbak_
+
+F elmhes.f
+D elmhes_
+
+F eltran.f
+D eltran_
+
+F epslon.f
+D epslon_
+
+F figi.f
+D figi_
+
+F figi2.f
+D figi2_
+
+F hqr.f
+D hqr_
+
+F hqr2.f
+D hqr2_
+R cdiv_
+
+F htrib3.f
+D htrib3_
+
+F htribk.f
+D htribk_
+
+F htrid3.f
+D htrid3_
+R pythag_
+
+F htridi.f
+D htridi_
+R pythag_
+
+F imtql1.f
+D imtql1_
+R pythag_
+
+F imtql2.f
+D imtql2_
+R pythag_
+
+F imtqlv.f
+D imtqlv_
+R pythag_
+
+F invit.f
+D invit_
+R cdiv_
+R epslon_
+R pythag_
+
+F minfit.f
+D minfit_
+R pythag_
+
+F ortbak.f
+D ortbak_
+
+F orthes.f
+D orthes_
+
+F ortran.f
+D ortran_
+
+F otqlrat.f
+D tqlrat_
+R epslon_
+R pythag_
+
+F pythag.f
+D pythag_
+
+F qzhes.f
+D qzhes_
+
+F qzit.f
+D qzit_
+R epslon_
+
+F qzval.f
+D qzval_
+
+F qzvec.f
+D qzvec_
+
+F ratqr.f
+D ratqr_
+R epslon_
+
+F rebak.f
+D rebak_
+
+F rebakb.f
+D rebakb_
+
+F reduc.f
+D reduc_
+
+F reduc2.f
+D reduc2_
+
+F rg.f
+D rg_
+R balanc_
+R balbak_
+R elmhes_
+R eltran_
+R hqr2_
+R hqr_
+
+F rgg.f
+D rgg_
+R qzhes_
+R qzit_
+R qzval_
+R qzvec_
+
+F rs.f
+D rs_
+R tql1_
+R tql2_
+R tred1_
+R tred2_
+
+F rsb.f
+D rsb_
+R bandr_
+R tql2_
+R tqlrat_
+
+F rsg.f
+D rsg_
+R rebak_
+R reduc_
+R tql2_
+R tqlrat_
+R tred1_
+R tred2_
+
+F rsgab.f
+D rsgab_
+R rebak_
+R reduc2_
+R tql2_
+R tqlrat_
+R tred1_
+R tred2_
+
+F rsgba.f
+D rsgba_
+R rebakb_
+R reduc2_
+R tql2_
+R tqlrat_
+R tred1_
+R tred2_
+
+F rsm.f
+D rsm_
+R imtqlv_
+R tinvit_
+R tqlrat_
+R trbak1_
+R tred1_
+
+F rsp.f
+D rsp_
+R tql2_
+R tqlrat_
+R trbak3_
+R tred3_
+
+F rst.f
+D rst_
+R imtql1_
+R imtql2_
+
+F rt.f
+D rt_
+R figi2_
+R figi_
+R imtql1_
+R imtql2_
+
+F svd.f
+D svd_
+R pythag_
+
+F tinvit.f
+D tinvit_
+R epslon_
+R pythag_
+
+F tql1.f
+D tql1_
+R pythag_
+
+F tql2.f
+D tql2_
+R pythag_
+
+F tqlrat.f
+D tqlrat_
+R epslon_
+R pythag_
+
+F trbak1.f
+D trbak1_
+
+F trbak3.f
+D trbak3_
+
+F tred1.f
+D tred1_
+
+F tred2.f
+D tred2_
+
+F tred3.f
+D tred3_
+
+F tridib.f
+D tridib_
+R epslon_
+
+F tsturm.f
+D tsturm_
+R epslon_
+R pythag_
+
