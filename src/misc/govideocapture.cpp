@@ -20,7 +20,15 @@
 //# include <linux/videodev2.h>
 //#endif
 #if HAVE_LINUX_VIDEODEV_H
+# ifdef __STRICT_ANSI__
+#  define FOO__STRICT_ANSI__
+#  undef __STRICT_ANSI__
+# endif
 # include <linux/videodev.h>
+# ifdef FOO__STRICT_ANSI__
+#  define __STRICT_ANSI__
+#  undef FOO__STRICT_ANSI__
+# endif
 #endif
 
 static int xioctl (int    fd,

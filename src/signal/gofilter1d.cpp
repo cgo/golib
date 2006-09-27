@@ -212,18 +212,26 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
         goLog::warning(msg,this);
         return false;
     }
-    switch (sig.getDataType().getID())
+
+    goSize_t channelCount = sig.getChannelCount ();
+    goSize_t orgChan = sig.getChannel ();
+    for (goSize_t i = 0; i < channelCount; ++i)
     {
-        case GO_INT8:   _filter<goInt8>   (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_UINT8:  _filter<goUInt8>  (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_INT16:  _filter<goInt16>  (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_UINT16: _filter<goUInt16> (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_INT32:  _filter<goInt32>  (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_UINT32: _filter<goUInt32> (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_FLOAT:  _filter<goFloat>  (sig, myPrivate->mask, myPrivate->center); break;
-        case GO_DOUBLE: _filter<goDouble> (sig, myPrivate->mask, myPrivate->center); break;
-        default: goLog::warning("filter(): Unknown data type.",this); return false; break;
+        sig.setChannel (i);
+        switch (sig.getDataType().getID())
+        {
+            case GO_INT8:   _filter<goInt8>   (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_UINT8:  _filter<goUInt8>  (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_INT16:  _filter<goInt16>  (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_UINT16: _filter<goUInt16> (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_INT32:  _filter<goInt32>  (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_UINT32: _filter<goUInt32> (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_FLOAT:  _filter<goFloat>  (sig, myPrivate->mask, myPrivate->center); break;
+            case GO_DOUBLE: _filter<goDouble> (sig, myPrivate->mask, myPrivate->center); break;
+            default: goLog::warning("filter(): Unknown data type.",this); return false; break;
+        }
     }
+    sig.setChannel (orgChan);
     return true;
 }
 

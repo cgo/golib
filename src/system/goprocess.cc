@@ -93,8 +93,11 @@ goProcess::run (const char* filename, char *const argv[]) {
  * @return The PID of the new process.
  **/
 int 
-goProcess::run (const char* filename, goFixedArray<goString> argv) {
-
+goProcess::run (const char* filename_, const goFixedArray<goString>& argv_) 
+{
+  goFixedArray<goString> argv = argv_;
+  goString filenameString = filename_;
+  const char* filename = filenameString.toCharPtr();
   int id = (int)fork();
   running = true;
   if (id == 0) 

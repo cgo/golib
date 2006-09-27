@@ -43,7 +43,7 @@ class goProcess : public goObjectBase {
   ///
   int run (const char* filename, char *const argv[]);
   ///
-  int run (const char* filename, goFixedArray<goString> argv);
+  int run (const char* filename, const goFixedArray<goString>& argv);
   /// Waits until the child returns.
   void wait ();
   /// Kills the child using SIGKILL.

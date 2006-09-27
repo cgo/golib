@@ -206,7 +206,12 @@ CHECK_INCLUDE_FILE (sys/types.h  HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE (errno.h  HAVE_ERRNO_H)
 CHECK_INCLUDE_FILE (linux/videodev2.h  HAVE_LINUX_VIDEODEV2_H)
 CHECK_INCLUDE_FILE (linux/videodev.h  HAVE_LINUX_VIDEODEV_H)
+CHECK_INCLUDE_FILE (f2c.h  HAVE_F2C_H)
 SET (HAVE_LINUX_VIDEODEV_H 1)
+
+IF (NOT HAVE_F2C_H)
+    MESSAGE ("f2c.h not found --- please install f2c.")
+ENDIF (NOT HAVE_F2C_H)
 
 CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
@@ -217,8 +222,8 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
 EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 
-FIND_LIBRARY (ATLAS NAMES atlas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
-FIND_LIBRARY (CBLAS NAMES cblas PATHS /usr/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY (ATLAS NAMES atlas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY (CBLAS NAMES cblas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
@@ -264,15 +269,13 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
 ##                 
-SET (CMAKE_CXX_COMPILER g++-3.3.6)
-SET (CMAKE_C_COMPILER gcc-3.3.6)
+SET (CMAKE_CXX_COMPILER g++-3.3)
+SET (CMAKE_C_COMPILER gcc-3.3)
                      
 # Add -MT flag!
 IF(UNIX)
- ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
+ ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
-CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
-                     ${GOPATH}/include/goconfig.h)
 IF (CBLAS)
     LINK_LIBRARIES (${CBLAS})
 ENDIF (CBLAS)
@@ -291,6 +294,9 @@ IF (PTHREAD)
     SET (HAVE_LIBPTHREAD 1)
     LINK_LIBRARIES (${PTHREAD})
 ENDIF (PTHREAD)
+
+CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
+                     ${GOPATH}/include/goconfig.h)
 
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})

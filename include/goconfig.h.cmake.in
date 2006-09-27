@@ -22,6 +22,7 @@
 #cmakedefine HAVE_ERRNO_H ${HAVE_ERRNO_H}
 #cmakedefine HAVE_LINUX_VIDEODEV2_H ${HAVE_LINUX_VIDEODEV2_H}
 #cmakedefine HAVE_LINUX_VIDEODEV_H ${HAVE_LINUX_VIDEODEV_H}
+#cmakedefine HAVE_F2C_H ${HAVE_F2C_H}
 
 /* functions */
 #cmakedefine HAVE_TMPNAM_R ${HAVE_TMPNAM_R}
