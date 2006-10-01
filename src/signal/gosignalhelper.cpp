@@ -119,6 +119,8 @@ bool goNormalizeSignal (const goSignal3DBase<void>* sig, goSignal3D<void>* targe
  * @brief Normalizes or translates a float or double type signal to the interval
  *        [0,1].
  *
+ * @note This does only work on the currently active channel.
+ *
  * If the signal values are out of the interval [0,1],
  * the signal is normalized to it.
  * If (maxValue - minValue) <= 1.0, the signal values are just translated into
@@ -419,7 +421,7 @@ static bool copySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<v
     }
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Copies a channel from a signal to another signal.
  * 
  * The signals do not have to have the same data type.
@@ -432,7 +434,7 @@ static bool copySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<v
  * @param targetSig Signal to hold the target.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 bool goCopySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!targetSig)
@@ -519,7 +521,7 @@ static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* t
     }
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Copies a signal to another signal.
  * 
  * The signals do not have to have the same data type.
@@ -531,7 +533,7 @@ static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* t
  * @param targetSig Signal to hold the target.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */ 
 bool goCopySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!targetSig)
