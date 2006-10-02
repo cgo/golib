@@ -12,6 +12,8 @@
 #include <engine.h>
 #include <gomatlab.h>
 
+#include <gosignal3dgenericiterator.h>
+
 using namespace std;
 
 class goMatlabPrivate
@@ -32,6 +34,84 @@ goMatlabPrivate::~goMatlabPrivate ()
 {
 }
 
+template <class T>
+static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
+{
+    // unsigned char* bp = buffer;
+    int X = sig->getSizeX ();
+    int Y = sig->getSizeY ();
+    int Z = goMath::min<int> (3, sig->getChannelCount());
+    int x;
+    int y;
+    int z;
+
+    goSize_t oldChan = sig->getChannel ();
+
+    for (z = Z-1; z >= 0; --z)
+    {
+        sig->setChannel(z);
+        // bp = buffer + z;
+        goSignal3DGenericConstIterator it (sig);
+        unsigned char* mpy = mp;
+        for (y = 0; y < Y && !it.endY(); ++y)
+        {
+            unsigned char* mpx = mpy;
+            it.resetX ();
+            for (x = 0; x < X && !it.endX(); ++x)
+            {
+                *mpx = (unsigned char)*(T*)*it;
+                mpx += Y; // dims[0];
+                it.incrementX ();
+            }
+            ++mpy;
+            it.incrementY();
+        }
+        mp += X * Y;
+    }
+    sig->setChannel (oldChan);
+
+    return true;
+}
+
+bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
+{
+    if (!myPrivate->matlabEngine)
+    {
+        return false;
+    }
+
+    int dimsMatlab[3];
+    dimsMatlab[0] = sig->getSizeX();
+    dimsMatlab[1] = sig->getSizeY();
+    dimsMatlab[2] = 3;
+    mxArray* image = mxCreateNumericArray(3, dimsMatlab, mxUINT8_CLASS, mxREAL);
+    if (!image)
+    {
+        goLog::error ("goMatlab::putRGBImage: Matlab could not allocate the image.");
+        mexErrMsgTxt ("goMatlab::putRGBImage: Could not allocate image.");
+    }
+
+    bool ok = true;
+    {
+        unsigned char* mp = (unsigned char*)mxGetPr(image);
+        goSignal3DBase<void>* sig2 = const_cast<goSignal3DBase<void>*> (sig);
+        switch (sig2->getDataType().getID())
+        {
+            case GO_UINT8: ok = putRGBImage1<goUInt8> (sig2, mp); break;
+            case GO_INT8: ok = putRGBImage1<goInt8> (sig2, mp); break;
+            case GO_UINT16: ok = putRGBImage1<goUInt16> (sig2, mp); break;
+            case GO_INT16: ok = putRGBImage1<goInt16> (sig2, mp); break;
+            case GO_UINT32: ok = putRGBImage1<goUInt32> (sig2, mp); break;
+            case GO_INT32: ok = putRGBImage1<goInt32> (sig2, mp); break;
+            case GO_FLOAT: ok = putRGBImage1<goFloat> (sig2, mp); break;
+            case GO_DOUBLE: ok = putRGBImage1<goDouble> (sig2, mp); break;
+            default: goLog::error ("goMatlab::putRGBImage: unknown data type."); ok = false; break;
+        }
+    } 
+    mxFree (image);
+    return ok;
+}
+
 bool goMatlab::putSignal(const goSignal3DBase<void>* sig, const char* name)
 {
     return this->signalToVariable (sig, name);
@@ -49,12 +129,12 @@ bool goMatlab::putArray(const goDouble* p, goSize_t length, const char* name)
 
 bool goMatlab::putArray(const goArray<goDouble>* array, const char* name)
 {
-    this->arrayToVariable (array, name);
+    return this->arrayToVariable (array, name);
 }
 
 bool goMatlab::getArray(goArray<goDouble>* array, const char* name)
 {
-    this->variableToArray (array, name);
+    return this->variableToArray (array, name);
 }
 
 bool goMatlab::putVector(const goVectord* vec, const char* name)
@@ -423,7 +503,7 @@ goMatlab::variableToArray (goArray<goDouble>* vector, const char* name)
     {
         return false;
     }
-    if (vector->getSize() != (goSize_t)mxGetN(temp) * (goSize_t)mxGetM(temp))
+    if ((unsigned int)vector->getSize() != (goSize_t)mxGetN(temp) * (goSize_t)mxGetM(temp))
     {
         vector->resize (mxGetN(temp) * mxGetM(temp));
     }
@@ -511,11 +591,10 @@ goMatlab::matlabCreateMatrix (int rows, int columns)
     return m;
 }
 
-
 bool
 goMatlab::copyToMatlab (const goSignal3DBase<void>* sig, mxArray* m)
 {
-    if ((int)sig->getSizeX() != mxGetN(m) || (int)sig->getSizeY() != mxGetM(m))
+    if ((unsigned int)sig->getSizeX() != mxGetN(m) || (unsigned int)sig->getSizeY() != mxGetM(m))
     {
         goLog::warning("Signal and matrix are not of the same size\n",this);
         return false;
@@ -553,7 +632,7 @@ bool
 goMatlab::copyToMatlab (const goArray<goDouble>* array, mxArray* m)
 {
     assert (sizeof(double) == sizeof(goDouble));
-    if ((int)array->getSize() != mxGetN(m) * mxGetM(m))
+    if ((unsigned int)array->getSize() != mxGetN(m) * mxGetM(m))
     {
         printf ("Signal and matrix are not of the same size\n");
         return false;
@@ -571,7 +650,7 @@ bool
 goMatlab::copyToMatlab (const goVectord* vec, mxArray* m)
 {
     assert (sizeof(double) == sizeof(goDouble));
-    if ((int)vec->getSize() != mxGetN(m) * mxGetM(m))
+    if ((unsigned int)vec->getSize() != mxGetN(m) * mxGetM(m))
     {
         printf ("Signal and matrix are not of the same size\n");
         return false;
@@ -589,7 +668,7 @@ bool
 goMatlab::copyToMatlab (const goDouble* array, goSize_t length, mxArray* m)
 {
     assert (sizeof(double) == sizeof(goDouble));
-    if ((int)length != mxGetN(m) * mxGetM(m))
+    if ((unsigned int)length != mxGetN(m) * mxGetM(m))
     {
         goLog::warning ("Array and matrix are not of the same size\n",this);
         return false;
@@ -609,7 +688,7 @@ goMatlab::copyToMatlab (goSparseMatrix* sp, mxArray* m)
     assert (sizeof(double) == sizeof(goDouble));
     assert (sp);
     assert (m);
-    if (sp->getColumnCount() != mxGetM(m) || sp->getRowCount() != mxGetM(m))
+    if ((unsigned int)sp->getColumnCount() != mxGetM(m) || (unsigned int)sp->getRowCount() != mxGetM(m))
     {
         printf ("Signal and matrix are not of the same size\n");
         return false;
@@ -621,7 +700,7 @@ goMatlab::copyToMatlab (goSparseMatrix* sp, mxArray* m)
 bool
 goMatlab::copyFromMatlab (mxArray* m, goSignal3DBase<void>* sig)
 {
-    if ((int)sig->getSizeX() != mxGetN(m) || (int)sig->getSizeY() != mxGetM(m))
+    if ((unsigned int)sig->getSizeX() != mxGetN(m) || (unsigned int)sig->getSizeY() != mxGetM(m))
     {
         printf ("Signal and matrix are not of the same size\n");
         return false;
@@ -646,7 +725,7 @@ bool
 goMatlab::copyFromMatlab (mxArray* m, goArray<goDouble>* array)
 {
     assert (sizeof(double) == sizeof(goDouble));
-    if ((int)array->getSize() != mxGetN(m) * mxGetM(m))
+    if ((unsigned int)array->getSize() != mxGetN(m) * mxGetM(m))
     {
         printf ("Signal and array are not of the same size\n");
         return false;
@@ -664,7 +743,7 @@ bool
 goMatlab::copyFromMatlab (mxArray* m, goVectord* vec)
 {
     assert (sizeof(double) == sizeof(goDouble));
-    if ((int)vec->getSize() != mxGetN(m) * mxGetM(m))
+    if ((unsigned int)vec->getSize() != mxGetN(m) * mxGetM(m))
     {
         printf ("Signal and array are not of the same size\n");
         return false;

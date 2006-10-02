@@ -82,6 +82,7 @@ class goMatlab : public goObjectBase
         goMatlab ();
         virtual ~goMatlab ();
 
+        bool     putRGBImage (const goSignal3DBase<void>* sig, const char* name);
         bool     putSignal (const goSignal3DBase<void>* sig, const char* name);
         bool     getSignal (goSignal3D<void>* sig, const char* name);
         bool     putArray  (const goDouble* p, goSize_t length, const char* name);
