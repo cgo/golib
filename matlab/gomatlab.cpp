@@ -60,10 +60,10 @@ static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
             for (x = 0; x < X && !it.endX(); ++x)
             {
                 *mpx = (unsigned char)*(T*)*it;
-                mpx += Y; // dims[0];
+                mpx += Y; // += Y; // dims[0];
                 it.incrementX ();
             }
-            ++mpy;
+            ++mpy; // ++mpy;
             it.incrementY();
         }
         mp += X * Y;
@@ -73,6 +73,18 @@ static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
     return true;
 }
 
+/** 
+ * @brief Puts a multichannel signal as RGB image to matlab.
+ *
+ * The image created in matlab is of type mxUINT8_CLASS and has
+ * 3 channels (R,G,B). The data type of sig does not matter,
+ * the data is simply cast to goUInt8. No quantisation is done.
+ * 
+ * @param sig   goSignal3DBase to put into matlab (multi-channel)
+ * @param name  Name of the matlab variable.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -81,8 +93,8 @@ bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
     }
 
     int dimsMatlab[3];
-    dimsMatlab[0] = sig->getSizeX();
-    dimsMatlab[1] = sig->getSizeY();
+    dimsMatlab[0] = sig->getSizeY();
+    dimsMatlab[1] = sig->getSizeX();
     dimsMatlab[2] = 3;
     mxArray* image = mxCreateNumericArray(3, dimsMatlab, mxUINT8_CLASS, mxREAL);
     if (!image)
@@ -108,7 +120,8 @@ bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
             default: goLog::error ("goMatlab::putRGBImage: unknown data type."); ok = false; break;
         }
     } 
-    mxFree (image);
+    engPutVariable (myPrivate->matlabEngine, name, image);
+    mxDestroyArray (image);
     return ok;
 }
 
