@@ -1,52 +1,46 @@
-#!/home/gosch/Software/bin/guile -s 
-!#
+(load-extension "libgolib_guile.so" "scm_init_golib_guile_module")
+(load-extension "libshape_guile.so" "scm_init_shape_guile_module")
 (primitive-load-path "golib_guile.scm")
-(use-modules (oop goops describe))
-; (use-modules (golib_guile))
+(primitive-load-path "shape_guile.scm")
 
-;(define mylist (golib-test-list))
-;(format #t "~S~%" mylist)
-;(golib-test-list-2 (list 2 6 4.0 (/ 1 6)))
- 
-(define sig (make <goSignal3Dv>))
-(format #t "Class name: ~a~%Object name: ~a~%" 
-        (getClassName sig) 
-        (toCharPtr (getObjectName sig)))
-(if (string=? (getClassName sig) "goSignal3D")
-  (format #t "This is a signal!~%")
-  (format #t "This is not a signal!~%"))
+(use-modules (oop goops)
+             ;(shape_guile)
+             (golib_guile))
 
-(if (setDataType sig (GO-FLOAT))
-  (format #t "Successfully set to float~%")
-  (format #t "AAARGH~%"))
+(define (print-signal-info s)
+    (let ((gs (make-instance <goString>)))
+        (goSignalInfoText s gs #f)
+        (display (to-string gs))))
+    
+;(define LS (make-instance <goRegionLS>))
+(define image (make-instance <goSignal3Dv>))
+(goReadImage "/home/gosch/bulletcluster.jpg" image)
+(define image2 (make-instance <goSignal3Dv>))
+(setDataType image2 (GO-FLOAT))
+(make-signal image2 image)
+(goCopySignal image image2)
+(format #t "Signal 1:\n")
+(print-signal-info image)
+(format #t "\nSignal 2:\n")
+(print-signal-info image2)
+(define image3 (make-instance <goSignal3Dv>))
 
-(if (HAVE-LIBIL)
-  (format #t "Have libIL~%")
-  (format #t "Don't have libIL~%"))
+(let ((ls (make-instance <goRegionLS>)))
+    (setImage ls image2 1.0 1.0 #t)
+    (display "\nEvolving...\n")
+    (let loop1 ((n 50))
+        (if (> n 0)
+            (begin
+                (evolve ls 1)
+                (loop1 (- a 1)))))
+    (let ((temp (make-instance <goSignal3Dv>)))
+        (setDataType temp GO-INT8)
+        (make-signal temp (getPhi ls))
+        (goConvertSignal (getPhi ls) temp)
+        (goWriteImage "phi.tif" temp)))
+        
 
-;; Make a list of signals:
-(define siglist (list (make-instance <goSignal3Dv>) 
-                      (make-instance <goSignal3Dv>) 
-                      (make-instance <goSignal3Dv>) 
-                      (make-instance <goSignal3Dv>)))
-
-;; Test reading an image:
-(if (goReadImage "/home/gosch/Documents/fem-level-sets/matlab/person.jpg" sig)
-  (format #t "Read image.~%")
-  (begin
-    (format #t "Could not read image.~%")
-    (quit)))
-;; Make a new signal and set to float type:
-(define sig2 (make-instance <goSignal3Dv>))
-(setDataType sig2 (GO-UINT8))
-;; Allocate it:
-(make-signal sig2 (getSizeX sig) (getSizeY sig) (getSizeZ sig))
-;; Convert first image to scalar float:
-(if (goRGBAtoScalar sig sig2)
-  (format #t "Successfully converted.~%")
-  (format #t "Conversion failed.~%"))
-;; Try to write the converted image:
-(delete-file "scalar-image.jpg")
-(if (goWriteImage "scalar-image.jpg" sig2)
-  (format #t "Written.~%")
-  (format #t "Write failed.~%"))
+(setDataType image3 (GO-INT8))
+(make-signal image3 image2)
+(goCopySignal image2 image3)
+(goWriteImage "test.jpg" image3)
