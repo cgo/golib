@@ -145,6 +145,48 @@ bool goSinglePlot::addCurve (const goVectord& x, const goVectord& y, const char*
 }
 
 /** 
+ * @brief Add a curve to the plot.
+ * 
+ * @param x X coordinates of curve points.
+ * @param y Y coordinates of curve points.
+ * @param title Title of the curve (set to "" for none).
+ * @param plotOptions Options for gnuplot, written after the plot command, default is "w l" for "with lines". E.g. set this to
+ * "with linespoints" for drawing with points and lines.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions)
+{
+    if (x.getSize() != y.getSize())
+    {
+        goLog::warning("addCurve(): x and y array sizes mismatch.",this);
+        return false;
+    }
+
+    goSize_t sz = x.getSize();
+    goVectord tempX (sz);
+    goVectord tempY (sz);
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        tempX[i] = x[i];
+        tempY[i] = y[i];
+    }
+
+    myPrivate->plotX.append(tempX);
+    myPrivate->plotY.append(tempY);
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
+/** 
  * @brief Add a label at a given position.
  * 
  * @param l Label text.

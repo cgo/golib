@@ -32,6 +32,26 @@ class goFunctorBase1T
         virtual Tret operator () (Targ1 p) = 0;
 };
 
+template <class Tret, class Targ1, class Targ2>
+class goFunctorBase2T
+{
+    public:
+        goFunctorBase2T ()
+        {
+        };
+        virtual ~goFunctorBase2T ()
+        {
+        };
+
+        /** 
+         * @brief Purely virtual function. In derived classes,
+         * calls the function represented by this functor.
+         * 
+         * @return Any value.
+         */
+        virtual Tret operator () (Targ1 p, Targ2 p2) = 0;
+};
+
 /** 
  * @brief Implementation template for
  * functors with 1 argument.
@@ -62,6 +82,40 @@ class goFunctor1T : public goFunctorBase1T<Tret, Targ1>
             if (myObject && myFunction)
             {
                 return (myObject->*myFunction)(p);
+            }
+        };
+
+    private:
+        Tclass* myObject;
+        function_t myFunction;
+};
+
+template <class Tret, class Tclass, class Targ1, class Targ2>
+class goFunctor2T : public goFunctorBase2T<Tret, Targ1, Targ2>
+{
+    public:
+        typedef Tret(Tclass::*function_t)(Targ1, Targ2);
+
+    public:
+        goFunctor2T (Tclass* object, function_t function)
+            : goFunctorBase2T<Tret, Targ1, Targ2>(), myObject (object), myFunction (function)
+        {
+        };
+        virtual ~goFunctor2T () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual Tret operator () (Targ1 p, Targ2 p2)
+        {
+            // printf ("Functor called.\n");
+            if (myObject && myFunction)
+            {
+                return (myObject->*myFunction)(p, p2);
             }
         };
 

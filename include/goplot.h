@@ -95,6 +95,7 @@ class goSinglePlot : public goObjectBase
             };
 
         bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
+        bool addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions = 0);
 
         template <class vectorT>
             bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)

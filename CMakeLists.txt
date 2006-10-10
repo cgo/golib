@@ -5,6 +5,10 @@ INCLUDE             (CheckFunctionExists)
 # Apparently buggy:
 # INCLUDE             (FindThreads)
 
+SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
+SET (BUILD_MATLAB_MODULE FALSE CACHE BOOL "Enable/disable building the matlab module")
+SET (BUILD_GUI_MODULE FALSE CACHE BOOL "Enable/disable building the GUI module")
+
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
@@ -269,8 +273,10 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
 ##                 
-SET (CMAKE_CXX_COMPILER g++-3.3)
-SET (CMAKE_C_COMPILER gcc-3.3)
+IF (BUILD_MATLAB_MODULE)
+    SET (CMAKE_CXX_COMPILER g++-3.3)
+    SET (CMAKE_C_COMPILER gcc-3.3)
+ENDIF (BUILD_MATLAB_MODULE)
                      
 # Add -MT flag!
 IF(UNIX)
@@ -305,11 +311,20 @@ INSTALL_TARGETS     (/lib ${TARGETNAME})
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not
 # automatically descended into. The user has to do that.
-IF(DEFINED ENV{MATLAB})
-    MESSAGE ("MATLAB path is $ENV{MATLAB}")
-    SET (EXTRA_INCLUDE_PATH $ENV{HOME}/Software/include)
-    ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab EXCLUDE_FROM_ALL)
-ELSE(DEFINED ENV{MATLAB})
-    MESSAGE ("*** MATLAB environment variable was not declared. ***")
-ENDIF(DEFINED ENV{MATLAB})
-ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/gui EXCLUDE_FROM_ALL)
+IF (BUILD_MATLAB_MODULE)
+    IF(DEFINED ENV{MATLAB})
+        MESSAGE ("MATLAB path is $ENV{MATLAB}")
+        SET (EXTRA_INCLUDE_PATH $ENV{HOME}/Software/include)
+        ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/matlab)
+    ELSE(DEFINED ENV{MATLAB})
+        MESSAGE ("*** MATLAB environment variable was not declared. ***")
+    ENDIF(DEFINED ENV{MATLAB})
+ENDIF (BUILD_MATLAB_MODULE)
+
+IF (BUILD_GUILE_MODULE)
+    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/swig)
+ENDIF (BUILD_GUILE_MODULE)
+
+IF (BUILD_GUI_MODULE)
+    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/gui)
+ENDIF (BUILD_GUI_MODULE)
