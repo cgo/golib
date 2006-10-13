@@ -69,8 +69,9 @@ class goMatrix
   bool resize (goSize_t rows, goSize_t cols);
 
   void transpose ();
-
   void getTranspose (goMatrix<T>& trans);
+
+  bool invert ();
 
   void flip (goSize_t dim = 0);
 
