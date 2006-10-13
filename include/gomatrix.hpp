@@ -18,6 +18,7 @@
 extern "C" 
 {
  #include <cblas.h>
+ #include <clapack.h>
 }
 
 /*!
@@ -188,6 +189,63 @@ void goMatrix<T>::getTranspose (goMatrix<T>& trans)
     }
 }
 
+template <>
+bool goMatrix<goFloat>::invert ()
+{
+    //= Factorise A P = L U
+    goSize_t M = this->getColumns();
+    if (M != this->getRows())
+    {
+        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
+        return false;
+    }
+    int* P = new int [M * M];
+    if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+    {
+        delete[] P;
+        return false;
+    }
+    if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+    {
+        delete[] P;
+        return false;
+    }
+    delete[] P;
+    return true;
+}
+
+template <>
+bool goMatrix<goDouble>::invert ()
+{
+    //= Factorise A P = L U
+    goSize_t M = this->getColumns();
+    if (M != this->getRows())
+    {
+        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
+        return false;
+    }
+    int* P = new int [M * M];
+    if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+    {
+        delete[] P;
+        return false;
+    }
+    if (clapack_dgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+    {
+        delete[] P;
+        return false;
+    }
+    delete[] P;
+    return true;
+}
+
+template <class T>
+bool goMatrix<T>::invert ()
+{
+    goLog::error ("goMatrix::invert() not implemented for types other than goFloat and goDouble.");
+    return false;
+}
+
 /** 
  * @brief Flip in row or column direction.
  * 
@@ -318,8 +376,8 @@ void goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex
 template <class T>
 void goMatrix<T>::operator () (const goMatrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2)
 {
-    assert (source.getRows() == i2-i1+1);
-    assert (source.getColumns() == j2-j1+1);
+    assert (source.getRows() == (goSize_t)(i2-i1+1));
+    assert (source.getColumns() == (goSize_t)(j2-j1+1));
     if (source.getRows() != static_cast<goSize_t>(i2-i1+1) || source.getColumns() != static_cast<goSize_t>(j2-j1+1))
     {
         goLog::warning ("goMatrix::operator(): source dimensions do not agree with sub-matrix. Not copying.");
@@ -694,6 +752,7 @@ bool goMatrix<T>::writeASCII (FILE* f) const
         }
         fprintf (f, "\n");
     }
+    return true;
 }
 
 template<class T>
