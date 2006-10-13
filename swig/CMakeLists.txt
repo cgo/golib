@@ -1,13 +1,16 @@
-INCLUDE (FindSWIG)
+# INCLUDE (FindSWIG)
 PROJECT             (golib_guile)
+
+FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
+FIND_PROGRAM (GUILE_CONFIG NAMES guile-config)
 
 SET (SCM_INSTALL_DIR $ENV{HOME}/.guile-modules CACHE PATH "Directory which holds guile modules -- often pointed to by the environment variable GUILE_LOAD_PATH")
 
-EXEC_PROGRAM        (guile-config ARGS link OUTPUT_VARIABLE GUILE_LIBS)
-EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+EXEC_PROGRAM        (${GUILE_CONFIG} ARGS link OUTPUT_VARIABLE GUILE_LIBS)
+EXEC_PROGRAM        (${GUILE_CONFIG} ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
-                        ARGS -I../include -Linkage passive -scmstub -guile -c++ -scm -proxy golib.i)
+                        ARGS -I../include -guile -Linkage module -c++ -scm -proxy golib.i)
 FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 SET                 (GOMATLAB_LIB "-lGomatlab")
 LINK_LIBRARIES      (${GUILE_LIBS} ${GOLIB} ${GOMATLAB_LIB})

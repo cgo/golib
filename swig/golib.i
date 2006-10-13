@@ -1,6 +1,7 @@
 /* example.i */
-%scheme %{ (load-extension "libgolib_guile.so" "scm_init_golib_guile_module") %}
+%scheme %{  %}
 %goops %{ 
+   (load-extension "libgolib_guile.so" "scm_init_golib_guile_module")
    (primitive-load-path "golib_guile-primitive.scm") 
    (primitive-load-path "common.scm")
 %}

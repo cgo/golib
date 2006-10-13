@@ -201,6 +201,8 @@ IF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
     SET (HAVE_INT64 1)
 ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 
+# SET (CMAKE_REQUIRED_INCLUDES /usr/include /usr/local/include)
+
 CHECK_INCLUDE_FILE (ieee754.h   HAVE_IEEE754_H)
 CHECK_INCLUDE_FILE (dirent.h    HAVE_DIRENT_H)
 CHECK_INCLUDE_FILE (time.h      HAVE_TIME_H)
@@ -211,11 +213,15 @@ CHECK_INCLUDE_FILE (errno.h  HAVE_ERRNO_H)
 CHECK_INCLUDE_FILE (linux/videodev2.h  HAVE_LINUX_VIDEODEV2_H)
 CHECK_INCLUDE_FILE (linux/videodev.h  HAVE_LINUX_VIDEODEV_H)
 CHECK_INCLUDE_FILE (f2c.h  HAVE_F2C_H)
+CHECK_INCLUDE_FILE (clapack.h  HAVE_CLAPACK_H)
 SET (HAVE_LINUX_VIDEODEV_H 1)
 
 IF (NOT HAVE_F2C_H)
     MESSAGE ("f2c.h not found --- please install f2c.")
 ENDIF (NOT HAVE_F2C_H)
+IF (NOT HAVE_CLAPACK_H)
+    MESSAGE ("clapack.h not found --- please install it, e.g. through the ATLAS library.")
+ENDIF (NOT HAVE_CLAPACK_H)
 
 CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
@@ -224,10 +230,9 @@ CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
 CHECK_FUNCTION_EXISTS (stat     HAVE_STAT)
 CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
-EXEC_PROGRAM        (guile-config ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
-
 FIND_LIBRARY (ATLAS NAMES atlas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (CBLAS NAMES cblas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
@@ -273,15 +278,18 @@ INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
 ##                 
-IF (BUILD_MATLAB_MODULE)
+IF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
     SET (CMAKE_CXX_COMPILER g++-3.3)
     SET (CMAKE_C_COMPILER gcc-3.3)
-ENDIF (BUILD_MATLAB_MODULE)
+ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
                      
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
+IF (LAPACK)
+    LINK_LIBRARIES (${LAPACK})
+ENDIF (LAPACK)
 IF (CBLAS)
     LINK_LIBRARIES (${CBLAS})
 ENDIF (CBLAS)
