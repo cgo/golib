@@ -1,0 +1,33 @@
+%        File: gogausspdf.tex
+%     Created: Sun Oct 15 04:00 PM 2006 C
+% Last Change: Sun Oct 15 04:00 PM 2006 C
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath,amssymb,makeidx}
+\begin{document}
+
+\section{Online Updating of Gauss Distribution}
+This is implemented in goMultiGaussPDF.
+\[
+    p(x) = \frac{1}{\sqrt{\det \Sigma} (2 \pi)^{\frac{n}{2}}} \exp \left( -\frac{1}{2} (x-\mu)^\top \Sigma^{-1} (x-\mu) \right)
+\]
+We want to learn the covariance matrix $\Sigma$ and mean $\mu$.
+\begin{eqnarray*}
+    \Sigma & = & \frac{1}{N} \sum\limits_{i=1}^{N} (v_i - \mu) \cdot (v_i - \mu)^\top \\
+           & = & \frac{1}{N} \sum\limits_{i=1}^{N} (v_i - \mu) \cdot (v_i^\top - \mu^\top) \\
+           & = & \frac{1}{N} \left[ \sum\limits_{i=1}^{N}v_iv_i^\top - 2\mu \sum\limits_{i=1}^{N} v_i^\top   \right]
+                        + \mu \mu^\top \\
+                        & = & \frac{1}{N} \left[ \sum\limits_{i=1}^{N} v_iv_i^\top \right] - \mu\mu^\top
+\end{eqnarray*}
+Which means we can store $S := \frac{1}{N} \sum\limits_{i=1}^{N} v_iv_i^\top$, $\mu$, and $N$ and
+then update with a new vector $v$
+\begin{eqnarray*}
+    \mu_{k+1} & = & \frac{N_k}{N_k+1} \mu_k + \frac{v}{N_k+1} \\
+    S_{k+1}   & = & \frac{N_k}{N_k+1} S_k + \frac{1}{N_k+1} vv^\top \\
+    N_{k+1}   & = & N_k + 1
+\end{eqnarray*}
+with $\mu_0 := 0, \mu_0 \in \mathbb{R}^n$, $S_0 := 0, S_0 \in \mathbb{R}^{n\times n}$, $N_0 := 0, N_0 \in \mathbb{N}^+$.
+
+\end{document}
+
+
