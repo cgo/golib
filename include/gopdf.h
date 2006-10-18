@@ -2,6 +2,9 @@
 #define GOPDF_H
 
 #include <goobjectbase.h>
+#ifndef GODEFS_H
+# include <godefs.h>
+#endif
 
 namespace goMath
 {
@@ -18,14 +21,14 @@ template <class input_type, class output_type>
 class goPDF : public goObjectBase
 {
     public:
-        virtual ~goPDF ();
+        virtual ~goPDF () {};
 
         virtual output_type operator() (const input_type&) = 0;
 
         // FIXME: add things common to all probability density functions here
 
     protected:
-        goPDF ();
+        goPDF () { this->setClassID(GO_PDF); };
 };
 /*! @} */
 

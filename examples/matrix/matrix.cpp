@@ -72,7 +72,7 @@ int main ()
             }
             printf ("\n");
         }
-        exit (1);
+        // exit (1);
     }
     {
         goList<goMatrixf> ml;
@@ -121,7 +121,7 @@ int main ()
             }
         }
 
-        exit(1);
+        // exit(1);
     }
     {
         goMatlab mat;
@@ -139,7 +139,7 @@ int main ()
         mat.getMatrix (M3,"M3");
         M3 = M1 * M2;
         M3.print();
-        exit(1);
+        // exit(1);
     }
 
     {
@@ -174,6 +174,7 @@ int main ()
         printf ("Seconds for 1000x1000 col-first fill: %.5f\n", timer.getTimerSeconds());
         // return 1;
     }
+#if 0
     {
         goVector< goComplex<float> >* test = new goVector< goComplex<float> > [3];
         goMatrix<goComplexf> m (3,3);
@@ -213,7 +214,7 @@ int main ()
             std::cout << "\n";
         }
     }
-
+#endif
     //= Sparse matrix
     {
         printf ("\nSparse multiplication\n");
@@ -317,9 +318,10 @@ int main ()
             printf ("%f ", v[i]);
         }
         printf ("\n");
-        return 1;
+        // return 1;
     }
     
+# if 0
     goMatrix<goFloat> m (3,3);
     int i;
     for (i = 0; i < 3; ++i)
@@ -345,7 +347,7 @@ int main ()
     goMatrix<goFloat> m3;
     m3 = m2_2 * m2;
     m3.print(); 
-
+#endif
 //    goPointf p (1.0f, 1.0f, 1.0f, 1.0f);
 //    go44Matrix<goFloat> m4 (2, 0, 0, 0,
 //                            0, 2, 0, 0,
@@ -354,6 +356,27 @@ int main ()
 //    p *= m4;
 //    std::cout << p << "\n";
 
+
+    goVectorf x (3);
+    x[0] = 1.0f;
+    x[1] = 1.0f;
+    x[2] = 1.0f;
+    
+    float temp[] = {1, 0, 0, 0.5,
+                    0, 1, 0, 0.2, 
+                    0, 0, 1, 0};
+                    // 0.5, 0.2, 0};
+    goMatrixf A (temp, 3, 4);
+
+    goVectorf y;
+    goMatrixVectorMult<goFloat> (1.0f, A, true, x, 1.0, y);
+
+    printf ("y == ");
+    for (goSize_t i = 0; i < y.getSize(); ++i)
+    {
+        printf ("%f ", y[i]);
+    }
+    printf ("\n");
     
     return 1;
 }

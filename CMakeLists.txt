@@ -33,7 +33,7 @@ SET                 (SOURCES
  src/math/goposition.cc 
  src/math/goquaternion.cc 
  # src/math/golinearalgebra.cc 
- src/math/gopdf.cpp 
+ # src/math/gopdf.cpp 
  src/math/gogausspdf.cpp 
  src/math/gopoint.cpp 
  src/math/gradient.cpp 

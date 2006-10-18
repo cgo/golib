@@ -442,6 +442,24 @@ void goMatrixMult (T alpha, const goMatrix<T>& A, bool transA,
                             const goMatrix<T>& B, bool transB, 
                    T beta, goMatrix<T>& C);
 
+/**
+ * @brief calculate \f$ y = \alpha A x + \beta y \f$.
+ *
+ * Sizes of A and x are checked. If y has mismatching size, it is resized and
+ * initialised with 0 before the operation.
+ *
+ * Parameters are named as in the formula above.
+ *
+ * Uses cblas_<>gemv().
+ *
+ * @todo TEST THIS FUNCTION.
+ * 
+ * @return true if successful, false otherwise.
+ */
+template<class T>
+bool goMatrixVectorMult (T alpha, const goMatrix<T>& A, bool transA,
+                         const goVector<T>& x, T beta, goVector<T>& y);
+
 typedef goMatrix<goDouble> goMatrixd;
 typedef goMatrix<goFloat>  goMatrixf;
 /** @} */

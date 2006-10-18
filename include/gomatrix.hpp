@@ -189,62 +189,6 @@ void goMatrix<T>::getTranspose (goMatrix<T>& trans)
     }
 }
 
-template <>
-bool goMatrix<goFloat>::invert ()
-{
-    //= Factorise A P = L U
-    goSize_t M = this->getColumns();
-    if (M != this->getRows())
-    {
-        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
-        return false;
-    }
-    int* P = new int [M * M];
-    if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    delete[] P;
-    return true;
-}
-
-template <>
-bool goMatrix<goDouble>::invert ()
-{
-    //= Factorise A P = L U
-    goSize_t M = this->getColumns();
-    if (M != this->getRows())
-    {
-        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
-        return false;
-    }
-    int* P = new int [M * M];
-    if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    if (clapack_dgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    delete[] P;
-    return true;
-}
-
-template <class T>
-bool goMatrix<T>::invert ()
-{
-    goLog::error ("goMatrix::invert() not implemented for types other than goFloat and goDouble.");
-    return false;
-}
 
 /** 
  * @brief Flip in row or column direction.
@@ -866,51 +810,5 @@ goVector<T> goMatrix<T>::operator* (const goVector<T>& v) const
     return y;
 }
 #endif
-
-
-
-template<>
-void goMatrixMult<goFloat> (goFloat alpha, const goMatrix<goFloat>& A, bool transA, 
-                                           const goMatrix<goFloat>& B, bool transB, 
-                            goFloat beta, goMatrix<goFloat>& C)
-{
-    goSize_t M = transA ? A.getColumns() : A.getRows();
-    goSize_t N = transB ? B.getRows() : B.getColumns();
-    goSize_t K = transA ? A.getRows() : A.getColumns();
-    if (C.getRows() != M || C.getColumns() != N)
-    {
-        C.resize (M,N);
-        C.fill (0.0f);
-    }
-    cblas_sgemm (CblasRowMajor, 
-                 transA ? CblasTrans : CblasNoTrans, 
-                 transB ? CblasTrans : CblasNoTrans,
-                 M, N, K, alpha,
-                 A.getData(), A.getLeadingDimension(),
-                 B.getData(), B.getLeadingDimension(),
-                 beta, C.getData(), C.getLeadingDimension());
-}
-
-template<>
-void goMatrixMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, bool transA, 
-                                           const goMatrix<goDouble>& B, bool transB, 
-                            goDouble beta, goMatrix<goDouble>& C)
-{
-    goSize_t M = transA ? A.getColumns() : A.getRows();
-    goSize_t N = transB ? B.getRows() : B.getColumns();
-    goSize_t K = transA ? A.getRows() : A.getColumns();
-    if (C.getRows() != M || C.getColumns() != N)
-    {
-        C.resize (M,N);
-        C.fill (0.0);
-    }
-    cblas_dgemm (CblasRowMajor, 
-                 transA ? CblasTrans : CblasNoTrans, 
-                 transB ? CblasTrans : CblasNoTrans,
-                 M, N, K, alpha,
-                 A.getData(), A.getLeadingDimension(),
-                 B.getData(), B.getLeadingDimension(),
-                 beta, C.getData(), C.getLeadingDimension());
-}
 
 #endif

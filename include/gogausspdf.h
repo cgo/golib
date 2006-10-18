@@ -31,23 +31,44 @@ namespace goMath
             goDouble   myNormFactor;            // 1 / sqrt (2 Pi sigma^2)
     };
 
-    template <class input_vector, class output_type>
-    class goMultiGaussPDF : public goPDF<input_vector, output_type>
+    /** 
+     * @brief Vector values Gauss distribution.
+     *
+     * You can use reset(), update(), and updateFlush() to learn a distribution from samples.
+     * 
+     * See the latex documentation in doc/gogausspdf for details.
+     * 
+     * @todo Normalisation factor.
+     */
+    template <class input_vector, class scalar_type>
+    class goMultiGaussPDF : public goPDF<input_vector, scalar_type>
     {
         public:
             goMultiGaussPDF ();
+            goMultiGaussPDF (const input_vector& mean, const goMatrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
             virtual ~goMultiGaussPDF ();
-            virtual output_type operator()    (const input_vector& input);
-            bool                fromSamples   (const input_vector* vectors, goIndex_t count);
-            goMatrixd&          getCovariance ();
-            const goMatrixd&    getCovariance () const;
-            input_vector&       getMean       ();
-            const input_vector& getMean       () const;
+            virtual scalar_type           operator()    (const input_vector& input);
+
+            void                          reset         (goSize_t N = 1);
+            void                          update        (const input_vector& v);
+            void                          updateFlush   ();
+            
+            // bool                          fromSamples   (const input_vector* vectors, goIndex_t count);
+            void                          setCovariance (const goMatrix<scalar_type>& cov);
+            const goMatrix<scalar_type>&  getCovarianceInv () const;
+            const goMatrix<scalar_type>&  getCovariance () const;
+            void                          setMean       (const input_vector& m);
+            const input_vector&           getMean       () const;
 
         private:
-            input_vector myMean;
-            goMatrixd    myCovarianceInv;
-            goDouble     myNormFactor;
+            input_vector          myMean;
+            goMatrix<scalar_type> myCovariance;
+            goMatrix<scalar_type> myCovarianceInv;
+            scalar_type           myNormFactor;
+
+            //= For learning
+            goMatrix<scalar_type> sum_xxT;
+            goFloat               N;
     };
     /*! @} */
 };

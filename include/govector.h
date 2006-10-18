@@ -10,10 +10,6 @@
 #ifndef GOCOMPLEX_H
 # include <gocomplex.h>
 #endif
-extern "C"
-{
-#include <cblas.h>
-}
 
 
 template <class T> class goMatrix;
@@ -225,36 +221,7 @@ class goVector : public goFixedArray<T>
          */
         goVector<T>& operator*= (const goMatrix<T>& m);
 
-        /**
-         * @brief Outer product.
-         * @note Untested.
-         * @return 
-         **/
-        template <class To>
-        bool outerProduct (const goVector<To>& other, goMatrix<T>& ret) const
-        {
-            if (this->getSize() != other.getSize())
-                return false;
-            goIndex_t sz = (goIndex_t)this->getSize();
-            if (!ret.resize (sz, sz))
-                return false;
-            T temp;
-            To tempi;
-            goIndex_t stride = this->getStride();
-            for (goIndex_t i = 0; i < sz; ++i)
-            {
-                tempi = other[i];
-                const T* array = this->getPtr();
-                //= NOTE: To account for complex numbers, we run through the whole matrix.
-                //= --> FIXME!
-                for (goIndex_t j = 0; j < sz; ++j, array += stride)
-                {
-                    temp = tempi * *array;
-                    ret(j,i) = temp;
-                }
-            }
-            return true;
-        };
+        void outerProduct (const goVector<T>& other, goMatrix<T>& ret) const;
 
         template <class To>
         bool copy (goVector<To>& target, goIndex_t startIndex, goIndex_t skip, goIndex_t lastIndex = -1) const
@@ -326,10 +293,37 @@ class goVector : public goFixedArray<T>
             return true;
         };
 
-        inline T square () const;
+        T square () const;
         inline T conjInnerProduct (const goVector<T>&) const;
 
-        inline T abs () const;
+        /**
+         * @brief Deprecated. Calls norm2() for scalar real types,
+         * special implementation for goComplex types.
+         *
+         * Use norm2() instead.
+         */
+        T abs () const;
+
+        /**
+         * @brief 2-Norm of this vector.
+         *
+         * Uses cblas_<>nrm2().
+         * Calls special abs() implementation for complex.
+         * 
+         * @todo Use cblas for complex as well. Use cblas internal cblas storage then.
+         * @return 2-norm of this vector.
+         */
+        T norm2 () const;
+        /**
+         * @brief 2-Norm of this vector.
+         *
+         * Uses cblas_<>asum().
+         * Not implemented for goComplex types.
+         * 
+         * @todo Use cblas for complex as well. Use cblas internal cblas storage then.
+         * @return 2-norm of this vector.
+         */
+        T norm1 () const;
 
         T sum (goIndex_t start = 0, goIndex_t end = -1) const
         {
@@ -350,28 +344,6 @@ class goVector : public goFixedArray<T>
 
 // inline goComplexf goVector<goComplexf>::square () const;
 
-template<class T> inline T goVector<T>::abs () const
-{
-    return static_cast<T>(sqrt(this->square()));
-};
-
-
-/**
- * @brief Calculates conj(this) * this.
- *
- * @return The return value is of the form r+i*0, meaning the imaginary part is 0.
- **/
-template<> inline goComplexf goVector<goComplexf>::square () const
-{
-    const goComplexf* array = this->getPtr();
-    goFloat sum = 0.0;
-    goIndex_t size = this->getSize();
-    for (goIndex_t i = 0; i < size; ++i, ++array)
-    {
-        sum += array->re() * array->re() + array->im() * array->im();
-    }
-    return goComplexf (sum, 0.0f);
-}
 
 template<> inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVector<goComplexf>& v) const
 {
@@ -387,27 +359,11 @@ template<> inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVec
     return sum;
 }
 
-template<> inline goComplexf goVector<goComplexf>::abs () const
-{
-    return goComplexf(sqrt(this->square().re()), 0.0f);
-};
-
-template<> inline goComplexd goVector<goComplexd>::abs () const
-{
-    return goComplexd(sqrt(this->square().re()), 0.0);
-};
-
 
 template <class T>
 inline T goVector<T>::conjInnerProduct (const goVector<T>& v) const
 {
     return *this * v;
-}
-
-template <class T>
-inline T goVector<T>::square () const
-{
-    return *this * *this;
 }
 
 #if 0
@@ -511,6 +467,37 @@ inline T goVector<T>::operator* (const goVector<T>& other) const
 };
 #endif
 
+/**
+ * @brief y = alpha * x + y
+ *
+ * @note IMplemented for goDouble and goFloat
+ *
+ * Uses cblas_<>axpy functions.
+ * Sizes of x and y must match and are checked for.
+ * 
+ * @param alpha Scalar factor
+ * @param x     Vector x
+ * @param y     Vector y
+ *
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goVectorAdd (T alpha, const goVector<T>& x, goVector<T>& y);
+
+
+/** 
+ * @brief Outer vector product \f$ A = A + \alpha \cdot x \cdot y^\top \f$
+ * 
+ * @note Implemented for goDouble and goFloat using cblas_<>ger(). Other types 
+ * are directly implemented and therefore slower in most implementations.
+ * 
+ * @param alpha Scalar factor
+ * @param x     Vector x of size M
+ * @param y     Vector y of size N
+ * @param ret   Return matrix A, of size MxN. Resized and initialised to 0 if it does not have the right size.
+ */
+template <class T>
+void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatrix<T>& ret);
 /** @} */
 
 typedef goVector<goFloat>  goVectorf;

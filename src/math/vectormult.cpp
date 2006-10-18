@@ -82,6 +82,7 @@ static inline bool vectorMult2 (const goSignal3DBase<void>& V1, const goSignal3D
                  return false; 
                  break;
     }
+    return false;
 }
 
     template <class T1>
@@ -101,6 +102,7 @@ static inline bool vectorMult1 (const goSignal3DBase<void>& V1, const goSignal3D
                  return false;
                  break;
     }
+    return false;
 }
 
 /** 
@@ -160,4 +162,5 @@ bool goMath::vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<vo
                  return false;
                  break;
     }
+    return false;
 }

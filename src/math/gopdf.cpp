@@ -10,7 +10,7 @@ namespace goMath
     goPDF<input_type, output_type>::goPDF ()
         : goObjectBase ()
     {
-        this->setClassID(GO_PDF);
+        
     }
 
     template <class input_type, class output_type>
