@@ -470,7 +470,7 @@ inline T goVector<T>::operator* (const goVector<T>& other) const
 /**
  * @brief y = alpha * x + y
  *
- * @note IMplemented for goDouble and goFloat
+ * @note Implemented for goDouble and goFloat
  *
  * Uses cblas_<>axpy functions.
  * Sizes of x and y must match and are checked for.

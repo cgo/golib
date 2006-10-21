@@ -453,7 +453,14 @@ void goMatrixMult (T alpha, const goMatrix<T>& A, bool transA,
  * Uses cblas_<>gemv().
  *
  * @todo TEST THIS FUNCTION.
- * 
+ *
+ * @param alpha Scalar factor
+ * @param A     Matrix A
+ * @param transA If true, A is used as transposed.
+ * @param x      Vector x
+ * @param beta   Scalar factor (for y)
+ * @param y      Vector y, also holds the result.
+ *
  * @return true if successful, false otherwise.
  */
 template<class T>
