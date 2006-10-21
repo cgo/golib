@@ -419,6 +419,7 @@ static bool copySignalChannel (const goSignal3DBase<void>* sig, goSignal3DBase<v
         case   GO_DOUBLE:   return copySignalChannel2<T,goDouble>   (sig,   targetSig);   break;
         default: return false;
     }
+    return false;
 }
 
 /** 
@@ -519,6 +520,7 @@ static bool copySignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* t
         case   GO_DOUBLE:   return copySignal2<T,goDouble>   (sig,   targetSig);   break;
         default: return false;
     }
+    return false;
 }
 
 /** 
