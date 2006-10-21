@@ -41,7 +41,7 @@ static bool laplacian2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
         msg += (int)retValue.getSizeX(); 
         msg += " "; msg += (int)retValue.getSizeY(); 
         msg += " "; msg += (int)retValue.getSizeZ();
-        msg += " but should be "; (int)sig.getSizeX(); 
+        msg += " but should be "; msg += (int)sig.getSizeX(); 
         msg += " "; msg += (int)sig.getSizeY(); msg += " 1";
         goLog::warning (msg);
         return false;
@@ -107,7 +107,7 @@ static bool gradient2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& 
         goString msg = "goMath::gradient2D: return signal size not correct.";
         msg += "Size is ";
         msg += (int)retValue.getSizeX(); msg += " "; msg += (int)retValue.getSizeY(); msg += " "; msg += (int)retValue.getSizeZ();
-        msg += " but should be "; (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1 and 2 channels";
+        msg += " but should be "; msg += (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1 and 2 channels";
         goLog::warning (msg);
         return false;
     }
@@ -174,7 +174,7 @@ static bool ddx2D_ (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
         goString msg = "goMath::ddx2D: return signal size not correct.";
         msg += "Size is ";
         msg += (int)retValue.getSizeX(); msg += " "; msg += (int)retValue.getSizeY(); msg += " "; msg += (int)retValue.getSizeZ();
-        msg += " but should be "; (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1";
+        msg += " but should be "; msg += (int)sig.getSizeX(); msg += " "; msg += (int)sig.getSizeY(); msg += " 1";
         goLog::warning (msg);
         return false;
     }
@@ -759,6 +759,7 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
                 return false;
             }
     }
+    return false;
 }
 
 /** 
@@ -792,5 +793,6 @@ bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>
                 return false;
             }
     }
+    return false;
 }
 /** @} */
