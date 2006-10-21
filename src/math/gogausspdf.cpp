@@ -186,7 +186,9 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
             myCovarianceInv = cov;
             if (!myCovarianceInv.invert())
             {
-                goLog::warning ("goMultiGaussPDF::setCovariance(): could not invert covariance matrix.", this);
+                goLog::warning ("goMultiGaussPDF::setCovariance(): could not invert covariance matrix. Setting it to identity.", this);
+                myCovariance.setIdentity();
+                myCovarianceInv = myCovariance;
             }
         }
 
