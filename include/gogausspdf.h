@@ -46,6 +46,9 @@ namespace goMath
         public:
             goMultiGaussPDF ();
             goMultiGaussPDF (const input_vector& mean, const goMatrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
+
+            //= The standard operator= and copy constructor will do.
+
             virtual ~goMultiGaussPDF ();
             virtual scalar_type           operator()    (const input_vector& input);
 
