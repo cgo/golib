@@ -13,7 +13,7 @@ class goPlotterPrivate
 {
     public:
         goPlotterPrivate() : plotX(), plotY(), titles(), plotCommands(), prefixCommands(""), shellPostfix(""),
-                             waitFlag(true), pauseFlag(false), cmdFilename(""), dataFilenames(){};
+                             waitFlag(true), pauseFlag(false), cmdFilename(""), dataFilenames() {};
         ~goPlotterPrivate() {};
 
         goList<goVectord>      plotX;
@@ -53,6 +53,7 @@ goPlotter::goPlotter (const goPlotter& other)
     myPrivate = new goPlotterPrivate;
     *this = other;
 }
+
 
 const goPlotter& goPlotter::operator= (const goPlotter& other)
 {
@@ -615,7 +616,9 @@ bool goPlot::addGnuplotCommands
 bool goPlot::callGnuplot (const goString& gnuplotCommands, 
                           const char*     shellPostfix, 
                           bool            waitfor, 
-                          goString*       cmdFilenameRet)
+                          goString*       cmdFilenameRet,
+                          int             redirectInputFD,
+                          int             redirectOutputFD)
 {
     goString cmd_filename;
     FILE* file = goFileIO::createTempFile(cmd_filename);
@@ -626,6 +629,8 @@ bool goPlot::callGnuplot (const goString& gnuplotCommands,
     fprintf (file, "%s", gnuplotCommands.toCharPtr());
     fclose (file);
     goProcess gnuplot;
+    gnuplot.setInput  (redirectInputFD);
+    gnuplot.setOutput (redirectOutputFD);
     if (shellPostfix)
     {
         goFixedArray<goString> cmds(2);

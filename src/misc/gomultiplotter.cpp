@@ -8,7 +8,7 @@ class goMultiPlotterPrivate
         goMultiPlotterPrivate ()
           : prefixCommands(), shellPostfix(), waitFlag(true), 
             pauseFlag(false), cmdFilename(), 
-            plots() {};
+            plots(), inputFD(-1), outputFD(-1) {};
         ~goMultiPlotterPrivate () {};
 
 
@@ -22,6 +22,10 @@ class goMultiPlotterPrivate
 
         goSize_t rows;
         goSize_t columns;
+
+        //= IO redirection. -1 means not used.
+        int               inputFD;
+        int               outputFD;
 };
 
 /** 
@@ -58,6 +62,34 @@ goMultiPlotter::goMultiPlotter (goMultiPlotter& other)
     this->setClassID (GO_MULTIPLOTTER);
     myPrivate = new goMultiPlotterPrivate;
     *this = other;
+}
+
+/** 
+ * @brief Set input file descriptor.
+ *
+ * Used for IO redirection.
+ * 
+ * @see C library functions dup2(), pipe(), etc.
+ *
+ * @param fd File descriptor.
+ */
+void goMultiPlotter::setInputFD (int fd)
+{
+    myPrivate->inputFD = fd;
+}
+
+/** 
+ * @brief Set output file descriptor.
+ *
+ * Used for IO redirection.
+ * 
+ * @see C library functions dup2(), pipe(), etc.
+ *
+ * @param fd File descriptor.
+ */
+void goMultiPlotter::setOutputFD (int fd)
+{
+    myPrivate->outputFD = fd;
 }
 
 goMultiPlotter& goMultiPlotter::operator= (goMultiPlotter& other)
@@ -204,7 +236,9 @@ bool goMultiPlotter::plot ()
     bool ok = goPlot::callGnuplot (plotCommands, 
                                 myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
                                 myPrivate->waitFlag, 
-                                &myPrivate->cmdFilename);
+                                &myPrivate->cmdFilename,
+                                myPrivate->inputFD,
+                                myPrivate->outputFD);
     //= If the process was paused, we can delete the files.
     if (myPrivate->pauseFlag)
     {

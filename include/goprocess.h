@@ -37,7 +37,9 @@ class goProcess : public goObjectBase {
   goProcess ();
   ///
   virtual ~goProcess ();
-  
+ 
+  void setInput  (int filedesc);
+  void setOutput (int filedesc);
   ///
   int run (const char* filename, const char* arg);
   ///
@@ -52,13 +54,19 @@ class goProcess : public goObjectBase {
   void suspend ();
   ///
   void resume ();
+
  protected:
+  
+  void redirectIO ();
 
   void deleteTemp ();
 
   bool running;
   int pid;
-    
+
+  int inputFD;
+  int outputFD;
+
  private:
   char **tempArgs;
   int argCount;

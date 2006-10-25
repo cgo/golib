@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include <signal.h>
 #include <string.h>
 
@@ -10,6 +11,8 @@ goProcess::goProcess ()
     : goObjectBase (),
       running (false),
       pid (0),
+      inputFD (-1),
+      outputFD (-1),
       tempArgs (0),
       argCount (0)
 {
@@ -20,6 +23,16 @@ goProcess::goProcess ()
 goProcess::~goProcess () 
 {
     this->deleteTemp ();
+}
+
+void goProcess::setInput (int fd)
+{
+    this->inputFD = fd;
+}
+
+void goProcess::setOutput (int fd)
+{
+    this->outputFD = fd;
 }
 
 void goProcess::deleteTemp ()
@@ -36,6 +49,18 @@ void goProcess::deleteTemp ()
     }
 }
 
+void goProcess::redirectIO ()
+{
+    if (this->inputFD >= 0)
+    {
+        dup2 (this->inputFD, STDIN_FILENO);
+    }
+    if (this->outputFD >= 0)
+    {
+        dup2 (this->outputFD, STDOUT_FILENO);
+    }
+}
+
 /**
  * @brief Calls a program by filename.
  *
@@ -48,13 +73,15 @@ int
 goProcess::run (const char* filename, const char* arg) {
   int id = fork();
   running = true;
-  if (id == 0) {
-    if (execlp (filename, filename, arg, NULL) < 0)
-    {
-        //= An error has occurred.
-        running = false;
-        exit (-1);
-    }
+  if (id == 0) 
+  {
+      this->redirectIO ();
+      if (execlp (filename, filename, arg, NULL) < 0)
+      {
+          //= An error has occurred.
+          running = false;
+          exit (-1);
+      }
   }
   pid = id;
   return id;
@@ -72,13 +99,15 @@ int
 goProcess::run (const char* filename, char *const argv[]) {
   int id = fork();
   running = true;
-  if (id == 0) {
-    if (execvp (filename, argv) < 0)
-    {
-        //= An error has occurred.
-        running = false;
-        exit (-1);
-    }
+  if (id == 0) 
+  {
+      this->redirectIO ();
+      if (execvp (filename, argv) < 0)
+      {
+          //= An error has occurred.
+          running = false;
+          exit (-1);
+      }
   }
   pid = id;
   return id;
@@ -102,6 +131,7 @@ goProcess::run (const char* filename_, const goFixedArray<goString>& argv_)
   running = true;
   if (id == 0) 
   {
+      this->redirectIO ();
       this->deleteTemp ();
       tempArgs = new char*[argv.getSize() + 2];
       tempArgs[0] = new char[strlen(filename)];

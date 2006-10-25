@@ -141,6 +141,10 @@ class goMultiPlotter : public goObjectBase
         goMultiPlotter (goSize_t rows, goSize_t cols);
         virtual ~goMultiPlotter ();
         goMultiPlotter (goMultiPlotter&);
+
+        void setInputFD (int fd);
+        void setOutputFD (int fd);
+
         goMultiPlotter & operator= (goMultiPlotter&);
 
         void addPlot (const goSinglePlot&, goSize_t row, goSize_t col);
@@ -319,7 +323,9 @@ namespace goPlot
     bool callGnuplot (const goString& gnuplotCommands, 
                       const char*     shellPostfix, 
                       bool            waitfor, 
-                      goString*       cmdFilenameRet);
+                      goString*       cmdFilenameRet,
+                      int             redirectInputFD = -1,
+                      int             redirectOutputFD = -1);
 
     bool addGnuplotCommands (goString& gnuplotCommands,
                              const goList<goString>* dataFileNames, 
