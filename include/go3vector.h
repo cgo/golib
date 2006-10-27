@@ -133,7 +133,7 @@ go3Vector {
     return (other.x * x + other.y * y + other.z * z);
   }
   
-  GO3VECTOR_FUNCTION_PREFIX void cross (go3Vector<T>& other) {
+  GO3VECTOR_FUNCTION_PREFIX void cross (const go3Vector<T>& other) {
     T x0,x1,x2;
     x0 = y * other.z - z * other.y;
     x1 = z * other.x - other.z * x;

@@ -20,5 +20,6 @@ tar -czvh --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" -
  golib/swig\
  golib/matlab\
  golib/gui\
+ golib/gl\
  golib/exp\
  golib/tools 

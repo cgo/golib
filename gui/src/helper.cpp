@@ -1,3 +1,5 @@
+#include <gofileio.h>
+
 #include <gogui/helper.h>
 #include <gtkmm.h>
 
@@ -76,8 +78,21 @@ bool goGUI::getFilenameSave (goString& fname, const goString& start, const goStr
     {
         return false;
     }
+
     std::string filename_ = dialog.get_filename ();
-    fname = filename_.data();
+    goString temp = filename_.data();
+    if (goFileIO::fileExists(temp.toCharPtr()))
+    {
+        goString msg = "The file ";
+        msg += temp;
+        msg += " exists.\nDo you want to overwrite it?";
+        Gtk::MessageDialog dlg (msg.toCharPtr(), false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_YES_NO);
+        if (dlg.run() != Gtk::RESPONSE_YES)
+        {
+            return false;
+        }
+    }
+    fname = temp;
 #endif
     return true;
 }

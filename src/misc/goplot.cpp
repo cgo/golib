@@ -208,8 +208,9 @@ bool goPlotter::plotFile (const goString& filename, const goString& type)
     myPrivate->prefixCommands += type;
     myPrivate->prefixCommands += "\n";
     goString backup2 = myPrivate->shellPostfix;
-    myPrivate->shellPostfix = " > ";
+    myPrivate->shellPostfix = " > \"";
     myPrivate->shellPostfix += filename;
+    myPrivate->shellPostfix += "\"";
     bool ok = this->plot();
     myPrivate->prefixCommands = backup1;
     myPrivate->shellPostfix = backup2;

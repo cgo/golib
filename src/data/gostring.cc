@@ -127,6 +127,14 @@ goString::getPathName (goString& pathRet) const
     }
 }
 
+/** 
+ * @brief Find occurrence of str.
+ * 
+ * @param str   String to search for.
+ * @param start Start index.
+ * 
+ * @return Start index of str in this string. -1 on failure.
+ */
 goIndex_t goString::find (const char* str, goIndex_t start)
 {
     goIndex_t i = 0;
