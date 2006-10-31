@@ -22,7 +22,7 @@ goGUI::CountFilenames::CountFilenames ()
     myBaseEntry.set_text ("base");
 
     myCount.set_digits (0);
-    myCount.set_range (0, 10000);
+    myCount.set_range (0, 1000000);
     myCount.set_increments (1.0, 5.0);
 
     this->set_border_width (2);
@@ -57,7 +57,7 @@ void goGUI::CountFilenames::getFilename (goString& fRet) const
     fRet = Glib::locale_from_utf8(myBaseEntry.get_text()).data ();
 
     char num[10];
-    sprintf (num, "%.4d", myCount.get_value_as_int());
+    sprintf (num, "%.7d", myCount.get_value_as_int());
     fRet += num;
     fRet += ".";
     fRet += Glib::locale_from_utf8(mySuffixEntry.get_text()).data ();

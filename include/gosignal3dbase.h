@@ -231,6 +231,7 @@ goSignal3DBase : public goObjectBase
          */
         void rotateAxes ();
         void swapXY     ();
+        void flip       (int axis);
 
         const T*   getClosest (go3Vector<goFloat>& point) const;
         goFloat    sample (go3Vector<goFloat>& point);

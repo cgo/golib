@@ -1,84 +1,77 @@
-#ifndef __GOTREE_H
-#define __GOTREE_H
+#ifndef GOTREE_H
+#define GOTREE_H
 
-#include <golist.h>
-#include <goqueue.h>
+#include <goobjectbase.h>
 
-template <class T>
-class goTreeNode 
-{
-public:
-  goTreeNode ();
-  virtual ~goTreeNode ();
-  
-  T		                  elem;
-  goList<goTreeNode<T>* > sons;
-  goTreeNode<T>*          parent;
-
-  
-  goTreeNode<T>* getParentPtr () { return parent; }
-  void		     setParentPtr (goTreeNode<T>*);
-  goTreeNode<T>* getNextSonPtr ();
-  void           prevSon ();
-  void		     addSonPtr (goTreeNode<T>* n);
-  T		         getContent () { return (T)content; }
-  void		     setContent (T newCont) { content = newCont; }
-
-};
-
-/*!
- * \brief Tree class.
- *
- * This is a tree class with a few extensions that 
- * were needed in some university project.
+/** @addtogroup data
+ * @{
  */
-template <class T>
-class goTree {
-public:
-  goTree ();
-  virtual ~goTree ();
+/** 
+ * @brief Element of a tree.
+ */
+template<class T>
+class goTreeElement : public goObjectBase
+{
+    public:
+        goTreeElement ();
+        goTreeElement (const T&);
+        virtual ~goTreeElement ();
 
-  void gotoRoot   ();
-  void gotoParent ();
-  T   getNextSon ();
-  T   getCurrent ();
-  /// Depth of the current node. Root is 0.
-  unsigned int getDepth () { return depth; }
-  unsigned int getSize () { return size; }
-  unsigned int getNumberOfSons ();
-  void gotoSon ();
-  void add (T item);
-
-  bool isLeaf ();
-  bool isRoot ();
-
-  /// Push / pop the current state (node + son pointer)
-  bool push ();
-  bool pop ();
-  
-  bool enqueue ();
-  bool dequeue ();
-  bool dequeueTail ();
-protected:
-  unsigned int depth;
-  unsigned int size;
-  T dummy;
-  goTreeNode<T>* root;
-  goTreeNode<T>* current;
-
-  goTreeNode<T>* pushed;
-  unsigned int pushedDepth;
-  goTreeNode<T>* pushedSonPtr;
-
-  goQueue<void*> Q;
-  goQueue<unsigned int> depthQ;
+		goList<goTreeElement<T>*> children;
+		goTreeElement<T>*         parent;
+        T                         value;
 };
 
+template<class T> class goTree;
+
+/** 
+ * @brief Running through a binary tree.
+ *
+ * Currently only offers depth first order.
+ *
+ * @todo Add breadth first order.
+ */
+template<class T>
+class goTreeAlgorithm
+{
+    public:
+        goTreeAlgorithm () {};
+        virtual ~goTreeAlgorithm () {};
+        bool breadthFirst (typename goTree<T>::Element* root);
+        bool breadthFirst (typename goTree<T>::ConstElement* root) const;
+        bool depthFirst (typename goTree<T>::Element* root);
+        bool depthFirst (typename goTree<T>::ConstElement* root) const;
+        virtual bool action (typename goTree<T>::Element* node) { return false; };
+        virtual bool action (typename goTree<T>::ConstElement* node) const { return false; };
+};
+
+
+/** 
+ * @brief Binary tree.
+ */
+template<class T>
+class goTree : public goObjectBase
+{
+    public:
+        typedef goTreeElement<T> Element;
+        typedef const goTreeElement<T> ConstElement;
+
+    public:
+        goTree ();
+        goTree (typename goTree<T>::Element* root);
+        virtual ~goTree ();
+
+        bool          isEmpty () const;
+        void          setRoot (typename goTree<T>::Element* e);
+        Element*      getRoot ();
+        ConstElement* getRoot () const;
+
+        void          erase   ();
+       
+        bool          writeDOT (FILE* f) const;
+
+    private:
+        goTreeElement<T>* myRoot;
+};
+/** @} */
 #endif
-
-
-
-
-
-
-

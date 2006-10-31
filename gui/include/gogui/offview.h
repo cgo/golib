@@ -16,11 +16,14 @@ class OFFView : public goGUI::GLWidget
 
         void lighting ();
         void load (const char* filename);
+        void align ();
 
         virtual void glDraw ();
 
         void setRotation (const goVectorf& angles);
         const goVectorf& getRotation () const;
+
+        goGL::OFFFile& getOFFFile ();
 
     private:
         goGL::OFFFile         off;

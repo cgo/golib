@@ -56,6 +56,36 @@ Real hypot(const Real &a, const Real &b)
  * \addtogroup math
  * @{
  */
+/*!
+    ::acos seems to result in nan when the argument is exactly 1.0 (contrary to the manpage!).
+    That is caught here.
+	@return acos (a)
+*/
+template <class Real>
+Real acos(const Real &a)
+{
+    if (a <= Real(-1.0))
+    {
+        return M_PI;
+    }
+    else
+    {
+        if (a >= Real(1.0))
+        {
+            return Real(0.0);
+        }
+        else
+        {
+            return ::acos (a);
+        }
+    }
+}
+/*! @} */
+
+/**
+ * \addtogroup math
+ * @{
+ */
 /**
 	@returns the minimum of scalars a and b.
 */

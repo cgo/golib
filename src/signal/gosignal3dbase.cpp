@@ -1379,7 +1379,6 @@ goSignal3DBase<T>::rotateAxes ()
 }
 
 template <class T>
-inline
 void
 goSignal3DBase<T>::swapXY()
 {
@@ -1405,6 +1404,77 @@ goSignal3DBase<T>::swapXY()
     tempSize      = myBlocks.x;
     myBlocks.x    = myBlocks.y;
     myBlocks.y    = tempSize;
+}
+
+template <class T>
+static void flip_array (T* array, goSize_t sz)
+{
+    goSize_t i = 0;
+    goSize_t j = sz - 1;
+    T* a = array;
+    T* e = &array[sz-1];
+    while (i < j)
+    {
+        T temp = *a;
+        *a = *e;
+        *e = temp;
+        ++a; ++i;
+        --e; --j;
+    }
+}
+
+/** 
+ * @brief BROKEN. Fix when there's time.
+ *
+ * @todo BROKEN. Fix when there's time.
+ * @bug BROKEN. Fix when there's time.
+ *
+ * @param axis Axis to flip.
+ */
+template <class T>
+void
+goSignal3DBase<T>::flip (int axis)
+{
+    switch (axis)
+    {
+        case GO_X: 
+            {
+                goSize_t sz = this->getSizeX() + 2 * this->getBorderX();
+                flip_array (this->real_myXJump, sz);
+                flip_array (this->real_xDiff, sz);
+                goPtrdiff_t* a = this->real_xDiff;
+                for (goSize_t i = 0; i < sz; ++i, ++a)
+                {
+                    *a *= static_cast<goPtrdiff_t>(-1);
+                }
+            }
+            break;
+        case GO_Y: 
+            {
+                goSize_t sz = this->getSizeY() + 2 * this->getBorderY();
+                flip_array (this->real_myYJump, sz);
+                flip_array (this->real_yDiff, sz);
+                goPtrdiff_t* a = this->real_yDiff;
+                for (goSize_t i = 0; i < sz; ++i, ++a)
+                {
+                    *a *= static_cast<goPtrdiff_t>(-1);
+                }
+            }
+            break;
+        case GO_Z: 
+            {
+                goSize_t sz = this->getSizeZ() + 2 * this->getBorderZ();
+                flip_array (this->real_myZJump, sz);
+                flip_array (this->real_zDiff, sz);
+                goPtrdiff_t* a = this->real_zDiff;
+                for (goSize_t i = 0; i < sz; ++i, ++a)
+                {
+                    *a *= static_cast<goPtrdiff_t>(-1);
+                }
+            }
+            break;
+        default: return; break;
+    }
 }
 
 template <class T>

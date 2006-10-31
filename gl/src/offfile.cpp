@@ -5,6 +5,7 @@
 #include <govector.h>
 #include <gofileio.h>
 #include <golist.h>
+#include <gopointcloud.h>
 
 namespace goGL
 {
@@ -167,6 +168,9 @@ bool goGL::OFFFile::read (const char* filename)
             fclose (f);
             return false;
         }
+        //= Transform and copy
+        {
+        }
 
         //= 
         //= Faces
@@ -209,6 +213,20 @@ bool goGL::OFFFile::read (const char* filename)
     }
     fclose (f);
 
+    return true;
+}
+
+bool goGL::OFFFile::align ()
+{
+    goMatrixf M;
+    goPointCloudf::getPrincipalAxes (myPrivate->vertices, M);
+    goSize_t sz = myPrivate->vertices.getSize ();
+    goVectorf mean;
+    goPointCloudf::getCenterOfMass (myPrivate->vertices, mean);
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        myPrivate->vertices[i] = M * (myPrivate->vertices[i] - mean);
+    }
     return true;
 }
 
@@ -283,4 +301,9 @@ const goVectorf& goGL::OFFFile::getMin () const
 const goVectorf& goGL::OFFFile::getMax () const
 {
     return myPrivate->max;
+}
+
+goFixedArray<goVectorf>& goGL::OFFFile::getVertices ()
+{
+    return myPrivate->vertices;
 }

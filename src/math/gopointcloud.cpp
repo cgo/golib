@@ -6,6 +6,7 @@
 #include <golog.h>
 #include <gomath.h>
 #include <assert.h>
+#include <goeigenvalue.h>
 
 template <class T>
 class goPointCloudPrivate
@@ -229,6 +230,30 @@ bool goPointCloud<T>::getCenterOfMass (goVector<T>& comRet) const
 //        z += p->z * factor;
 //        w += p->w * factor;
         el = el->next;
+        ++i;
+    }
+    comRet = temp;
+//    comRet.x = x;
+//    comRet.y = y;
+//    comRet.z = z;
+//    comRet.w = w;
+    return true;
+}
+
+template <class T>
+bool goPointCloud<T>::getCenterOfMass (const goFixedArray<goVector<T> >& points, goVector<T>& comRet)
+{
+    if (points.getSize() < 1)
+        return false;
+
+    goIndex_t pointCount = static_cast<goIndex_t>(points.getSize());
+    goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
+    goVector<T> temp (points[0].getSize());
+    temp.fill (T(0));
+    goIndex_t i = 0;
+    while (i < pointCount)
+    {
+        temp += points[i] * factor;        
         ++i;
     }
     comRet = temp;
@@ -464,6 +489,98 @@ bool goPointCloud<T>::getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const go
 //    a2 = a1;
 //    a2.cross (temp);
 //    a2 *= 1.0f / a1.abs();
+    return true;
+}
+
+template <class T>
+bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
+{
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    if (!el)
+        return false;
+
+    axes.resize (el->elem.getSize(), el->elem.getSize());
+
+    goDouble totalWeight = (goDouble)this->getPoints().getSize();
+    {
+        goIndex_t i = 0;
+        goIndex_t size = this->getPointCount ();
+        goVector<T> mean;
+        this->getCenterOfMass (mean);
+        goMatrix<T> cov (axes.getRows() < axes.getColumns());
+        cov.fill (T(0));
+        while (el && i < size)
+        {
+            goVector<T> temp = el->elem - mean;
+            goVectorOuter<T> (1.0f, temp, temp, cov);
+            el = el->next;
+            ++i;
+        }
+        cov *= 1.0 / totalWeight;
+
+        goMath::goEigenvalue<T> ev (cov);
+        ev.getV (axes);
+        axes.transpose ();
+        //= Normalise
+        goSize_t N = axes.getRows ();
+        for (goSize_t j = 0; j < N; ++j)
+        {
+            goVector<T> r;
+            axes.refRow (j, r);
+            T norm = r.norm2 ();
+            if (norm > 1e-4)
+            {
+                r *= 1.0f / norm;
+            }
+        }
+    }
+    return true;
+}
+
+template <class T>
+bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goVector<T> >& points, goMatrix<T>& axes)
+{
+    if (points.getSize() < 3)
+    {
+        return false;
+    }
+
+    axes.resize (points[0].getSize(), points[0].getSize());
+
+    goDouble totalWeight = (goDouble)points.getSize();
+    {
+        goIndex_t i = 0;
+        goIndex_t size = points.getSize();
+        goVector<T> mean;
+        goPointCloud<T>::getCenterOfMass (points, mean);
+        goMatrix<T> cov (axes.getRows() < axes.getColumns());
+        cov.fill (T(0));
+        while (i < size)
+        {
+            goVector<T> temp = points[i] - mean;
+            goVectorOuter<T> (1.0f, temp, temp, cov);
+            ++i;
+        }
+        cov *= 1.0 / totalWeight;
+
+        goMath::goEigenvalue<T> ev (cov);
+        ev.getV (axes);
+        axes.transpose ();
+        //= Normalise
+        goSize_t N = axes.getRows ();
+        for (goSize_t j = 0; j < N; ++j)
+        {
+            goVector<T> r;
+            axes.refRow (j, r);
+            T norm = r.norm2 ();
+            if (norm > 1e-4)
+            {
+                r *= 1.0f / norm;
+            }
+        }
+        printf ("axes: \n");
+        axes.print();
+    }
     return true;
 }
 

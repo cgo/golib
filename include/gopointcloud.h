@@ -62,11 +62,14 @@ class goPointCloud : public goObjectBase
 
         bool              getMean            (goVector<T>& mean) const;
         bool              getCenterOfMass    (goVector<T>& comRet) const;
+        static bool       getCenterOfMass    (const goFixedArray<goVector<T> >&, goVector<T>& comRet);
         bool              translate          (const goVector<T>& d);
         void              getConfigurationMatrix (goMatrix<T>& cmRet) const;
         void              getConfigurationVector (goVector<T>& cvRet) const;
 
         bool              getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const goArray<goFloat>* weights = 0) const; // REPLACE THIS WITH GENERIC
+        bool              getPrincipalAxes   (goMatrix<T>& axes) const;
+        static bool       getPrincipalAxes   (const goFixedArray<goVector<T> >&, goMatrix<T>& axes);
         bool              unitScale          (goFloat factor = 1.0f);
 
         template<class matrixT> inline bool transform (const matrixT& m)

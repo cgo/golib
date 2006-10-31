@@ -14,11 +14,16 @@ namespace goGUI
             OFFViewControl ();
             virtual ~OFFViewControl ();
 
-            void setOFFView (goGUI::OFFView* view);
-            void addWidget  (Gtk::Widget& w);
+            void            setOFFView (goGUI::OFFView* view);
+            goGUI::OFFView* getOFFView ();
+            void            addWidget  (Gtk::Widget& w);
 
             void angleChanged ();
             void loadOFF ();
+            void align ();
+
+            void setRotation (const goVectorf& v);
+            void getRotation (goVectorf& v) const;
 
         protected:
             OFFViewControlPrivate* myPrivate;

@@ -1,7 +1,11 @@
 #include <gogui/offview.h>
 #include <gogl/offfile.h>
+#include <gogl/helper.h>
 #include <gogui/glwidget.h>
 #include <gogui/helper.h>
+
+#include <gofileio.h>
+#include <gopointcloud.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,12 +59,27 @@ goGUI::OFFView::~OFFView ()
 void goGUI::OFFView::load (const char* filename)
 {
     this->off.read (filename);
+    goFixedArray<goVectorf>& V = this->off.getVertices ();
+    goSize_t sz = V.getSize ();
+    goVectorf com;
+    goPointCloud<goFloat>::getCenterOfMass (V, com);
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        V[i] -= com;
+    }
+    // this->off.align ();
     // this->myList = glGenLists (1);
     check_gl_error ("glGenLists");
     this->GLWidgetBegin ();
     this->off.toList (this->myList);
-    glLoadIdentity ();
-    this->lighting ();
+    this->GLWidgetEnd ();
+}
+
+void goGUI::OFFView::align ()
+{
+    this->off.align ();
+    this->GLWidgetBegin ();
+    this->off.toList (this->myList);
     this->GLWidgetEnd ();
 }
 
@@ -81,12 +100,20 @@ void goGUI::OFFView::lighting ()
     glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     check_gl_error ("lighting3");
 
-    const float pos[] = {this->off.getMax()[0] + 5.0f, this->off.getMax()[0] + 5.0, this->off.getMax()[0] + 5.0, 1.0f};
-    goVectorf center = (this->off.getMax() + this->off.getMin()) * 0.5f;
-    const float dir[] = {center[0] - pos[0], center[1] - pos[1], center[2] - pos[2]};
-    glLightfv (GL_LIGHT1, GL_SPOT_DIRECTION, dir);
+    // const float pos[] = {this->off.getMax()[0] + 5.0f, this->off.getMax()[0] + 5.0, this->off.getMax()[0] + 5.0, 1.0f};
+    // goVectorf center = (this->off.getMax() + this->off.getMin()) * 0.5f;
+    // const float dir[] = {center[0] - pos[0], center[1] - pos[1], center[2] - pos[2]};
+    const float pos1[] = {-0.2, -0.2, 0.0, 1.0};
+    const float dir1[] = {1.0, 1.0, 0.0, 1.0};
+    const float pos2[] = {0.2, 0.2, 0.0, 1.0};
+    const float dir2[] = {-1.0, -1.0, 0.0, 1.0};
+    glLightfv (GL_LIGHT1, GL_SPOT_DIRECTION, dir1);
     check_gl_error ("lighting4");
-    glLightfv (GL_LIGHT1, GL_POSITION, pos);
+    glLightfv (GL_LIGHT1, GL_POSITION, pos1);
+    check_gl_error ("lighting5");
+    glLightfv (GL_LIGHT2, GL_SPOT_DIRECTION, dir2);
+    check_gl_error ("lighting4");
+    glLightfv (GL_LIGHT2, GL_POSITION, pos2);
     check_gl_error ("lighting5");
 
     // glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
@@ -96,14 +123,16 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting7");
     glEnable (GL_LIGHT1);
     check_gl_error ("lighting8");
+    glEnable (GL_LIGHT2);
+    check_gl_error ("lighting8");
     glDepthFunc(GL_LEQUAL);
     check_gl_error ("lighting9");
     glEnable(GL_DEPTH_TEST);
     check_gl_error ("lighting10");
     glEnable (GL_AUTO_NORMAL);
     check_gl_error ("lighting11");
-    // glShadeModel (GL_SMOOTH);
-    glShadeModel (GL_FLAT);
+    glShadeModel (GL_SMOOTH);
+    //glShadeModel (GL_FLAT);
     check_gl_error ("lighting12");
 }
 
@@ -130,7 +159,7 @@ void goGUI::OFFView::glDraw ()
     glViewport (0, 0, this->get_width(), this->get_height());
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective (60.0, 1.0, 0.1, 1000.0);
+    gluPerspective (80.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
     glMatrixMode (GL_MODELVIEW);
 
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
@@ -141,6 +170,16 @@ void goGUI::OFFView::glDraw ()
     goVectorf eye (3);
     goVectorf center (3);
     goVectorf up (3);
+
+    eye[0] = 1.25f * goMath::max<goFloat> (fabs(max[0]), goMath::max<goFloat>(fabs(max[1]), fabs(max[2])));
+    eye[1] = 0.0f;
+    eye[2] = 0.0f;
+    // goPointCloud<goFloat>::getCenterOfMass (this->off.getVertices(), center);
+    center.fill (0.0f);
+    up[0] = 0.0f;
+    up[1] = 1.0f;
+    up[2] = 0.0f;
+#if 0
     eye = max * 1.5f;
     //            eye[0] = 2.0;
     //            eye[1] = 2.0;
@@ -160,6 +199,7 @@ void goGUI::OFFView::glDraw ()
         up[2] = temp[0] * f[1] - temp[1] * f[0];
     }
     up *= 1.0 / up.norm2();
+#endif
 
     gluLookAt(eye[0], eye[1], eye[2],
             center[0], center[1], center[2],
@@ -212,17 +252,6 @@ void goGUI::OFFView::glDraw ()
     // glRotatef (myRotation.getRotationAngle() * 360.0f, corr_axis.x, corr_axis.y, corr_axis.z);
     glTranslatef (-center[0], -center[1], -center[2]);
 #endif
-
-    glColor3f (1.0, 1.0, 1.0);
-    //            glLoadIdentity ();
-    //            goVectorf scale (3);
-    //            scale[0] = 1.0f / (max[0] - min[0]);
-    //            scale[1] = 1.0f / (max[1] - min[1]);
-    //            scale[2] = 1.0f / (max[2] - min[2]);
-    //            glScalef (1.0, 1.0, 1.0);
-    //            glTranslatef (0.0, 0.0, -1.5 - max[2]);
-    // glTranslatef (-(max[0] + min[0]) * 0.5, -(max[1] + min[1]) * 0.5, -1.5 - max[2]);
-    // glScalef (scale[0], scale[1], scale[2]);
     check_gl_error ("2");
 
     glTranslatef (center[0], center[1], center[2]);
@@ -231,17 +260,53 @@ void goGUI::OFFView::glDraw ()
     glRotatef (myPrivate->rotationAngles[2], 0.0f, 0.0f, 1.0f);
     glTranslatef (-center[0], -center[1], -center[2]);
 
+    this->lighting ();
+
     //glPushMatrix ();
     //glLoadIdentity ();
     //this->lighting ();
     //glPopMatrix ();
 
     const float list_diffuse[] = {0.3f, 0.3f, 0.7f, 1.0f};
-    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, list_diffuse);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
     glCallList (this->myList);
     // this->off.draw ();
     // int n = check_gl_error ("calllist");
     // printf ("%s\n", gluErrorString (n));
     glFlush ();
     this->swapBuffers ();
+
+    //= Some test code for getting the buffer:
+#if 0
+    {
+        goSignal3D<void> buffer;
+        buffer.setDataType (GO_UINT8);
+        buffer.make (1,1,1,
+                     1,1,1,
+                     0,0,0,1);
+        if (!goGL::getGLBuffer (buffer))
+        {
+            printf ("Error calling getGLBuffer.\n");
+        }
+        else
+        {
+            try
+            {
+                if (goFileIO::fileExists ("testimage.jpg"))
+                {
+                    goFileIO::remove ("testimage.jpg");
+                }
+                goFileIO::writeImage ("testimage.jpg", &buffer);
+            }
+            catch (goFileIOException& ex)
+            {
+            }
+        }
+    }
+#endif
+}
+
+goGL::OFFFile& goGUI::OFFView::getOFFFile ()
+{
+    return this->off;
 }

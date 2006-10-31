@@ -8,6 +8,7 @@ INCLUDE             (CheckFunctionExists)
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_MATLAB_MODULE FALSE CACHE BOOL "Enable/disable building the matlab module")
 SET (BUILD_GUI_MODULE FALSE CACHE BOOL "Enable/disable building the GUI module")
+SET (BUILD_GUI_MODULE_OPENGL FALSE CACHE BOOL "Enable/disable building the OpenGL widget (may have problems with matlab)")
 SET (BUILD_GL_MODULE FALSE CACHE BOOL "Enable/disable building the OpenGL module")
 
 PROJECT             (Go)

@@ -442,7 +442,7 @@ goList<T>::remove () {
                 position = 0;
             }
         }
-        size--;
+        --size;
     } 
     else 
     {
@@ -461,12 +461,16 @@ goList<T>::remove () {
 template <class T>
 goListElement<T>* goList<T>::remove (goListElement<T>* el)
 {
+    if (this->size == 0)
+    {
+        return 0;
+    }
     goListElement<T>* n = this->unhook(el);
     if (el)
     {
         delete el;
+        el = 0;
     }
-    el = 0;
     return n;
 #if 0
     if (!el)
