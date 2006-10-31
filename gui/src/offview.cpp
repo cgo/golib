@@ -150,7 +150,7 @@ void goGUI::OFFView::glDraw ()
 {
     // glFrontFace (GL_CW);
     glDisable (GL_CULL_FACE);
-
+    
     const goVectorf& min = this->off.getMin ();
     const goVectorf& max = this->off.getMax ();
     printf ("max: %f %f %f\n", max[0], max[1], max[2]);
@@ -269,12 +269,16 @@ void goGUI::OFFView::glDraw ()
 
     const float list_diffuse[] = {0.3f, 0.3f, 0.7f, 1.0f};
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
+    glEnable (GL_LINE_SMOOTH);
+    glEnable (GL_POLYGON_SMOOTH);
     glCallList (this->myList);
     // this->off.draw ();
     // int n = check_gl_error ("calllist");
     // printf ("%s\n", gluErrorString (n));
     glFlush ();
     this->swapBuffers ();
+    glDisable (GL_POLYGON_SMOOTH);
+    glDisable (GL_LINE_SMOOTH);
 
     //= Some test code for getting the buffer:
 #if 0

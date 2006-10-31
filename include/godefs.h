@@ -37,8 +37,6 @@ enum {
     GO_BTREE,
     GO_ROWVECTOR,
     GO_MATLAB,
-    GO_GRAPH,
-    GO_GRAPHNODE,
     
     GO_CLASSID_USER = 0x00010000
 };
