@@ -115,7 +115,8 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
             this->myMean.resize (N);
             this->myMean.fill (scalar_type(0));
             this->myCovariance.resize (N,N);
-            this->myCovariance.fill (scalar_type(0));
+            // this->myCovariance.fill (scalar_type(0));
+            this->myCovariance.setIdentity ();
             this->myNormFactor = 1.0f;
 
             this->N = 0.0f;
@@ -141,13 +142,13 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
             this->myMean *= this->N * factor;
             goVectorAdd<scalar_type> (scalar_type(factor), input, this->myMean);
             
-            this->N += 1.0f;
-            this->myCovariance = this->sum_xxT;
             if (this->N >= 2)
             {
+                this->myCovariance = this->sum_xxT;
                 factor = -1.0f; // (this->N - 2) / this->N;
                 goVectorOuter<scalar_type> (scalar_type(factor), this->myMean, this->myMean, this->myCovariance);
             }
+            this->N += 1.0f;
         }
 
     /** 
