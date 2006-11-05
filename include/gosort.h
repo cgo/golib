@@ -1,6 +1,52 @@
 #ifndef GOSORT_H
 #define GOSORT_H
 
+template <class Container, class T>
+static void goQuickSort (typename Container::iterator& i1, typename Container::iterator& i2)
+{
+    if (i1 == i2)
+    {
+        return;
+    }
+    typename Container::iterator l = i1;
+    typename Container::iterator r = i2;
+    printf ("Sorting %d to %d\n", *i1, *i2);
+    T temp;
+    T ref = *i1;  //= Reference value: just take the beginning value.
+    bool stop = false;
+    while (!stop)
+    {
+        while (l != i2 && (*l < ref) && l != r) ++l;
+        while (r != i1 && (*r > ref) && l != r) --r;
+        if (l != r)
+        {
+            //= FIXME: For lists, do a faster swap here. 
+            //=        This copies the actual data elements.
+            T temp = *l;
+            *l = *r;
+            *r = temp;
+            if (l != i2)
+                ++l;
+            if (l == r) stop = true;
+            if (r != i1)
+                --r;
+            if (l == r) stop = true;
+        }
+        else
+        {
+            if (l != i2)
+                ++l;
+            if (r != i1)
+                --r;
+            stop = true;
+        }
+    }
+    if (l != i2)
+        goQuickSort<Container, T> (l, i2);
+    if (r != i1)
+        goQuickSort<Container, T> (i1, r);
+}
+
 template < class T >
 static void goQuickSort (goIndex_t i1, goIndex_t i2, T* array) 
 {

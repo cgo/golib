@@ -20,6 +20,52 @@ class goListElement {
   goIndex_t         index;
 };
 
+template <class T>
+class goListIterator
+{
+    public:
+        goListIterator () : el (0) {};
+        goListIterator (goListElement<T>* e) : el (e) {};
+        ~goListIterator () {};
+
+        T& operator* () { return el->elem; };
+        const T& operator* () const { return el->elem; };
+        
+        bool operator== (const goListIterator<T>& other) const { return this->el == other.el; };
+        bool operator!= (const goListIterator<T>& other) const { return !(this->operator== (other)); };
+        void operator++ () { el = el->next; };
+        void operator-- () { el = el->prev; };
+
+        goIndex_t getIndex () const { return el->index; };
+        void      setIndex (goIndex_t i) { el->index = i; };
+
+    private:
+        goListElement<T>* el;
+};
+
+template <class T>
+class goListConstIterator  
+{
+    public:
+        goListConstIterator () : el (0) {};
+        goListConstIterator (const goListElement<T>* e) : el (e) {};
+        ~goListConstIterator () {};
+
+        // T& operator* () { return el->elem; };
+        const T& operator* () const { return el->elem; };
+        
+        bool operator== (const goListConstIterator<T>& other) const { return this->el == other.el; };
+        bool operator!= (const goListConstIterator<T>& other) const { return !this->operator== (other); };
+        void operator++ () { el = el->next; };
+        void operator-- () { el = el->prev; };
+
+        goIndex_t getIndex () const { return el->index; };
+        // void      setIndex (goIndex_t i) { el->index = i; };
+
+    private:
+        const goListElement<T>* el;
+};
+
 /**
  * Simple doubly linked list.
  * This list is not yet completely tested but should do so far.
@@ -29,14 +75,41 @@ template <class T>
 class goList {
 
  public:
-    typedef goListElement<T>       Element;
-    typedef const goListElement<T> ConstElement;
+    typedef goListElement<T>        Element;
+    typedef const goListElement<T>  ConstElement;
+    typedef goListIterator<T>       iterator;
+    typedef goListConstIterator<T>  const_iterator;
 
  public:
   ///
   goList ();
   goList (const goList<T>& other);
   ~goList ();
+
+  iterator begin () { return iterator (this->getFrontElement()); };
+  /** 
+   * @note Returns the iterator pointing to NULL if the list is not closed.
+   * If it is closed, note that the tail element is returned, so 
+   * in order to go through every element do the tail element at the end
+   * or use the getSize() method to determine the size and iterate over that
+   * number of elements. That should be preferred if you do not know 
+   * if the list is closed or not.
+   */
+  iterator end   () 
+  { 
+      if (!this->isClosed())
+          return iterator (0); 
+      else
+          return iterator (this->getTailElement());
+  };
+  const_iterator begin () const { return const_iterator (this->getFrontElement()); };
+  const_iterator end   () const
+  { 
+      if (!this->isClosed())
+          return const_iterator (0); 
+      else
+          return const_iterator (this->getTailElement());
+  };
 
   Element*      getFrontElement ();
   Element*      getTailElement  ();
