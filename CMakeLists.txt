@@ -17,7 +17,6 @@ SET                 (TARGETNAME Go)
 SET                 (SOURCES 
  src/data/goarrayi.cc 
  src/data/golisti.cc 
- src/data/goheapi.cc 
  # src/data/gotreei.cc 
  src/data/gobtreei.cpp 
  src/data/goqueuei.cc
