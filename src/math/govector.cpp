@@ -301,7 +301,7 @@ void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatri
         //= --> FIXME!
         for (goSize_t j = 0; j < M; ++j, array += stridex)
         {
-            ret(j,i) = tempy * *array;
+            ret(j,i) += alpha * tempy * *array;
         }
     }
 }

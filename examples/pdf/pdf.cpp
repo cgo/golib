@@ -26,6 +26,8 @@ int main (int argc, char* argv[])
         printf ("\n");
         printf ("Covariance: \n");
         pdf.getCovariance().print();
+        printf ("Covariance^(-1): \n");
+        pdf.getCovarianceInv().print();
 
         goMatrixf cov (2,2);
         cov.setIdentity();
@@ -60,6 +62,8 @@ int main (int argc, char* argv[])
             printf ("Mean: %f\n", pdf.getMean()[0]);
             printf ("Covariance: \n");
             pdf.getCovariance().print();
+            printf ("Covariance^(-1): \n");
+            pdf.getCovarianceInv().print();
             {
                 goVectorf v (1);
                 FILE* f = fopen ("gauss1.txt","w");

@@ -236,8 +236,8 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 FIND_LIBRARY (ATLAS NAMES atlas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (CBLAS NAMES cblas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
-FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
-FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib $ENV{HOME}/Software/lib) 
+FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
@@ -271,9 +271,9 @@ IF (${HAVE_LIBSOCKET} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lsocket")
 ENDIF (${HAVE_LIBSOCKET} MATCHES 1)
 
-INCLUDE_DIRECTORIES (${GUILE_CFLAGS}
-    # ${EXTRA_INCLUDE_PATH}
-                     ${GOPATH}/include)
+INCLUDE_DIRECTORIES (# ${EXTRA_INCLUDE_PATH}
+                     ${GOPATH}/include
+                     ${GOPATH}/extra/include)
 
 ##                 
 ## If your system compiler is a gcc 4.x,
@@ -343,3 +343,4 @@ ENDIF (BUILD_GUI_MODULE)
 IF (BUILD_GL_MODULE)
     ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/gl)
 ENDIF (BUILD_GL_MODULE)
+

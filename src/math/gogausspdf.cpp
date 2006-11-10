@@ -2,6 +2,7 @@
 #include <gotypes.h>
 #include <golog.h>
 #include <gostring.h>
+#include <gorandom.h>
 #include <assert.h>
 #include <math.h>
 
@@ -48,7 +49,7 @@ namespace goMath
     
     template <class input_type, class output_type>
     output_type
-    goGaussPDF<input_type, output_type>::operator () (const input_type& input)
+    goGaussPDF<input_type, output_type>::operator () (const input_type& input) const
     {
         goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
         assert (false);
@@ -56,7 +57,7 @@ namespace goMath
     }
     
 //    template <class input_type, class output_type>
-template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble& input)
+template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble& input) const
     {
         return myNormFactor * exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
     }
@@ -95,8 +96,16 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
     };
 
     template<class input_vector, class scalar_type>
-    scalar_type goMultiGaussPDF<input_vector, scalar_type>::operator() (const input_vector& input)
+    scalar_type goMultiGaussPDF<input_vector, scalar_type>::operator() (const input_vector& input) const
     {
+//        if (myNormFactor == 0.0f)
+//        {
+//            //= Graceful handling of special case with no variation at all.
+//            if (input == myMean)
+//                return 1.0f;
+//            else
+//                return 0.0f;
+//        }
         input_vector temp = input - myMean;
         scalar_type f = -0.5 * (temp * (myCovarianceInv * temp));
         return myNormFactor * exp(f);
@@ -145,7 +154,7 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
             if (this->N >= 2)
             {
                 this->myCovariance = this->sum_xxT;
-                factor = -1.0f; // (this->N - 2) / this->N;
+                factor = -1.0f; 
                 goVectorOuter<scalar_type> (scalar_type(factor), this->myMean, this->myMean, this->myCovariance);
             }
             this->N += 1.0f;
@@ -190,6 +199,20 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
                 goLog::warning ("goMultiGaussPDF::setCovariance(): could not invert covariance matrix. Setting it to identity.", this);
                 myCovariance.setIdentity();
                 myCovarianceInv = myCovariance;
+            }
+            //= Normalisation factor is currently only set for the special case of univariate Gaussian. FIXME
+            if (cov.getRows() == 1 && cov.getColumns() == 1)
+            {
+                if (cov(0,0) <= 0.0)
+                {
+                    goDouble e = 0.0;
+                    while (fabs(e) < 1e-4)
+                        e = goRandom ();
+                    this->myMean[0] += e;
+                    myCovariance(0,0) = e*e; //= Set to _some_ value, here a random disturbance. FIXME
+                    myCovarianceInv(0,0) = 1.0 / myCovariance(0,0);
+                }
+                this->myNormFactor = 1.0 / sqrt (2.0 * M_PI * myCovariance(0,0));
             }
         }
 

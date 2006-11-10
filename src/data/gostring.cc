@@ -471,9 +471,10 @@ goString::toCharPtr () const
     return thisString.getPtr();
 }
 
-goDate&
+goDate
 goString::toDate () {
   char tmp[5];
+  goDate thisDate;
   goIndex_t i     = 0,
             tmp_i = 0;
 

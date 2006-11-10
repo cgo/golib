@@ -23,7 +23,7 @@ class goPDF : public goObjectBase
     public:
         virtual ~goPDF () {};
 
-        virtual output_type operator() (const input_type&) = 0;
+        virtual output_type operator() (const input_type&) const = 0;
 
         // FIXME: add things common to all probability density functions here
 

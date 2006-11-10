@@ -20,7 +20,7 @@ namespace goMath
             goGaussPDF ();
             virtual ~goGaussPDF ();
 
-            virtual output_type operator () (const input_type& input);
+            virtual output_type operator () (const input_type& input) const;
             void                setMean     (const input_type& mean);
             void                setVariance (const input_type& variance);
             
@@ -50,7 +50,7 @@ namespace goMath
             //= The standard operator= and copy constructor will do.
 
             virtual ~goMultiGaussPDF ();
-            virtual scalar_type           operator()    (const input_vector& input);
+            virtual scalar_type           operator()    (const input_vector& input) const;
 
             void                          reset         (goSize_t N = 1);
             void                          update        (const input_vector& v);

@@ -62,7 +62,7 @@ public:
   ///
   const char* toCharPtr () const;
   ///
-  goDate&     toDate ();
+  goDate      toDate ();
 
   ///
   void		toUpper ();
@@ -121,11 +121,7 @@ protected:
   ///
   goArray<char>  thisString;
   ///
-  char*			  charPtr;
-  ///
   char            dummyChar;
-  ///
-  goDate		  thisDate;
 };
 /** @} */
 #endif 
