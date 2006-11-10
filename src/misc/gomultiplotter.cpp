@@ -257,13 +257,29 @@ bool goMultiPlotter::plot ()
 /** 
  * @brief Plot to a postscript file.
  * 
+ * Same as plotFile (filename, goString("postscript colour"));
+ *
  * @param filename Postscript file name.
  * 
  * @return True if successful, false otherwise.
  */
 bool goMultiPlotter::plotPostscript (const goString& filename)
 {
-    return this->plotFile (filename, goString("postscript color"));
+    return this->plotFile (filename, goString("postscript colour"));
+}
+
+/** 
+ * @brief Plot to a postscript file.
+ * 
+ * Same as plotFile (filename, goString("postscript eps colour"));
+ *
+ * @param filename Postscript file name.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goMultiPlotter::plotEPS (const goString& filename)
+{
+    return this->plotFile (filename, goString("postscript eps colour"));
 }
 
 /** 
@@ -307,7 +323,7 @@ void goMultiPlotter::clear ()
     myPrivate->plots.erase ();
 }
 
-#ifndef GOLIST_HPP
-# include <golist.hpp>
-#endif
-template class goList<goSinglePlot>;
+//#ifndef GOLIST_HPP
+//# include <golist.hpp>
+//#endif
+//template class goList<goSinglePlot>;

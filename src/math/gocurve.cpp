@@ -661,6 +661,7 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
             {
                 el = pl.remove(el);
                 ++removed;
+                --sz;
             }
             else
             {

@@ -519,6 +519,6 @@ goObjectBase::receiveObjectMessage (const goObjectMessage& message)
     // std::cout << "Class " << getClassName() << " received message " << message.myMessageID << " from object \"" << message.mySender->getObjectName() << "\" of class " << message.mySender->getClassName() << "\n" << std::endl;
 }
 
-#include <golist.hpp>
-template class goList<goObjectBase*>;
-template class goList<goObjectMethodParameters*>;
+//#include <golist.hpp>
+//template class goList<goObjectBase*>;
+//template class goList<goObjectMethodParameters*>;

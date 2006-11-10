@@ -159,9 +159,10 @@ class goMultiPlotter : public goObjectBase
        
         void setPrefix (const goString&);
 
-        virtual bool plot ();
+        virtual bool plot           ();
         virtual bool plotPostscript (const goString& filename);
-        virtual bool plotFile (const goString& filename, const goString& type);
+        virtual bool plotEPS        (const goString& filename);
+        virtual bool plotFile       (const goString& filename, const goString& type);
 
         void clear ();
 

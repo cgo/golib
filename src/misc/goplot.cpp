@@ -822,7 +822,7 @@ bool goPlot::gnuplot (const goFixedArray<goDouble>& a, const char* title, goStri
 }
 #endif
 
-#ifndef GOLIST_HPP
-#include <golist.hpp>
-template class goList<goPlotterLabel>;
-#endif
+//#ifndef GOLIST_HPP
+//#include <golist.hpp>
+//template class goList<goPlotterLabel>;
+//#endif
