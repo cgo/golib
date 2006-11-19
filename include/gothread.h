@@ -1,3 +1,8 @@
+/*
+ * (C) Christian Gosch.
+ * This file is licensed under the GNU General Public License Version 2.
+ */
+
 #ifndef GOTHREAD_H
 #define GOTHREAD_H
 
@@ -51,6 +56,7 @@ class goMutex {
 #ifdef HAVE_LIBPTHREAD
 /** 
 * @brief Condition variable.
+* @author Christian Gosch
 */
 class goCondition {
  public:
@@ -74,6 +80,8 @@ class goCondition {
  * If the semaphore's value is 0 and decrement is called, the calling thread
  * is blocked until the semaphore is > 0, then the value is decremented.
  * Increments and decrements are atomic operations, i.e. they are thread-safe.
+ *
+ * @author Christian Gosch
  */
 class goSemaphore {
  public:

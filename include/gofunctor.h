@@ -33,11 +33,11 @@ class goFunctorBase
 };
 
 template <class Tret, class Targ1>
-class goFunctorBase1 : public goFunctorBase <class Tret, class Targ1, void, void, void ,void, void, void, void ,void, void>
+class goFunctorBase1 : public goFunctorBase <Tret, Targ1, void, void, void ,void, void, void, void ,void, void>
 {
     public:
         goFunctorBase1 ()
-            : goFunctorBase <class Tret, class Targ1, void, void, void ,void, void, void, void ,void, void> ()
+            : goFunctorBase <Tret, Targ1, void, void, void ,void, void, void, void ,void, void> ()
         {
         };
         virtual ~goFunctorBase1 ()
@@ -54,11 +54,11 @@ class goFunctorBase1 : public goFunctorBase <class Tret, class Targ1, void, void
 };
 
 template <class Tret, class Targ1, class Targ2>
-class goFunctorBase2 : public goFunctorBase <class Tret, class Targ1, class Targ2, void, void ,void, void, void, void ,void, void>
+class goFunctorBase2 : public goFunctorBase <Tret, Targ1, Targ2, void, void ,void, void, void, void ,void, void>
 {
     public:
         goFunctorBase2 ()
-            : goFunctorBase <class Tret, class Targ1, class Targ2, void, void ,void, void, void, void ,void, void> ()
+            : goFunctorBase <Tret, Targ1, Targ2, void, void ,void, void, void, void ,void, void> ()
         {
         };
         virtual ~goFunctorBase2 ()
@@ -86,7 +86,7 @@ class goFunctor1 : public goFunctorBase1<Tret, Targ1>
 
     public:
         goFunctor1 (Tclass* object, function_t function)
-            : goFunctorBase1T<Tret, Targ1>(), myObject (object), myFunction (function)
+            : goFunctorBase1<Tret, Targ1>(), myObject (object), myFunction (function)
         {
         };
         virtual ~goFunctor1 () {};
@@ -104,6 +104,11 @@ class goFunctor1 : public goFunctorBase1<Tret, Targ1>
             if (myObject && myFunction)
             {
                 return (myObject->*myFunction)(p);
+            }
+            else
+            {
+                Tret dummy;
+                return dummy;
             }
         };
 

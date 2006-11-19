@@ -7,18 +7,29 @@ class goSinglePlotPrivate
         goSinglePlotPrivate() 
             : plotX(), 
               plotY(), 
+              plotZ(),
+              plotMatrixf(),
+              plotMatrixd(),
+              plotImages(),
+              lineLength(0),
               titles(), 
               plotCommands(), 
               prefixCommands(""), 
               dataFilenames(),
               row(0),
               column(0),
-              title("")
+              title(""),
+              plotType(goPlot::Normal)
         {};
         ~goSinglePlotPrivate() {};
 
         goList<goVectord>      plotX;
         goList<goVectord>      plotY;
+        goList<goVectord>      plotZ;
+        goList<goMatrixf>      plotMatrixf;
+        goList<goMatrixd>      plotMatrixd;
+        goList<const goSignal3DBase<void>*> plotImages;
+        goIndex_t              lineLength;      // Meaning only in 3D plots -- length of one grid line in x direction.
         goList<goString>       titles;          // These are titles for each of the individual curves
         goList<goPlotterLabel> labels;
         goList<goString>       plotCommands;
@@ -30,6 +41,8 @@ class goSinglePlotPrivate
         goSize_t          column;
 
         goString          title;               // This is the title of the whole plot.
+
+        goPlot::PlotType  plotType;
 };
 
 goSinglePlot::goSinglePlot ()
@@ -112,6 +125,110 @@ goSize_t goSinglePlot::getColumn () const
     return myPrivate->column;
 }
 
+bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
+                          goIndex_t lineLength,
+                          const goVectord& values, 
+                          const char* title, 
+                          const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+    myPrivate->plotX.append (x);
+    myPrivate->plotY.append (y);
+    myPrivate->plotZ.append (values);
+    myPrivate->lineLength = lineLength;
+
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
+bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+    myPrivate->plotMatrixf.append (m);
+
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
+bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+    myPrivate->plotMatrixd.append (m);
+
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
+/** 
+ * @brief Add surface to draw as goSignal3DBase<void>.
+ *
+ * @note Only the current channel of the 0th z slice will be used since it is assumed the input signal is
+ * a 2D image.
+ * 
+ * @param image Image object. May not be deleted as long as this goSinglePlot uses it.
+ * @param title Title.
+ * @param plotOptions  Options for gnuplot (like "with lines", "with points").
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goSinglePlot::add3D (const goSignal3DBase<void>* image, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+
+    myPrivate->plotImages.append (image);
+
+    myPrivate->titles.append(goString(title));
+    if (!plotOptions)
+    {
+        myPrivate->plotCommands.append(goString("w l"));
+    }
+    else
+    {
+        myPrivate->plotCommands.append(goString(plotOptions));
+    }
+    return true;
+}
+
 /** 
  * @brief Add a curve to the plot.
  * 
@@ -130,6 +247,13 @@ bool goSinglePlot::addCurve (const goVectord& x, const goVectord& y, const char*
         goLog::warning("addCurve(): x and y array sizes mismatch.",this);
         return false;
     }
+
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
+    }
+
     myPrivate->plotX.append(x);
     myPrivate->plotY.append(y);
     myPrivate->titles.append(goString(title));
@@ -161,6 +285,12 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
     {
         goLog::warning("addCurve(): x and y array sizes mismatch.",this);
         return false;
+    }
+
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
     }
 
     goSize_t sz = x.getSize();
@@ -255,18 +385,67 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
         }
     }
 
-    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
-                                        &myPrivate->plotY,
-                                        myPrivate->dataFilenames))
+    switch (myPrivate->plotType)
     {
-        return false;
+        case goPlot::Normal:
+            {
+                if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
+                            &myPrivate->plotY,
+                            myPrivate->dataFilenames))
+                {
+                    return false;
+                }
+            }
+            break;
+        case goPlot::Surface:
+            {
+                if (myPrivate->plotX.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
+                                &myPrivate->plotY,
+                                &myPrivate->plotZ,
+                                myPrivate->lineLength,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotMatrixf.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixf,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotMatrixd.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixd,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotImages.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotImages,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+            }
+            break;
+        default: goLog::error ("goSinglePlot::makePlot(): Unknown plot type!"); return false;
     }
+
     if (!goPlot::addGnuplotCommands (plotCommandsRet,
                                      &myPrivate->dataFilenames,
                                      &myPrivate->titles,
                                      &myPrivate->plotCommands,
                                      prefix.toCharPtr(),
-                                     postfix.toCharPtr()))
+                                     postfix.toCharPtr(),
+                                     myPrivate->plotType))
     {
         return false;
     }
@@ -298,6 +477,10 @@ void goSinglePlot::clear ()
 {
     myPrivate->plotX.erase ();
     myPrivate->plotY.erase ();
+    myPrivate->plotZ.erase ();
+    myPrivate->plotMatrixf.erase ();
+    myPrivate->plotMatrixd.erase ();
+    myPrivate->plotImages.erase ();
     myPrivate->titles.erase ();
     myPrivate->labels.erase ();
     myPrivate->plotCommands.erase ();

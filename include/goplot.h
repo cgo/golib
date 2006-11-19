@@ -66,6 +66,12 @@ class goSinglePlot : public goObjectBase
         goSize_t getRow () const;
         goSize_t getColumn () const;
 
+        bool add3D (const goVectord& x, const goVectord& y, goIndex_t lineLength, 
+                    const goVectord& values, const char* title, const char* plotOptions = 0);
+        bool add3D (const goMatrixf& m, const char* title, const char* plotOptions = 0);
+        bool add3D (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+        bool add3D (const goSignal3DBase<void>* image, const char* title, const char* plotOptions = 0);
+
         template <class pointT>
             bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
             {
@@ -241,6 +247,13 @@ class goPlotter : public goObjectBase
 
 namespace goPlot
 {
+
+    typedef enum
+    {
+        Normal,
+        Surface
+    } PlotType;
+
     /** 
      * @brief Plots 1D data using gnuplot.
      *
@@ -333,11 +346,28 @@ namespace goPlot
                              const goList<goString>* titles, 
                              const goList<goString>* plotCommands, 
                              const char* prefixCommands,
-                             const char* postfixCommands);
+                             const char* postfixCommands,
+                             goPlot::PlotType plotType = goPlot::Normal);
     template <class arrayT>
         bool writeGnuplotDataFiles (const goList<arrayT>* arrayListX, 
                                     const goList<arrayT>* arrayListY, 
                                     goList<goString>& dataFileNameRet);
+
+    //= For 3D-plots
+    template <class arrayT>
+        bool writeGnuplotDataFiles (const goList<arrayT>* arrayListX, 
+                                    const goList<arrayT>* arrayListY, 
+                                    const goList<arrayT>* arrayListZ,
+                                    goIndex_t             lineLength,
+                                    goList<goString>& dataFileNameRet);
+    //= For 3D-plots
+    template <class T>
+        bool writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrix,
+                                    goList<goString>& dataFileNameRet);
+
+    //= For 3D-plots
+    bool writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* images,
+                                goList<goString>&     dataFileNameRet);
 #if 0
         static bool gnuplot (const goArray<goFloat>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
         static bool gnuplot (const goArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);

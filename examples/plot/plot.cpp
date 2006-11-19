@@ -1,6 +1,8 @@
 #include <goplot.h>
 #include <gorandom.h>
 #include <gomath.h>
+#include <gosignal3d.h>
+#include <gofileio.h>
 
 int main ()
 {
@@ -70,7 +72,7 @@ int main ()
     plotter.addCurve(x,d_plus,"mean + deviation");
     plotter.addCurve(x,d_minus,"mean - deviation");
     plotter.setPauseFlag(true);
-    plotter.plot();
+    // plotter.plot();
    
     {
         printf ("Testing goMultiPlotter\n");
@@ -84,8 +86,56 @@ int main ()
         sp1.addCurve(x,d_minus,"mean - deviation");
         mp.addPlot (sp1,1,1);
         mp.setPauseFlag (true);
-        mp.plot ();
+        // mp.plot ();
         // mp.plotPostscript ("test.ps");
+    }
+
+    {
+        goSinglePlot plot;
+        goSize_t N = 20;
+        goSize_t M = 20;
+        goVectord x (N*M);
+        goVectord y (N*M);
+        goVectord z (N*M);
+
+        for (goSize_t i = 0; i < N; ++i)
+        {
+            for (goSize_t j = 0; j < M; ++j)
+            {
+                x[i+j*N] = (float)i;
+                y[i+j*N] = (float)j;
+                z[i+j*N] = (float)sin(M_PI*i/(float)N*M_PI*j/(float)M);
+            }
+        }
+
+        plot.add3D (x,y,N,z,"My plot");
+        goMultiPlotter plotter (1,1);
+        plotter.addPlot (plot,0,0);
+        plotter.setPauseFlag (true);
+        plotter.plot ();
+        plotter.setPauseFlag (false);
+        plotter.plotEPS ("test.eps");
+    }
+
+    {
+        goSinglePlot plot;
+
+        goSignal3D<void> image;
+        goFileIO::readImage ("/home/christian/tisch2.jpg", &image);
+        
+        plot.setTitle ("A surface");
+        plot.add3D (&image, "My image");
+        goMultiPlotter plotter (1,2);
+        plotter.addPlot (plot,0,0);
+        
+        goSinglePlot sp1;
+        sp1.setTitle ("A random curve");
+        sp1.addCurve(x,y,"random");
+        sp1.addCurve(x,m,"mean");
+        plotter.addPlot (sp1,0,1);
+        
+        plotter.setPauseFlag (true);
+        plotter.plot ();
     }
 
     exit(1);

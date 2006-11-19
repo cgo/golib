@@ -15,6 +15,9 @@ using namespace std;
 
 namespace goMath
 {
+    /*! \addtogroup math
+     * @{
+     */
    /** Singular Value Decomposition.
    * This is taken from the JAMA toolkit. JAMA is free of copyright.
    * The classes are renamed to fit in the go... naming conventions.
@@ -526,6 +529,10 @@ class goSVD
       return r;
    }
 };
+
+/*!
+ * @}
+ */
 
 }
 

@@ -15,6 +15,7 @@
 #include <gotype.h>
 #include <assert.h>
 
+template <class level_type>
 class goHistogramPrivate
 {
     public:
@@ -26,17 +27,22 @@ class goHistogramPrivate
         goDouble          minValue;             // Minimum data value (set in calculate())
         goDouble          _binStep;             // 1 / binStep (set in calculate())
         goTypeEnum        inputSignalType;
+        goArray<level_type> levels;
 };
 
-goHistogramPrivate::goHistogramPrivate ()
+template <class T>
+goHistogramPrivate<T>::goHistogramPrivate ()
     : userSetLevels (false),
       bins          (),
       minValue      (0.0),
-      _binStep      (0.0)
+      _binStep      (0.0),
+      inputSignalType (GO_UINT8),
+      levels ()
 {
 }
 
-goHistogramPrivate::~goHistogramPrivate ()
+template <class T>
+goHistogramPrivate<T>::~goHistogramPrivate ()
 {
 }
 
@@ -45,11 +51,10 @@ goHistogramPrivate::~goHistogramPrivate ()
 template <class level_type>
 goHistogram<level_type>::goHistogram ()
     : goObjectBase (),
-      myLevels     (),
       myPrivate    (NULL)
 {
     this->setClassID(GO_HISTOGRAM);
-    myPrivate = new goHistogramPrivate;
+    myPrivate = new goHistogramPrivate<level_type>;
     assert (myPrivate);
 }
 
@@ -61,6 +66,32 @@ goHistogram<level_type>::~goHistogram ()
         delete myPrivate;
         myPrivate = NULL;
     }
+}
+
+template <class level_type>
+goHistogram<level_type>::goHistogram (const goHistogram<level_type>& other)
+{
+    myPrivate = new goHistogramPrivate<level_type>;
+    *myPrivate = *other.myPrivate;
+}
+
+template <class level_type>
+const goHistogram<level_type>& goHistogram<level_type>::operator= (const goHistogram<level_type>& other)
+{
+    *myPrivate = *other.myPrivate;
+    return *this;
+}
+
+template <class level_type>
+goDouble goHistogram<level_type>::getMinValue () const
+{
+    return myPrivate->minValue;
+}
+
+template <class level_type>
+goDouble goHistogram<level_type>::getBinStep () const
+{
+    return myPrivate->_binStep;
 }
 
 template <class level_type, class signal_type>
@@ -75,50 +106,24 @@ static bool calculateHistogram (const goSignal3DBase<void>& sig,
     if (_binStep > 0.0)
     {
         GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (
-                bins[(goIndex_t)((*(const signal_type*)__ptr - minValue) * _binStep)] += 1.0;, sig
-                );
+                bins[(goIndex_t)((*(const signal_type*)__ptr - minValue) * _binStep)] += 1.0;, sig);
     }
     return true;
 }
 
 template <class level_type>
-bool 
-goHistogram<level_type>::calculate (const goSignal3DBase<void>& sig, bool normalize)
+bool goHistogram<level_type>::calculateCore (const goSignal3DBase<void>& sig)
 {
-    goDouble _binStep = -1.0;
-    goDouble minValue = 0.0;
-    if (!myPrivate->userSetLevels)
-    {
-        myLevels.resize(myPrivate->bins.getSize());
-        goIndex_t i;
-        minValue = sig.getMinimum();
-        goDouble maxValue = sig.getMaximum();
-        goDouble binStep = (maxValue - minValue) / (float)(myLevels.getSize()-1);
-        _binStep = 1.0 / binStep;
-        for (i = 0; i < myLevels.getSize(); ++i)
-        {
-            // myLevels[i] = minValue + binStep * (i+1);
-            myLevels[i] = minValue + binStep * (float)(i);
-        }
-    }
-    else
-    {
-        return false;
-    }
-    myPrivate->minValue = minValue;
-    myPrivate->_binStep = _binStep;
-    myPrivate->inputSignalType = sig.getDataType().getID();
-
     switch (sig.getDataType().getID())
     {
-        case GO_UINT8: calculateHistogram <level_type,goUInt8>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_INT8: calculateHistogram <level_type,goInt8>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_UINT16: calculateHistogram <level_type,goUInt16>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_INT16: calculateHistogram <level_type,goInt16>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_UINT32: calculateHistogram <level_type,goUInt32>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_INT32: calculateHistogram <level_type,goInt32>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_FLOAT: calculateHistogram <level_type,goFloat>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
-        case GO_DOUBLE: calculateHistogram <level_type,goDouble>(sig, myLevels, myPrivate->bins, _binStep, minValue); break;
+        case GO_UINT8: calculateHistogram <level_type,goUInt8>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_INT8: calculateHistogram <level_type,goInt8>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_UINT16: calculateHistogram <level_type,goUInt16>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_INT16: calculateHistogram <level_type,goInt16>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_UINT32: calculateHistogram <level_type,goUInt32>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_INT32: calculateHistogram <level_type,goInt32>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_FLOAT: calculateHistogram <level_type,goFloat>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
+        case GO_DOUBLE: calculateHistogram <level_type,goDouble>(sig, this->getLevels(), this->getHistogram(), this->getBinStep(), this->getMinValue()); break;
         default:
             {
                 goString msg;
@@ -130,6 +135,46 @@ goHistogram<level_type>::calculate (const goSignal3DBase<void>& sig, bool normal
             }
             break;
     }
+
+    return true;
+}
+
+template <class level_type>
+bool 
+goHistogram<level_type>::calculate (const goSignal3DBase<void>& sig, bool normalize)
+{
+    goDouble _binStep = -1.0;
+    goDouble minValue = 0.0;
+    if (!myPrivate->userSetLevels)
+    {
+        myPrivate->levels.resize(myPrivate->bins.getSize());
+        goIndex_t i;
+        minValue = sig.getMinimum();
+        goDouble maxValue = sig.getMaximum();
+        goDouble binStep = (maxValue - minValue) / (float)(myPrivate->levels.getSize()-1);
+        if (binStep > 0.0)
+        {
+            _binStep = 1.0 / binStep;
+        }
+        else
+        {
+            binStep = 0.0;
+        }
+        for (i = 0; i < myPrivate->levels.getSize(); ++i)
+        {
+            // myPrivate->levels[i] = minValue + binStep * (i+1);
+            myPrivate->levels[i] = minValue + binStep * (float)(i);
+        }
+    }
+    else
+    {
+        return false;
+    }
+    myPrivate->minValue = minValue;
+    myPrivate->_binStep = _binStep;
+    myPrivate->inputSignalType = sig.getDataType().getID();
+
+    this->calculateCore (sig);
     
     if (normalize)
     {
@@ -148,7 +193,7 @@ bool
 goHistogram<level_type>::setLevels (const goArray<level_type>& levelArray)
 {
     myPrivate->userSetLevels = true;
-    myLevels = levelArray;
+    myPrivate->levels = levelArray;
     return true;
 }
 
@@ -158,7 +203,7 @@ goHistogram<level_type>::setBins (goSize_t n)
 {
     myPrivate->userSetLevels = false;
     myPrivate->bins.resize(n);
-    myLevels.resize(n);
+    myPrivate->levels.resize(n);
     return true;
 }
 
@@ -196,7 +241,15 @@ goHistogram<level_type>::lookup (const void* valueP)
     {
         return myPrivate->bins[index];
     }
-    goLog::warning ("Index to bins out of range.",this);
+    goString msg = "Index ";
+    msg += (int)(index);
+    msg += " out of range -- max. is ";
+    msg += (int)(myPrivate->bins.getSize() - 1);
+    msg += ", binStep = ";
+    msg += (float)myPrivate->_binStep;
+    msg += ", minValue = ";
+    msg += (float)myPrivate->minValue;
+    goLog::warning (msg, this);
     return 0;
 }
 
@@ -211,7 +264,7 @@ template <class level_type>
 goArray<level_type>& 
 goHistogram<level_type>::getLevels ()
 {
-    return myLevels;
+    return myPrivate->levels;
 }
 
 

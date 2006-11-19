@@ -23,7 +23,7 @@
 # include <gotype.h>
 #endif
 
-class goHistogramPrivate;
+template <class level_type> class goHistogramPrivate;
 
 /**
  * @addtogroup signal
@@ -37,6 +37,12 @@ goHistogram : public goObjectBase
         goHistogram ();
         virtual ~goHistogram ();
 
+        goHistogram (const goHistogram<level_type>& other);
+        const goHistogram<level_type>& operator= (const goHistogram<level_type>& other);
+
+        goDouble             getMinValue  () const;
+        goDouble             getBinStep   () const;
+
         virtual bool         calculate    (const goSignal3DBase<void>&, bool normalize = false);
         bool                 setLevels    (const goArray<level_type>& levelArray);
         bool                 setBins      (goSize_t n);
@@ -45,12 +51,11 @@ goHistogram : public goObjectBase
         goArray<goDouble>&   getHistogram ();
         goArray<level_type>& getLevels    ();
         
-        
 	protected:
+        virtual bool calculateCore (const goSignal3DBase<void>& sig);
 	
 	private:
-        goArray<level_type> myLevels;
-        goHistogramPrivate* myPrivate;
+        goHistogramPrivate<level_type>* myPrivate;
 
     private:
         goHistogram<level_type>& operator= (goHistogram<level_type>&);

@@ -651,16 +651,18 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
 {
     if (retValue.getSizeX() != x.getSizeX() ||
         retValue.getSizeY() != x.getSizeY() ||    
-        retValue.getSizeZ() != x.getSizeZ())
+        retValue.getSizeZ() != x.getSizeZ() ||
+        retValue.getChannelCount() != x.getChannelCount())
     {
         retValue.make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
                        x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
-                       1, 1, 1);
+                       1, 1, 1, x.getChannelCount());
     }
     goSignal3DGenericConstIterator itX (&x);
     goSignal3DGenericIterator itResult (&retValue);
 
     goDouble h2 = 1.0 / (2*h);
+    goSize_t channelCount = retValue.getChannelCount();
     
     switch (dimension)
     {
@@ -676,7 +678,8 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
                         itResult.resetX();
                         while (!itX.endX())
                         {
-                            *(Tret*)*itResult = (*(const Tx*)itX.rightX() - *(const Tx*)itX.leftX()) * h2;
+                            for (goSize_t i = 0; i < channelCount; ++i)
+                                *((Tret*)*itResult + i) = (*((const Tx*)itX.rightX() + i) - *((const Tx*)itX.leftX() + i)) * h2;
                             itX.incrementX();
                             itResult.incrementX();
                         }
@@ -700,7 +703,8 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
                         itResult.resetX();
                         while (!itX.endX())
                         {
-                            *(Tret*)*itResult = (*(const Tx*)itX.rightY() - *(const Tx*)itX.leftY()) * h2;
+                            for (goSize_t i = 0; i < channelCount; ++i)
+                                *((Tret*)*itResult + i) = (*((const Tx*)itX.rightY() + i) - *((const Tx*)itX.leftY() + i)) * h2;
                             itX.incrementX();
                             itResult.incrementX();
                         }
@@ -724,7 +728,8 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
                         itResult.resetX();
                         while (!itX.endX())
                         {
-                            *(Tret*)*itResult = (*(const Tx*)itX.rightZ() - *(const Tx*)itX.leftZ()) * h2;
+                            for (goSize_t i = 0; i < channelCount; ++i)
+                                *((Tret*)*itResult + i) = (*((const Tx*)itX.rightZ() + i) - *((const Tx*)itX.leftZ() + i)) * h2;
                             itX.incrementX();
                             itResult.incrementX();
                         }
@@ -769,7 +774,7 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
  * @param retValue   Contains finite differences after the function returns true.
  *                   If the size of retValue does not match the size of
  *                   x, retValue
- *                   will be resized to the size of x, 
+ *                   will be resized to the size of x, including number of channels, 
  *                   blocksize of x and border of 1 in each direction.
  * @param dimension  Dimension (0, 1, or 2 for x, y, or z)
  * @param h          Grid spacing (default 1)
@@ -777,6 +782,7 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
  * @note Only goFloat and goDouble data are supported. The data types of x and retValue may differ.
  *       Both are given by the user, so the data type of retValue must be set before calling 
  *       this function.
+ * @note The algorithm is run for all channels.
  *
  * @return  True if successful, false otherwise.
  * @author Christian Gosch

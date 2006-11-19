@@ -1,0 +1,27 @@
+# INCLUDE (FindSWIG)
+PROJECT             (gomatlab_python)
+
+SET (TARGET _gomatlab.so)
+
+FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
+
+
+#EXEC_PROGRAM        (${GUILE_CONFIG} ARGS link OUTPUT_VARIABLE GUILE_LIBS)
+#EXEC_PROGRAM        (${GUILE_CONFIG} ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
+#EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
+EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
+                        ARGS -I../../include -python -c++ gomatlab.i)
+FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
+SET                 (GOMATLAB_LIB "-lGomatlab")
+LINK_LIBRARIES      (${GOLIB} ${GOMATLAB_LIB})
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include /usr/include/python2.4)
+#ADD_DEFINITIONS     ()
+ADD_LIBRARY         (_gomatlab MODULE gomatlab_wrap.cxx)
+SET_TARGET_PROPERTIES (_gomatlab PROPERTIES PREFIX "")
+#INSTALL_TARGETS     (/lib _golib)
+
+SET (CMAKE_CXX_COMPILER g++-3.3)
+
+SET (PYTHON_FILES ${CMAKE_CURRENT_SOURCE_DIR}/gomatlab.py ${TARGET})
+
+ADD_CUSTOM_TARGET   (install-py cp ${PYTHON_FILES} ${PYTHON_INSTALL_DIR})

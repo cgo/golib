@@ -449,7 +449,7 @@ template<>
 goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v) const
 {
     assert (v.getSize() == this->getColumns());
-    goVector<goFloat> y (v.getSize());
+    goVector<goFloat> y (this->getRows());
     y.fill (0.0f);
     cblas_sgemv (CblasRowMajor, CblasNoTrans, 
                  this->getRows(), this->getColumns(), 
@@ -464,7 +464,7 @@ template<>
 goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v) const
 {
     assert (v.getSize() == this->getColumns());
-    goVector<goDouble> y (v.getSize());
+    goVector<goDouble> y (this->getRows());
     y.fill (0.0f);
     cblas_dgemv (CblasRowMajor, CblasNoTrans, 
                  this->getRows(), this->getColumns(), 

@@ -173,6 +173,8 @@ goSignal3DBase : public goObjectBase
         const goSize3D& getBlockSize () const { return myBlockSize; };
         const goSize3D& getBorderSize () const { return myBorderSize; };
 
+        void resizeBorder (const goSize3D& size);
+
         /*!
          * \return Size in samples in x direction.
          */
@@ -236,13 +238,89 @@ goSignal3DBase : public goObjectBase
         const T*   getClosest (go3Vector<goFloat>& point) const;
         goFloat    sample (go3Vector<goFloat>& point);
 
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels,
+         * up to the minimum number of channels of this object and the other object
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator += (const goSignal3DBase<T>& other);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels,
+         * up to the minimum number of channels of this object and the other object
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator -= (const goSignal3DBase<T>& other);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels,
+         * up to the minimum number of channels of this object and the other object
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator *= (const goSignal3DBase<T>& other);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels,
+         * up to the minimum number of channels of this object and the other object
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator /= (const goSignal3DBase<T>& other);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels.
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator += (goFloat scalar);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels.
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator -= (goFloat scalar);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels.
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator *= (goFloat scalar);
+        /** 
+         * @brief Element-wise operator.
+         *
+         * All operator [/+-*]= work on all channels.
+         * 
+         * @param other Signal to combine with.
+         * 
+         * @return Reference to *this.
+         */
         goSignal3DBase<T>& operator /= (goFloat scalar);
         
     protected:

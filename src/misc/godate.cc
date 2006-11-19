@@ -23,8 +23,12 @@ goDate::goDate (goInt16 Day,
   }
 }
 
+goDate::~goDate ()
+{
+}
+
 bool
-goDate::operator< (goDate& other) {
+goDate::operator< (const goDate& other) const {
 
   if ( year < other.getYear()) {
     return true;
@@ -41,7 +45,7 @@ goDate::operator< (goDate& other) {
 }	
 
 bool
-goDate::operator== (goDate& other) {
+goDate::operator== (const goDate& other) const {
   if ( (day == other.getDay()) && (month == other.getMonth()) && (year == other.getYear()) ) {
     return true;
   }
@@ -49,12 +53,12 @@ goDate::operator== (goDate& other) {
 }
 
 bool
-goDate::operator!= (goDate& other) {
+goDate::operator!= (const goDate& other) const {
   return !( (*this) == other );
 }
 
 bool
-goDate::operator> (goDate& other) {
+goDate::operator> (const goDate& other) const {
   if ( !(*this < other) && !(*this == other) ) {
     return true;
   }
@@ -62,7 +66,7 @@ goDate::operator> (goDate& other) {
 }
 
 bool
-goDate::operator>= (goDate& other) {
+goDate::operator>= (const goDate& other) const {
   if ( (*this > other) || (*this == other) ) {
     return true;
   }
@@ -70,7 +74,7 @@ goDate::operator>= (goDate& other) {
 }
 
 bool
-goDate::operator<= (goDate& other) {
+goDate::operator<= (const goDate& other) const {
   if ( (*this < other) || (*this == other) ) {
     return true;
   }
@@ -78,7 +82,7 @@ goDate::operator<= (goDate& other) {
 }
 
 void
-goDate::operator= (goDate& other) {
+goDate::operator= (const goDate& other) {
   setDay   (other.getDay());
   setMonth (other.getMonth());
   setYear  (other.getYear());

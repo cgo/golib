@@ -1657,6 +1657,25 @@ goSignal3DBase<T>::setSizeZ (goSize_t s)
     mySize.z = s;
 }
 
+/** 
+ * @brief Resize the border and re-initialise internal data structures
+ * accordingly.
+ * 
+ * Newly set border flags (setBorderFlags()) will be taken into account automatically.
+ *
+ * @param size New border size.
+ */
+template <class T>
+void goSignal3DBase<T>::resizeBorder (const goSize3D& size)
+{
+    if (this->real_ptr)
+    {
+        this->initialize (this->real_ptr, this->getSizeX(), this->getSizeY(), this->getSizeZ(),
+                this->getBlockSizeX(), this->getBlockSizeY(), this->getBlockSizeZ(), 
+                size.x, size.y, size.z, this->getChannelCount());
+    }
+}
+
 /**
  * @brief INTERNAL -- DO NOT USE
  *

@@ -25,26 +25,27 @@ class goDate
   goDate (goInt16 Day,
 	      goInt16 Month,
 	      goInt16 Year);
+  ~goDate ();
 
-  goInt16 getDay   () { return day; }
-  goInt16 getMonth () { return month; }
-  goInt16 getYear  () { return year; }
+  goInt16 getDay   () const { return day; }
+  goInt16 getMonth () const { return month; }
+  goInt16 getYear  () const { return year; }
   
   void 	setDay   (goInt16 d) { day = d; }
   void	setMonth (goInt16 m) { month = m; }
   void 	setYear  (goInt16 y) { year = y; }
 
-  bool operator<  (goDate& other);
-  bool operator>  (goDate& other);
-  bool operator<= (goDate& other);
-  bool operator>= (goDate& other);
-  bool operator== (goDate& other);
-  bool operator!= (goDate& other);
-  void operator=  (goDate& other);
+  bool operator<  (const goDate& other) const;
+  bool operator>  (const goDate& other) const;
+  bool operator<= (const goDate& other) const;
+  bool operator>= (const goDate& other) const;
+  bool operator== (const goDate& other) const;
+  bool operator!= (const goDate& other) const;
+  void operator=  (const goDate& other);
   void operator=  (const char* s);
   //friend operator++ ();
   //friend operator-- ();	
-  friend std::ostream& operator<< (std::ostream& outstr, goDate& d);
+  friend std::ostream& operator<< (std::ostream& outstr, const goDate& d);
   
  protected:
   goInt16 day;

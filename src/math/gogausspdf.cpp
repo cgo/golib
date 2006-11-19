@@ -35,16 +35,20 @@ namespace goMath
     void
     goGaussPDF<input_type, output_type>::setVariance (const input_type& variance)
     {
-        if (variance <= 0.0)
+        if (variance <= 0.0f)
         {
             goLog::warning ("goGaussPDF::setVariance(): Variance is zero or lower than zero");
-            return;
+            myVariance            = 0.0;
+            myVarianceReciprocal2 = 1.0;
+            myNormFactor          = 1.0;
         }
-        assert (variance > 0.0);
-
-        myVariance            = variance;
-        myVarianceReciprocal2 = 1.0 / (2.0 * variance);
-        myNormFactor          = 1.0 / sqrt (2 * M_PI * variance);
+        else
+        {
+            assert (variance > 0.0);
+            myVariance            = variance;
+            myVarianceReciprocal2 = 1.0 / (2.0 * variance);
+            myNormFactor          = 1.0 / sqrt (2 * M_PI * variance);
+        }
     }
     
     template <class input_type, class output_type>
@@ -53,7 +57,7 @@ namespace goMath
     {
         goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
         assert (false);
-        return (output_type)0;
+        return (output_type)1;
     }
     
 //    template <class input_type, class output_type>

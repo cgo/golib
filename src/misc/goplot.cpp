@@ -7,7 +7,8 @@
 #ifndef GOLOG_H
 # include <golog.h>
 #endif
-
+#include <gosignal3dbase.h>
+#include <gosignal3dgenericiterator.h>
 
 class goPlotterPrivate
 {
@@ -522,7 +523,8 @@ bool goPlot::addGnuplotCommands
                const goList<goString>* titles, 
                const goList<goString>* plotCommands, 
                const char* prefixCommands,
-               const char* postfixCommands)
+               const char* postfixCommands,
+               goPlot::PlotType plotType)
 {
     if (!dataFileNames)
     {
@@ -566,7 +568,11 @@ bool goPlot::addGnuplotCommands
         gnuplotCommands += prefixCommands;
         gnuplotCommands += "\n";
     }
-    gnuplotCommands += "plot ";
+    switch (plotType)
+    {
+        case goPlot::Normal: gnuplotCommands += "plot "; break;
+        case goPlot::Surface: gnuplotCommands += "set pm3d\nsplot "; break;
+    }
     while (dataFileNameEl)
     {
         gnuplotCommands += "\"";
@@ -610,6 +616,11 @@ bool goPlot::addGnuplotCommands
     else
     {
         gnuplotCommands += "\n";
+    }
+    switch (plotType)
+    {
+        case goPlot::Normal: break; 
+        case goPlot::Surface: break; // gnuplotCommands += "unset pm3d\n"; break;
     }
     return true;
 }
@@ -716,6 +727,164 @@ bool goPlot::writeGnuplotDataFiles (const goList<arrayT>* arrayListX,
     return true;
 }
 
+template <class arrayT>
+bool goPlot::writeGnuplotDataFiles (const goList<arrayT>* arrayListX, 
+                                    const goList<arrayT>* arrayListY, 
+                                    const goList<arrayT>* arrayListZ,
+                                    goIndex_t             lineLength,
+                                    goList<goString>& dataFileNameRet)
+{
+    if (!arrayListX || !arrayListY || !arrayListZ)
+    {
+        return false;
+    }
+    if (arrayListX->getSize() != arrayListY->getSize())
+    {
+        goLog::warning("goPlot::writeGnuplotDataFiles(): (list version) arrayListX must be of same size as arrayListY.");
+        return false;
+    }
+    if (arrayListZ->getSize() != arrayListY->getSize())
+    {
+        goLog::warning("goPlot::writeGnuplotDataFiles(): (list version) arrayListZ must be of same size as arrayListY.");
+        return false;
+    }
+    goList<goString>* filenames = &dataFileNameRet;
+
+    filenames->erase(); 
+    typename goList<arrayT>::ConstElement* elX = arrayListX->getFrontElement();
+    typename goList<arrayT>::ConstElement* elY = arrayListY->getFrontElement();
+    typename goList<arrayT>::ConstElement* elZ = arrayListZ->getFrontElement();
+    assert (arrayListX->getSize() == arrayListY->getSize());
+    goIndex_t lineCounter = 0;
+    while (elX)
+    {
+        goString filename;
+        FILE* file = goFileIO::createTempFile (filename);
+        if (!file)
+            return false;
+        filenames->append(filename);
+        goIndex_t i;
+        goIndex_t size = elX->elem.getSize();
+        assert (size == static_cast<goIndex_t>(elY->elem.getSize()));
+        assert (size == static_cast<goIndex_t>(elZ->elem.getSize()));
+        for (i = 0; i < size; ++i)
+        {
+            fprintf (file, "%f %f %f\n", elX->elem[i], elY->elem[i], elZ->elem[i]);
+            ++lineCounter;
+            if (lineCounter >= lineLength)
+            {
+                lineCounter = 0;
+                fprintf (file, "\n");
+            }
+        }
+        elX = elX->next;
+        elY = elY->next;
+        elZ = elZ->next;
+        fclose (file);
+    }
+    return true;
+}
+
+template <class T>
+bool goPlot::writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrices,
+                                    goList<goString>&     dataFileNameRet)
+{
+    goList<goString>* filenames = &dataFileNameRet;
+
+    filenames->erase(); 
+    goString filename;
+
+    typename goList<goMatrix<T> >::ConstElement* el = matrices->getFrontElement ();
+    while (el)
+    {
+        FILE* file = goFileIO::createTempFile (filename);
+        if (!file)
+            return false;
+        filenames->append(filename);
+        const goMatrix<T>& matrix = el->elem;
+        for (goSize_t row = 0; row < matrix.getRows(); ++row)
+        {
+            for (goSize_t col = 0; col < matrix.getColumns(); ++col)
+            {
+                fprintf (file, "%f %f %f\n", (float)row, (float)col, (float)matrix(row,col));
+            }
+            fprintf (file, "\n");
+        }
+        fclose (file);
+        el = el->next;
+    }
+    return true;
+}
+
+template <class T>
+static bool writeGnuplotDataFilesSignal3D (
+        const goSignal3DBase<void>* image,
+        FILE* file)
+{
+    goSignal3DGenericConstIterator it (image);
+    goSize_t y = 0;
+    while (!it.endY())
+    {
+        it.resetX();
+        goSize_t x = 0;
+        while (!it.endX())
+        {
+            fprintf (file, "%f %f %f\n", (float)x, (float)y, (float)*(T*)*it);
+            it.incrementX();
+            ++x;
+        }
+        fprintf (file, "\n");
+        it.incrementY();
+        ++y;
+    }
+    return true;
+}
+
+bool goPlot::writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* images,
+                                    goList<goString>&     dataFileNameRet)
+{
+    if (!images)
+        return false;
+
+    goList<goString>* filenames = &dataFileNameRet;
+
+    filenames->erase(); 
+    goString filename;
+
+    goList<const goSignal3DBase<void>* >::ConstElement* el = images->getFrontElement ();
+    while (el)
+    {
+        if (el->elem)
+        {
+            FILE* file = goFileIO::createTempFile (filename);
+            if (!file)
+            {
+                goString msg = "goPlot::writeGnuplotDataFiles() for goSignal3D: can not open file ";
+                msg += filename.toCharPtr();
+                msg += " for writing.";
+                el = el->next;
+                continue;
+            }
+            filenames->append(filename);
+            switch (el->elem->getDataType().getID())
+            {
+                case GO_UINT8:  writeGnuplotDataFilesSignal3D<goUInt8>  (el->elem, file); break;
+                case GO_INT8:   writeGnuplotDataFilesSignal3D<goInt8>   (el->elem, file); break;
+                case GO_UINT16: writeGnuplotDataFilesSignal3D<goUInt16> (el->elem, file); break;
+                case GO_INT16:  writeGnuplotDataFilesSignal3D<goInt16>  (el->elem, file); break;
+                case GO_UINT32: writeGnuplotDataFilesSignal3D<goUInt32> (el->elem, file); break;
+                case GO_INT32:  writeGnuplotDataFilesSignal3D<goInt32>  (el->elem, file); break;
+                case GO_FLOAT:  writeGnuplotDataFilesSignal3D<goFloat>  (el->elem, file); break;
+                case GO_DOUBLE: writeGnuplotDataFilesSignal3D<goDouble> (el->elem, file); break;
+                default: break;
+            }
+            fclose (file);
+        }
+        el = el->next;
+    }
+    return true;
+}
+
 template < class arrayT >
 bool goPlot::gnuplot(const arrayT& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor)
 {
@@ -766,6 +935,17 @@ template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<TYPE>* arrayList
                                     const goList<TYPE>* arrayListY, \
                                     goList<goString>& dataFileNameRet);
 
+#define GOPLOT_WRITEFILES_INSTANTIATE2(TYPE) \
+template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<TYPE>* arrayListX, \
+                                    const goList<TYPE>* arrayListY, \
+                                    const goList<TYPE>* arrayListZ, \
+                                    goIndex_t lineLength, \
+                                    goList<goString>& dataFileNameRet);
+
+#define GOPLOT_WRITEFILES_INSTANTIATE3(TYPE) \
+template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<goMatrix<TYPE> >*    matrix, \
+                                    goList<goString>&     dataFileNameRet);
+
 GOPLOT_INSTANTIATE(goArray<goFloat>);
 GOPLOT_INSTANTIATE(goArray<goDouble>);
 GOPLOT_INSTANTIATE(goFixedArray<goFloat>);
@@ -782,8 +962,16 @@ GOPLOT_WRITEFILES_INSTANTIATE(goArray<goFloat>);
 GOPLOT_WRITEFILES_INSTANTIATE(goArray<goDouble>);
 GOPLOT_WRITEFILES_INSTANTIATE(goFixedArray<goFloat>);
 GOPLOT_WRITEFILES_INSTANTIATE(goFixedArray<goDouble>);
+GOPLOT_WRITEFILES_INSTANTIATE2(goArray<goFloat>);
+GOPLOT_WRITEFILES_INSTANTIATE2(goArray<goDouble>);
+GOPLOT_WRITEFILES_INSTANTIATE2(goFixedArray<goFloat>);
+GOPLOT_WRITEFILES_INSTANTIATE2(goFixedArray<goDouble>);
 GOPLOT_WRITEFILES_INSTANTIATE(goVectorf);
 GOPLOT_WRITEFILES_INSTANTIATE(goVectord);
+GOPLOT_WRITEFILES_INSTANTIATE2(goVectorf);
+GOPLOT_WRITEFILES_INSTANTIATE2(goVectord);
+GOPLOT_WRITEFILES_INSTANTIATE3(goFloat);
+GOPLOT_WRITEFILES_INSTANTIATE3(goDouble);
 
 #if 0
 #define GOPLOT_INSTANTIATE(TYPE) \
