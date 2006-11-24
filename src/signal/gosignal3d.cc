@@ -99,13 +99,12 @@ goSignal3D<T>::~goSignal3D ()
 template<> void
 goSignal3D<void>::destroy ()
 {
-    goSignal3DBase<void>::destroy ();
-    
     if (real_ptr)
     {
         delete[] (goUInt8*)real_ptr;
         real_ptr = NULL;
         ptr      = NULL;
+        goSignal3DBase<void>::destroy ();
     }
 }
 
@@ -357,9 +356,9 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
     //= NOTE: In order for the iterator classes not to
     //=       cause illegal reads at the end of a zero-border
     //=       signal, make the border min. 1.
-    border_x = goMath::max<goSize_t> (border_x, 1);
-    border_y = goMath::max<goSize_t> (border_y, 1);
-    border_z = goMath::max<goSize_t> (border_z, 1);
+    border_x = goMath::min(goMath::max<goSize_t>(border_x, 1), x);
+    border_y = goMath::min(goMath::max<goSize_t>(border_y, 1), y);
+    border_z = goMath::min(goMath::max<goSize_t>(border_z, 1), z);
     
     goSize3D blocks;
   

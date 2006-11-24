@@ -34,6 +34,7 @@ goMatlabPrivate::~goMatlabPrivate ()
 {
 }
 
+        
 template <class T>
 static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
 {
@@ -41,13 +42,15 @@ static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
     int X = sig->getSizeX ();
     int Y = sig->getSizeY ();
     int Z = goMath::min<int> (3, sig->getChannelCount());
+    int Zmax = Z;
     int x;
     int y;
     int z;
 
     goSize_t oldChan = sig->getChannel ();
 
-    for (z = Z-1; z >= 0; --z)
+    // for (z = Z-1; z >= 0; --z)
+    for (z = 0; z < Zmax; ++z)
     {
         sig->setChannel(z);
         // bp = buffer + z;
@@ -70,6 +73,45 @@ static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
     }
     sig->setChannel (oldChan);
 
+    return true;
+}
+
+bool goMatlab::putString (const goString& str, const char* name)
+{
+    if (!myPrivate->matlabEngine)
+    {
+        return false;
+    }
+
+    mxArray* mstring = mxCreateString (str.toCharPtr());
+    if (!mstring)
+        return false;
+
+    engPutVariable (myPrivate->matlabEngine, name, mstring);
+    return true;
+}
+
+bool goMatlab::getString (goString& str, const char* name)
+{
+    if (!myPrivate->matlabEngine)
+    {
+        return false;
+    }
+
+    mxArray* tempArray = engGetVariable (myPrivate->matlabEngine, name);
+    if (!tempArray)
+        return false;
+    
+    if (mxGetClassID(tempArray) != mxCHAR_CLASS)
+        return false;
+    
+    char* temp = mxArrayToString (tempArray);
+    if (temp)
+    {
+        str = temp;
+        ::free (temp);
+        temp = 0;
+    }
     return true;
 }
 

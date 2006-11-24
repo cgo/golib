@@ -213,6 +213,11 @@ void goSignal3DBase<T>::cleanup ()
             delete[] myChannelOffset;
             myChannelOffset = NULL;
     }
+
+    this->mySize       = goSize3D (0,0,0);
+    this->myBorderSize = goSize3D (0,0,0);
+    this->myBlockSize  = goSize3D (0,0,0);
+    this->myBlocks     = goSize3D (0,0,0);
 }
 
 template <class T>
@@ -1670,9 +1675,13 @@ void goSignal3DBase<T>::resizeBorder (const goSize3D& size)
 {
     if (this->real_ptr)
     {
+        goSize3D newBorder = size;
+        newBorder.x = goMath::min<goSize_t> (newBorder.x, this->getSizeX());
+        newBorder.y = goMath::min<goSize_t> (newBorder.y, this->getSizeY());
+        newBorder.z = goMath::min<goSize_t> (newBorder.z, this->getSizeZ());
         this->initialize (this->real_ptr, this->getSizeX(), this->getSizeY(), this->getSizeZ(),
                 this->getBlockSizeX(), this->getBlockSizeY(), this->getBlockSizeZ(), 
-                size.x, size.y, size.z, this->getChannelCount());
+                newBorder.x, newBorder.y, newBorder.z, this->getChannelCount());
     }
 }
 

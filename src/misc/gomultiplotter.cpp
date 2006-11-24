@@ -240,7 +240,7 @@ bool goMultiPlotter::plot ()
                                 myPrivate->inputFD,
                                 myPrivate->outputFD);
     //= If the process was paused, we can delete the files.
-    if (myPrivate->pauseFlag)
+    if (myPrivate->pauseFlag && myPrivate->waitFlag)
     {
         el = myPrivate->plots.getFrontElement();
         while (el)

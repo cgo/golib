@@ -18,6 +18,7 @@ tar -czvh --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" -
  golib/CMakeLists.txt\
  golib/src\
  golib/swig\
+ golib/python\
  golib/matlab\
  golib/gui\
  golib/gl\
