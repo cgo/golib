@@ -647,16 +647,22 @@ bool goMath::ddy2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retVa
 }
 
 template <class Tx, class Tret>
-static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h)
 {
     if (retValue.getSizeX() != x.getSizeX() ||
         retValue.getSizeY() != x.getSizeY() ||    
         retValue.getSizeZ() != x.getSizeZ() ||
         retValue.getChannelCount() != x.getChannelCount())
     {
-        retValue.make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
-                       x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
-                       1, 1, 1, x.getChannelCount());
+        goSignal3D<void>* sig = dynamic_cast<goSignal3D<void>*> (&retValue);
+        if (!sig)
+        {
+            goLog::error ("goMath::centralDifferences(): retValue is of wrong size and not a goSignal3D<void> -- can not re-allocate it.");
+            return false;
+        }
+        sig->make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
+                   x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
+                   1, 1, 1, x.getChannelCount());
     }
     goSignal3DGenericConstIterator itX (&x);
     goSignal3DGenericIterator itResult (&retValue);
@@ -752,7 +758,7 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3D<void
 }
 
 template <class T>
-static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h)
 {
     switch (retValue.getDataType().getID())
     {
@@ -773,7 +779,7 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
  * @param x          Data grid.
  * @param retValue   Contains finite differences after the function returns true.
  *                   If the size of retValue does not match the size of
- *                   x, retValue
+ *                   x and retValue is a goSignal3D<void>, retValue
  *                   will be resized to the size of x, including number of channels, 
  *                   blocksize of x and border of 1 in each direction.
  * @param dimension  Dimension (0, 1, or 2 for x, y, or z)
@@ -787,7 +793,7 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3D<void>
  * @return  True if successful, false otherwise.
  * @author Christian Gosch
  */
-bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension, goDouble h)
+bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h)
 {
     switch (x.getDataType().getID())
     {

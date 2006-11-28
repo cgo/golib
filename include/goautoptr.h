@@ -36,6 +36,26 @@ class goRRefPtr
             this->myPtr = other.myPtr;
         };
 
+        bool operator== (const goRRefPtr<T>& other) const
+        {
+            return this->myPtr == other.myPtr;
+        };
+
+        bool operator!= (const goRRefPtr<T>& other) const
+        {
+            return !(*this == other);
+        };
+
+        bool operator== (const T* p) const
+        {
+            return p == myPtr;
+        };
+
+        bool operator!= (const T* p) const
+        {
+            return !(*this == p);
+        };
+        
         int incRef ()
         {
             ++myRefCount;
@@ -171,6 +191,28 @@ class goAutoPtr
             return *this;
         };
 
+        bool operator== (const goAutoPtr<T>& other) const
+        {
+            return myRRefPtr == other.myRRefPtr;
+        };
+
+        bool operator!= (const goAutoPtr<T>& other) const
+        {
+            return !(*this == other);
+        };
+        
+        bool operator== (const T* p) const
+        {
+            if (!myRRefPtr)
+                return !p;
+            return *myRRefPtr == p;
+        };
+
+        bool operator!= (const T* p) const
+        {
+            return !(*this == p);
+        };
+        
         /** 
          * @brief The usual unary operator*().
          * 

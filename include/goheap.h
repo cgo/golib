@@ -3,6 +3,10 @@
 
 #include <gotypes.h>
 
+/**
+* \addtogroup data
+* @{
+*/
 /** 
  * \brief Binary heap implementation.
  */
@@ -105,6 +109,8 @@ class goHeap
         goSize_t myHeapSize;
         goSize_t myArraySize;
 };
-
+/**
+* @}
+*/
 
 #endif

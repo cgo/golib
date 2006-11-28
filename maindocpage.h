@@ -12,25 +12,47 @@
  * goLib is a C++ class library written by 
  * Christian Gosch</a>.
  * It contains some classes which have proven useful to me, like 
- * - Arrays, strings, lists, hashtables, binary trees, and so forth
- * - Multithreading wrappers (goThreadObject and related) and a process
- *   class (goProcess) to start new processes
- * - A class for grabbing frames from a video4linux device (recent, goVideoCapture)
- * - Some small matlab modules to use some functionality under matlab
- * - A matlab interface to use matlab engines from C++ and swap data
- *   between the two (you need matlab for the latter two, of course)
- * - Classes for image processing, like container classes for 3D grid data 
- *   (source tree under src/signal), wrapper for writing and reading images (goFileIO)
+ * - <b>Arrays, strings, lists, hashtables, binary trees, heaps</b> and so forth
+ * - <b>Multithreading</b> wrappers (goThreadObject and related) 
+ * - A class for grabbing frames from a <b>video4linux</b> device (recent, goVideoCapture)
+ *   including some small matlab mex modules to use v4l under matlab
+ * - Classes for <b>image processing</b>, like container classes for <b>3D grid data</b>
+ *   which supports multi-channel data
+ *   (source tree under src/signal), wrapper for <b>writing and reading images</b> (goFileIO)
  *   which rely on libdevil
- * - Some limited matrix and vector classes, and (more recently added) a sparse matrix class (which is subject to change if sparse BLAS will be used).
- * - Few numerical routines, like the ones from the free TNT library (incorporated in the code
- *   and marked as such) and the standard conjugate gradients method for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
- *   for solving linear systems, Eigenvalues of complex Hermitian matrices.
- * - An interface to gnuplot (goPlotter, goMultiPlotter)
+ * - A <b>file system interface</b> in goFileIO to do some basic tasks like
+ *   reading/writing ASCII files, checking for file existance, making directories, and so on.
+ * - Some <b>matrix and vector classes</b>, and a sparse matrix class 
+ *   that acts mainly as a golib-side representation of sparse matrices for the Matlab
+ *   interface
+ * - Few <b>numerical linear algebra routines</b>, 
+ *   like the ones from the free TNT library (incorporated in the code
+ *   and marked as such) and the standard conjugate gradients method 
+ *   for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
+ *   for solving linear systems, Eigenvalues of complex Hermitian matrices (the latter from
+ *   SEISPACK).
+ * - An interface to <b>gnuplot</b> (goPlotter, goMultiPlotter)
  * - A few networking classes (not well tested)
- * - Interface to some file system functions (in goFileIO), 
- *   external program calls (goProcess)
+ * - A <b>process interface</b> for external program calls (goProcess)
  * - ... it's slowly growing as I find use for more stuff :)
+ *
+ * There are also additional libraries which use golib and are all included 
+ * in the distribution:
+ * - A <b>matlab interface wrapper</b>  
+ *   to use matlab engines from C++ and swap data
+ *   between the two (you need matlab for this, of course)
+ * - A GUI base library using gtkmm, a (very good) C++ wrapper for gtk+
+ *   <ul>
+ *   <li>http://www.gtkmm.org</li>
+ *   </ul>
+ *   You need version 2.4 of gtkmm for the GUI library.
+ * - A small OpenGL helper library (quite recent and currently very small).
+ *   You need OpenGL libraries to use this.
+ * 
+ * All additional libraries can be selected to be built from the ccmake
+ * interface. However, build and install golib itself first, without
+ * selecting additional libraries (since they rely on finding golib).
+ * See the building instructions further below.
  *
  * \par 
  * <strong>Important notice:</strong> All of this was made because I had
@@ -44,7 +66,24 @@
  * are used by me a lot and therefore
  * get more bug fixing than other classes like the network server or 
  * similar).
- * \subsection intro3 Scripting with Guile Scheme (EXPERIMENTAL and very recent)
+ * \subsection intro3 Scripting using SWiG
+ * \subsubsection intro31 Python
+ * I have recently tried Python and it fits quite well into
+ * my programming habits and environment. Therefore,
+ * I will continue work on the Python interface for golib and
+ * neglect other interpreted languages.
+ * The Python module can be selected in the ccmake interface,
+ * but should only be built when libGo has been built and installed.
+ * The matlab module also provides for a Python interface,
+ * which will automatically be built if you select to build the Python and
+ * the Matlab interface in cmake/ccmake.
+ * You should also select the install directory for your Python modules
+ * in cmake/ccmake (the directory where the environment variable 
+ * PYTHONPATH points to).
+ * You do need SWiG >= 1.3.29 and Python >= 2.4 for this. It might work
+ * with different versions, but was tried only with these.
+ * 
+ * \subsubsection intro32 Guile Scheme (not recommended, discontinued)
  * If you have GNU Guile >= 1.6.7, you can use Guile's implementation of the Scheme
  * programming language to write scripts that use the functionality of golib.
  * In the directory <code>swig</code>, you will find code and a CMakeLists.txt
@@ -63,21 +102,23 @@
  * 
  * \section howto How to build and use
  *	\subsection pre Prerequisites
- *	 You will need:
+ *	 You will definitely need:
  *	 - A recent cmake: http://www.cmake.org
  *	 - GNU compiler collection (gcc) with C++ -- other compilers may work but were not tested.
  *	 - ATLAS generated CBLAS library: http://math-atlas.sourceforge.net/  for some matrix and vector operations<br>
+ *	 - CLAPACK, the C implementation of LAPACK. Use liblapack_atlas if you use ATLAS.
  *	 You may replace ATLAS with another CBLAS implementation. In that case, you have to remove the ATLAS library from
  *	 CMakeFiles.txt and only leave CBLAS.
  *
- *	 Optional, but highly recommended:
- *	 - Developer's Image Library: http://openil.sourceforge.net<br>
+ *	 Optional, but very highly recommended:
+ *	 - <b>Developer's Image Library: http://openil.sourceforge.net</b><br>
  *	 You need this in order to load and store image files with goFileIO:: methods.
  *
  *	 Completely optional:
  *	 - SWiG: http://www.swig.org
+ *	 - Python 2.4: http://www.python.org
  *	 - Guile: http://www.gnu.org/software/guile<br>
-*	 These are both needed to build the golib_guile module for guile.
+ *	 These are both needed for the respective modules for golib.
  *
  *	 You will always need the pthread library to compile goLib. It is
  *	 available in many modern Unix environments.
@@ -93,30 +134,6 @@
  *	 see below), you need swig (http://www.swig.org) and libguile
  *	 (http://www.gnu.org/software/guile).
  *
- *	\subsection build Compilation
- *  Using CMake:
- *  - If you don't have it, get it at http://www.cmake.org
- *  - In the main distribution directory, say, ~/golib, do
- *    <ul>
- *      <li>mkdir build</li>
- *      <li>cd build</li>
- *      <li>cmake ..  or  ccmake ..</li>
- *      <li>make</li>
- *      <li>(and if you like) make install</li>
- *    </ul>
- * 
- *	DEPRECATED: Using GNU Autotools
- * 	In the main distribution directory, say, ~/golib,
- *	do the following:
- *	<ul>
- *		<li>./configure</li>
- *		<li>make</li>
- *	</ul>
- * 	If the configure script fails, check for error messages and fix the
- *	errors (e.g., missing libraries).
- *	Depending on the library version, there are some custom command line options
- *	for the configure script. To get a list, type ./configure --help in the
- * 	shell.
  * 	\subsection env Environment variables
  * 	You need to set:
  * 	- GOPATH to the golib base directory.
@@ -126,6 +143,11 @@
  * 	  <code>setenv GOPATH /home/user/golib</code><br>
  * 	  in bash, you would do<br>
  * 	  <code>export GOPATH=/home/user/golib</code><br>
+ * 	- MATLAB should point to your Matlab installation path,
+ * 	  if you want to build the Matlab module. E.g., <br>
+ * 	    setenv MATLAB /usr/opt/matlab
+ * 	- PYTHONPATH after installing the Python language modules
+ * 	  in order to use the modules from Python.
  *
  * 	You may have to set:
  * 	- LD_LIBRARY_PATH accordingly, depending on where you install golib
@@ -139,6 +161,28 @@
  *	 environment variable GOPATH to the root path of the golib distribution,
  *	 for example to /home/myUserName/golib.
  * 	 The example programs in the distribution need this variable to be set.
+ *
+ *	\subsection build Compilation
+ *  Using CMake:
+ *  - If you don't have it, get it at http://www.cmake.org
+ *  - I recommend using the newest version, as of now that is 2.4
+ *  - In the main distribution directory, say, ~/golib, do
+ *    <ul>
+ *      <li>mkdir build</li>
+ *      <li>cd build</li>
+ *      <li>cmake ..  or  ccmake ..</li>
+ *      <li>  --> select no additional modules
+ *      <li>make</li>
+ *      <li>make install</li>
+ *      <li>If you like to build some additional modules, do<br>
+ *          ccmake<br>
+ *            --> select additional modules, like the Matlab module, GTKMM GUI module,
+ *            Python module, etc., and do<br>
+ *           make<br>
+ *           make install<br>
+ *          again.
+ *    </ul>
+ * 
  *	\subsection examples Examples
  *	 There are several little example programs in $(GO_PATH)/examples.
  *	 For more recent examples, there is a subdirectory for each example.

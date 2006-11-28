@@ -1,4 +1,4 @@
-#ifndef GOMATH_H
+#ifndef GOMATH_H 
 #define GOMATH_H
 
 #include <math.h>
@@ -145,7 +145,7 @@ goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
  */
 bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, goDouble hx, goDouble hy, goSignal3D<void>& retValue);
 
-/** 
+/* 
  * @brief Central differences of a signal.
  * 
  * @param x Input signal.
@@ -155,7 +155,7 @@ bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, g
  * 
  * @return True if successful, false otherwise.
  */
-bool centralDifferences (const goSignal3DBase<void>& x, goSignal3D<void>& retValue, int dimension = 0, goDouble h = 1.0);
+bool centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0);
 
 /** 
  * @brief Conjugate gradients solver.
