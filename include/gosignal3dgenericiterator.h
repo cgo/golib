@@ -76,9 +76,33 @@
 class goSignal3DGenericIterator
 {
     public:
-        goSignal3DGenericIterator  (goSignal3DBase<void>* s);
-        goSignal3DGenericIterator  (const goSignal3DGenericIterator& other);
-        ~goSignal3DGenericIterator ();
+        goSignal3DGenericIterator  (goSignal3DBase<void>* s)
+        : sig (s),
+            dx (NULL), dy (NULL), dz (NULL),
+            dxStart (NULL), dyStart (NULL), dzStart (NULL),
+            px (NULL), py (NULL), pz (NULL),
+            posX (0) , posY (0) , posZ (0),
+            maxX (s->getSizeX()-1), maxY (s->getSizeY()-1), maxZ(s->getSizeZ()-1)
+            {
+                this->setPosition (0,0,0);
+                dxStart = dx;
+                dyStart = dy;
+                dzStart = dz;
+            };
+
+        goSignal3DGenericIterator  (const goSignal3DGenericIterator& other)
+        : sig (other.sig),
+            dx (NULL), dy (NULL), dz (NULL),
+            px (NULL), py (NULL), pz (NULL),
+            posX (0) , posY (0) , posZ (0)
+            {
+                // Standard operator=()
+                *this = other;
+            };
+
+        ~goSignal3DGenericIterator ()
+        {
+        };
         
         /**
          * @brief Sets the iterator position to x,y,z in the signal.
@@ -184,7 +208,14 @@ class goSignal3DGenericIterator
             py   = pz;
             resetX ();
         };
-        void     resetZ      ();
+        void     resetZ      ()
+        {
+            dz   = sig->getZDiff();
+            posZ = 0;
+            pz   = (goByte*)sig->getPtr(0,0,0);
+            resetY ();
+            resetX ();
+        };
         /** 
          * @return Pointer to the data element at the current iterator position.
          */
@@ -221,12 +252,212 @@ class goSignal3DGenericIterator
         goIndex_t             maxZ;
 };
 
+template <class T>
+class goSignal3DGenericIterator2
+{
+    public:
+        goSignal3DGenericIterator2  (goSignal3DBase<void>* s)
+        : sig (s),
+            dx (NULL), dy (NULL), dz (NULL),
+            dxStart (NULL), dyStart (NULL), dzStart (NULL),
+            px (NULL), py (NULL), pz (NULL),
+            posX (0) , posY (0) , posZ (0),
+            maxX (s->getSizeX()-1), maxY (s->getSizeY()-1), maxZ(s->getSizeZ()-1)
+            {
+                this->setPosition (0,0,0);
+                dxStart = dx;
+                dyStart = dy;
+                dzStart = dz;
+            };
+        goSignal3DGenericIterator2  (const goSignal3DGenericIterator2<T>& other)
+        : sig (other.sig),
+            dx (NULL), dy (NULL), dz (NULL),
+            px (NULL), py (NULL), pz (NULL),
+            posX (0) , posY (0) , posZ (0)
+            {
+                // Standard operator=()
+                *this = other;
+            };
+        ~goSignal3DGenericIterator2 ()
+        {
+        };
+        
+        /**
+         * @brief Sets the iterator position to x,y,z in the signal.
+         *
+         * @param x  X position
+         * @param y  Y position
+         * @param z  Z position
+         **/
+        inline void setPosition (goIndex_t x, goIndex_t y, goIndex_t z)
+        {
+            posX = x; posY = y; posZ = z;
+            dx = sig->getXDiff() + x;
+            dy = sig->getYDiff() + y;
+            dz = sig->getZDiff() + z;
+            px = (goByte*)sig->getPtr(x,y,z);
+            py = px; // (goByte*)sig->getPtr(x,y,z);
+            pz = px; // (goByte*)sig->getPtr(x,y,z);
+        }
+        
+        /**
+         * @return True if the end of the current x-line is reached, false otherwise.
+         */
+        inline bool     endX        ()
+        {
+            return posX > maxX;
+        };
+        /**
+         * @return True if the end of the current y-plane is reached, false otherwise.
+         */
+        inline bool     endY        ()
+        {
+            return posY > maxY;
+        };
+        /**
+         * @return True if the end of the current z-plane is reached (end of the 3D signal), false otherwise.
+         */
+        inline bool     endZ        ()
+        {
+            return posZ > maxZ;
+        };
+        inline void     incrementX  ()
+        {
+            px += *dx;
+            ++posX;
+            ++dx;
+        };
+        inline void     incrementY  ()
+        {
+            py += *dy;
+            ++posY;
+            ++dy;
+        };
+        /** --------------------------------------------------------------------------
+         * @bug See todo.
+         * @todo This runs over the edge of the dz array when there is no 
+         *       border (holds for all increment functions). This leads
+         *       to an invalid read operation which may lead to problems.
+         *       Check if there is a way to fix this without having to change
+         *       all iterator calls.
+         ----------------------------------------------------------------------------*/
+        inline void     incrementZ  ()
+        {
+            pz += *dz;
+            ++posZ;
+            ++dz;
+        };
+        inline void     decrementX  ()
+        {
+            px -= *(dx-1);
+            --posX;
+            --dx;
+        };
+        inline void     decrementY  ()
+        {
+            py -= *(dy-1);
+            --posY;
+            --dy;
+        };
+        inline void     decrementZ  ()
+        {
+            pz -= *(dz-1);
+            --posZ;
+            --dz;
+        };
+        /**
+         * @brief Resets the X pointer and internals concerning X to the 
+         * beginning of the current x-line.
+         **/
+        inline void     resetX      ()
+        {
+            dx   = dxStart;
+            posX = 0;
+            px   = py;
+        };
+        /**
+         * @brief Resets the Y pointer and internals concerning Y to the 
+         * beginning of the current z-plane.
+         **/
+        inline void     resetY      ()
+        {
+            dy   = dyStart;
+            posY = 0;
+            py   = pz;
+            resetX ();
+        };
+        void     resetZ      ()
+        {
+            dz   = sig->getZDiff();
+            posZ = 0;
+            pz   = (goByte*)sig->getPtr(0,0,0);
+            resetY ();
+            resetX ();
+        };
+        /** 
+         * @return Pointer to the data element at the current iterator position.
+         */
+        inline T*  operator*   () { return (T*)px; };
+        inline T*  leftX       () { return (T*)(px - *(dx-1)); }
+        inline T*  leftY       () { return (T*)(px - *(dy-1)); }
+        inline T*  leftZ       () { return (T*)(px - *(dz-1)); }
+        inline T*  rightX      () { return (T*)(px + *dx); }
+        inline T*  rightY      () { return (T*)(px + *dy); }
+        inline T*  rightZ      () { return (T*)(px + *dz); }
+        
+        inline T* leftUp    () { return (T*)(px - *(dx-1) - *(dy-1)); }  //= Works because dy at left is the same as at px.
+        inline T* leftDown  () { return (T*)(px - *(dx-1) + *dy); }  
+        inline T* rightUp   () { return (T*)(px + *dx - *(dy-1)); }  
+        inline T* rightDown () { return (T*)(px + *dx + *dy); }  
+        
+        inline const T* operator*   ()  const { return (const T*)px; };
+       
+        goSignal3DBase<void>* sig;
+        goPtrdiff_t*          dx;
+        goPtrdiff_t*          dy;
+        goPtrdiff_t*          dz;
+        goPtrdiff_t*          dxStart;
+        goPtrdiff_t*          dyStart;
+        goPtrdiff_t*          dzStart;
+        goByte*               px;
+        goByte*               py;
+        goByte*               pz;
+        goIndex_t             posX;
+        goIndex_t             posY;
+        goIndex_t             posZ;
+        goIndex_t             maxX;
+        goIndex_t             maxY;
+        goIndex_t             maxZ;
+};
+
 class goSignal3DGenericConstIterator
 {
     public:
-        goSignal3DGenericConstIterator  (const goSignal3DBase<void>* s);
-        goSignal3DGenericConstIterator  (const goSignal3DGenericConstIterator& other);
-        ~goSignal3DGenericConstIterator ();
+        goSignal3DGenericConstIterator  (const goSignal3DBase<void>* s)
+        : sig (s),
+          dx (NULL), dy (NULL), dz (NULL),
+          dxStart (NULL), dyStart (NULL), dzStart (NULL),
+          px (NULL), py (NULL), pz (NULL),
+          posX (0) , posY (0) , posZ (0),
+          maxX (s->getSizeX()-1), maxY (s->getSizeY()-1), maxZ(s->getSizeZ()-1)
+          {
+               this->setPosition (0,0,0);
+               dxStart = dx;
+               dyStart = dy;
+               dzStart = dz;
+          };
+        goSignal3DGenericConstIterator  (const goSignal3DGenericConstIterator& other)
+            : sig (other.sig),
+              dx (NULL), dy (NULL), dz (NULL),
+              px (NULL), py (NULL), pz (NULL),
+              posX (0) , posY (0) , posZ (0)
+        {
+            // Standard operator=()
+            *this = other;
+        };
+        ~goSignal3DGenericConstIterator ()
+        {
+        };
         
         /**
          * @brief Sets the iterator position to x,y,z in the signal.
@@ -323,7 +554,14 @@ class goSignal3DGenericConstIterator
             py   = pz;
             resetX ();
         };
-        void     resetZ      ();
+        void     resetZ      ()
+        {
+            dz   = sig->getZDiff();
+            posZ = 0;
+            pz   = (goByte*)sig->getPtr(0,0,0);
+            resetY ();
+            resetX ();
+        };
         /** 
          * @return Pointer to the data element at the current iterator position.
          */

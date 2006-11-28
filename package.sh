@@ -1,6 +1,6 @@
 #!/bin/sh
 # Call this from one directory up from golib
-tar -czvh --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la" --exclude="doc/html" -f golib-`date +%Y%m%d`.tar.gz \
+tar -czvh --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" --exclude="*.o" --exclude="*.so*" --exclude="*.a" --exclude="*.la" --exclude="doc/html" --exclude="tags" -f golib-`date +%Y%m%d`.tar.gz \
  golib/AUTHORS\
  golib/COPYING\
  golib/ChangeLog\

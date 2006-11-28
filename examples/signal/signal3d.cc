@@ -7,6 +7,8 @@
 #include <gosignalmacros.h>
 #include <gosignal3dgenericiterator.h>
 #include <gofilter3d.h>
+#include <gotimerobject.h>
+#include <gomatrix.h>
 
 void printSignal (goSignal3DBase<void>& signal)
 {
@@ -143,6 +145,57 @@ void printWithPointers (goSignal3D<void>& signal)
 
 int main (void)
 {
+    //= Performance test
+    {
+        goSignal3D<void> sig;
+        sig.setDataType (GO_FLOAT);
+        goSize_t w = 2*1470;
+        goSize_t h = 2*1600;
+        sig.make (w, h, 1, 16, 16, 1, 3, 3, 0, 1);
+        goTimerObject timer;
+        goMatrixf M (h, w);
+        timer.startTimer();
+        for (goSize_t i1 = 0; i1 < 10; ++i1)
+        {
+            goFloat* p = M.getPtr ();
+            for (goSize_t y = 0; y < h; ++y)
+            {
+                for (goSize_t x = 0; x < w; ++x)
+                {
+                    *p *= 5.0f;
+                    ++p;
+                }
+            }
+        }
+        timer.stopTimer();
+        printf ("Matrix time: %f\n", timer.getTimerSeconds());
+        timer.startTimer();
+        for (goSize_t i1 = 0; i1 < 10; ++i1)
+        {
+            //goSignal3DGenericIterator2<goFloat> it (&sig);
+            goSignal3DGenericIterator it (&sig);
+            while (!it.endZ())
+            {
+                it.resetY();
+                while (!it.endY())
+                {
+                    it.resetX();
+                    while (!it.endX())
+                    {
+                        *(goFloat*)*it *= 5.0;
+                        it.incrementX();
+                    }
+                    it.incrementY();
+                }
+                it.incrementZ();
+            }
+        }
+        timer.stopTimer();
+        printf ("sig time: %f\n", timer.getTimerSeconds());
+
+        exit (1);
+    }
+
     {
         goSignal3D<void> s1;
         goSignal3D<void> s2;

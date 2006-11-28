@@ -292,6 +292,7 @@ static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>
  *                   input and output types are void and must be
  *                   of the same size as inSignal.
  *
+ *
  * @return True if successful, false otherwise.
  **/
 template<> bool

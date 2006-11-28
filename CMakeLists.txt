@@ -85,7 +85,7 @@ SET                 (SOURCES
  src/signal/gosignalhelper.cpp 
  src/signal/gohistogram.cpp 
  src/signal/gosignal3diterator.cpp 
- src/signal/gosignal3dgenericiterator.cpp
+ # src/signal/gosignal3dgenericiterator.cpp
  src/system/godirectory.cc
  src/system/goprocess.cc
  src/system/goenvironment.cpp

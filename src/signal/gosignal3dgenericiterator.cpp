@@ -10,6 +10,7 @@
 #include <gosignal3dbase.h>
 #include <gosignal3dgenericiterator.h>
 
+#if 0
 goSignal3DGenericIterator::goSignal3DGenericIterator (goSignal3DBase<void>* s)
     : sig (s),
       dx (NULL), dy (NULL), dz (NULL),
@@ -69,7 +70,7 @@ void goSignal3DGenericIterator::resetZ ()
     resetY ();
     resetX ();
 }
-
+#endif
 
 /**
  * @brief Sets the iterator position to x,y,z in the signal.

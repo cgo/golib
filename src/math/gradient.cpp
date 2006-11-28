@@ -757,18 +757,175 @@ static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3DBase<
     return true;
 }
 
-template <class T>
-static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h)
+template <class Tx, class Tret>
+static bool centralDifferences2_ (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h, const goSignal3DBase<void>* mask)
 {
-    switch (retValue.getDataType().getID())
+    if (mask->getDataType().getID() != GO_INT8)
     {
-        case GO_FLOAT: return centralDifferences2_<T, goFloat> (x,retValue,dimension, h); break; 
-        case GO_DOUBLE: return centralDifferences2_<T, goDouble> (x,retValue,dimension, h); break; 
+        goLog::error ("centralDifferences2_(): mask must be GO_INT8.");
+        return false;
+    }
+    if (retValue.getSizeX() != x.getSizeX() ||
+        retValue.getSizeY() != x.getSizeY() ||    
+        retValue.getSizeZ() != x.getSizeZ() ||
+        retValue.getChannelCount() != x.getChannelCount())
+    {
+        goSignal3D<void>* sig = dynamic_cast<goSignal3D<void>*> (&retValue);
+        if (!sig)
+        {
+            goLog::error ("goMath::centralDifferences(): retValue is of wrong size and not a goSignal3D<void> -- can not re-allocate it.");
+            return false;
+        }
+        sig->make (x.getSizeX(), x.getSizeY(), x.getSizeZ(),
+                   x.getBlockSizeX(), x.getBlockSizeY(), x.getBlockSizeZ(),
+                   1, 1, 1, x.getChannelCount());
+    }
+    goSignal3DGenericConstIterator itX (&x);
+    goSignal3DGenericConstIterator itMask (mask);
+    goSignal3DGenericIterator itResult (&retValue);
+
+    goDouble h2 = 1.0 / (2*h);
+    goSize_t channelCount = retValue.getChannelCount();
+    
+    switch (dimension)
+    {
+        case 0:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    itMask.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        itMask.resetX();
+                        while (!itX.endX())
+                        {
+                            if (*(goInt8*)*itMask != 0)
+                            {
+                                for (goSize_t i = 0; i < channelCount; ++i)
+                                    *((Tret*)*itResult + i) = (*((const Tx*)itX.rightX() + i) - *((const Tx*)itX.leftX() + i)) * h2;
+                            }
+                            itX.incrementX();
+                            itResult.incrementX();
+                            itMask.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                        itMask.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                    itMask.incrementZ();
+                }
+            }
+            break;
+        case 1:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    itMask.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        itMask.resetX();
+                        while (!itX.endX())
+                        {
+                            if (*(goInt8*)*itMask != 0)
+                            {
+                                for (goSize_t i = 0; i < channelCount; ++i)
+                                    *((Tret*)*itResult + i) = (*((const Tx*)itX.rightY() + i) - *((const Tx*)itX.leftY() + i)) * h2;
+                            }
+                            itX.incrementX();
+                            itResult.incrementX();
+                            itMask.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                        itMask.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                    itMask.incrementZ();
+                }
+            }
+            break;
+        case 2:
+            {
+                while (!itX.endZ())
+                {
+                    itX.resetY();
+                    itResult.resetY();
+                    itMask.resetY();
+                    while (!itX.endY())
+                    {
+                        itX.resetX();
+                        itResult.resetX();
+                        itMask.resetX();
+                        while (!itX.endX())
+                        {
+                            if (*(goInt8*)*itMask != 0)
+                            {
+                                for (goSize_t i = 0; i < channelCount; ++i)
+                                    *((Tret*)*itResult + i) = (*((const Tx*)itX.rightZ() + i) - *((const Tx*)itX.leftZ() + i)) * h2;
+                            }
+                            itX.incrementX();
+                            itResult.incrementX();
+                            itMask.incrementX();
+                        }
+                        itX.incrementY();
+                        itResult.incrementY();
+                        itMask.incrementY();
+                    }
+                    itX.incrementZ();
+                    itResult.incrementZ();
+                    itMask.incrementZ();
+                }
+            }
+            break;
         default:
             {
-                goLog::error ("centralDifferencesX(): Unsupported data type for retValue.");
+                goLog::error ("goMath::centralDifferences(): Only dimensions 0,1,2 are valid.");
                 return false;
             }
+            break;
+    }
+    return true;
+}
+
+template <class T>
+static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h, const goSignal3DBase<void>* mask)
+{
+    if (mask)
+    {
+        switch (retValue.getDataType().getID())
+        {
+            case GO_FLOAT: return centralDifferences2_<T, goFloat> (x,retValue,dimension, h, mask); break; 
+            case GO_DOUBLE: return centralDifferences2_<T, goDouble> (x,retValue,dimension, h, mask); break; 
+            default:
+                            {
+                                goLog::error ("centralDifferencesX(): Unsupported data type for retValue.");
+                                return false;
+                            }
+        }
+    }
+    else
+    {
+        switch (retValue.getDataType().getID())
+        {
+            case GO_FLOAT: return centralDifferences2_<T, goFloat> (x,retValue,dimension, h); break; 
+            case GO_DOUBLE: return centralDifferences2_<T, goDouble> (x,retValue,dimension, h); break; 
+            default:
+                            {
+                                goLog::error ("centralDifferencesX(): Unsupported data type for retValue.");
+                                return false;
+                            }
+        }
     }
     return false;
 }
@@ -784,6 +941,8 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3DBase<v
  *                   blocksize of x and border of 1 in each direction.
  * @param dimension  Dimension (0, 1, or 2 for x, y, or z)
  * @param h          Grid spacing (default 1)
+ * @param mask       Optional mask of type goInt8. If given, central differences are only calculated where mask is != 0.
+ *                   The other values in retValue are not changed. Default: NULL.
  * 
  * @note Only goFloat and goDouble data are supported. The data types of x and retValue may differ.
  *       Both are given by the user, so the data type of retValue must be set before calling 
@@ -793,12 +952,12 @@ static bool centralDifferences_ (const goSignal3DBase<void>& x, goSignal3DBase<v
  * @return  True if successful, false otherwise.
  * @author Christian Gosch
  */
-bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h)
+bool goMath::centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension, goDouble h, const goSignal3DBase<void>* mask)
 {
     switch (x.getDataType().getID())
     {
-        case GO_FLOAT: return centralDifferences_<goFloat> (x,retValue,dimension,h); break;
-        case GO_DOUBLE: return centralDifferences_<goDouble> (x,retValue,dimension,h); break;
+        case GO_FLOAT: return centralDifferences_<goFloat> (x,retValue,dimension,h,mask); break;
+        case GO_DOUBLE: return centralDifferences_<goDouble> (x,retValue,dimension,h,mask); break;
         default:
             {
                 goLog::error ("centralDifferences(): Unsupported data type for x.");

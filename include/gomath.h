@@ -132,7 +132,7 @@ bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 template <class T>
 goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
 
-/** 
+/* 
  * @brief Divergence of a 2D vector field.
  * 
  * @param x x component.
@@ -143,7 +143,7 @@ goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
  * 
  * @return True if successful, false otherwise.
  */
-bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, goDouble hx, goDouble hy, goSignal3D<void>& retValue);
+bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, goDouble hx, goDouble hy, goSignal3D<void>& retValue, const goSignal3DBase<void>* mask = 0);
 
 /* 
  * @brief Central differences of a signal.
@@ -152,10 +152,11 @@ bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, g
  * @param retValue Central difference values.
  * @param dimension One of {0,1,2}
  * @param h Grid spacing.
+ * @param mask Optional goInt8 mask.
  * 
  * @return True if successful, false otherwise.
  */
-bool centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0);
+bool centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0, const goSignal3DBase<void>* mask = 0);
 
 /** 
  * @brief Conjugate gradients solver.

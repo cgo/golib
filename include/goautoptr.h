@@ -233,6 +233,20 @@ class goAutoPtr
             return myRRefPtr->myPtr;
         };
 
+        operator T* () 
+        {
+            if (!myRRefPtr)
+                return 0;
+            return myRRefPtr->myPtr;
+        };
+
+        operator const T* () const
+        {
+            if (!myRRefPtr)
+                return 0;
+            return myRRefPtr->myPtr;
+        };
+
     private:
         goRRefPtr<T>* myRRefPtr;
 };
