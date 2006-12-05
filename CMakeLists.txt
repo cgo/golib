@@ -49,8 +49,8 @@ SET                 (SOURCES
  src/math/gobiorthowavelet.cpp
  src/math/divergence.cpp
  src/math/vectormult.cpp
- src/math/mean.cpp
- src/math/variance.cpp
+ # src/math/mean.cpp
+ # src/math/variance.cpp
  src/math/integrate.cpp
  src/math/getroots.cpp
  src/misc/gosingleplot.cpp
@@ -73,6 +73,7 @@ SET                 (SOURCES
  src/network/gonetwork.cc 
  src/network/goserver.cc
  src/nifty/gorandom.cc
+ src/signal/gosignal3dref.cpp
  src/signal/gogaussimage.cpp
  src/signal/gosignal3dbase.cpp 
  src/signal/gosubsignal3d.cc 

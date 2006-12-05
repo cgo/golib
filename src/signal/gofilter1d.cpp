@@ -10,6 +10,7 @@
 #include <gofilter1d.h>
 #include <gosignal3dgenericiterator.h>
 #include <gosignal3d.h>
+#include <gosignal3dref.h>
 #include <goarray.h>
 #include <golog.h>
 
@@ -138,7 +139,7 @@ bool goFilter1D::setCenter (goIndex_t c)
 }
 
 template <class T>
-inline void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_t center)
+static inline void _filter (goSignal3DBase<void>& sig, goArray<goFloat>& mask, goIndex_t center)
 {
     goSignal3DGenericIterator it (&sig);
     goIndex_t maskSize = mask.getSize();
@@ -233,6 +234,30 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
     }
     sig.setChannel (orgChan);
     return true;
+}
+
+template <class T, int type_enum>
+static inline bool _filterMatrix (goMatrix<T>& m, goArray<goFloat>& mask, goIndex_t center, int direction)
+{
+    goSize3D sz (m.getColumns(), m.getRows(), 1);
+    //= "Simulate" the stride (not implemented in matrices yet) with number of channels -- 
+    //= then filter only the first channel.
+    goSignal3DRef refSig (m.getPtr(), type_enum, sz, sz, goSize3D(mask.getSize(), mask.getSize(), 0), 1); // m.getStride());
+    if (direction == 1)
+        refSig.swapXY();
+
+    _filter<T> (refSig, mask, center);
+    return true;
+}
+
+bool goFilter1D::filter (goMatrixf& m, int direction)
+{
+    return _filterMatrix<goFloat,GO_FLOAT> (m, myPrivate->mask, myPrivate->center, direction);
+}
+
+bool goFilter1D::filter (goMatrixd& m, int direction)
+{
+    return _filterMatrix<goDouble,GO_DOUBLE> (m, myPrivate->mask, myPrivate->center, direction);
 }
 
 /**

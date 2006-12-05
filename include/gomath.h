@@ -27,7 +27,16 @@
 namespace goMath
 {
     extern const goFloat epsilon;
-    
+   
+    template <class T>
+        T mod (T value, T modulus)
+        {
+            T m = value % modulus;
+            if (m < 0)
+                m = modulus + m;
+            return m;
+        }
+
 /**
  * \addtogroup math
  * @{
@@ -186,15 +195,101 @@ bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t point
 
 bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
+/** 
+ * @brief Mean calculation.
+ *
+ * Slow implementation but prevents overflows.
+ * 
+ * @param v  Vector.
+ * @param sz Number of elements in v.
+ * 
+ * @return Mean.
+ */
 template <class vectorT, class T>
-T mean (const vectorT&, goSize_t sz);
+T mean (const vectorT& v, goSize_t sz)
+{
+    goSize_t i;
+    goDouble accum = 0.0;
+    goDouble f = 1.0;
+    for (i = 0; i < sz; ++i, f += 1.0)
+    {
+        accum = (accum * i + v[i]) / f;
+    }
+    return static_cast<T>(accum);
+}
+
+/** 
+ * @brief Mean calculation.
+ *
+ * Fast implementation but can overflow (values are added, then divided once).
+ * 
+ * @param v  Vector.
+ * @param sz Number of elements in v.
+ * 
+ * @return Mean.
+ */
 template <class vectorT, class T>
-T fastMean (const vectorT&, goSize_t sz);
+T fastMean (const vectorT& v, goSize_t sz)
+{
+    goSize_t i;
+    goDouble accum = 0.0;
+    for (i = 0; i < sz; ++i)
+    {
+        accum += v[i];
+    }
+    return static_cast<T>(accum / static_cast<goDouble>(sz));
+}
+template <class vectorT, class T>
+T variance (const vectorT& v, goSize_t sz, T mean)
+{
+    goDouble accum = 0.0;
+    goSize_t i;
+    goDouble temp;
+    goDouble f = 1.0;
+    for (i = 0; i < sz; ++i, f += 1.0)
+    {
+        temp = v[i] - mean;
+        accum = (accum * T(i) + temp * temp) / f;
+    }
+    return static_cast<T>(accum);
+}
 
 template <class vectorT, class T>
-T variance (const vectorT&, goSize_t sz, T mean);
+T fastVariance (const vectorT& v, goSize_t sz, T mean)
+{
+    goDouble accum = 0.0;
+    goSize_t i;
+    goDouble temp;
+    for (i = 0; i < sz; ++i)
+    {
+        temp = v[i] - mean;
+        accum += temp * temp;
+    }
+    return static_cast<T>(accum / static_cast<goDouble>(sz - 1));
+}
+
 template <class vectorT, class T>
-T fastVariance (const vectorT&, goSize_t sz, T mean);
+void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
+{
+    if (sz < 2)
+    {
+        return;
+    }
+    for (goSize_t i = 1; i < sz - 1; ++i)
+    {
+        ret[i] = (v[i + 1] - v[i - 1]) * 0.5;
+    }
+    if (periodic)
+    {
+        ret[0] = (v[1] - v[sz - 1]) * 0.5f;
+        ret[sz - 1] = (v[0] - v[sz - 2]) * 0.5f;
+    }
+    else
+    {
+        ret[0] = 0.0;
+        ret[sz - 1] = 0.0;
+    }
+}
 
 template <class vectorT, class T>
 T integrate (const vectorT& x, const vectorT& y, goSize_t sz);

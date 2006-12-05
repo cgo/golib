@@ -29,13 +29,14 @@ namespace goGUI
     class OFFViewPrivate
     {
         public:
-            OFFViewPrivate () : rotationAngles (3)
+            OFFViewPrivate () : rotation (3)
             {
-                rotationAngles.fill (0.0f);
+                rotation.fill (0.0f);
+                rotation[0] = 1.0f;
             };
             ~OFFViewPrivate () {};
 
-            goVectorf rotationAngles;
+            goVectorf rotation;
     };
 }
 
@@ -44,6 +45,7 @@ goGUI::OFFView::OFFView ()
       off (), myList (1), myRotation (), myPrivate (0)
 {
     myPrivate = new OFFViewPrivate;
+    //= Unused.
     myRotation.setRotation (0.0f, go3Vector<goFloat> (1.0f, 0.0f, 0.0f));
 }
 
@@ -85,11 +87,11 @@ void goGUI::OFFView::align ()
 
 void goGUI::OFFView::lighting ()
 {
-    GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat mat_shininess[] = { 50.0 };
-    GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+    GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 0.0 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
     check_gl_error ("lighting1");
@@ -103,18 +105,20 @@ void goGUI::OFFView::lighting ()
     // const float pos[] = {this->off.getMax()[0] + 5.0f, this->off.getMax()[0] + 5.0, this->off.getMax()[0] + 5.0, 1.0f};
     // goVectorf center = (this->off.getMax() + this->off.getMin()) * 0.5f;
     // const float dir[] = {center[0] - pos[0], center[1] - pos[1], center[2] - pos[2]};
-    const float pos1[] = {-0.2, -0.2, 0.0, 1.0};
-    const float dir1[] = {1.0, 1.0, 0.0, 1.0};
-    const float pos2[] = {0.2, 0.2, 0.0, 1.0};
-    const float dir2[] = {-1.0, -1.0, 0.0, 1.0};
-    glLightfv (GL_LIGHT1, GL_SPOT_DIRECTION, dir1);
+    const float pos1[] = {-2.0, 2.0, 1.0, 0.0};
+    // glLightfv (GL_LIGHT1, GL_SPOT_DIRECTION, dir1);
     check_gl_error ("lighting4");
     glLightfv (GL_LIGHT1, GL_POSITION, pos1);
     check_gl_error ("lighting5");
-    glLightfv (GL_LIGHT2, GL_SPOT_DIRECTION, dir2);
-    check_gl_error ("lighting4");
-    glLightfv (GL_LIGHT2, GL_POSITION, pos2);
-    check_gl_error ("lighting5");
+    GLfloat light1_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.5);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.2);
 
     // glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glEnable (GL_LIGHTING);
@@ -123,7 +127,8 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting7");
     glEnable (GL_LIGHT1);
     check_gl_error ("lighting8");
-    glEnable (GL_LIGHT2);
+    //glEnable (GL_LIGHT2);
+    //glEnable (GL_LIGHT3);
     check_gl_error ("lighting8");
     glDepthFunc(GL_LEQUAL);
     check_gl_error ("lighting9");
@@ -138,12 +143,12 @@ void goGUI::OFFView::lighting ()
 
 const goVectorf& goGUI::OFFView::getRotation () const
 {
-    return myPrivate->rotationAngles;
+    return myPrivate->rotation;
 }
 
 void goGUI::OFFView::setRotation (const goVectorf& r)
 {
-    myPrivate->rotationAngles = r;
+    myPrivate->rotation = r;
 }
 
 void goGUI::OFFView::glDraw ()
@@ -167,105 +172,34 @@ void goGUI::OFFView::glDraw ()
     glLoadIdentity ();
     check_gl_error ("1");
 
-    goVectorf eye (3);
-    goVectorf center (3);
-    goVectorf up (3);
-
-    eye[0] = 1.25f * goMath::max<goFloat> (fabs(max[0]), goMath::max<goFloat>(fabs(max[1]), fabs(max[2])));
-    eye[1] = 0.0f;
-    eye[2] = 0.0f;
-    // goPointCloud<goFloat>::getCenterOfMass (this->off.getVertices(), center);
-    center.fill (0.0f);
-    up[0] = 0.0f;
-    up[1] = 1.0f;
-    up[2] = 0.0f;
-#if 0
-    eye = max * 1.5f;
-    //            eye[0] = 2.0;
-    //            eye[1] = 2.0;
-    //            eye[2] = 2.0;
-    center = (max + min) * 0.5;
-    goVectorf temp = eye - center;
-    temp *= 1.0f / temp.norm2();
-    const float f[3] = {1.0f, 0.0f, 0.0f};
-    up[0] = temp[1] * f[2] - temp[2] * f[1];
-    up[1] = temp[2] * f[0] - temp[0] * f[2];
-    up[2] = temp[0] * f[1] - temp[1] * f[0];
-    if (up.norm2() < 1e-3)
-    {
-        const float f[3] = {0.0f, 1.0f, 0.0f};
-        up[0] = temp[1] * f[2] - temp[2] * f[1];
-        up[1] = temp[2] * f[0] - temp[0] * f[2];
-        up[2] = temp[0] * f[1] - temp[1] * f[0];
-    }
-    up *= 1.0 / up.norm2();
-#endif
-
-    gluLookAt(eye[0], eye[1], eye[2],
-            center[0], center[1], center[2],
-            up[0], up[1], up[2]);
-
-    printf ("Up: %f %f %f\n", up[0], up[1], up[2]);
-    printf ("center: %f %f %f\n", center[0], center[1], center[2]);
-    printf ("eye: %f %f %f\n", eye[0], eye[1], eye[2]);
-
-    //= Rotation via mouse -- does not work right.
-#if 0
-    goVectorf rotMovement = this->getRotationEnd() - this->getRotationStart();
-    goFloat rotNorm = rotMovement.norm2 ();
-    if (fabs(rotNorm) > 1e-2)
-        //= Calculate rotation in object coordinates.
-    {
-        rotMovement *= 1.0f / rotNorm;
-
-        go3Vector<goFloat> axis;
-        axis.x = rotMovement[1];
-        axis.y = rotMovement[0]; //-temp[0]; // y-Koordinate negiert, weil GL genau die
-        // entgegengerichtete y-Achse benutzt.
-        axis.z = 0.0f;
-        {
-            //= Find camera coordinate system
-            go3Vector<goFloat> e2_ (up[0], up[1], up[2]);
-            go3Vector<goFloat> e3_ (temp[0], temp[1], temp[2]);
-            e3_ *= 1.0f / e3_.abs();
-            go3Vector<goFloat> e1_ = e2_;
-            e1_.cross (e3_);
-            e1_ *= 1.0f / e1_.abs();
-            go3Vector<goFloat> e1 (e1_.x, e2_.x, e3_.x);
-            go3Vector<goFloat> e2 (e1_.y, e2_.y, e3_.y);
-            go3Vector<goFloat> e3 (e1_.z, e2_.z, e3_.z);
-
-            axis = go3Vector<goFloat> (axis * e1, axis * e2, axis * e3);
-        }
-        goQuaternion<goFloat> rot;
-        rot.setRotation (rotNorm / static_cast<float>(this->get_width() + this->get_height()) * M_PI, axis);
-        myRotation = myRotation * rot;
-
-        printf ("rotation: %f %f %f %f\n", myRotation.v.x,  myRotation.v.y, myRotation.v.z, myRotation.scalar);
-    }
-    glTranslatef (center[0], center[1], center[2]);
-    // glRotatef (rot.getRotationAngle() * 360.0f, rot.v.x, rot.v.y, rot.v.z);
-    //= Rotation around axis in camera coordinates
-    float rotMatrix [16];
-    myRotation.getRotationMatrix (rotMatrix);
-    glMultMatrixf (rotMatrix);
-    // glRotatef (myRotation.getRotationAngle() * 360.0f, corr_axis.x, corr_axis.y, corr_axis.z);
-    glTranslatef (-center[0], -center[1], -center[2]);
-#endif
     check_gl_error ("2");
 
-    glTranslatef (center[0], center[1], center[2]);
-    glRotatef (myPrivate->rotationAngles[0], 1.0f, 0.0f, 0.0f);
-    glRotatef (myPrivate->rotationAngles[1], 0.0f, 1.0f, 0.0f);
-    glRotatef (myPrivate->rotationAngles[2], 0.0f, 0.0f, 1.0f);
-    glTranslatef (-center[0], -center[1], -center[2]);
+//    if (myPrivate->rotation[1] == 0.0f)
+//    {
+//        myPrivate->rotation[1] = 0.0001f; //= bloody libc cos() ...
+//    }
+//    else if (myPrivate->rotation[1] == 180.0f)
+//    {
+//        myPrivate->rotation[1] = 180.0f - 0.0001f; //= bloody libc cos() ...
+//    }
+    goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
+    goVectorf pos (3);
+    goVectorf up (3);
+    goGL::viewSphere (myPrivate->rotation[0] / 180.0f * M_PI,
+                      temp,
+                      myPrivate->rotation[2], &pos, &up);
 
     this->lighting ();
 
-    //glPushMatrix ();
-    //glLoadIdentity ();
-    //this->lighting ();
-    //glPopMatrix ();
+    glPushMatrix ();
+    glLoadIdentity ();
+    GLfloat light_position[] = { pos[0] + up[0], pos[1] + up[1], pos[2] + up[2], 0.0 };
+    GLfloat light_dir[] = { -pos[0] - up[0], -pos[1] - up[1], -pos[2] - up[2], 1.0 };
+    glLightfv (GL_LIGHT0, GL_POSITION, light_position);
+    //glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 75.0);
+    //glLightfv (GL_LIGHT0, GL_SPOT_DIRECTION, light_dir);
+    glEnable (GL_LIGHT0);
+    glPopMatrix ();
 
     const float list_diffuse[] = {0.3f, 0.3f, 0.7f, 1.0f};
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
@@ -279,35 +213,6 @@ void goGUI::OFFView::glDraw ()
     this->swapBuffers ();
     glDisable (GL_POLYGON_SMOOTH);
     glDisable (GL_LINE_SMOOTH);
-
-    //= Some test code for getting the buffer:
-#if 0
-    {
-        goSignal3D<void> buffer;
-        buffer.setDataType (GO_UINT8);
-        buffer.make (1,1,1,
-                     1,1,1,
-                     0,0,0,1);
-        if (!goGL::getGLBuffer (buffer))
-        {
-            printf ("Error calling getGLBuffer.\n");
-        }
-        else
-        {
-            try
-            {
-                if (goFileIO::fileExists ("testimage.jpg"))
-                {
-                    goFileIO::remove ("testimage.jpg");
-                }
-                goFileIO::writeImage ("testimage.jpg", &buffer);
-            }
-            catch (goFileIOException& ex)
-            {
-            }
-        }
-    }
-#endif
 }
 
 goGL::OFFFile& goGUI::OFFView::getOFFFile ()

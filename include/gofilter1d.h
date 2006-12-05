@@ -18,6 +18,10 @@
 # include <gosignal3dbase.h>
 #endif
 
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+
 class goFilter1DPrivate;
 
 /*!
@@ -66,6 +70,8 @@ goFilter1D : public goObjectBase
         bool setMask   (const goFloat* mask, goIndex_t length);
         bool setCenter (goIndex_t c);
         bool filter    (goSignal3DBase<void>& sig);
+        bool filter    (goMatrixf& m, int direction = 0);
+        bool filter    (goMatrixd& m, int direction = 0);
         bool normalize (goDouble constant = 1.0);
         
 	private:

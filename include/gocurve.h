@@ -62,6 +62,8 @@ class goCurve : public goPointCloud<T>
         static bool writeASCII (FILE* f, const goList<goVector<T> >& ret);
 
         static goSize_t removeDuplicates (goList<goVector<T> >& pl);
+        
+        static bool     filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goVector<T> >& pl, goSize_t count = 1);
 
         bool readASCII  (FILE* f);
         bool writeASCII (FILE* f) const;

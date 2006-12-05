@@ -3,6 +3,8 @@
 #include <golist.h>
 #include <gonubs.h>
 #include <goconfig.h>
+#include <gomatrix.h>
+#include <gofilter1d.h>
 
 #ifndef GOLOG_H
 # include <golog.h>
@@ -661,7 +663,6 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
             {
                 el = pl.remove(el);
                 ++removed;
-                --sz;
             }
             else
             {
@@ -672,6 +673,49 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
         removed_total += removed;
     } while (removed > 0 );
     return removed_total;
+}
+
+/** 
+ * @brief Filter the curve points with a linear filter mask.
+ * 
+ * @param mask Mask.
+ * @param size Size of the mask.
+ * @param center Center index of the mask.
+ * @param pointList The points.
+ * @param count The number of times to apply the filter mask (default: 1)
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goCurve<T>::filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goVector<T> >& pointList, goSize_t count)
+{
+    if (pointList.isEmpty())
+        return true;
+
+    goMatrix<T> M (pointList.getFront().getSize(), pointList.getSize());
+    typename goList<goVector<T> >::Element* el = pointList.getFrontElement();
+    goSize_t sz = pointList.getSize();
+    goVector<T> column;
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        M.refColumn (i, column);
+        column = el->elem;      //= Works because column is of same size as el->elem.
+        el = el->next;
+    }
+
+    goFilter1D filter (mask, size, center);
+    for (goSize_t i = 0; i < count; ++i)
+        filter.filter (M, 0);
+
+    el = pointList.getFrontElement();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        M.refColumn (i, column);
+        el->elem = column;      //= Works because column is of same size as el->elem.
+        el = el->next;
+    }
+
+    return true;
 }
 
 template <class T>

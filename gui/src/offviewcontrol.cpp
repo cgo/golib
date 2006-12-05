@@ -9,13 +9,17 @@ namespace goGUI
             OFFViewControlPrivate ()
                 : loadButton ("Load OFF"),
                   alignButton ("Align"),
-                  angleX (0.0f, 360.0f, 1.0f),
-                  angleY (0.0f, 360.0f, 1.0f),
-                  angleZ (0.0f, 360.0f, 1.0f),
+                  phi    (-180.0f, 181.0f, 1.0f),
+                  theta  (0.0f, 181.0f, 1.0f),
+                  radius (),
                   view (0),
                   vbox (),
                   tips ()
             {
+                this->radius.set_range (0.0, 10000.0);
+                this->radius.set_digits (1);
+                this->radius.set_increments (1.0, 10.0);
+                this->radius.set_value (5.0);
             };
             ~OFFViewControlPrivate ()
             {
@@ -23,9 +27,9 @@ namespace goGUI
 
             Gtk::Button loadButton;
             Gtk::Button alignButton;
-            Gtk::HScale angleX;
-            Gtk::HScale angleY;
-            Gtk::HScale angleZ;
+            Gtk::HScale phi;
+            Gtk::HScale theta;
+            Gtk::SpinButton radius;
             Gtk::VBox   vbox;
             Gtk::Tooltips tips;
 
@@ -40,12 +44,12 @@ goGUI::OFFViewControl::OFFViewControl ()
     
     myPrivate->tips.enable ();
 
-    myPrivate->vbox.pack_start (myPrivate->angleX, Gtk::PACK_SHRINK);
-    myPrivate->vbox.pack_start (myPrivate->angleY, Gtk::PACK_SHRINK);
-    myPrivate->vbox.pack_start (myPrivate->angleZ, Gtk::PACK_SHRINK);
-    myPrivate->tips.set_tip (myPrivate->angleX, "X angle");
-    myPrivate->tips.set_tip (myPrivate->angleY, "Y angle");
-    myPrivate->tips.set_tip (myPrivate->angleZ, "Z angle");
+    myPrivate->vbox.pack_start (myPrivate->phi, Gtk::PACK_SHRINK);
+    myPrivate->vbox.pack_start (myPrivate->theta, Gtk::PACK_SHRINK);
+    myPrivate->vbox.pack_start (myPrivate->radius, Gtk::PACK_SHRINK);
+    myPrivate->tips.set_tip (myPrivate->phi, "phi angle");
+    myPrivate->tips.set_tip (myPrivate->theta, "theta angle");
+    myPrivate->tips.set_tip (myPrivate->radius, "view sphere radius");
     
     Gtk::HBox* buttonBox = Gtk::manage (new Gtk::HBox);
     buttonBox->pack_start (myPrivate->loadButton, Gtk::PACK_SHRINK);
@@ -55,9 +59,9 @@ goGUI::OFFViewControl::OFFViewControl ()
     myPrivate->vbox.pack_start (*buttonBox, Gtk::PACK_SHRINK);
     this->add (myPrivate->vbox);
 
-    myPrivate->angleX.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
-    myPrivate->angleY.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
-    myPrivate->angleZ.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
+    myPrivate->phi.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
+    myPrivate->theta.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
+    myPrivate->radius.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
     myPrivate->loadButton.signal_clicked().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::loadOFF));
     myPrivate->alignButton.signal_clicked().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::align));
 }
@@ -79,9 +83,9 @@ void goGUI::OFFViewControl::setOFFView (goGUI::OFFView* view)
 void goGUI::OFFViewControl::angleChanged ()
 {
     goVectorf angles (3);
-    angles[0] = myPrivate->angleX.get_value();
-    angles[1] = myPrivate->angleY.get_value();
-    angles[2] = myPrivate->angleZ.get_value();
+    angles[0] = myPrivate->phi.get_value();
+    angles[1] = myPrivate->theta.get_value();
+    angles[2] = myPrivate->radius.get_value();
     if (myPrivate->view)
     {
         myPrivate->view->setRotation (angles);
@@ -110,9 +114,9 @@ void goGUI::OFFViewControl::loadOFF ()
         return;
     }
     filename.getPathName (lastFilename);
-    myPrivate->angleX.set_value (0.0f);
-    myPrivate->angleY.set_value (0.0f);
-    myPrivate->angleZ.set_value (0.0f);
+    myPrivate->phi.set_value (0.0f);
+    myPrivate->theta.set_value (0.0f);
+    myPrivate->radius.set_value (0.0f);
     myPrivate->view->load (filename.toCharPtr());
 }
 
@@ -138,9 +142,9 @@ void goGUI::OFFViewControl::setRotation (const goVectorf& r)
     {
         return;
     }
-    myPrivate->angleX.set_value (r[0]);
-    myPrivate->angleY.set_value (r[1]);
-    myPrivate->angleZ.set_value (r[2]);
+    myPrivate->phi.set_value (r[0]);
+    myPrivate->theta.set_value (r[1]);
+    myPrivate->radius.set_value (r[2]);
 }
 
 void goGUI::OFFViewControl::getRotation (goVectorf& r) const
@@ -149,7 +153,7 @@ void goGUI::OFFViewControl::getRotation (goVectorf& r) const
     {
         r.resize (3);
     }
-    r[0] = myPrivate->angleX.get_value();
-    r[1] = myPrivate->angleY.get_value();
-    r[2] = myPrivate->angleZ.get_value();
+    r[0] = myPrivate->phi.get_value();
+    r[1] = myPrivate->theta.get_value();
+    r[2] = myPrivate->radius.get_value();
 }

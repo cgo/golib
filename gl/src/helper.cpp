@@ -1,4 +1,5 @@
 #include <gogl/helper.h>
+#include <GL/glu.h>
 #include <golog.h>
 
 static int check_gl_error (const char* name)
@@ -51,5 +52,45 @@ bool goGL::getGLBuffer (goSignal3D<void>& ret)
             format, type, ret.getPtr());
     // ret.flip (GO_Y);  // flipping is buggy.
     check_gl_error ("glReadPixels");
+    return true;
+}
+
+bool goGL::viewSphere (goFloat phi, goFloat theta, goFloat radius,
+                       goVectorf* positionRet, goVectorf* upRet)
+{
+    //= Spherical to cartesian coordinates
+    GLfloat sin_theta = ::sin(theta);
+
+    //= Only rotation of phi from x towards y axis
+    go3Vector<goFloat> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
+    //= Complete rotation, first phi towards y, then the result towards z axis
+    go3Vector<goFloat> v2 (v1.x * sin_theta, v1.y * sin_theta, radius * ::cos(theta));
+    //= Create up vector as cross product
+    go3Vector<goFloat> up (v2);
+
+    up.cross (v1);
+    up *= 1.0f / up.abs();
+    if (v2.z < 0.0f)
+        up *= -1.0f;
+
+    glLoadIdentity ();
+    gluLookAt (v2.x, v2.y, v2.z,
+               0.0f, 0.0f, 0.0f,
+               up.x, up.y, up.z);
+    if (positionRet)
+    {
+        positionRet->resize (3);
+        (*positionRet)[0] = v2.x;
+        (*positionRet)[1] = v2.y;
+        (*positionRet)[2] = v2.z;
+    }
+    if (upRet)
+    {
+        upRet->resize (3);
+        (*upRet)[0] = up.x;
+        (*upRet)[1] = up.y;
+        (*upRet)[2] = up.z;
+    }
+
     return true;
 }

@@ -55,17 +55,12 @@ namespace goMath
     output_type
     goGaussPDF<input_type, output_type>::operator () (const input_type& input) const
     {
-        goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
-        assert (false);
-        return (output_type)1;
-    }
-    
-//    template <class input_type, class output_type>
-template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble& input) const
-    {
+        //goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
+        //assert (false);
+        //return (output_type)1;
         return myNormFactor * exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
     }
-
+    
     //===================================================================
     template <class input_vector, class scalar_type>
     goMultiGaussPDF<input_vector, scalar_type>::goMultiGaussPDF ()
@@ -245,5 +240,6 @@ template<> goDouble goGaussPDF<goDouble, goDouble>::operator () (const goDouble&
 };
 
 template class goMath::goGaussPDF <goDouble, goDouble>;
+template class goMath::goGaussPDF <goFloat, goFloat>;
 template class goMath::goMultiGaussPDF <goVectorf, goFloat>;
 // template class goMath::goMultiGaussPDF <goVectord, goDouble>;
