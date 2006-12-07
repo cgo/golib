@@ -191,6 +191,11 @@ class goAutoPtr
             return *this;
         };
 
+        bool isNull () const
+        {
+            return ((const T*)(*this) == 0);
+        };
+
         bool operator== (const goAutoPtr<T>& other) const
         {
             return myRRefPtr == other.myRRefPtr;

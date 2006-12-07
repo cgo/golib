@@ -289,10 +289,23 @@ goSignal3D<T>::fill (const T* element)
     GO_SIGNAL3D_EACHELEMENT (*__ptr = *element, (*this), T);
 }
 
+template <class T>
+void
+goSignal3D<T>::fill (goDouble v)
+{
+    goSignal3DBase<T>::fill (v);
+}
+
 template<> void
 goSignal3D<void>::fill (const void* p)
 {
     goSignal3DBase<void>::fill(p);
+}
+
+template<> void
+goSignal3D<void>::fill (goDouble v)
+{
+    goSignal3DBase<void>::fill(v);
 }
 
 /** 

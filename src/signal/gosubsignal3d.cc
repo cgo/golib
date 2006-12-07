@@ -421,6 +421,8 @@ goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
   {
     this->myChannelOffset[i] = p->getChannelOffset(i);
   }
+
+  this->myBlockSize = p->getBlockSize();
 }
 
 template< class T >

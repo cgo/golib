@@ -69,6 +69,8 @@ goSignal3D : public goSignal3DBase<T>
         void fillByte (goInt8 b);
 
         virtual void fill (const T* element);
+        virtual void fill (goDouble v);
+
     private:
         goSignal3D<T>& operator= (goSignal3D<T>& other);
 };

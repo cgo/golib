@@ -212,6 +212,7 @@ goSignal3DBase : public goObjectBase
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;
         virtual void fill (const T* value);
+        virtual void fill (goDouble value);
 
         /// Copies the last valid values from the block data into the borders
         // void  interpolateBorders ();

@@ -23,7 +23,7 @@
 template<class T> class goPointCloudPrivate;
 
 /**
-* \addtogroup shape
+* \addtogroup math
 * @{
 */
 /**

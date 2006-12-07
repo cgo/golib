@@ -19,6 +19,10 @@
 
 class goCurvePrivate;
 
+/** 
+ * @addtocurve math
+ * @{
+ */
 /**
  * @brief Curve representation.
  **/
@@ -85,4 +89,8 @@ class goCurve : public goPointCloud<T>
 
 typedef goCurve<goFloat> goCurvef;
 typedef goCurve<goDouble> goCurved;
+
+/**
+ * @}
+ */
 #endif

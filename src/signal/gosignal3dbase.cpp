@@ -1005,6 +1005,11 @@ goSignal3DBase<T>::getMinimum() const
 }
 
 
+/** 
+ * @brief Fills the current channel.
+ * 
+ * @param value pointer to a value.
+ */
 template< class T >
     void
 goSignal3DBase<T>::fill (const T* value)
@@ -1046,6 +1051,86 @@ goSignal3DBase<void>::fill (const void* value)
             break;
     }
 }
+
+template<> void
+goSignal3DBase<void>::fill (goDouble v)
+{
+    switch (this->getDataType().getID())
+    {
+        case GO_INT8:
+            {
+                goInt8 value = (goInt8)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goInt8*)__ptr = value, (*this));
+            }
+            break;
+        case GO_UINT8:
+            {
+                goUInt8 value = (goUInt8)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goUInt8*)__ptr = value, (*this));
+            }
+            break;
+        case GO_INT16:
+            {
+                goInt16 value = (goInt16)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goInt16*)__ptr = value, (*this));
+            }
+            break;
+        case GO_UINT16:
+            {
+                goUInt16 value = (goUInt16)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goUInt16*)__ptr = value, (*this));
+            }
+            break;
+        case GO_INT32:
+            {
+                goInt32 value = (goInt32)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goInt32*)__ptr = value, (*this));
+            }
+            break;
+        case GO_UINT32:
+            {
+                goUInt32 value = (goUInt32)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goUInt32*)__ptr = value, (*this));
+            }
+            break;
+        case GO_FLOAT:
+            {
+                goFloat value = (goFloat)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goFloat*)__ptr = value, (*this));
+            }
+            break;
+        case GO_DOUBLE:
+            {
+                goDouble value = (goDouble)v;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC(*(goDouble*)__ptr = value, (*this));
+            }
+            break;
+        default:
+            goLog::warning ("goSignal3DBase<void>: fill not yet implemented for this type.");
+            break;
+    }
+}
+
+template<class T> 
+void goSignal3DBase<T>::fill (goDouble v) 
+{ 
+    T value = (T)v;
+    this->fill (&value); 
+}
+template<>
+void goSignal3DBase<void*>::fill (goDouble v) 
+{ 
+    goLog::warning ("goSignal3DBase::fill(double) not supported for void*.");
+}
+
+//template<> void goSignal3DBase<goInt8>::fill (goDouble v) { this->fill ((goInt8)v); }
+//template<> void goSignal3DBase<goUInt8>::fill (goDouble v) { this->fill ((goUInt8)v); }
+//template<> void goSignal3DBase<goInt16>::fill (goDouble v) { this->fill ((goInt16)v); }
+//template<> void goSignal3DBase<goUInt16>::fill (goDouble v) { this->fill ((goUInt16)v); }
+//template<> void goSignal3DBase<goInt32>::fill (goDouble v) { this->fill ((goInt32)v); }
+//template<> void goSignal3DBase<goUInt32>::fill (goDouble v) { this->fill ((goUInt32)v); }
+//template<> void goSignal3DBase<goFloat>::fill (goDouble v) { this->fill ((goFloat)v); }
+//template<> void goSignal3DBase<goComplexf>::fill (goDouble v) { goLog::warning("fill(double) in complex signals not supported."); }
 
 template <class T>
 void goSignal3DBase<T>::shiftLeftDiff  (int n, int axes)
