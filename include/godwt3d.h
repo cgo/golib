@@ -14,6 +14,12 @@
 #ifndef GOSIGNAL3D_H
 # include <gosignal3d.h>
 #endif
+#ifndef GOFIXEDARRAY_H
+# include <gofixedarray.h>
+#endif
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 class goDWT3DPrivate;
 
@@ -41,10 +47,10 @@ goDWT3D : public goObjectBase
         bool dwt            (goDWT3D& parentDWT, int axes = GO_X|GO_Y|GO_Z);
         bool idwt           (goSignal3D<void>* target);
         bool idwt           (goDWT3D& parentDWT);
-        bool setFilter      (int filterEnum);
-        void setPyramidMode (bool m = true);
+        bool setFilter      (int filterEnum, int upsample = 0);
+        void setFrameMode   (bool m = true);
 
-        goSignal3DBase<void>* getDWT ();
+        goFixedArray<goAutoPtr<goSignal3D<void> > >& getDWT ();
       
     private:
         bool calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType);

@@ -700,6 +700,23 @@ bool goMatrix<T>::writeASCII (FILE* f) const
 }
 
 template<class T>
+bool goMatrix<T>::writeASCII (const char* fname) const
+{
+    if (!fname)
+    {
+        return false;
+    }
+    FILE* f = fopen (fname,"w");
+    if (!f)
+    {
+        return false;
+    }
+    bool ok = this->writeASCII (f);
+    fclose (f);
+    return ok;
+}
+
+template<class T>
 bool goMatrix<T>::readASCII (FILE* f)
 {
     if (!f)
@@ -760,6 +777,22 @@ bool goMatrix<T>::readASCII (FILE* f)
     return true;
 }
 
+template<class T>
+bool goMatrix<T>::readASCII (const char* fname) 
+{
+    if (!fname)
+    {
+        return false;
+    }
+    FILE* f = fopen (fname,"r");
+    if (!f)
+    {
+        return false;
+    }
+    bool ok = this->readASCII (f);
+    fclose (f);
+    return ok;
+}
 #if 0
 template<>
 goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goFloat>& v) const

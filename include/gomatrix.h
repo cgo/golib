@@ -410,7 +410,9 @@ class goMatrix
     };
 
   bool writeASCII (FILE* f) const;
+  bool writeASCII (const char* fname) const;
   bool readASCII  (FILE* f);
+  bool readASCII  (const char* f);
 
  protected:
   bool               externalData;

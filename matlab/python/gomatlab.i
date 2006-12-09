@@ -7,6 +7,7 @@
 #include <goobjectbase.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <godwt3d.h>
 #include <goarray.h>
 #include <gofixedarray.h>
 #include <gostring.h>
