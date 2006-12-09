@@ -90,17 +90,23 @@ goSubSignal3D<T>::~goSubSignal3D ()
     if (!deleteX)
     {
         this->xDiff    = NULL;
+        this->real_xDiff = 0;
         this->myXJump  = NULL;
+        this->real_myXJump  = NULL;
     }
     if (!deleteY)
     {
         this->yDiff    = NULL;
+        this->real_yDiff    = NULL;
         this->myYJump  = NULL;
+        this->real_myYJump  = NULL;
     }
     if (!deleteZ)
     {
         this->zDiff    = NULL;
+        this->real_zDiff    = NULL;
         this->myZJump  = NULL;
+        this->real_myZJump  = NULL;
     }
 }
 
@@ -164,9 +170,9 @@ goSubSignal3D<T>::setPosition (goPosition &p)
     bool newZ = false;
     const goFixedArray<int>& myBF = this->getBorderFlags();
     const goFixedArray<int>& pBF = this->parent->getBorderFlags();
-    if ( (myBF[0] != GO_PARENT_BORDER && myBF[0] != pBF[0] && this->getBorderX() != 0) || this->skipX != 0 ) newX = true;
-    if ( (myBF[1] != GO_PARENT_BORDER && myBF[1] != pBF[1] && this->getBorderY() != 0) || this->skipY != 0 ) newY = true;
-    if ( (myBF[2] != GO_PARENT_BORDER && myBF[2] != pBF[2] && this->getBorderZ() != 0) || this->skipZ != 0 ) newZ = true;
+    if ( ((myBF[0] != GO_PARENT_BORDER) && (myBF[0] != pBF[0]) && (this->getBorderX() != 0)) || this->skipX != 0 ) newX = true;
+    if ( ((myBF[1] != GO_PARENT_BORDER) && (myBF[1] != pBF[1]) && (this->getBorderY() != 0)) || this->skipY != 0 ) newY = true;
+    if ( ((myBF[2] != GO_PARENT_BORDER) && (myBF[2] != pBF[2]) && (this->getBorderZ() != 0)) || this->skipZ != 0 ) newZ = true;
     
     if (deleteX)
     {
@@ -398,6 +404,13 @@ goSubSignal3D<void>::setParent (goSignal3DBase<void> *p)
 {
   if (p == 0)
   {
+      if (this->myChannelOffset)
+      {
+          delete [] this->myChannelOffset;
+          this->myChannelOffset = NULL;
+      }
+      this->parent = 0;
+      this->myBlockSize = goSize3D(0,0,0);
       return;
   }
 //  this->setBorder (goMath::min(this->getSizeX(),(goSize_t)32),

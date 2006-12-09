@@ -172,37 +172,37 @@ goSignal3DBase<void>::sample(go3Vector<goFloat>& point)
 template <class T>
 void goSignal3DBase<T>::cleanup ()
 {
-    if (xDiff)
+    if (real_xDiff)
     {
             delete[] real_xDiff;
             xDiff = NULL;
             real_xDiff = NULL;
     }
-    if (yDiff)
+    if (real_yDiff)
     {
             delete[] real_yDiff;
             yDiff = NULL;
             real_yDiff = NULL;
     }
-    if (zDiff)
+    if (real_zDiff)
     {
             delete[] real_zDiff;
             zDiff = NULL;
             real_zDiff = NULL;
     }
-    if (myXJump)
+    if (real_myXJump)
     {
             delete[] real_myXJump;
             myXJump = NULL;
             real_myXJump = NULL;
     }
-    if (myYJump)
+    if (real_myYJump)
     {
             delete[] real_myYJump;
             myYJump = NULL;
             real_myYJump = NULL;
     }
-    if (myZJump)
+    if (real_myZJump)
     {
             delete[] real_myZJump;
             myZJump = NULL;

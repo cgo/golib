@@ -82,6 +82,8 @@ goDWT3D::~goDWT3D ()
  * @param mask Mask (will be replaced)
  * @param center Center (will be replaced)
  * 
+ * @see NOTE in the source code.
+ *
  * @return True if successful, false otherwise.
  */
 static inline bool insertZeroTaps (goArray<goFloat>& mask, int &center)
@@ -110,6 +112,11 @@ static inline bool insertZeroTaps (goArray<goFloat>& mask, int &center)
             --zero_counter;
         }
     }
+    //= NOTE: This is not necessarily _correct_; it is done to provide non-translated filter outputs
+    //=       for the level set experiment.
+    //if (new_sz & 1)
+    //new_center = new_sz / 2;
+
     mask = new_mask;
 
 //    for (goSize_t i = 0; i < mask.getSize(); ++i)
@@ -182,12 +189,25 @@ goDWT3D::setFilter (int filterEnum, int upsample)
         maskReverse[i] = mask [mask.getSize() - 1 - i];
     }
 
-    for (int i = 0; i < upsample; ++i)
+    if (myPrivate->frameMode)
     {
-        insertZeroTaps (mask, center);
-        insertZeroTaps (hiMask, center);
-        insertZeroTaps (maskReverse, centerReverse);
-        insertZeroTaps (hiReverse, centerReverse);
+        for (int i = 0; i < upsample; ++i)
+        {
+            insertZeroTaps (mask, center);
+            insertZeroTaps (hiMask, center);
+            insertZeroTaps (maskReverse, centerReverse);
+            insertZeroTaps (hiReverse, centerReverse);
+            if (mask.getSize() & 1)
+            {
+                center = mask.getSize() / 2;
+                centerReverse = mask.getSize() / 2;
+            }
+            else
+            {
+                center = mask.getSize() / 2 + 1;
+                centerReverse = mask.getSize() / 2;
+            }
+        }
     }
     
     myPrivate->lowPass.setMask (mask);
@@ -353,8 +373,8 @@ goDWT3D::upsampleFilter (goSignal3DBase<void>& L, goSignal3DBase<void>& H, goSig
     tempH.make (&target);
     
     goSubSignal3D<void> subsignal;
-    subsignal.setSize (L.getSizeX(), L.getSizeY(), L.getSizeZ());
     subsignal.setParent (&tempL);
+    subsignal.setSize (L.getSizeX(), L.getSizeY(), L.getSizeZ());
     subsignal.setSkip (1,0,0);
     if (!goCopySignal (&L, &subsignal))
         goLog::warning ("upsampleFilter(): copy failed.",this);
@@ -409,23 +429,26 @@ goDWT3D::downsampleFilter (goSignal3DBase<void>& sig,
     sx = sx <= 1 ? sx : sx >> 1;
     goSignal3D<void> temp;
     temp.copy(sig);
-    goSubSignal3D<void> subsignal;
     L.make (sx, sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
     H.make (sx, sig.getSizeY(), sig.getSizeZ(), 16, 16, 16, 32, 32, 32);
     
     myPrivate->lowPass.filter (temp);
-    subsignal.setSize (L.getSizeX(), L.getSizeY(), L.getSizeZ());
-    subsignal.setParent (&temp);
-    subsignal.setSkip (1,0,0);
-    goCopySignal (&subsignal, &L);
-
+    {
+        goSubSignal3D<void> subsignal;
+        subsignal.setParent (&temp);
+        subsignal.setSize (L.getSizeX(), L.getSizeY(), L.getSizeZ());
+        subsignal.setSkip (1,0,0);
+        goCopySignal (&subsignal, &L);
+    }
     temp.copy(sig);
     myPrivate->highPass.filter (temp);
-    subsignal.setSize (H.getSizeX(), H.getSizeY(), H.getSizeZ());
-    subsignal.setParent (&temp);
-    subsignal.setSkip (1,0,0);
-    goCopySignal (&subsignal, &H);
-
+    {
+        goSubSignal3D<void> subsignal;
+        subsignal.setParent (&temp);
+        subsignal.setSize (H.getSizeX(), H.getSizeY(), H.getSizeZ());
+        subsignal.setSkip (1,0,0);
+        goCopySignal (&subsignal, &H);
+    }
     temp.destroy();
     return true;
 }
@@ -657,7 +680,7 @@ goDWT3D::idwt (goSignal3D<void>* target)
         dwt[0]->rotateAxes();
         dwt[1]->rotateAxes();
         reconstruct (tempL, tempH, *target);
-        _scaleValues (*target, 0.5);
+        _scaleValues (*target, (1.0f / 4.0f));
     }
     return true;
 }
