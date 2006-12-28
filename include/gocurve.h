@@ -72,6 +72,8 @@ class goCurve : public goPointCloud<T>
         bool readASCII  (FILE* f);
         bool writeASCII (FILE* f) const;
 
+        bool readASCIISimple (const char* filename, goSize_t dimension, bool closed);
+
         goSize_t removeDuplicates ();
 
         

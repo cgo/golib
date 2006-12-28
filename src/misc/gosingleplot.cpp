@@ -330,6 +330,12 @@ bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y)
     return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y));
 }
 
+void goSinglePlot::setPrefix (const goString& p)
+{
+    myPrivate->prefixCommands = p;
+    myPrivate->prefixCommands += "\n";
+}
+
 void goSinglePlot::setTitle (const goString& s)
 {
     myPrivate->title = s;

@@ -2,6 +2,9 @@
 #define GOBTREE_H
 
 #include <goobjectbase.h>
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 /** @addtogroup data
  * @{
@@ -17,10 +20,10 @@ class goBTreeElement : public goObjectBase
         goBTreeElement (const T&);
         virtual ~goBTreeElement ();
 
-		goBTreeElement<T>* leftChild;
-		goBTreeElement<T>* rightChild;
-		goBTreeElement<T>* parent;
-        T                  value;
+		goAutoPtr<goBTreeElement<T> > leftChild;
+		goAutoPtr<goBTreeElement<T> > rightChild;
+		goAutoPtr<goBTreeElement<T> > parent;
+        T                             value;
 };
 
 template<class T> class goBTree;
@@ -38,12 +41,12 @@ class goBTreeAlgorithm
     public:
         goBTreeAlgorithm () {};
         virtual ~goBTreeAlgorithm () {};
-        bool breadthFirst (typename goBTree<T>::Element* root);
-        bool breadthFirst (typename goBTree<T>::ConstElement* root) const;
-        bool depthFirst (typename goBTree<T>::Element* root);
-        bool depthFirst (typename goBTree<T>::ConstElement* root) const;
-        virtual bool action (typename goBTree<T>::Element* node) { return false; };
-        virtual bool action (typename goBTree<T>::ConstElement* node) const { return false; };
+        bool breadthFirst (typename goBTree<T>::ElementPtr root);
+        // bool breadthFirst (typename goBTree<T>::ElementConstPtr root) const;
+        bool depthFirst (typename goBTree<T>::ElementPtr root);
+        // bool depthFirst (typename goBTree<T>::ElementConstPtr root) const;
+        virtual bool action (typename goBTree<T>::ElementPtr node) { return false; };
+        // virtual bool action (typename goBTree<T>::ElementConstPtr node) const { return false; };
 };
 
 
@@ -55,24 +58,26 @@ class goBTree : public goObjectBase
 {
     public:
         typedef goBTreeElement<T> Element;
-        typedef const goBTreeElement<T> ConstElement;
+        // typedef const goBTreeElement<T> ConstElement;
+        typedef goAutoPtr<goBTreeElement<T> > ElementPtr;
+        // typedef goAutoPtr<const goBTreeElement<T> > ElementConstPtr;
 
     public:
         goBTree ();
-        goBTree (typename goBTree<T>::Element* root);
+        goBTree (goAutoPtr<typename goBTree<T>::Element> root);
         virtual ~goBTree ();
 
         bool          isEmpty () const;
-        void          setRoot (typename goBTree<T>::Element* e);
-        Element*      getRoot ();
-        ConstElement* getRoot () const;
+        void          setRoot (goAutoPtr<typename goBTree<T>::Element> e);
+        ElementPtr      getRoot ();
+        // ElementConstPtr getRoot () const;
 
         void          erase   ();
        
-        bool          writeDOT (FILE* f) const;
+        bool          writeDOT (FILE* f); // const;
 
     private:
-        goBTreeElement<T>* myRoot;
+        ElementPtr myRoot;
 };
 /** @} */
 #endif

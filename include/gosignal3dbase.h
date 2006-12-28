@@ -324,12 +324,13 @@ goSignal3DBase : public goObjectBase
          */
         goSignal3DBase<T>& operator /= (goFloat scalar);
         
+        void applyBorderFlags (int axis);
+        void applyBorderFlags ();
+
     protected:
         void setBorder (goSize_t x, goSize_t y, goSize_t z);
         void constantBorders (int axes = GO_X|GO_Y|GO_Z);
         void periodicBorders (int axes = GO_X|GO_Y|GO_Z);
-        void applyBorderFlags (int axis);
-        void applyBorderFlags ();
         
     protected:
         /* pointer to the first value */

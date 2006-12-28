@@ -142,6 +142,47 @@ void goPointCloud<T>::affineTransform (const goMatrix<T>& m)
     }
 }
 
+template <class T>
+bool goPointCloud<T>::readASCII (const char* filename, goSize_t dimension, goList<goVector<T> >& pointList)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f)
+    {
+        goString msg ("goPointCloud::readASCII(): Could not open file ");
+        msg += filename;
+        goLog::warning (msg);
+        return false;
+    }
+
+    goString line;
+    while (goFileIO::readASCIILine(f, line))
+    {
+        goList<goString> words;
+        line.getWords (words);
+        if (words.getSize() > 0)
+        {
+            //= Comments
+            if (words.getFront()[0] == '#')
+            {
+                continue;
+            }
+            //= Expecting numbers
+            goList<goString>::Element* el = words.getFrontElement();
+            goVector<T> v (dimension);
+            goSize_t i = 0;
+            while (el && i < dimension)
+            {
+                v[i] = el->elem.toFloat();
+                el = el->next;
+                ++i;
+            }
+            pointList.append (v);
+        }
+    }
+    ::fclose (f);
+    return true;
+}
+
 /**
 * @brief Get list of points.
 *

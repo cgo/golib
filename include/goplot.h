@@ -118,6 +118,7 @@ class goSinglePlot : public goObjectBase
                 return this->addCurve (x,y,title,plotOptions);
             };
 
+        void setPrefix   (const goString& p);
         void setTitle    (const goString& s);
         bool addLabel    (const goString& l, goDouble x, goDouble y);
         bool makePlot    (goString& plotCommandsRet) const;

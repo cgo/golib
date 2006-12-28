@@ -690,7 +690,7 @@ bool goCopySignalArray (const T* array, goSignal3DBase<void>* targetSig)
 }
 
 template <class sourceT, class targetT>
-static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+static bool _RGBAtoScalar2 (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     goSignal3DGenericConstIterator sourceIt (sig);
     goSignal3DGenericIterator targetIt (targetSig);
@@ -728,6 +728,24 @@ static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     return true;
 }
 
+template <class targetT>
+static bool _RGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
+{
+    switch (sig->getDataType().getID())
+    {
+        case GO_UINT8: return _RGBAtoScalar2<goUInt8, targetT> (sig, targetSig); break;
+        case GO_INT8: return _RGBAtoScalar2<goInt8, targetT> (sig, targetSig); break;
+        case GO_UINT16: return _RGBAtoScalar2<goUInt16, targetT> (sig, targetSig); break;
+        case GO_INT16: return _RGBAtoScalar2<goInt16, targetT> (sig, targetSig); break;
+        case GO_UINT32: return _RGBAtoScalar2<goUInt32, targetT> (sig, targetSig); break;
+        case GO_INT32: return _RGBAtoScalar2<goInt32, targetT> (sig, targetSig); break;
+        case GO_FLOAT: return _RGBAtoScalar2<goFloat, targetT> (sig, targetSig); break;
+        case GO_DOUBLE: return _RGBAtoScalar2<goDouble, targetT> (sig, targetSig); break;
+        default: goLog::warning ("goRGBAtoScalar(): illegal source type."); break;
+    }
+    return false;
+}
+
 /** 
  * @brief Converts an RGBA 3- or 4-channel signal to a scalar 1-channel signal.
  * 
@@ -756,11 +774,11 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
         goLog::warning("goRGBAtoScalar(): source signal has less than 3 channels. Not converting.");
         return false;
     }
-    if (sig->getDataType().getID() != GO_UINT8)
-    {
-        goLog::warning("goRGBAtoScalar(): currently only supporting 8 bit RGBA conversion.");
-        return false;
-    }
+//    if (sig->getDataType().getID() != GO_UINT8)
+//    {
+//        goLog::warning("goRGBAtoScalar(): currently only supporting 8 bit RGBA conversion.");
+//        return false;
+//    }
     if (sig->getSizeX() != targetSig->getSizeX() ||
         sig->getSizeY() != targetSig->getSizeY() ||
         sig->getSizeZ() != targetSig->getSizeZ())
@@ -775,15 +793,15 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
     
     switch (targetSig->getDataType().getID())
     {
-        case GO_UINT8:  return _RGBAtoScalar<goUInt8,goUInt8>  (sig, targetSig); break;
-        case GO_INT8:   return _RGBAtoScalar<goUInt8,goInt8>   (sig, targetSig); break;
-        case GO_UINT16: return _RGBAtoScalar<goUInt8,goUInt16> (sig, targetSig); break;
-        case GO_INT16:  return _RGBAtoScalar<goUInt8,goInt16>  (sig, targetSig); break;
-        case GO_UINT32: return _RGBAtoScalar<goUInt8,goUInt32> (sig, targetSig); break;
-        case GO_INT32:  return _RGBAtoScalar<goUInt8,goInt32>  (sig, targetSig); break;
+        case GO_UINT8:  return _RGBAtoScalar<goUInt8>  (sig, targetSig); break;
+        case GO_INT8:   return _RGBAtoScalar<goInt8>   (sig, targetSig); break;
+        case GO_UINT16: return _RGBAtoScalar<goUInt16> (sig, targetSig); break;
+        case GO_INT16:  return _RGBAtoScalar<goInt16>  (sig, targetSig); break;
+        case GO_UINT32: return _RGBAtoScalar<goUInt32> (sig, targetSig); break;
+        case GO_INT32:  return _RGBAtoScalar<goInt32>  (sig, targetSig); break;
         case GO_FLOAT:  
                   {
-                      bool ok = _RGBAtoScalar<goUInt8,goFloat>  (sig, targetSig); 
+                      bool ok = _RGBAtoScalar<goFloat>  (sig, targetSig); 
 //                      if (ok)
 //                      {
 //                          goNormalizeSignal(targetSig);
@@ -793,7 +811,7 @@ bool goRGBAtoScalar (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targ
                   break;
         case GO_DOUBLE: 
                   {
-                      bool ok = _RGBAtoScalar<goUInt8,goDouble> (sig, targetSig); 
+                      bool ok = _RGBAtoScalar<goDouble> (sig, targetSig); 
 //                      if (ok)
 //                      {
 //                          goNormalizeSignal(targetSig);

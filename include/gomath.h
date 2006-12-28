@@ -291,6 +291,23 @@ void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
     }
 }
 
+/** 
+ * @brief Studen t density function.
+ * 
+ * \f$ f(x) = \frac{\Gamma((n+1)/2)}{\sqrt{\pi \cdot n} \cdot \Gamma(n/2)} \cdot \left( 1 + x^2/n \right)^{-(n+1)/2} \f$
+ *
+ * @param x Parameter x.
+ * @param n Degrees of freedom.
+ * 
+ * @return The value of f(x) as defined above.
+ */
+template <class T>
+T studentT (T x, goSize_t n)
+{
+    goDouble dn = (goDouble)n;
+    return ::tgamma((dn + 1.0f) * 0.5f) / (sqrt(dn * M_PI) * ::tgamma (dn * 0.5)) * ::pow(1.0 + x*x / dn, -(dn+1.0)*0.5);
+}
+
 template <class vectorT, class T>
 T integrate (const vectorT& x, const vectorT& y, goSize_t sz);
 template <class vectorT, class T>

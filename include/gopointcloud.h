@@ -88,6 +88,8 @@ class goPointCloud : public goObjectBase
 
         void    affineTransform (const goMatrix<T>& m);
 
+        static bool readASCII (const char* filename, goSize_t dimension, goList<goVector<T> >& pointList);
+
         virtual bool writeObjectFile (FILE*) const;
         virtual bool readObjectFile  (FILE*);
         

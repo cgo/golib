@@ -19,7 +19,7 @@ class goRRefPtr
             }
             if (myPtr)
             {
-                printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
+                // printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
                 delete myPtr;
                 myPtr = 0;
             }

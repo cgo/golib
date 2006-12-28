@@ -480,6 +480,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
+            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
             return false;
         }
         goList<goString>::Element* el = words.getFrontElement();
@@ -489,6 +490,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
+            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
             return false;
         }
         while (el)
@@ -517,6 +519,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
+            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
             return false;
         }
         goList<goString>::Element* el = words.getFrontElement();
@@ -526,6 +529,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
+            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
             return false;
         }
 
@@ -545,6 +549,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             if (fscanf(f,"%f ",&x) < 1)
             {
                 goLog::warning("goCurve::readASCII(): could not read point from a line.");
+                throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
                 return false;
             }
             p[j] = x;
@@ -552,6 +557,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
         if (fscanf(f,"%f\n",&x) < 1)
         {
             goLog::warning("goCurve::readASCII(): could not read point from a line.");
+            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
             return false;
         }
         p[dim-1] = x;
@@ -642,6 +648,38 @@ bool goCurve<T>::writeASCII (FILE* f, const goList<goVector<T> >& pointList)
     return true;
 }
 
+/** 
+ * @brief Read from a simple ASCII file (like for gnuplot)
+ * 
+ * Each line starting with # is treated as comment as in goPointCloud<T>::readASCII().
+ *
+ * @param filename  Name of the file.
+ * @param dimension Dimension of the points (i.e. numbers per line).
+ *                  This may be less than the number of entries per line actually in the file,
+ *                  but it may not be larger.
+ * @param closed    If true, the point list will be closed.
+ * 
+ * @return True if successful, false otherwise. Also check the log file.
+ */
+template <class T>
+bool goCurve<T>::readASCIISimple (const char* filename, goSize_t dimension, bool closed)
+{
+    this->getPoints().erase ();
+    bool ok = goPointCloud<T>::readASCII (filename, dimension, this->getPoints());
+    if (ok && closed)
+    {
+        this->getPoints().close ();
+    }
+    return ok;
+}
+
+/** 
+ * @brief Removes duplicate entries in the point list.
+ * 
+ * @param pl Point list.
+ * 
+ * @return Total number of removed entries.
+ */
 template <class T>
 goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
 {
@@ -742,7 +780,16 @@ bool goCurve<T>::writeASCII (FILE* f) const
 template <class T>
 bool goCurve<T>::readASCII (FILE* f)
 {
-    return goCurve<T>::readASCII (f, this->getPoints());
+    bool ok = false;
+    try
+    {
+        ok = goCurve<T>::readASCII (f, this->getPoints());
+    }
+    catch (goFileIOException& ex)
+    {
+        throw (ex);
+    }
+    return ok;
 }
 
 template<class T>

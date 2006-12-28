@@ -45,7 +45,8 @@ class goFileIOException : public goException
     {
         NOT_FOUND,
         FAILED,
-        EXISTS
+        EXISTS,
+        UNEXPECTED_DATA
     };
 
     goFileIOException (int _code = FAILED) : goException(), code (_code) {};
