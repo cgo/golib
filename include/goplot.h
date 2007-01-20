@@ -24,10 +24,10 @@ class goSinglePlotPrivate;
 class goPlotterLabel
 {
     public:
-        goPlotterLabel (const char* l, goDouble x_, goDouble y_) 
-            : label(l), x(x_), y(y_) {};
+        goPlotterLabel (const char* l, goDouble x_, goDouble y_, const char* colourspec_ = "") 
+            : label(l), x(x_), y(y_), colourspec(colourspec_) {};
         goPlotterLabel ()
-            : label(""), x(0.0), y(0.0) {};
+            : label(""), x(0.0), y(0.0), colourspec("") {};
         goPlotterLabel (const goPlotterLabel& other)
         {
             *this = other;
@@ -46,6 +46,7 @@ class goPlotterLabel
         goString label;
         goDouble x;
         goDouble y;
+        goString colourspec;
 };
 
 /** 
@@ -120,7 +121,7 @@ class goSinglePlot : public goObjectBase
 
         void setPrefix   (const goString& p);
         void setTitle    (const goString& s);
-        bool addLabel    (const goString& l, goDouble x, goDouble y);
+        bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "");
         bool makePlot    (goString& plotCommandsRet) const;
         void removeFiles () const;
         void clear       ();

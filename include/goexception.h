@@ -50,7 +50,7 @@ class goFileIOException : public goException
     };
 
     goFileIOException (int _code = FAILED) : goException(), code (_code) {};
-    ~goFileIOException () {};
+    virtual ~goFileIOException () {};
 
     int code;
 };
@@ -64,7 +64,7 @@ class goTypeException : public goException
         WRONG_TYPE
     };
     goTypeException (int t = WRONG_TYPE) : goException(), code (t) {};
-    ~goTypeException () {};
+    virtual ~goTypeException () {};
 
     int code;
 };
@@ -82,7 +82,7 @@ class goMathException : public goException
             OTHER
         };
         goMathException (int t = OTHER) : goException(), code (t) {};
-        ~goMathException () {};
+        virtual ~goMathException () {};
 
         int code;
 };

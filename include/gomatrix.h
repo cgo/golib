@@ -171,6 +171,26 @@ class goMatrix
       v.setData (&(*this)(row,column), length, 1);
   };
 
+  inline void setRow (goSize_t row, const goVector<T>& v)
+  {
+      goSize_t sz = this->getColumns();
+      assert (v.getSize() >= sz);
+      for (goSize_t i = 0; i < sz; ++i)
+      {
+          (*this)(row, i) = v[i];
+      }
+  };
+
+  inline void setColumn (goSize_t col, const goVector<T>& v)
+  {
+      goSize_t sz = this->getRows();
+      assert (v.getSize() >= sz);
+      for (goSize_t i = 0; i < sz; ++i)
+      {
+          (*this)(i, col) = v[i];
+      }
+  };
+
   /** 
    * @brief Const reference to row.
    * 

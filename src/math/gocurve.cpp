@@ -13,6 +13,8 @@
 # include <gofileio.h>
 #endif
 
+#include <goexception.h>
+
 #include <assert.h>
 #include <math.h>
 
@@ -467,6 +469,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
     bool closed = false;
     
     goString line;
+    goFileIOException ex (goFileIOException::UNEXPECTED_DATA);
     if (!goFileIO::readASCIILine (f, line))
     {
         return false;
@@ -480,7 +483,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
-            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+            throw ex;
             return false;
         }
         goList<goString>::Element* el = words.getFrontElement();
@@ -490,7 +493,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
-            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+            throw ex;
             return false;
         }
         while (el)
@@ -519,7 +522,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
-            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+            throw ex;
             return false;
         }
         goList<goString>::Element* el = words.getFrontElement();
@@ -529,7 +532,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             msg += line;
             msg += "'";
             goLog::warning(msg);
-            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+            throw ex;
             return false;
         }
 
@@ -549,7 +552,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
             if (fscanf(f,"%f ",&x) < 1)
             {
                 goLog::warning("goCurve::readASCII(): could not read point from a line.");
-                throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+                throw ex;
                 return false;
             }
             p[j] = x;
@@ -557,7 +560,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
         if (fscanf(f,"%f\n",&x) < 1)
         {
             goLog::warning("goCurve::readASCII(): could not read point from a line.");
-            throw (goFileIOException(goFileIOException::UNEXPECTED_DATA));
+            throw ex;
             return false;
         }
         p[dim-1] = x;

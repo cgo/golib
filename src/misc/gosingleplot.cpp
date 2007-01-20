@@ -325,9 +325,9 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y)
+bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, const char* colourspec)
 {
-    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y));
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, colourspec));
 }
 
 void goSinglePlot::setPrefix (const goString& p)
@@ -361,10 +361,10 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
     {
         assert (!myPrivate->labels.isClosed());
         goList<goPlotterLabel>::Element* el = myPrivate->labels.getFrontElement();
-        goSize_t labelTag = 0;
+        goSize_t labelTag = 1;
         while (el)
         {
-            prefix += "set label";
+            prefix += "set label ";
             prefix += (int)labelTag;
             prefix += " \"";
             prefix += el->elem.label;
@@ -372,6 +372,9 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
             prefix += (float)el->elem.x;
             prefix += ",";
             prefix += (float)el->elem.y;
+            prefix += " ";
+            prefix += "textcolor ";
+            prefix += el->elem.colourspec.toCharPtr();
             prefix += "\n";
             el = el->next;
             ++labelTag;
@@ -382,8 +385,8 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
 
     //= Unset labels
     {
-        goIndex_t labelTag = 0;
-        for (labelTag = 0; labelTag < myPrivate->labels.getSize(); ++labelTag)
+        goIndex_t labelTag = 1;
+        for (labelTag = 1; labelTag <= myPrivate->labels.getSize(); ++labelTag)
         {
             postfix += "unset label ";
             postfix += (int)labelTag;

@@ -292,7 +292,7 @@ void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
 }
 
 /** 
- * @brief Studen t density function.
+ * @brief Student t density function.
  * 
  * \f$ f(x) = \frac{\Gamma((n+1)/2)}{\sqrt{\pi \cdot n} \cdot \Gamma(n/2)} \cdot \left( 1 + x^2/n \right)^{-(n+1)/2} \f$
  *
