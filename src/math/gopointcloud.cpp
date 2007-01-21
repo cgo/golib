@@ -62,6 +62,24 @@ goPointCloud<T>::goPointCloud (const goList<goVector<T> >& pl)
     assert (myPrivate);
     this->setPoints (pl);
 }
+
+template <class T>
+goPointCloud<T>::goPointCloud (const goMatrix<T>& confMatrix)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    myPrivate = new goPointCloudPrivate<T>;
+    assert (myPrivate);
+    goList<goVector<T> >& points = this->getPoints();
+    goSize_t sz = confMatrix.getRows();
+    const goVector<T> ref;
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        confMatrix.refRow (i, ref);
+        points.append (ref);
+    }
+}
+
 template <class T>
 goPointCloud<T>& goPointCloud<T>::operator= (const goPointCloud<T>& other)
 {

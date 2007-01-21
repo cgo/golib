@@ -57,6 +57,15 @@ goCurve<T>::goCurve (const goList<goVector<T> >& pl)
 }
 
 template<class T>
+goCurve<T>::goCurve (const goMatrix<T>& confMatrix)
+    : goPointCloud<T> (confMatrix),
+      myPrivate (0)
+{
+    myPrivate = new goCurvePrivate;
+    assert (myPrivate);
+}
+
+template<class T>
 goCurve<T>& goCurve<T>::operator= (const goCurve<T>& other)
 {
     *myPrivate = *other.myPrivate;
@@ -769,6 +778,17 @@ template <class T>
 bool goCurve<T>::writeASCII (FILE* f) const
 {
     return goCurve<T>::writeASCII (f, this->getPoints());
+}
+
+template <class T>
+bool goCurve<T>::writeASCII (const char* filename) const
+{
+    FILE* f = ::fopen (filename, "w");
+    if (!f)
+        return false;
+    bool ok = goCurve<T>::writeASCII (f, this->getPoints());
+    ::fclose (f);
+    return ok;
 }
 
 /** 

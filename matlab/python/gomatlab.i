@@ -19,6 +19,8 @@
 #include <govector.h>
 #include <goplot.h>
 #include <gohistogram.h>
+#include <gopointcloud.h>
+#include <gocurve.h>
 %}
 %import ../../python/golib.i
 

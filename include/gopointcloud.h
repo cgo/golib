@@ -44,6 +44,7 @@ class goPointCloud : public goObjectBase
         goPointCloud (goSize_t dim = 2);
         goPointCloud (const goPointCloud<T>&);
         goPointCloud (const goList<goVector<T> >&);
+        goPointCloud (const goMatrix<T>&);
         virtual ~goPointCloud ();
         goPointCloud<T>& operator= (const goPointCloud<T>&);
 
@@ -60,7 +61,7 @@ class goPointCloud : public goObjectBase
 
         goSize_t          getDim             () const;
 
-        bool              getMean            (goVector<T>& mean) const;
+        // bool              getMean            (goVector<T>& mean) const;
         bool              getCenterOfMass    (goVector<T>& comRet) const;
         static bool       getCenterOfMass    (const goFixedArray<goVector<T> >&, goVector<T>& comRet);
         bool              translate          (const goVector<T>& d);

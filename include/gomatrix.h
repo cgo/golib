@@ -137,7 +137,22 @@ class goMatrix
   {
     return this->leadingDimension;
   };
- 
+
+  inline T sum () const
+  {
+      T s = T(0);
+      goSize_t r = this->getRows();
+      goSize_t c = this->getColumns();
+      for (goSize_t i = 0; i < r; ++i)
+      {
+          for (goSize_t j = 0; j < c; ++j)
+          {
+              s += (*this)(i,j);
+          }
+      }
+      return s;
+  };
+
   // TNT compatibility methods BEGIN
   inline int        dim1 () const { return this->getRows(); };
   inline int        dim2 () const { return this->getColumns(); };
