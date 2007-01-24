@@ -195,6 +195,9 @@ bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t point
 
 bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
+template <class T>
+bool affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix<T>& A, goVector<T>& t);
+
 /** 
  * @brief Mean calculation.
  *
