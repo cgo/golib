@@ -55,6 +55,7 @@ class goPointCloud : public goObjectBase
         goList<goVector<T> >&       getPoints ();
         const goList<goVector<T> >& getPoints () const;
         virtual bool                setPoints (const goList<goVector<T> >&);
+        virtual bool                setPoints (const goMatrix<T>&);
         void                        addPoint (const goVector<T>& p);
 
         void              setChanged         ();

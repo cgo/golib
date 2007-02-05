@@ -317,6 +317,36 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
 }
 
 /** 
+ * @brief Add curve defined by configuration matrix.
+ *
+ * The matrix contains one point per row.
+ * Dimensions must be m x 2, where m is the number of points.
+ * 
+ * @param m Configuration matrix.
+ * @param title  Title of the curve.
+ * @param plotOptions  Options (see addCurve() functions).
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goSinglePlot::addCurveMatrix (const goMatrixf& m, const char* title, const char* plotOptions)
+{
+    const goVectorf x;
+    const goVectorf y;
+    m.refColumn (0, x);
+    m.refColumn (1, y);
+    return this->addCurve (x, y, title, plotOptions);
+}
+
+bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const char* plotOptions)
+{
+    const goVectord x;
+    const goVectord y;
+    m.refColumn (0, x);
+    m.refColumn (1, y);
+    return this->addCurve (x, y, title, plotOptions);
+}
+
+/** 
  * @brief Add a label at a given position.
  * 
  * @param l Label text.

@@ -44,8 +44,31 @@ class goVector : public goFixedArray<T>
             this->setSize (s,this->getLeftBorder(),this->getRightBorder());
         }
         
-        // template <class To>
-        goVector<T> operator- (const goVector<T>& other) const;
+        template <class To>
+        goVector<T> operator- (const goVector<To>& other) const
+        {
+        #ifdef GO_USE_EXCEPTIONS
+            if (this->getSize() != other.getSize())
+            {
+                throw goMathException (goMathException::SIZE_MISMATCH);
+            }
+        #endif
+            goVector<T> ret (this->getSize());
+            goIndex_t max = this->getSize();
+            T* retArray = ret.getPtr();
+            const T* array = this->getPtr();
+            const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
+            for (goIndex_t i = 0; i < max; ++i)
+            {
+                *retArray = *array - *otherArray;
+                array += stride;
+                otherArray += otherStride;
+                ++retArray;
+            }
+            return ret;
+        };
 
         template <class To>
         goVector<T> operator+ (const goVector<To>& other) const

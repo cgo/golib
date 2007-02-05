@@ -212,7 +212,58 @@ bool goMatlab::putVector(const goVectord* vec, const char* name)
     return true;
 }
 
+bool goMatlab::putVector(const goVectorf* vec, const char* name)
+{
+    if (!myPrivate->matlabEngine)
+    {
+        return false;
+    }
+    mxArray* temp = matlabCreateMatrix (vec->getSize(), 1);
+    if (!temp)
+    {
+        return false;
+    }
+    if (!copyToMatlab (vec, temp))
+    {
+        return false;
+    }
+    engPutVariable (myPrivate->matlabEngine, name, temp);
+    mxDestroyArray (temp);
+    return true;
+}
+
 bool goMatlab::getVector(goVectord* vec, const char* name)
+{
+    if (!myPrivate->matlabEngine)
+    {
+        return false;
+    }
+    mxArray* temp = engGetVariable (myPrivate->matlabEngine, name);
+    if (!temp)
+    {
+        return false;
+    }
+    if (mxIsSparse (temp))
+    {
+        return false;
+    }
+    if (!mxIsDouble (temp))
+    {
+        return false;
+    }
+    if (vec->getSize() != (goSize_t)mxGetN(temp) * (goSize_t)mxGetM(temp))
+    {
+        vec->resize (mxGetN(temp) * mxGetM(temp));
+    }
+    if (!copyFromMatlab (temp, vec))
+    {
+        return false;
+    }
+    mxDestroyArray (temp);
+    return true;
+}
+
+bool goMatlab::getVector(goVectorf* vec, const char* name)
 {
     if (!myPrivate->matlabEngine)
     {
@@ -720,6 +771,30 @@ goMatlab::copyToMatlab (const goVectord* vec, mxArray* m)
 }
 
 bool
+goMatlab::copyToMatlab (const goVectorf* vec, mxArray* m)
+{
+    assert (sizeof(double) == sizeof(goDouble));
+    if ((unsigned int)vec->getSize() != mxGetN(m) * mxGetM(m))
+    {
+        printf ("Signal and matrix are not of the same size\n");
+        return false;
+    }
+    double* mPtr = mxGetPr (m);
+    if (!mPtr)
+    {
+        return false;
+    }
+    goSize_t sz = vec->getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        *mPtr = (*vec)[i];
+        ++mPtr;
+    }
+    // memcpy (mPtr, vec->getPtr(), sizeof(double) * vec->getSize());
+    return true;
+}
+
+bool
 goMatlab::copyToMatlab (const goDouble* array, goSize_t length, mxArray* m)
 {
     assert (sizeof(double) == sizeof(goDouble));
@@ -809,6 +884,30 @@ goMatlab::copyFromMatlab (mxArray* m, goVectord* vec)
         return false;
     }
     memcpy (vec->getPtr(), mPtr, sizeof(double) * vec->getSize());
+    return true;
+}
+
+bool
+goMatlab::copyFromMatlab (mxArray* m, goVectorf* vec)
+{
+    assert (sizeof(double) == sizeof(goDouble));
+    if ((unsigned int)vec->getSize() != mxGetN(m) * mxGetM(m))
+    {
+        printf ("Signal and array are not of the same size\n");
+        return false;
+    }
+    const double* mPtr = mxGetPr (m);
+    if (!mPtr)
+    {
+        return false;
+    }
+    goSize_t sz = vec->getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        (*vec)[i] = *mPtr;
+        ++mPtr;
+    }
+    // memcpy (vec->getPtr(), mPtr, sizeof(double) * vec->getSize());
     return true;
 }
 

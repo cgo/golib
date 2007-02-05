@@ -25,6 +25,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/goaffinetransform.cpp
  src/math/affinematch.cpp
  src/math/getknee.cpp
  src/math/goresample.cpp

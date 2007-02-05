@@ -1,7 +1,6 @@
 #ifndef GOMATRIX_H
 #define GOMATRIX_H
 
-
 #include <gotypes.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
@@ -72,6 +71,8 @@ class goMatrix
   void getTranspose (goMatrix<T>& trans);
 
   bool invert ();
+
+  void power (T scalar);
 
   void flip (goSize_t dim = 0);
 
@@ -153,13 +154,97 @@ class goMatrix
       return s;
   };
 
+  /** 
+   * @brief Sum over all columns / all rows.
+   * 
+   * @param dimension If 0, sums over all columns and the result is a row vector.
+   * Else, sums over all rows and the result is a column vector.
+   * @param ret Result.
+   */
+  template <class To>
+  inline void sum (int dimension, goMatrix<To>& ret) const
+  {
+      if (dimension == 0)
+      {
+          goSize_t r = this->getRows();
+          goSize_t c = this->getColumns();
+          ret.resize (1, c);
+          ret.fill (T(0));
+          for (goSize_t i = 0; i < r; ++i)
+          {
+              for (goSize_t j = 0; j < c; ++j)
+              {
+                  ret(0,j) += (*this)(i,j);
+              }
+          }
+      }
+      else
+      {
+          goSize_t r = this->getRows();
+          goSize_t c = this->getColumns();
+          ret.resize (r, 1);
+          ret.fill (T(0));
+          for (goSize_t i = 0; i < r; ++i)
+          {
+              T temp = T(0);
+              for (goSize_t j = 0; j < c; ++j)
+              {
+                  temp += (*this)(i,j);
+              }
+              ret(i,0) = temp;
+          }
+      }
+  };
+
   // TNT compatibility methods BEGIN
   inline int        dim1 () const { return this->getRows(); };
   inline int        dim2 () const { return this->getColumns(); };
   inline const goMatrix<T>& copy () const { return *this;};  // NOTE: Makes a deep copy here
                                                              // and a reference in TNT
   // TNT compatibility methods END  
- 
+
+  /** 
+   * @brief Make a reference to sub-matrix.
+   * 
+   * refMatrix will be initialised to refer to the sub-matrix starting at
+   * (startRow,startColumn) and extending for num_rows and num_cols rows and columns,
+   * respectively.
+   *
+   * @note No bound checks are done.
+   *
+   * @param startRow     Start element.
+   * @param startColumn  Start element.
+   * @param num_rows     Number of rows.
+   * @param num_cols     Number of columns.
+   * @param refMatrix    Refers to the defined sub-matrix on return.
+   */
+  inline void ref (goSize_t startRow, goSize_t startColumn, 
+                   goSize_t num_rows, goSize_t num_cols, goMatrix<T>& refMatrix)
+  {
+      refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
+  };
+
+  /** 
+   * @brief Make a reference to sub-matrix.
+   * 
+   * refMatrix will be initialised to refer to the sub-matrix starting at
+   * (startRow,startColumn) and extending for num_rows and num_cols rows and columns,
+   * respectively.
+   *
+   * @note No bound checks are done.
+   *
+   * @param startRow     Start element.
+   * @param startColumn  Start element.
+   * @param num_rows     Number of rows.
+   * @param num_cols     Number of columns.
+   * @param refMatrix    Refers to the defined sub-matrix on return.
+   */
+  inline void ref (goSize_t startRow, goSize_t startColumn, 
+                   goSize_t num_rows, goSize_t num_cols, const goMatrix<T>& refMatrix) const
+  {
+      refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
+  };
+
   /** 
   * @brief Makes a vector reference a row from this matrix.
   * 
@@ -397,6 +482,13 @@ class goMatrix
     return *this;
   };
 
+  inline goMatrix<T> operator* (T scalar)
+  {
+      goMatrix<T> temp = *this;
+      temp *= scalar;
+      return temp;
+  };
+
   /** 
   * @brief Division by a scalar.
   * 
@@ -478,6 +570,9 @@ template<class T>
 void goMatrixMult (T alpha, const goMatrix<T>& A, bool transA, 
                             const goMatrix<T>& B, bool transB, 
                    T beta, goMatrix<T>& C);
+
+template<class T>
+void goMatrixPower (goMatrix<T>& A, T scalar);
 
 /**
  * @brief calculate \f$ y = \alpha A x + \beta y \f$.

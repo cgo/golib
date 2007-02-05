@@ -212,6 +212,31 @@ const goList<goVector<T> >& goPointCloud<T>::getPoints () const
     return myPrivate->points;
 }
 
+/** 
+ * @brief Set points from the rows of a configuration matrix.
+ * 
+ * @param m Matrix, each row containing one point.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goPointCloud<T>::setPoints (const goMatrix<T>& m)
+{
+    myPrivate->points.erase ();
+    goSize_t sz = m.getRows ();
+    const goVector<T> ref;
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        m.refRow (i, ref);
+        myPrivate->points.append (ref);
+    }
+    if (!myPrivate->points.isEmpty())
+    {
+        myPrivate->dim = m.getColumns();
+    }
+    return true;
+}
+
 /**
 * @brief Set the point list.
 *

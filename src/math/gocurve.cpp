@@ -5,6 +5,7 @@
 #include <goconfig.h>
 #include <gomatrix.h>
 #include <gofilter1d.h>
+#include <goresample.h>
 
 #ifndef GOLOG_H
 # include <golog.h>
@@ -83,6 +84,148 @@ goCurve<T>::~goCurve ()
     }
 }
 
+/** 
+ * @brief Sample a point from the curve polygon.
+ *
+ * Interpolates linearly to sample points from the polygon defined by
+ * the points of this curve.
+ * 
+ * @param position Position on the curve in [0,this->getLength()]
+ * @param ret      On return, contains the point at position.
+ * 
+ * @return True if successful, false otherwise (check logfile).
+ */
+template <class T>
+bool goCurve<T>::sample (goDouble position, goVector<T>& ret) const
+{
+    if (this->getPoints().getSize() < 2)
+    {
+        return false;
+    }
+    goDouble pos1 = 0.0;
+
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    goSize_t sz = this->getPoints().getSize ();
+    goSize_t i = 0;
+    goDouble lastLength = 0.0;
+    while (i < (sz - 1) && el && position > pos1)
+    {
+        goVector<T> temp = el->elem;
+        temp -= el->next->elem;
+        lastLength = temp.norm2();
+        pos1 += lastLength;
+        ++i;
+        el = el->next;
+    }
+    if (position > pos1)
+    {
+        goLog::warning ("goCurve::sample(): position > pos1 after loop. Out of range?");
+        return false;
+    }
+    if (!el)
+    {
+        goLog::warning ("goCurve::sample(): el == 0 after loop. Out of range?");
+        return false;
+    }
+    
+    if (position > 0.0)
+    {
+        ret = el->prev->elem + 
+            (el->elem - el->prev->elem) * (position - pos1 + lastLength) * (1.0 / lastLength);
+    }
+    else
+    {
+        ret = el->elem;
+    }
+    return true;
+}
+
+/** 
+ * @brief Resample from start to end given in length parameters.
+ *
+ * @note Remember that resampling does not preserve the original points
+ * except the first and last!
+ * 
+ * @param start Start (curve goes from 0.0 to getLength())
+ * @param end End
+ * @param samples Number of samples 
+ * @param ret List of points for the result.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goCurve<T>::resample (goDouble start, goDouble end, 
+                           goSize_t samples, goList<goVector<T> >& ret) const
+{
+    if (this->getPoints().getSize() < 2)
+    {
+        return false;
+    }
+    goDouble pos1 = 0.0;
+    goDouble pos2 = 0.0;
+
+    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    goSize_t sz = this->getPoints().getSize ();
+    goSize_t i = 0;
+    goDouble lastLength = 0.0;
+    while (i < (sz - 1) && el && start > pos1)
+    {
+        goVector<T> temp = el->elem;
+        temp -= el->next->elem;
+        lastLength = temp.norm2();
+        pos1 += lastLength;
+        ++i;
+        el = el->next;
+    }
+    if (start > pos1)
+    {
+        goLog::warning ("goCurve::resample(): start > pos1 after loop. Wrong start value?");
+        return false;
+    }
+
+    assert (el);
+
+    //= Go one step back
+    // --i;
+    // el = el->prev;
+    // pos1 -= lastLength;
+    //= Copy points including start and end points into temporary and
+    //= then resample those (this is more readable and less error prone).
+    goList<goVector<T> > tempPoints;
+    //= First point:
+    if (start > 0.0)
+    {
+        goVector<T> p = el->prev->elem + 
+            (el->elem - el->prev->elem) * (start - pos1 + lastLength) * (1.0 / lastLength);
+        tempPoints.append (p);
+    }
+    // pos1 += lastLength;
+    while (el && pos1 < end && i < sz)
+    {
+        tempPoints.append (el->elem);
+        goVector<T> temp = el->elem;
+        temp -= el->next->elem;
+        lastLength = temp.norm2();
+        pos1 += lastLength;
+        ++i;
+        el = el->next;
+    }
+    if (pos1 < end)
+    {
+        goLog::warning ("goCurve::resample(): pos1 < end after loop. end too large? -- resampling until end of curve instead.");
+    }
+    
+    //= Append last point.
+    {
+        goVector<T> p = el->prev->elem + 
+            (el->elem - el->prev->elem) * (end - pos1 + lastLength) * (1.0 / lastLength);
+        tempPoints.append (p);
+    }
+
+    return resampleLinear (tempPoints.getFrontElement(), tempPoints.getSize(), 
+            samples, ret, false);
+}
+
 // Defined in pointcloud
 #if 0
 template <class pointT>
@@ -97,6 +240,12 @@ bool goCurve<pointT>::operator!= (const goCurve<pointT>& other) const
     return !(*this == other);
 }
 #endif
+
+template <class T>
+bool goCurve<T>::setPoints (const goMatrix<T>& m)
+{
+    return goPointCloud<T>::setPoints (m);
+}
 
 /**
  * @bug Check this -- this can't be the right solution.

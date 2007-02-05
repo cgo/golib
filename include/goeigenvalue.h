@@ -87,8 +87,8 @@ class goEigenvalue
 
    /** Arrays for internal storage of eigenvalues. */
 
-   goArray<Real> d;         /* real part */
-   goArray<Real> e;         /* img part */
+   goVector<Real> d;         /* real part */
+   goVector<Real> e;         /* img part */
 
    /** Array for internal storage of eigenvectors. */
     goMatrix<Real> V;
@@ -124,17 +124,17 @@ class goEigenvalue
    
          // Scale to avoid under/overflow.
    
-         Real scale = 0.0;
-         Real h = 0.0;
+         Real scale = Real(0.0);
+         Real h = Real(0.0);
          for (int k = 0; k < i; k++) {
             scale = scale + abs(d[k]);
          }
-         if (scale == 0.0) {
+         if (scale == Real(0.0)) {
             e[i] = d[i-1];
             for (int j = 0; j < i; j++) {
                d[j] = V(i-1,j);
-               V(i,j) = 0.0;
-               V(j,i) = 0.0;
+               V(i,j) = Real(0.0);
+               V(j,i) = Real(0.0);
             }
          } else {
    
@@ -145,7 +145,7 @@ class goEigenvalue
                h += d[k] * d[k];
             }
             Real f = d[i-1];
-            Real g = sqrt(h);
+            Real g = Real(sqrt(h));
             if (f > 0) {
                g = -g;
             }
@@ -153,7 +153,7 @@ class goEigenvalue
             h = h - f * g;
             d[i-1] = f - g;
             for (int j = 0; j < i; j++) {
-               e[j] = 0.0;
+               e[j] = Real(0.0);
             }
    
             // Apply similarity transformation to remaining columns.
@@ -168,7 +168,7 @@ class goEigenvalue
                }
                e[j] = g;
             }
-            f = 0.0;
+            f = Real(0.0);
             for (int j = 0; j < i; j++) {
                e[j] /= h;
                f += e[j] * d[j];
@@ -184,7 +184,7 @@ class goEigenvalue
                   V(k,j) -= (f * e[k] + g * d[k]);
                }
                d[j] = V(i-1,j);
-               V(i,j) = 0.0;
+               V(i,j) = Real(0.0);
             }
          }
          d[i] = h;
@@ -194,14 +194,14 @@ class goEigenvalue
    
       for (int i = 0; i < n-1; i++) {
          V(n-1,i) = V(i,i);
-         V(i,i) = 1.0;
+         V(i,i) = Real(1.0);
          Real h = d[i+1];
-         if (h != 0.0) {
+         if (h != Real(0.0)) {
             for (int k = 0; k <= i; k++) {
                d[k] = V(k,i+1) / h;
             }
             for (int j = 0; j <= i; j++) {
-               Real g = 0.0;
+               Real g = Real(0.0);
                for (int k = 0; k <= i; k++) {
                   g += V(k,i+1) * V(k,j);
                }
@@ -211,15 +211,15 @@ class goEigenvalue
             }
          }
          for (int k = 0; k <= i; k++) {
-            V(k,i+1) = 0.0;
+            V(k,i+1) = Real(0.0);
          }
       }
       for (int j = 0; j < n; j++) {
          d[j] = V(n-1,j);
-         V(n-1,j) = 0.0;
+         V(n-1,j) = Real(0.0);
       }
-      V(n-1,n-1) = 1.0;
-      e[0] = 0.0;
+      V(n-1,n-1) = Real(1.0);
+      e[0] = Real(0.0);
    } 
 
    // Symmetric tridiagonal QL algorithm.
@@ -234,11 +234,11 @@ class goEigenvalue
       for (int i = 1; i < n; i++) {
          e[i-1] = e[i];
       }
-      e[n-1] = 0.0;
+      e[n-1] = Real(0.0);
    
-      Real f = 0.0;
-      Real tst1 = 0.0;
-      Real eps = pow(2.0,-52.0);
+      Real f = Real(0.0);
+      Real tst1 = Real(0.0);
+      Real eps = Real(pow(2.0,-52.0));
       for (int l = 0; l < n; l++) {
 
          // Find small subdiagonal element
@@ -266,8 +266,8 @@ class goEigenvalue
                // Compute implicit shift
    
                Real g = d[l];
-               Real p = (d[l+1] - g) / (2.0 * e[l]);
-               Real r = goMath::hypot<Real>(p,1.0f);
+               Real p = Real((d[l+1] - g) / (2.0 * (float)e[l]));
+               Real r = goMath::hypot<Real>(p,Real(1));
                if (p < 0) {
                   r = -r;
                }
@@ -283,12 +283,12 @@ class goEigenvalue
                // Implicit QL transformation.
    
                p = d[m];
-               Real c = 1.0;
+               Real c = Real(1.0);
                Real c2 = c;
                Real c3 = c;
                Real el1 = e[l+1];
-               Real s = 0.0;
-               Real s2 = 0.0;
+               Real s = Real(0.0);
+               Real s2 = Real(0.0);
                for (int i = m-1; i >= l; i--) {
                   c3 = c2;
                   c2 = c;
@@ -319,7 +319,7 @@ class goEigenvalue
             } while (abs(e[l]) > eps*tst1);
          }
          d[l] = d[l] + f;
-         e[l] = 0.0;
+         e[l] = Real(0.0);
       }
      
       // Sort eigenvalues and corresponding vectors.
@@ -361,20 +361,20 @@ class goEigenvalue
    
          // Scale column.
    
-         Real scale = 0.0;
+         Real scale = Real(0.0);
          for (int i = m; i <= high; i++) {
             scale = scale + abs(H(i,m-1));
          }
-         if (scale != 0.0) {
+         if (scale != Real(0.0)) {
    
             // Compute Householder transformation.
    
-            Real h = 0.0;
+            Real h = Real(0.0);
             for (int i = high; i >= m; i--) {
                ort[i] = H(i,m-1)/scale;
                h += ort[i] * ort[i];
             }
-            Real g = sqrt(h);
+            Real g = Real(sqrt(h));
             if (ort[m] > 0) {
                g = -g;
             }
@@ -385,7 +385,7 @@ class goEigenvalue
             // H = (I-u*u'/h)*H*(I-u*u')/h)
    
             for (int j = m; j < n; j++) {
-               Real f = 0.0;
+               Real f = Real(0.0);
                for (int i = high; i >= m; i--) {
                   f += ort[i]*H(i,j);
                }
@@ -396,7 +396,7 @@ class goEigenvalue
            }
    
            for (int i = 0; i <= high; i++) {
-               Real f = 0.0;
+               Real f = Real(0.0);
                for (int j = high; j >= m; j--) {
                   f += ort[j]*H(i,j);
                }
@@ -414,17 +414,17 @@ class goEigenvalue
 
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
-            V(i,j) = (i == j ? 1.0 : 0.0);
+            V(i,j) = (i == j ? Real(1.0) : Real(0.0));
          }
       }
 
       for (int m = high-1; m >= low+1; m--) {
-         if (H(m,m-1) != 0.0) {
+         if (H(m,m-1) != Real(0.0)) {
             for (int i = m+1; i <= high; i++) {
                ort[i] = H(i,m-1);
             }
             for (int j = m; j <= high; j++) {
-               Real g = 0.0;
+               Real g = Real(0.0);
                for (int i = m; i <= high; i++) {
                   g += ort[i] * V(i,j);
                }
@@ -473,17 +473,17 @@ class goEigenvalue
       int n = nn-1;
       int low = 0;
       int high = nn-1;
-      Real eps = pow(2.0,-52.0);
-      Real exshift = 0.0;
+      Real eps = Real(pow(2.0,-52.0));
+      Real exshift = Real(0.0);
       Real p=0,q=0,r=0,s=0,z=0,t,w,x,y;
    
       // Store roots isolated by balanc and compute matrix norm
    
-      Real norm = 0.0;
+      Real norm = Real(0.0);
       for (int i = 0; i < nn; i++) {
          if ((i < low) || (i > high)) {
             d[i] = H(i,i);
-            e[i] = 0.0;
+            e[i] = Real(0.0);
          }
          for (int j = max(i-1,0); j < nn; j++) {
             norm = norm + abs(H(i,j));
@@ -500,7 +500,7 @@ class goEigenvalue
          int l = n;
          while (l > low) {
             s = abs(H(l-1,l-1)) + abs(H(l,l));
-            if (s == 0.0) {
+            if (s == Real(0.0)) {
                s = norm;
             }
             if (abs(H(l,l-1)) < eps * s) {
@@ -515,7 +515,7 @@ class goEigenvalue
          if (l == n) {
             H(n,n) = H(n,n) + exshift;
             d[n] = H(n,n);
-            e[n] = 0.0;
+            e[n] = Real(0.0);
             n--;
             iter = 0;
    
@@ -523,9 +523,9 @@ class goEigenvalue
    
          } else if (l == n-1) {
             w = H(n,n-1) * H(n-1,n);
-            p = (H(n-1,n-1) - H(n,n)) / 2.0;
+            p = Real((H(n-1,n-1) - H(n,n)) / 2.0);
             q = p * p + w;
-            z = sqrt(abs(q));
+            z = Real(sqrt(abs(q)));
             H(n,n) = H(n,n) + exshift;
             H(n-1,n-1) = H(n-1,n-1) + exshift;
             x = H(n,n);
@@ -540,16 +540,16 @@ class goEigenvalue
                }
                d[n-1] = x + z;
                d[n] = d[n-1];
-               if (z != 0.0) {
+               if (z != Real(0.0)) {
                   d[n] = x - w / z;
                }
-               e[n-1] = 0.0;
-               e[n] = 0.0;
+               e[n-1] = Real(0.0);
+               e[n] = Real(0.0);
                x = H(n,n-1);
                s = abs(x) + abs(z);
                p = x / s;
                q = z / s;
-               r = sqrt(p * p+q * q);
+               r = Real(sqrt(p * p+q * q));
                p = p / r;
                q = q / r;
    
@@ -595,8 +595,8 @@ class goEigenvalue
             // Form shift
    
             x = H(n,n);
-            y = 0.0;
-            w = 0.0;
+            y = Real(0.0);
+            w = Real(0.0);
             if (l < n) {
                y = H(n-1,n-1);
                w = H(n,n-1) * H(n-1,n);
@@ -610,26 +610,26 @@ class goEigenvalue
                   H(i,i) -= x;
                }
                s = abs(H(n,n-1)) + abs(H(n-1,n-2));
-               x = y = 0.75 * s;
-               w = -0.4375 * s * s;
+               x = y = Real(0.75 * s);
+               w = Real(-0.4375 * s * s);
             }
 
             // MATLAB's new ad hoc shift
 
             if (iter == 30) {
-                s = (y - x) / 2.0;
-                s = s * s + w;
+                s = Real((y - x) / 2.0);
+                s = Real(s * s + w);
                 if (s > 0) {
-                    s = sqrt(s);
+                    s = Real(sqrt(s));
                     if (y < x) {
                        s = -s;
                     }
-                    s = x - w / ((y - x) / 2.0 + s);
+                    s = Real((double)(x - w) / (double)((y - x) / 2.0 + s));
                     for (int i = low; i <= n; i++) {
                        H(i,i) -= s;
                     }
                     exshift += s;
-                    x = y = w = 0.964;
+                    x = y = w = Real(0.964);
                 }
             }
    
@@ -661,9 +661,9 @@ class goEigenvalue
             }
    
             for (int i = m+2; i <= n; i++) {
-               H(i,i-2) = 0.0;
+               H(i,i-2) = Real(0.0);
                if (i > m+2) {
-                  H(i,i-3) = 0.0;
+                  H(i,i-3) = Real(0.0);
                }
             }
    
@@ -674,18 +674,18 @@ class goEigenvalue
                if (k != m) {
                   p = H(k,k-1);
                   q = H(k+1,k-1);
-                  r = (notlast ? H(k+2,k-1) : 0.0);
+                  r = (notlast ? H(k+2,k-1) : Real(0.0));
                   x = abs(p) + abs(q) + abs(r);
-                  if (x != 0.0) {
+                  if (x != Real(0.0)) {
                      p = p / x;
                      q = q / x;
                      r = r / x;
                   }
                }
-               if (x == 0.0) {
+               if (x == Real(0.0)) {
                   break;
                }
-               s = sqrt(p * p + q * q + r * r);
+               s = Real(sqrt(p * p + q * q + r * r));
                if (p < 0) {
                   s = -s;
                }
@@ -744,7 +744,7 @@ class goEigenvalue
       
       // Backsubstitute to find vectors of upper triangular form
 
-      if (norm == 0.0) {
+      if (norm == Real(0.0)) {
          return;
       }
    
@@ -756,20 +756,20 @@ class goEigenvalue
    
          if (q == 0) {
             int l = n;
-            H(n,n) = 1.0;
+            H(n,n) = Real(1.0);
             for (int i = n-1; i >= 0; i--) {
                w = H(i,i) - p;
-               r = 0.0;
+               r = Real(0.0);
                for (int j = l; j <= n; j++) {
                   r = r + H(i,j) * H(j,n);
                }
-               if (e[i] < 0.0) {
+               if (e[i] < Real(0.0)) {
                   z = w;
                   s = r;
                } else {
                   l = i;
-                  if (e[i] == 0.0) {
-                     if (w != 0.0) {
+                  if (e[i] == Real(0.0)) {
+                     if (w != Real(0.0)) {
                         H(i,n) = -r / w;
                      } else {
                         H(i,n) = -r / (eps * norm);
@@ -812,23 +812,23 @@ class goEigenvalue
                H(n-1,n-1) = q / H(n,n-1);
                H(n-1,n) = -(H(n,n) - p) / H(n,n-1);
             } else {
-               cdiv(0.0,-H(n-1,n),H(n-1,n-1)-p,q);
+               cdiv(Real(0.0),-H(n-1,n),H(n-1,n-1)-p,q);
                H(n-1,n-1) = cdivr;
                H(n-1,n) = cdivi;
             }
-            H(n,n-1) = 0.0;
-            H(n,n) = 1.0;
+            H(n,n-1) = Real(0.0);
+            H(n,n) = Real(1.0);
             for (int i = n-2; i >= 0; i--) {
                Real ra,sa,vr,vi;
-               ra = 0.0;
-               sa = 0.0;
+               ra = Real(0.0);
+               sa = Real(0.0);
                for (int j = l; j <= n; j++) {
                   ra = ra + H(i,j) * H(j,n-1);
                   sa = sa + H(i,j) * H(j,n);
                }
                w = H(i,i) - p;
    
-               if (e[i] < 0.0) {
+               if (e[i] < Real(0.0)) {
                   z = w;
                   r = ra;
                   s = sa;
@@ -845,8 +845,8 @@ class goEigenvalue
                      x = H(i,i+1);
                      y = H(i+1,i);
                      vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
-                     vi = (d[i] - p) * 2.0 * q;
-                     if ((vr == 0.0) && (vi == 0.0)) {
+                     vi = Real((d[i] - p) * 2.0 * q);
+                     if ((vr == Real(0.0)) && (vi == Real(0.0))) {
                         vr = eps * norm * (abs(w) + abs(q) +
                         abs(x) + abs(y) + abs(z));
                      }
@@ -891,7 +891,7 @@ class goEigenvalue
    
       for (int j = nn-1; j >= low; j--) {
          for (int i = low; i <= high; i++) {
-            z = 0.0;
+            z = Real(0.0);
             for (int k = low; k <= min(j,high); k++) {
                z = z + V(i,k) * H(k,j);
             }
@@ -909,9 +909,9 @@ public:
 
    goEigenvalue(const goMatrix<Real> &A) {
       n = A.dim2();
-      V = goMatrix<Real>(n,n);
-      d = goArray<Real>(n);
-      e = goArray<Real>(n);
+      V.resize(n,n);
+      d.resize(n);
+      e.resize(n);
 
       issymmetric = 1;
       for (int j = 0; (j < n) && issymmetric; j++) {
@@ -934,8 +934,8 @@ public:
          tql2();
 
       } else {
-         H = goMatrix<Real>(n,n);
-         ort = goArray<Real>(n);
+         H.resize(n,n);
+         ort.resize(n);
          
          for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
@@ -961,11 +961,18 @@ public:
       return;
    }
 
+   const goMatrix<Real>& getV () const { return this->V; };
+   goMatrix<Real>&       getV () { return this->V; };
+
+   goVector<Real>&       getRealEigenvalues () { return this->d; };
+   const goVector<Real>& getRealEigenvalues () const { return this->d; };
+   goVector<Real>&       getImagEigenvalues () { return this->e; };
+   const goVector<Real>& getImagEigenvalues () const { return this->e; };
+
    /** Return the real parts of the eigenvalues
    @return     real(diag(D))
    */
-
-   void getRealEigenvalues (goArray<Real> &d_) {
+   void getRealEigenvalues (goVector<Real> &d_) {
       d_ = d;
       return ;
    }
@@ -975,7 +982,7 @@ public:
 
    @pararm e_: new matrix with imaginary parts of the eigenvalues.
    */
-   void getImagEigenvalues (goArray<Real> &e_) {
+   void getImagEigenvalues (goVector<Real> &e_) {
       e_ = e;
       return;
    }
@@ -1018,7 +1025,7 @@ public:
       D = goMatrix<Real>(n,n);
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
-            D(i,j) = 0.0;
+            D(i,j) = Real(0.0);
          }
          D(i,i) = d[i];
          if (e[i] > 0) {

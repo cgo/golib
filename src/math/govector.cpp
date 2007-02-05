@@ -24,6 +24,8 @@ goVector<T>::~goVector ()
 {
 }
 
+//= Was inlined.
+#if 0
 template <class T>
 goVector<T> goVector<T>::operator- (const goVector<T>& other) const
 {
@@ -49,6 +51,8 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
     }
     return ret;
 };
+#endif
+
 template<> 
 goFloat goVector<goFloat>::operator* (const goVector<goFloat>& other) const
 {

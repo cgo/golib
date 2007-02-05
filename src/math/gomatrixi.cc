@@ -2,6 +2,9 @@
 #include <gomatrix.hpp>
 #include <gocomplex.h>
 #include <gomath.h>		// MAX()
+#ifndef GOEIGENVALUE_H
+# include <goeigenvalue.h>
+#endif
 #include <iostream>
 
 template <>
@@ -86,6 +89,62 @@ bool goMatrix<T>::invert ()
 {
     goLog::error ("goMatrix::invert() not implemented for types other than goFloat and goDouble.");
     return false;
+}
+
+template <>
+void goMatrix<goFloat>::power (goFloat scalar)
+{
+    goMatrixPower<goFloat> (*this, scalar);
+}
+
+template <>
+void goMatrix<goDouble>::power (goDouble scalar)
+{
+    goMatrixPower<goDouble> (*this, scalar);
+}
+
+template <class T>
+void goMatrix<T>::power (T)
+{
+    goLog::warning ("goMatrix::power() not defined for this type.");
+}
+
+template<>
+void goMatrixPower (goMatrix<goComplexf>& A, goComplexf scalar)
+{
+    goLog::error ("goMatrixPower() not implemented for complex.");
+}
+
+template<>
+void goMatrixPower (goMatrix<goComplexd>& A, goComplexd scalar)
+{
+    goLog::error ("goMatrixPower() not implemented for complex.");
+}
+
+template<class T>
+void goMatrixPower (goMatrix<T>& A, T scalar)
+{
+    if (A.getRows() != A.getColumns())
+    {
+        goLog::warning ("goMatrixPower(): A is not quadratic.");
+        return;
+    }
+    goMath::goEigenvalue<T> eig (A);
+    const goMatrix<T>& V = eig.getV();
+    goMatrix<T> Vtemp = V;
+    goVector<T>& d = eig.getRealEigenvalues();
+    //= V * D.^scalar * V'
+    goSize_t n = d.getSize();
+    for (goSize_t i = 0; i < n; ++i)
+        d[i] = T(::pow (d[i],scalar));
+    n = Vtemp.getRows ();
+    goVector<T> refV;
+    for (goSize_t i = 0; i < n; ++i)
+    {
+        Vtemp.refRow (i,refV);
+        refV *= d;  //= Element-wise multiplication
+    }
+    goMatrixMult<T> (T(1), Vtemp, false, V, true, T(0), A);
 }
 
 template<>
@@ -202,6 +261,7 @@ bool goMatrixVectorMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, 
 }
 
 /* Instantiation */
+template void  goMatrixPower<goFloat> (goMatrix<goFloat>& A, goFloat);
 template class goMatrix<goDouble>;
 template class goMatrix<goFloat>;
 template class goMatrix<goIndex_t>;

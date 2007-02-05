@@ -20,6 +20,10 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#ifndef GOAFFINETRANSFORM_H
+# include <goaffinetransform.h>
+#endif
+
 
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask
@@ -56,7 +60,7 @@ Real hypot(const Real &a, const Real &b)
 	else
 	{
 		Real c = b/a;
-		return abs(a) * sqrt(1 + c*c);
+		return Real(abs((double)a) * Real(sqrt(1.0 + (double)(c*c))));
 	}
 }
 /*! @} */
@@ -187,6 +191,9 @@ goDouble goConjugateGradients (const MatrixType& A, const VectorType& b, VectorT
 template <class T>
 bool centerOfMass (const goList<goVector<T> >&, goVector<T>& comRet);
 
+template <class T>
+bool centerOfMass (const goMatrix<T>& confMatrix, goVector<T>& comRet);
+
 template <class pointT>
 bool centerOfMass (const goList<pointT>&, pointT& comRet);
 
@@ -197,6 +204,16 @@ bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2,
 
 template <class T>
 bool affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix<T>& A, goVector<T>& t);
+
+template <class T>
+bool affineMatch(
+        const goMatrix<T>& q,
+        const goMatrix<T>& s,
+        goDouble beta,
+        const goMatrix<T>& q2,
+        const goMatrix<T>& s2,
+        goMatrix<T>& A,
+        goVector<T>& t);
 
 /** 
  * @brief Mean calculation.

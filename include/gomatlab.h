@@ -92,6 +92,8 @@ class goMatlab : public goObjectBase
         bool     getArray  (goArray<goDouble>* array, const char* name);
         bool     putVector (const goVectord* vec, const char* name);
         bool     getVector (goVectord* vec, const char* name);
+        bool     putVector (const goVectorf* vec, const char* name);
+        bool     getVector (goVectorf* vec, const char* name);
         bool     putDouble (goDouble d, const char* name);
         bool     getDouble (goDouble& d, const char* name);
         bool     putSparse (goSparseMatrix* sm, const char* name);
@@ -144,14 +146,15 @@ class goMatlab : public goObjectBase
                     return false;
                 }
                 double* mP = mxGetPr (temp);
-                goSize_t i;
-                goSize_t sz = matrix.getRows() * matrix.getColumns();
-                T* p = matrix.getData();
-                for (i = 0; i < sz; ++i)
+                goSize_t N = matrix.getColumns();
+                goSize_t M = matrix.getRows();
+                for (goSize_t j = 0; j < N; ++j)
                 {
-                    *p = *mP;
-                    ++p;
-                    ++mP;
+                    for (goSize_t i = 0; i < M; ++i)
+                    {
+                        matrix(i,j) = *mP;
+                        ++mP;
+                    }
                 }
                 return true;
             };
@@ -173,11 +176,13 @@ class goMatlab : public goObjectBase
         bool     copyToMatlab         (const goSignal3DBase<void>* sig, mxArray* matrix);
         bool     copyToMatlab         (const goArray<goDouble>* array, mxArray* matrix);
         bool     copyToMatlab         (const goVectord* array, mxArray* matrix);
+        bool     copyToMatlab         (const goVectorf* array, mxArray* matrix);
         bool     copyToMatlab         (const goDouble* array, goSize_t length, mxArray* matrix);
         bool     copyToMatlab         (goSparseMatrix* sp, mxArray* matrix);
         bool     copyFromMatlab       (mxArray* matrix, goSignal3DBase<void>* sig);
         bool     copyFromMatlab       (mxArray* matrix, goArray<goDouble>* array);
         bool     copyFromMatlab       (mxArray* matrix, goVectord* array);
+        bool     copyFromMatlab       (mxArray* matrix, goVectorf* array);
         bool     sparseToMatlabSparse (goSparseMatrix* sp, const char* name);
         bool     signalToVariable     (const goSignal3DBase<void>* sig, const char* name);
         bool     arrayToVariable      (const goArray<goDouble>* array, const char* name);

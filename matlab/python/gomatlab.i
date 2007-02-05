@@ -30,3 +30,23 @@
 %}
 
 %include <gomatlab.h>
+
+%extend goMatlab
+{
+    bool putMatrixf (const goMatrix<goFloat>& m, const char* name)
+    {
+        return self->putMatrix (m, name);
+    };
+    bool putMatrixd (const goMatrix<goDouble>& m, const char* name)
+    {
+        return self->putMatrix (m, name);
+    };
+    bool getMatrixf (goMatrix<goFloat>& m, const char* name)
+    {
+        return self->getMatrix (m, name);
+    };
+    bool getMatrixd (goMatrix<goDouble>& m, const char* name)
+    {
+        return self->getMatrix (m, name);
+    };
+}

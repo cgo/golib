@@ -20,7 +20,7 @@
 class goCurvePrivate;
 
 /** 
- * @addtocurve math
+ * @addtogroup math
  * @{
  */
 /**
@@ -37,7 +37,9 @@ class goCurve : public goPointCloud<T>
         virtual ~goCurve ();
         goCurve& operator= (const goCurve<T>&);
 
-        virtual bool setPoints (const goList<goVector<T> >&);
+
+        virtual bool setPoints    (const goList<goVector<T> >&);
+        virtual bool setPoints    (const goMatrix<T>&);
         bool     setPoints        (typename goList<goVector<T> >::ConstElement* sourceBegin, 
                                    goIndex_t                              sourcePointCount, 
                                    goIndex_t                              destPointCount, 
@@ -58,6 +60,11 @@ class goCurve : public goPointCloud<T>
         goDouble euclideanDistance (const goCurve<T>& other, bool forward = true) const;
 
         static goDouble getLength (const goList<goVector<T> >& pl);
+
+        bool sample (goDouble position, goVector<T>& ret) const;
+
+        bool resample (goDouble start, goDouble end, goSize_t samples, goList<goVector<T> >& ret) const;
+
         // static bool resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, typename goList<goVector<T> >::ConstElement* end, goIndex_t pointCount, goList<goVector<T> >& ret);
         // static bool resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret);
         static bool resample (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve);

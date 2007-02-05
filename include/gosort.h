@@ -140,9 +140,9 @@ static void goQuickSort (goIndex_t i1, goIndex_t i2, T* array, T2* array2, index
         }
     }
     if (l < i2)
-        goQuickSort (l,i2,array,indexArray);
+        goQuickSort (l,i2,array,array2,indexArray);
     if (r > i1)
-        goQuickSort (i1,r,array,indexArray);
+        goQuickSort (i1,r,array,array2,indexArray);
 }
 
 template <class T>
@@ -155,6 +155,12 @@ template <class T, class indexT>
 static void goSort (T* array, indexT* indexArray, goSize_t size)
 {
     goQuickSort (0, size-1, array, indexArray);
+}
+
+template < class T, class T2, class indexT >
+static void goSort (T* array, T2* array2, indexT* indexArray, goSize_t size)
+{
+    goQuickSort (0, size-1, array, array2, indexArray);
 }
 
 #endif

@@ -250,8 +250,16 @@ void goMatrix<T>::flip (goSize_t dim)
 template <class T>
 void goMatrix<T>::transpose ()
 {
+    if (this->externalData)
+    {
+        goLog::warning ("goMatrix::transpose() called on a matrix with external data. The matrix will not be a reference to the external data any more -- is this what you want?");
+    }
     goMatrix<T> temp;
     this->getTranspose(temp);
+    if (this->externalData)
+    {
+        this->resize (0, 0);
+    }
     *this = temp;
 }
 
@@ -569,6 +577,10 @@ goMatrix<T>& goMatrix<T>::operator-= (const goMatrix<T>& other)
 /** 
  * @brief Deep copy operator.
  * 
+ * If the size of this matrix does not match, it will be resized (ref()'ed matrices
+ * will no longer be references!). If the size matches, nothing is changed and
+ * data are just copied.
+ *
  * @param other Other matrix.
  * 
  * @return Reference to this matrix.
@@ -620,7 +632,7 @@ bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
 }
 
 /** 
- * @brief Calculate the Frobenius norm \f$ \left( \sum_i\sum_j |a_{i,j}|^2 \right)^{\frac{1}{2}} = \mathrm{trace} (A A^T) = \sum_i \sigma_i^2 \f$
+ * @brief Calculate the Frobenius norm \f$ \left( \sum_i\sum_j |a_{i,j}|^2 \right)^{\frac{1}{2}} = \left(\mathrm{trace} (A A^T)\right)^\frac{1}{2} = \left( \sum_i \sigma_i^2 \right)^\frac{1}{2} \f$
  * where \f$ \sigma_i \f$ is the \f$ i\f$'th singular value.
  *
  * @return The Frobenius norm of this matrix.
@@ -831,7 +843,7 @@ static void matrixVectorMult (const goMatrix<Tm>& m, const goVector<Tv>& v, goVe
   * @note Uses CBLAS for goFloat and goDouble types.
   * @param v A vector.
   * 
-  * @return this * v
+  * @return (*this) * v
   */
 template<class T>
 goVector<T> goMatrix<T>::operator* (const goVector<T>& v) const

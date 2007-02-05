@@ -163,6 +163,54 @@ class goList {
   };
 
   /** 
+   * @brief Return element number i.
+   *
+   * @note This is slow, O(this->getSize()). Lists are not meant for
+   * indexed access.
+   * 
+   * @return Element number i.
+   */
+  Element* operator() (goSize_t i)
+  {
+      if (i >= (goSize_t)this->getSize())
+      {
+          return 0;
+      }
+      Element* el = this->getFrontElement();
+      goSize_t c = 0;
+      while (c < i)
+      {
+          el = el->next;
+          ++c;
+      }
+      return el;
+  };
+
+  /** 
+   * @brief Return element number i.
+   *
+   * @note This is slow, O(this->getSize()). Lists are not meant for
+   * indexed access.
+   * 
+   * @return Element number i.
+   */
+  ConstElement* operator() (goSize_t i) const
+  {
+      if (i >= (goSize_t)this->getSize())
+      {
+          return 0;
+      }
+      ConstElement* el = this->getFrontElement();
+      goSize_t c = 0;
+      while (c < i)
+      {
+          el = el->next;
+          ++c;
+      }
+      return el;
+  };
+
+  /** 
    * @brief Fill the index field of the list elements with indices starting at 0.
    */
   void          index           ()
@@ -296,6 +344,14 @@ class goList {
       }
       return front->elem;
   };
+  const T&        getFront () const
+  {
+      if (!front)
+      {
+          return dummy.elem;
+      }
+      return front->elem;
+  };
 
   T*        getFrontPtr ()
   {
@@ -308,6 +364,14 @@ class goList {
 
   /// Returns the tail of the list.
   T&        getTail ()
+  {
+      if (!tail)
+      {
+          return dummy.elem;
+      }
+      return tail->elem;
+  };
+  const T&        getTail () const
   {
       if (!tail)
       {
