@@ -2,9 +2,10 @@
 #define GOSVD_H
 
 #include <goarray.h>
+#include <govector.h>
 #include <gomath.h>
 #include <gomatrix.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 
 #include <algorithm>
 // for min(), max() below
@@ -15,6 +16,42 @@ using namespace std;
 
 namespace goMath
 {
+
+    template <class T>
+        class SVD
+        {
+            private:
+                goMatrix<T> U;
+                goMatrix<T> V;
+                goVector<T> s;
+                goSize_t    myM;
+                goSize_t    myN;
+
+            public:
+                SVD (const goMatrix<T>& A);
+                virtual ~SVD ();
+
+                goMatrix<T>&       getU ();
+                const goMatrix<T>& getU () const;
+                goMatrix<T>&       getV ();
+                const goMatrix<T>& getV () const;
+                goVector<T>&       getSingularValues ();
+                const goVector<T>& getSingularValues () const;
+                void getS (goMatrix<T>& S) const;
+
+                bool calculate (const goMatrix<T>& A);
+        };
+
+#ifdef min
+# undef min
+#endif
+#ifdef max
+# undef max
+#endif
+#ifdef abs
+# undef abs
+#endif
+
     /*! \addtogroup math
      * @{
      */
@@ -38,18 +75,18 @@ namespace goMath
 	by the Mathworks and NIST; see  http://math.nist.gov/javanumerics/jama).
    */
 template <class Real>
-class goSVD 
+class ThinSVD 
 {
 	goMatrix<Real> U, V;
-	goArray<Real> s;
+	goVector<Real> s;
 	int m, n;
 
   public:
-   goSVD (const goMatrix<Real> &Arg) {
+   ThinSVD (const goMatrix<Real> &Arg) {
       m = Arg.dim1();
       n = Arg.dim2();
       int nu = min(m,n);
-      s = goArray<Real>(min(m+1,n)); 
+      s.resize(min(m+1,n)); 
       U = goMatrix<Real>(m, nu);
       U.fill (Real(0));
       V = goMatrix<Real>(n,n);
@@ -479,12 +516,38 @@ class goSVD
    	  A = V;
    }
 
+   goMatrix<Real>& getU ()
+   {
+       return this->U;
+   };
+   const goMatrix<Real>& getU () const
+   {
+       return this->U;
+   };
+   goMatrix<Real>& getV ()
+   {
+       return this->V;
+   };
+   const goMatrix<Real>& getV () const
+   {
+       return this->V;
+   };
+
    /** Return the one-dimensional array of singular values */
 
-   void getSingularValues (goArray<Real> &x) 
+   void getSingularValues (goVector<Real> &x) 
    {
       x = s;
-   }
+   };
+
+   goVector<Real>& getSingularValues ()
+   {
+       return this->s;
+   };
+   const goVector<Real>& getSingularValues () const
+   {
+       return this->s;
+   };
 
    /** Return the diagonal matrix of singular values
    @return     S

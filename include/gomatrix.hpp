@@ -27,7 +27,8 @@ extern "C"
 */
 template <class T>
 goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
-    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
+    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols),
+      rowMajor (true)
 {
     this->matrix = new T[rows * cols];
 }
@@ -39,7 +40,7 @@ goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
 */
 template <class T>
 goMatrix<T>::goMatrix (const goMatrix<T>& other)
-    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0)
+    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0), rowMajor (other.getRowMajor())
 {
     *this = other;
 }
@@ -52,12 +53,16 @@ goMatrix<T>::goMatrix (const goMatrix<T>& other)
 * @param c Columns
 */
 template <class T>
-goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
-    : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim)
+goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim, bool row_major)
+    : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim),
+      rowMajor (row_major)
 {
     if (leadingDim == 0)
     {
-        leadingDimension = columns;
+        if (row_major)
+            leadingDimension = columns;
+        else
+            leadingDimension = rows;
     }
 }
 
@@ -93,7 +98,14 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     this->matrix = new T[rows * cols];
     this->rows = rows;
     this->columns = cols;
-    this->leadingDimension = cols;
+    if (this->rowMajor)
+    {
+        this->leadingDimension = cols;
+    }
+    else
+    {
+        this->leadingDimension = rows;
+    }
     this->externalData = false;
     return true;
 }
@@ -120,7 +132,14 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
     this->columns = c;
     if (leadingDim == 0)
     {
-        this->leadingDimension = c;
+        if (this->rowMajor)
+        {
+            this->leadingDimension = c;
+        }
+        else
+        {
+            this->leadingDimension = r;
+        }
     }
     else
     {
@@ -155,7 +174,14 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
     const_cast<goMatrix<T>*>(this)->columns = c;
     if (leadingDim == 0)
     {
-        const_cast<goMatrix<T>*>(this)->leadingDimension = c;
+        if (this->rowMajor)
+        {
+            const_cast<goMatrix<T>*>(this)->leadingDimension = c;
+        }
+        else
+        {
+            const_cast<goMatrix<T>*>(this)->leadingDimension = r;
+        }
     }
     else
     {
@@ -170,7 +196,7 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
  * @param trans Contains the transpose after the method returned.
  */
 template <class T>
-void goMatrix<T>::getTranspose (goMatrix<T>& trans)
+void goMatrix<T>::getTranspose (goMatrix<T>& trans) const
 {
     if (trans.getColumns() != this->getRows() || trans.getRows() != this->getColumns())
     {
@@ -307,9 +333,9 @@ bool goMatrix<T>::operator!= (const goMatrix<T>& other) const
 //}
 
 /** 
- * @brief Copy sub-matrix from i1,j1 to i2,j2 into target.
+ * @brief References sub-matrix from i1,j1 to i2,j2 into target.
  *
- * For referencing, use the setData() method.
+ * To make clear it is referencing, use the ref() method.
  */
 template <class T>
 void goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, goMatrix<T>& target) const
@@ -675,13 +701,15 @@ void goMatrix<T>::setIdentity()
 template <class T>
 void goMatrix<T>::fill(T v)
 {
-    goSize_t sz = this->getRows() * this->getColumns();
-    goSize_t i;
-    T* mptr = this->matrix;
-    for (i = 0; i < sz; ++i)
+    T* row = this->matrix;
+    for (goSize_t i = 0; i < this->rows; ++i)
     {
-        *mptr = v;
-        ++mptr;
+        T* mptr = row;
+        for (goSize_t j = 0; j < this->columns; ++j, ++mptr)
+        {
+            *mptr = v;
+        }
+        row += this->leadingDimension;
     }
 }
 

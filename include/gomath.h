@@ -24,7 +24,6 @@
 # include <goaffinetransform.h>
 #endif
 
-
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask
 // for acknowledgment when TNT is used in a product.
@@ -103,7 +102,7 @@ Real acos(const Real &a)
 	@returns the minimum of scalars a and b.
 */
 template <class Scalar>
-Scalar min(const Scalar &a, const Scalar &b)
+Scalar min(Scalar a, Scalar b)
 {
 	return  a < b ? a : b;
 }
@@ -117,7 +116,7 @@ Scalar min(const Scalar &a, const Scalar &b)
 	@returns the maximum of scalars a and b.
 */
 template <class Scalar>
-Scalar max(const Scalar &a, const Scalar &b)
+Scalar max(Scalar a, Scalar b)
 {
 	return  a > b ? a : b;
 }
@@ -131,7 +130,7 @@ Scalar max(const Scalar &a, const Scalar &b)
 	@returns the absolute value of a real (no-complex) scalar.
 */
 template <class Real>
-Real abs(const Real &a)
+Real abs(Real a)
 {
 	return  (a > 0 ? a : -a);
 }

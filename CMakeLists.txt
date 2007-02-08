@@ -25,6 +25,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/gosvd.cpp
  src/math/goaffinetransform.cpp
  src/math/affinematch.cpp
  src/math/getknee.cpp
@@ -176,7 +177,56 @@ SET                 (SOURCES
  src/seispack/tred3.c
  src/seispack/tridib.c
  src/seispack/tsturm.c
- src/seispack/r_sign.c)
+ src/seispack/r_sign.c
+ ### For general SVD:
+ ## BLAS part:
+ #src/clapack/blas/lsame.c
+ #src/clapack/blas/xerbla.c
+ #src/clapack/blas/s_copy.c  ## in f2c
+ #src/clapack/blas/s_cmp.c   ## in f2c
+ ## LAPACK part:
+ #src/clapack/single/sbdsqr.c
+ #src/clapack/single/sgebd2.c
+ #src/clapack/single/sgebrd.c
+ #src/clapack/single/sgelq2.c
+ #src/clapack/single/sgelqf.c
+ #src/clapack/single/sgeqr2.c
+ #src/clapack/single/sgeqrf.c
+ #src/clapack/single/sgesvd.c
+ #src/clapack/single/slabrd.c
+ #src/clapack/single/slacpy.c
+ #src/clapack/single/slamch.c
+ #src/clapack/single/slange.c
+ #src/clapack/single/slapy2.c
+ #src/clapack/single/slarfb.c
+ #src/clapack/single/slarf.c
+ #src/clapack/single/slarfg.c
+ #src/clapack/single/slarft.c
+ #src/clapack/single/slartg.c
+ #src/clapack/single/slas2.c
+ #src/clapack/single/slascl.c
+ #src/clapack/single/slaset.c
+ #src/clapack/single/slasq1.c
+ #src/clapack/single/slasq2.c
+ #src/clapack/single/slasq3.c
+ #src/clapack/single/slasq4.c
+ #src/clapack/single/slasq5.c
+ #src/clapack/single/slasq6.c
+ #src/clapack/single/slasr.c
+ #src/clapack/single/slasrt.c
+ #src/clapack/single/slassq.c
+ #src/clapack/single/slasv2.c
+ #src/clapack/single/sorg2r.c
+ #src/clapack/single/sorgbr.c
+ #src/clapack/single/sorgl2.c
+ #src/clapack/single/sorglq.c
+ #src/clapack/single/sorgqr.c
+ #src/clapack/single/sorm2r.c
+ #src/clapack/single/sormbr.c
+ #src/clapack/single/sorml2.c
+ #src/clapack/single/sormlq.c
+ #src/clapack/single/sormqr.c
+ )
 
 SET (GOPATH ${PROJECT_SOURCE_DIR})
 
@@ -240,10 +290,13 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
 FIND_LIBRARY (ATLAS NAMES atlas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (CBLAS NAMES cblas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
+FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib /usr/local/lib /usr/lib64 ${GOPATH}/extra/lib)
 FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
+#FIND_LIBRARY (F2C NAMES f2c PATHS /usr/lib /usr/local/lib)
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
 #IF (${HAVE_LIBATLAS} MATCHES 1)
@@ -295,9 +348,15 @@ ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
+IF (LAPACK_ATLAS)
+    LINK_LIBRARIES (${LAPACK_ATLAS})
+ENDIF (LAPACK_ATLAS)
 IF (LAPACK)
     LINK_LIBRARIES (${LAPACK})
 ENDIF (LAPACK)
+IF (BLAS)
+    LINK_LIBRARIES (${BLAS})
+ENDIF (BLAS)
 IF (CBLAS)
     LINK_LIBRARIES (${CBLAS})
 ENDIF (CBLAS)
@@ -316,6 +375,7 @@ IF (PTHREAD)
     SET (HAVE_LIBPTHREAD 1)
     LINK_LIBRARIES (${PTHREAD})
 ENDIF (PTHREAD)
+#LINK_LIBRARIES (${F2C})
 
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)

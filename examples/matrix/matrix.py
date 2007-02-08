@@ -1,5 +1,40 @@
-import golib
+import golib, sys
 from golib import *
+
+M = goMatrixf (3,4)
+M.setIdentity ()
+v = goVectorf ()
+M.refColumn (0, v)
+v.fill (-1)
+M._print ()
+
+M2 = goMatrixf ()
+M.ref (0, 1, 3, 3, M2)
+M2.setIdentity ()
+M2.fill (4)
+M._print ()
+
+e = goMatrixf (1,10)
+e.fill (1)
+svd = goSVDf (e)
+print "U:"
+svd.getU()._print ()
+print "V:"
+svd.getV()._print ()
+print "s:"
+for i in xrange(svd.getSingularValues().getSize()):
+    print svd.getSingularValues().get(i),
+
+V = goMatrixf (svd.getV())
+V.transpose()
+vv = goMatrixf()
+S = goMatrixf()
+svd.getS (S)
+vv = svd.getU() * S * V
+print "\n U*S*V':"
+vv._print()
+
+sys.exit ()
 
 plotter = goMultiPlotter (1,1)
 plot = goSinglePlot ()

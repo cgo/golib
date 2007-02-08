@@ -57,8 +57,9 @@ class goMatrix
   * @param r Rows
   * @param c Columns
   * @param leadingDim leading dimension -- if 0, is set to c.
+  * @param rowMajor Leave at true (default) -- not implemented yet (and might never be).
   */
-  goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
+  goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0, bool rowMajor = true);
 
   virtual ~goMatrix ();
   
@@ -68,13 +69,16 @@ class goMatrix
   bool resize (goSize_t rows, goSize_t cols);
 
   void transpose ();
-  void getTranspose (goMatrix<T>& trans);
+  void getTranspose (goMatrix<T>& trans) const;
 
   bool invert ();
 
   void power (T scalar);
 
   void flip (goSize_t dim = 0);
+
+  //= FIXME: column major is almost not implemented yet. It may never be.
+  bool getRowMajor () const { return this->rowMajor; };
 
   goMatrix<T>& operator= (const goMatrix<T>& other);
 
@@ -547,6 +551,7 @@ class goMatrix
   goSize_t           rows;
   goSize_t           columns;
   goSize_t           leadingDimension;
+  bool               rowMajor;
 };
 
 /** 

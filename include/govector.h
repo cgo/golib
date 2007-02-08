@@ -233,6 +233,29 @@ class goVector : public goFixedArray<T>
             }
             return *this;
         };
+        //= Element-wise division.
+        template <class To>
+        goVector<T>& operator/= (const goVector<To>& other)
+        {
+        #ifdef GO_USE_EXCEPTIONS
+            if (this->getSize() != other.getSize())
+            {
+                throw goMathException (goMathException::SIZE_MISMATCH);
+            }
+        #endif
+            goIndex_t max = this->getSize();
+            T* array = this->getPtr();
+            const To* otherArray = other.getPtr();
+            goIndex_t stride = this->getStride();
+            goIndex_t otherStride = other.getStride();
+            for (goIndex_t i = 0; i < max; ++i)
+            {
+                *array /= *otherArray;
+                array += stride;
+                otherArray += otherStride;
+            }
+            return *this;
+        };
 
 
         /** 

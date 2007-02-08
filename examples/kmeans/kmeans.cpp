@@ -61,8 +61,7 @@ int main (int argc, char* argv[])
         ++i;
         el = el->next;
     }
-    goMultiPlotter plotter(1,1);
-    goSinglePlot plot;
+    goPlotter plotter;
     goList<goPointf> meansCurve;
     for (i = 0; i < K; ++i)
     {
@@ -70,14 +69,12 @@ int main (int argc, char* argv[])
         {
             goString title = "Cluster ";
             title += (int)i;
-            plot.addCurve (drawLists[i],title.toCharPtr(),"with points");
+            plotter.addCurve (drawLists[i],title.toCharPtr(),"with points");
         }
         meansCurve.append(goPointf(kmeans.getMeans()[i][0],kmeans.getMeans()[i][1]));
     }
-    plot.addCurve(meansCurve,"Means","with points");
-    plot.setPrefix (goString("set key on outside\n"));
+    plotter.addCurve(meansCurve,"Means","with points");
     plotter.setPauseFlag(true);
-    plotter.addPlot (plot, 0, 0);
     plotter.plot();
 
     exit(1);
