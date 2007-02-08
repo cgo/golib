@@ -13,7 +13,7 @@ LDARGS		= $(GTKMM_LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui
+LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui -lGogl
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
 
