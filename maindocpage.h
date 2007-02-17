@@ -106,9 +106,15 @@
  *	 - A recent cmake: http://www.cmake.org
  *	 - GNU compiler collection (gcc) with C++ -- other compilers may work but were not tested.
  *	 - ATLAS generated CBLAS library: http://math-atlas.sourceforge.net/  for some matrix and vector operations<br>
- *	 - CLAPACK, the C implementation of LAPACK. Use liblapack_atlas if you use ATLAS.
- *	 You may replace ATLAS with another CBLAS implementation. In that case, you have to remove the ATLAS library from
- *	 CMakeFiles.txt and only leave CBLAS.
+ *	 - ATLAS's LAPACK C implementation.
+ *	 - An f2c translated or compatible 
+ *	   LAPACK, like the reference implementation from www.netlib.org.
+ *	   (ATLAS's LAPACK only implements a subset of LAPACK).
+ *	   Many Linux distributors provide for this library, just as for ATLAS.
+ *	   You will also need the header files cblas.h and clapack.h from ATLAS.
+ *	 You may replace ATLAS's CBLAS with another CBLAS implementation. 
+ *	 In that case, you have to remove the ATLAS library from
+ *	 CMakeFiles.txt and only leave CBLAS. You will be on your own since I haven't tried that.
  *
  *	 Optional, but very highly recommended:
  *	 - <b>Developer's Image Library: http://openil.sourceforge.net</b><br>

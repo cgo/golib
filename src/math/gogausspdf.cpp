@@ -242,4 +242,5 @@ namespace goMath
 template class goMath::goGaussPDF <goDouble, goDouble>;
 template class goMath::goGaussPDF <goFloat, goFloat>;
 template class goMath::goMultiGaussPDF <goVectorf, goFloat>;
+template class goMath::goMultiGaussPDF <goVectord, goDouble>;
 // template class goMath::goMultiGaussPDF <goVectord, goDouble>;
