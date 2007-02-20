@@ -1,6 +1,18 @@
 import golib, sys
 from golib import *
 
+null = goMatrixf (5,2)
+null.fill (0)
+svd = goSVDf (null, False)
+print "U:"
+svd.getU()._print()
+print "S:"
+for i in xrange (svd.getSingularValues().getSize()):
+    print svd.getSingularValues().get(i),
+print "\n"
+print "V:"
+svd.getV()._print()
+
 M = goMatrixf (3,4)
 M.setIdentity ()
 v = goVectorf ()
@@ -14,13 +26,23 @@ M2.setIdentity ()
 M2.fill (4)
 M._print ()
 
-e = goMatrixf (1,10)
+e = goMatrixf (1,5)
 e.fill (1)
 svd = goSVDf (e)
 print "U:"
 svd.getU()._print ()
 print "V:"
 svd.getV()._print ()
+
+print "Nullspace basis:"
+ref = goMatrixf ()
+svd.getV().ref (0,1,svd.getV().getRows(),svd.getV().getColumns()-1,ref)
+ref._print ()
+print "... and transposed:"
+nullT = goMatrixf ()
+ref.getTranspose (nullT)
+nullT._print ()
+
 print "s:"
 for i in xrange(svd.getSingularValues().getSize()):
     print svd.getSingularValues().get(i),

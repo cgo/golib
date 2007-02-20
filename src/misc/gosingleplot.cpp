@@ -125,6 +125,18 @@ goSize_t goSinglePlot::getColumn () const
     return myPrivate->column;
 }
 
+/** 
+ * @brief Add 3D plot given by x,y,z coordinates.
+ * 
+ * @param x x coordinates
+ * @param y y coordinates
+ * @param lineLength Length of the grid in x-direction (number of elements in one line)
+ * @param values z values
+ * @param title Title
+ * @param plotOptions plot options as in the other add* functions.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
                           goIndex_t lineLength,
                           const goVectord& values, 
@@ -153,45 +165,111 @@ bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
     return true;
 }
 
-bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plotOptions)
+bool goSinglePlot::add3D (const goVectorf& x, const goVectorf& y,
+                          goIndex_t lineLength,
+                          const goVectorf& values, 
+                          const char* title, 
+                          const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
         this->clear ();
         myPrivate->plotType = goPlot::Surface;
     }
-    myPrivate->plotMatrixf.append (m);
 
-    myPrivate->titles.append(goString(title));
-    if (!plotOptions)
+    goVectord tempx (x.getSize());
+    goVectord tempy (y.getSize());
+    goVectord tempz (values.getSize());
+    goSize_t sz = x.getSize();
+    for (goSize_t i = 0; i < sz; ++i) tempx[i] = x[i];
+    sz = y.getSize();
+    for (goSize_t i = 0; i < sz; ++i) tempy[i] = y[i];
+    sz = tempz.getSize();
+    for (goSize_t i = 0; i < sz; ++i) tempz[i] = values[i];
+
+    return this->add3D (tempx, tempy, lineLength, tempz, title, plotOptions);
+}
+
+bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plotOptions, bool separateRows)
+{
+    if (myPrivate->plotType != goPlot::Surface)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+    if (!separateRows)
+    {
+        myPrivate->plotMatrixf.append (m);
+        myPrivate->titles.append(goString(title));
+        if (!plotOptions)
+        {
+            myPrivate->plotCommands.append(goString("w l"));
+        }
+        else
+        {
+            myPrivate->plotCommands.append(goString(plotOptions));
+        }
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        const goMatrixf ref;
+        goSize_t sz = m.getRows();
+        for (goSize_t i = 0; i < sz; ++i)
+        {
+            goVectorf y (m.getColumns());
+            y.fill (float(i));
+            goVectorf x (m.getColumns());
+            for (goSize_t j = 0; j < x.getSize(); ++j)
+                x[j] = float(j);
+            const goVectorf z;
+            m.refRow (i, z);
+            this->add3D (x,y,x.getSize(),z,title,plotOptions);
+        }
     }
+
     return true;
 }
 
-bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plotOptions)
+bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plotOptions, bool separateRows)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
         this->clear ();
         myPrivate->plotType = goPlot::Surface;
     }
-    myPrivate->plotMatrixd.append (m);
-
-    myPrivate->titles.append(goString(title));
-    if (!plotOptions)
+    if (!separateRows)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        myPrivate->plotMatrixd.append (m);
+        myPrivate->titles.append(goString(title));
+        if (!plotOptions)
+        {
+            myPrivate->plotCommands.append(goString("w l"));
+        }
+        else
+        {
+            myPrivate->plotCommands.append(goString(plotOptions));
+        }
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        const goMatrixd ref;
+        goSize_t sz = m.getRows();
+        for (goSize_t i = 0; i < sz; ++i)
+        {
+            m.ref (i, 0, 1, m.getColumns(), ref);
+            myPrivate->plotMatrixd.append (ref);
+            myPrivate->titles.append(goString(title));
+            if (!plotOptions)
+            {
+                myPrivate->plotCommands.append(goString("w l"));
+            }
+            else
+            {
+                myPrivate->plotCommands.append(goString(plotOptions));
+            }
+        }
     }
+
     return true;
 }
 

@@ -113,6 +113,14 @@ void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t row, goSize_t col)
     myPrivate->plots.getTailElement()->elem.setPosition (row, col);
 }
 
+void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t index)
+{
+    goSize_t row = index % this->getRows();
+    goSize_t col = index / this->getRows();
+    myPrivate->plots.append (p);
+    myPrivate->plots.getTailElement()->elem.setPosition (row, col);
+}
+
 /** 
  * @brief Get number of rows in the multiplot grid.
  * 
@@ -268,6 +276,11 @@ bool goMultiPlotter::plotPostscript (const goString& filename)
     return this->plotFile (filename, goString("postscript colour"));
 }
 
+bool goMultiPlotter::plotPostscript (const char* filename)
+{
+    return this->plotFile (goString(filename), goString("postscript colour"));
+}
+
 /** 
  * @brief Plot to a postscript file.
  * 
@@ -280,6 +293,10 @@ bool goMultiPlotter::plotPostscript (const goString& filename)
 bool goMultiPlotter::plotEPS (const goString& filename)
 {
     return this->plotFile (filename, goString("postscript eps colour"));
+}
+bool goMultiPlotter::plotEPS (const char* filename)
+{
+    return this->plotFile (goString(filename), goString("postscript eps colour"));
 }
 
 /** 
@@ -308,6 +325,11 @@ bool goMultiPlotter::plotFile (const goString& filename,
     myPrivate->prefixCommands = backup1;
     myPrivate->shellPostfix = backup2;
     return ok;
+}
+bool goMultiPlotter::plotFile (const char* filename, 
+                               const char* type)
+{
+    return this->plotFile (goString(filename), goString(type));
 }
 
 /** 

@@ -108,6 +108,12 @@ class goAutoPtr
         {
         };
 
+        void set (T* p)
+        {
+            this->reset ();
+            myRRefPtr = new goRRefPtr<T>(p);
+        };
+
         /** 
          * @brief Reset the pointer and reference count.
          * Decrements the current reference count, if a pointer is set,

@@ -199,6 +199,9 @@ bool centerOfMass (const goList<pointT>&, pointT& comRet);
 template <class pointT>
 bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, pointT& comRet);
 
+template <class T>
+bool translate (goMatrix<T>& confMatrix, const goVector<T>& trans);
+
 bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
 template <class T>

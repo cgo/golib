@@ -137,6 +137,27 @@ bool goMath::centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex
     return true;
 }
 
+/** 
+ * @brief Translates all points in a configuration matrix.
+ * 
+ * @param confMatrix Configuration matrix, one point per row.
+ * @param trans Translation vector.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goMath::translate (goMatrix<T>& confMatrix, const goVector<T>& trans)
+{
+    goVector<T> ref;
+    goSize_t N = confMatrix.getRows();
+    for (goSize_t i = 0; i < N; ++i)
+    {
+        confMatrix.refRow (i, ref);
+        ref += trans;
+    }
+    return true;
+}
+
 template bool goMath::centerOfMass<goFloat> (const goList<goVector<goFloat> >&, goVector<goFloat>&);
 template bool goMath::centerOfMass<goDouble> (const goList<goVector<goDouble> >&, goVector<goDouble>&);
 template bool goMath::centerOfMass<goFloat> (const goMatrix<goFloat>&, goVector<goFloat>&);
@@ -146,3 +167,6 @@ template bool goMath::centerOfMass<goPointf> (const goList<goPointf>& points, go
 template bool goMath::centerOfMass<goPointd> (const goList<goPointd>& points, goPointd& comRet);
 template bool goMath::centerOfMass<goPointf> (goList<goPointf>::ConstElement* begin, goIndex_t pointCount, goPointf& comRet);
 template bool goMath::centerOfMass<goPointd> (goList<goPointd>::ConstElement* begin, goIndex_t pointCount, goPointd& comRet);
+
+template bool goMath::translate<goFloat> (goMatrix<goFloat>&, const goVector<goFloat>&);
+template bool goMath::translate<goDouble> (goMatrix<goDouble>&, const goVector<goDouble>&);

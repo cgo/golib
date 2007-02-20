@@ -69,8 +69,10 @@ class goSinglePlot : public goObjectBase
 
         bool add3D (const goVectord& x, const goVectord& y, goIndex_t lineLength, 
                     const goVectord& values, const char* title, const char* plotOptions = 0);
-        bool add3D (const goMatrixf& m, const char* title, const char* plotOptions = 0);
-        bool add3D (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+        bool add3D (const goVectorf& x, const goVectorf& y, goIndex_t lineLength, 
+                    const goVectorf& values, const char* title, const char* plotOptions = 0);
+        bool add3D (const goMatrixf& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
+        bool add3D (const goMatrixd& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
         bool add3D (const goSignal3DBase<void>* image, const char* title, const char* plotOptions = 0);
 
         template <class pointT>
@@ -158,6 +160,7 @@ class goMultiPlotter : public goObjectBase
         goMultiPlotter & operator= (goMultiPlotter&);
 
         void addPlot (const goSinglePlot&, goSize_t row, goSize_t col);
+        void addPlot (const goSinglePlot&, goSize_t index);
 
         goSize_t getRows () const;
         goSize_t getColumns () const;
@@ -173,6 +176,9 @@ class goMultiPlotter : public goObjectBase
         virtual bool plotPostscript (const goString& filename);
         virtual bool plotEPS        (const goString& filename);
         virtual bool plotFile       (const goString& filename, const goString& type);
+        bool plotPostscript (const char* filename);
+        bool plotEPS        (const char* filename);
+        bool plotFile       (const char* filename, const char* type);
 
         void clear ();
 

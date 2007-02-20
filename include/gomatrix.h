@@ -246,7 +246,7 @@ class goMatrix
   inline void ref (goSize_t startRow, goSize_t startColumn, 
                    goSize_t num_rows, goSize_t num_cols, const goMatrix<T>& refMatrix) const
   {
-      refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
+      const_cast<goMatrix<T>&>(refMatrix).setData (const_cast<T*>(&(*this)(startRow,startColumn)), num_rows, num_cols, this->getLeadingDimension());
   };
 
   /** 

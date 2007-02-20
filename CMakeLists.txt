@@ -7,7 +7,6 @@ INCLUDE             (CheckFunctionExists)
 
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_PYTHON_MODULE FALSE CACHE BOOL "Enable/disable building the python module")
-SET (BUILD_PYTHON_EMBED FALSE CACHE BOOL "Enable/disable embedding python (goPython)")
 SET (PYTHON_INSTALL_DIR $ENV{HOME}/.python CACHE PATH "Directory which holds python modules -- often pointed to by the environment variable PYTHONPATH")
 SET (BUILD_MATLAB_MODULE FALSE CACHE BOOL "Enable/disable building the matlab module")
 SET (BUILD_MATLAB_MEX FALSE CACHE BOOL "Enable/disable building the matlab mex modules")
@@ -229,10 +228,6 @@ SET                 (SOURCES
  #src/clapack/single/sormqr.c
  )
 
-IF (BUILD_PYTHON_EMBED)
-    SET (SOURCES src/python/gopython.cpp ${SOURCES})
-ENDIF (BUILD_PYTHON_EMBED)
-
 SET (GOPATH ${PROJECT_SOURCE_DIR})
 
 #
@@ -296,8 +291,8 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 #FIND_LIBRARY (ATLAS NAMES atlas PATHS ${GOPATH}/extra/lib)
 #FIND_LIBRARY (CBLAS NAMES cblas PATHS ${GOPATH}/extra/lib)
 #FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS ${GOPATH}/extra/lib)
-FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 ${GOPATH}/extra/lib)
-FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 ${GOPATH}/extra/lib)
+FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
 FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
 FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
@@ -334,16 +329,7 @@ IF (${HAVE_LIBSOCKET} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lsocket")
 ENDIF (${HAVE_LIBSOCKET} MATCHES 1)
 
-SET (EXTRA_INCLUDE_PATH "")
-
-IF (BUILD_PYTHON_EMBED)
-    EXEC_PROGRAM (python ARGS -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')" OUTPUT_VARIABLE PYTHON_INCLUDE)
-    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
-    EXEC_PROGRAM (python ARGS -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')" OUTPUT_VARIABLE PYTHON_LDFLAGS)
-ENDIF (BUILD_PYTHON_EMBED)
-
-
-INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
+INCLUDE_DIRECTORIES (# ${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
                      ${GOPATH}/extra/include)
 
@@ -362,7 +348,6 @@ ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
-
 IF (LAPACK_ATLAS)
     LINK_LIBRARIES (${LAPACK_ATLAS})
 ENDIF (LAPACK_ATLAS)
@@ -397,11 +382,7 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
-
-IF (BUILD_PYTHON_EMBED)
-    SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS ${PYTHON_LDFLAGS})
-ENDIF (BUILD_PYTHON_EMBED)
-
+# SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")
 INSTALL_TARGETS     (/lib ${TARGETNAME})
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not
