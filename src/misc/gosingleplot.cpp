@@ -437,16 +437,28 @@ bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, const ch
 {
     return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, colourspec));
 }
+bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, const char* colourspec)
+{
+    return this->addLabel (goString(l), x, y, colourspec);
+}
 
 void goSinglePlot::setPrefix (const goString& p)
 {
     myPrivate->prefixCommands = p;
     myPrivate->prefixCommands += "\n";
 }
+void goSinglePlot::setPrefix (const char* p)
+{
+    this->setPrefix (goString(p));
+}
 
 void goSinglePlot::setTitle (const goString& s)
 {
     myPrivate->title = s;
+}
+void goSinglePlot::setTitle (const char* s)
+{
+    this->setTitle (goString(s));
 }
 
 /** 
