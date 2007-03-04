@@ -124,8 +124,11 @@ class goSinglePlot : public goObjectBase
             };
 
         void setPrefix   (const goString& p);
+        void setPrefix   (const char* p);
         void setTitle    (const goString& s);
+        void setTitle    (const char* s);
         bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "");
+        bool addLabel    (const char* l, goDouble x, goDouble y, const char* colourspec = "");
         bool makePlot    (goString& plotCommandsRet) const;
         void removeFiles () const;
         void clear       ();
