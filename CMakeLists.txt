@@ -329,7 +329,16 @@ IF (${HAVE_LIBSOCKET} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lsocket")
 ENDIF (${HAVE_LIBSOCKET} MATCHES 1)
 
-INCLUDE_DIRECTORIES (# ${EXTRA_INCLUDE_PATH}
+SET (EXTRA_INCLUDE_PATH "")
+
+IF (BUILD_PYTHON_EMBED)
+    EXEC_PROGRAM (python ARGS -c "\"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
+    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
+    EXEC_PROGRAM (python ARGS -c "\"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
+ENDIF (BUILD_PYTHON_EMBED)
+
+
+INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
                      ${GOPATH}/extra/include)
 
@@ -382,7 +391,9 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
 # SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")
+
 INSTALL_TARGETS     (/lib ${TARGETNAME})
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not

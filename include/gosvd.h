@@ -17,6 +17,16 @@ using namespace std;
 namespace goMath
 {
 
+/** 
+* @addtogroup math
+* @{
+*/
+/**
+* @brief Singular value decomposition.
+* This class can do full SVD or thin SVD. It uses
+* sgesvd_() or dgesvd_() from the linked LAPACK library (as opposed to 
+* goMath::ThinSVD). Instantiated for goFloat and goDouble types.
+*/
     template <class T>
         class SVD
         {
@@ -41,6 +51,7 @@ namespace goMath
 
                 bool calculate (const goMatrix<T>& A, bool thin = true);
         };
+/** @} */
 
 #ifdef min
 # undef min

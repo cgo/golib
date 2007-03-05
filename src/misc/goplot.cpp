@@ -885,6 +885,61 @@ bool goPlot::writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* i
     return true;
 }
 
+/** 
+ * @brief Convenience function for quickly plotting something.
+ *
+ * For quick one-line plotting commands.
+ * Creates a goMultiPlotter and goSinglePlot, adds the given curve with options and
+ * prefix commands, sets the pause flag in goMultiPlotter to true (so that
+ * each plot waits for a key press) and calls plot().
+ * 
+ * @param x X coordinates.
+ * @param y Y coordinates.
+ * @param title Title (of the curve).
+ * @param plotOptions Options for gnuplot (like "with lines")
+ * @param prefix Prefix commands for gnuplot (like "set ..." commands)
+ */
+template <class T>
+void goPlot::plot (const goVector<T>& x, const goVector<T>& y, 
+                const char* title, const char* plotOptions, const char* prefix)
+{
+    goMultiPlotter plotter (1,1);
+    goSinglePlot plot;
+    plot.addCurve (x,y,title ? title : "", plotOptions);
+    if (prefix)
+        plot.setPrefix (prefix);
+    plotter.addPlot (plot,0,0);
+    plotter.setPauseFlag (true);
+    plotter.plot ();
+}
+
+/** 
+ * @brief Convenience function for quickly plotting something.
+ *
+ * For quick one-line plotting commands.
+ * Creates a goMultiPlotter and goSinglePlot, adds the given curve with options and
+ * prefix commands, sets the pause flag in goMultiPlotter to true (so that
+ * each plot waits for a key press) and calls plot().
+ * 
+ * @param points N x 2 point configuration matrix of the curve.
+ * @param title Title (of the curve).
+ * @param plotOptions Options for gnuplot (like "with lines")
+ * @param prefix Prefix commands for gnuplot (like "set ..." commands)
+ */
+template <class T>
+void goPlot::plot (const goMatrix<T>& points,
+                const char* title, const char* plotOptions, const char* prefix)
+{
+    goMultiPlotter plotter (1,1);
+    goSinglePlot plot;
+    plot.addCurveMatrix (points,title ? title : "", plotOptions);
+    if (prefix)
+        plot.setPrefix (prefix);
+    plotter.addPlot (plot,0,0);
+    plotter.setPauseFlag (true);
+    plotter.plot ();
+}
+
 template < class arrayT >
 bool goPlot::gnuplot(const arrayT& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor)
 {
@@ -972,6 +1027,25 @@ GOPLOT_WRITEFILES_INSTANTIATE2(goVectorf);
 GOPLOT_WRITEFILES_INSTANTIATE2(goVectord);
 GOPLOT_WRITEFILES_INSTANTIATE3(goFloat);
 GOPLOT_WRITEFILES_INSTANTIATE3(goDouble);
+
+template 
+void goPlot::plot<goFloat> (
+        const goVector<goFloat>&, 
+        const goVector<goFloat>&, 
+        const char*, const char*, const char*);
+template 
+void goPlot::plot<goDouble> (
+        const goVector<goDouble>&, 
+        const goVector<goDouble>&, 
+        const char*, const char*, const char*);
+template 
+void goPlot::plot<goFloat> (
+        const goMatrix<goFloat>&, 
+        const char*, const char*, const char*);
+template 
+void goPlot::plot<goDouble> (
+        const goMatrix<goDouble>&, 
+        const char*, const char*, const char*);
 
 #if 0
 #define GOPLOT_INSTANTIATE(TYPE) \

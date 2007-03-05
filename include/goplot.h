@@ -162,7 +162,7 @@ class goMultiPlotter : public goObjectBase
 
         goMultiPlotter & operator= (goMultiPlotter&);
 
-        void addPlot (const goSinglePlot&, goSize_t row, goSize_t col);
+        void addPlot (const goSinglePlot&, goSize_t row, goSize_t col, goFloat extentRow = 1.0f, goFloat extentCol = 1.0f);
         void addPlot (const goSinglePlot&, goSize_t index);
 
         goSize_t getRows () const;
@@ -266,6 +266,13 @@ namespace goPlot
         Normal,
         Surface
     } PlotType;
+
+    template <class T>
+        void plot (const goVector<T>& x, const goVector<T>& y, 
+                const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
+    template <class T>
+        void plot (const goMatrix<T>& points,
+                const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
 
     /** 
      * @brief Plots 1D data using gnuplot.

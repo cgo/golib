@@ -19,6 +19,8 @@ class goMultiPlotterPrivate
         bool              pauseFlag;
         goString          cmdFilename;
         goList<goSinglePlot> plots;
+        goList<goFloat>   extentRow;
+        goList<goFloat>   extentCol;
 
         goSize_t rows;
         goSize_t columns;
@@ -107,9 +109,11 @@ goMultiPlotter& goMultiPlotter::operator= (goMultiPlotter& other)
  * @param row   Row position.
  * @param col   Column position.
  */
-void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t row, goSize_t col)
+void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t row, goSize_t col, goFloat extentRow, goFloat extentCol)
 {
     myPrivate->plots.append (p);
+    myPrivate->extentRow.append (extentRow);
+    myPrivate->extentCol.append (extentCol);
     myPrivate->plots.getTailElement()->elem.setPosition (row, col);
 }
 
@@ -118,6 +122,8 @@ void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t index)
     goSize_t row = index % this->getRows();
     goSize_t col = index / this->getRows();
     myPrivate->plots.append (p);
+    myPrivate->extentRow.append (1.0f);
+    myPrivate->extentCol.append (1.0f);
     myPrivate->plots.getTailElement()->elem.setPosition (row, col);
 }
 
@@ -214,16 +220,19 @@ bool goMultiPlotter::plot ()
     goDouble stepY = -1.0 / static_cast<goDouble>(this->getRows());
 
     goString prefix = myPrivate->prefixCommands;
-    prefix += "set multiplot\nset size ";
-    prefix += (float)stepX;
-    prefix += ",";
-    prefix += (float)-stepY;
-    prefix += "\n";
+    prefix += "set multiplot\n";
+    //set size ";
+    //prefix += (float)stepX;
+    //prefix += ",";
+    //prefix += (float)-stepY;
+    //prefix += "\n";
     goDouble posX  = 0.0;
     goDouble posY  = 1.0 + stepY;
 
     goString plotCommands = prefix;
     goList<goSinglePlot>::Element *el = myPrivate->plots.getFrontElement();
+    goList<goFloat>::Element *extentRowEl = myPrivate->extentRow.getFrontElement();
+    goList<goFloat>::Element *extentColEl = myPrivate->extentCol.getFrontElement();
     while (el)
     {
         plotCommands += "set origin ";
@@ -231,8 +240,15 @@ bool goMultiPlotter::plot ()
         plotCommands += ",";
         plotCommands += (float)(posY + el->elem.getRow() * stepY);
         plotCommands += "\n";
+        plotCommands += "set size ";
+        plotCommands += (float)(extentColEl->elem * stepX);
+        plotCommands += ",";
+        plotCommands += (float)(extentRowEl->elem * -stepY);
+        plotCommands += "\n";
         el->elem.makePlot (plotCommands);
         el = el->next;
+        extentRowEl = extentRowEl->next;
+        extentColEl = extentColEl->next;
     }
     
     goString postfix = "unset multiplot\n";
@@ -343,6 +359,8 @@ void goMultiPlotter::clear ()
     myPrivate->pauseFlag = false;
     myPrivate->cmdFilename = "";
     myPrivate->plots.erase ();
+    myPrivate->extentCol.erase ();
+    myPrivate->extentRow.erase ();
 }
 
 //#ifndef GOLIST_HPP

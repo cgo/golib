@@ -129,7 +129,7 @@ void goMatrixPower (goMatrix<T>& A, T scalar)
         goLog::warning ("goMatrixPower(): A is not quadratic.");
         return;
     }
-    goMath::goEigenvalue<T> eig (A);
+    goMath::Eigenvalue<T> eig (A);
     const goMatrix<T>& V = eig.getV();
     goMatrix<T> Vtemp = V;
     goVector<T>& d = eig.getRealEigenvalues();

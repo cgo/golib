@@ -385,6 +385,8 @@ class goVector : public goFixedArray<T>
             }
             return retValue;
         };
+
+        void fillRange (const T& start, const T& step, const T& end);
 };
 
 

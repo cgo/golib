@@ -602,7 +602,7 @@ bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
         }
         cov *= 1.0 / totalWeight;
 
-        goMath::goEigenvalue<T> ev (cov);
+        goMath::Eigenvalue<T> ev (cov);
         ev.getV (axes);
         axes.transpose ();
         //= Normalise
@@ -647,7 +647,7 @@ bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goVector<T> >& points
         }
         cov *= 1.0 / totalWeight;
 
-        goMath::goEigenvalue<T> ev (cov);
+        goMath::Eigenvalue<T> ev (cov);
         ev.getV (axes);
         axes.transpose ();
         //= Normalise

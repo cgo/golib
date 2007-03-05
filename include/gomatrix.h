@@ -199,6 +199,20 @@ class goMatrix
           }
       }
   };
+  template <class To>
+  inline void sum (int dimension, goVector<To>& ret) const
+  {
+      goMatrix<To> M;
+      this->sum (dimension, M);
+      if (dimension == 0)
+      {
+          M.copyRow (0, ret);
+      }
+      else
+      {
+          M.copyColumn (0, ret);
+      }
+  };
 
   // TNT compatibility methods BEGIN
   inline int        dim1 () const { return this->getRows(); };

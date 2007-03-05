@@ -226,6 +226,16 @@ template<class T> T goVector<T>::norm1 () const
     return T(0);
 }
 
+template <class T>
+void goVector<T>::fillRange (const T& start, const T& step, const T& end)
+{
+    goSize_t i = 0;
+    for (T v = start; v < end; v += step, ++i)
+    {
+        (*this)[i] = v;
+    }
+}
+
 // =====================================
 
 template <>

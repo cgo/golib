@@ -15,7 +15,7 @@ namespace goMath
  * \addtogroup math
  * @{
  */
-    goSize_t goComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
+    goSize_t ComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
     
 /*!
  * \internal
@@ -76,7 +76,7 @@ namespace goMath
 **/
 
 template <class Real>
-class goEigenvalue
+class Eigenvalue
 {
 
 
@@ -907,7 +907,7 @@ public:
    @param A    Square real (non-complex) matrix
    */
 
-   goEigenvalue(const goMatrix<Real> &A) {
+   Eigenvalue(const goMatrix<Real> &A) {
       n = A.dim2();
       V.resize(n,n);
       d.resize(n);
