@@ -789,7 +789,7 @@ goSize_t goFileIO::fileSize (const char* filename)
     if (!f)
         return 0;
     fseek (f, 0, SEEK_END);
-    int pos = ftell (f);
+    long int pos = ftell (f);
     fclose (f);
     return (goSize_t)pos;
 }
