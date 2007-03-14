@@ -538,7 +538,12 @@ bool goPlot::addGnuplotCommands
     {
         if (dataFileNames->getSize() != titles->getSize())
         {
-            goLog::warning ("goPlot::addGnuplotCommands(): (list version) dataFileNameRet and titles are of different sizes.");
+            goString s = "goPlot::addGnuplotCommands(): (list version) dataFileNames and titles are of different sizes (";
+            s += (int)dataFileNames->getSize();
+            s += " != ";
+            s += (int)titles->getSize();
+            s += ")";
+            goLog::warning (s.toCharPtr());
             return false;
         }
     }
@@ -546,7 +551,12 @@ bool goPlot::addGnuplotCommands
     {
         if (dataFileNames->getSize() != plotCommands->getSize())
         {
-            goLog::warning ("goPlot::addGnuplotCommands(): (list version) dataFileNameRet and plotCommands are of different sizes.");
+            goString s = "goPlot::addGnuplotCommands(): (list version) dataFileNames and plotCommands are of different sizes (";
+            s += (int)dataFileNames->getSize();
+            s += " != ";
+            s += (int)titles->getSize();
+            s += ")";
+            goLog::warning (s.toCharPtr());
             return false;
         }
     }
@@ -571,7 +581,7 @@ bool goPlot::addGnuplotCommands
     switch (plotType)
     {
         case goPlot::Normal: gnuplotCommands += "plot "; break;
-        case goPlot::Surface: gnuplotCommands += "set pm3d\nsplot "; break;
+        case goPlot::Surface: gnuplotCommands += "splot "; break;
     }
     while (dataFileNameEl)
     {
@@ -688,7 +698,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<arrayT>* arrayListX,
     }
     goList<goString>* filenames = &dataFileNameRet;
 
-    filenames->erase(); 
+    // filenames->erase(); 
     typename goList<arrayT>::ConstElement* elX = arrayListX->getFrontElement();
     typename goList<arrayT>::ConstElement* elY = 0;
     if (arrayListY)
@@ -750,7 +760,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<arrayT>* arrayListX,
     }
     goList<goString>* filenames = &dataFileNameRet;
 
-    filenames->erase(); 
+    // filenames->erase(); 
     typename goList<arrayT>::ConstElement* elX = arrayListX->getFrontElement();
     typename goList<arrayT>::ConstElement* elY = arrayListY->getFrontElement();
     typename goList<arrayT>::ConstElement* elZ = arrayListZ->getFrontElement();
@@ -791,7 +801,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrices,
 {
     goList<goString>* filenames = &dataFileNameRet;
 
-    filenames->erase(); 
+    // filenames->erase(); 
     goString filename;
 
     typename goList<goMatrix<T> >::ConstElement* el = matrices->getFrontElement ();
@@ -848,7 +858,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* i
 
     goList<goString>* filenames = &dataFileNameRet;
 
-    filenames->erase(); 
+    // filenames->erase(); 
     goString filename;
 
     goList<const goSignal3DBase<void>* >::ConstElement* el = images->getFrontElement ();
