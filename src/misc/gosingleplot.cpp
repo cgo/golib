@@ -518,6 +518,7 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
     {
         case goPlot::Normal:
             {
+                myPrivate->dataFilenames.erase ();
                 if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
                             &myPrivate->plotY,
                             myPrivate->dataFilenames))
@@ -528,6 +529,7 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
             break;
         case goPlot::Surface:
             {
+                myPrivate->dataFilenames.erase ();
                 if (myPrivate->plotX.getSize() > 0)
                 {
                     if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
