@@ -30,6 +30,7 @@ bool goMath::centerOfMass (const goList<goVector<T> >& points, goVector<T>& comR
     if (el) 
         sz = el->elem.getSize();
     comRet.setSize(sz);
+    comRet.fill (T(0));
     goIndex_t i = 0;
     while (el && i < pointCount)
     {
@@ -54,6 +55,7 @@ bool goMath::centerOfMass (const goMatrix<T>& confMatrix, goVector<T>& comRet)
 
     goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
     comRet.setSize (confMatrix.getColumns());
+    comRet.fill (T(0));
     goIndex_t i = 0;
     goVector<T> ref;
     for (i = 0; i < pointCount; ++i)
