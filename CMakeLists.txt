@@ -7,6 +7,7 @@ INCLUDE             (CheckFunctionExists)
 
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_PYTHON_MODULE FALSE CACHE BOOL "Enable/disable building the python module")
+SET (BUILD_PYTHON_EMBED FALSE CACHE BOOL "Enable/disable embedding python (goPython)")
 SET (PYTHON_INSTALL_DIR $ENV{HOME}/.python CACHE PATH "Directory which holds python modules -- often pointed to by the environment variable PYTHONPATH")
 SET (BUILD_MATLAB_MODULE FALSE CACHE BOOL "Enable/disable building the matlab module")
 SET (BUILD_MATLAB_MEX FALSE CACHE BOOL "Enable/disable building the matlab mex modules")
@@ -228,6 +229,10 @@ SET                 (SOURCES
  #src/clapack/single/sormqr.c
  )
 
+IF (BUILD_PYTHON_EMBED)
+    SET (SOURCES src/python/gopython.cpp ${SOURCES})
+ENDIF (BUILD_PYTHON_EMBED)
+
 SET (GOPATH ${PROJECT_SOURCE_DIR})
 
 #
@@ -357,6 +362,7 @@ ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
+
 IF (LAPACK_ATLAS)
     LINK_LIBRARIES (${LAPACK_ATLAS})
 ENDIF (LAPACK_ATLAS)
@@ -392,7 +398,9 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-# SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS "-L${MATPACK_PATH} -L/usr/X11R6/lib -lXpm")
+#IF (BUILD_PYTHON_EMBED)
+#    SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS ${PYTHON_LDFLAGS})
+#ENDIF (BUILD_PYTHON_EMBED)
 
 INSTALL_TARGETS     (/lib ${TARGETNAME})
 # If the the environment variable MATLAB is set, assume the matlab module
