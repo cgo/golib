@@ -4,7 +4,7 @@
 
 #define USAGE()\
 {\
-    mexErrMsgTxt ("Usage: [image] = videocapture (file_descriptor)"); \
+    mexErrMsgTxt ("Usage: [image] = videocapture (file_descriptor)\nCopyright Christian Gosch, all rights reserved."); \
 }
 
 /* --------------------------------------------------------------------------

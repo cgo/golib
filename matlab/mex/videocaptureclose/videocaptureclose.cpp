@@ -20,6 +20,10 @@ void mexFunction (int            nlhs,
     {
         USAGE();
     }
+    else
+    {
+        printf ("Matlab V4L interface\nUsing golib 0.5 with libGomatlab\nCopyright Christian Gosch. All rights reserved.\n");
+    }
 
     int fd  = (int)mxGetScalar(prhs[0]);
     goVideoCapture vc;

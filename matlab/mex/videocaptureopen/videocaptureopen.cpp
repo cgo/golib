@@ -41,6 +41,10 @@ void mexFunction (int            nlhs,
         plhs[0] = mxCreateDoubleScalar (-1.0);
         mexErrMsgTxt ("Could not open device.");
     }
+    else
+    {
+        printf ("Matlab V4L interface\nUsing golib 0.5 with libGomatlab\nCopyright Christian Gosch. All rights reserved.\n");
+    }
     vc.getSettings();  // get settings from device instead of trying to initialise it.
     vc.setCaptureSize (width,height);
     // vc.setColourMode (goVideoCapture::RGB24);
