@@ -9,30 +9,6 @@
 # include <godefs.h>
 #endif
 
-template <class T>
-goGraphNode<T>::goGraphNode ()
-    : goObjectBase (),
-      adj (),
-      value (),
-      status (NORMAL)
-{
-    this->setClassID(GO_GRAPHNODE);
-}
-
-template <class T>
-goGraphNode<T>::goGraphNode (const T& v)
-    : goObjectBase (),
-      adj (),
-      value (v),
-      status (NORMAL)
-{
-    this->setClassID(GO_GRAPHNODE);
-}
-
-template<class T>
-goGraphNode<T>::~goGraphNode ()
-{
-}
 
 //============================================
 
@@ -45,6 +21,7 @@ goGraphNode<T>::~goGraphNode ()
  * 
  * @return True if successful, false otherwise.
  ----------------------------------------------------------------------------*/
+#if 0
 template<class T>
 bool goGraphAlgorithm<T>::depthFirst (typename goGraph<T>::Node* root, goGraph<T>& graph)
 {
@@ -116,6 +93,7 @@ bool goGraphAlgorithm<T>::breadthFirst (typename goGraph<T>::Node* root, goGraph
     return ok;
 #endif
 }
+#endif
 
 //============================================
 

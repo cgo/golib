@@ -30,28 +30,33 @@ class goRRefPtr
             *this = other;
         };
 
-        goRRefPtr<T>& operator= (goRRefPtr<T>& other)
+        template <class To>
+        goRRefPtr<T>& operator= (goRRefPtr<To>& other)
         {
             this->myRefCount = other.myRefCount;
-            this->myPtr = other.myPtr;
+            this->myPtr = static_cast<T*>(other.myPtr);
         };
 
-        bool operator== (const goRRefPtr<T>& other) const
+        template <class To>
+        bool operator== (const goRRefPtr<To>& other) const
         {
-            return this->myPtr == other.myPtr;
+            return this->myPtr == static_cast<T*>(other.myPtr);
         };
 
-        bool operator!= (const goRRefPtr<T>& other) const
+        template <class To>
+        bool operator!= (const goRRefPtr<To>& other) const
         {
             return !(*this == other);
         };
 
-        bool operator== (const T* p) const
+        template <class To>
+        bool operator== (const To* p) const
         {
-            return p == myPtr;
+            return p == static_cast<T*>(myPtr);
         };
 
-        bool operator!= (const T* p) const
+        template <class To>
+        bool operator!= (const To* p) const
         {
             return !(*this == p);
         };
@@ -158,12 +163,16 @@ class goAutoPtr
          *
          * @param other Other auto ptr.
          */
-        goAutoPtr (const goAutoPtr<T>& other)
+        template <class To>
+        goAutoPtr (const goAutoPtr<To>& other)
             : myRRefPtr (0)
         {
-            *this = const_cast<goAutoPtr<T>&>(other);
+            *this = const_cast<goAutoPtr<To>&>(other);
         };
 
+        goRRefPtr<T>* getRRefPtr () { return this->myRRefPtr; };
+        const goRRefPtr<T>* getRRefPtr () const { return this->myRRefPtr; };
+        
         /** 
         * @brief 
         * 
@@ -175,9 +184,10 @@ class goAutoPtr
         * 
         * @return 
         */
+        // template <class To>
         goAutoPtr<T>& operator= (const goAutoPtr<T>& other)
         {
-            if (other.myRRefPtr == this->myRRefPtr)
+            if (other.getRRefPtr() == this->myRRefPtr)
             {
                 return *this;
             }
@@ -188,7 +198,7 @@ class goAutoPtr
                     delete myRRefPtr;
                 }
             }
-            myRRefPtr = const_cast<goRRefPtr<T>*>(other.myRRefPtr);
+            myRRefPtr = const_cast<goRRefPtr<T>*>(other.getRRefPtr());
             if (myRRefPtr)
             {
                 myRRefPtr->incRef ();

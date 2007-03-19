@@ -3,6 +3,9 @@
 
 #include <goobjectbase.h>
 #include <golist.h>
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 /** @addtogroup data
  * @{
@@ -14,11 +17,20 @@ template<class T>
 class goGraphNode : public goObjectBase
 {
     public:
-        goGraphNode ();
-        goGraphNode (const T&);
-        virtual ~goGraphNode ();
+        goGraphNode ()
+            : adj(), value(), status(NORMAL)
+            {
+            };
+        goGraphNode (const T&)
+            : adj(), value(), status(NORMAL)
+            {
+            };
 
-		goList<goGraphNode<T>*> adj;   //= Adjacency list
+        //= Using the standard copy operator.
+        
+        virtual ~goGraphNode () {};
+
+		goList< goGraphNode<T>* > adj;   //= Adjacency list
         T                       value;
 
         enum Status
@@ -37,23 +49,58 @@ template<class T> class goGraph;
  *
  * Currently only offers depth first order.
  *
+ * NodeType must be derived from goGraphNode
+ * 
  * @todo Add breadth first order.
  */
-template<class T>
+template<class T, class NodeType>
 class goGraphAlgorithm
 {
     public:
         goGraphAlgorithm () {};
         virtual ~goGraphAlgorithm () {};
-        bool breadthFirst (typename goGraph<T>::Node* root, goGraph<T>& graph);
+        // bool breadthFirst (typename goGraph<T>::Node* root, goGraph<T>& graph) { return false; };
         // bool breadthFirst (typename goGraph<T>::ConstNode* root) const;
-        bool depthFirst (typename goGraph<T>::Node* root, goGraph<T>& graph);
+        
+        //= New version
+        bool depthFirst (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        {
+            // static bool ok = true;
+            if (!root)
+                return false;
+            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            while (el)
+            {
+                el->elem->status = goGraphNode<T>::NORMAL;
+                el = el->next;
+            }
+            root->status = goGraphNode<T>::VISITED;
+            return this->depthFirstVisit (root);
+        };
+
         // bool depthFirst (typename goGraph<T>::ConstNode* root) const;
-        virtual bool action (typename goGraph<T>::Node* node) { return false; };
-        virtual bool action (typename goGraph<T>::ConstNode* node) const { return false; };
+        virtual bool action (goGraphNode<T>* node) { return false; };
+        virtual bool action (const goGraphNode<T>* node) const { return false; };
 
     private:
-        bool depthFirstVisit (typename goGraph<T>::Node* root);
+        //= New version
+        bool depthFirstVisit (goGraphNode<T>* root)
+        {
+            static bool ok = true;
+            if (!root)
+                return false;
+            typename goList< goGraphNode<T>* >::Element* el = root->adj.getFrontElement();
+            while (el)
+            {
+                if (el->elem->status != goGraphNode<T>::VISITED)
+                {
+                    el->elem->status = goGraphNode<T>::VISITED;
+                    ok = ok && this->depthFirstVisit (el->elem);
+                }
+                el = el->next;
+            }
+            return ok && this->action (root);
+        };
 };
 
 
