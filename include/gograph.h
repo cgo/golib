@@ -10,6 +10,42 @@
 /** @addtogroup data
  * @{
  */
+
+#if 0
+template <class T> class goGraphNode;
+
+template <class T>
+class goGraphEdge
+{
+    public:
+        goGraphEdge (goGraphNode<T>* n1 = 0, goGraphNode<T>* n2 = 0) 
+            : myNode1(n1), myNode2(n2) {};
+        virtual ~goGraphEdge() {};
+
+        inline void setNodes (goGraphNode<T>* n1, goGraphNode<T>* n2) 
+        { 
+            myNode1 = n1;
+            myNode2 = n2;
+        };
+        
+        inline goGraphNode<T>* getOtherNode (const goGraphNode<T>* askingNode)
+        {
+            if (askingNode == myNode1)
+            {
+                return myNode2;
+            }
+            else
+            {
+                assert (askingNode == myNode2);
+                return myNode1;
+            }
+        };
+        
+    protected:
+        goGraphNode<T>* myNode1;
+        goGraphNode<T>* myNode2;
+};
+
 /** 
  * @brief TO BE IMPLEMENTED Node of a Graph.
  */
@@ -18,11 +54,11 @@ class goGraphNode : public goObjectBase
 {
     public:
         goGraphNode ()
-            : adj(), value(), status(NORMAL), pass(0)
+            : adj(), parent(0), children(), value(), status(NORMAL), pass(0)
             {
             };
         goGraphNode (const T&)
-            : adj(), value(), status(NORMAL), pass(0)
+            : adj(), parent(0), children(), value(), status(NORMAL), pass(0)
             {
             };
 
@@ -30,9 +66,21 @@ class goGraphNode : public goObjectBase
         
         virtual ~goGraphNode () {};
 
-		goList< goGraphNode<T>* > adj;   //= Adjacency list
-        T                         value; //= Node value
-        goSize_t                  pass;  //= Counter for passes (how often was this node visited)
+        void reset ()
+        {
+            this->adj.erase();
+            this->parent = 0;
+            this->children.erase();
+            this->pass = 0;
+            this->status = NORMAL;
+        };
+
+		goList< EdgeType* >       adj;      //= Adjacency list
+        EdgeType*                 parent;   //= Set only if an algorithm has set it. Else NULL.
+        goList< EdgeType* >       children; //= Set only if an algorithm has set it. Else NULL.
+        T                         value;    //= Node value
+
+        goSize_t                  pass;     //= Counter for passes (how often was this node visited)
 
         enum Status
         {
@@ -44,6 +92,7 @@ class goGraphNode : public goObjectBase
 };
 
 template<class T> class goGraph;
+#endif
 
 /** 
  * @brief Running through a binary Graph.
@@ -56,7 +105,7 @@ template<class T> class goGraph;
  * 
  * @todo Add support for multiple connected components
  */
-template<class T, class NodeType>
+template<class T, class NodeType, class EdgeType>
 class goGraphAlgorithm
 {
     public:
@@ -72,7 +121,7 @@ class goGraphAlgorithm
             typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
             while (el)
             {
-                el->elem->status = goGraphNode<T>::NORMAL;
+                el->elem->status = NodeType::NORMAL;
                 el = el->next;
             }
 
@@ -87,17 +136,18 @@ class goGraphAlgorithm
             {
                 node = Qhead->elem;
                 assert (node);
-                typename goList<goGraphNode<T>*>::Element* adjNodeEl = node->adj.getFrontElement();
+                typename goList<EdgeType*>::Element* adjNodeEl = node->adj.getFrontElement();
                 while (adjNodeEl)
                 {
-                    if (adjNodeEl->elem->status != goGraphNode<T>::VISITED)
+                    NodeType* adjNode = adjNodeEl->elem->getOtherNode (node);
+                    if (adjNode->status != NodeType::VISITED)
                     {
-                        Q.append (dynamic_cast<NodeType*>(adjNodeEl->elem));
+                        Q.append (dynamic_cast<NodeType*>(adjNode));
                     }
                     adjNodeEl = adjNodeEl->next;
                 }
                 ok = ok & this->action (node);
-                node->status = goGraphNode<T>::VISITED;
+                node->status = NodeType::VISITED;
                 Qhead = Q.remove (Qhead);
             }
             return ok;
@@ -115,10 +165,10 @@ class goGraphAlgorithm
             typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
             while (el)
             {
-                el->elem->status = goGraphNode<T>::NORMAL;
+                el->elem->status = NodeType::NORMAL;
                 el = el->next;
             }
-            root->status = goGraphNode<T>::VISITED;
+            root->status = NodeType::VISITED;
             return this->depthFirstVisit (root);
         };
 
@@ -130,7 +180,7 @@ class goGraphAlgorithm
             typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
             while (el)
             {
-                el->elem->status = goGraphNode<T>::NORMAL;
+                el->elem->status = NodeType::NORMAL;
                 //if (&*el->elem != root)
                 //    stack.append (&*el->elem);
                 el = el->next;
@@ -139,15 +189,69 @@ class goGraphAlgorithm
             while (!stack.isEmpty())
             {
                 typename goList<NodeType*>::Element* nodeEl = stack.getTailElement();
-                if (nodeEl->elem->status != goGraphNode<T>::VISITED)
+                if (nodeEl->elem->status != NodeType::VISITED)
                 {
-                    nodeEl->elem->status = goGraphNode<T>::VISITED;
-                    typename goList<goGraphNode<T>*>::Element* el = nodeEl->elem->adj.getFrontElement();
+                    nodeEl->elem->status = NodeType::VISITED;
+                    typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
                     while (el)
                     {
-                        if (el->elem->status == goGraphNode<T>::NORMAL && el->elem != (goGraphNode<T>*)nodeEl->elem)
+                        NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
                         {
-                            stack.append (dynamic_cast<NodeType*>(el->elem));
+                            stack.append (adjNode);
+                        }
+                        el = el->next;
+                    }
+                }
+                else
+                {
+                    this->action (nodeEl->elem);
+                    stack.remove (nodeEl);
+                }
+            }
+            return true;
+        };
+
+        /** 
+         * @brief Same as depthFirst(), plus fills parent and children fields in the nodes.
+         * 
+         * @param root     Root node (to start with).
+         * @param nodeList Node list of the complete graph.
+         *
+         * @todo Find a better name for this.
+         * 
+         * @return True if successful, false otherwise.
+         */
+        bool depthFirstTree (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        {
+            if (!root)
+                return false;
+            goList<NodeType*> stack;
+            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            while (el)
+            {
+                el->elem->status = NodeType::NORMAL;
+                //if (&*el->elem != root)
+                //    stack.append (&*el->elem);
+                el = el->next;
+            }
+            stack.append (root);
+            while (!stack.isEmpty())
+            {
+                typename goList<NodeType*>::Element* nodeEl = stack.getTailElement();
+                if (nodeEl->elem->status != NodeType::VISITED)
+                {
+                    nodeEl->elem->status = NodeType::VISITED;
+                    nodeEl->elem->children.erase ();
+                    typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
+                    while (el)
+                    {
+                        NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
+                        {
+                            stack.append (adjNode);
+                            adjNode->parent = el->elem;
+                            nodeEl->elem->children.append (el->elem);
                         }
                         el = el->next;
                     }
@@ -162,23 +266,24 @@ class goGraphAlgorithm
         };
 
         // bool depthFirst (typename goGraph<T>::ConstNode* root) const;
-        virtual bool action (goGraphNode<T>* node) { return false; };
-        virtual bool action (const goGraphNode<T>* node) const { return false; };
+        virtual bool action (NodeType* node) { return false; };
+        virtual bool action (const NodeType* node) const { return false; };
 
     private:
         //= New version
-        bool depthFirstVisit (goGraphNode<T>* root)
+        bool depthFirstVisit (NodeType* root)
         {
             static bool ok = true;
             if (!root)
                 return false;
-            typename goList< goGraphNode<T>* >::Element* el = root->adj.getFrontElement();
+            typename goList< EdgeType* >::Element* el = root->adj.getFrontElement();
             while (el)
             {
-                if (el->elem->status != goGraphNode<T>::VISITED)
+                NodeType* adjNode = el->elem->getOtherNode (root);
+                if (adjNode->status != NodeType::VISITED)
                 {
-                    el->elem->status = goGraphNode<T>::VISITED;
-                    ok = ok && this->depthFirstVisit (el->elem);
+                    adjNode->status = NodeType::VISITED;
+                    ok = ok && this->depthFirstVisit (adjNode);
                 }
                 el = el->next;
             }
@@ -187,6 +292,7 @@ class goGraphAlgorithm
 };
 
 
+#if 0
 /** 
  * @brief Graph.
  */
@@ -212,5 +318,8 @@ class goGraph : public goObjectBase
     private:
         goList<goGraphNode<T>*> myNodes;
 };
+
+#endif
+
 /** @} */
 #endif
