@@ -22,7 +22,7 @@
 
 template <class T, class MessageType> class goFGEdge;
 
-template <class T>
+template <class T, class Tfloat>
 class goFGNode
 {
     public:
@@ -47,8 +47,8 @@ class goFGNode
             this->status = NORMAL;
         };
 
-		goList< goFGEdge<T, goVector<T> >* >       adj;      //= Adjacency list
-        typename goList< goFGEdge<T, goVector<T> >* >::Element*  parent;   //= Set only if an algorithm has set it. Else NULL.
+		goList< goFGEdge<T, Tfloat >* >  adj;      //= Adjacency list
+        typename goList< goFGEdge<T, Tfloat >* >::Element*  parent;   //= Set only if an algorithm has set it. Else NULL.
         T                                          value;    //= Node value
 
         enum Status
@@ -57,7 +57,7 @@ class goFGNode
             VISITED
         };
 
-        enum goFGNode<T>::Status status;
+        enum goFGNode<T,Tfloat>::Status status;
 
         goSize_t                  pass;     //= Counter for passes (how often was this node visited)
 
@@ -77,51 +77,56 @@ class goFGNode
         Type     myType;
 };
 
-template <class T>
-class goFGNodeFactor : public goFGNode<T>
+template <class T, class Tfloat>
+class goFGNodeFactor : public goFGNode<T,Tfloat>
 {
     public:
         goFGNodeFactor () 
-            : goFGNode<T> (),
+            : goFGNode<T,Tfloat> (),
               functor (0)
         {
-            this->setType (goFGNode<T>::FACTOR);
+            this->setType (goFGNode<T,Tfloat>::FACTOR);
             this->dummyFunctor = 
-                    goMemberFunction<goFGNodeFactor<T>,goDouble,const goVector<T>& > (this, &goFGNodeFactor<T>::dummyFactor);
+                    goMemberFunction<goFGNodeFactor<T,Tfloat>,Tfloat,const goVector<T>& > (this, &goFGNodeFactor<T,Tfloat>::dummyFactor);
             this->functor = &*dummyFunctor;
         };
         virtual ~goFGNodeFactor ()
         {
         };
 
-        virtual goDouble operator () (const goVector<T>& X)
+        Tfloat operator () (const goVector<T>& X)
         {
             return (*this->functor) (X);
         };
 
-        goDouble dummyFactor (const goVector<T>& X)
+        Tfloat dummyFactor (const goVector<T>& X)
         {
             return 1.0;
         };
 
-        goFunctorBase1< goDouble, const goVector<T>& >* getFunctor ()
+        goFunctorBase1< Tfloat, const goVector<T>& >* getFunctor ()
         {
             return &*this->functor;
         };
+
+        void setFunctor (goFunctorBase1< Tfloat, const goVector<T>& >* f)
+        {
+            this->functor = f;
+        };
         
     private:
-        goFunctorBase1< goDouble, const goVector<T>& >*  functor;
+        goFunctorBase1< Tfloat, const goVector<T>& >*  functor;
 
-        goAutoPtr <goFunctorBase1< goDouble, const goVector<T>&> > dummyFunctor;
+        goAutoPtr <goFunctorBase1< Tfloat, const goVector<T>&> > dummyFunctor;
 };
 
-template <class T>
-class goFGNodeVariable : public goFGNode<T>
+template <class T, class Tfloat>
+class goFGNodeVariable : public goFGNode<T,Tfloat>
 {
     public:
-        goFGNodeVariable () : goFGNode<T> ()
+        goFGNodeVariable () : goFGNode<T,Tfloat> ()
         {
-            this->setType (goFGNode<T>::VARIABLE);
+            this->setType (goFGNode<T,Tfloat>::VARIABLE);
         };
         
         virtual ~goFGNodeVariable ()
@@ -129,21 +134,24 @@ class goFGNodeVariable : public goFGNode<T>
         };
 };
 
-template <class T, class MessageType>
+template <class T, class Tfloat>
 class goFGEdge
 {
     public:
-        goFGEdge (goFGNode<T>* n1 = 0, goFGNode<T>* n2 = 0) 
+        typedef goVector<Tfloat> MessageType;
+    
+    public:
+        goFGEdge (goFGNode<T,Tfloat>* n1 = 0, goFGNode<T,Tfloat>* n2 = 0) 
             : myNode1(n1), myNode2(n2), myMsg12(), myMsg21() {};
         virtual ~goFGEdge () {};
 
-        inline void setNodes (goFGNode<T>* n1, goFGNode<T>* n2) 
+        inline void setNodes (goFGNode<T,Tfloat>* n1, goFGNode<T,Tfloat>* n2) 
         { 
             myNode1 = n1;
             myNode2 = n2;
         };
         
-        inline goFGNode<T>* getOtherNode (const goFGNode<T>* askingNode)
+        inline goFGNode<T,Tfloat>* getOtherNode (const goFGNode<T,Tfloat>* askingNode)
         {
             if (askingNode == myNode1)
             {
@@ -156,7 +164,7 @@ class goFGEdge
             }
         };
         
-        inline MessageType& getInMsg (const goFGNode<T>* askingNode)
+        inline MessageType& getInMsg (const goFGNode<T,Tfloat>* askingNode)
         {
             if (askingNode == myNode1)
             {
@@ -169,7 +177,7 @@ class goFGEdge
             }
         };
 
-        inline MessageType& getOutMsg (const goFGNode<T>* askingNode)
+        inline MessageType& getOutMsg (const goFGNode<T,Tfloat>* askingNode)
         {
             if (askingNode == myNode1)
             {
@@ -183,28 +191,28 @@ class goFGEdge
         };
 
     private:
-        goFGNode<T>* myNode1;
-        goFGNode<T>* myNode2;
+        goFGNode<T,Tfloat>* myNode1;
+        goFGNode<T,Tfloat>* myNode2;
         MessageType  myMsg12;
         MessageType  myMsg21;
 };
 
-template <class T>
+template <class T, class Tfloat>
 class goFactorGraph
 {
     public:
-        typedef goList< goAutoPtr< goFGNode<T> > >                NodeList;
-        typedef goList< goAutoPtr< goFGEdge<T, goVector<T> > > >  EdgeList;
+        typedef goList< goAutoPtr< goFGNode<T, Tfloat> > >             NodeList;
+        typedef goList< goAutoPtr< goFGEdge<T, Tfloat > > >  EdgeList;
 
     public:
         goFactorGraph ()
             : myNodes(), myEdges() {};
         ~goFactorGraph () {};
         
-        void connect (goFGNode<T>* n1, goFGNode<T>* n2)
+        void connect (goFGNode<T,Tfloat>* n1, goFGNode<T,Tfloat>* n2)
         {
             //= Create a new edge
-            myEdges.append (goAutoPtr< goFGEdge<T, goVector<T> > > (new goFGEdge<T, goVector<T> > (n1,n2)));
+            myEdges.append (goAutoPtr< goFGEdge<T, Tfloat > > (new goFGEdge<T, Tfloat > (n1,n2)));
             //= Append edge to both nodes and index all edges at each node.
             n1->adj.append (&*myEdges.getTail());
             n1->adj.getTailElement()->index = n1->adj.getSize()-1;
@@ -219,22 +227,22 @@ class goFactorGraph
 
 //==========================================================
 
-template<class T> class goSumProductPrivate;
+template<class T, class Tfloat> class goSumProductPrivate;
 
-template <class T>
+template <class T, class Tfloat>
 class goSumProduct : public goObjectBase
 {
     public:
-        // typedef goList< goAutoPtr< goFGNode<T> > > NodeList;
+        // typedef goList< goAutoPtr< goFGNode<T,Tfloat> > > NodeList;
     
     public:
         goSumProduct ();
         virtual ~goSumProduct ();
 
-        virtual bool run (goFactorGraph<T>& fg);
+        virtual bool run (goFactorGraph<T,Tfloat>& fg);
 
     private:
-        goSumProductPrivate<T>* myPrivate;
+        goSumProductPrivate<T,Tfloat>* myPrivate;
 };
 
 #endif

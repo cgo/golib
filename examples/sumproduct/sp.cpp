@@ -2,25 +2,26 @@
 
 int main ()
 {
-    goSumProduct<goFloat> sp;
-    goFactorGraph<goFloat> fg;
-    goFactorGraph<goFloat>::NodeList& nodelist = fg.myNodes;
+    goSumProduct<goSize_t,goFloat> sp;
+    goFactorGraph<goSize_t,goFloat> fg;
+    goFactorGraph<goSize_t,goFloat>::NodeList& nodelist = fg.myNodes;
     
-    goAutoPtr<goFGNode<goFloat> > node;
+    goAutoPtr<goFGNode<goSize_t,goFloat> > node;
     
-    node.set (new goFGNodeVariable<goFloat>);
+    node.set (new goFGNodeVariable<goSize_t,goFloat>);
+    node->value = 0.0f;
+    nodelist.append (node);
+
+    node.set (new goFGNodeVariable<goSize_t,goFloat>);
     node->value = 1.0f;
     nodelist.append (node);
 
-    node.set (new goFGNodeVariable<goFloat>);
+    node.set (new goFGNodeVariable<goSize_t,goFloat>);
     node->value = 2.0f;
     nodelist.append (node);
 
-    node.set (new goFGNodeVariable<goFloat>);
+    node.set (new goFGNodeFactor<goSize_t,goFloat>);
     node->value = 3.0f;
-    nodelist.append (node);
-
-    node.set (new goFGNodeFactor<goFloat>);
     nodelist.append (node);
 
     fg.connect (nodelist(0)->elem,nodelist(1)->elem);
@@ -45,7 +46,7 @@ int main ()
         goFloat f = 1.0;
         for (goSize_t i = 0; i < 11; ++i, f += 1.0f)
         {
-            nodelist.append (new goFGNodeVariable<goFloat>);
+            nodelist.append (new goFGNodeVariable<goSize_t,goFloat>);
             nodelist.getTail()->value = f;
         }
 

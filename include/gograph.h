@@ -213,7 +213,7 @@ class goGraphAlgorithm
         };
 
         /** 
-         * @brief Same as depthFirst(), plus fills parent and children fields in the nodes.
+         * @brief Same as depthFirst(), plus fills parent fields in the nodes.
          * 
          * @param root     Root node (to start with).
          * @param nodeList Node list of the complete graph.
@@ -242,16 +242,16 @@ class goGraphAlgorithm
                 if (nodeEl->elem->status != NodeType::VISITED)
                 {
                     nodeEl->elem->status = NodeType::VISITED;
-                    nodeEl->elem->children.erase ();
+                    // nodeEl->elem->children.erase ();
                     typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
                     while (el)
                     {
                         NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
-                        if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
+                        if (adjNode->status == NodeType::NORMAL && adjNode != nodeEl->elem)
                         {
                             stack.append (adjNode);
-                            adjNode->parent = el->elem;
-                            nodeEl->elem->children.append (el->elem);
+                            adjNode->parent = el;
+                            // nodeEl->elem->children.append (el->elem);
                         }
                         el = el->next;
                     }
