@@ -51,6 +51,10 @@ class goFGNode
         typename goList< goFGEdge<T, Tfloat >* >::Element*  parent;   //= Set only if an algorithm has set it. Else NULL.
         T                                          value;    //= Node value
 
+        //= For max-sum: keep the variable values that lead to the max message (f->x)
+        goMatrix<T> maxX; //= TODO: implement max-sum filling this in the forward step and using it to set the
+                          //= variable values in the backtracking step.
+
         enum Status
         {
             NORMAL,

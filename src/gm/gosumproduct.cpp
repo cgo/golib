@@ -33,32 +33,6 @@ goSumProduct<T,Tfloat>::~goSumProduct ()
     }
 }
 
-/** 
- * @brief Message passing in trees.
- *
- * \li \c T      Type for the variables (currently recommended to be integer, since [0,myValueCount-1] is used as values).
- * \li \c Tfloat Floating point type for the "message" vectors. Determines the accuracy. Set to goFloat or goDouble.
- */
-template <class T, class Tfloat>
-class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdge<T, Tfloat > >
-{
-    public:
-        typedef goList< goFGEdge<T, Tfloat >* > EdgeList;
-        typedef goList< goFGNode<T,Tfloat> >    NodeList;
-
-        enum Direction
-        {
-            FORWARD,
-            BACKWARD
-        };
-
-    public:
-        goMessagePassing () 
-            : goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdge<T, Tfloat > > (),
-              myValueCount (3),
-              myDirection (FORWARD)
-        {};
-        virtual ~goMessagePassing () {};
 
         //=
         //= TODO: * [ scheint zu funktionieren ] Hinweg / Rueckweg, 
@@ -67,9 +41,48 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
         //        dokumentieren,
         //=       * [ scheint ok ] message-Typ != T, message-Typ = float|double, T nur Variablen-Typ (idR integer) 
         //=
-        
-        bool run (goFGNode<T,Tfloat>* root, goFactorGraph<T,Tfloat>& fg)
+/** 
+ * @brief Message passing in trees (sum-product)
+ *
+ * \li \c T      Type for the variables (currently recommended to be integer, since [0,myValueCount-1] is used as values).
+ * \li \c Tfloat Floating point type for the "message" vectors. Determines the accuracy. Set to goFloat or goDouble.
+ */
+template <class T, class Tfloat>
+class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdge<T, Tfloat > >
+{
+    public:
+        typedef goList< goFGEdge<T,Tfloat>* > EdgeList;
+        typedef goList< goFGNode<T,Tfloat> >  NodeList;
+
+        enum Direction
         {
+            FORWARD,
+            BACKWARD
+        };
+
+        //=
+        //= Currently, two algorithms are chosen by an enumerator.
+        //= This could more OO be done by more classes, but for quickness' sake, 
+        //= do it like this now.
+        //=
+        enum Algorithm
+        {
+            SUM_PRODUCT,
+            MAX_SUM
+        };
+
+    public:
+        goMessagePassing () 
+            : goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdge<T, Tfloat > > (),
+              myValueCount (3),
+              myDirection (FORWARD),
+              myAlgorithm (SUM_PRODUCT)
+        {};
+        virtual ~goMessagePassing () {};
+        
+        bool run (goFGNode<T,Tfloat>* root, goFactorGraph<T,Tfloat>& fg, Algorithm algo = SUM_PRODUCT)
+        {
+            myAlgorithm = algo;
             //= Test for the sum() code. Tests show it seems to work fine.
 #if 0
             goVector<T> X (5);
@@ -117,13 +130,31 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             // assert (parentEdge->getOtherNode(fgn)->getType() == goFGNode<T,Tfloat>::FACTOR);
             if (mu.getSize() != this->myValueCount)
                 mu.resize (this->myValueCount);
-            mu.fill (T(1));
             typename EdgeList::Element* el = fgn->adj.getFrontElement();
-            while (el)
+            switch (myAlgorithm) //= This may be done differently, but this prevents copy-paste. I know
+                                 //= that is may slow things down.
             {
-                if (el->elem != parentEdgeEl->elem)
-                    mu *= el->elem->getInMsg (fgn);  //= Element-wise multiply
-                el = el->next;
+                case SUM_PRODUCT:
+                {
+                    mu.fill (Tfloat(1));
+                    while (el)
+                    {
+                        if (el->elem != parentEdgeEl->elem)
+                            mu *= el->elem->getInMsg (fgn);  //= Element-wise multiply
+                        el = el->next;
+                    }
+                }
+                break;
+                case MAX_SUM:
+                {
+                    mu.fill (Tfloat(0));
+                    while (el)
+                    {
+                        if (el->elem != parentEdgeEl->elem)
+                            mu += el->elem->getInMsg (fgn);  //= Element-wise multiply
+                        el = el->next;
+                    }
+                }
             }
 
             return true;
@@ -183,7 +214,9 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                     }
                     el = el->next;
                 }
-                //= Multiply with all incoming messages except from the parent variable node.
+                //= Multiply with all incoming messages except the one from the parent variable node.
+                //= TODO: Das ist wahrscheinlich falsch. (8.66) im Buch, Produkt ist Funktion von den
+                //=       Variablen x_m --> Produkt in sum() einbauen.
                 el = fgn->adj.getFrontElement();
                 while (el)
                 {
@@ -228,7 +261,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
          * 
          * @return The sum of f over all variables except fixed_index.
          */
-        goDouble sum (goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
+        inline goDouble sum (goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
         {
             if (i >= X.getSize())
             {
@@ -253,94 +286,132 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             return s;
         };
 
+        inline goDouble sumproduct (goFGNodeFactor<T,Tfloat>* factorNode,
+                goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
+        {
+            if (i >= X.getSize())
+            {
+                //printf ("X: ");
+                //for (goSize_t k = 0; k < X.getSize(); ++k)
+               // {
+               //     printf ("%f ", X[k]);
+               // }
+               // printf ("\n");
+               Tfloat prodIncoming = Tfloat(1);
+               //= TODO: Jetzt waere ein array mit allen eingehenden Kanten praktisch. Indexierung die gleiche wie in X.
+               //= \prod mu_{x_m->f_s}(x_m) ausrechnen
+               return (*f)(X);
+            }
+            if (i == fixed_index)
+            {
+                return sum (f, X, i+1, fixed_index);
+            }
+            goDouble s = 0.0;
+            for (goSize_t j = 0; j < this->myValueCount; ++j)
+            {
+                X[i] = T(j);
+                s += sum (f, X, i+1, fixed_index);
+            }
+            return s;
+        };
+
+        inline bool forwardPass (goFGNode<T,Tfloat>* node)
+        {
+            //=
+            //= This is pass 1 (from leaves to root).
+            //=
+
+            //=
+            //= Send a message to the parent of node fgn.
+            //=
+            typename EdgeList::Element* parentEdge = node->parent;
+            if (!parentEdge)
+            {
+                // goLog::warning ("goMessagePassing::action(): parent == 0");
+                //= This means we are at the root.
+                return true;
+            }
+
+            printf ("Would send from %d to %d\n", node->value, parentEdge->elem->getOtherNode(node)->value);
+            switch (node->getType())
+            {
+                case goFGNode<T,Tfloat>::VARIABLE:
+                    this->variableSend (node, parentEdge);
+                    break;
+                case goFGNode<T,Tfloat>::FACTOR:
+                    this->factorSend (node, parentEdge);
+                    break;
+                default:
+                    goLog::error ("goMessagePassing::action(): Unknown node type.");
+                    return false;
+                    break;
+            }
+
+            return true;
+        };
+
+        inline bool backwardPass (goFGNode<T,Tfloat>* node)
+        {
+            //=
+            //= This is pass 2 (from root back to leaves).
+            //=
+            typename EdgeList::Element* parentEdge = node->parent;
+            switch (node->getType())
+            {
+                case goFGNode<T,Tfloat>::VARIABLE:
+                    {
+                        typename EdgeList::Element* el = node->adj.getFrontElement();
+                        //= Send messages to all "children" (away from root)
+                        while (el)
+                        {
+                            if (!parentEdge || el->elem != parentEdge->elem)
+                            {
+                                printf ("Backward pass: would send from %d to %d\n", node->value, el->elem->getOtherNode(node)->value);
+                                this->variableSend (node, el);
+                            }
+                            el = el->next;
+                        }
+                    }
+                    break;
+                case goFGNode<T,Tfloat>::FACTOR:
+                    {
+                        typename EdgeList::Element* el = node->adj.getFrontElement();
+                        //= Send messages to all "children" (away from root)
+                        while (el)
+                        {
+                            if (!parentEdge || el->elem != parentEdge->elem)
+                            {
+                                printf ("Backward pass: would send from %d to %d\n", node->value, el->elem->getOtherNode(node)->value);
+                                this->factorSend (node, el);
+                            }
+                            el = el->next;
+                        }
+                    }
+                    break;
+                default:
+                    goLog::error ("goMessagePassing::action(): Unknown node type.");
+                    return false;
+                    break;
+            }
+
+            return true;
+        };
+
         virtual bool action (goFGNode<T,Tfloat>* node) 
         { 
-            //= Hmm .. how expensive are dynamic casts? -- FIXME
-            goFGNode<T,Tfloat>* fgn = node;
-
-            if (!fgn)
+            if (!node)
                 return false;
 
             switch (this->myDirection)
             {
                 case FORWARD:
                     {
-                        //=
-                        //= This is pass 1 (from leaves to root).
-                        //=
-
-                        //=
-                        //= Send a message to the parent of node fgn.
-                        //=
-                        typename EdgeList::Element* parentEdge = fgn->parent;
-                        if (!parentEdge)
-                        {
-                            // goLog::warning ("goMessagePassing::action(): parent == 0");
-                            //= This means we are at the root.
-                            return true;
-                        }
-
-                        printf ("Would send from %d to %d\n", fgn->value, parentEdge->elem->getOtherNode(fgn)->value);
-                        switch (fgn->getType())
-                        {
-                            case goFGNode<T,Tfloat>::VARIABLE:
-                                this->variableSend (fgn, parentEdge);
-                                break;
-                            case goFGNode<T,Tfloat>::FACTOR:
-                                this->factorSend (fgn, parentEdge);
-                                break;
-                            default:
-                                goLog::error ("goMessagePassing::action(): Unknown node type.");
-                                return false;
-                                break;
-                        }
-
-                        return true;
+                        return this->forwardPass (node);
                     }
                     break;
                 case BACKWARD:
                     {
-                        //=
-                        //= This is pass 2 (from root back to leaves).
-                        //=
-                        typename EdgeList::Element* parentEdge = fgn->parent;
-                        switch (fgn->getType())
-                        {
-                            case goFGNode<T,Tfloat>::VARIABLE:
-                                {
-                                    typename EdgeList::Element* el = fgn->adj.getFrontElement();
-                                    //= Send messages to all "children" (away from root)
-                                    while (el)
-                                    {
-                                        if (!parentEdge || el->elem != parentEdge->elem)
-                                        {
-                                            printf ("Backward pass: would send from %d to %d\n", fgn->value, el->elem->getOtherNode(fgn)->value);
-                                            this->variableSend (fgn, el);
-                                        }
-                                        el = el->next;
-                                    }
-                                }
-                                break;
-                            case goFGNode<T,Tfloat>::FACTOR:
-                                {
-                                    typename EdgeList::Element* el = fgn->adj.getFrontElement();
-                                    //= Send messages to all "children" (away from root)
-                                    while (el)
-                                    {
-                                        if (!parentEdge || el->elem != parentEdge->elem)
-                                        {
-                                            printf ("Backward pass: would send from %d to %d\n", fgn->value, el->elem->getOtherNode(fgn)->value);
-                                            this->factorSend (fgn, el);
-                                        }
-                                        el = el->next;
-                                    }
-                                }
-                                break;
-                            default:
-                                goLog::error ("goMessagePassing::action(): Unknown node type.");
-                                return false;
-                                break;
-                        }
+                        return this->backwardPass (node);
                     }
                     break;
                 default:
@@ -360,6 +431,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
         //= so that the message vectors have same lengths. This is this length.
         goSize_t  myValueCount;
         Direction myDirection;
+        Algorithm myAlgorithm;
 };
 
 template <class T, class Tfloat>
@@ -447,28 +519,7 @@ bool goSumProduct<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg)
     goMessagePassing<T,Tfloat> mp;
     mp.run ((goFGNode<T,Tfloat>*)el->elem, fg);
 
-    //=
-    //= Start message passing at the leaves (they are in findLeaves.leaves).
-    //= Nur Implementierungsfrage: wie genau messages realisieren? 
-    //=  - "send"-Methode an jedem Knoten (intuitiv, aber blaeht Objekte auf und ist langsamer)
-    //=  - zentrale Funktion (wahrsch. schneller, aber weniger intuitiv, weniger objektorientiert)
-    //= Per DFS durch graph laufen und Nachrichten schicken -- geht nur fuer Baeume!
-    //= Nachrichten: Variable -> Faktor: Reelle Zahl ; Faktor -> Variable: Vektor (f(x))
-   
-    //= Einfuehren: Marker fuer "messages sent" in nodes.
-    
-    //= Use leaves as queue.
-
     return true;
-    
-    //goList<goFGNode<T,Tfloat>*>& Q = findLeaves.leaves;
-    //while (!findLeaves.leaves.isEmpty())
-   // {
-   //     goFGNode<T,Tfloat>* node = Q.getFront();
-   //             
-   // }
-    
-    return true; 
 }
 
 template class goSumProduct<goSize_t,goFloat>;
