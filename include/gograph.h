@@ -136,15 +136,18 @@ class goGraphAlgorithm
             {
                 node = Qhead->elem;
                 assert (node);
-                typename goList<EdgeType*>::Element* adjNodeEl = node->adj.getFrontElement();
-                while (adjNodeEl)
+                //typename goList<EdgeType*>::Element* adjNodeEl = node->adj.getFrontElement();
+                //while (adjNodeEl)
+                goSize_t adjCount = node->adj.getSize();
+                for (goSize_t i = 0; i < adjCount; ++i)
                 {
-                    NodeType* adjNode = adjNodeEl->elem->getOtherNode (node);
+                //    NodeType* adjNode = adjNodeEl->elem->getOtherNode (node);
+                    NodeType* adjNode = node->adj[i]->getOtherNode (node);
                     if (adjNode->status != NodeType::VISITED)
                     {
-                        Q.append (dynamic_cast<NodeType*>(adjNode));
+                        Q.append (adjNode);
                     }
-                    adjNodeEl = adjNodeEl->next;
+                //    adjNodeEl = adjNodeEl->next;
                 }
                 ok = ok & this->action (node);
                 node->status = NodeType::VISITED;
@@ -192,15 +195,18 @@ class goGraphAlgorithm
                 if (nodeEl->elem->status != NodeType::VISITED)
                 {
                     nodeEl->elem->status = NodeType::VISITED;
-                    typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
-                    while (el)
+                    // typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
+                    //while (el)
+                    goSize_t adjCount = nodeEl->elem->adj.getSize();
+                    for (goSize_t i = 0; i < adjCount; ++i)
                     {
-                        NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        // NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
                         if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
                         {
                             stack.append (adjNode);
                         }
-                        el = el->next;
+                    //    el = el->next;
                     }
                 }
                 else
@@ -243,17 +249,21 @@ class goGraphAlgorithm
                 {
                     nodeEl->elem->status = NodeType::VISITED;
                     // nodeEl->elem->children.erase ();
-                    typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
-                    while (el)
+                    //typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
+                    //while (el)
+                    goSize_t adjCount = nodeEl->elem->adj.getSize();
+                    for (goSize_t i = 0; i < adjCount; ++i)
                     {
-                        NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        //NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
+                        NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
                         if (adjNode->status == NodeType::NORMAL && adjNode != nodeEl->elem)
                         {
                             stack.append (adjNode);
-                            adjNode->parent = el;
+                            // adjNode->parent = el;
+                            adjNode->parent = nodeEl->elem->adj[i]->getIndex (adjNode);
                             // nodeEl->elem->children.append (el->elem);
                         }
-                        el = el->next;
+                    //    el = el->next;
                     }
                 }
                 else
@@ -276,16 +286,19 @@ class goGraphAlgorithm
             static bool ok = true;
             if (!root)
                 return false;
-            typename goList< EdgeType* >::Element* el = root->adj.getFrontElement();
-            while (el)
+            //typename goList< EdgeType* >::Element* el = root->adj.getFrontElement();
+            //while (el)
+            goSize_t adjCount = root->adj.getSize();
+            for (goSize_t i = 0; i < adjCount; ++i)
             {
-                NodeType* adjNode = el->elem->getOtherNode (root);
+                //NodeType* adjNode = el->elem->getOtherNode (root);
+                NodeType* adjNode = root->adj[i]->getOtherNode (root);
                 if (adjNode->status != NodeType::VISITED)
                 {
                     adjNode->status = NodeType::VISITED;
                     ok = ok && this->depthFirstVisit (adjNode);
                 }
-                el = el->next;
+                //el = el->next;
             }
             return ok && this->action (root);
         };
