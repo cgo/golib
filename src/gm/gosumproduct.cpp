@@ -33,12 +33,14 @@ goSumProduct<T,Tfloat>::~goSumProduct ()
     }
 }
 
-
         //=
         //= TODO: * [ scheint zu funktionieren ] Hinweg / Rueckweg, 
-        //        - sum-product -> max-sum, 
+        //        * [ scheint ok, testen in partialshape! ] sum-product -> max-sum, 
         //        testen, 
         //        dokumentieren,
+        //        sum-product ist nicht ganz komplett, Summe ueber alle eingehenden 
+        //          Nachrichten in einem Knoten
+        //          muss noch gebildet werden, um die Randverteilung zu bekommen.
         //=       * [ scheint ok ] message-Typ != T, message-Typ = float|double, T nur Variablen-Typ (idR integer) 
         //=
 /** 
@@ -79,7 +81,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
               myAlgorithm (SUM_PRODUCT)
         {};
         virtual ~goMessagePassing () {};
-        
+
         bool run (goFGNode<T,Tfloat>* root, goFactorGraph<T,Tfloat>& fg, Algorithm algo = SUM_PRODUCT)
         {
             myAlgorithm = algo;
@@ -95,16 +97,29 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             //= Depth first search plus fill parent fields in the nodes so we know
             //= which is which.
             this->myDirection = FORWARD;
-            bool ok = this->depthFirstTree (root, fg.myNodes);
+            {
+                //=
+                //= Reset factor and variable nodes 
+                //=
+                goSize_t sz = fg.myFactors.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myFactors[i]->status = goFGNode<T,Tfloat>::NORMAL;
+                sz = fg.myVariables.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myVariables[i]->status = goFGNode<T,Tfloat>::NORMAL;
+            }
+            bool ok = this->depthFirstTree (root);
             if (!ok)
             {
                 goLog::warning ("goMessagePassing::run(): Forward pass failed.");
                 return false;
             }
+
             this->myDirection = BACKWARD;
 
             //=
-            //= Set the maximising value of the root node in the case of the max-sum algorithm.
+            //= Set the maximising value of the root node in the case of the max-sum algorithm
+            //= by taking \arg\max_x (\sum_{s \in ne(x)} \mu_{f_s -> x}(x)) (8.98 in Bishop's book).
             //=
             if (this->myAlgorithm == MAX_SUM)
             {
@@ -114,7 +129,13 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                 sum.fill (Tfloat(0));
                 for (goIndex_t i = 0; i < adjCount; ++i)
                 {
-                    sum += root->adj[i]->getInMsg (root);
+                    goVector<Tfloat>& inMsg = root->adj[i]->getInMsg (root);
+                    if (inMsg.getSize() != this->myValueCount)
+                    {
+                        goLog::warning ("goMessagePassing::run(): inMsg to ROOT of wrong size -- loopy graph?");
+                        continue;
+                    }
+                    sum += inMsg;
                 }
                 goSize_t max_i = 0;
                 assert (this->myValueCount > 0);
@@ -130,7 +151,18 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                 root->value = T(max_i);
             }
             
-            ok = this->breadthFirst (root, fg.myNodes);
+            {
+                //=
+                //= Reset factor and variable nodes 
+                //=
+                goSize_t sz = fg.myFactors.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myFactors[i]->status = goFGNode<T,Tfloat>::NORMAL;
+                sz = fg.myVariables.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myVariables[i]->status = goFGNode<T,Tfloat>::NORMAL;
+            }
+            ok = this->breadthFirst (root);
 
             return ok;
         };
@@ -147,7 +179,8 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
          * @brief Create and "send" message from a variable node \c fgn along a given edge.
          * 
          * @param fgn           Variable node to send from.
-         * @param parentEdgeEl  Edge to send along (the other connected node is a factor and "receives" the message).
+         * @param parentIndex   Index into fgn->adj of edge to send the message along 
+         *                      (the other connected node is a variable and "receives" the message).
          * 
          * @return True if successful, false otherwise.
          */
@@ -155,7 +188,6 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
         inline bool variableSend (goFGNode<T,Tfloat>* fgn, goIndex_t parentIndex)
         {
             //= Send message \mu_{x->f} along parent edge
-            //goVector<Tfloat>& mu = parentEdgeEl->elem->getOutMsg (fgn);
             goIndex_t mu_index = parentIndex;
             if (mu_index < 0)
                 mu_index = 0;
@@ -163,7 +195,6 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             // assert (parentEdge->getOtherNode(fgn)->getType() == goFGNode<T,Tfloat>::FACTOR);
             if (mu.getSize() != this->myValueCount)
                 mu.resize (this->myValueCount);
-            // typename EdgeList::Element* el = fgn->adj.getFrontElement();
             goIndex_t adjCount = static_cast<goIndex_t>(fgn->adj.getSize());
             switch (myAlgorithm) //= This may be done differently, but this prevents copy-paste. I know
                                  //= that is may slow things down.
@@ -171,28 +202,20 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                 case SUM_PRODUCT:
                 {
                     mu.fill (Tfloat(1));
-                    //while (el)
                     for (goIndex_t i = 0; i < adjCount; ++i)
                     {
-                        //if (el->elem != parentEdgeEl->elem)
                         if (i != parentIndex)
-                            //mu *= el->elem->getInMsg (fgn);  //= Element-wise multiply
                             mu *= fgn->adj[i]->getInMsg (fgn);
-                        //el = el->next;
                     }
                 }
                 break;
                 case MAX_SUM:
                 {
                     mu.fill (Tfloat(0));
-                    //while (el)
                     for (goIndex_t i = 0; i < adjCount; ++i)
                     {
-                        //if (el->elem != parentEdgeEl->elem)
                         if (i != parentIndex)
-                            //mu += el->elem->getInMsg (fgn);  //= Element-wise multiply
                             mu += fgn->adj[i]->getInMsg (fgn);  
-                        //el = el->next;
                     }
                 }
             }
@@ -203,7 +226,8 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
          * @brief Create and "send" message from a factor node \c fgn along a given edge.
          * 
          * @param fgn           Factor node to send from.
-         * @param parentEdgeEl  Edge to send along (the other connected node is a variable and "receives" the message).
+         * @param parentIndex   Index into fgn->adj of edge to send the message along 
+         *                      (the other connected node is a variable and "receives" the message).
          * 
          * @return True if successful, false otherwise.
          */
@@ -211,9 +235,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
         inline bool factorSend (goFGNode<T,Tfloat>* fgn, goSize_t parentIndex)
         {
             //= Make this a function of parentEdge -- the same will be needed on the way back.
-            //goVector<Tfloat>& mu = parentEdgeEl->elem->getOutMsg (fgn);
             goVector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
-            // assert (parentEdge->getOtherNode(fgn)->getType() == goFGNode<T,Tfloat>::VARIABLE);
             if (mu.getSize() != this->myValueCount)
                 mu.resize (this->myValueCount);
 
@@ -231,17 +253,13 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             //=          When there are individual possible values, use those instead.
             if (fgn->adj.getSize() > 1)
             {
-                //typename EdgeList::Element* el = fgn->adj.getFrontElement();
                 goSize_t adjCount = fgn->adj.getSize();
-                //while (el)
                 for (goSize_t i = 0; i < adjCount; ++i)
                 {
-                    //if (el->elem != parentEdgeEl->elem)   
                     if (i != parentIndex)
                     {
                         //= Sum over all other variables connected to this 
                         //= factor except for the parent.
-                        // goSize_t x_index = parentEdgeEl->index;
                         goSize_t x_index = parentIndex;
                         printf ("parent x index == %d\n", x_index);
                         goVector<T> X (fgn->adj.getSize());
@@ -258,25 +276,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                             mu[x] = this->sumproduct (factornode, f, X, 0, x_index);
                         }
                     }
-                    //el = el->next;
                 }
-                //= Multiply with all incoming messages except the one from the parent variable node.
-                //= TODO: Das ist wahrscheinlich falsch. (8.66) im Buch, Produkt ist Funktion von den
-                //=       Variablen x_m --> Produkt in sum() einbauen.
-                //el = fgn->adj.getFrontElement();
-                //while (el)
-#if 0
-                for (goSize_t i = 0; i < adjCount; ++i)
-                {
-                    //if (el->elem != parentEdgeEl->elem)   
-                    if (i != parentIndex)
-                    {
-                        mu *= fgn->adj[i]->getInMsg (fgn);
-                        //mu *= el->elem->getInMsg (fgn);
-                    }
-                    //el = el->next;
-                }
-#endif
             }
             else
             {
@@ -379,7 +379,9 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
          *
          * Sums f over all variables except fixed_index. Currently just uses the indices as input functions
          * for the function f(). If other values should be used, change this function accordingly.
-         * 
+         *
+         * @note This function is not used in this class, but left for completeness.
+         *
          * @param f Functor to sum over.
          * @param X Input vector for f.
          * @param i Current index into X to sum over (start the recursion with 0).
@@ -412,7 +414,6 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             return s;
         };
 
-# if 1
         inline goDouble sumproduct (goFGNodeFactor<T,Tfloat>* factorNode,
                 goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
         {
@@ -430,7 +431,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                {
                    //= This can be made faster with an array containing simply the incoming messages. But what the heck.
                    if (j != fixed_index)
-                       prodIncoming *= factorNode->adj[j]->getInMsg(factorNode)[X[i]];
+                       prodIncoming *= factorNode->adj[j]->getInMsg(factorNode)[X[j]];
                }
                return (*f)(X) * prodIncoming;
             }
@@ -446,9 +447,14 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             }
             return s;
         };
-# endif
+
         inline Tfloat maxsum (goFGNodeFactor<T,Tfloat>* factorNode,
-                goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index, Tfloat currentMax, goVector<T>& maxX)
+                              goFunctorBase1 <Tfloat, const goVector<T>& >* f, 
+                              goVector<T>& X, 
+                              goSize_t     i, 
+                              goSize_t     fixed_index, 
+                              Tfloat       currentMax, 
+                              goVector<T>& maxX)
         {
             if (i >= X.getSize())
             {
@@ -463,8 +469,14 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
                for (goSize_t j = 0; j < M; ++j)
                {
                    //= This can be made faster with an array containing simply the incoming messages. But what the heck.
+                   goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
+                   if (inMsg.getSize() != this->myValueCount)
+                   {
+                       goLog::warning ("goMessagePassing::maxsum(): inMsg size mismatch, continuing -- loopy graph?");
+                       continue;
+                   }
                    if (j != fixed_index)
-                       sumIncoming += factorNode->adj[j]->getInMsg(factorNode)[X[i]];
+                       sumIncoming += factorNode->adj[j]->getInMsg(factorNode)[X[j]];
                }
                Tfloat temp = (*f)(X) + sumIncoming;
                if (temp > currentMax)
@@ -482,7 +494,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
             for (goSize_t j = 0; j < this->myValueCount; ++j)
             {
                 X[i] = T(j);
-                s = maxsum (factorNode, f, i+1, fixed_index, s, maxX);
+                s = maxsum (factorNode, f, X, i+1, fixed_index, s, maxX);
             }
             return s;
         };
@@ -737,7 +749,7 @@ class goMessagePassing : public goGraphAlgorithm< T, goFGNode<T,Tfloat>, goFGEdg
 };
 
 template <class T, class Tfloat>
-bool goSumProduct<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg)
+bool goSumProduct<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
 {
     /*
      * Take any one variable node as root
@@ -748,80 +760,79 @@ bool goSumProduct<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg)
     //= 
     //= Find first variable node
     //=
-    typename goFactorGraph<T,Tfloat>::NodeList& nodeList = fg.myNodes;
-    typename goFactorGraph<T,Tfloat>::NodeList::Element* el = nodeList.getFrontElement();
-    while (el && el->elem->getType() != goFGNode<T,Tfloat>::VARIABLE)
+    //typename goFactorGraph<T,Tfloat>::NodeList& nodeList = fg.myNodes;
+    //typename goFactorGraph<T,Tfloat>::NodeList::Element* el = nodeList.getFrontElement();
+    goSize_t nodes_sz = fg.myVariables.getSize();
+    goSize_t i = 0;
+    for (i = 0; i < nodes_sz && fg.myVariables[i]->getType() != goFGNode<T,Tfloat>::VARIABLE; ++i)
+    // while (el && el->elem->getType() != )
     {
-        el = el->next;
+        //el = el->next;
     }
-    if (!el)
+    // if (!el)
+    if (i >= nodes_sz)
     {
-        goLog::warning ("goSumProduct::run(): el == 0");
+        goLog::warning ("goSumProduct::run(): no variable node found. Not running.");
         return false;
     }
 
-    //=
-    //= Find leaves
-    //=
-#if 0
-    class FindLeaves : public goGraphAlgorithm< T, goFGNode<T,Tfloat> >
-    {
-        public:
-            FindLeaves () : goGraphAlgorithm< T, goFGNode<T,Tfloat> > () {};
-            virtual ~FindLeaves () {};
-
-            virtual bool action (goGraphNode<T>* node) 
-            { 
-                //= Hmm .. how expensive are dynamic casts? -- FIXME
-                goFGNode<T,Tfloat>* fgn = dynamic_cast< goFGNode<T,Tfloat>* > (node);
-                if (!fgn)
-                    return false;
-                printf ("%s node visited\n", (fgn->getType() == goFGNode<T,Tfloat>::VARIABLE) ? "Variable" : "Factor");
-                if (fgn->getType() == goFGNode<T,Tfloat>::VARIABLE)
-                {
-                    printf ("\tValue: %f\n", fgn->value);
-                }
-
-                if (fgn->adj.getSize() == 1)
-                    leaves.append (fgn);
-
-                return true;
-            };
-
-            goList<goFGNode<T,Tfloat>*> leaves;
-    };
-
-    FindLeaves findLeaves;
-
-    printf ("Breadth first:\n");
-    findLeaves.breadthFirst ((goFGNode<T,Tfloat>*)el->elem, nodeList);
-
-    findLeaves.leaves.erase ();
-    printf ("Depth first:\n");
-    findLeaves.depthFirst ((goFGNode<T,Tfloat>*)el->elem, nodeList);
-
-    findLeaves.leaves.erase ();
-    printf ("Depth first:\n");
-    findLeaves.depthFirstRecursive ((goFGNode<T,Tfloat>*)el->elem, nodeList);
-    {
-        typename goList<goFGNode<T,Tfloat>*>::Element* el = findLeaves.leaves.getFrontElement();
-        printf ("Leaves: ");
-        while (el)
-        {
-            if (el->elem->getType() == goFGNode<T,Tfloat>::VARIABLE)
-                printf ("%f ", el->elem->value);
-            else
-                printf ("f(x) ");
-            el = el->next;
-        }
-        printf ("\n");
-    }
-#endif
-
     goMessagePassing<T,Tfloat> mp;
-    mp.run ((goFGNode<T,Tfloat>*)el->elem, fg);
+    mp.setValueCount (valueCount);
+    mp.run ((goFGNode<T,Tfloat>*)fg.myVariables[i], fg);
 
     return true;
 }
 
+//====================================================================
+
+template <class T, class Tfloat>
+goMaxSum<T,Tfloat>::goMaxSum ()
+    : goObjectBase ()
+{
+}
+
+template <class T, class Tfloat>
+goMaxSum<T,Tfloat>::~goMaxSum ()
+{
+}
+
+template <class T, class Tfloat>
+bool goMaxSum<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
+{
+    /*
+     * Take any one variable node as root
+     * Find the leaves
+     * At the leaves, start the message passing
+     */
+
+    //= 
+    //= Find first variable node
+    //=
+
+    //typename goFactorGraph<T,Tfloat>::NodeList& nodeList = fg.myNodes;
+    //typename goFactorGraph<T,Tfloat>::NodeList::Element* el = nodeList.getFrontElement();
+    goSize_t nodes_sz = fg.myVariables.getSize();
+    goSize_t i = 0;
+    for (i = 0; i < nodes_sz && fg.myVariables[i]->getType() != goFGNode<T,Tfloat>::VARIABLE; ++i)
+    // while (el && el->elem->getType() != )
+    {
+        //el = el->next;
+    }
+    // if (!el)
+    if (i >= nodes_sz)
+    {
+        goLog::warning ("goMaxSum::run(): no variable node found. Not running.");
+        return false;
+    }
+
+    goMessagePassing<T,Tfloat> mp;
+    mp.setValueCount (valueCount);
+    mp.run ((goFGNode<T,Tfloat>*)fg.myVariables[i], fg, goMessagePassing<T,Tfloat>::MAX_SUM);
+
+    return true;
+}
+
+//==============================================================
+
+template class goMaxSum<goSize_t,goFloat>;
 template class goSumProduct<goSize_t,goFloat>;

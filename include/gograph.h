@@ -3,6 +3,9 @@
 
 #include <goobjectbase.h>
 #include <golist.h>
+#ifndef GOFIXEDARRAY_H
+# include <gofixedarray.h>
+#endif
 #ifndef GOAUTOPTR_H
 # include <goautoptr.h>
 #endif
@@ -112,18 +115,27 @@ class goGraphAlgorithm
         goGraphAlgorithm () {};
         virtual ~goGraphAlgorithm () {};
 
-        bool breadthFirst (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        /** 
+         * @brief BFS.
+         * 
+         * @note All nodes need to be reset to NodeType::NORMAL state before calling this.
+         *
+         * @param root Node to start at.
+         * 
+         * @return True if successful, false otherwise.
+         */
+        bool breadthFirst (NodeType* root) //, goFixedArray< goAutoPtr< NodeType > >& nodes)
         {
             if (!root)
                 return false;
 
             //= Set all nodes to NORMAL (not visited)
-            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            while (el)
-            {
-                el->elem->status = NodeType::NORMAL;
-                el = el->next;
-            }
+            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            //while (el)
+            //{
+            //    el->elem->status = NodeType::NORMAL;
+            //    el = el->next;
+            //}
 
             goList<NodeType*> Q;
             Q.append (root);
@@ -160,34 +172,36 @@ class goGraphAlgorithm
         // bool breadthFirst (typename goGraph<T>::ConstNode* root) const;
         
         //= New version
-        bool depthFirstRecursive (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        bool depthFirstRecursive (NodeType* root) // , goFixedArray< goAutoPtr< NodeType > >& nodes)
         {
             // static bool ok = true;
             if (!root)
                 return false;
-            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            while (el)
-            {
-                el->elem->status = NodeType::NORMAL;
-                el = el->next;
-            }
+            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            //while (el)
+            //{
+            //    el->elem->status = NodeType::NORMAL;
+            //    el = el->next;
+            //}
+
             root->status = NodeType::VISITED;
             return this->depthFirstVisit (root);
         };
 
-        bool depthFirst (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        bool depthFirst (NodeType* root) // , goFixedArray< goAutoPtr< NodeType > >& nodes)
         {
             if (!root)
                 return false;
+            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            //while (el)
+            //{
+            //    el->elem->status = NodeType::NORMAL;
+            //    //if (&*el->elem != root)
+            //    //    stack.append (&*el->elem);
+            //    el = el->next;
+            //}
+
             goList<NodeType*> stack;
-            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            while (el)
-            {
-                el->elem->status = NodeType::NORMAL;
-                //if (&*el->elem != root)
-                //    stack.append (&*el->elem);
-                el = el->next;
-            }
             stack.append (root);
             while (!stack.isEmpty())
             {
@@ -228,19 +242,20 @@ class goGraphAlgorithm
          * 
          * @return True if successful, false otherwise.
          */
-        bool depthFirstTree (NodeType* root, goList< goAutoPtr< NodeType > >& nodeList)
+        bool depthFirstTree (NodeType* root) // , goFixedArray< goAutoPtr< NodeType > >& nodes)
         {
             if (!root)
                 return false;
+            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
+            //while (el)
+           // {
+            //    el->elem->status = NodeType::NORMAL;
+            //    //if (&*el->elem != root)
+            //    //    stack.append (&*el->elem);
+            //    el = el->next;
+            //}
+
             goList<NodeType*> stack;
-            typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            while (el)
-            {
-                el->elem->status = NodeType::NORMAL;
-                //if (&*el->elem != root)
-                //    stack.append (&*el->elem);
-                el = el->next;
-            }
             stack.append (root);
             while (!stack.isEmpty())
             {

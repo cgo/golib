@@ -51,8 +51,6 @@ class goFGNode
         };
 
 		goFixedArray< goFGEdge<T, Tfloat >* >  adj;      //= Adjacency list
-		// goList< goFGEdge<T, Tfloat >* >  adj;      //= Adjacency list
-        //typename goList< goFGEdge<T, Tfloat >* >::Element*  parent;   //= Set only if an algorithm has set it. Else NULL.
         goIndex_t parent; // Index into adj of the parent. Negative if not net, set only if an algorithm has set it.
         T         value;    //= Node value
 
@@ -252,12 +250,14 @@ template <class T, class Tfloat>
 class goFactorGraph
 {
     public:
-        typedef goList< goAutoPtr< goFGNode<T, Tfloat> > >   NodeList;
+        typedef goFixedArray< goAutoPtr< goFGNodeVariable<T,Tfloat> > > VariableArray;
+        typedef goFixedArray< goAutoPtr< goFGNodeFactor<T,Tfloat> > >   FactorArray;
+        // typedef goList< goAutoPtr< goFGNode<T, Tfloat> > >   NodeList;
         typedef goList< goAutoPtr< goFGEdge<T, Tfloat > > >  EdgeList;
 
     public:
         goFactorGraph ()
-            : myNodes(), myEdges() {};
+            : myVariables(), myFactors(), myEdges() {};
         ~goFactorGraph () {};
         
         /** 
@@ -282,8 +282,11 @@ class goFactorGraph
             myEdges.getTail()->setIndex (adjIndex1, adjIndex2);
         };
 
-        NodeList myNodes;
-        EdgeList myEdges;
+        //NodeList myNodes;
+        //EdgeList myEdges;
+        VariableArray myVariables;
+        FactorArray   myFactors;
+        EdgeList      myEdges;
 };
 
 
@@ -301,10 +304,23 @@ class goSumProduct : public goObjectBase
         goSumProduct ();
         virtual ~goSumProduct ();
 
-        virtual bool run (goFactorGraph<T,Tfloat>& fg);
+        virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
 
     private:
         goSumProductPrivate<T,Tfloat>* myPrivate;
+};
+
+template <class T, class Tfloat>
+class goMaxSum : public goObjectBase
+{
+    public:
+        // typedef goList< goAutoPtr< goFGNode<T,Tfloat> > > NodeList;
+    
+    public:
+        goMaxSum ();
+        virtual ~goMaxSum ();
+
+        virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
 };
 
 #endif
