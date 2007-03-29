@@ -9,6 +9,9 @@
 #ifndef GOAUTOPTR_H
 # include <goautoptr.h>
 #endif
+#ifndef GOFILEIO_H
+# include <gofileio.h>
+#endif
 
 /** @addtogroup data
  * @{
@@ -139,7 +142,7 @@ class goGraphEdge
  * 
  * @todo Add support for multiple connected components (simply by supplying a set of all nodes).
  */
-template<class T, class NodeType, class EdgeType>
+template<class NodeType, class EdgeType>
 class goGraphAlgorithm
 {
     public:
@@ -361,6 +364,59 @@ class goGraphAlgorithm
             return ok && this->action (root);
         };
 };
+
+template <class NodeType, class EdgeType>
+static bool goGraphWriteDOT (NodeType* root, FILE* f) //const
+{
+    if (!f)
+    {
+        return false;
+    }
+
+    class dotWriter : public goGraphAlgorithm<NodeType,EdgeType>
+    {
+        public:
+            dotWriter (FILE* f_) : goGraphAlgorithm<NodeType,EdgeType> (), f(f_) {};
+            virtual ~dotWriter() {};
+
+            virtual bool action (NodeType* node) // const
+            {
+                goString pointer;
+                pointer.resize(256);
+                sprintf(pointer.getPtr(),"%p",node);
+                goString nodeName = "node_";
+                nodeName += pointer.toCharPtr();
+                goString leftName = "";
+                goString rightName = "";
+                goString command = nodeName;
+                command += ";\n";
+                goFileIO::writeASCII(this->f, command);
+
+                goSize_t adjCount = node->adj.getSize();
+                for (goSize_t i = 0; i < adjCount; ++i)
+                {
+                    if (node->adj[i])
+                    {
+                        sprintf(pointer.getPtr(),"%p",node->adj[i]->getOtherNode(node));
+                        goString adjName = "node_";
+                        adjName += pointer.toCharPtr();
+                        command = nodeName;
+                        command += " -- "; command += adjName; command += ";\n";
+                        goFileIO::writeASCII(this->f, command);
+                    }
+                }
+                return true;
+            };
+
+            FILE* f;
+    };
+
+    goFileIO::writeASCII(f,goString("graph {\n"));
+    dotWriter writer(f);
+    bool ok = writer.depthFirst(root);
+    goFileIO::writeASCII(f,goString("}\n"));
+    return ok;
+}
 
 /** @} */
 
