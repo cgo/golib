@@ -272,6 +272,7 @@
  /**
  * \page notes Notes
  * - \subpage notes_atlas Notes on CBLAS and ATLAS
+ * - Some PDF on non-recursive depth first search from the web is in doc/gographalgorithm
  */
 
  /**

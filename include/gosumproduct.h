@@ -30,6 +30,11 @@
 #endif
 
 /** 
+ * \addtogroup gm
+ * @{
+ */
+
+/** 
  * @brief The sum-product algorithm.
  * @verbatim
     Bishop, C.M., Pattern Recognition and Machine Learning, Springer, 2006, chapter 8
@@ -86,5 +91,7 @@ class goMaxSum : public goObjectBase
          */
         virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
 };
+
+/** @} */
 
 #endif

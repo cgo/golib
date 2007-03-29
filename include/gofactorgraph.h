@@ -14,6 +14,11 @@
 template <class T, class MessageType> class goFGEdge;
 
 /** 
+ * \addtogroup gm
+ * @{
+ */
+
+/** 
  * @brief Node base class for variable and factor nodes for goFactorGraph.
  */
 template <class T, class Tfloat>
@@ -354,5 +359,7 @@ static bool goFGGraphWriteDOT (goFGNode<T,Tfloat>* root, FILE* f) //const
     goFileIO::writeASCII(f,goString("}\n"));
     return ok;
 }
+
+/** @} */
 
 #endif

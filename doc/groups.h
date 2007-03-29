@@ -155,4 +155,5 @@
  * \defgroup net Network classes
  * \defgroup thread Multithreading classes
  * \defgroup video Video capture and related
+ * \defgroup gm Belief propagation and factor graphs
  */
