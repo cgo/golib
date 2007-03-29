@@ -22,11 +22,17 @@
 #ifndef GOMATRIX_H
 # include <gomatrix.h>
 #endif
+#ifndef GOGRAPH_H
+# include <gograph.h>
+#endif
 
 template <class T, class MessageType> class goFGEdge;
 
+/** 
+ * @brief Node base class for variable and factor nodes for goFactorGraph.
+ */
 template <class T, class Tfloat>
-class goFGNode
+class goFGNode : public goGraphNode < goFGEdge<T,Tfloat> >
 {
     public:
         virtual ~goFGNode () {};
@@ -42,27 +48,14 @@ class goFGNode
             return this->myType;
         };
 
-        void reset ()
+        virtual void reset ()
         {
-            this->adj.setSize(0);
-            this->parent = -1;
+            goGraphNode< goFGEdge<T,Tfloat> >::reset ();
             this->pass = 0;
-            this->status = NORMAL;
         };
 
-		goFixedArray< goFGEdge<T, Tfloat >* >  adj;      //= Adjacency list
-        goIndex_t parent; // Index into adj of the parent. Negative if not net, set only if an algorithm has set it.
         T         value;    //= Node value
-
-        enum Status
-        {
-            NORMAL,
-            VISITED
-        };
-
-        enum goFGNode<T,Tfloat>::Status status;
-
-        goSize_t                  pass;     //= Counter for passes (how often was this node visited)
+        goSize_t  pass;     //= UNUSED Counter for passes (how often was this node visited)
 
     protected:
         void setType (Type t)
@@ -71,16 +64,17 @@ class goFGNode
         };
 
         goFGNode (goSize_t edgeCount)
-            : adj(edgeCount), parent(-1), value(T(0)), status(NORMAL), pass(0), 
-              myType (VARIABLE)
-        {
-            adj.fill (0);
-        };
+            : goGraphNode< goFGEdge<T,Tfloat> > (edgeCount), 
+              value(T(0)), pass(0), myType (VARIABLE)
+        { };
 
     private:
         Type     myType;
 };
 
+/** 
+ * @brief Factor node for goFactorGraph.
+ */
 template <class T, class Tfloat>
 class goFGNodeFactor : public goFGNode<T,Tfloat>
 {
@@ -133,6 +127,9 @@ class goFGNodeFactor : public goFGNode<T,Tfloat>
 
 };
 
+/** 
+ * @brief Variable class for goFactorGraph.
+ */
 template <class T, class Tfloat>
 class goFGNodeVariable : public goFGNode<T,Tfloat>
 {
@@ -147,112 +144,63 @@ class goFGNodeVariable : public goFGNode<T,Tfloat>
         };
 };
 
+/** 
+ * @brief Edge class for goFactorGraph.
+ */
 template <class T, class Tfloat>
-class goFGEdge
+class goFGEdge : public goGraphEdge < goFGNode<T,Tfloat> >
 {
     public:
         typedef goVector<Tfloat> MessageType;
     
     public:
         goFGEdge (goFGNode<T,Tfloat>* n1 = 0, goFGNode<T,Tfloat>* n2 = 0) 
-            : myNode1(n1), myNode2(n2), myIndex1(-1), myIndex2(-1), myMsg12(), myMsg21() {};
+            : goGraphEdge< goFGNode<T,Tfloat> > (n1,n2), myMsg12(), myMsg21() {};
         virtual ~goFGEdge () {};
 
-        inline void setNodes (goFGNode<T,Tfloat>* n1, goFGNode<T,Tfloat>* n2) 
-        { 
-            myNode1 = n1;
-            myNode2 = n2;
-        };
-        
-        inline goFGNode<T,Tfloat>* getOtherNode (const goFGNode<T,Tfloat>* askingNode)
-        {
-            if (askingNode == myNode1)
-            {
-                return myNode2;
-            }
-            else
-            {
-                assert (askingNode == myNode2);
-                return myNode1;
-            }
-        };
-
-        /** 
-         * @brief Get index of this edge in adj array.
-         * 
-         * @param askingNode Node that is asking.
-         * 
-         * @return The index of this edge in the adj array of \c askingNode.
-         */
-        inline goIndex_t getIndex (const goFGNode<T,Tfloat>* askingNode)
-        {
-            if (askingNode == myNode1)
-            {
-                return myIndex1;
-            }
-            else
-            {
-                assert (askingNode == myNode2);
-                return myIndex2;
-            }
-        };
-
-        /** 
-         * @brief Set index of this edge in \c adj elements of nodes.
-         * 
-         * @see getIndex()
-         * 
-         * @param i1 Index1
-         * @param i2 Index2
-         */
-        inline void setIndex (goIndex_t i1, goIndex_t i2)
-        {
-            myIndex1 = i1;
-            myIndex2 = i2;
-        };
-        
         inline MessageType& getInMsg (const goFGNode<T,Tfloat>* askingNode)
         {
-            if (askingNode == myNode1)
+            if (askingNode == this->myNode1)
             {
                 return myMsg21;
             }
             else
             {
-                assert (askingNode == myNode2);
+                assert (askingNode == this->myNode2);
                 return myMsg12;
             }
         };
 
         inline MessageType& getOutMsg (const goFGNode<T,Tfloat>* askingNode)
         {
-            if (askingNode == myNode1)
+            if (askingNode == this->myNode1)
             {
                 return myMsg12;
             }
             else
             {
-                assert (askingNode == myNode2);
+                assert (askingNode == this->myNode2);
                 return myMsg21;
             }
         };
 
     private:
-        goFGNode<T,Tfloat>* myNode1;
-        goFGNode<T,Tfloat>* myNode2;
-        goIndex_t           myIndex1;          //= Index of this edge in myNode1->adj
-        goIndex_t           myIndex2;          //= Index of this edge in myNode2->adj
-        MessageType         myMsg12;
-        MessageType         myMsg21;
+        MessageType myMsg12;
+        MessageType myMsg21;
 };
 
+/** 
+ * @brief Factor graph for use with goMaxSum and goSumProduct.
+ *
+ * Directly resize the arrays myVariables and myFactors, and connect them using the \c connect()
+ * member function.
+ */
 template <class T, class Tfloat>
 class goFactorGraph
 {
     public:
         typedef goFixedArray< goAutoPtr< goFGNodeVariable<T,Tfloat> > > VariableArray;
         typedef goFixedArray< goAutoPtr< goFGNodeFactor<T,Tfloat> > >   FactorArray;
-        // typedef goList< goAutoPtr< goFGNode<T, Tfloat> > >   NodeList;
         typedef goList< goAutoPtr< goFGEdge<T, Tfloat > > >  EdgeList;
 
     public:
@@ -273,17 +221,11 @@ class goFactorGraph
             //= Create a new edge
             myEdges.append (goAutoPtr< goFGEdge<T, Tfloat > > (new goFGEdge<T, Tfloat > (n1,n2)));
             //= Append edge to both nodes and index all edges at each node.
-            //n1->adj.append (&*myEdges.getTail());
-            //n1->adj.getTailElement()->index = n1->adj.getSize()-1;
-            //n2->adj.append (&*myEdges.getTail());
-            //n2->adj.getTailElement()->index = n2->adj.getSize()-1;
             n1->adj[adjIndex1] = &*myEdges.getTail();
             n2->adj[adjIndex2] = &*myEdges.getTail();
             myEdges.getTail()->setIndex (adjIndex1, adjIndex2);
         };
 
-        //NodeList myNodes;
-        //EdgeList myEdges;
         VariableArray myVariables;
         FactorArray   myFactors;
         EdgeList      myEdges;
@@ -292,34 +234,59 @@ class goFactorGraph
 
 //==========================================================
 
-template<class T, class Tfloat> class goSumProductPrivate;
-
+/** 
+ * @brief The sum-product algorithm.
+ * @verbatim
+    Bishop, C.M., Pattern Recognition and Machine Learning, Springer, 2006, chapter 8
+   @endverbatim
+ * @author Christian Gosch
+ */
 template <class T, class Tfloat>
 class goSumProduct : public goObjectBase
 {
     public:
-        // typedef goList< goAutoPtr< goFGNode<T,Tfloat> > > NodeList;
-    
-    public:
         goSumProduct ();
         virtual ~goSumProduct ();
 
+        /** 
+         * @brief Run the sum-product algorithm.
+         * 
+         * @param fg Factor graph to run the algorithm on.
+         * @param valueCount The values of the variables are in the range [0,valueCount-1].
+         * 
+         * @return True if successful, false otherwise.
+         */
         virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
 
-    private:
-        goSumProductPrivate<T,Tfloat>* myPrivate;
+        bool marginal (
+                goFGNodeVariable<T,Tfloat>* variable, 
+                goSize_t                    valueCount, 
+                goVector<Tfloat>&           marginalRet);
 };
 
+/** 
+ * @brief The max-sum algorithm.
+ * @verbatim
+    Bishop, C.M., Pattern Recognition and Machine Learning, Springer, 2006, chapter 8
+   @endverbatim
+ * @note The factors in the factor graph must return logarithms, no extra log() is called.
+ * @author Christian Gosch
+ */
 template <class T, class Tfloat>
 class goMaxSum : public goObjectBase
 {
     public:
-        // typedef goList< goAutoPtr< goFGNode<T,Tfloat> > > NodeList;
-    
-    public:
         goMaxSum ();
         virtual ~goMaxSum ();
 
+        /** 
+         * @brief Run the max-sum algorithm.
+         * 
+         * @param fg Factor graph to run the algorithm on.
+         * @param valueCount The values of the variables are in the range [0,valueCount-1].
+         * 
+         * @return True if successful, false otherwise.
+         */
         virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
 };
 

@@ -13,25 +13,64 @@
 /** @addtogroup data
  * @{
  */
+/** 
+ * @brief Graph node base class.
+ *
+ * Use derived classes with goGraphAlgorithm.
+ */
+template <class EdgeType>
+class goGraphNode 
+{
+    public:
+        enum Status
+        {
+            NORMAL,
+            VISITED
+        };
 
-#if 0
-template <class T> class goGraphNode;
+        enum goGraphNode<EdgeType>::Status status;
 
-template <class T>
+		goFixedArray< EdgeType* >  adj;      //= Adjacency list
+        goIndex_t parent;                    //= Index into adj of the parent. 
+                                             //= Negative if not net, set only if 
+                                             //= an algorithm has set it.
+
+    public:
+        virtual ~goGraphNode () {};
+        
+        virtual void reset ()
+        {
+            this->adj.setSize(0);
+            this->parent = -1;
+            this->status = NORMAL;
+        };
+
+    protected:
+        goGraphNode (goSize_t edgeCount)
+            : status(NORMAL), adj(edgeCount), parent(-1)
+        {
+            adj.fill (0);
+        };
+};
+
+/** 
+ * @brief Graph edge base class.
+ *
+ * Use derived classes with goGraphAlgorithm.
+ */
+template <class NodeType>
 class goGraphEdge
 {
     public:
-        goGraphEdge (goGraphNode<T>* n1 = 0, goGraphNode<T>* n2 = 0) 
-            : myNode1(n1), myNode2(n2) {};
-        virtual ~goGraphEdge() {};
+        virtual ~goGraphEdge () {};
 
-        inline void setNodes (goGraphNode<T>* n1, goGraphNode<T>* n2) 
+        inline void setNodes (NodeType* n1, NodeType* n2) 
         { 
             myNode1 = n1;
             myNode2 = n2;
         };
         
-        inline goGraphNode<T>* getOtherNode (const goGraphNode<T>* askingNode)
+        inline NodeType* getOtherNode (const NodeType* askingNode)
         {
             if (askingNode == myNode1)
             {
@@ -43,70 +82,62 @@ class goGraphEdge
                 return myNode1;
             }
         };
-        
+
+        /** 
+         * @brief Get index of this edge in adj array.
+         * 
+         * @param askingNode Node that is asking.
+         * 
+         * @return The index of this edge in the adj array of \c askingNode.
+         */
+        inline goIndex_t getIndex (const NodeType* askingNode)
+        {
+            if (askingNode == myNode1)
+            {
+                return myIndex1;
+            }
+            else
+            {
+                assert (askingNode == myNode2);
+                return myIndex2;
+            }
+        };
+
+        /** 
+         * @brief Set index of this edge in \c adj elements of nodes.
+         * 
+         * @see getIndex()
+         * 
+         * @param i1 Index1
+         * @param i2 Index2
+         */
+        inline void setIndex (goIndex_t i1, goIndex_t i2)
+        {
+            myIndex1 = i1;
+            myIndex2 = i2;
+        };
+
     protected:
-        goGraphNode<T>* myNode1;
-        goGraphNode<T>* myNode2;
+        goGraphEdge (NodeType* n1 = 0, NodeType* n2 = 0)
+            : myNode1(n1), myNode2(n2), myIndex1(-1), myIndex2(-1)
+        { };
+
+
+        NodeType*           myNode1;
+        NodeType*           myNode2;
+        goIndex_t           myIndex1;          //= Index of this edge in myNode1->adj
+        goIndex_t           myIndex2;          //= Index of this edge in myNode2->adj
 };
 
 /** 
- * @brief TO BE IMPLEMENTED Node of a Graph.
- */
-template<class T>
-class goGraphNode : public goObjectBase
-{
-    public:
-        goGraphNode ()
-            : adj(), parent(0), children(), value(), status(NORMAL), pass(0)
-            {
-            };
-        goGraphNode (const T&)
-            : adj(), parent(0), children(), value(), status(NORMAL), pass(0)
-            {
-            };
-
-        //= Using the standard copy operator.
-        
-        virtual ~goGraphNode () {};
-
-        void reset ()
-        {
-            this->adj.erase();
-            this->parent = 0;
-            this->children.erase();
-            this->pass = 0;
-            this->status = NORMAL;
-        };
-
-		goList< EdgeType* >       adj;      //= Adjacency list
-        EdgeType*                 parent;   //= Set only if an algorithm has set it. Else NULL.
-        goList< EdgeType* >       children; //= Set only if an algorithm has set it. Else NULL.
-        T                         value;    //= Node value
-
-        goSize_t                  pass;     //= Counter for passes (how often was this node visited)
-
-        enum Status
-        {
-            NORMAL,
-            VISITED
-        };
-
-        enum goGraphNode<T>::Status status;
-};
-
-template<class T> class goGraph;
-#endif
-
-/** 
- * @brief Running through a binary Graph.
+ * @brief Running through a Graph.
  *
- * Currently only offers depth first order.
- *
- * NodeType must be derived from goGraphNode
+ * \c NodeType should be derived from \c goGraphNode or provide the same functionality.
+ * \c EdgeType should be derived from \c goGraphEdge or provide the same functionality.
  * 
  * @note Algorithms currently work for graphs with a single connected component
  * 
- * @todo Add support for multiple connected components
+ * @todo Add support for multiple connected components (simply by supplying a set of all nodes).
  */
 template<class T, class NodeType, class EdgeType>
 class goGraphAlgorithm
@@ -154,10 +185,13 @@ class goGraphAlgorithm
                 for (goSize_t i = 0; i < adjCount; ++i)
                 {
                 //    NodeType* adjNode = adjNodeEl->elem->getOtherNode (node);
-                    NodeType* adjNode = node->adj[i]->getOtherNode (node);
-                    if (adjNode->status != NodeType::VISITED)
+                    if (node->adj[i])
                     {
-                        Q.append (adjNode);
+                        NodeType* adjNode = node->adj[i]->getOtherNode (node);
+                        if (adjNode->status != NodeType::VISITED)
+                        {
+                            Q.append (adjNode);
+                        }
                     }
                 //    adjNodeEl = adjNodeEl->next;
                 }
@@ -215,10 +249,13 @@ class goGraphAlgorithm
                     for (goSize_t i = 0; i < adjCount; ++i)
                     {
                         // NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
-                        NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
-                        if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
+                        if (nodeEl->elem->adj[i])
                         {
-                            stack.append (adjNode);
+                            NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
+                            if (adjNode->status == NodeType::NORMAL && adjNode != (NodeType*)nodeEl->elem)
+                            {
+                                stack.append (adjNode);
+                            }
                         }
                     //    el = el->next;
                     }
@@ -270,13 +307,16 @@ class goGraphAlgorithm
                     for (goSize_t i = 0; i < adjCount; ++i)
                     {
                         //NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
-                        NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
-                        if (adjNode->status == NodeType::NORMAL && adjNode != nodeEl->elem)
+                        if (nodeEl->elem->adj[i])
                         {
-                            stack.append (adjNode);
-                            // adjNode->parent = el;
-                            adjNode->parent = nodeEl->elem->adj[i]->getIndex (adjNode);
-                            // nodeEl->elem->children.append (el->elem);
+                            NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
+                            if (adjNode->status == NodeType::NORMAL && adjNode != nodeEl->elem)
+                            {
+                                stack.append (adjNode);
+                                // adjNode->parent = el;
+                                adjNode->parent = nodeEl->elem->adj[i]->getIndex (adjNode);
+                                // nodeEl->elem->children.append (el->elem);
+                            }
                         }
                     //    el = el->next;
                     }
@@ -307,11 +347,14 @@ class goGraphAlgorithm
             for (goSize_t i = 0; i < adjCount; ++i)
             {
                 //NodeType* adjNode = el->elem->getOtherNode (root);
-                NodeType* adjNode = root->adj[i]->getOtherNode (root);
-                if (adjNode->status != NodeType::VISITED)
+                if (root->adj[i])
                 {
-                    adjNode->status = NodeType::VISITED;
-                    ok = ok && this->depthFirstVisit (adjNode);
+                    NodeType* adjNode = root->adj[i]->getOtherNode (root);
+                    if (adjNode->status != NodeType::VISITED)
+                    {
+                        adjNode->status = NodeType::VISITED;
+                        ok = ok && this->depthFirstVisit (adjNode);
+                    }
                 }
                 //el = el->next;
             }
@@ -319,35 +362,6 @@ class goGraphAlgorithm
         };
 };
 
-
-#if 0
-/** 
- * @brief Graph.
- */
-template<class T>
-class goGraph : public goObjectBase
-{
-    public:
-        typedef goGraphNode<T> Node;
-        typedef const goGraphNode<T> ConstNode;
-        typedef goList<goGraphNode<T>*> NodeList;
-
-    public:
-        goGraph ();
-        virtual ~goGraph ();
-
-        goGraphNode<T>*          newNode ();
-        goList<goGraphNode<T>*>& getNodes ();
-        
-        bool          isEmpty () const;
-        void          erase   ();
-        bool          writeDOT (FILE* f) const;
-
-    private:
-        goList<goGraphNode<T>*> myNodes;
-};
-
-#endif
-
 /** @} */
+
 #endif
