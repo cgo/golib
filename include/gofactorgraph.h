@@ -298,7 +298,7 @@ static bool goFGGraphWriteDOT (goFGNode<T,Tfloat>* root, FILE* f) //const
     class dotWriter : public goGraphAlgorithm<NodeType,EdgeType>
     {
         public:
-            dotWriter (FILE* f_) : goGraphAlgorithm<NodeType,EdgeType> (), f(f_) {};
+            dotWriter (FILE* f_) : goGraphAlgorithm<NodeType,EdgeType> (), visitedEdges(), f(f_) {};
             virtual ~dotWriter() {};
 
             virtual bool action (NodeType* node) // const
@@ -311,44 +311,62 @@ static bool goFGGraphWriteDOT (goFGNode<T,Tfloat>* root, FILE* f) //const
                 goString leftName = "";
                 goString rightName = "";
                 goString command = nodeName;
-                command += " [label=";
                 switch (node->getType())
                 {
                     case NodeType::VARIABLE:
-                        command += "Var";
+                        command += " [label=Variable];\n";
                         break;
                     case NodeType::FACTOR:
-                        command += "Fac";
+                        {
+                            goString s = " [label=Factor,shape=box,style=filled];\n";
+                            command += s.toCharPtr();
+                        }
                         break;
                     default:
-                        command += "UNKNOWN";
+                        command += " [label=UNKNOWN];\n";
                         break;
                 }
-                command += "];\n";
                 goFileIO::writeASCII(this->f, command);
 
                 goSize_t adjCount = node->adj.getSize();
                 for (goSize_t i = 0; i < adjCount; ++i)
                 {
-                    if (node->adj[i])
+                    bool visited = false;
                     {
+                        goList<void*>::Element* el = visitedEdges.getFrontElement();
+                        while (el)
+                        {
+                            if ((void*)node->adj[i] == el->elem)
+                            {
+                                visited = true;
+                                break;
+                            }
+                            el = el->next;
+                        }
+                    }
+                    if (node->adj[i] && !visited)
+                    {
+                        visitedEdges.append ((void*)node->adj[i]);
                         sprintf(pointer.getPtr(),"%p",node->adj[i]->getOtherNode(node));
                         goString adjName = "node_";
                         adjName += pointer.toCharPtr();
                         command = nodeName;
                         command += " -- "; command += adjName; 
-                        goSize_t inSize = node->adj[i]->getInMsg(node).getSize();
-                        goSize_t outSize = node->adj[i]->getOutMsg(node).getSize();
-                        command += " [label=\"msg_size:";
-                        command += (int)(inSize);
-                        command += ",";
-                        command += (int)(outSize);
-                        command += "\"];\n";
+                        command += "\n";
+                        //goSize_t inSize = node->adj[i]->getInMsg(node).getSize();
+                        //goSize_t outSize = node->adj[i]->getOutMsg(node).getSize();
+                        // command += " [label=\"msg_size:";
+                        //command += (int)(inSize);
+                        //command += ",";
+                        //command += (int)(outSize);
+                        //command += "\"];\n";
                         goFileIO::writeASCII(this->f, command);
                     }
                 }
                 return true;
             };
+
+            goList<void*> visitedEdges;
 
             FILE* f;
     };

@@ -163,6 +163,66 @@ int main ()
         printf ("\n");
     }
 #endif
+    
+    //= Make one factor graph just for drawing:
+    {
+        goFactorGraph<goSize_t,float> fg;
+        fg.myVariables.setSize (3);
+        fg.myFactors.setSize (3);
+        fg.myVariables[0].set (new goFGNodeVariable<goSize_t,float> (3));
+        fg.myVariables[1].set (new goFGNodeVariable<goSize_t,float> (1));
+        fg.myVariables[2].set (new goFGNodeVariable<goSize_t,float> (2));
+        fg.myFactors[0].set (new goFGNodeFactor<goSize_t,float> (1));
+        fg.myFactors[1].set (new goFGNodeFactor<goSize_t,float> (3));
+        fg.myFactors[2].set (new goFGNodeFactor<goSize_t,float> (2));
+
+        fg.connect (fg.myVariables[0], 0, fg.myFactors[0], 0);
+        fg.connect (fg.myVariables[0], 1, fg.myFactors[1], 0);
+        fg.connect (fg.myVariables[1], 0, fg.myFactors[1], 1);
+        fg.connect (fg.myVariables[2], 0, fg.myFactors[1], 2);
+        fg.connect (fg.myVariables[2], 1, fg.myFactors[2], 0);
+        fg.connect (fg.myVariables[0], 2, fg.myFactors[2], 1);
+
+        FILE* f = fopen ("fg.dot","w");
+        if (!f)
+        {
+            printf ("Could not open fg.dot for writing.\n");
+            exit(0);
+        }
+        goFGGraphWriteDOT<goSize_t,float> (fg.myVariables[0], f);
+        fclose (f);
+    }
+
+    //= Make a circular factor graph just for drawing:
+    {
+        goFactorGraph<goSize_t,float> fg;
+        fg.myVariables.setSize (5);
+        fg.myFactors.setSize (10);
+        for (goSize_t i = 0; i < 5; ++i)
+        {
+            fg.myVariables[i].set (new goFGNodeVariable<goSize_t,float> (3));
+        }
+        for (goSize_t i = 0; i < 5; ++i)
+        {
+            fg.myFactors[i].set (new goFGNodeFactor<goSize_t,float> (2));
+            fg.connect (fg.myFactors[i], 0, fg.myVariables[i], 0);
+            fg.connect (fg.myFactors[i], 1, fg.myVariables[(i+1) % 5], 1);
+        }
+        for (goSize_t i = 5; i < 10; ++i)
+        {
+            fg.myFactors[i].set (new goFGNodeFactor<goSize_t,float> (1));
+            fg.connect (fg.myFactors[i], 0, fg.myVariables[i-5], 2);
+        }
+
+        FILE* f = fopen ("fg2.dot","w");
+        if (!f)
+        {
+            printf ("Could not open fg2.dot for writing.\n");
+            exit(0);
+        }
+        goFGGraphWriteDOT<goSize_t,float> (fg.myVariables[0], f);
+        fclose (f);
+    }
 
     exit(1);
 }
