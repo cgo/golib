@@ -1,0 +1,410 @@
+#ifndef GOMAXSUM_H
+#define GOMAXSUM_H
+
+#ifndef GOOBJECTBASE_H
+# include <goobjectbase.h>
+#endif
+#ifndef GOLIST_H
+# include <golist.h>
+#endif
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
+#ifndef GOGRAPH_H
+# include <gograph.h>
+#endif
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+#ifndef GOGRAPH_H
+# include <gograph.h>
+#endif
+#ifndef GOFACTORGRAPH_H
+# include <gofactorgraph.h>
+#endif
+#ifndef GOMESSAGEPASSING_H
+# include <gomessagepassing.h>
+#endif
+
+/** 
+ * \addtogroup gm
+ * @{
+ */
+/** 
+ * @brief The max-sum algorithm.
+ * @verbatim
+    Bishop, C.M., Pattern Recognition and Machine Learning, Springer, 2006, chapter 8
+   @endverbatim
+ * @note The factors in the factor graph must return logarithms, no extra log() is called.
+ * @author Christian Gosch
+ */
+template <class T, class Tfloat>
+class goMaxSum : public goMessagePassing <T,Tfloat>
+{
+    public:
+        goMaxSum ()
+            : goMessagePassing<T,Tfloat> () {};
+        virtual ~goMaxSum () {};
+
+        /** 
+         * @brief Run the max-sum algorithm.
+         * 
+         * @param fg Factor graph to run the algorithm on.
+         * @param valueCount The values of the variables are in the range [0,valueCount-1].
+         * 
+         * @return True if successful, false otherwise.
+         */
+        virtual bool run (goFGNode<T,Tfloat>* root, goFactorGraph<T,Tfloat>& fg)
+        {
+            this->setDirection (goMessagePassing<T,Tfloat>::FORWARD);
+            {
+                //=
+                //= Reset factor and variable nodes 
+                //=
+                goSize_t sz = fg.myFactors.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myFactors[i]->status = goFGNode<T,Tfloat>::NORMAL;
+                sz = fg.myVariables.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myVariables[i]->status = goFGNode<T,Tfloat>::NORMAL;
+            }
+            bool ok = this->depthFirstTree (root);
+            if (!ok)
+            {
+                goLog::warning ("goMaxSum::run(): Forward pass failed.");
+                return false;
+            }
+
+            this->setDirection (goMessagePassing<T,Tfloat>::BACKWARD);
+
+            //=
+            //= Set the maximising value of the root node in the case of the max-sum algorithm
+            //= by taking \arg\max_x (\sum_{s \in ne(x)} \mu_{f_s -> x}(x)) (8.98 in Bishop's book).
+            //=
+            assert ((root->getType() == goFGNode<T,Tfloat>::VARIABLE));
+            goIndex_t adjCount = static_cast<goIndex_t>(root->adj.getSize());
+            goSize_t vc = this->getValueCount();
+            goVector<Tfloat> sum (vc);
+            sum.fill (Tfloat(0));
+            for (goIndex_t i = 0; i < adjCount; ++i)
+            {
+                if (!root->adj[i])
+                    continue;
+                goVector<Tfloat>& inMsg = root->adj[i]->getInMsg (root);
+                if (inMsg.getSize() != vc)
+                {
+                    goLog::warning ("goMaxSum::run(): inMsg to ROOT of wrong size -- loopy graph?");
+                    continue;
+                }
+                sum += inMsg;
+            }
+            goSize_t max_i = 0;
+            assert (vc > 0);
+            Tfloat   max_value = sum[0];
+            for (goSize_t i = 0; i < vc; ++i)
+            {
+                if (sum[i] > max_value)
+                {
+                    max_value = sum[i];
+                    max_i = i;
+                }
+            }
+            root->value = T(max_i);
+            
+            {
+                //=
+                //= Reset factor and variable nodes 
+                //=
+                goSize_t sz = fg.myFactors.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myFactors[i]->status = goFGNode<T,Tfloat>::NORMAL;
+                sz = fg.myVariables.getSize();
+                for (goSize_t i = 0; i < sz; ++i)
+                    fg.myVariables[i]->status = goFGNode<T,Tfloat>::NORMAL;
+            }
+            ok = this->breadthFirst (root);
+
+            return ok;
+        };
+
+        /** 
+         * @brief Create and "send" message from a variable node \c fgn along a given edge.
+         * 
+         * @param fgn           Variable node to send from.
+         * @param parentIndex   Index into fgn->adj of edge to send the message along 
+         *                      (the other connected node is a variable and "receives" the message).
+         * 
+         * @return True if successful, false otherwise.
+         */
+        inline bool variableSend (goFGNode<T,Tfloat>* fgn, goIndex_t parentIndex)
+        {
+            //= Send message \mu_{x->f} along parent edge
+            goIndex_t mu_index = parentIndex;
+            if (mu_index < 0)
+                mu_index = 0;
+            goVector<Tfloat>& mu = fgn->adj[mu_index]->getOutMsg (fgn);
+            if (mu.getSize() != this->getValueCount())
+                mu.resize (this->getValueCount());
+            goIndex_t adjCount = static_cast<goIndex_t>(fgn->adj.getSize());
+
+            mu.fill (Tfloat(0));
+            for (goIndex_t i = 0; i < adjCount; ++i)
+            {
+                if (i != parentIndex && fgn->adj[i])
+                    mu += fgn->adj[i]->getInMsg (fgn);  
+            }
+
+            return true;
+        };
+
+        /** 
+         * @brief Calculate outgoing message for a factor node in the max-sum algorithm.
+         * 
+         * @param fgn Factor node.
+         * @param parentIndex Index into fgn->adj pointing to the "parent" link,
+         * i.e. the link where the message is sent to.
+         * 
+         * @return True if successful, false otherwise.
+         */
+        inline bool factorSend (goFGNode<T,Tfloat>* fgn, goSize_t parentIndex)
+        {
+            //= Make this a function of parentEdge -- the same will be needed on the way back.
+            goVector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
+            if (mu.getSize() != this->getValueCount())
+                mu.resize (this->getValueCount());
+
+            //= Dynamic cast funktionierte in einem Fall nicht (nicht ersichtlich warum) ...
+            //= daher mit Gewalt.
+            goFGNodeFactor<T,Tfloat>* factornode = (goFGNodeFactor<T,Tfloat>*)fgn;
+            assert (factornode);
+
+            goSize_t vc = this->getValueCount ();
+
+            //= 
+            //= Reference and optionally resize storage for maximising variable values.
+            //=
+            goMatrix<T>& maxX = factornode->getMaxX();
+            if (maxX.getRows() != vc || 
+                maxX.getColumns() != fgn->adj.getSize())
+            {
+                maxX.resize (vc, fgn->adj.getSize());
+                maxX.fill (T(0));
+            }
+            
+            //=
+            //= Maximise locally for this factor and add all incoming 
+            //= messages (from variables).
+            //=
+            static Tfloat float_min = -std::numeric_limits<Tfloat>::max(); //= Start value for maxsum()
+            if (fgn->adj.getSize() > 1)
+            {
+                //= Sum over all other variables connected to this 
+                //= factor except for the parent.
+                goSize_t x_index = parentIndex;
+                goVector<T> X (fgn->adj.getSize());
+                goFunctorBase1< Tfloat, const goVector<T>& >* f = factornode->getFunctor();
+                goVector<T> maxXv;
+                for (goSize_t x = 0; x < vc; ++x)
+                {
+                    X.fill (T(0));
+                    X[x_index] = T(x);
+                    //= Maximise over all other variables .. this is recursive, but as long
+                    //= as the number of connections (variables) is not overly large, 
+                    //= that should work.
+                    //= maxXv should contain the variable values that maximise the function for
+                    //= each x and
+                    //= will be used to set the variables in the backtracking pass.
+                    maxX.refRow (x, maxXv);
+                    mu[x] = this->maxsum (factornode, f, X, 0, x_index, float_min, maxXv);
+                }
+            }
+            else
+            {
+                //= This must be a leaf node. Send f(x).
+                goVector<T> X(1);
+                for (goSize_t i = 0; i < vc; ++i)
+                {
+                    X[0] = T(i);
+                    mu[i] = (*factornode)(X);
+                }
+            }
+
+            return true;
+        };
+
+        inline bool forwardPass (goFGNode<T,Tfloat>* node)
+        {
+            //=
+            //= This is pass 1 (from leaves to root).
+            //=
+
+            //=
+            //= Send a message to the parent of node fgn.
+            //=
+            goIndex_t parentIndex = node->parent;
+            if (parentIndex < 0)
+            {
+                //= This means we are at the root.
+                return true;
+            }
+
+            switch (node->getType())
+            {
+                case goFGNode<T,Tfloat>::VARIABLE:
+                    this->variableSend (node, parentIndex);
+                    break;
+                case goFGNode<T,Tfloat>::FACTOR:
+                    this->factorSend (node, parentIndex);
+                    break;
+                default:
+                    goLog::error ("goMaxSum::action(): Unknown node type.");
+                    return false;
+                    break;
+            }
+
+            return true;
+        };
+
+        inline bool backwardPass (goFGNode<T,Tfloat>* node)
+        {
+            //=
+            //= This is pass 2 (from root back to leaves).
+            //=
+            goIndex_t parentIndex = node->parent;
+            switch (node->getType())
+            {
+                case goFGNode<T,Tfloat>::VARIABLE:
+                    {
+                        //= We actually only need to set the value at the root and 
+                        //= then use backtracking to set
+                        //= the maximising configuration from the factor nodes.
+                    }
+                    break;
+                case goFGNode<T,Tfloat>::FACTOR:
+                    {
+                        //= Send messages to all "children" (away from root)
+                        goIndex_t adjCount = static_cast<goIndex_t>(node->adj.getSize());
+
+                        //= Dynamic cast funktionierte in einem Fall nicht (nicht ersichtlich
+                        //= warum .. vielleicht compiler bug??) .. daher mit Gewalt.
+                        goFGNodeFactor<T,Tfloat>* fn = (goFGNodeFactor<T,Tfloat>*)node;
+                        assert (fn);
+                        //= Get the maximising configuration of the other variable nodes given the value of the parent variable:
+                        goVector<T> maxX;
+                        goSize_t parent_value = static_cast<goSize_t>(fn->adj[fn->parent]->getOtherNode(fn)->value);
+                        fn->getMaxX().refRow (parent_value, maxX);
+                        //= 
+                        //= Set values of all other adjacent nodes:
+                        //=
+                        for (goIndex_t i = 0; i < adjCount; ++i)
+                        {
+                            if (i != parentIndex && fn->adj[i])
+                            {
+                                fn->adj[i]->getOtherNode(fn)->value = maxX[i];
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    goLog::error ("goMaxSum::backwardPass(): Unknown node type.");
+                    return false;
+                    break;
+            }
+
+            return true;
+        };
+
+        /** 
+         * @brief Recursive max/sum for the max-sum algorithm.
+         * 
+         * Calculates \f$ \max\limits_{x_1,\ldots,x_M} \left[ \ln f(x,x_1,\ldots,x_M) + \sum\limits_{m \in neighbours(f)\backslash x} \mu_{x_m \mapsto f}(x_m) \right] \f$
+         * with x being the variable with \c fixed_index, \f$x_1,\ldots,x_M\f$ the other variables connected to \c factorNode,
+         * and \f$\mu\f$ the messages stored in the edges between the variable nodes and \c factorNode.
+         * The above term constitutes the messages \f$ \mu_{f \mapsto x}(x) \f$ for the max-sum algorithm.
+         *
+         * @param factorNode Factor node to calculate on.
+         * @param f Functor of \c factorNode (usually, but can also be a different one).
+         * @param X Input for \c f
+         * @param i Current index into \c X we are summing over.
+         * @param fixed_index Index into \c X of the variable that is held fixed (not summed over).
+         * @param currentMax Current maximum -- start with a value lower than all other occuring values.
+         * @param maxX Maximising variable values -- set by this function.
+         * @return The max/sum value.
+         */
+        Tfloat maxsum (goFGNodeFactor<T,Tfloat>* factorNode,
+                       goFunctorBase1 <Tfloat, const goVector<T>& >* f, 
+                       goVector<T>& X, 
+                       goSize_t     i, 
+                       goSize_t     fixed_index, 
+                       Tfloat       currentMax, 
+                       goVector<T>& maxX)
+        {
+            goSize_t vc = this->getValueCount();
+            if (i >= X.getSize())
+            {
+               Tfloat sumIncoming = Tfloat(0);
+               goSize_t M = factorNode->adj.getSize();
+               for (goSize_t j = 0; j < M; ++j)
+               {
+                   //= This can be made faster with an array containing simply the incoming messages. But what the heck.
+                   if (!factorNode->adj[j] || j == fixed_index)
+                       continue;
+                   goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
+                   if (inMsg.getSize() != vc)
+                   {
+                       goLog::warning ("goMessagePassing::maxsum(): inMsg size mismatch, continuing -- loopy graph?");
+                       continue;
+                   }
+                   sumIncoming += factorNode->adj[j]->getInMsg(factorNode)[X[j]];
+               }
+               Tfloat temp = (*f)(X) + sumIncoming;
+               if (temp > currentMax)
+               {
+                   maxX = X;
+                   return temp;
+               }
+               return currentMax;
+            }
+            if (i == fixed_index)
+            {
+                return this->maxsum (factorNode, f, X, i+1, fixed_index, currentMax, maxX);
+            }
+            Tfloat s = currentMax;
+            for (goSize_t j = 0; j < vc; ++j)
+            {
+                X[i] = T(j);
+                s = this->maxsum (factorNode, f, X, i+1, fixed_index, s, maxX);
+            }
+            return s;
+        };
+
+        virtual bool action (goFGNode<T,Tfloat>* node) 
+        { 
+            if (!node)
+                return false;
+
+            switch (this->getDirection())
+            {
+                case goMessagePassing<T,Tfloat>::FORWARD:  return this->forwardPass (node); break;
+                case goMessagePassing<T,Tfloat>::BACKWARD: return this->backwardPass (node); break;
+                default:
+                    goLog::error ("goMaxSum::action(): Unknown value for direction.");
+                    return false;
+                    break;
+            }
+
+            return true;
+        };
+
+        // virtual bool run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount);
+};
+
+/** @} */
+
+#endif
