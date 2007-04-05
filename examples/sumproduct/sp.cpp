@@ -1,4 +1,5 @@
 #include <gosumproduct.h>
+#include <gomaxsum.h>
 #include <goautoptr.h>
 #include <gofunctor.h>
 
@@ -56,7 +57,8 @@ int main ()
     //nodelist(0)->elem->adj.append (nodelist(3)->elem);
     
     printf ("First test graph:\n");
-    sp.run (fg, 10);
+    sp.setValueCount (10);
+    sp.run (fg.myVariables[0], fg);
    
     printf ("\nSecond test graph:\n");
     //= Build a second graph to test:
@@ -119,7 +121,7 @@ int main ()
         //nodelist(2)->elem->adj.append (nodelist(8)->elem);
         //nodelist(8)->elem->adj.append (nodelist(2)->elem);
         
-        sp.run (fg, 10);
+        sp.run (fg.myVariables[0], fg);
     }
 
 #if 1
@@ -153,7 +155,8 @@ int main ()
 
         // goSumProduct<goSize_t,float> sp;
         goMaxSum<goSize_t,float> ms;
-        ms.run (fg, 10);
+        ms.setValueCount (10);
+        ms.run (fg.myVariables[0], fg);
 
         printf ("Values: ");
         for (goSize_t i = 0; i < fg.myVariables.getSize(); ++i)
