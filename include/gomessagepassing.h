@@ -17,7 +17,7 @@
  */
 
 /** 
- * @brief Message passing in trees (sum-product)
+ * @brief Message passing in trees (sum-product and max-sum)
  *
  * This does also terminate for graphs with loops, but the result may be very bad.
  * Loopy belief propagation with scheduling is not yet implemented.
