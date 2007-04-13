@@ -160,6 +160,13 @@ class goFGEdge : public goGraphEdge < goFGNode<T,Tfloat> >
             : goGraphEdge< goFGNode<T,Tfloat> > (n1,n2), myMsg12(), myMsg21() {};
         virtual ~goFGEdge () {};
 
+        /** 
+         * @brief Get message coming in to \c askingNode.
+         * 
+         * @param askingNode Must be one of the nodes this edge is connected to.
+         * 
+         * @return The incoming message for \c askingNode.
+         */
         inline MessageType& getInMsg (const goFGNode<T,Tfloat>* askingNode)
         {
             if (askingNode == this->myNode1)
@@ -173,6 +180,13 @@ class goFGEdge : public goGraphEdge < goFGNode<T,Tfloat> >
             }
         };
 
+        /** 
+         * @brief Get message going out from \c askingNode.
+         * 
+         * @param askingNode Must be one of the nodes this edge is connected to.
+         * 
+         * @return The outgoing message from \c askingNode.
+         */
         inline MessageType& getOutMsg (const goFGNode<T,Tfloat>* askingNode)
         {
             if (askingNode == this->myNode1)
@@ -184,6 +198,18 @@ class goFGEdge : public goGraphEdge < goFGNode<T,Tfloat> >
                 assert (askingNode == this->myNode2);
                 return myMsg21;
             }
+        };
+
+        //=
+        //= Needed for initialising messages in the flooding scheme.
+        //=
+        inline MessageType& getMsg12 ()
+        {
+            return myMsg12;
+        };
+        inline MessageType& getMsg21 ()
+        {
+            return myMsg21;
         };
 
     private:
@@ -207,9 +233,16 @@ class goFactorGraph
         typedef goFixedArray< goAutoPtr< goFGNodeFactor<T,Tfloat> > >   FactorArray;
         typedef goList< goAutoPtr< goFGEdge<T, Tfloat > > >  EdgeList;
 
+        
+        /** 
+         * @brief Indicates whether the used factors are exponential or logarithmic.
+         *
+         * If they are exponential, \c operator() uses multiplications to calculate the function value,
+         * otherwise it uses sums.
+         */
         enum FactorType
         {
-            NORMAL,
+            EXP,
             LOG
         };
 
@@ -236,6 +269,9 @@ class goFactorGraph
             myEdges.getTail()->setIndex (adjIndex1, adjIndex2);
         };
 
+        /** 
+         * @brief Set all nodes to \c NodeType::NORMAL state.
+         */
         void setNormal ()
         {
             goSize_t sz = myVariables.getSize();
@@ -250,7 +286,7 @@ class goFactorGraph
             }
         };
 
-        goDouble operator () (const goVector<T>& X, FactorType ft = NORMAL) 
+        goDouble operator () (const goVector<T>& X, FactorType ft = EXP) 
         {
             assert (X.getSize() == myVariables.getSize());
             goSize_t sz = X.getSize();
@@ -259,7 +295,7 @@ class goFactorGraph
                 myVariables[i]->value = X[i];
             }
             sz = myFactors.getSize();
-            if (ft == NORMAL)
+            if (ft == EXP)
             {
                 goDouble ret = 1.0;
                 for (goSize_t i = 0; i < sz; ++i)

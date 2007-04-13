@@ -105,12 +105,134 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return ok;
         };
 
+        //= Flooding scheme
+        bool flooding (goFGNode<T,Tfloat>* startNode, goFactorGraph<T,Tfloat>& fg)
+        {
+            goSize_t vc = this->getValueCount();
+
+            //=
+            //= Step 1: Initialisation.
+            //=
+
+            //=
+            //= Set all messages to the unit message.
+            //=
+            {
+                typename goFactorGraph<T,Tfloat>::EdgeList::Element* el = fg.myEdges.getFrontElement();
+                while (el)
+                {
+                    el->elem->getMsg12().resize (vc);
+                    el->elem->getMsg12().fill (Tfloat(1));
+                    el->elem->getMsg21().resize (vc);
+                    el->elem->getMsg21().fill (Tfloat(1));
+                    el = el->next;
+                }
+            }
+
+            goList<goFGNode<T,Tfloat>*> nodeQueue;  //= Nodes with incoming messages
+            //=
+            //= Add all nodes to the queue with incoming messages and set the
+            //= incoming ("parent") edge index to "none" (negative).
+            //=
+            {
+                goSize_t nodeCount = fg.myVariables.getSize();
+                for (goSize_t i = 0; i < nodeCount; ++i)
+                {
+                    nodeQueue.append (fg.myVariables[i]);
+                    fg.myVariables[i]->parent = -1; //= Set "incoming edge" to "none".
+                }
+                nodeCount = fg.myFactors.getSize();
+                for (goSize_t i = 0; i < nodeCount; ++i)
+                {
+                    nodeQueue.append (fg.myFactors[i]);
+                    fg.myFactors[i]->parent = -1; //= Set "incoming edge" to "none".
+                }
+            }
+
+            //=
+            //= Step 2: Flooding.
+            //=
+            typename goList<goFGNode<T,Tfloat>*>::Element* Qel = 0;
+            goFGNode<T,Tfloat>* currentNode = 0;
+            //= FIXME Change this if you want to stop in cyclic graphs. This works for trees only (as a test).
+            while (!nodeQueue.isEmpty())
+            {
+                //= Get first element from queue
+                Qel = nodeQueue.getFrontElement();
+                currentNode = Qel->elem;
+                nodeQueue.remove (Qel);
+                Qel = 0;
+                
+                //= Compute outgoing messages for all outgoing edges and send them.
+                //= Note: Only add nodes to the queue if their previous parent index was invalid.
+                //= If they already have a valid parent (incoming message), they are already in the queue.
+                //= After initialisation, all nodes will be added to the queue again. (Try: do not add nodes to the queue in initialisation,
+                //= just set the parent to -1).
+                //
+                //= This is principally backwardPass() from the two-way schedule (message passing in a tree), but we additionally
+                //= need to set the "parent" (current incoming message) here.
+                {
+                    goIndex_t parentIndex = currentNode->parent;
+                    //= Check if the node is a leaf without outgoing edges, if yes simply "absorb" the message
+                    if (parentIndex >= 0 && currentNode->adj.getSize() <= 1)
+                    {
+                        continue;
+                    }
+                    switch (currentNode->getType())
+                    {
+                        case goFGNode<T,Tfloat>::VARIABLE:
+                            {
+                                //= Send messages to all "outgoing" edges ("parent" denotes the currently incoming edge)
+                                goIndex_t adjCount = static_cast<goIndex_t>(currentNode->adj.getSize());
+                                for (goIndex_t i = 0; i < adjCount; ++i)
+                                {
+                                    if (i != parentIndex && currentNode->adj[i])
+                                    {
+                                        this->variableSend (currentNode, i);
+                                        goFGNode<T,Tfloat>* otherNode = currentNode->adj[i]->getOtherNode(currentNode);
+                                        if (otherNode->parent < 0)
+                                            nodeQueue.append (otherNode);
+                                        otherNode->parent = currentNode->adj[i]->getIndex(otherNode);
+                                    }
+                                }
+                            }
+                            break;
+                        case goFGNode<T,Tfloat>::FACTOR:
+                            {
+                                //= Send messages to all "outgoing" edges ("parent" denotes the currently incoming edge)
+                                goIndex_t adjCount = static_cast<goIndex_t>(currentNode->adj.getSize());
+                                for (goIndex_t i = 0; i < adjCount; ++i)
+                                {
+                                    if (i != parentIndex && currentNode->adj[i])
+                                    {
+                                        this->factorSend (currentNode, i);
+                                        goFGNode<T,Tfloat>* otherNode = currentNode->adj[i]->getOtherNode(currentNode);
+                                        if (otherNode->parent < 0)
+                                            nodeQueue.append (otherNode);
+                                        otherNode->parent = currentNode->adj[i]->getIndex(otherNode);
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            goLog::error ("goSumProduct::flooding(): Unknown node type.");
+                            return false;
+                            break;
+                    }
+                }
+
+                currentNode->parent = -1;  //= Reset parent to -1, since this node was removed from the queue.
+            }
+
+        };
+
         /** 
          * @brief Create and "send" message from a variable node \c fgn along a given edge.
          * 
          * @param fgn           Variable node to send from.
          * @param parentIndex   Index into fgn->adj of edge to send the message along 
          *                      (the other connected node is a variable and "receives" the message).
+         *                      Think of it as "outgoingIndex".
          * 
          * @return True if successful, false otherwise.
          */
