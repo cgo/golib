@@ -205,21 +205,48 @@ class goGraphAlgorithm
             return ok;
         };
 
-        // bool breadthFirst (typename goGraph<T>::Node* root, goGraph<T>& graph) { return false; };
-        // bool breadthFirst (typename goGraph<T>::ConstNode* root) const;
-        
+        bool breadthFirstTree (NodeType* root) //, goFixedArray< goAutoPtr< NodeType > >& nodes)
+        {
+            if (!root)
+                return false;
+
+            goList<NodeType*> Q;
+            Q.append (root);
+
+            typename goList<NodeType*>::Element* Qhead = Q.getFrontElement();
+
+            bool ok = true;
+            NodeType* node = 0;
+            while (!Q.isEmpty())
+            {
+                node = Qhead->elem;
+                assert (node);
+                goSize_t adjCount = node->adj.getSize();
+                //= Append all adjacent nodes to queue
+                for (goSize_t i = 0; i < adjCount; ++i)
+                {
+                    if (node->adj[i])
+                    {
+                        NodeType* adjNode = node->adj[i]->getOtherNode (node);
+                        if (adjNode->status != NodeType::VISITED)
+                        {
+                            Q.append (adjNode);
+                            adjNode->parent = node->adj[i]->getIndex (adjNode);
+                        }
+                    }
+                }
+                ok = ok & this->action (node);
+                node->status = NodeType::VISITED;
+                Qhead = Q.remove (Qhead);
+            }
+            return ok;
+        };
+
         //= New version
         bool depthFirstRecursive (NodeType* root) // , goFixedArray< goAutoPtr< NodeType > >& nodes)
         {
-            // static bool ok = true;
             if (!root)
                 return false;
-            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            //while (el)
-            //{
-            //    el->elem->status = NodeType::NORMAL;
-            //    el = el->next;
-            //}
 
             root->status = NodeType::VISITED;
             return this->depthFirstVisit (root);
@@ -229,14 +256,6 @@ class goGraphAlgorithm
         {
             if (!root)
                 return false;
-            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            //while (el)
-            //{
-            //    el->elem->status = NodeType::NORMAL;
-            //    //if (&*el->elem != root)
-            //    //    stack.append (&*el->elem);
-            //    el = el->next;
-            //}
 
             goList<NodeType*> stack;
             stack.append (root);
@@ -246,12 +265,9 @@ class goGraphAlgorithm
                 if (nodeEl->elem->status != NodeType::VISITED)
                 {
                     nodeEl->elem->status = NodeType::VISITED;
-                    // typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
-                    //while (el)
                     goSize_t adjCount = nodeEl->elem->adj.getSize();
                     for (goSize_t i = 0; i < adjCount; ++i)
                     {
-                        // NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
                         if (nodeEl->elem->adj[i])
                         {
                             NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
@@ -260,7 +276,6 @@ class goGraphAlgorithm
                                 stack.append (adjNode);
                             }
                         }
-                    //    el = el->next;
                     }
                 }
                 else
@@ -275,6 +290,9 @@ class goGraphAlgorithm
         /** 
          * @brief Same as depthFirst(), plus fills parent fields in the nodes.
          * 
+         * In order for all nodes to be visited, their status field must be set to NORMAL
+         * prior to calling any of the BFS or DFS methods.
+         *
          * @param root     Root node (to start with).
          * @param nodeList Node list of the complete graph.
          *
@@ -286,14 +304,6 @@ class goGraphAlgorithm
         {
             if (!root)
                 return false;
-            //typename goList< goAutoPtr< NodeType > >::Element* el = nodeList.getFrontElement();
-            //while (el)
-           // {
-            //    el->elem->status = NodeType::NORMAL;
-            //    //if (&*el->elem != root)
-            //    //    stack.append (&*el->elem);
-            //    el = el->next;
-            //}
 
             goList<NodeType*> stack;
             stack.append (root);
@@ -303,25 +313,18 @@ class goGraphAlgorithm
                 if (nodeEl->elem->status != NodeType::VISITED)
                 {
                     nodeEl->elem->status = NodeType::VISITED;
-                    // nodeEl->elem->children.erase ();
-                    //typename goList<EdgeType*>::Element* el = nodeEl->elem->adj.getFrontElement();
-                    //while (el)
                     goSize_t adjCount = nodeEl->elem->adj.getSize();
                     for (goSize_t i = 0; i < adjCount; ++i)
                     {
-                        //NodeType* adjNode = el->elem->getOtherNode (nodeEl->elem);
                         if (nodeEl->elem->adj[i])
                         {
                             NodeType* adjNode = nodeEl->elem->adj[i]->getOtherNode (nodeEl->elem);
                             if (adjNode->status == NodeType::NORMAL && adjNode != nodeEl->elem)
                             {
                                 stack.append (adjNode);
-                                // adjNode->parent = el;
                                 adjNode->parent = nodeEl->elem->adj[i]->getIndex (adjNode);
-                                // nodeEl->elem->children.append (el->elem);
                             }
                         }
-                    //    el = el->next;
                     }
                 }
                 else

@@ -39,9 +39,11 @@
 
 /** 
  * @brief The sum-product algorithm.
- * @verbatim
-    Bishop, C.M., Pattern Recognition and Machine Learning, Springer, 2006, chapter 8
-   @endverbatim
+ * \par References:
+   \verbatim
+     Bishop, C.M. 
+     Pattern Recognition and Machine Learning 
+     Springer, 2006 \endverbatim
  * @author Christian Gosch
  */
 template <class T, class Tfloat>
@@ -105,6 +107,143 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return ok;
         };
 
+        //=
+        //= Wed Apr 11 11:57:08 CEST 2007
+        //= Flooding appears to work. Will terminate for loops if maxPasses is set to some value > 0.
+        //=
+        /** 
+         * @brief "Flooding" type scheme for graphs with loops.
+         *
+         * Uses a sort of flooding message passing schedule (not parallel, but driven by a queue of pending messages).
+         *
+         * @param startNode "Root" node. Does not serve any purpose and may be removed.
+         * @param fg Factor graph to work on.
+         * @param maxPasses Maximal number of passes each node is allowed to send messages for. If 0 (default),
+         * the algorithm will terminate when no more messages are pending. If there are loops in the graph and \c maxPasses is 0,
+         * the algorithm will run indefinitely.
+         * 
+         * @return True if successful, false otherwise.
+         */
+        bool flooding (goFGNode<T,Tfloat>* startNode, goFactorGraph<T,Tfloat>& fg, goSize_t maxPasses = 0)
+        {
+            goSize_t vc = this->getValueCount();
+
+            //=
+            //= Step 1: Initialisation.
+            //=
+
+            //=
+            //= Set all messages to the unit message.
+            //=
+            {
+                typename goFactorGraph<T,Tfloat>::EdgeList::Element* el = fg.myEdges.getFrontElement();
+                while (el)
+                {
+                    el->elem->getMsg12().resize (vc);
+                    el->elem->getMsg12().fill (Tfloat(1));
+                    el->elem->getMsg21().resize (vc);
+                    el->elem->getMsg21().fill (Tfloat(1));
+                    el = el->next;
+                }
+            }
+
+            goList<goFGNode<T,Tfloat>*> nodeQueue;         //= Nodes with outgoing messages
+            goList<goSize_t>            edgeQueue;         //= Edge indices in node->adj on which the outgoing messages need to be sent
+
+            //= Append all messages as pending messages
+            {
+                goSize_t nodeCount = fg.myVariables.getSize();
+                for (goSize_t j = 0; j < nodeCount; ++j)
+                {
+                    fg.myVariables[j]->pass = 0;
+                    goSize_t adjCount = fg.myVariables[j]->adj.getSize();
+                    for (goSize_t i = 0; i < adjCount; ++i)
+                    {
+                        if (fg.myVariables[j]->adj[i])
+                        {
+                            nodeQueue.append (fg.myVariables[j]);
+                            edgeQueue.append (i);
+                        }
+                    }
+                }
+                nodeCount = fg.myFactors.getSize();
+                for (goSize_t j = 0; j < nodeCount; ++j)
+                {
+                    fg.myFactors[j]->pass = 0;
+                    goSize_t adjCount = fg.myFactors[j]->adj.getSize();
+                    for (goSize_t i = 0; i < adjCount; ++i)
+                    {
+                        if (fg.myFactors[j]->adj[i])
+                        {
+                            nodeQueue.append (fg.myFactors[j]);
+                            edgeQueue.append (i);
+                        }
+                    }
+                }
+            }
+
+            //=
+            //= Step 2: Flooding.
+            //=
+            typename goList<goFGNode<T,Tfloat>*>::Element* nodeEl = 0;
+            goList<goSize_t>::Element* edgeEl = 0;
+            goFGNode<T,Tfloat>* currentNode = 0;
+            goSize_t            currentEdge = 0;
+            //= FIXME Change this if you want to stop in cyclic graphs. This works for trees only (as a test).
+            while (!nodeQueue.isEmpty())
+            {
+                //= Get first element from queue
+                nodeEl = nodeQueue.getFrontElement();
+                currentNode = nodeEl->elem;
+                nodeQueue.remove (nodeEl);
+                nodeEl = 0;
+                edgeEl = edgeQueue.getFrontElement();
+                currentEdge = edgeEl->elem;
+                edgeQueue.remove (edgeEl);
+                edgeEl = 0;
+                
+                //= Compute outgoing messages for all outgoing edges and send them.
+                //= Note: Only add nodes to the queue if their previous parent index was invalid.
+                //= If they already have a valid parent (incoming message), they are already in the queue.
+                //= After initialisation, all nodes will be added to the queue again. (Try: do not add nodes to the queue in initialisation,
+                //= just set the parent to -1).
+                //
+                //= This is principally backwardPass() from the two-way schedule (message passing in a tree), but we additionally
+                //= need to set the "parent" (current incoming message) here.
+                {
+                    switch (currentNode->getType())
+                    {
+                        case goFGNode<T,Tfloat>::VARIABLE: this->variableSend (currentNode, currentEdge); break;
+                        case goFGNode<T,Tfloat>::FACTOR:   this->factorSend (currentNode, currentEdge); break;
+                        default:
+                            goLog::error ("goSumProduct::flooding(): Unknown node type.");
+                            return false;
+                            break;
+                    }
+                    goFGNode<T,Tfloat>* otherNode = currentNode->adj[currentEdge]->getOtherNode (currentNode);
+                    goSize_t otherIndex = currentNode->adj[currentEdge]->getIndex (otherNode);
+                    //= Add adjacent nodes of the one we just sent to to pending messages queue
+                    goSize_t adjCount = otherNode->adj.getSize();
+                    for (goSize_t i = 0; i < adjCount; ++i)
+                    {
+                        if (i != otherIndex && otherNode->adj[i] && (maxPasses == 0 || otherNode->pass < maxPasses))
+                        {
+                            // printf ("Adding from %p over egde %d\n", otherNode->adj[i]->getOtherNode(otherNode), i);
+                            nodeQueue.append (otherNode);
+                            edgeQueue.append (i);
+                            // otherNode->parent = currentNode->adj[i]->getIndex(otherNode);
+                        }
+                    }
+
+                    ++currentNode->pass;
+                }
+
+                // currentNode->parent = -1;  //= Reset parent to -1, since this node was removed from the queue.
+            }
+            return true;
+        };
+
+#if 0
         //= Flooding scheme
         bool flooding (goFGNode<T,Tfloat>* startNode, goFactorGraph<T,Tfloat>& fg)
         {
@@ -225,6 +364,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             }
 
         };
+#endif
 
         /** 
          * @brief Create and "send" message from a variable node \c fgn along a given edge.

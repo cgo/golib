@@ -58,6 +58,7 @@ int main ()
     
     printf ("First test graph:\n");
     sp.setValueCount (10);
+
     // sp.run (fg.myVariables[0], fg);
     sp.flooding (fg.myVariables[0], fg);
    
@@ -137,8 +138,8 @@ int main ()
         vars[2].set (new goFGNodeVariable<goSize_t,float> (3));
         vars[3].set (new goFGNodeVariable<goSize_t,float> (1));
 
-        // factors.setSize (4);
-        factors.setSize (3);
+        factors.setSize (4);
+        //factors.setSize (3);
         factors[0].set (new MyFactor(2));
         factors[1].set (new MyFactor(2));
         factors[2].set (new MyFactor(2));
@@ -151,16 +152,34 @@ int main ()
         fg.connect (vars[3], 0, factors[2], 1);
 
         //= Add a loop and see what happens ...
-        //factors[3].set (new MyFactor(2));
-        //fg.connect (vars[1], 1, factors[3], 0);
-        //fg.connect (vars[2], 2, factors[3], 1);
+        factors[3].set (new MyFactor(2));
+        fg.connect (vars[1], 1, factors[3], 0);
+        fg.connect (vars[2], 2, factors[3], 1);
+
+        FILE* f = fopen ("graph2.dot","w");
+        if (!f)
+        {
+            printf ("Could not open graph2.dot for writing.\n");
+            exit(0);
+        }
+        goFGGraphWriteDOT<goSize_t,float> (fg.myVariables[0], f);
+        fclose (f);
 
         // goSumProduct<goSize_t,float> sp;
         goMaxSum<goSize_t,float> ms;
         ms.setValueCount (10);
-        // ms.run (fg.myVariables[0], fg);
-        ms.flooding (fg.myVariables[0], fg);
 
+        printf ("Normal operation:\n");
+        ms.run (fg.myVariables[0], fg);
+        printf ("Values: ");
+        for (goSize_t i = 0; i < fg.myVariables.getSize(); ++i)
+        {
+            printf ("%d ", fg.myVariables[i]->value);
+        }
+        printf ("\n");
+
+        printf ("Flooding:\n");
+        ms.flooding (fg.myVariables[0], fg, 50);
         printf ("Values: ");
         for (goSize_t i = 0; i < fg.myVariables.getSize(); ++i)
         {
