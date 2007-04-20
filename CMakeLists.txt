@@ -18,7 +18,6 @@ SET (BUILD_GL_MODULE FALSE CACHE BOOL "Enable/disable building the OpenGL module
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
- # src/gm/gosumproduct.cpp
  src/data/goarrayi.cc 
  # src/data/golisti.cc 
  # src/data/goheapi.cc 

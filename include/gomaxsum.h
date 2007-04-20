@@ -365,16 +365,16 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                goSize_t M = factorNode->adj.getSize();
                for (goSize_t j = 0; j < M; ++j)
                {
-                   //= This can be made faster with an array containing simply the incoming messages. But what the heck.
                    if (!factorNode->adj[j] || j == fixed_index)
                        continue;
                    goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
                    if (inMsg.getSize() != vc)
                    {
-                       goLog::warning ("goMessagePassing::maxsum(): inMsg size mismatch, continuing -- loopy graph?");
+                       goLog::warning ("goMaxSum::maxsum(): inMsg size mismatch, continuing -- loopy graph?");
                        continue;
                    }
-                   sumIncoming += factorNode->adj[j]->getInMsg(factorNode)[X[j]];
+                   //sumIncoming += factorNode->adj[j]->getInMsg(factorNode)[X[j]];
+                   sumIncoming += inMsg[X[j]];
                }
                Tfloat temp = (*f)(X) + sumIncoming;
                if (temp > currentMax)

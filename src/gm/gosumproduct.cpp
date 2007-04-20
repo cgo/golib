@@ -36,33 +36,17 @@ template <class T, class Tfloat>
 bool goSumProduct<T,Tfloat>::run (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
 {
     /*
-     * Take any one variable node as root
-     * Find the leaves
-     * At the leaves, start the message passing
+     * Take any one variable node as root (the first).
      */
-
-    //= 
-    //= Find first variable node
-    //=
-    //typename goFactorGraph<T,Tfloat>::NodeList& nodeList = fg.myNodes;
-    //typename goFactorGraph<T,Tfloat>::NodeList::Element* el = nodeList.getFrontElement();
-    goSize_t nodes_sz = fg.myVariables.getSize();
-    goSize_t i = 0;
-    for (i = 0; i < nodes_sz && fg.myVariables[i]->getType() != goFGNode<T,Tfloat>::VARIABLE; ++i)
-    // while (el && el->elem->getType() != )
+    if (fg.myVariables.getSize() < 1)
     {
-        //el = el->next;
-    }
-    // if (!el)
-    if (i >= nodes_sz)
-    {
-        goLog::warning ("goSumProduct::run(): no variable node found. Not running.");
+        goLog::warning ("goSumProduct::run(): Factor graph has no variable nodes. Not continuing.");
         return false;
     }
 
     goMessagePassing<T,Tfloat> mp;
     mp.setValueCount (valueCount);
-    mp.run ((goFGNode<T,Tfloat>*)fg.myVariables[i], fg);
+    mp.run ((goFGNode<T,Tfloat>*)fg.myVariables[0], fg);
 
     return true;
 }

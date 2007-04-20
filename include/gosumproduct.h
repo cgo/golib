@@ -408,7 +408,6 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
          */
         inline bool factorSend (goFGNode<T,Tfloat>* fgn, goSize_t parentIndex)
         {
-            //= Make this a function of parentEdge -- the same will be needed on the way back.
             goVector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
             if (mu.getSize() != this->getValueCount())
                 mu.resize (this->getValueCount());
@@ -447,14 +446,20 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             }
             else
             {
-                //= This must be a leaf node. Send f(x).
-                goVector<T> X(1);
-                //= Dynamic cast funktioniert in manchen Faellen nicht (??) -- daher mit Gewalt.
-                goFGNodeFactor<T,Tfloat>* f = (goFGNodeFactor<T,Tfloat>*)fgn;
-                for (goSize_t i = 0; i < this->getValueCount(); ++i)
+                //= 
+                //= Send message from leaf only in forward mode (from leaves to root).
+                //=
+                if (this->getDirection() == goMessagePassing<T,Tfloat>::FORWARD)
                 {
-                    X[0] = T(i);
-                    mu[i] = (*f)(X);
+                    //= This must be a leaf node. Send f(x).
+                    goVector<T> X(1);
+                    //= Dynamic cast funktioniert in manchen Faellen nicht (??) -- daher mit Gewalt.
+                    goFGNodeFactor<T,Tfloat>* f = (goFGNodeFactor<T,Tfloat>*)fgn;
+                    for (goSize_t i = 0; i < this->getValueCount(); ++i)
+                    {
+                        X[0] = T(i);
+                        mu[i] = (*f)(X);
+                    }
                 }
             }
 
@@ -481,16 +486,27 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
         inline Tfloat sumproduct (goFGNodeFactor<T,Tfloat>* factorNode,
                 goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
         {
+            goSize_t vc = this->getValueCount();
             if (i >= X.getSize())
             {
                Tfloat prodIncoming = Tfloat(1);
                goSize_t M = factorNode->adj.getSize();
                for (goSize_t j = 0; j < M; ++j)
                {
-                   //= This can be made faster with an array containing simply the incoming messages. But what the heck.
-                   if (j != fixed_index && factorNode->adj[j])
-                       prodIncoming *= factorNode->adj[j]->getInMsg(factorNode)[X[j]];
+                   if (j == fixed_index || !factorNode->adj[j])
+                   {
+                       continue;
+                   }
+                   goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
+                   if (inMsg.getSize() != vc)
+                   {
+                       goLog::warning ("goSumProduct::sumproduct(): inMsg size mismatch, continuing -- loopy graph?");
+                       continue;
+                   }
+                   //prodIncoming *= factorNode->adj[j]->getInMsg(factorNode)[X[j]];
+                   prodIncoming *= inMsg[X[j]];
                }
+
                return (*f)(X) * prodIncoming;
             }
             if (i == fixed_index)
@@ -498,10 +514,16 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
                 return sumproduct (factorNode, f, X, i+1, fixed_index);
             }
             Tfloat s = Tfloat(0);
-            for (goSize_t j = 0; j < this->getValueCount(); ++j)
+            for (goSize_t j = 0; j < vc; ++j)
             {
                 X[i] = T(j);
                 s += sumproduct (factorNode, f, X, i+1, fixed_index);
+                //printf ("Added sumproduct for ");
+                //for (goSize_t k = 0; k < X.getSize(); ++k)
+                //{
+                //    printf ("%d ", X[k]);
+                //}
+                //printf ("\n");
             }
             return s;
         };

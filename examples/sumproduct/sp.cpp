@@ -2,6 +2,7 @@
 #include <gomaxsum.h>
 #include <goautoptr.h>
 #include <gofunctor.h>
+#include <goplot.h>
 
 class MyFactor : public goFGNodeFactor<goSize_t,float>
 {
@@ -15,7 +16,7 @@ class MyFactor : public goFGNodeFactor<goSize_t,float>
 
         float my_f (const goVector<goSize_t>& X)
         {
-            if (X[1] - X[0] == 2 || X[1] - X[0] == 4)
+            if (X[1] - X[0] == 2)
                 return 1.0f;
             else
                 return 0.0f;
@@ -49,19 +50,12 @@ int main ()
     fg.connect (vars[1], 1, vars[2], 0);
     fg.connect (factors[0], 0, vars[0], 1);
     
-    //nodelist(0)->elem->adj.append (nodelist(1)->elem);
-    //nodelist(1)->elem->adj.append (nodelist(0)->elem);
-    //nodelist(1)->elem->adj.append (nodelist(2)->elem);
-    //nodelist(2)->elem->adj.append (nodelist(1)->elem);
-    //nodelist(3)->elem->adj.append (nodelist(0)->elem);
-    //nodelist(0)->elem->adj.append (nodelist(3)->elem);
-    
-    printf ("First test graph:\n");
+    // printf ("First test graph:\n");
     sp.setValueCount (10);
 
     // sp.run (fg.myVariables[0], fg);
-    sp.flooding (fg.myVariables[0], fg);
-   
+    //sp.flooding (fg.myVariables[0], fg);
+
     printf ("\nSecond test graph:\n");
     //= Build a second graph to test:
     {
@@ -96,27 +90,6 @@ int main ()
         fg.connect (vars[6], 1, vars[7], 0);
         fg.connect (vars[8], 1, vars[9], 0);
         fg.connect (vars[9], 1, vars[10], 0);
-        
-        //nodelist(0)->elem->adj.append (nodelist(1)->elem);
-        //nodelist(1)->elem->adj.append (nodelist(0)->elem);
-        //nodelist(1)->elem->adj.append (nodelist(8)->elem);
-        //nodelist(8)->elem->adj.append (nodelist(1)->elem);
-        //nodelist(1)->elem->adj.append (nodelist(2)->elem);
-        //nodelist(2)->elem->adj.append (nodelist(1)->elem);
-        //nodelist(2)->elem->adj.append (nodelist(3)->elem);
-        //nodelist(3)->elem->adj.append (nodelist(2)->elem);
-        //nodelist(2)->elem->adj.append (nodelist(4)->elem);
-        //nodelist(4)->elem->adj.append (nodelist(2)->elem);
-        //nodelist(2)->elem->adj.append (nodelist(5)->elem);
-        //nodelist(5)->elem->adj.append (nodelist(2)->elem);
-        //nodelist(4)->elem->adj.append (nodelist(6)->elem);
-        //nodelist(6)->elem->adj.append (nodelist(4)->elem);
-        //nodelist(6)->elem->adj.append (nodelist(7)->elem);
-        //nodelist(7)->elem->adj.append (nodelist(6)->elem);
-        //nodelist(8)->elem->adj.append (nodelist(9)->elem);
-        //nodelist(9)->elem->adj.append (nodelist(8)->elem);
-        //nodelist(9)->elem->adj.append (nodelist(10)->elem);
-        //nodelist(10)->elem->adj.append (nodelist(9)->elem);
 
         //= Insert a loop
         // fg.connect (nodelist(2), nodelist(8));
@@ -138,8 +111,8 @@ int main ()
         vars[2].set (new goFGNodeVariable<goSize_t,float> (3));
         vars[3].set (new goFGNodeVariable<goSize_t,float> (1));
 
-        factors.setSize (4);
-        //factors.setSize (3);
+        // factors.setSize (4);
+        factors.setSize (3);
         factors[0].set (new MyFactor(2));
         factors[1].set (new MyFactor(2));
         factors[2].set (new MyFactor(2));
@@ -152,9 +125,9 @@ int main ()
         fg.connect (vars[3], 0, factors[2], 1);
 
         //= Add a loop and see what happens ...
-        factors[3].set (new MyFactor(2));
-        fg.connect (vars[1], 1, factors[3], 0);
-        fg.connect (vars[2], 2, factors[3], 1);
+        //factors[3].set (new MyFactor(2));
+        //fg.connect (vars[1], 1, factors[3], 0);
+        //fg.connect (vars[2], 2, factors[3], 1);
 
         FILE* f = fopen ("graph2.dot","w");
         if (!f)
@@ -166,6 +139,19 @@ int main ()
         fclose (f);
 
         // goSumProduct<goSize_t,float> sp;
+        // sp.flooding (fg.myVariables[0], fg);
+        sp.run (fg.myVariables[0], fg);
+
+        for (goSize_t i = 0; i < fg.myVariables.getSize(); ++i)
+        {
+            goVectorf marginal;
+            sp.marginal (fg.myVariables[i], sp.getValueCount(), marginal);
+            goVectorf x (marginal.getSize());
+            x.fillRange (0.0f, 1.0f, (float)(marginal.getSize()));
+            goString s = "Marginal var["; s += (int)i; s += "]";
+            goPlot::plot (x, marginal, s.toCharPtr());
+        }
+
         goMaxSum<goSize_t,float> ms;
         ms.setValueCount (10);
 
