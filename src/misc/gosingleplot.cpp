@@ -492,9 +492,12 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
             prefix += (float)el->elem.x;
             prefix += ",";
             prefix += (float)el->elem.y;
-            prefix += " ";
-            prefix += "textcolor ";
-            prefix += el->elem.colourspec.toCharPtr();
+            if (el->elem.colourspec.getSize() > 0)
+            {
+                prefix += " ";
+                prefix += "textcolor ";
+                prefix += el->elem.colourspec.toCharPtr();
+            }
             prefix += "\n";
             el = el->next;
             ++labelTag;
