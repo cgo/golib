@@ -87,6 +87,8 @@ void goGUI::OFFView::align ()
 
 void goGUI::OFFView::lighting ()
 {
+    glEnable (GL_NORMALIZE);  //= Automatically normalise normal vectors
+
     GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat mat_shininess[] = { 50.0 };
@@ -99,8 +101,11 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting2");
     glLightfv (GL_LIGHT0, GL_POSITION, light_position);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, lm_ambient);
-    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     check_gl_error ("lighting3");
+    //glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    //check_gl_error ("lighting3");
+    //glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    //check_gl_error ("lighting3");
 
     // const float pos[] = {this->off.getMax()[0] + 5.0f, this->off.getMax()[0] + 5.0, this->off.getMax()[0] + 5.0, 1.0f};
     // goVectorf center = (this->off.getMax() + this->off.getMin()) * 0.5f;
@@ -172,6 +177,8 @@ void goGUI::OFFView::glDraw ()
     glLoadIdentity ();
     check_gl_error ("1");
 
+    this->lighting ();
+
     check_gl_error ("2");
 
 //    if (myPrivate->rotation[1] == 0.0f)
@@ -189,17 +196,15 @@ void goGUI::OFFView::glDraw ()
                       temp,
                       myPrivate->rotation[2], &pos, &up);
 
-    this->lighting ();
-
-    glPushMatrix ();
-    glLoadIdentity ();
-    GLfloat light_position[] = { pos[0] + up[0], pos[1] + up[1], pos[2] + up[2], 0.0 };
-    GLfloat light_dir[] = { -pos[0] - up[0], -pos[1] - up[1], -pos[2] - up[2], 1.0 };
-    glLightfv (GL_LIGHT0, GL_POSITION, light_position);
+    //glPushMatrix ();
+    //glLoadIdentity ();
+    //GLfloat light_position[] = { pos[0] + up[0], pos[1] + up[1], pos[2] + up[2], 0.0 };
+    //GLfloat light_dir[] = { -pos[0] - up[0], -pos[1] - up[1], -pos[2] - up[2], 1.0 };
+    //glLightfv (GL_LIGHT0, GL_POSITION, light_position);
     //glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 75.0);
     //glLightfv (GL_LIGHT0, GL_SPOT_DIRECTION, light_dir);
-    glEnable (GL_LIGHT0);
-    glPopMatrix ();
+    //glEnable (GL_LIGHT0);
+    //glPopMatrix ();
 
     const float list_diffuse[] = {0.3f, 0.3f, 0.7f, 1.0f};
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);

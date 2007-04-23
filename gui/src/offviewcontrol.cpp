@@ -10,7 +10,7 @@ namespace goGUI
                 : loadButton ("Load OFF"),
                   alignButton ("Align"),
                   phi    (-180.0f, 181.0f, 1.0f),
-                  theta  (0.0f, 181.0f, 1.0f),
+                  theta  (0.0f, 361.0f, 1.0f),
                   radius (),
                   view (0),
                   vbox (),
