@@ -727,6 +727,24 @@ class goList {
       return false;
   };
 
+  bool cyclicPermutation ()
+  {
+        if (this->front && this->front->next)
+        {
+            if (this->isClosed())
+            {
+                this->open (this->front->next);
+                this->close ();
+            }
+            else
+            {
+                this->close ();
+                this->open (this->front->next);
+            }
+        }
+        return true;
+  };
+
   /// Resets the pointer to the front of the list.
   inline void       resetToFront () { position = front; }
 
