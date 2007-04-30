@@ -44,6 +44,19 @@ namespace goMath
  * \addtogroup math
  * @{
  */
+/**
+	@returns the absolute value of a real (no-complex) scalar.
+*/
+template <class Real>
+Real abs(Real a)
+{
+	return  (a > 0 ? a : -a);
+}
+
+/**
+ * \addtogroup math
+ * @{
+ */
 /*!
 	@returns hypotenuse of real (non-complex) scalars a and b by 
 	avoiding underflow/overflow
@@ -55,11 +68,11 @@ Real hypot(const Real &a, const Real &b)
 {
 	
 	if (a == 0)
-		return abs(b);
+		return goMath::abs(b);
 	else
 	{
 		Real c = b/a;
-		return Real(abs((double)a) * Real(sqrt(1.0 + (double)(c*c))));
+		return Real(goMath::abs((double)a) * Real(sqrt(1.0 + (double)(c*c))));
 	}
 }
 /*! @} */
@@ -122,18 +135,6 @@ Scalar max(Scalar a, Scalar b)
 }
 /*! @} */
 
-/**
- * \addtogroup math
- * @{
- */
-/**
-	@returns the absolute value of a real (no-complex) scalar.
-*/
-template <class Real>
-Real abs(Real a)
-{
-	return  (a > 0 ? a : -a);
-}
 
 bool gradient2D          (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool laplacian2D         (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);

@@ -134,7 +134,8 @@ bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
         return false;
     }
 
-    int dimsMatlab[3];
+    //int dimsMatlab[3];
+    mwSize dimsMatlab[3];
     dimsMatlab[0] = sig->getSizeY();
     dimsMatlab[1] = sig->getSizeX();
     dimsMatlab[2] = 3;
@@ -443,7 +444,7 @@ bool goMatlab::startEngine ()
 {
     if (myPrivate->matlabEngine)
         this->stopEngine();
-    myPrivate->matlabEngine = engOpen ("matlab -nodesktop -nosplash -nojvm");
+    myPrivate->matlabEngine = engOpen ("matlab -nodesktop");
     if (!myPrivate->matlabEngine)
     {
         printf ("Could not open matlab engine.\n");

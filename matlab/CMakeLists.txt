@@ -17,6 +17,12 @@ ELSE (MACHINE_TYPE MATCHES amd64)
     SET (MEX_EXTENSION .mexglx)
 ENDIF (MACHINE_TYPE MATCHES amd64)
 
+## For now, always set to 3.3
+IF (BUILD_WITH_GCC_3_3)
+    SET (CMAKE_CXX_COMPILER g++-3.3)
+    SET (CMAKE_C_COMPILER gcc-3.3)
+ENDIF (BUILD_WITH_GCC_3_3)
+
 SET          (MATLAB_LIB_PATH ${MATLAB}/extern/lib/${MATLAB_ARCH};${MATLAB}/bin/${MATLAB_ARCH})
 SET          (MATLAB_INC_PATH ${MATLAB}/extern/include)
 SET          (GOPATH $ENV{GOPATH})

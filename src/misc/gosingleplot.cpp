@@ -145,7 +145,7 @@ bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
-        this->clear ();
+        // this->clear (); //= This deletes all labels ... not good.
         myPrivate->plotType = goPlot::Surface;
     }
     myPrivate->plotX.append (x);
@@ -435,11 +435,19 @@ bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const 
  */
 bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, const char* colourspec)
 {
-    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, colourspec));
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, 0.0, colourspec));
 }
 bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, const char* colourspec)
 {
-    return this->addLabel (goString(l), x, y, colourspec);
+    return this->addLabel (goString(l), x, y, 0.0, colourspec);
+}
+bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec)
+{
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, z, colourspec));
+}
+bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec)
+{
+    return this->addLabel (goString(l), x, y, z, colourspec);
 }
 
 void goSinglePlot::setPrefix (const goString& p)
@@ -492,6 +500,8 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
             prefix += (float)el->elem.x;
             prefix += ",";
             prefix += (float)el->elem.y;
+            prefix += ",";
+            prefix += (float)el->elem.z;
             if (el->elem.colourspec.getSize() > 0)
             {
                 prefix += " ";

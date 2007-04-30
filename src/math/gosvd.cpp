@@ -10,18 +10,6 @@
 #endif
 
 template <class T>
-goMath::SVD<T>::SVD (const goMatrix<T>& A, bool thin)
-: U(), V(), s(), myM(0), myN(0)
-{
-    this->calculate (A, thin);
-}
-
-template <class T>
-goMath::SVD<T>::~SVD () 
-{
-}
-
-template <class T>
 goMatrix<T>& goMath::SVD<T>::getU () { return this->U; };
 
 template <class T>
@@ -49,97 +37,112 @@ void goMath::SVD<T>::getS (goMatrix<T>& S) const
     {
         S(i,i) = this->s[i];
     }
-};
+}
 
-template <>
-bool goMath::SVD<goFloat>::calculate (const goMatrix<goFloat>& A, bool thin)
+namespace goMath 
 {
-    goMatrix<goFloat> AT;
-    A.getTranspose (AT);
-    //= Careful: sgesvd_ expects column major arrays, we use row major.
-    //= So we here calculate svd(A), because the f2c-generated code thinks
-    //= AT = A.
-    integer m = AT.getColumns();  //= rows in row-major
-    integer n = AT.getRows();     //= columns in row-major
-    myM = m;
-    myN = n;
-    integer lda = AT.getLeadingDimension();
-    s.resize (goMath::min<integer>(m,n));
-    if (thin)
-    {
-        //= sgesvd_ expects column major, so the dimensions are transposed.
-        this->U.resize (goMath::min(m,n),m);
-        // this->V.resize (n,goMath::min(m,n));
-        V.resize (n,n);
-    }
-    else
-    {
-        U.resize (m,m);
-        V.resize (n,n);
-    }
-    integer ldu = U.getLeadingDimension();
-    integer ldv = V.getLeadingDimension();
-    goFixedArray<goFloat> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
-    integer lwork = work.getSize ();
-    integer info = -1;
-    char job = thin ? 'S' : 'A';
-    char jobvt = thin ? 'A' : 'A'; //= all n rows of V in any case.
-    sgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
-            V.getPtr(), &ldv, work.getPtr(), &lwork, &info);
-    //= V now contains V^T in column-major, so it's V in row-major.
-    //= We need to transpose U in order to get the correct row-major U.
-    U.transpose ();
-    if (info != 0)
-        return false;
-    return true;
-};
+    template <>
+        bool SVD<goFloat>::calculate (const goMatrix<goFloat>& A, bool thin)
+        {
+            goMatrix<goFloat> AT;
+            A.getTranspose (AT);
+            //= Careful: sgesvd_ expects column major arrays, we use row major.
+            //= So we here calculate svd(A), because the f2c-generated code thinks
+            //= AT = A.
+            integer m = AT.getColumns();  //= rows in row-major
+            integer n = AT.getRows();     //= columns in row-major
+            myM = m;
+            myN = n;
+            integer lda = AT.getLeadingDimension();
+            s.resize (goMath::min<integer>(m,n));
+            if (thin)
+            {
+                //= sgesvd_ expects column major, so the dimensions are transposed.
+                this->U.resize (goMath::min(m,n),m);
+                // this->V.resize (n,goMath::min(m,n));
+                V.resize (n,n);
+            }
+            else
+            {
+                U.resize (m,m);
+                V.resize (n,n);
+            }
+            integer ldu = U.getLeadingDimension();
+            integer ldv = V.getLeadingDimension();
+            goFixedArray<goFloat> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
+            integer lwork = work.getSize ();
+            integer info = -1;
+            char job = thin ? 'S' : 'A';
+            char jobvt = thin ? 'A' : 'A'; //= all n rows of V in any case.
+            sgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
+                    V.getPtr(), &ldv, work.getPtr(), &lwork, &info);
+            //= V now contains V^T in column-major, so it's V in row-major.
+            //= We need to transpose U in order to get the correct row-major U.
+            U.transpose ();
+            if (info != 0)
+                return false;
+            return true;
+        }
 
-template <>
-bool goMath::SVD<goDouble>::calculate (const goMatrix<goDouble>& A, bool thin)
-{
-    goMatrix<goDouble> AT;
-    A.getTranspose (AT);
-    //= Careful: sgesvd_ expects column major arrays, we use row major.
-    //= So we here calculate svd(A), because the f2c-generated code thinks
-    //= AT = A.
-    integer m = AT.getColumns();  //= rows in row-major
-    integer n = AT.getRows();     //= columns in row-major
-    myM = m;
-    myN = n;
-    integer lda = AT.getLeadingDimension();
-    s.resize (goMath::min<integer>(m,n));
-    if (thin)
-    {
-        //= dgesvd_ expects column major, so the dimensions are transposed.
-        U.resize (goMath::min(m,n),m);
-        V.resize (n,goMath::min(m,n));
-    }
-    else
-    {
-        U.resize (m,m);
-        V.resize (n,n);
-    }
-    integer ldu = U.getLeadingDimension();
-    integer ldv = V.getLeadingDimension();
-    goFixedArray<goDouble> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
-    integer lwork = work.getSize ();
-    integer info = -1;
-    char job = thin ? 'S' : 'A';
-    char jobvt = thin ? 'S' : 'A';
-    dgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
-            V.getPtr(), &ldv, work.getPtr(), &lwork, &info);
-    //= V now contains V^T in column-major, so it's V in row-major.
-    //= We need to transpose U in order to get the correct row-major U.
-    U.transpose ();
-    if (info != 0)
-        return false;
-    return true;
-};
+    template <>
+        bool SVD<goDouble>::calculate (const goMatrix<goDouble>& A, bool thin)
+        {
+            goMatrix<goDouble> AT;
+            A.getTranspose (AT);
+            //= Careful: sgesvd_ expects column major arrays, we use row major.
+            //= So we here calculate svd(A), because the f2c-generated code thinks
+            //= AT = A.
+            integer m = AT.getColumns();  //= rows in row-major
+            integer n = AT.getRows();     //= columns in row-major
+            myM = m;
+            myN = n;
+            integer lda = AT.getLeadingDimension();
+            s.resize (goMath::min<integer>(m,n));
+            if (thin)
+            {
+                //= dgesvd_ expects column major, so the dimensions are transposed.
+                U.resize (goMath::min(m,n),m);
+                V.resize (n,goMath::min(m,n));
+            }
+            else
+            {
+                U.resize (m,m);
+                V.resize (n,n);
+            }
+            integer ldu = U.getLeadingDimension();
+            integer ldv = V.getLeadingDimension();
+            goFixedArray<goDouble> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
+            integer lwork = work.getSize ();
+            integer info = -1;
+            char job = thin ? 'S' : 'A';
+            char jobvt = thin ? 'S' : 'A';
+            dgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
+                    V.getPtr(), &ldv, work.getPtr(), &lwork, &info);
+            //= V now contains V^T in column-major, so it's V in row-major.
+            //= We need to transpose U in order to get the correct row-major U.
+            U.transpose ();
+            if (info != 0)
+                return false;
+            return true;
+        }
+
+    template <class T>
+        bool SVD<T>::calculate (const goMatrix<T>&, bool)
+        {
+            return false;
+        }
+}
 
 template <class T>
-bool goMath::SVD<T>::calculate (const goMatrix<T>&, bool)
+goMath::SVD<T>::SVD (const goMatrix<T>& A, bool thin)
+: U(), V(), s(), myM(0), myN(0)
 {
-    return false;
+    this->calculate (A, thin);
+}
+
+template <class T>
+goMath::SVD<T>::~SVD () 
+{
 }
 
 //=============================================================================

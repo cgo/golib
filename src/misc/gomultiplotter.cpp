@@ -250,7 +250,7 @@ bool goMultiPlotter::plot ()
         extentRowEl = extentRowEl->next;
         extentColEl = extentColEl->next;
     }
-    
+
     goString postfix = "unset multiplot\n";
     if (myPrivate->pauseFlag)
     {

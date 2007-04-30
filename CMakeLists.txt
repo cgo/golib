@@ -5,6 +5,7 @@ INCLUDE             (CheckFunctionExists)
 # Apparently buggy:
 # INCLUDE             (FindThreads)
 
+SET (BUILD_WITH_GCC_3_3 FALSE CACHE BOOL "Enable/disable gcc-3.3 (for matlab < 2007a)")
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_PYTHON_MODULE FALSE CACHE BOOL "Enable/disable building the python module")
 SET (BUILD_PYTHON_EMBED FALSE CACHE BOOL "Enable/disable embedding python (goPython)")
@@ -336,11 +337,11 @@ ENDIF (${HAVE_LIBSOCKET} MATCHES 1)
 
 SET (EXTRA_INCLUDE_PATH "")
 
-IF (BUILD_PYTHON_EMBED)
-    EXEC_PROGRAM (python ARGS -c "\"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
+IF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
+    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
     SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
-    EXEC_PROGRAM (python ARGS -c "\"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
-ENDIF (BUILD_PYTHON_EMBED)
+    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
+ENDIF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
 
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
@@ -353,10 +354,16 @@ INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
 ##                 
-IF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
+#IF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
+#    SET (CMAKE_CXX_COMPILER g++-3.3)
+#    SET (CMAKE_C_COMPILER gcc-3.3)
+#ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
+
+## For now, always set to 3.3
+IF (BUILD_WITH_GCC_3_3)
     SET (CMAKE_CXX_COMPILER g++-3.3)
     SET (CMAKE_C_COMPILER gcc-3.3)
-ENDIF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
+ENDIF (BUILD_WITH_GCC_3_3)
                      
 # Add -MT flag!
 IF(UNIX)
