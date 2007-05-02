@@ -5,6 +5,7 @@ INCLUDE             (CheckFunctionExists)
 # Apparently buggy:
 # INCLUDE             (FindThreads)
 
+SET (HAVE_MATLAB_GEQ_2007A FALSE CACHE BOOL "Have Matlab >= 2007a? Also see BUILD_WITH_GCC_3_3")
 SET (BUILD_WITH_GCC_3_3 FALSE CACHE BOOL "Enable/disable gcc-3.3 (for matlab < 2007a)")
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_PYTHON_MODULE FALSE CACHE BOOL "Enable/disable building the python module")
@@ -15,6 +16,11 @@ SET (BUILD_MATLAB_MEX FALSE CACHE BOOL "Enable/disable building the matlab mex m
 SET (BUILD_GUI_MODULE FALSE CACHE BOOL "Enable/disable building the GUI module")
 SET (BUILD_GUI_MODULE_OPENGL FALSE CACHE BOOL "Enable/disable building the OpenGL widget (may have problems with matlab)")
 SET (BUILD_GL_MODULE FALSE CACHE BOOL "Enable/disable building the OpenGL module")
+
+IF (HAVE_MATLAB_GEQ_2007A)
+    ADD_DEFINITIONS (-DHAVE_MATLAB_GEQ_2007A)
+    SET (HAVE_MATLAB_GEQ_2007A 1)
+ENDIF (HAVE_MATLAB_GEQ_2007A)
 
 PROJECT             (Go)
 SET                 (TARGETNAME Go)

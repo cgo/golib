@@ -1607,6 +1607,10 @@ bool goSparseMatrix::vectorMatrixMult (goArray<goDouble>& ret, const goArray<goD
 // =========================================
 
 #ifdef HAVE_MATLAB
+#ifndef HAVE_MATLAB_GEQ_2007A
+# define mwIndex int
+# define mwSize int
+#endif
 /*!
 * If HAVE_MATLAB is defined at compile time,
 * this method can be used to fill a Matlab sparse

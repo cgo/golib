@@ -13,6 +13,12 @@
 #include <gomatlab.h>
 
 #include <gosignal3dgenericiterator.h>
+#include <goconfig.h>
+
+#ifndef HAVE_MATLAB_GEQ_2007A
+# define mwIndex int
+# define mwSize int
+#endif
 
 using namespace std;
 
@@ -444,7 +450,7 @@ bool goMatlab::startEngine ()
 {
     if (myPrivate->matlabEngine)
         this->stopEngine();
-    myPrivate->matlabEngine = engOpen ("matlab -nodesktop");
+    myPrivate->matlabEngine = engOpen ("matlab -nodesktop -nosplash");
     if (!myPrivate->matlabEngine)
     {
         printf ("Could not open matlab engine.\n");

@@ -51,6 +51,8 @@
 #cmakedefine HAVE_SWIG ${HAVE_SWIG}
 #cmakedefine HAVE_NASM ${HAVE_NASM}
 
+#cmakedefine HAVE_MATLAB_GEQ_2007A ${HAVE_MATLAB_GEQ_2007A}
+
 /* Guile-related */
 #cmakedefine GO_GUILE_MULTITHREAD ${GO_GUILE_MULTITHREAD}
 

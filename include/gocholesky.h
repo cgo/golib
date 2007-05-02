@@ -57,9 +57,9 @@ class goCholesky
     public:
         goCholesky ();
         goCholesky (const goMatrix<Real> &A);
-        goMatrix<Real> getL   () const;
-        goArray<Real>  solve  (const goArray<Real> &B);
-        goMatrix<Real> solve  (const goMatrix<Real> &B);
+        const goMatrix<Real>& getL   () const;
+        bool  solve  (const goArray<Real> &B, goArray<Real>& xRet);
+        bool  solve  (const goMatrix<Real> &B, goMatrix<Real>& XRet);
         int            is_spd () const;
 
     protected:

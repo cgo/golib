@@ -21,7 +21,7 @@ int goCholesky<Real>::is_spd() const
 	@return the lower triangular factor, L, such that L*L'=A.
 */
 template <class Real>
-goMatrix<Real> goCholesky<Real>::getL() const
+const goMatrix<Real>& goCholesky<Real>::getL() const
 {
 	return L_;
 }
@@ -85,15 +85,13 @@ goCholesky<Real>::goCholesky(const goMatrix<Real> &A)
    						array is returned.
 */
 template <class Real>
-goArray<Real> goCholesky<Real>::solve(const goArray<Real> &b)
+bool goCholesky<Real>::solve(const goArray<Real> &b, goArray<Real>& x)
 {
 	int n = L_.dim1();
 	if (b.dim1() != n)
-		return goArray<Real>();
+		return false;
 
-
-	goArray<Real> x = b.copy();
-
+	x = b;
 
       // Solve L*y = b;
       for (int k = 0; k < n; k++) 
@@ -112,7 +110,7 @@ goArray<Real> goCholesky<Real>::solve(const goArray<Real> &b)
          x[k] /= L_[k][k];
       }
 
-	return x;
+      return true;
 }
 
 
@@ -127,14 +125,14 @@ goArray<Real> goCholesky<Real>::solve(const goArray<Real> &b)
    						array is returned.
 */
 template <class Real>
-goMatrix<Real> goCholesky<Real>::solve(const goMatrix<Real> &B)
+bool goCholesky<Real>::solve(const goMatrix<Real> &B, goMatrix<Real>& X)
 {
 	int n = L_.dim1();
 	if (B.dim1() != n)
-		return goMatrix<Real>();
+		return false;
 
 
-	goMatrix<Real> X = B.copy();
+	X = B;
 	int nx = B.dim2();
 
       // Solve L*y = b;
@@ -159,9 +157,7 @@ goMatrix<Real> goCholesky<Real>::solve(const goMatrix<Real> &B)
 		}
       }
 
-
-
-	return X;
+	return true;
 }
 
 }
