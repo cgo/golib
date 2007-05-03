@@ -49,4 +49,21 @@
     {
         return self->getMatrix (m, name);
     };
+
+    bool getVectorf (goVector<goFloat>& v, const char* name)
+    {
+        return self->getVector (&v, name);
+    };
+    bool getVectord (goVector<goDouble>& v, const char* name)
+    {
+        return self->getVector (&v, name);
+    };
+    bool putVectorf (const goVector<goFloat>& v, const char* name)
+    {
+        return self->putVector (&v, name);
+    };
+    bool putVectord (const goVector<goDouble>& v, const char* name)
+    {
+        return self->putVector (&v, name);
+    };
 }
