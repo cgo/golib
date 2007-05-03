@@ -950,6 +950,20 @@ void goPlot::plot (const goMatrix<T>& points,
     plotter.plot ();
 }
 
+template <class T>
+void goPlot::plot3D (const goMatrix<T>& M,
+        const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false)
+{
+    goMultiPlotter plotter (1,1);
+    goSinglePlot plot;
+    if (prefix)
+        plot.setPrefix (prefix);
+    plot.add3D (M, title, plotOptions, separateRows);
+    plotter.addPlot (plot,0);
+    plotter.setPauseFlag (true);
+    plotter.plot ();
+}
+
 template < class arrayT >
 bool goPlot::gnuplot(const arrayT& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor)
 {
@@ -1056,6 +1070,14 @@ template
 void goPlot::plot<goDouble> (
         const goMatrix<goDouble>&, 
         const char*, const char*, const char*);
+template 
+void goPlot::plot3D<goFloat> (
+        const goMatrix<goFloat>&, 
+        const char*, const char*, const char*, bool);
+template 
+void goPlot::plot3D<goDouble> (
+        const goMatrix<goDouble>&, 
+        const char*, const char*, const char*, bool);
 
 #if 0
 #define GOPLOT_INSTANTIATE(TYPE) \

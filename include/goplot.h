@@ -276,6 +276,9 @@ namespace goPlot
     template <class T>
         void plot (const goMatrix<T>& points,
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
+    template <class T>
+        void plot3D (const goMatrix<T>& M,
+                const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false);
 
     /** 
      * @brief Plots 1D data using gnuplot.
