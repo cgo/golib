@@ -67,6 +67,12 @@ class goMatrix
   bool setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0) const;
 
   bool resize (goSize_t rows, goSize_t cols);
+  
+  template <class To>
+  bool resize (const goMatrix<To>& o)
+  {
+      return this->resize (o.getRows(),o.getColumns());
+  };
 
   void transpose ();
   void getTranspose (goMatrix<T>& trans) const;

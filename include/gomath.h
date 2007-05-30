@@ -341,6 +341,15 @@ bool getRoots (const vectorT& fX,
                const vectorT& fY,
                vectorT&       retX,
                goVector<goIndex_t>* retRootIndex = 0);
+
+template <class T>
+bool pairwiseDistances (const goMatrix<T>& X, int dimension, goMatrix<T>& ret);
+template <class T>
+bool pdist (const goMatrix<T>& X, int dimension, goMatrix<T>& ret)
+{
+    return goMath::pairwiseDistances<T> (X, dimension, ret);
+};
+
 /*! @} */
 };
 
