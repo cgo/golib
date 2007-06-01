@@ -55,9 +55,119 @@ bool goGL::getGLBuffer (goSignal3D<void>& ret)
     return true;
 }
 
+/** 
+ * @brief Convert from spherical coordinates to euclidean coordinates.
+ * 
+ * @param phi      in [-pi,pi]
+ * @param theta    in [0,2*pi]
+ * @param radius   Radius
+ * @param positionRet  3D position, return value
+ * @param upRet        3D up-vector, return value
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goGL::sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius,
+                       goVectorf* positionRet, goVectorf* upRet)
+{
+    //= Spherical to cartesian coordinates
+    goFloat sin_theta = ::sin(theta);
+
+    //= Only rotation of phi from x towards y axis
+    go3Vector<goFloat> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
+    //= Complete rotation, first phi towards y, then the result towards z axis
+    go3Vector<goFloat> v2 (v1.x * sin_theta, v1.y * sin_theta, radius * ::cos(theta));
+    //= Create up vector as cross product
+    go3Vector<goFloat> up (v2);
+
+    up.cross (v1);
+    up *= 1.0f / up.abs();
+    if (v2.z < 0.0f)
+        up *= -1.0f;
+
+    if (positionRet)
+    {
+        positionRet->resize (3);
+        (*positionRet)[0] = v2.x;
+        (*positionRet)[1] = v2.y;
+        (*positionRet)[2] = v2.z;
+    }
+    if (upRet)
+    {
+        upRet->resize (3);
+        (*upRet)[0] = up.x;
+        (*upRet)[1] = up.y;
+        (*upRet)[2] = up.z;
+    }
+    return true;
+}
+
+/** 
+ * @brief Set OpenGL camera on view sphere, looking at the origin.
+ * 
+ * @param phi      in [-pi,pi]
+ * @param theta    in [0,2*pi]
+ * @param radius 
+ * @param positionRet  3D position, return value
+ * @param upRet        3D up-vector, return value
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goGL::viewSphere (goFloat phi, goFloat theta, goFloat radius,
                        goVectorf* positionRet, goVectorf* upRet)
 {
+    //= Spherical to cartesian coordinates
+    GLfloat sin_theta = ::sin(theta);
+
+    //= Only rotation of phi from x towards y axis
+    go3Vector<goFloat> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
+    //= Complete rotation, first phi towards y, then the result towards z axis
+    go3Vector<goFloat> v2 (v1.x * sin_theta, v1.y * sin_theta, radius * ::cos(theta));
+    //= Create up vector as cross product
+    go3Vector<goFloat> up (v2);
+
+    up.cross (v1);
+    up *= 1.0f / up.abs();
+    if (v2.z < 0.0f)
+        up *= -1.0f;
+
+    glLoadIdentity ();
+    gluLookAt (v2.x, v2.y, v2.z,
+               0.0f, 0.0f, 0.0f,
+               up.x, up.y, up.z);
+    if (positionRet)
+    {
+        positionRet->resize (3);
+        (*positionRet)[0] = v2.x;
+        (*positionRet)[1] = v2.y;
+        (*positionRet)[2] = v2.z;
+    }
+    if (upRet)
+    {
+        upRet->resize (3);
+        (*upRet)[0] = up.x;
+        (*upRet)[1] = up.y;
+        (*upRet)[2] = up.z;
+    }
+
+    return true;
+}
+
+//= FIXME!
+bool goGL::sampleViewSphere (goFloat dist, goFloat radius,
+                             goList<goVectorf>& positionRet, goList<goVectorf>& upRet)
+{
+    goVectorf pos, up;
+    goFloat phi = -M_PI;
+    while (phi < M_PI)
+    {
+        goFloat theta = 0.0f;
+        while (theta < 2*M_PI)
+        {
+            // FIXME
+
+        }
+    }
+
     //= Spherical to cartesian coordinates
     GLfloat sin_theta = ::sin(theta);
 
