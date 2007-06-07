@@ -193,6 +193,7 @@ class goMatlab : public goObjectBase
         bool     variableToArray      (goArray<goDouble>* vector, const char* name);
         bool     variableToDouble     (goDouble& d, const char* name);
         bool     matlabCall           (const char* command, goString* resultBuffer = 0);
+        bool     call                 (const char* command, goString* resultBuffer = 0);
 
         virtual bool callObjectMethod (int methodID, goObjectMethodParameters* param = NULL);
 

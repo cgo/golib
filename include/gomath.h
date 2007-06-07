@@ -350,6 +350,14 @@ bool pdist (const goMatrix<T>& X, int dimension, goMatrix<T>& ret)
     return goMath::pairwiseDistances<T> (X, dimension, ret);
 };
 
+bool sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius,
+                        goVectorf* positionRet, goVectorf* upRet);
+bool euclideanToSphere (const goVectorf& x, goFloat& phiRet, goFloat& thetaRet, goFloat& radiusRet);
+bool sampleViewSphere (goFloat dist, goFloat radius,
+                       goList<goVectorf>& positionRet, goList<goVectorf>& upRet);
+bool sampleViewSphere (goFloat dist, goFloat radius,
+                       goMatrix<goFloat>& viewSphereRet);
+
 /*! @} */
 };
 

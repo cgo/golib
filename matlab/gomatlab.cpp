@@ -918,6 +918,16 @@ goMatlab::copyFromMatlab (mxArray* m, goVectorf* vec)
     return true;
 }
 
+/** 
+ * @brief Execute matlab command.
+ * 
+ * @param command       Command string, any valid matlab script will do.
+ * @param resultBuffer  If not 0, will be filled with the string output of the call,
+ *                      up to the length of resultBuffer. If 0 (default), no output buffer
+ *                      is used.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool
 goMatlab::matlabCall (const char* command, goString* resultBuffer)
 {
@@ -943,6 +953,20 @@ goMatlab::matlabCall (const char* command, goString* resultBuffer)
         }
     }
     return true;
+}
+
+/** 
+ * @brief Synonym for matlabCall.
+ * 
+ * @param command Command
+ * @param resultBuffer  Result buffer.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool
+goMatlab::call (const char* command, goString* resultBuffer)
+{
+    return this->matlabCall (command, resultBuffer);
 }
 
 // ===========================================================

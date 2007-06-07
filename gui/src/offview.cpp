@@ -29,14 +29,22 @@ namespace goGUI
     class OFFViewPrivate
     {
         public:
-            OFFViewPrivate () : rotation (3)
+            OFFViewPrivate () : rotation (3), position(3), up(3), focus(3)
             {
                 rotation.fill (0.0f);
                 rotation[0] = 1.0f;
+
+                position.fill (0.0f);
+                up[0] = 1.0f; up[1] = 0.0f; up[2] = 1.0f;
+                focus.fill (0.0f);
             };
             ~OFFViewPrivate () {};
 
             goVectorf rotation;
+
+            goVectorf position;
+            goVectorf up;
+            goVectorf focus;
     };
 }
 
@@ -153,7 +161,26 @@ const goVectorf& goGUI::OFFView::getRotation () const
 
 void goGUI::OFFView::setRotation (const goVectorf& r)
 {
+    // this line is obsolete, as is myPrivate->rotation.
     myPrivate->rotation = r;
+
+    goVectorf pos (3);
+    goVectorf up (3);
+
+    goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
+
+    goMath::sphereToEuclidean (myPrivate->rotation[0] / 180.0f * M_PI, temp, 
+            myPrivate->rotation[2], &pos, &up);
+    goVectorf focus(3);
+    focus.fill(0.0f);
+    this->setView (pos, up, focus);
+}
+
+void goGUI::OFFView::setView (const goVectorf& position, const goVectorf& up, const goVectorf& focus)
+{
+    myPrivate->position = position;
+    myPrivate->up = up;
+    myPrivate->focus = focus;
 }
 
 void goGUI::OFFView::glDraw ()
@@ -189,12 +216,15 @@ void goGUI::OFFView::glDraw ()
 //    {
 //        myPrivate->rotation[1] = 180.0f - 0.0001f; //= bloody libc cos() ...
 //    }
-    goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
-    goVectorf pos (3);
-    goVectorf up (3);
-    goGL::viewSphere (myPrivate->rotation[0] / 180.0f * M_PI,
-                      temp,
-                      myPrivate->rotation[2], &pos, &up);
+    // goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
+    const goVectorf& pos = myPrivate->position;
+    const goVectorf& up  = myPrivate->up;
+    const goVectorf& focus  = myPrivate->focus;
+
+    glLoadIdentity ();
+    gluLookAt (pos[0], pos[1], pos[2],
+               focus[0], focus[1], focus[2],
+               up[0], up[1], up[2]);
 
     //glPushMatrix ();
     //glLoadIdentity ();

@@ -21,6 +21,7 @@ class OFFView : public goGUI::GLWidget
         virtual void glDraw ();
 
         void setRotation (const goVectorf& angles);
+        void setView (const goVectorf& position, const goVectorf& up, const goVectorf& focus);
         const goVectorf& getRotation () const;
 
         goGL::OFFFile& getOFFFile ();

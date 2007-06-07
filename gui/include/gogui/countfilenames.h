@@ -32,6 +32,9 @@ namespace goGUI
             void increment ();
 
             void getFilename (goString& fRet) const;
+            void getBase (goString& ret) const;
+            void getSuffix (goString& ret) const;
+            goIndex_t getCount () const;
             
         protected:
             Gtk::Entry      myBaseEntry;

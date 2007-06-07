@@ -12,9 +12,9 @@ namespace goGUI
                   phi    (-180.0f, 181.0f, 1.0f),
                   theta  (0.0f, 361.0f, 1.0f),
                   radius (),
-                  view (0),
                   vbox (),
-                  tips ()
+                  tips (),
+                  view (0)
             {
                 this->radius.set_range (0.0, 10000.0);
                 this->radius.set_digits (1);

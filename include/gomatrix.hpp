@@ -269,6 +269,76 @@ void goMatrix<T>::flip (goSize_t dim)
 }
 
 /** 
+ * @brief Copies sub-matrix from this matrix to target matrix.
+ *
+ * Copies the given sub-matrix from this to target starting in target at 0,0.
+ * 
+ * @param startRow 
+ * @param startCol 
+ * @param endRow 
+ * @param endCol 
+ * @param target 
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target)
+{
+    return this->copy (startRow, startCol, endRow, endCol, 0, 0, target);
+}
+
+/** 
+ * @brief Copy rectangular sub-matrix to another matrix.
+ * 
+ * Copies from this matrix the sub-matrix (startRow...endRow , startCol...endCol) to the sub-matrix in target starting at target_row,target_col.
+ *
+ * @param startRow 
+ * @param startCol 
+ * @param endRow 
+ * @param endCol 
+ * @param target_row 
+ * @param target_col 
+ * @param target 
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target)
+{
+    goSize_t num_rows = endRow - startRow + 1;
+    goSize_t num_cols = endCol - startCol + 1;
+    if (target.getRows() - target_row < num_rows || target.getColumns() - target_col < num_cols)
+    {
+        goLog::warning ("goMatrix::copy(): target too small. Not copying.");
+        return false;
+    }
+    goMatrix<T> refM(0,0);
+    this->ref (startRow, startCol, num_rows, num_cols, refM);
+    goMatrix<T> refTarget(0,0);
+    target.ref (target_row, target_col, num_rows, num_cols, refTarget);
+    refTarget = refM;
+
+    return true;
+}
+
+/** 
+ * @brief Copies this matrix to target matrix. 
+ * 
+ * Target is not resized, this matrix is copied to target starting at 0,0.
+ * If target is too small, false is returned.
+ *
+ * @param target 
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goMatrix<T>::copy (goMatrix<T>& target)
+{
+    return this->copy (0, 0, this->getRows() - 1, this->getColumns() - 1, 0, 0, target);
+}
+
+
+/** 
  * @brief Transpose the data.
  * This is very slow and should be used scarcely.
  * For Multiplication with transposition, use goMatrixMult().

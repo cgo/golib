@@ -62,3 +62,18 @@ void goGUI::CountFilenames::getFilename (goString& fRet) const
     fRet += ".";
     fRet += Glib::locale_from_utf8(mySuffixEntry.get_text()).data ();
 }
+
+void goGUI::CountFilenames::getBase (goString& ret) const
+{
+    ret = Glib::locale_from_utf8(myBaseEntry.get_text()).data ();
+}
+
+void goGUI::CountFilenames::getSuffix (goString& ret) const
+{
+    ret = Glib::locale_from_utf8(mySuffixEntry.get_text()).data ();
+}
+
+goIndex_t goGUI::CountFilenames::getCount () const
+{
+    return static_cast<goIndex_t>(myCount.get_value_as_int());
+}

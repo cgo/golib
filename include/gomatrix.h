@@ -248,6 +248,10 @@ class goMatrix
       refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
   };
 
+  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target);
+  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target);
+  bool copy (goMatrix<T>& target);
+
   /** 
    * @brief Make a reference to sub-matrix.
    * 
@@ -291,8 +295,7 @@ class goMatrix
    */
   inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, goVector<T>& v)
   {
-      assert (length <= this->getColumns());
-      v.setData (&(*this)(row,column), length, 1);
+
   };
 
   inline void setRow (goSize_t row, const goVector<T>& v)
