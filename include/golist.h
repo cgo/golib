@@ -715,6 +715,13 @@ class goList {
       this->tail = p;
   };
 
+  void open ()
+  {
+      if (!this->isClosed() || !this->getFrontElement())
+          return;
+      this->open (this->getFrontElement());
+  };
+
   bool          isClosed () const
   {
       if (this->front && this->tail)
