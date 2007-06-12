@@ -89,6 +89,9 @@ goCurve<T>::~goCurve ()
  *
  * Interpolates linearly to sample points from the polygon defined by
  * the points of this curve.
+ *
+ * This is quite slow since potentially all points are searched, 
+ * but appears to work.
  * 
  * @param position Position on the curve in [0,this->getLength()]
  * @param ret      On return, contains the point at position.
