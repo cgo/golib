@@ -230,7 +230,8 @@ template <class T>
 void goVector<T>::fillRange (const T& start, const T& step, const T& end)
 {
     goSize_t i = 0;
-    for (T v = start; v < end; v += step, ++i)
+    goSize_t sz = this->getSize();
+    for (T v = start; v < end && i < sz; v += step, ++i)
     {
         (*this)[i] = v;
     }
