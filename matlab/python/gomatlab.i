@@ -21,6 +21,7 @@
 #include <gohistogram.h>
 #include <gopointcloud.h>
 #include <gocurve.h>
+#include <gognuplot.h>
 %}
 %import ../../python/golib.i
 

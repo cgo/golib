@@ -25,7 +25,11 @@ class goMultiPlotterPrivate
         goSize_t rows;
         goSize_t columns;
 
-        //= IO redirection. -1 means not used.
+        //= IO redirection. -1 means not used. This is not used, only here for completeness
+        //= because one CAN set it to redirect gnuplot's input/output if it is called
+        //= via  This is not used, only here for completeness
+        //= because one CAN set it to redirect gnuplot's input/output if it is called
+        //= via callGnuplot().
         int               inputFD;
         int               outputFD;
 };
@@ -207,12 +211,7 @@ void goMultiPlotter::setPrefix (const goString& p)
     myPrivate->prefixCommands = p;
 }
 
-/** 
- * @brief Plot all plots.
- * 
- * @return True if successful, false otherwise.
- */
-bool goMultiPlotter::plot ()
+bool goMultiPlotter::makePlotCommands (goString& plotCommands)
 {
     assert (!myPrivate->plots.isClosed());
 
@@ -220,7 +219,14 @@ bool goMultiPlotter::plot ()
     goDouble stepY = -1.0 / static_cast<goDouble>(this->getRows());
 
     goString prefix = myPrivate->prefixCommands;
-    prefix += "set multiplot\n";
+    if (myPrivate->rows > 1 || myPrivate->columns > 1)
+    {
+        prefix += "set multiplot\n";
+    }
+    else
+    {
+        prefix += "unset multiplot\n";
+    }
     //set size ";
     //prefix += (float)stepX;
     //prefix += ",";
@@ -229,7 +235,7 @@ bool goMultiPlotter::plot ()
     goDouble posX  = 0.0;
     goDouble posY  = 1.0 + stepY;
 
-    goString plotCommands = prefix;
+    plotCommands = prefix;
     goList<goSinglePlot>::Element *el = myPrivate->plots.getFrontElement();
     goList<goFloat>::Element *extentRowEl = myPrivate->extentRow.getFrontElement();
     goList<goFloat>::Element *extentColEl = myPrivate->extentCol.getFrontElement();
@@ -251,31 +257,45 @@ bool goMultiPlotter::plot ()
         extentColEl = extentColEl->next;
     }
 
-    goString postfix = "unset multiplot\n";
-    if (myPrivate->pauseFlag)
-    {
-        postfix += "pause -1\n";
-    }
-    plotCommands += postfix;
-    bool ok = goPlot::callGnuplot (plotCommands, 
-                                myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
-                                myPrivate->waitFlag, 
-                                &myPrivate->cmdFilename,
-                                myPrivate->inputFD,
-                                myPrivate->outputFD);
-    //= If the process was paused, we can delete the files.
-    if (myPrivate->pauseFlag && myPrivate->waitFlag)
-    {
-        el = myPrivate->plots.getFrontElement();
-        while (el)
-        {
-            el->elem.removeFiles();
-            el = el->next;
-        }
-        goFileIO::remove (myPrivate->cmdFilename);
-    }
+    return true;
+}
 
-    return ok;
+/** 
+ * @brief Plot all plots.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goMultiPlotter::plot (goGnuplot* gp)
+{
+    goString plotCommands;
+    if (!this->makePlotCommands (plotCommands))
+        return false;
+
+    if (gp)
+    {
+        return gp->call (plotCommands);
+    }
+    else
+    {
+        goString postfix = "unset multiplot\n";
+        if (myPrivate->pauseFlag)
+        {
+            postfix += "pause -1\n";
+        }
+        plotCommands += postfix;
+        bool ok = goPlot::callGnuplot (plotCommands, 
+                myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
+                myPrivate->waitFlag, 
+                &myPrivate->cmdFilename,
+                myPrivate->inputFD,
+                myPrivate->outputFD);
+        //= If the process was paused, we can delete the files.
+        if (myPrivate->pauseFlag && myPrivate->waitFlag)
+        {
+            this->removeFiles ();
+        }
+        return ok;
+    }
 }
 
 /** 
@@ -322,6 +342,8 @@ bool goMultiPlotter::plotEPS (const char* filename)
  * The plotter (gnuplot) is called through a shell and the shell output is
  * stored in <filename>.
  *
+ * All temporary files created by the plot are removed after plotting.
+ *
  * @param filename Filename to store the shell output in.
  * @param type     Terminal type (from gnuplot, e.g. "postscript color").
  * 
@@ -340,6 +362,7 @@ bool goMultiPlotter::plotFile (const goString& filename,
     bool ok = this->plot();
     myPrivate->prefixCommands = backup1;
     myPrivate->shellPostfix = backup2;
+    this->removeFiles();
     return ok;
 }
 bool goMultiPlotter::plotFile (const char* filename, 
@@ -361,6 +384,20 @@ void goMultiPlotter::clear ()
     myPrivate->plots.erase ();
     myPrivate->extentCol.erase ();
     myPrivate->extentRow.erase ();
+}
+
+/** 
+ * @brief Remove all data and command files.
+ */
+void goMultiPlotter::removeFiles ()
+{
+    goList<goSinglePlot>::Element *el = myPrivate->plots.getFrontElement();
+    while (el)
+    {
+        el->elem.removeFiles();
+        el = el->next;
+    }
+    goFileIO::remove (myPrivate->cmdFilename);
 }
 
 //#ifndef GOLIST_HPP

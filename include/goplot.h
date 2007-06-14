@@ -15,6 +15,9 @@
 #ifndef GOVECTOR_H
 # include <govector.h>
 #endif
+#ifndef GOGNUPLOT_H
+# include <gognuplot.h>
+#endif
 
 class goPlotterPrivate;
 
@@ -178,7 +181,9 @@ class goMultiPlotter : public goObjectBase
        
         void setPrefix (const goString&);
 
-        virtual bool plot           ();
+        bool makePlotCommands (goString& plotCommandsRet);
+
+        virtual bool plot           (goGnuplot *gp = 0);
         virtual bool plotPostscript (const goString& filename);
         virtual bool plotEPS        (const goString& filename);
         virtual bool plotFile       (const goString& filename, const goString& type);
@@ -187,6 +192,7 @@ class goMultiPlotter : public goObjectBase
         bool plotFile       (const char* filename, const char* type);
 
         void clear ();
+        void removeFiles ();
 
     private:
         goMultiPlotterPrivate* myPrivate;
