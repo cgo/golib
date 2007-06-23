@@ -1,16 +1,164 @@
 #include <goplot.h>
 #include <gofileio.h>
+#include <goautoptr.h>
+
+class goPlotElement
+{
+    public:
+        goPlotElement (const char* command = "plot", const char* fn = "\"-\"" , const char* options = "with lines")
+            : myPlotOptions (options),
+              myPlotCommand (command),
+              myFilename (fn)
+        {
+        };
+        virtual ~goPlotElement () {};
+
+        void setPlotCommand (const char* cmd) { myPlotCommand = cmd; };
+        void setPlotOptions (const char* cmd) { myPlotOptions = cmd; };
+        void setPlotCommand (const goString& cmd) { myPlotCommand = cmd; };
+        void setPlotOptions (const goString& cmd) { myPlotOptions = cmd; };
+        void setFilename    (const char* fn) { myFilename = fn; };
+        void setFilename    (const goString& fn) { myFilename = fn; };
+
+        const goString& plotCommand () const { return myPlotCommand; };
+        const goString& plotOptions () const { return myPlotOptions; };
+        const goString& filename    () const { return myFilename; };
+
+        virtual void data (goString& ret) const {};
+
+        goString myPlotOptions;
+        goString myPlotCommand;
+        goString myFilename;
+};
+
+template <class T>
+class goPlotElementMatrixImage : public goPlotElement
+{
+    public:
+        goPlotElementMatrixImage (const goMatrix<T>& M) : goPlotElement ("plot", "\"-\"", "with image"), myMatrix (M) { };
+        virtual ~goPlotElementMatrixImage () {};
+
+        virtual void data (goString& ret) const
+        {
+            for (goSize_t i = 0; i < myMatrix.getRows(); ++i)
+            {
+                for (goSize_t j = 0; j < myMatrix.getColumns(); ++j)
+                {
+                    ret += (int)j; ret += " "; ret += (int)i; ret += " "; ret += (float)myMatrix(i,j); ret += "\n";
+                }
+            }
+        };
+
+        goMatrix<T> myMatrix;
+};
+
+template <class T>
+class goPlotElementMatrixSurface : public goPlotElement
+{
+    public:
+        goPlotElementMatrixSurface (const goMatrix<T>& M) : goPlotElement ("splot" , "\"-\"", "with lines"), myMatrix (M) { };
+        virtual ~goPlotElementMatrixSurface () {};
+
+        virtual void data (goString& ret) const
+        {
+            for (goSize_t i = 0; i < myMatrix.getRows(); ++i)
+            {
+                for (goSize_t j = 0; j < myMatrix.getColumns(); ++j)
+                {
+                    ret += (int)j; ret += " "; ret += (int)i; ret += " "; ret += (float)myMatrix(i,j); ret += "\n";
+                }
+                ret += "\n";
+            }
+        };
+
+        goMatrix<T> myMatrix;
+};
+
+template <class T>
+class goPlotElementMatrixCurve : public goPlotElement
+{
+    public:
+        goPlotElementMatrixCurve (const goMatrix<T>& M) : goPlotElement ("plot", "\"-\"", "with lines"), myMatrix (M) { };
+        virtual ~goPlotElementMatrixCurve () {};
+
+        virtual void data (goString& ret) const
+        {
+            for (goSize_t i = 0; i < myMatrix.getRows(); ++i)
+            {
+                for (goSize_t j = 0; j < myMatrix.getColumns(); ++j)
+                {
+                    ret += (float)myMatrix(i,j); ret += " ";
+                }
+                ret += "\n";
+            }
+        };
+
+        goMatrix<T> myMatrix;
+};
+
+template <class T>
+class goPlotElementVectorCurve : public goPlotElement
+{
+    public:
+        goPlotElementVectorCurve (const goVector<T>* x, const goVector<T>* y, const goVector<T>* z, int linelength) 
+            : goPlotElement ("plot", "\"-\"", "with lines"), myX(0), myY(0), myZ(0), myLinelength(linelength)
+        {
+            if (x)
+                myX = *x;
+            if (y)
+                myY = *y;
+            if (z)
+                myZ = *z;
+        };
+        virtual ~goPlotElementVectorCurve () {};
+
+        virtual void data (goString& ret) const
+        {
+            goSize_t N = myX.getSize();
+            bool haveY = (myY.getSize() == N);
+            bool haveZ = (myZ.getSize() == N);
+            int ll = 0;
+            for (goSize_t i = 0; i < N; ++i)
+            {
+                if (haveZ && haveY)
+                {
+                    ret += (float)myX[i]; ret += " "; ret += (float)myY[i]; ret += " "; ret += (float)myZ[i]; ret += "\n";
+                    ++ll;
+                    if (ll >= myLinelength)
+                    {
+                        ret += "\n";
+                    }
+                }
+                if (haveY)
+                {
+                    ret += (float)myX[i]; ret += " "; ret += (float)myY[i]; ret += "\n";
+                }
+                else
+                {
+                    ret += (int)i; ret += " "; ret += (float)myX[i]; ret += "\n";
+                }
+            }
+        };
+
+        goVector<T> myX, myY, myZ;
+        int myLinelength;
+};
+
 
 class goSinglePlotPrivate
 {
     public:
         goSinglePlotPrivate() 
-            : plotX(), 
+            : 
+              plotElements (),
+              plotX(), 
               plotY(), 
               plotZ(),
               plotMatrixf(),
               plotMatrixd(),
               plotImages(),
+              plotImageMatrixf(),
+              plotImageMatrixd(),
               lineLength(0),
               titles(), 
               plotCommands(), 
@@ -23,12 +171,16 @@ class goSinglePlotPrivate
         {};
         ~goSinglePlotPrivate() {};
 
+        goList<goAutoPtr<goPlotElement> > plotElements;  //= This should deprecate the lists of different objects below.
+
         goList<goVectord>      plotX;
         goList<goVectord>      plotY;
         goList<goVectord>      plotZ;
         goList<goMatrixf>      plotMatrixf;
         goList<goMatrixd>      plotMatrixd;
         goList<const goSignal3DBase<void>*> plotImages;
+        goList<goMatrixf>      plotImageMatrixf;  // For 2D image plotting -- the others are for 3D.
+        goList<goMatrixd>      plotImageMatrixd;  // dito.
         goIndex_t              lineLength;      // Meaning only in 3D plots -- length of one grid line in x direction.
         goList<goString>       titles;          // These are titles for each of the individual curves
         goList<goPlotterLabel> labels;
@@ -154,14 +306,31 @@ bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
     myPrivate->lineLength = lineLength;
 
     myPrivate->titles.append(goString(title));
+    goString temp = "";
     if (!plotOptions)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        temp = "w l";
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        temp = plotOptions;
     }
+    temp += " title \""; temp += title; temp += "\"";
+    myPrivate->plotCommands.append(temp);
+
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementVectorCurve<goDouble>(&x,&y,&values,lineLength));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo.toCharPtr());
+    }
+    myPrivate->plotElements.append (aptr);
+
     return true;
 }
 
@@ -201,14 +370,32 @@ bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plo
     {
         myPrivate->plotMatrixf.append (m);
         myPrivate->titles.append(goString(title));
+        goString temp = "";
         if (!plotOptions)
         {
-            myPrivate->plotCommands.append(goString("w l"));
+            temp = "w l";
         }
         else
         {
-            myPrivate->plotCommands.append(goString(plotOptions));
+            temp = plotOptions;
         }
+        temp += " title \""; temp += title; temp += "\"";
+        myPrivate->plotCommands.append(temp);
+
+
+        //= New
+        goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixSurface<goFloat>(m));
+        if (plotOptions)
+            aptr->setPlotOptions (plotOptions);
+        if (title)
+        {
+            goString newpo = aptr->plotOptions();
+            newpo += " title \"";
+            newpo += title;
+            newpo += "\"";
+            aptr->setPlotOptions (newpo);
+        }
+        myPrivate->plotElements.append (aptr);
     }
     else
     {
@@ -241,14 +428,40 @@ bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plo
     {
         myPrivate->plotMatrixd.append (m);
         myPrivate->titles.append(goString(title));
+        goString temp = "";
         if (!plotOptions)
         {
-            myPrivate->plotCommands.append(goString("w l"));
+            temp = "w l";
         }
         else
         {
-            myPrivate->plotCommands.append(goString(plotOptions));
+            temp = plotOptions;
         }
+        temp += " title \""; temp += title; temp += "\"";
+        myPrivate->plotCommands.append(temp);
+
+
+        //= New
+        goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixSurface<goDouble>(m));
+        if (plotOptions)
+            aptr->setPlotOptions (plotOptions);
+        if (title)
+        {
+            goString newpo = aptr->plotOptions();
+            newpo += " title \"";
+            newpo += title;
+            newpo += "\"";
+            aptr->setPlotOptions (newpo);
+        }
+        myPrivate->plotElements.append (aptr);
+//        if (!plotOptions)
+//        {
+//            myPrivate->plotCommands.append(goString("w l"));
+//        }
+//        else
+//        {
+//            myPrivate->plotCommands.append(goString(plotOptions));
+//        }
     }
     else
     {
@@ -259,14 +472,26 @@ bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plo
             m.ref (i, 0, 1, m.getColumns(), ref);
             myPrivate->plotMatrixd.append (ref);
             myPrivate->titles.append(goString(title));
+            goString temp = "";
             if (!plotOptions)
             {
-                myPrivate->plotCommands.append(goString("w l"));
+                temp = "w l";
             }
             else
             {
-                myPrivate->plotCommands.append(goString(plotOptions));
+                temp = plotOptions;
             }
+            temp += " title \""; temp += title; temp += "\"";
+            myPrivate->plotCommands.append(temp);
+
+//            if (!plotOptions)
+//            {
+//                myPrivate->plotCommands.append(goString("w l"));
+//            }
+//            else
+//            {
+//                myPrivate->plotCommands.append(goString(plotOptions));
+//            }
         }
     }
 
@@ -294,16 +519,120 @@ bool goSinglePlot::add3D (const goSignal3DBase<void>* image, const char* title, 
     }
 
     myPrivate->plotImages.append (image);
-
-    myPrivate->titles.append(goString(title));
+    goString temp = "";
     if (!plotOptions)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        temp = "w l";
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        temp = plotOptions;
     }
+    temp += " title \""; temp += title; temp += "\"";
+    myPrivate->plotCommands.append(temp);
+
+    goLog::warning ("goSinglePlot::add3D(goSignal3DBase): no new version for signals yet! Will not be added to plot list using new plot objects.");
+//    myPrivate->titles.append(goString(title));
+//    if (!plotOptions)
+//    {
+//        myPrivate->plotCommands.append(goString("w l"));
+//    }
+//    else
+//    {
+//        myPrivate->plotCommands.append(goString(plotOptions));
+//    }
+    return true;
+}
+
+bool goSinglePlot::addImage (const goMatrixf& m, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
+    }
+
+    myPrivate->plotImageMatrixf.append (m);
+    myPrivate->titles.append(goString(""));
+    goString temp = "";
+    if (!plotOptions)
+    {
+        temp = "binary w image";
+    }
+    else
+    {
+        temp = plotOptions;
+    }
+    if (title != "")
+    {
+        temp += " title \""; temp += title; temp += "\"";
+    }
+    else
+    {
+        temp += " notitle";
+    }
+    myPrivate->plotCommands.append(temp);
+
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixImage<goFloat>(m));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addImage (const goMatrixd& m, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
+    }
+
+    myPrivate->plotImageMatrixd.append (m);
+    myPrivate->titles.append(goString(""));
+    goString temp = "";
+    if (!plotOptions)
+    {
+        temp = "binary w image";
+    }
+    else
+    {
+        temp = plotOptions;
+    }
+    if (title != "")
+    {
+        temp += " title \""; temp += title; temp += "\"";
+    }
+    else
+    {
+        temp += " notitle";
+    }
+    myPrivate->plotCommands.append(temp);
+
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixImage<goDouble>(m));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
     return true;
 }
 
@@ -335,14 +664,39 @@ bool goSinglePlot::addCurve (const goVectord& x, const goVectord& y, const char*
     myPrivate->plotX.append(x);
     myPrivate->plotY.append(y);
     myPrivate->titles.append(goString(title));
+    goString temp = "";
     if (!plotOptions)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        temp = "w l";
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        temp = plotOptions;
     }
+    if (title != "")
+    {
+        temp += " title \""; temp += title; temp += "\"";
+    }
+    else
+    {
+        temp += " notitle";
+    }
+    myPrivate->plotCommands.append(temp);
+
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementVectorCurve<goDouble>(&x,&y,0,1));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
     return true;
 }
 
@@ -383,14 +737,39 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
     myPrivate->plotX.append(tempX);
     myPrivate->plotY.append(tempY);
     myPrivate->titles.append(goString(title));
+    goString temp = "";
     if (!plotOptions)
     {
-        myPrivate->plotCommands.append(goString("w l"));
+        temp = "w l";
     }
     else
     {
-        myPrivate->plotCommands.append(goString(plotOptions));
+        temp = plotOptions;
     }
+    if (title != "")
+    {
+        temp += " title \""; temp += title; temp += "\"";
+    }
+    else
+    {
+        temp += " notitle";
+    }
+    myPrivate->plotCommands.append(temp);
+
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementVectorCurve<goFloat>(&x,&y,0,1));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
     return true;
 }
 
@@ -469,6 +848,82 @@ void goSinglePlot::setTitle (const char* s)
     this->setTitle (goString(s));
 }
 
+bool goSinglePlot::writeGnuplotDataFiles () const
+{
+    switch (myPrivate->plotType)
+    {
+        case goPlot::Normal:
+            {
+                myPrivate->dataFilenames.erase ();
+                if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
+                            &myPrivate->plotY,
+                            myPrivate->dataFilenames))
+                {
+                    return false;
+                }
+                if (myPrivate->plotImageMatrixf.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFilesBinary<goFloat> (&myPrivate->plotImageMatrixf,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotImageMatrixd.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFilesBinary<goDouble> (&myPrivate->plotImageMatrixd,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+            }
+            break;
+        case goPlot::Surface:
+            {
+                myPrivate->dataFilenames.erase ();
+                if (myPrivate->plotX.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
+                                &myPrivate->plotY,
+                                &myPrivate->plotZ,
+                                myPrivate->lineLength,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotMatrixf.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixf,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotMatrixd.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixd,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+                if (myPrivate->plotImages.getSize() > 0)
+                {
+                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotImages,
+                                myPrivate->dataFilenames))
+                    {
+                        return false;
+                    }
+                }
+            }
+            break;
+        default: goLog::error ("goSinglePlot::writeGnuplotDataFiles(): Unknown plot type!"); return false;
+    }
+    return true;
+}
+
 /** 
  * @brief Create all necessary temporary files and create gnuplot command string.
  * 
@@ -476,7 +931,7 @@ void goSinglePlot::setTitle (const char* s)
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::makePlot (goString& plotCommandsRet) const
+bool goSinglePlot::makePlot (goString& plotCommandsRet, bool useDataFiles) const
 {
     goString prefix = myPrivate->prefixCommands;
     if (myPrivate->title != "")
@@ -527,73 +982,57 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet) const
         }
     }
 
-    switch (myPrivate->plotType)
+    if (useDataFiles)
     {
-        case goPlot::Normal:
-            {
-                myPrivate->dataFilenames.erase ();
-                if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
-                            &myPrivate->plotY,
-                            myPrivate->dataFilenames))
-                {
-                    return false;
-                }
-            }
-            break;
-        case goPlot::Surface:
-            {
-                myPrivate->dataFilenames.erase ();
-                if (myPrivate->plotX.getSize() > 0)
-                {
-                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotX,
-                                &myPrivate->plotY,
-                                &myPrivate->plotZ,
-                                myPrivate->lineLength,
-                                myPrivate->dataFilenames))
-                    {
-                        return false;
-                    }
-                }
-                if (myPrivate->plotMatrixf.getSize() > 0)
-                {
-                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixf,
-                                myPrivate->dataFilenames))
-                    {
-                        return false;
-                    }
-                }
-                if (myPrivate->plotMatrixd.getSize() > 0)
-                {
-                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotMatrixd,
-                                myPrivate->dataFilenames))
-                    {
-                        return false;
-                    }
-                }
-                if (myPrivate->plotImages.getSize() > 0)
-                {
-                    if (!goPlot::writeGnuplotDataFiles (&myPrivate->plotImages,
-                                myPrivate->dataFilenames))
-                    {
-                        return false;
-                    }
-                }
-            }
-            break;
-        default: goLog::error ("goSinglePlot::makePlot(): Unknown plot type!"); return false;
+        this->writeGnuplotDataFiles ();
+        if (!goPlot::addGnuplotCommands (plotCommandsRet,
+                                         &myPrivate->dataFilenames,
+                                         0, // &myPrivate->titles,
+                                         &myPrivate->plotCommands,
+                                         prefix.toCharPtr(),
+                                         postfix.toCharPtr(),
+                                         myPrivate->plotType))
+        {
+            return false;
+        }
     }
-
-    if (!goPlot::addGnuplotCommands (plotCommandsRet,
-                                     &myPrivate->dataFilenames,
-                                     &myPrivate->titles,
-                                     &myPrivate->plotCommands,
-                                     prefix.toCharPtr(),
-                                     postfix.toCharPtr(),
-                                     myPrivate->plotType))
+    else
     {
-        return false;
+        plotCommandsRet += prefix;
+        this->addGnuplotCommands (plotCommandsRet);
+        plotCommandsRet += postfix;
     }
     return true;
+}
+
+bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
+{
+    goList<goAutoPtr<goPlotElement> >::Element* el = myPrivate->plotElements.getFrontElement();
+    switch (myPrivate->plotType)
+    {
+        case goPlot::Normal: plotCommandsRet += "plot "; break;
+        case goPlot::Surface: plotCommandsRet += "splot "; break;
+        default: goLog::warning ("goSinglePlot::addGnuplotCommands(): Unknown plot type."); return false; break;
+    }
+    while (el)
+    {
+        plotCommandsRet += el->elem->filename();
+        plotCommandsRet += " "; 
+        plotCommandsRet += el->elem->plotOptions();
+        if (el->next)
+            plotCommandsRet += ",";
+        else
+            plotCommandsRet += "\n";
+        el = el->next;
+    }
+    el = myPrivate->plotElements.getFrontElement();
+    while (el)
+    {
+        el->elem->data(plotCommandsRet);
+        plotCommandsRet += "e\n";
+        el = el->next;
+    }
+    return true; 
 }
 
 /** 
@@ -619,11 +1058,14 @@ void goSinglePlot::removeFiles () const
  */
 void goSinglePlot::clear ()
 {
+    myPrivate->plotElements.erase ();
     myPrivate->plotX.erase ();
     myPrivate->plotY.erase ();
     myPrivate->plotZ.erase ();
     myPrivate->plotMatrixf.erase ();
     myPrivate->plotMatrixd.erase ();
+    myPrivate->plotImageMatrixf.erase ();
+    myPrivate->plotImageMatrixd.erase ();
     myPrivate->plotImages.erase ();
     myPrivate->titles.erase ();
     myPrivate->labels.erase ();
