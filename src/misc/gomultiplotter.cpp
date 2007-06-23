@@ -251,7 +251,7 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
         plotCommands += ",";
         plotCommands += (float)(extentRowEl->elem * -stepY);
         plotCommands += "\n";
-        el->elem.makePlot (plotCommands);
+        el->elem.makePlot (plotCommands, false);
         el = el->next;
         extentRowEl = extentRowEl->next;
         extentColEl = extentColEl->next;
@@ -263,6 +263,9 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
 /** 
  * @brief Plot all plots.
  * 
+ * @param gp goGnuplot object pointer. If not null, all commands are sent to this object. 
+ * A command files will then not be written.
+ *
  * @return True if successful, false otherwise.
  */
 bool goMultiPlotter::plot (goGnuplot* gp)
@@ -273,6 +276,8 @@ bool goMultiPlotter::plot (goGnuplot* gp)
 
     if (gp)
     {
+        goString postfix = "unset multiplot\n";
+        plotCommands += postfix;
         return gp->call (plotCommands);
     }
     else
