@@ -530,7 +530,7 @@ bool goPlot::addGnuplotCommands
     {
         return false;
     }
-    if (dataFileNames->getSize() == 0)
+    if (dataFileNames && dataFileNames->getSize() == 0)
     {
         return true;
     }
@@ -547,21 +547,25 @@ bool goPlot::addGnuplotCommands
             return false;
         }
     }
-    if (plotCommands)
+    if (plotCommands && dataFileNames)
     {
         if (dataFileNames->getSize() != plotCommands->getSize())
         {
             goString s = "goPlot::addGnuplotCommands(): (list version) dataFileNames and plotCommands are of different sizes (";
             s += (int)dataFileNames->getSize();
             s += " != ";
-            s += (int)titles->getSize();
+            s += (int)plotCommands->getSize();
             s += ")";
             goLog::warning (s.toCharPtr());
             return false;
         }
     }
 
-    goList<goString>::ConstElement* dataFileNameEl = dataFileNames->getFrontElement();
+    goList<goString>::ConstElement* dataFileNameEl = 0;
+    if (dataFileNames)
+    {
+        dataFileNameEl = dataFileNames->getFrontElement();
+    }
     goList<goString>::ConstElement* titlesEl       = 0;
     if (titles)
     {
@@ -588,11 +592,7 @@ bool goPlot::addGnuplotCommands
         gnuplotCommands += "\"";
         gnuplotCommands += dataFileNameEl->elem.toCharPtr();
         gnuplotCommands += "\"";
-        if (!titlesEl)
-        {
-            gnuplotCommands += "notitle ";
-        }
-        else
+        if (titlesEl)
         {
             gnuplotCommands += " title \"";
             gnuplotCommands += titlesEl->elem.toCharPtr();
@@ -850,6 +850,25 @@ static bool writeGnuplotDataFilesSignal3D (
     return true;
 }
 
+template <class T>
+bool goPlot::writeGnuplotDataFilesBinary (const goList<goMatrix<T> >* images,
+                                          goList<goString>&        dataFileNameRet)
+{
+    goString filename;
+    typename goList<goMatrix<T> >::ConstElement *el = images->getFrontElement();
+    while (el)
+    {
+        FILE* f = goFileIO::createTempFile (filename);
+        if (!f)
+            return false;
+        goFileIO::writeBinaryMatrix (el->elem, f);
+        dataFileNameRet.append (filename);
+        fclose (f);
+        el = el->next;
+    }
+    return true;    
+}
+
 bool goPlot::writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* images,
                                     goList<goString>&     dataFileNameRet)
 {
@@ -1025,6 +1044,10 @@ template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<TYPE>* arrayList
 template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<goMatrix<TYPE> >*    matrix, \
                                     goList<goString>&     dataFileNameRet);
 
+#define GOPLOT_WRITEFILES_BINARY_INSTANTIATE(TYPE) \
+template bool goPlot::writeGnuplotDataFilesBinary<TYPE> (const goList<goMatrix<TYPE> >*    matrix, \
+                                    goList<goString>&     dataFileNameRet);
+
 GOPLOT_INSTANTIATE(goArray<goFloat>);
 GOPLOT_INSTANTIATE(goArray<goDouble>);
 GOPLOT_INSTANTIATE(goFixedArray<goFloat>);
@@ -1051,6 +1074,8 @@ GOPLOT_WRITEFILES_INSTANTIATE2(goVectorf);
 GOPLOT_WRITEFILES_INSTANTIATE2(goVectord);
 GOPLOT_WRITEFILES_INSTANTIATE3(goFloat);
 GOPLOT_WRITEFILES_INSTANTIATE3(goDouble);
+GOPLOT_WRITEFILES_BINARY_INSTANTIATE(goFloat);
+GOPLOT_WRITEFILES_BINARY_INSTANTIATE(goDouble);
 
 template 
 void goPlot::plot<goFloat> (
