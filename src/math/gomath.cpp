@@ -160,6 +160,103 @@ bool goMath::translate (goMatrix<T>& confMatrix, const goVector<T>& trans)
     return true;
 }
 
+template <class T>
+void goMath::sin (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::sin(a[i]);
+    }
+}
+
+template <class T>
+void goMath::cos (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::cos(a[i]);
+    }
+}
+
+template <class T>
+void goMath::tan (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::tan(a[i]);
+    }
+}
+
+template <class T>
+void goMath::asin(goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::asin(a[i]);
+    }
+}
+
+template <class T>
+void goMath::acos (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::acos(a[i]);
+    }
+}
+
+template <class T>
+void goMath::atan (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::atan(a[i]);
+    }
+}
+
+template <class T>
+void goMath::exp (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::exp(a[i]);
+    }
+}
+
+template <class T>
+void goMath::log (goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        a[i] = ::log(a[i]);
+    }
+}
+
+template void goMath::sin<goFloat> (goFixedArray<goFloat>&);
+template void goMath::cos<goFloat> (goFixedArray<goFloat>&);
+template void goMath::tan<goFloat> (goFixedArray<goFloat>&);
+template void goMath::asin<goFloat> (goFixedArray<goFloat>&);
+template void goMath::acos<goFloat> (goFixedArray<goFloat>&);
+template void goMath::atan<goFloat> (goFixedArray<goFloat>&);
+template void goMath::exp<goFloat> (goFixedArray<goFloat>&);
+template void goMath::log<goFloat> (goFixedArray<goFloat>&);
+template void goMath::sin<goDouble> (goFixedArray<goDouble>&);
+template void goMath::cos<goDouble> (goFixedArray<goDouble>&);
+template void goMath::tan<goDouble> (goFixedArray<goDouble>&);
+template void goMath::asin<goDouble> (goFixedArray<goDouble>&);
+template void goMath::acos<goDouble> (goFixedArray<goDouble>&);
+template void goMath::atan<goDouble> (goFixedArray<goDouble>&);
+template void goMath::exp<goDouble> (goFixedArray<goDouble>&);
+template void goMath::log<goDouble> (goFixedArray<goDouble>&);
+
 template bool goMath::centerOfMass<goFloat> (const goList<goVector<goFloat> >&, goVector<goFloat>&);
 template bool goMath::centerOfMass<goDouble> (const goList<goVector<goDouble> >&, goVector<goDouble>&);
 template bool goMath::centerOfMass<goFloat> (const goMatrix<goFloat>&, goVector<goFloat>&);

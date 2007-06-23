@@ -39,7 +39,7 @@ namespace goMath
    linear equations.  This will fail if isNonsingular() returns false.
    */
 template <class Real>
-class goLU
+class LU
 {
 
 
@@ -47,13 +47,13 @@ class goLU
    /* Array for internal storage of decomposition.  */
    goMatrix<Real>  LU_;
    int m, n, pivsign; 
-   goArray<int> piv;
+   goVector<int> piv;
 
 
    void permute_copy(const goMatrix<Real> &A, 
-   			const goArray<int> &piv, int j0, int j1, goMatrix<Real>& retValue)
+   			const goVector<int> &piv, int j0, int j1, goMatrix<Real>& retValue)
 	{
-		int piv_length = piv.dim();
+		int piv_length = piv.getSize();
 
         retValue.resize (piv_length, j1-j0+1);
 		// goMatrix<Real> X(piv_length, j1-j0+1);
@@ -64,15 +64,16 @@ class goLU
 		// return X;
 	}
 
-   void permute_copy(const goArray<Real> &A, 
-   		const goArray<int> &piv, goArray<Real>& retValue)
+   void permute_copy(const goVector<Real> &A, 
+   		const goVector<int> &piv, goVector<Real>& retValue)
 	{
 		int piv_length = piv.getSize();
-		if (piv_length != A.getSize())
+		if (piv_length != (int)A.getSize())
 			 retValue.resize(0);
 
-        retValue.resize (piv_length);
-		// goArray<Real> x(piv_length);
+        if ((int)retValue.getSize() != piv_length)
+            retValue.resize (piv_length);
+		// goVector<Real> x(piv_length);
 
          for (int i = 0; i < piv_length; i++) 
                retValue[i] = A[piv[i]];
@@ -90,7 +91,7 @@ class goLU
 
     //goLU (const goMatrix<Real> &A) : LU_(A.copy()), m(A.dim1()), n(A.dim2()), 
 	//	piv(A.dim1())
-    goLU (const goMatrix<Real> &A) : LU_(A), m(A.dim1()), n(A.dim2()), 
+    LU (const goMatrix<Real> &A) : LU_(A), m(A.dim1()), n(A.dim2()), 
 		piv(A.dim1())
 	
 	{
@@ -105,7 +106,7 @@ class goLU
          piv[i] = i;
       }
       pivsign = 1;
-      goArray<Real> LUcolj(m);
+      goVector<Real> LUcolj(m);
 
       // Outer loop.
 
@@ -218,7 +219,7 @@ class goLU
    @return     piv
    */
 
-   goArray<int> getPivot () {
+   goVector<int> getPivot () {
       return piv;
    }
 
@@ -287,28 +288,27 @@ class goLU
    /** Solve A*x = b, where x and b are vectors of length equal	
    		to the number of rows in A.
 
-   @param  b   a vector (goArray> of length equal to the first dimension
+   @param  b   a vector (goVector> of length equal to the first dimension
    						of A.
-   @return x a vector (goArray> so that L*U*x = b(piv), if B is nonconformant,
+   @return x a vector (goVector> so that L*U*x = b(piv), if B is nonconformant,
    					returns 0x0 (null) array.
    @todo  Add solve() method that takes the return value reference 
           as the second parameter.
    */
 
-   bool solve (const goArray<Real> &b, goArray<Real>& retValue) 
+   bool solve (const goVector<Real> &b, goVector<Real>& retValue) 
    {
 
 	  /* Dimensions: A is mxn, X is nxk, B is mxk */
       
-      if (b.getSize() != m) {
+      if (b.getSize() != (goSize_t)m) {
 	  	return false;
       }
       if (!isNonsingular()) {
         return false;
       }
 
-
-      permute_copy(b, piv, retValue);
+      permute_copy(b, this->piv, retValue);
 
       // Solve L*Y = B(piv)
       for (int k = 0; k < n; k++) {

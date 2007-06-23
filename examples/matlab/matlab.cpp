@@ -4,8 +4,18 @@
 #include <gomatlab.h>
 #include <stdlib.h>
 
+#include <iostream>
 int main (int argc, char* argv[])
 {
+    Engine* engine = engOpen ("/usr/bin/xterm\0");
+    if (!engine)
+        printf ("First attempt failed.\n");
+    else
+        printf ("First attempt succeeded.\n");
+    
+    char i;
+    std::cin >> i;
+
     goMatlab matlab;
 
     matlab.doubleToVariable (1.0, "my_variable");

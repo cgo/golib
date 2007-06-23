@@ -291,6 +291,23 @@ T fastVariance (const vectorT& v, goSize_t sz, T mean)
     return static_cast<T>(accum / static_cast<goDouble>(sz - 1));
 }
 
+template <class T>
+void sin (goFixedArray<T>& a);
+template <class T>
+void cos (goFixedArray<T>& a);
+template <class T>
+void tan (goFixedArray<T>& a);
+template <class T>
+void asin(goFixedArray<T>& a);
+template <class T>
+void acos (goFixedArray<T>& a);
+template <class T>
+void atan (goFixedArray<T>& a);
+template <class T>
+void exp (goFixedArray<T>& a);
+template <class T>
+void log (goFixedArray<T>& a);
+
 template <class vectorT, class T>
 void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
 {

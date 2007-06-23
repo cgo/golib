@@ -58,7 +58,7 @@ namespace goMath
         //goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
         //assert (false);
         //return (output_type)1;
-        return myNormFactor * exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
+        return myNormFactor * ::exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
     }
     
     //===================================================================
@@ -107,7 +107,7 @@ namespace goMath
 //        }
         input_vector temp = input - myMean;
         scalar_type f = -0.5 * (temp * (myCovarianceInv * temp));
-        return myNormFactor * exp(f);
+        return myNormFactor * ::exp(f);
     }
     
     /** 

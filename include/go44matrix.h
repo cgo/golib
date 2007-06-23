@@ -317,7 +317,7 @@ go44Matrix<T>::invert ()
     goMatrix<T> B (4,4);
     B.setIdentity ();
     goMatrix<T> X (4,4);
-    goMath::goLU<T> lu (M);
+    goMath::LU<T> lu (M);
     if (!lu.solve (B,X))
     {
         return false;

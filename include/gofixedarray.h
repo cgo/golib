@@ -98,6 +98,18 @@ template <class T> class goFixedArray
             this->mySize     = size;
         };
 
+        void ref (goFixedArray<T>& target, goSize_t startIndex = 0, goSize_t size = 0)
+        {
+            if (size == 0)
+            {
+                target.setData (this->getPtr() + startIndex, this->getSize(), this->getStride());
+            }
+            else
+            {
+                target.setData (this->getPtr() + startIndex, size, this->getStride());
+            }
+        };
+
         T&       operator() (goIndex_t i)
         {
             assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
