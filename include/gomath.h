@@ -135,6 +135,81 @@ Scalar max(Scalar a, Scalar b)
 }
 /*! @} */
 
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+T max (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return T(0);
+    T ret = a[0];
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        ret = goMath::max<T>(ret,a[i]);
+    }
+    return ret;
+}
+/*! @} */
+
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+T min (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return T(0);
+    T ret = a[0];
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        ret = goMath::min<T>(ret,a[i]);
+    }
+    return ret;
+}
+/*! @} */
+
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+T maxabs (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return T(0);
+    T ret = fabs(a[0]);
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        ret = goMath::max<T>(ret,fabs(a[i]));
+    }
+    return ret;
+}
+/*! @} */
+
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+T minabs (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return T(0);
+    T ret = fabs(a[0]);
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        ret = goMath::min<T>(ret,fabs(a[i]));
+    }
+    return ret;
+}
+/*! @} */
 
 bool gradient2D          (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool laplacian2D         (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);

@@ -79,6 +79,9 @@ class goSinglePlot : public goObjectBase
         bool add3D (const goMatrixd& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
         bool add3D (const goSignal3DBase<void>* image, const char* title, const char* plotOptions = 0);
 
+        bool addImage (const goMatrixf& m, const char* title, const char* plotOptions = 0);
+        bool addImage (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+
         template <class pointT>
             bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
             {
@@ -135,7 +138,9 @@ class goSinglePlot : public goObjectBase
         bool addLabel    (const char* l, goDouble x, goDouble y, const char* colourspec = "");
         bool addLabel    (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec = "");
         bool addLabel    (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec = "");
-        bool makePlot    (goString& plotCommandsRet) const;
+        bool writeGnuplotDataFiles () const;
+        bool makePlot    (goString& plotCommandsRet, bool useDataFiles = false) const;
+        bool addGnuplotCommands (goString& commandsRet) const;
         void removeFiles () const;
         void clear       ();
 
@@ -395,6 +400,10 @@ namespace goPlot
     //= For 3D-plots
     template <class T>
         bool writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrix,
+                                    goList<goString>& dataFileNameRet);
+    //= For 2D-images
+    template <class T>
+        bool writeGnuplotDataFilesBinary (const goList<goMatrix<T> >*    matrix,
                                     goList<goString>& dataFileNameRet);
 
     //= For 3D-plots

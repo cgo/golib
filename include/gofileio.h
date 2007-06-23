@@ -15,6 +15,10 @@
 #endif
 #include <stdio.h>   // FILE*
 
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+
 class goObjectBase;
 
 /*!
@@ -51,6 +55,8 @@ class goFileIO {
   static bool  readImage  (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException);
   static bool  writeImage (const char* filename, const goSignal3DBase<void>* signal) throw (goFileIOException, goTypeException);
   /** @} */
+  template <class T> static bool  writeBinaryMatrix (const goMatrix<T>&, FILE* f);
+  template <class T> static bool  writeBinaryMatrix (const goMatrix<T>&, const char* filename);
   static FILE* createTempFile (goString& filenameRet);
   static bool  remove         (const goString& filename);
   static goSize_t fileSize    (const char* filename);

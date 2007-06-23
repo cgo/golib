@@ -295,7 +295,7 @@ class goMatrix
    */
   inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, goVector<T>& v)
   {
-
+    v.setData (&(*this)(row,column), length, 1);
   };
 
   inline void setRow (goSize_t row, const goVector<T>& v)
