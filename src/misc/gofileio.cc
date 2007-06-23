@@ -726,6 +726,66 @@ goFileIO::writeImage (const char*, const goSignal3DBase<void>*) throw (goFileIOE
 #endif
 
 /** 
+ * @brief Write binary matrix as described in the gnuplot manual.
+ * 
+ * The data looks like:
+ * \verbatim
+     <N+1>  <y0>   <y1>   <y2>  ...  <yN>
+      <x0> <z0,0> <z0,1> <z0,2> ... <z0,N>
+      <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
+       :      :      :      :   ...    :
+   \endverbatim
+ *
+ * @param M Matrix (goFloat or goDouble type)
+ * @param filename File name.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class T>
+bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, FILE* f) 
+{
+    goSize_t N = M.getColumns();
+    goFloat Nf = static_cast<goFloat>(N);
+    fwrite (&Nf, sizeof(goFloat), 1, f);
+    for (goSize_t i = 0; i < N; ++i)
+    {
+        goFloat y = (float)i;
+        fwrite (&y, sizeof(goFloat), 1, f);
+    }
+    for (goSize_t i = 0; i < M.getRows(); ++i)
+    {
+        goFloat x = (float)i;
+        fwrite (&x, sizeof(goFloat), 1, f);
+        for (goSize_t j = 0; j < N; ++j)
+        {
+            goFloat z = (float)M(i,j);
+            fwrite (&z, sizeof(goFloat), 1, f);
+        }
+    }
+    return true;
+}
+
+template <class T>
+bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, const char* filename) 
+{
+    FILE* f = fopen (filename, "wb");
+    if (!f)
+    {
+        goString str("goFileIO::writeBinaryMatrix(): Could not open file ");
+        str += filename;
+        str += " for writing.";
+        goLog::warning (str);
+        return false;
+    }
+    bool ok = goFileIO::writeBinaryMatrix (M, f);
+    fclose (f);
+    return ok;
+}
+
+template bool goFileIO::writeBinaryMatrix<goFloat> (const goMatrix<goFloat>&, const char*);
+template bool goFileIO::writeBinaryMatrix<goDouble> (const goMatrix<goDouble>&, const char*);
+
+/** 
  * @brief Creates a temporary file.
  * 
  * @param filenameRet The name of the file.
