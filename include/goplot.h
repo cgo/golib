@@ -285,6 +285,9 @@ namespace goPlot
         void plot (const goVector<T>& x, const goVector<T>& y, 
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
     template <class T>
+        void plot (const goVector<T>& y, 
+                const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
+    template <class T>
         void plot (const goMatrix<T>& points,
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
     template <class T>

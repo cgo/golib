@@ -942,6 +942,20 @@ void goPlot::plot (const goVector<T>& x, const goVector<T>& y,
     plotter.plot ();
 }
 
+template <class T>
+void goPlot::plot (const goVector<T>& y, 
+                const char* title, const char* plotOptions, const char* prefix)
+{
+    goMultiPlotter plotter (1,1);
+    goSinglePlot plot;
+    plot.addCurve (y,title ? title : "", plotOptions);
+    if (prefix)
+        plot.setPrefix (prefix);
+    plotter.addPlot (plot,0,0);
+    plotter.setPauseFlag (true);
+    plotter.plot ();
+}
+
 /** 
  * @brief Convenience function for quickly plotting something.
  *
@@ -1085,6 +1099,14 @@ void goPlot::plot<goFloat> (
 template 
 void goPlot::plot<goDouble> (
         const goVector<goDouble>&, 
+        const goVector<goDouble>&, 
+        const char*, const char*, const char*);
+template 
+void goPlot::plot<goFloat> (
+        const goVector<goFloat>&, 
+        const char*, const char*, const char*);
+template 
+void goPlot::plot<goDouble> (
         const goVector<goDouble>&, 
         const char*, const char*, const char*);
 template 

@@ -173,6 +173,8 @@ class goSinglePlotPrivate
 
         goList<goAutoPtr<goPlotElement> > plotElements;  //= This should deprecate the lists of different objects below.
 
+        //= Except for labels, these are only for the old interface to gnuplot using temporary files and
+        //= the functions in goplot.cpp. These will deprecate in the future.
         goList<goVectord>      plotX;
         goList<goVectord>      plotY;
         goList<goVectord>      plotZ;
@@ -940,6 +942,10 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet, bool useDataFiles) const
         prefix += myPrivate->title;
         prefix += "\"\n";
     }
+    else
+    {
+        prefix += "unset title\n";
+    }
     if (!myPrivate->labels.isEmpty())
     {
         assert (!myPrivate->labels.isClosed());
@@ -1059,6 +1065,8 @@ void goSinglePlot::removeFiles () const
 void goSinglePlot::clear ()
 {
     myPrivate->plotElements.erase ();
+    myPrivate->title = "";
+
     myPrivate->plotX.erase ();
     myPrivate->plotY.erase ();
     myPrivate->plotZ.erase ();
