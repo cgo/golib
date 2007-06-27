@@ -102,7 +102,7 @@ template <class T> class goFixedArray
         {
             if (size == 0)
             {
-                target.setData (this->getPtr() + startIndex, this->getSize(), this->getStride());
+                target.setData (this->getPtr() + startIndex, this->getSize() - startIndex, this->getStride());
             }
             else
             {
