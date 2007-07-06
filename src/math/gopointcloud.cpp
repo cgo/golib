@@ -373,6 +373,31 @@ bool goPointCloud<T>::translate (const goVector<T>& d)
     return true;
 }
 
+/**
+* @brief Scale all points.
+*
+* @param s  Scale factor.
+*
+* @return True if successful, false otherwise.
+**/
+template <class T>
+bool goPointCloud<T>::scale (T s)
+{
+    if (myPrivate->points.isEmpty())
+        return true;
+    
+    goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
+    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
+    goIndex_t i = 0;
+    while (el && i < pointCount)
+    {
+        el->elem *= s;
+        el = el->next;
+        ++i;
+    }
+    return true;
+}
+
 /** 
  * @brief Get matrix containing the point coordinates.
  * 

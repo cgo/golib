@@ -66,6 +66,7 @@ class goPointCloud : public goObjectBase
         bool              getCenterOfMass    (goVector<T>& comRet) const;
         static bool       getCenterOfMass    (const goFixedArray<goVector<T> >&, goVector<T>& comRet);
         bool              translate          (const goVector<T>& d);
+        bool              scale              (T s);
         void              getConfigurationMatrix (goMatrix<T>& cmRet) const;
         void              getConfigurationVector (goVector<T>& cvRet) const;
 
