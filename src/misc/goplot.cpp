@@ -975,9 +975,9 @@ void goPlot::plot (const goMatrix<T>& points,
 {
     goMultiPlotter plotter (1,1);
     goSinglePlot plot;
-    plot.addCurveMatrix (points,title ? title : "", plotOptions);
     if (prefix)
         plot.setPrefix (prefix);
+    plot.addCurveMatrix (points,title ? title : "", plotOptions);
     plotter.addPlot (plot,0,0);
     plotter.setPauseFlag (true);
     plotter.plot ();
