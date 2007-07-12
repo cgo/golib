@@ -3,6 +3,15 @@
 
 #include <gotypes.h>
 #include <gosignal2d.h>
+#ifndef GOMATH_H
+# include <gomath.h>
+#endif
+
+namespace goMath
+{
+    template <class T>
+        bool resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount, bool closed = false);
+};
 
 template <class T>
 bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount);

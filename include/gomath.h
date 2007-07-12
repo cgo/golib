@@ -23,6 +23,12 @@
 #ifndef GOAFFINETRANSFORM_H
 # include <goaffinetransform.h>
 #endif
+#ifndef GOCUBICSPLINE_H
+# include <gocubicspline.h>
+#endif
+#ifndef GORESAMPLE_H
+# include <goresample.h>
+#endif
 
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask

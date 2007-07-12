@@ -10,6 +10,8 @@
 
 int main (int argc, char* argv[])
 {
+    bool do_sine_test = true;
+    if (do_sine_test)
     {
         goMatrixd M (10, 2);
         goDouble t = 0.0;
@@ -25,19 +27,27 @@ int main (int argc, char* argv[])
         goVectord y;
         M.refColumn (0,x);
         M.refColumn (1,y);
-        goPlotter plotter;
-        plotter.addCurve (x,y,"sin(x)");
+        goMultiPlotter mp(1,1);
+        goSinglePlot plot;
+        plot.addCurve (x,y,"sin(x)","with points ps 4");
 
         goMatrixd M2;
+        goMatrixd M3;
         goMatrixd temp;
-        goResampleLinear (M, temp, 99);
-        goResampleLinear (temp, M2, 99);
-        M2.refColumn (0,x);
-        M2.refColumn (1,y);
-        plotter.addCurve (x,y,"sin(x) resampled","with points pointsize 3");
-        
-        plotter.setPauseFlag (true);
-        plotter.plot ();
+        goMath::resampleCubic (M, M2, 99, false);
+        goMath::resampleCubic (M, M3, 99, true);
+
+        M2.writeASCII ("M2.txt");
+        M3.writeASCII ("M3.txt");
+
+        // goResampleLinear (M, temp, 99);
+        // goResampleLinear (temp, M2, 99);
+        plot.addCurveMatrix (M2,"sin(x) resampled","with points pointsize 1");
+        plot.addCurveMatrix (M3,"sin(x) resampled, closed","with points pointsize 1");
+        plot.setPrefix ("set key on above\n");
+        mp.addPlot(plot,0);
+        mp.setPauseFlag (true);
+        mp.plot ();
         exit (1);
     }
     
@@ -50,20 +60,48 @@ int main (int argc, char* argv[])
             printf ("Could not open %s for reading.\n",argv[1]);
             exit(-1);
         }
+        printf ("Reading curve\n");
         curve.readASCII (f);
         fclose(f);
-        goCurvef curve2;
-        curve.resample (10,curve2);
 
-        {
-            goPlotter plotter;
-            plotter.addCurve (curve.getPoints(),"curve");
-            plotter.setPauseFlag(true);
-            plotter.plot();
-            plotter.addCurve (curve2.getPoints(),"resampled curve","with linespoints");
-            plotter.plot();
-        }
+        printf ("Resampling\n");
+        goMatrixf M;
+        goMatrixf M2;
+        goMatrixf M3;
+        curve.getConfigurationMatrix (M);
+        goMath::resampleCubic (M, M2, 100, curve.getPoints().isClosed());
+        goResampleLinear (M, M3, 100);
+        printf ("Done, plotting\n");
+
+        goMultiPlotter mp (1,1);
+        goSinglePlot plot;
+        plot.addCurveMatrix (M, "Original points", "with lines");
+        plot.addCurveMatrix (M2, "Resampled points", "with linespoints");
+        plot.addCurveMatrix (M3, "Linearly resampled points", "with linespoints");
+        plot.setPrefix ("set key on above\n");
+        mp.addPlot (plot,0);
+        mp.setPauseFlag (true);
+        mp.plot ();
+
+
+        //goCurvef curve2;
+        //curve.resample (10,curve2);
+
+
+        //{
+        //    goPlotter plotter;
+        //    plotter.addCurve (curve.getPoints(),"curve");
+        //    plotter.setPauseFlag(true);
+        //    plotter.plot();
+        //    plotter.addCurve (curve2.getPoints(),"resampled curve","with linespoints");
+        //    plotter.plot();
+        //}
         exit(1);
+    }
+    else
+    {
+        printf ("Usage: %s <curve file>\n", argv[0]);
+        exit(2);
     }
 
 # if 0

@@ -270,7 +270,7 @@ class goVector : public goFixedArray<T>
         void outerProduct (const goVector<T>& other, goMatrix<T>& ret) const;
 
         template <class To>
-        bool copy (goVector<To>& target, goIndex_t startIndex, goIndex_t skip, goIndex_t lastIndex = -1) const
+        bool copy (goVector<To>& target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const
         {
             assert (static_cast<goIndex_t>(this->getSize()) > startIndex);
             assert (skip >= 0);
@@ -295,7 +295,7 @@ class goVector : public goFixedArray<T>
         };
 
         template <class To>
-        bool copy (To* target, goIndex_t startIndex, goIndex_t skip, goIndex_t lastIndex = -1) const
+        bool copy (To* target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const
         {
             assert (this->getSize() > startIndex);
             assert (skip >= 0);
