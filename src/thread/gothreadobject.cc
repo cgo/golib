@@ -4,14 +4,17 @@
 
 
 goThreadObject::goThreadObject() 
-    : goObjectBase()
+    : goObjectBase(), thisThread()
 {
     this->setClassID(GO_THREADOBJECT);
 }
 
+/** 
+* @TODO Think of a way to clean up threads nicely when object is destroyed.
+*/
 goThreadObject::~goThreadObject()
 {
-    thisThread.cancel();
+    // thisThread.join(); //= This causes seg fault!
 }
 
 static void* goThreadObject_threadFunction(void* p)

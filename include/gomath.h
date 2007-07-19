@@ -434,6 +434,9 @@ T integrate (const vectorT& x, const vectorT& y, goSize_t sz);
 template <class vectorT, class T>
 T integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t sz);
 
+template <class T>
+T integrate (const goVector<T>& v);
+
 template <class vectorT, class T>
 bool getRoots (const vectorT& fX, 
                const vectorT& fY,
