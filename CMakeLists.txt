@@ -33,6 +33,7 @@ SET                 (SOURCES
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp
+ src/math/barycentric.cpp
  src/math/gocubicspline.cpp
  src/math/viewsphere.cpp
  src/math/pairwisedistances.cpp

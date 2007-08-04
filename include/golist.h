@@ -734,22 +734,27 @@ class goList {
       return false;
   };
 
-  bool cyclicPermutation ()
+  bool cyclicPermutation (goIndex_t count = 1)
   {
-        if (this->front && this->front->next)
-        {
-            if (this->isClosed())
-            {
-                this->open (this->front->next);
-                this->close ();
-            }
-            else
-            {
-                this->close ();
-                this->open (this->front->next);
-            }
-        }
-        return true;
+      if (count > this->getSize())
+      {
+          // goLog::warning ("goList::cyclicPermutation(): count > size");
+          return false;
+      }
+      if (this->front && this->front->next)
+      {
+          if (this->isClosed())
+          {
+              this->open ((*this)(count));
+              this->close ();
+          }
+          else
+          {
+              this->close ();
+              this->open ((*this)(count));
+          }
+      }
+      return true;
   };
 
   /// Resets the pointer to the front of the list.

@@ -194,7 +194,25 @@ template <class T> class goFixedArray
                 *array = value;
             }
         };
-        
+       
+        /** 
+         * @brief Actually copies the data.
+         * 
+         * @TODO: An alternative is to just change the stride and start pointer.
+         */
+        void flip ()
+        {
+            goSize_t sz = this->getSize();
+            goSize_t j = sz - 1;
+            T temp;
+            for (goSize_t i = 0; i < j; ++i, --j)
+            {
+                temp = (*this)[i];
+                (*this)[i] = (*this)[j];
+                (*this)[j] = temp;
+            }
+        };
+
     private:
         T*        myArray;
         goSize_t  mySize;

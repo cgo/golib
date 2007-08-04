@@ -282,7 +282,7 @@ void goMatrix<T>::flip (goSize_t dim)
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target)
+bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target) const
 {
     return this->copy (startRow, startCol, endRow, endCol, 0, 0, target);
 }
@@ -303,7 +303,7 @@ bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, g
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target)
+bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target) const
 {
     goSize_t num_rows = endRow - startRow + 1;
     goSize_t num_cols = endCol - startCol + 1;
@@ -332,7 +332,7 @@ bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, g
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goMatrix<T>& target)
+bool goMatrix<T>::copy (goMatrix<T>& target) const
 {
     return this->copy (0, 0, this->getRows() - 1, this->getColumns() - 1, 0, 0, target);
 }

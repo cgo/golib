@@ -1,7 +1,9 @@
 #ifndef __GOQUEUE_H
 #define __GOQUEUE_H
 
-#include <golist.h>
+#ifndef GOLIST_H
+# include <golist.h>
+#endif
 #include <gotypes.h>
 
 /** @addtogroup data

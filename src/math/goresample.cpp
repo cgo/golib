@@ -59,7 +59,15 @@ bool goMath::resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSi
                 source.refRow (i, p0);
                 source.refRow (goMath::min<goIndex_t>(i + 1, pointCount - 1), p1);
                 source.refRow (goMath::min<goIndex_t>(i + 2, pointCount - 1), p2);
-                curveLength += ((p1 - pm1).norm2() * 0.5 + (p2 - p0).norm2() * 0.5) * 0.5;
+                goMath::CubicSpline<T> spline (pm1, p0, p1, p2);
+                goVector<T> time (10);
+                time.fillRange (0.0, 1.0, 10.0);
+                time *= 1.0 / 9.0;
+                for (goSize_t j = 0; j < 9; ++j)
+                {
+                    curveLength += ((*spline(time[j])) - (*spline(time[j+1]))).norm2();
+                }
+                // curveLength += ((p1 - pm1).norm2() * 0.5 + (p2 - p0).norm2() * 0.5) * 0.5;
                 accumLength[i + 1] = curveLength;
             }
         }
@@ -76,7 +84,7 @@ bool goMath::resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSi
                     source.refRow (i - 1, pm1);
                 }
                 source.refRow (i, p0);
-                if (i >= pointCount - 1)
+                if ((goSize_t)i >= pointCount - 1)
                 {
                     source.refRow (i - pointCount + 1, p1);
                 }
@@ -84,7 +92,7 @@ bool goMath::resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSi
                 {
                     source.refRow (i + 1, p1);
                 }
-                if (i >= pointCount - 2)
+                if ((goSize_t)i >= pointCount - 2)
                 {
                     source.refRow (i - pointCount + 2, p2);
                 }
@@ -92,8 +100,16 @@ bool goMath::resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSi
                 {
                     source.refRow (i + 2, p2);
                 }
-
-                curveLength += ((p1 - pm1).norm2() * 0.5 + (p2 - p0).norm2() * 0.5) * 0.5;
+                goMath::CubicSpline<T> spline (pm1, p0, p1, p2);
+                goSize_t N = 100;
+                goVector<T> time (N);
+                time.fillRange (0.0, 1.0, T(N));
+                time *= 1.0 / T(N-1);
+                for (goSize_t j = 0; j < N-1; ++j)
+                {
+                    curveLength += ((*spline(time[j])) - (*spline(time[j+1]))).norm2();
+                }
+                //curveLength += ((p1 - pm1).norm2() * 0.5 + (p2 - p0).norm2() * 0.5) * 0.5;
                 accumLength[i + 1] = curveLength;
             }
         }
@@ -192,6 +208,27 @@ bool goMath::resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSi
     }
     return true;
 }
+
+template <class T>
+void goMath::resampleLinear (const goFixedArray<T>& f, goFixedArray<T>& ret)
+{
+    const goSize_t N = f.getSize();
+    const goSize_t M = ret.getSize();
+    goDouble delta_x = goDouble(N-1) / goDouble(M-1);
+    goDouble x = 0.0;
+
+    goSize_t x0 = 0, x1 = 1;
+    goDouble t = 0.0;
+    for (goSize_t i = 0; i < M; ++i, x += delta_x)
+    {
+        x0 = goSize_t(::floor(x));
+        x1 = goMath::min(x0 + 1, N-1);
+        
+        t = x - float(x0);
+        ret[i] = t * f[x1] + (1.0 - t) * f[x0];
+    }
+}
+
 /** @} */
 
 /** 
@@ -271,3 +308,5 @@ template bool goResampleLinear <goDouble> (const goMatrix<goDouble>&, goMatrix<g
 
 template bool goMath::resampleCubic <goFloat> (const goMatrix<goFloat>&, goMatrix<goFloat>&, goSize_t, bool);
 template bool goMath::resampleCubic <goDouble> (const goMatrix<goDouble>&, goMatrix<goDouble>&, goSize_t, bool);
+template void goMath::resampleLinear <goFloat> (const goFixedArray<goFloat>&, goFixedArray<goFloat>&);
+template void goMath::resampleLinear <goDouble> (const goFixedArray<goDouble>&, goFixedArray<goDouble>&);

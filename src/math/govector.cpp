@@ -53,6 +53,36 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
 };
 #endif
 
+template<>
+void goVector<goFloat>::_print (const char* formatstring) const
+{
+    goSize_t sz = this->getSize();
+
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        printf (formatstring, (*this)[i]);
+    }
+    printf ("\n");
+}
+
+template<>
+void goVector<goDouble>::_print (const char* formatstring) const
+{
+    goSize_t sz = this->getSize();
+
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        printf (formatstring, (*this)[i]);
+    }
+    printf ("\n");
+}
+
+template <class T>
+void goVector<T>::_print (const char*) const
+{
+    printf ("goVector<T>::_print() not defined for this type.\n");
+}
+
 template<> 
 goFloat goVector<goFloat>::operator* (const goVector<goFloat>& other) const
 {

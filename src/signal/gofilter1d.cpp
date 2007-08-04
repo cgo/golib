@@ -209,6 +209,8 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
         goString msg = "filter(): signal ";
         msg += sig.getObjectName();
         msg += " has insufficient border size in X direction. Not filtering.";
+        msg += " Border size: ";
+        msg += (int) (sig.getBorderX());
         
         goLog::warning(msg,this);
         return false;

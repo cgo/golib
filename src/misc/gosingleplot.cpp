@@ -5,13 +5,19 @@
 class goPlotElement
 {
     public:
-        goPlotElement (const char* command = "plot", const char* fn = "\"-\"" , const char* options = "with lines")
+        goPlotElement (const char* command = "plot", const char* fn = "-" , const char* options = "with lines")
             : myPlotOptions (options),
               myPlotCommand (command),
               myFilename (fn)
         {
         };
-        virtual ~goPlotElement () {};
+        virtual ~goPlotElement () 
+        {
+            if (myFilename != "-")
+            {
+                goFileIO::remove (myFilename);
+            }
+        };
 
         void setPlotCommand (const char* cmd) { myPlotCommand = cmd; };
         void setPlotOptions (const char* cmd) { myPlotOptions = cmd; };
@@ -35,7 +41,7 @@ template <class T>
 class goPlotElementMatrixImage : public goPlotElement
 {
     public:
-        goPlotElementMatrixImage (const goMatrix<T>& M) : goPlotElement ("plot", "\"-\"", "with image"), myMatrix (M) { };
+        goPlotElementMatrixImage (const goMatrix<T>& M) : goPlotElement ("plot", "-", "with image"), myMatrix (M) { };
         virtual ~goPlotElementMatrixImage () {};
 
         virtual void data (goString& ret) const
@@ -56,7 +62,7 @@ template <class T>
 class goPlotElementMatrixSurface : public goPlotElement
 {
     public:
-        goPlotElementMatrixSurface (const goMatrix<T>& M) : goPlotElement ("splot" , "\"-\"", "with lines"), myMatrix (M) { };
+        goPlotElementMatrixSurface (const goMatrix<T>& M) : goPlotElement ("splot" , "-", "with lines"), myMatrix (M) { };
         virtual ~goPlotElementMatrixSurface () {};
 
         virtual void data (goString& ret) const
@@ -78,7 +84,7 @@ template <class T>
 class goPlotElementMatrixCurve : public goPlotElement
 {
     public:
-        goPlotElementMatrixCurve (const goMatrix<T>& M) : goPlotElement ("plot", "\"-\"", "with lines"), myMatrix (M) { };
+        goPlotElementMatrixCurve (const goMatrix<T>& M) : goPlotElement ("plot", "-", "with lines"), myMatrix (M) { };
         virtual ~goPlotElementMatrixCurve () {};
 
         virtual void data (goString& ret) const
@@ -101,7 +107,7 @@ class goPlotElementVectorCurve : public goPlotElement
 {
     public:
         goPlotElementVectorCurve (const goVector<T>* x, const goVector<T>* y, const goVector<T>* z, int linelength) 
-            : goPlotElement ("plot", "\"-\"", "with lines"), myX(0), myY(0), myZ(0), myLinelength(linelength)
+            : goPlotElement ("plot", "-", "with lines"), myX(0), myY(0), myZ(0), myLinelength(linelength)
         {
             if (x)
                 myX = *x;
@@ -167,7 +173,8 @@ class goSinglePlotPrivate
               row(0),
               column(0),
               title(""),
-              plotType(goPlot::Normal)
+              plotType(goPlot::Normal),
+              useFiles(false)
         {};
         ~goSinglePlotPrivate() {};
 
@@ -197,6 +204,8 @@ class goSinglePlotPrivate
         goString          title;               // This is the title of the whole plot.
 
         goPlot::PlotType  plotType;
+
+        bool              useFiles;
 };
 
 goSinglePlot::goSinglePlot ()
@@ -1022,8 +1031,19 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
     }
     while (el)
     {
+        if (this->getUseFiles())
+        {
+            goString dataString;
+            el->elem->data (dataString);
+            goString filename;
+            FILE* f = goFileIO::createTempFile (filename);
+            el->elem->setFilename (filename);
+            goFileIO::writeASCII (f, dataString);
+            fclose (f);
+        }
+        plotCommandsRet += "\"";
         plotCommandsRet += el->elem->filename();
-        plotCommandsRet += " "; 
+        plotCommandsRet += "\" "; 
         plotCommandsRet += el->elem->plotOptions();
         if (el->next)
             plotCommandsRet += ",";
@@ -1032,11 +1052,14 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
         el = el->next;
     }
     el = myPrivate->plotElements.getFrontElement();
-    while (el)
+    if (!this->getUseFiles())
     {
-        el->elem->data(plotCommandsRet);
-        plotCommandsRet += "e\n";
-        el = el->next;
+        while (el)
+        {
+            el->elem->data(plotCommandsRet);
+            plotCommandsRet += "e\n";
+            el = el->next;
+        }
     }
     return true; 
 }
@@ -1051,12 +1074,20 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
  */
 void goSinglePlot::removeFiles () const
 {
-    goList<goString>::ConstElement* el = myPrivate->dataFilenames.getFrontElement();
+    goList<goAutoPtr<goPlotElement> >::Element* el = myPrivate->plotElements.getFrontElement();
+
     while (el)
     {
-        goFileIO::remove (el->elem);
+        goFileIO::remove (el->elem->filename());
         el = el->next;
     }
+
+//    goList<goString>::ConstElement* el = myPrivate->dataFilenames.getFrontElement();
+//    while (el)
+//    {
+//        goFileIO::remove (el->elem);
+//        el = el->next;
+//    }
 }
 
 /** 
@@ -1080,4 +1111,15 @@ void goSinglePlot::clear ()
     myPrivate->plotCommands.erase ();
     myPrivate->prefixCommands = "";
     myPrivate->dataFilenames.erase ();
+}
+
+
+void goSinglePlot::setUseFiles (bool f)
+{
+    myPrivate->useFiles = f;
+}
+
+bool goSinglePlot::getUseFiles () const
+{
+    return myPrivate->useFiles;
 }

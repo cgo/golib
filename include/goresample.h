@@ -11,6 +11,9 @@ namespace goMath
 {
     template <class T>
         bool resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount, bool closed = false);
+
+    template <class T>
+        void resampleLinear (const goFixedArray<T>& f, goFixedArray<T>& ret);
 };
 
 template <class T>

@@ -437,6 +437,15 @@ T integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t sz);
 template <class T>
 T integrate (const goVector<T>& v);
 
+template <class T>
+T integrateSimpson (const goVector<T>& v);
+
+template <class T>
+bool euclideanToBarycentric (const goMatrix<T>& simplex, const goVector<T>& point, goVector<T>& ret);
+
+template <class T>
+void barycentricToEuclidean (const goMatrix<T>& simplex, const goVector<T>& barycentric, goVector<T>& ret);
+
 template <class vectorT, class T>
 bool getRoots (const vectorT& fX, 
                const vectorT& fY,
@@ -451,13 +460,17 @@ bool pdist (const goMatrix<T>& X, int dimension, goMatrix<T>& ret)
     return goMath::pairwiseDistances<T> (X, dimension, ret);
 };
 
-bool sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius,
-                        goVectorf* positionRet, goVectorf* upRet);
-bool euclideanToSphere (const goVectorf& x, goFloat& phiRet, goFloat& thetaRet, goFloat& radiusRet);
-bool sampleViewSphere (goFloat dist, goFloat radius,
-                       goList<goVectorf>& positionRet, goList<goVectorf>& upRet);
-bool sampleViewSphere (goFloat dist, goFloat radius,
-                       goMatrix<goFloat>& viewSphereRet);
+template <class T>
+bool sphereToEuclidean (T phi, T theta, T radius,
+                        goVector<T>* positionRet, goVector<T>* upRet);
+
+template <class T>
+bool euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T& radiusRet);
+
+template <class T>
+bool sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, goList<goVector<T> >& upRet);
+template <class T>
+bool sampleSphere (T dist, T radius, goMatrix<T>& sphereRet);
 
 /*! @} */
 };

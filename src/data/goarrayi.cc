@@ -3,6 +3,7 @@
 #include <goarray.hpp>
 #include <gocomplex.h>
 #include <goconfigfile.h>
+#include <golog.h>
 #include <golist.h>
 #include <gopoint.h>
 #include <gohashtable.h>

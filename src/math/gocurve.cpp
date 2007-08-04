@@ -878,6 +878,47 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
 }
 
 /** 
+ * @brief Removes one of two consecutive when they are not more than epsilon apart.
+ * 
+ * @param pl 
+ * @param epsilon 
+ * 
+ * @return Number of removed points.
+ */
+template <class T>
+goSize_t goCurve<T>::removeCloseDuplicates (goList<goVector<T> >& pl, goDouble epsilon)
+{
+    goSize_t removed = 0;
+    goSize_t removed_total = 0;
+    do
+    {
+        goSize_t i = 0;
+        removed = 0;
+        goSize_t sz = pl.getSize();
+        typename goList<goVector<T> >::Element* el = pl.getFrontElement();
+        if (!pl.isClosed())
+        {
+            --sz;
+        }
+        while (i < sz && el)
+        {
+            if ((el->elem - el->next->elem).norm2() <= epsilon)
+            {
+                el = pl.remove(el);
+                ++removed;
+            }
+            else
+            {
+                el = el->next;
+            }
+            ++i;
+        }
+        removed_total += removed;
+    } while (removed > 0 );
+    return removed_total;
+}
+
+/** 
  * @brief Filter the curve points with a linear filter mask.
  * 
  * @param mask Mask.
@@ -924,6 +965,12 @@ template <class T>
 goSize_t goCurve<T>::removeDuplicates ()
 {
     return goCurve<T>::removeDuplicates (this->getPoints());
+}
+
+template <class T>
+goSize_t goCurve<T>::removeCloseDuplicates (goDouble epsilon)
+{
+    return goCurve<T>::removeCloseDuplicates (this->getPoints(), epsilon);
 }
 
 template <class T>

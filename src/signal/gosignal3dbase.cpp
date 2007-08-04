@@ -1494,6 +1494,10 @@ goSignal3DBase<T>::swapXY()
     tempSize      = myBlocks.x;
     myBlocks.x    = myBlocks.y;
     myBlocks.y    = tempSize;
+
+    tempSize = myBorderSize.x;
+    myBorderSize.x = myBorderSize.y;
+    myBorderSize.y = tempSize;
 }
 
 template <class T>

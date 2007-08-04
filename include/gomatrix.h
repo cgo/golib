@@ -248,9 +248,9 @@ class goMatrix
       refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
   };
 
-  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target);
-  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target);
-  bool copy (goMatrix<T>& target);
+  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target) const;
+  bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target) const;
+  bool copy (goMatrix<T>& target) const;
 
   /** 
    * @brief Make a reference to sub-matrix.
@@ -444,6 +444,36 @@ class goMatrix
             vRet[i] = (*this)(i, col);
         }
     };
+
+  void swapRows (goIndex_t i1, goIndex_t i2)
+  {
+      goVector<T> ref1, ref2;
+      this->refRow (i1, ref1);
+      this->refRow (i2, ref2);
+      goSize_t sz = ref1.getSize();
+      T temp = T(0);
+      for (goSize_t i = 0; i < sz; ++i)
+      {
+          temp = ref1[i];
+          ref1[i] = ref2[i];
+          ref2[i] = temp;
+      }
+  };
+
+  void swapColumns (goIndex_t i1, goIndex_t i2)
+  {
+      goVector<T> ref1, ref2;
+      this->refColumn (i1, ref1);
+      this->refColumn (i2, ref2);
+      goSize_t sz = ref1.getSize();
+      T temp = T(0);
+      for (goSize_t i = 0; i < sz; ++i)
+      {
+          temp = ref1[i];
+          ref1[i] = ref2[i];
+          ref2[i] = temp;
+      }
+  };
 
   inline T&                operator() (goIndex_t i, goIndex_t j)
   {

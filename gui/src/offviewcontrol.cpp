@@ -157,3 +157,13 @@ void goGUI::OFFViewControl::getRotation (goVectorf& r) const
     r[1] = myPrivate->theta.get_value();
     r[2] = myPrivate->radius.get_value();
 }
+
+goFloat goGUI::OFFViewControl::getRadius () const
+{
+    return myPrivate->radius.get_value();
+}
+
+void goGUI::OFFViewControl::setRadius (goFloat r)
+{
+    myPrivate->radius.set_value (r);
+}

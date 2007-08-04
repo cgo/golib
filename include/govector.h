@@ -11,7 +11,6 @@
 # include <gocomplex.h>
 #endif
 
-
 template <class T> class goMatrix;
 
 /**
@@ -43,7 +42,9 @@ class goVector : public goFixedArray<T>
         {
             this->setSize (s,this->getLeftBorder(),this->getRightBorder());
         }
-        
+
+        void _print (const char* formatstring = "%f\n") const;
+
         template <class To>
         goVector<T> operator- (const goVector<To>& other) const
         {
@@ -137,6 +138,28 @@ class goVector : public goFixedArray<T>
             return ret;
         };
 
+        /** 
+         * @brief Quite inefficient vector-matrix multiplication.
+         * 
+         * If possible, avoid this or use only matrices in your programs
+         * if you can.
+         *
+         * @TODO This is inefficient, but may be frequently needed. Solve this issue!
+         *
+         * @return this * M
+         */
+        goVector<T> operator* (const goMatrix<T>& M) const
+        {
+            const goMatrix<T> this_M (0,0);
+            this_M.setData (&(*this)[0], this->getSize(), 1, this->getStride());
+            goVector<T> ret;
+            goMatrix<T> temp;
+            temp = this_M * M;
+            ret.resize (temp.getRows());
+            temp.copyColumn (0, ret);
+            return ret;
+        };
+
         goVector<T>& operator*= (goFloat n)
         {
             goIndex_t max = this->getSize();
@@ -162,6 +185,37 @@ class goVector : public goFixedArray<T>
                 array += stride;
             }
             return *this;
+        };
+
+        goVector<T> cross (const goVector<T>& other) const
+        {
+            goVector<T> v(3);
+            this->cross (other, v);
+            return v;
+        };
+
+        bool cross (const goVector<T>& other, goVector<T>& ret) const
+        {
+            if (other.getSize() != 3 || this->getSize() != 3)
+            {
+                goLog::warning ("goVector::cross(): vectors must be size 3.");
+                return false;
+            }
+            if (ret.getSize() < 3)
+            {
+                ret.resize(3);
+            }
+
+            T x = (*this)[0];
+            T y = (*this)[1];
+            T z = (*this)[2];
+            T ox = other[0];
+            T oy = other[1];
+            T oz = other[2];
+            ret[0] = y * oz - z * oy;
+            ret[1] = z * ox - oz * x;
+            ret[2] = x * oy - ox * y;
+            return true;
         };
 
         template <class To>
@@ -210,7 +264,7 @@ class goVector : public goFixedArray<T>
             return *this;
         };
 
-        //= Element-wise multiplication.
+        //= Element-wise (Hadamard) multiplication.
         template <class To>
         goVector<T>& operator*= (const goVector<To>& other)
         {

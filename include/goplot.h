@@ -143,6 +143,8 @@ class goSinglePlot : public goObjectBase
         bool addGnuplotCommands (goString& commandsRet) const;
         void removeFiles () const;
         void clear       ();
+        void setUseFiles (bool f);
+        bool getUseFiles () const;
 
     private:
         goSinglePlotPrivate* myPrivate;

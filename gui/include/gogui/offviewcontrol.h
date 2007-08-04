@@ -25,6 +25,9 @@ namespace goGUI
             void setRotation (const goVectorf& v);
             void getRotation (goVectorf& v) const;
 
+            goFloat getRadius () const;
+            void    setRadius (goFloat r);
+
         protected:
             OFFViewControlPrivate* myPrivate;
     };

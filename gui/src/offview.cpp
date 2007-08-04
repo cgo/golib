@@ -169,7 +169,7 @@ void goGUI::OFFView::setRotation (const goVectorf& r)
 
     goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
 
-    goMath::sphereToEuclidean (myPrivate->rotation[0] / 180.0f * M_PI, temp, 
+    goMath::sphereToEuclidean<goFloat> (myPrivate->rotation[0] / 180.0f * M_PI, temp, 
             myPrivate->rotation[2], &pos, &up);
     goVectorf focus(3);
     focus.fill(0.0f);

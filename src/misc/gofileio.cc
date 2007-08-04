@@ -801,6 +801,7 @@ goFileIO::createTempFile (goString& filenameRet)
     {
         return NULL;
     }
+    filenameRet.resize (::strlen(filenameRet.getPtr()));
     return fopen (filenameRet.toCharPtr(), "w");
 #else
     goLog::warning ("goFileIO::createTempFile(): golib was compiled without tmpnam_r().");

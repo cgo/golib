@@ -15,18 +15,19 @@
  * 
  * @return True if successful, false otherwise.
  */
-bool goMath::sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius,
-                                goVectorf* positionRet, goVectorf* upRet)
+template <class T>
+bool goMath::sphereToEuclidean (T phi, T theta, T radius,
+                                goVector<T>* positionRet, goVector<T>* upRet)
 {
     //= Spherical to cartesian coordinates
-    goFloat sin_theta = ::sin(theta);
+    T sin_theta = ::sin(theta);
 
     //= Only rotation of phi from x towards y axis
-    go3Vector<goFloat> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
+    go3Vector<T> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
     //= Complete rotation, first phi towards y, then the result towards z axis
-    go3Vector<goFloat> v2 (v1.x * sin_theta, v1.y * sin_theta, radius * ::cos(theta));
+    go3Vector<T> v2 (v1.x * sin_theta, v1.y * sin_theta, radius * ::cos(theta));
     //= Create up vector as cross product
-    go3Vector<goFloat> up (v2);
+    go3Vector<T> up (v2);
 
     up.cross (v1);
     up *= 1.0f / up.abs();
@@ -50,16 +51,16 @@ bool goMath::sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius,
     return true;
 }
 
-bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
-                               goList<goVectorf>& positionRet, goList<goVectorf>& upRet)
+template <class T>
+bool goMath::sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, goList<goVector<T> >& upRet)
 {
-    goVectorf pos(3);
+    goVector<T> pos(3);
     goDouble phi = 0;
     goDouble d_phi = dist / radius;
     while (phi < M_PI)
     {
         //= Only rotation of phi from x towards y axis -- needed for up-vector
-        go3Vector<goFloat> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
+        go3Vector<T> v1 (radius * ::cos(phi), radius * ::sin(phi), 0.0f);
 
         goDouble r2 = radius * ::cos(phi);
         goDouble rho = sqrt(radius*radius - r2*r2);
@@ -74,15 +75,15 @@ bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
 
             //= Compute an up-vector:
             //= Complete rotation, first phi towards y, then the result towards z axis
-            go3Vector<goFloat> v2 (v1.x * ::sin(theta), v1.y * ::sin(theta), radius * ::cos(theta));
+            go3Vector<T> v2 (v1.x * ::sin(theta), v1.y * ::sin(theta), radius * ::cos(theta));
             //= Create up vector as cross product
-            go3Vector<goFloat> up (v2);
+            go3Vector<T> up (v2);
 
             up.cross (v1);
             up *= 1.0f / up.abs();
             if (v2.z < 0.0f)
                 up *= -1.0f;
-            goVectorf temp(3);
+            goVector<T> temp(3);
             temp[0] = up.x; temp[1] = up.y; temp[2] = up.z;
             upRet.append(temp);
 
@@ -94,11 +95,11 @@ bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
     return true;
 }
 
-bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
-                               goMatrix<goFloat>& viewSphereRet)
+template <class T>
+bool goMath::sampleSphere (T dist, T radius, goMatrix<T>& viewSphereRet)
 {
-    goList<goVector<goFloat> > pl, ul;
-    if (!goMath::sampleViewSphere(dist,radius,pl,ul))
+    goList<goVector<T> > pl, ul;
+    if (!goMath::sampleSphere<T> (dist,radius,pl,ul))
     {
         goLog::warning ("sampleViewSphere() failed.");
         return false;
@@ -108,7 +109,7 @@ bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
     {
         viewSphereRet.resize(N,3);
     }
-    goList<goVector<goFloat> >::Element* el = pl.getFrontElement();
+    typename goList<goVector<T> >::Element* el = pl.getFrontElement();
     for (goSize_t i = 0; i < N && el; ++i, el = el->next)
     {
         viewSphereRet(i,0) = el->elem[0];
@@ -118,7 +119,8 @@ bool goMath::sampleViewSphere (goFloat dist, goFloat radius,
     return true;
 }
 
-bool goMath::euclideanToSphere (const goVectorf& x, goFloat& phiRet, goFloat& thetaRet, goFloat& radiusRet)
+template <class T>
+bool goMath::euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T& radiusRet)
 {
     if (x.getSize() != 3)
         return false;
@@ -129,3 +131,24 @@ bool goMath::euclideanToSphere (const goVectorf& x, goFloat& phiRet, goFloat& th
 
     return true;
 }
+
+template 
+bool goMath::sphereToEuclidean<goFloat> (goFloat phi, goFloat theta, goFloat radius,
+                                goVector<goFloat>* positionRet, goVector<goFloat>* upRet);
+template 
+bool goMath::sphereToEuclidean<goDouble> (goDouble phi, goDouble theta, goDouble radius,
+                                goVector<goDouble>* positionRet, goVector<goDouble>* upRet);
+template
+bool goMath::euclideanToSphere<goFloat> (const goVector<goFloat>& , goFloat& , goFloat& , goFloat&);
+template
+bool goMath::euclideanToSphere<goDouble> (const goVector<goDouble>& , goDouble& , goDouble& , goDouble&);
+
+template 
+bool goMath::sampleSphere<goFloat> (goFloat dist, goFloat radius, goMatrix<goFloat>& viewSphereRet);
+template 
+bool goMath::sampleSphere<goDouble> (goDouble dist, goDouble radius, goMatrix<goDouble>& viewSphereRet);
+
+template 
+bool goMath::sampleSphere<goFloat> (goFloat, goFloat, goList<goVector<goFloat> >&, goList<goVector<goFloat> >&);
+template 
+bool goMath::sampleSphere<goDouble> (goDouble, goDouble, goList<goVector<goDouble> >&, goList<goVector<goDouble> >&);
