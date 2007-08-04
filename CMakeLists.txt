@@ -68,6 +68,7 @@ SET                 (SOURCES
  # src/math/variance.cpp
  src/math/integrate.cpp
  src/math/getroots.cpp
+ src/misc/plot.cpp
  src/misc/gognuplot.cpp
  src/misc/gosingleplot.cpp
  src/misc/gomultiplotter.cpp

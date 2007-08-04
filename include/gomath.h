@@ -436,6 +436,8 @@ T integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t sz);
 
 template <class T>
 T integrate (const goVector<T>& v);
+template <class T>
+T integrateSum (const goVector<T>& v);
 
 template <class T>
 T integrateSimpson (const goVector<T>& v);

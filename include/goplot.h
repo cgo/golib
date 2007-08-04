@@ -198,6 +198,8 @@ class goMultiPlotter : public goObjectBase
         bool plotEPS        (const char* filename);
         bool plotFile       (const char* filename, const char* type);
 
+        bool saveGnuplot (const char* filename);
+
         void clear ();
         void removeFiles ();
 
@@ -295,6 +297,30 @@ namespace goPlot
     template <class T>
         void plot3D (const goMatrix<T>& M,
                 const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false);
+
+    class PlotPrivate;
+
+    class Plot : public goObjectBase
+    {
+        public:
+            Plot ();
+            virtual ~Plot ();
+
+            void plot (const goMatrixf& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMatrixd& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goVectorf& px, const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goVectord& px, const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot ();
+
+            goAutoPtr<goSinglePlot> getPlotp (goSize_t x, goSize_t y);
+            goSinglePlot& getPlot (goSize_t x, goSize_t y);
+            goGnuplot& getGnuplot ();
+
+        private:
+            PlotPrivate* myPrivate;
+    };
 
     /** 
      * @brief Plots 1D data using gnuplot.

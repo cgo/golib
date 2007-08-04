@@ -146,6 +146,22 @@ class goList {
       return 0;
   };
 
+  goSize_t      findIndex (const T& e)
+  {
+      Element* el = this->getFrontElement();
+      goSize_t sz = this->getSize();
+      goSize_t i;
+      for (i = 0; i < sz; ++i)
+      {
+          if (el->elem == e)
+          {
+              return i;
+          }
+          el = el->next;
+      }
+      return sz + 1;
+  };
+
   ConstElement* find            (const T& e) const
   {
       ConstElement* el = this->getFrontElement();
@@ -160,6 +176,22 @@ class goList {
           el = el->next;
       }
       return 0;
+  };
+
+  goSize_t findIndex  (const T& e) const
+  {
+      ConstElement* el = this->getFrontElement();
+      goSize_t sz = this->getSize();
+      goSize_t i;
+      for (i = 0; i < sz; ++i)
+      {
+          if (el->elem == e)
+          {
+              return i;
+          }
+          el = el->next;
+      }
+      return sz + 1;
   };
 
   /** 

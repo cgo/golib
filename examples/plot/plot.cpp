@@ -73,7 +73,22 @@ int main ()
     plotter.addCurve(x,d_minus,"mean - deviation");
     plotter.setPauseFlag(true);
     // plotter.plot();
-   
+  
+    {
+        printf ("Testing goPlot::Plot\n");
+        goPlot::Plot p;
+        p.plot (x,y);
+        p.plot ();
+        char c;
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+        scanf ("%c",&c);
+    }
+
     {
         printf ("Testing goMultiPlotter\n");
         goMultiPlotter mp (2,3);

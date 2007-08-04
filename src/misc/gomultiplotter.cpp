@@ -376,6 +376,13 @@ bool goMultiPlotter::plotFile (const char* filename,
     return this->plotFile (goString(filename), goString(type));
 }
 
+bool goMultiPlotter::saveGnuplot (const char* filename)
+{
+    goString cmd;
+    this->makePlotCommands (cmd);
+    return goFileIO::writeASCII (filename, cmd);
+}
+
 /** 
  * @brief Clears all commands and plots and resets flags to default values.
  */

@@ -88,6 +88,12 @@ T goMath::integrateSimpson (const goVector<T>& v)
 
     return (v[0] + sum_2 + sum_4 + v[sz-1]) / 6.0;   
 }
+
+template <class T>
+T goMath::integrateSum (const goVector<T>& v)
+{
+    return v.sum ();
+}
 /** @} */
 
 template goDouble goMath::integrate<goFixedArray<goDouble>,goDouble> (const goFixedArray<goDouble>&,const goFixedArray<goDouble>&,goSize_t);
@@ -99,3 +105,5 @@ template goFloat goMath::integrate<goFloat> (const goVector<goFloat>&);
 template goDouble goMath::integrate<goDouble> (const goVector<goDouble>&);
 template goFloat goMath::integrateSimpson<goFloat> (const goVector<goFloat>&);
 template goDouble goMath::integrateSimpson<goDouble> (const goVector<goDouble>&);
+template goFloat goMath::integrateSum<goFloat> (const goVector<goFloat>&);
+template goDouble goMath::integrateSum<goDouble> (const goVector<goDouble>&);

@@ -14,6 +14,11 @@ x.copy(y)
 goCosf(y)
 M.writeASCII("cos.txt")
 
+p = Plot ()
+p.plot (M)
+#p.plot (M, "", "w l", 0, 1)
+p.plot ()
+
 gp = goGnuplot()
 mp = goMultiPlotter(1,1)
 plot = goSinglePlot()

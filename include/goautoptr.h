@@ -2,13 +2,14 @@
 #define GOAUTOPTR_H
 
 #include <golog.h>
+#include <gothread.h>
 
 template <class T>
 class goRRefPtr
 {
     public:
         goRRefPtr (T* p)
-            : myRefCount (1), myPtr (p)
+            : myRefCount (1), myPtr (p), myMutex()
         {
         };
         ~goRRefPtr ()
@@ -20,21 +21,27 @@ class goRRefPtr
             if (myPtr)
             {
                 // printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
+                myMutex.lock();
                 delete myPtr;
                 myPtr = 0;
+                myMutex.unlock();
             }
         };
         goRRefPtr (goRRefPtr<T>& other)
             : myRefCount (0), myPtr (0)
         {
+            myMutex.lock();
             *this = other;
+            myMutex.unlock();
         };
 
         template <class To>
         goRRefPtr<T>& operator= (goRRefPtr<To>& other)
         {
+            myMutex.lock();
             this->myRefCount = other.myRefCount;
             this->myPtr = static_cast<T*>(other.myPtr);
+            myMutex.unlock();
         };
 
         template <class To>
@@ -63,14 +70,18 @@ class goRRefPtr
         
         int incRef ()
         {
+            myMutex.lock();
             ++myRefCount;
-            // printf ("refcount == %d\n", myRefCount);
+            //printf ("refcount == %d\n", myRefCount);
+            myMutex.unlock();
             return myRefCount;
         };
         int decRef ()
         {
+            myMutex.lock();
             --myRefCount;
-            // printf ("refcount == %d\n", myRefCount);
+            //printf ("refcount == %d\n", myRefCount);
+            myMutex.unlock();
             return myRefCount;
         };
         int getRefCount ()
@@ -81,6 +92,7 @@ class goRRefPtr
 
         int myRefCount;
         T*  myPtr;
+        goMutex myMutex;
 };
 
 /**
@@ -128,6 +140,7 @@ class goAutoPtr
         {
             if (myRRefPtr)
             {
+                //printf ("reset decref\n");
                 if (myRRefPtr->decRef() <= 0)
                 {
                     delete myRRefPtr;
@@ -146,6 +159,7 @@ class goAutoPtr
             // printf ("~goAutoPtr(): myRRefPtr->getRefCount() == %d\n", myRRefPtr->getRefCount());
             if (myRRefPtr)
             {
+                //printf ("delete operator decref\n");
                 if (myRRefPtr->decRef() <= 0)
                 {
                     delete myRRefPtr;
@@ -193,14 +207,17 @@ class goAutoPtr
             }
             if (myRRefPtr)
             {
+                //printf ("op= decref\n");
                 if (myRRefPtr->decRef() <= 0)
                 {
                     delete myRRefPtr;
+                    myRRefPtr = 0;
                 }
             }
             myRRefPtr = const_cast<goRRefPtr<T>*>(other.getRRefPtr());
             if (myRRefPtr)
             {
+                //printf ("op = incref\n");
                 myRRefPtr->incRef ();
             }
 

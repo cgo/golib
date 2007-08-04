@@ -604,5 +604,6 @@ void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatri
 
 typedef goVector<goFloat>  goVectorf;
 typedef goVector<goDouble> goVectord;
+typedef goVector<goInt32>  goVectori;
 
 #endif
