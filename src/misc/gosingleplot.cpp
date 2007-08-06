@@ -850,6 +850,11 @@ void goSinglePlot::setPrefix (const char* p)
     this->setPrefix (goString(p));
 }
 
+const goString& goSinglePlot::getPrefix () const
+{
+    return myPrivate->prefixCommands;
+}
+
 void goSinglePlot::setTitle (const goString& s)
 {
     myPrivate->title = s;

@@ -159,6 +159,25 @@ T max (const goFixedArray<T>& a)
     return ret;
 }
 /*! @} */
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+goSize_t maxIndex (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return 0;
+    goSize_t ret = 0;
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        if (a[i] > a[ret])
+            ret = i;
+    }
+    return ret;
+}
+/*! @} */
 
 /**
  * \addtogroup math
@@ -174,6 +193,26 @@ T min (const goFixedArray<T>& a)
     for (goSize_t i = 1; i < sz; ++i)
     {
         ret = goMath::min<T>(ret,a[i]);
+    }
+    return ret;
+}
+/*! @} */
+
+/**
+ * \addtogroup math
+ * @{
+ */
+template <class T>
+goSize_t minIndex (const goFixedArray<T>& a)
+{
+    goSize_t sz = a.getSize();
+    if (sz < 1)
+        return 0;
+    goSize_t ret = 0;
+    for (goSize_t i = 1; i < sz; ++i)
+    {
+        if (a[i] < a[ret])
+            ret = i;
     }
     return ret;
 }

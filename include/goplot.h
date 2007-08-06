@@ -132,6 +132,7 @@ class goSinglePlot : public goObjectBase
 
         void setPrefix   (const goString& p);
         void setPrefix   (const char* p);
+        const goString&  getPrefix () const;
         void setTitle    (const goString& s);
         void setTitle    (const char* s);
         bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "");
@@ -177,6 +178,7 @@ class goMultiPlotter : public goObjectBase
 
         void addPlot (const goSinglePlot&, goSize_t row, goSize_t col, goFloat extentRow = 1.0f, goFloat extentCol = 1.0f);
         void addPlot (const goSinglePlot&, goSize_t index);
+        void addPlotBarycentric (goSinglePlot& p, goDouble u, goDouble v, goDouble w, goDouble xsize, goDouble ysize);
 
         goSize_t getRows () const;
         goSize_t getColumns () const;
@@ -185,6 +187,11 @@ class goMultiPlotter : public goObjectBase
         bool getWaitFlag () const;
         void setPauseFlag (bool p);
         bool getPauseFlag () const;
+        void setAutoPosition (bool a);
+        bool getAutoPosition () const;
+
+        void setBarycentric (const goMatrixf& triangle);
+        void setBarycentric (const goMatrixd& triangle);
        
         void setPrefix (const goString&);
 

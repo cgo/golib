@@ -7,7 +7,8 @@ class goMultiPlotterPrivate
     public:
         goMultiPlotterPrivate ()
           : prefixCommands(), shellPostfix(), waitFlag(true), 
-            pauseFlag(false), cmdFilename(), 
+            pauseFlag(false), autoPosition(true), barycentric(false),
+            barycentricTriangle(2,3), cmdFilename(), 
             plots(), inputFD(-1), outputFD(-1) {};
         ~goMultiPlotterPrivate () {};
 
@@ -17,6 +18,9 @@ class goMultiPlotterPrivate
 
         bool              waitFlag;
         bool              pauseFlag;
+        bool              autoPosition;
+        bool              barycentric;
+        goMatrixd         barycentricTriangle;
         goString          cmdFilename;
         goList<goSinglePlot> plots;
         goList<goFloat>   extentRow;
@@ -115,6 +119,11 @@ goMultiPlotter& goMultiPlotter::operator= (goMultiPlotter& other)
  */
 void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t row, goSize_t col, goFloat extentRow, goFloat extentCol)
 {
+    if (myPrivate->barycentric)
+    {
+        goLog::warning ("goMultiPlotter::addPlot(): mp is barycentric, use addPlotBarycentric()");
+        return;
+    }
     myPrivate->plots.append (p);
     myPrivate->extentRow.append (extentRow);
     myPrivate->extentCol.append (extentCol);
@@ -123,12 +132,46 @@ void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t row, goSize_t col,
 
 void goMultiPlotter::addPlot (const goSinglePlot& p, goSize_t index)
 {
+    if (myPrivate->barycentric)
+    {
+        goLog::warning ("goMultiPlotter::addPlot(): mp is barycentric, use addPlotBarycentric()");
+        return;
+    }
     goSize_t row = index % this->getRows();
     goSize_t col = index / this->getRows();
     myPrivate->plots.append (p);
     myPrivate->extentRow.append (1.0f);
     myPrivate->extentCol.append (1.0f);
     myPrivate->plots.getTailElement()->elem.setPosition (row, col);
+}
+
+void goMultiPlotter::addPlotBarycentric (goSinglePlot& p, goDouble u, goDouble v, goDouble w, goDouble xsize, goDouble ysize)
+{
+    if (!myPrivate->barycentric)
+    {
+        goLog::warning ("goMultiPlotter::addPlotBarycentric(): put into barycentric mode first by setBarycentric() !");
+        return;
+    }
+
+    goVectord bary (3);
+    goVectord pos (2);
+    bary[0] = u; bary[1] = v; bary[2] = w;
+    goMath::barycentricToEuclidean (myPrivate->barycentricTriangle, bary, pos);
+
+    goString pref = p.getPrefix ();
+    pref += "set origin ";
+    pref += (float)pos[0];
+    pref += ",";
+    pref += (float)pos[1];
+    pref += "\nset size ";
+    pref += (float)xsize; pref += ",";
+    pref += (float)ysize; pref += "\n";
+    p.setPrefix (pref);
+
+    myPrivate->plots.append (p);
+    myPrivate->extentRow.append (1.0f);
+    myPrivate->extentCol.append (1.0f);
+    myPrivate->plots.getTailElement()->elem.setPosition (0, 0);
 }
 
 /** 
@@ -197,6 +240,60 @@ bool goMultiPlotter::getPauseFlag () const
     return myPrivate->pauseFlag;
 }
 
+void goMultiPlotter::setAutoPosition (bool a)
+{
+    myPrivate->autoPosition = a;
+}
+
+bool goMultiPlotter::getAutoPosition () const
+{
+    return myPrivate->autoPosition;
+}
+
+void goMultiPlotter::setBarycentric (const goMatrixf& triangle)
+{
+    goVectord row;
+
+    myPrivate->barycentricTriangle.resize (2,3);
+
+    if (triangle.getRows() != myPrivate->barycentricTriangle.getRows() || triangle.getColumns() != myPrivate->barycentricTriangle.getColumns())
+    {
+        goLog::warning ("goMultiPlotter::setBarycentric(): triangle has size != 2x3");
+        return;
+    }
+
+    for (goSize_t i = 0; i < 2; ++i)
+    {
+        myPrivate->barycentricTriangle.refRow (i, row);
+        triangle.copyRow (i, row);
+    }
+
+    this->setAutoPosition (false);
+    myPrivate->barycentric = true;
+}
+
+void goMultiPlotter::setBarycentric (const goMatrixd& triangle)
+{
+    goVectord row;
+
+    myPrivate->barycentricTriangle.resize (2,3);
+
+    if (triangle.getRows() != myPrivate->barycentricTriangle.getRows() || triangle.getColumns() != myPrivate->barycentricTriangle.getColumns())
+    {
+        goLog::warning ("goMultiPlotter::setBarycentric(): triangle has size != 2x3");
+        return;
+    }
+
+    for (goSize_t i = 0; i < 2; ++i)
+    {
+        myPrivate->barycentricTriangle.refRow (i, row);
+        triangle.copyRow (i, row);
+    }
+
+    this->setAutoPosition (false);
+    myPrivate->barycentric = true;
+}
+
 /** 
  * @brief Set a gnuplot command prefix.
  * 
@@ -219,7 +316,7 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
     goDouble stepY = -1.0 / static_cast<goDouble>(this->getRows());
 
     goString prefix = myPrivate->prefixCommands;
-    if (myPrivate->rows > 1 || myPrivate->columns > 1)
+    if (myPrivate->rows > 1 || myPrivate->columns > 1 || myPrivate->barycentric)
     {
         prefix += "set multiplot\n";
     }
@@ -241,16 +338,19 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
     goList<goFloat>::Element *extentColEl = myPrivate->extentCol.getFrontElement();
     while (el)
     {
-        plotCommands += "set origin ";
-        plotCommands += (float)(posX + el->elem.getColumn() * stepX);
-        plotCommands += ",";
-        plotCommands += (float)(posY + el->elem.getRow() * stepY);
-        plotCommands += "\n";
-        plotCommands += "set size ";
-        plotCommands += (float)(extentColEl->elem * stepX);
-        plotCommands += ",";
-        plotCommands += (float)(extentRowEl->elem * -stepY);
-        plotCommands += "\n";
+        if (this->getAutoPosition())
+        {
+            plotCommands += "set origin ";
+            plotCommands += (float)(posX + el->elem.getColumn() * stepX);
+            plotCommands += ",";
+            plotCommands += (float)(posY + el->elem.getRow() * stepY);
+            plotCommands += "\n";
+            plotCommands += "set size ";
+            plotCommands += (float)(extentColEl->elem * stepX);
+            plotCommands += ",";
+            plotCommands += (float)(extentRowEl->elem * -stepY);
+            plotCommands += "\n";
+        }
         el->elem.makePlot (plotCommands, false);
         el = el->next;
         extentRowEl = extentRowEl->next;
@@ -392,6 +492,8 @@ void goMultiPlotter::clear ()
     myPrivate->shellPostfix = "";
     myPrivate->waitFlag = true;
     myPrivate->pauseFlag = false;
+    myPrivate->autoPosition = true;
+    myPrivate->barycentric = false;
     myPrivate->cmdFilename = "";
     myPrivate->plots.erase ();
     myPrivate->extentCol.erase ();
