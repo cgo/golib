@@ -115,6 +115,12 @@ class goSinglePlot : public goObjectBase
         bool addCurveMatrix (const goMatrixf& m, const char* title, const char* plotOptions = 0);
         bool addCurveMatrix (const goMatrixd& m, const char* title, const char* plotOptions = 0);
 
+        bool addPoint (const goVectorf& p, const char* title, const char* plotOptions = 0);
+        bool addPoint (const goVectord& p, const char* title, const char* plotOptions = 0);
+
+        bool addPlane (const goVectorf& n, const goVectorf& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
+        bool addPlane (const goVectord& n, const goVectord& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
+
         template <class vectorT>
             bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)
             {

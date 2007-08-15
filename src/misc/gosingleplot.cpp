@@ -81,6 +81,58 @@ class goPlotElementMatrixSurface : public goPlotElement
 };
 
 template <class T>
+class goPlotElementPlane : public goPlotElement
+{
+    public:
+        goPlotElementPlane (const goVector<T>& n, const goVector<T>& p, T dx = 0.1, T dy = 0.1, T sx = 1.0, T sy = 1.0) 
+            : goPlotElement ("splot" , "-", "with lines"), 
+              myNormal (n), 
+              myPoint (p),
+              myDx (dx),
+              myDy (dy),
+              mySx (sx),
+              mySy (sy) { };
+        virtual ~goPlotElementPlane () {};
+
+        virtual void data (goString& ret) const
+        {
+
+            //= Find orthonormal basis of the plane
+            goVector<T> x(3), y(3);
+            x[0] = 1.0; x[1] = 0.0; x[2] = 0.0;
+            goVector<T> n (myNormal);
+            n *= 1.0 / n.norm2();
+            if (fabs(1.0 - n * x) < 1e-3)
+            {
+                x[0] = 0.0; x[1] = 1.0; x[2] = 0.0;
+            }
+            n.cross (x, y);  //= y = n X x
+            y.cross (n, x);
+            x *= 1.0 / x.norm2();
+            y *= 1.0 / y.norm2();
+
+            goVector<T> p (3);
+
+            for (T u = -0.5 * mySx; u <= 0.5 * mySx; u += myDx)
+            {
+                for (T v = -0.5 * mySy; v <= 0.5 * mySy; v += myDy)
+                {
+                    p = myPoint + x * u + y * v;
+                    ret += (float)p[0]; ret += " "; ret += (float)p[1]; ret += " "; ret += (float)p[2]; ret += "\n";
+                }
+                ret += "\n";
+            }
+        };
+
+        goVector<T> myNormal;
+        goVector<T> myPoint;
+        T myDx;
+        T myDy;
+        T mySx;
+        T mySy;
+};
+
+template <class T>
 class goPlotElementMatrixCurve : public goPlotElement
 {
     public:
@@ -100,6 +152,25 @@ class goPlotElementMatrixCurve : public goPlotElement
         };
 
         goMatrix<T> myMatrix;
+};
+
+template <class T>
+class goPlotElementPoint : public goPlotElement
+{
+    public:
+        goPlotElementPoint (const goVector<T>& p) : goPlotElement ("plot", "-", "with points"), myPoint (p) { };
+        virtual ~goPlotElementPoint () {};
+
+        virtual void data (goString& ret) const
+        {
+            for (goSize_t j = 0; j < myPoint.getSize(); ++j)
+            {
+                ret += (float)myPoint[j]; ret += " ";
+            }
+            ret += "\n";
+        };
+
+        goVector<T> myPoint;
 };
 
 template <class T>
@@ -798,20 +869,130 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
  */
 bool goSinglePlot::addCurveMatrix (const goMatrixf& m, const char* title, const char* plotOptions)
 {
-    const goVectorf x;
-    const goVectorf y;
-    m.refColumn (0, x);
-    m.refColumn (1, y);
-    return this->addCurve (x, y, title, plotOptions);
+//    const goVectorf x;
+//    const goVectorf y;
+//    m.refColumn (0, x);
+//    m.refColumn (1, y);
+//    return this->addCurve (x, y, title, plotOptions);
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixCurve<goFloat>(m));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
 }
 
 bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const char* plotOptions)
 {
-    const goVectord x;
-    const goVectord y;
-    m.refColumn (0, x);
-    m.refColumn (1, y);
-    return this->addCurve (x, y, title, plotOptions);
+    //const goVectord x;
+    //const goVectord y;
+    //m.refColumn (0, x);
+    //m.refColumn (1, y);
+    //return this->addCurve (x, y, title, plotOptions);
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixCurve<goDouble>(m));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addPoint (const goVectorf& p, const char* title, const char* plotOptions)
+{
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPoint<goFloat>(p));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addPoint (const goVectord& p, const char* title, const char* plotOptions)
+{
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPoint<goDouble>(p));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addPlane (const goVectorf& n, const goVectorf& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPlane<goFloat>(n,p,dx,dy,sx,sy));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addPlane (const goVectord& n, const goVectord& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPlane<goDouble>(n,p,dx,dy,sx,sy));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
 }
 
 /** 

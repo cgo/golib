@@ -487,6 +487,11 @@ bool euclideanToBarycentric (const goMatrix<T>& simplex, const goVector<T>& poin
 template <class T>
 void barycentricToEuclidean (const goMatrix<T>& simplex, const goVector<T>& barycentric, goVector<T>& ret);
 
+template <class T>
+bool planeLineCut (const goVector<T>& planeNormal, const goVector<T>& planePoint, 
+                   const goVector<T>& lineDirection, const goVector<T>& linePoint,
+                   goVector<T>& ret);
+
 template <class vectorT, class T>
 bool getRoots (const vectorT& fX, 
                const vectorT& fY,
