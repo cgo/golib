@@ -6,6 +6,56 @@
 
 int main ()
 {
+    
+    {
+        goMultiPlotter mp (1,1);
+        goSinglePlot plot;
+        plot.setPrefix ("set size square\n");
+        plot.setUseFiles (true);
+        goVectorf phi (10), theta (10);
+        phi.fillRange(-4.0, 1.0, 5.0);
+        phi *= M_PI / (float)(phi.getSize() / 2 - 1);
+        theta.fillRange(0.0, 1.0, 10.0);
+        theta *= M_PI / (float)(theta.getSize() - 1);
+        for (goSize_t i = 0; i < phi.getSize(); ++i)
+        {
+            for (goSize_t j = 0; j < theta.getSize(); ++j)
+            {
+                goVectorf n;
+                goVectorf p(3); p.fill (0.0);
+                goMath::sphereToEuclidean<goFloat> (phi[i], theta[j], 1.0, &n, 0);
+                plot.addLine (n, p);
+            }
+        }
+        mp.addPlot (plot,0);
+        mp.setPauseFlag (true);
+        mp.plot ();
+    }
+    {
+        goMultiPlotter mp (1,1);
+        goSinglePlot plot;
+        plot.setPrefix ("set size square\n");
+        plot.setUseFiles (true);
+        goVectorf sinx (100), cosx(100);
+        sinx.fillRange(0.0, 1.0, 100.0);
+        sinx *= 2 * M_PI / 99.0;
+        cosx = sinx;
+        goMath::sin (sinx);
+        goMath::cos (cosx);
+        for (goSize_t i = 0; i < cosx.getSize(); ++i)
+        {
+            goVectorf n (2);
+            goVectorf p (2); p.fill (0.0);
+            n[0] = sinx[i];
+            n[1] = cosx[i];
+            plot.addLine (n, p);
+        }
+        mp.addPlot (plot,0);
+        mp.setPauseFlag (true);
+        mp.plot ();
+        exit (1);
+    }
+
     goFixedArray<goFloat> a1 (5);
     a1[0] = 1.0;
     a1[1] = 2.0;

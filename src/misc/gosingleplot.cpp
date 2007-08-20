@@ -133,6 +133,47 @@ class goPlotElementPlane : public goPlotElement
 };
 
 template <class T>
+class goPlotElementLine : public goPlotElement
+{
+    public:
+        goPlotElementLine (const goVector<T>& n, const goVector<T>& p)
+            : goPlotElement ("plot" , "-", "with lines"), 
+              myDirection (n), 
+              myPoint (p) 
+        {
+            if (n.getSize() > 2)
+            {
+                const_cast<goPlotElementLine*>(this)->setPlotCommand ("splot");
+            }
+        };
+        virtual ~goPlotElementLine () {};
+
+        virtual void data (goString& ret) const
+        {
+            goSize_t sz = myDirection.getSize();
+            if (sz != myPoint.getSize())
+            {
+                goLog::warning ("goPlotElementLine: myPoint different size than myDirection");
+                return;
+            }
+            for (goSize_t i = 0; i < sz; ++i)
+            {
+                ret += (float)myPoint[i]; ret += " ";
+            }
+            ret += "\n";
+            goVector<T> p2 = myPoint + myDirection;
+            for (goSize_t i = 0; i < sz; ++i)
+            {
+                ret += (float)p2[i]; ret += " ";
+            }
+            ret += "\n";
+        };
+
+        goVector<T> myDirection;
+        goVector<T> myPoint;
+};
+
+template <class T>
 class goPlotElementMatrixCurve : public goPlotElement
 {
     public:
@@ -915,6 +956,11 @@ bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const 
 
 bool goSinglePlot::addPoint (const goVectorf& p, const char* title, const char* plotOptions)
 {
+    if (myPrivate->plotType != goPlot::Surface && p.getSize() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPoint<goFloat>(p));
     if (plotOptions)
@@ -933,6 +979,11 @@ bool goSinglePlot::addPoint (const goVectorf& p, const char* title, const char* 
 
 bool goSinglePlot::addPoint (const goVectord& p, const char* title, const char* plotOptions)
 {
+    if (myPrivate->plotType != goPlot::Surface && p.getSize() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPoint<goDouble>(p));
     if (plotOptions)
@@ -981,6 +1032,52 @@ bool goSinglePlot::addPlane (const goVectord& n, const goVectord& p, goDouble dx
     }
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementPlane<goDouble>(n,p,dx,dy,sx,sy));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addLine (const goVectorf& n, const goVectorf& p, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface && n.getSize() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementLine<goFloat>(n,p));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addLine (const goVectord& n, const goVectord& p, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Surface && n.getSize() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementLine<goDouble>(n,p));
     if (plotOptions)
         aptr->setPlotOptions (plotOptions);
     if (title)

@@ -25,6 +25,30 @@ int main ()
         }
         {
             goMatrixf M2;
+            for (goIndex_t i = 0; i < M1.getRows(); ++i)
+            {
+                M1.shiftRows (i, M2);
+                M2.print();
+            }
+            for (goIndex_t i = 0; i > -(goIndex_t)M1.getRows(); --i)
+            {
+                M1.shiftRows (i, M2);
+                M2.print();
+            }
+            for (goIndex_t i = 0; i < M1.getRows(); ++i)
+            {
+                M1.shiftColumns (i, M2);
+                M2.print();
+            }
+            for (goIndex_t i = 0; i > -(goIndex_t)M1.getRows(); --i)
+            {
+                M1.shiftColumns (i, M2);
+                M2.print();
+            }
+            exit (1);
+        }
+        {
+            goMatrixf M2;
             M2.setData (&M1(1,1), 3, 3, M1.getLeadingDimension());
             goMatrixf M3 (&M1(2,0), 3, 4, M1.getLeadingDimension());
             printf ("M1:\n"); M1.print ();
@@ -381,5 +405,3 @@ int main ()
     return 1;
 }
 
-#include <golist.hpp>
-template class goList<goMatrixf>;

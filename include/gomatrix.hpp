@@ -269,6 +269,64 @@ void goMatrix<T>::flip (goSize_t dim)
 }
 
 /** 
+ * @brief Shift (cyclically permute) rows.
+ * 
+ * Shifts all rows "down" a given offset.
+ * The offset can be positive or negative
+ *
+ * @param offset Offset
+ * @param ret    On return, contains the shifted matrix.
+ */
+template <class T>
+void goMatrix<T>::shiftRows (goIndex_t offset, goMatrix<T>& ret) const
+{
+    if (ret.getRows() != this->getRows() || ret.getColumns() != this->getColumns())
+    {
+        ret.resize (this->getRows(), this->getColumns());
+    }
+
+    goSize_t sz = this->getRows();
+    goSize_t newIndex = (offset >= 0) ? (offset) : (sz + offset);
+    const goVector<T> ref(0);
+    for (goSize_t oldIndex = 0; oldIndex < sz; ++oldIndex, ++newIndex)
+    {
+        if (newIndex >= sz)
+            newIndex = 0;
+        this->refRow (oldIndex, ref);
+        ret.setRow (newIndex, ref);
+    }
+}
+
+/** 
+ * @brief Shift (cyclically permute) columns.
+ * 
+ * Shifts all columns "down" a given offset.
+ * The offset can be positive or negative
+ *
+ * @param offset Offset
+ * @param ret    On return, contains the shifted matrix.
+ */
+template <class T>
+void goMatrix<T>::shiftColumns (goIndex_t offset, goMatrix<T>& ret) const
+{
+    if (ret.getRows() != this->getRows() || ret.getColumns() != this->getColumns())
+    {
+        ret.resize (this->getRows(), this->getColumns());
+    }
+
+    goSize_t sz = this->getColumns();
+    goSize_t newIndex = (offset >= 0) ? (offset) : (sz + offset);
+    const goVector<T> ref(0);
+    for (goSize_t oldIndex = 0; oldIndex < sz; ++oldIndex, ++newIndex)
+    {
+        if (newIndex >= sz)
+            newIndex = 0;
+        this->refColumn (oldIndex, ref);
+        ret.setColumn (newIndex, ref);
+    }
+}
+
+/** 
  * @brief Copies sub-matrix from this matrix to target matrix.
  *
  * Copies the given sub-matrix from this to target starting in target at 0,0.

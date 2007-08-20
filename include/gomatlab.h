@@ -160,8 +160,13 @@ class goMatlab : public goObjectBase
             };
 
         bool     put2DPoints (const goList<goVectorf>& l, const char* variableName);
+        bool     put2DPoints (const goList<goVectord>& l, const char* variableName);
         bool     get2DPoints (goList<goVectorf>& l, const char* variableName);
+        bool     get2DPoints (goList<goVectord>& l, const char* variableName);
         bool     put2DPoints (goList<goVectorf>::ConstElement* begin, 
+                              goIndex_t size, 
+                              const char* variableName);
+        bool     put2DPoints (goList<goVectord>::ConstElement* begin, 
                               goIndex_t size, 
                               const char* variableName);
 

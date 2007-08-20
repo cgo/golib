@@ -11,7 +11,7 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
+LIBS		=  -L/space/gosch/lib -lGo -lGomatlab -L/usr/lib/atlas -llapack -latlas
 
 INCLUDE		=  -I$(GOPATH)/include
 

@@ -82,6 +82,8 @@ class goMatrix
   void power (T scalar);
 
   void flip (goSize_t dim = 0);
+  void shiftRows (goIndex_t offset, goMatrix<T>& ret) const;
+  void shiftColumns (goIndex_t offset, goMatrix<T>& ret) const;
 
   //= FIXME: column major is almost not implemented yet. It may never be.
   bool getRowMajor () const { return this->rowMajor; };

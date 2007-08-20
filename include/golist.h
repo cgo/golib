@@ -3,6 +3,9 @@
 
 #include <gotypes.h>
 #include <assert.h>
+#ifndef GOEXCEPTION_H
+# include <goexception.h>
+#endif
 
 /** @addtogroup data
  * @{ */
@@ -216,6 +219,24 @@ class goList {
           ++c;
       }
       return el;
+  };
+
+  T& getItem (goSize_t i)
+  {
+      Element* el = (*this)(i);
+      if (el)
+          return el->elem;
+      else
+          throw goException();
+  };
+
+  const T& getItem (goSize_t i) const
+  {
+      ConstElement* el = (*this)(i);
+      if (el)
+          return el->elem;
+      else
+          throw goException();
   };
 
   /** 

@@ -196,7 +196,7 @@ void goGUI::OFFView::glDraw ()
     glViewport (0, 0, this->get_width(), this->get_height());
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective (80.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
+    gluPerspective (30.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
     glMatrixMode (GL_MODELVIEW);
 
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f);

@@ -22,6 +22,7 @@
 #include <gopointcloud.h>
 #include <gocurve.h>
 #include <gognuplot.h>
+#include <gofilter1d.h>
 %}
 %import ../../python/golib.i
 

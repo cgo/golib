@@ -59,6 +59,18 @@ goFilter1D::goFilter1D (const goArray<goFloat>& mask, goIndex_t center, bool nor
         this->normalize();
 }
 
+goFilter1D::goFilter1D (const goVector<goFloat>& mask, goIndex_t center, bool normalize)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    myPrivate = new goFilter1DPrivate;
+    assert(myPrivate);
+    this->setMask(mask);
+    this->setCenter(center);
+    if (normalize)
+        this->normalize();
+}
+
 /** 
  * @brief Constructor, setting the mask and center.
  * 
@@ -101,6 +113,17 @@ goFilter1D::~goFilter1D ()
 bool goFilter1D::setMask (const goArray<goFloat>& m)
 {
     myPrivate->mask = m;
+    return true;
+}
+
+bool goFilter1D::setMask (const goVector<goFloat>& m)
+{
+    goSize_t sz = m.getSize();
+    myPrivate->mask.resize (sz);
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        myPrivate->mask[i] = m[i];
+    }
     return true;
 }
 

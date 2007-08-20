@@ -353,6 +353,29 @@ bool goMatlab::put2DPoints (const goList<goVectorf>& l, const char* variableName
     return true;
 }
 
+bool goMatlab::put2DPoints (const goList<goVectord>& l, const char* variableName)
+{
+    assert(this->getEngine());
+    mxArray* array = mxCreateDoubleMatrix(2,l.getSize(),mxREAL);
+    goIndex_t sz = 2 * static_cast<goIndex_t>(l.getSize());
+    goIndex_t i;
+    double* a = mxGetPr(array);
+    goList<goVectord>::ConstElement* el = l.getFrontElement();
+    for (i = 0; i < sz && el; i+=2)
+    {
+        a[i] = el->elem[0];
+        a[i+1] = el->elem[1];
+        el = el->next;
+    }
+    if (engPutVariable(this->getEngine(),variableName,array) != 0)
+    {
+        mxDestroyArray(array);
+        return false;
+    }
+    mxDestroyArray(array);
+    return true;
+}
+
 /** 
  * @brief Get a matrix of 2d points from matlab into a list.
  * 
@@ -401,6 +424,40 @@ bool goMatlab::get2DPoints (goList<goVectorf>& l, const char* variableName)
     return true;
 }
 
+bool goMatlab::get2DPoints (goList<goVectord>& l, const char* variableName)
+{
+    assert (this->getEngine());
+    mxArray* temp = engGetVariable (this->getEngine(), variableName);
+    if (!temp)
+    {
+        goString msg = "get2DPoints(): Variable ";
+        msg += variableName;
+        msg += " does not exist.";
+        goLog::warning(msg,this);
+        return false;
+    }
+    assert (temp);
+    if (mxGetM(temp) != 2)
+    {
+        mxDestroyArray(temp);
+        return false;
+    }
+    goIndex_t sz = (goIndex_t)mxGetN(temp);
+    goIndex_t i;
+    double* ptr = mxGetPr(temp);
+    assert(ptr);
+    goVectord tempv (2);
+    for (i = 0; i < sz; ++i, ptr+=2)
+    {
+        tempv[0] = *ptr;
+        tempv[1] = *(ptr + 1);
+        l.append(tempv);
+    }
+    assert (l.getSize() == sz);
+    mxDestroyArray(temp);
+    return true;
+}
+
 bool goMatlab::put2DPoints (goList<goVectorf>::ConstElement* begin, 
                             goIndex_t size, 
                             const char* variableName)
@@ -411,6 +468,31 @@ bool goMatlab::put2DPoints (goList<goVectorf>::ConstElement* begin,
     goIndex_t i;
     double* a = mxGetPr(array);
     goList<goVectorf>::ConstElement* el = begin;
+    for (i = 0; i < sz && el; i+=2)
+    {
+        a[i] = el->elem[0];
+        a[i+1] = el->elem[1];
+        el = el->next;
+    }
+    if (engPutVariable(this->getEngine(),variableName,array) != 0)
+    {
+        mxDestroyArray(array);
+        return false;
+    }
+    mxDestroyArray(array);
+    return true;
+}
+
+bool goMatlab::put2DPoints (goList<goVectord>::ConstElement* begin, 
+                            goIndex_t size, 
+                            const char* variableName)
+{
+    assert(this->getEngine());
+    mxArray* array = mxCreateDoubleMatrix(2,size,mxREAL);
+    goIndex_t sz = 2 * size;
+    goIndex_t i;
+    double* a = mxGetPr(array);
+    goList<goVectord>::ConstElement* el = begin;
     for (i = 0; i < sz && el; i+=2)
     {
         a[i] = el->elem[0];
