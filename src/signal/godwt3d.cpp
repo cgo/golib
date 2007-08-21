@@ -233,7 +233,7 @@ goDWT3D::calculateDWT (goSignal3DBase<void>& sig, goTypeEnum dwtType)
     }
     goLog::message("calculateDWT(): Currently only 2D.", this);
     goFixedArray<goAutoPtr<goSignal3D<void> > >& dwt = myPrivate->dwt;
-    goIndex_t i;
+    goSize_t i;
     
     for (i = 0; i < dwt.getSize(); ++i)
     {
@@ -580,11 +580,11 @@ goDWT3D::idwt (goDWT3D& parentDWT)
     if (!myPrivate->frameMode)
     {
         // We know this is a signal3d<void>
-        return this->idwt (parentDWT.getDWT()[0]);
+        return this->idwt (parentDWT.getDWT()[0].get());
     }
     else
     {
-        return this->idwt (parentDWT.getDWT()[0]);
+        return this->idwt (parentDWT.getDWT()[0].get());
 //        goSignal3D<void> tempTarget;
 //        this->idwt (&tempTarget);
         // _scaleValues (tempTarget, 2);       // Undo the value scaling in the next stage

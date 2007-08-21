@@ -55,9 +55,9 @@ bool goBTreeAlgorithm<T>::depthFirst (typename goBTree<T>::ElementPtr root)
     static bool ok = true;
     if (root.isNull())
         return false;
-    if (root->leftChild)
+    if (!root->leftChild.isNull())
         ok = ok && this->depthFirst (root->leftChild);
-    if (root->rightChild)
+    if (!root->rightChild.isNull())
         ok = ok && this->depthFirst (root->rightChild);
     return ok && this->action(root);
 }
@@ -97,7 +97,7 @@ bool goBTreeAlgorithm<T>::breadthFirst (typename goBTree<T>::ElementPtr root)
     while (!Q.isEmpty())
     {
         node = Qhead->elem;
-        assert (!node.isNull());
+        // assert (!node.isNull());
         if (!node->leftChild.isNull())
         {
             Q.append (node->leftChild);

@@ -644,7 +644,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
         Tfloat norm (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
         {
             goVector<Tfloat> marginal (valueCount);
-            this->marginal (fg.myVariables[0], valueCount, marginal);
+            this->marginal (fg.myVariables[0].get(), valueCount, marginal);
             return marginal.sum ();
         };
 };
