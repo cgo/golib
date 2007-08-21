@@ -514,6 +514,9 @@ template <class T>
 bool euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T& radiusRet);
 
 template <class T>
+bool euclideanToSphere (const goVector<T>& x, goVector<T>& phitheta, T* radiusRet = 0);
+
+template <class T>
 bool sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, goList<goVector<T> >& upRet);
 template <class T>
 bool sampleSphere (T dist, T radius, goMatrix<T>& sphereRet);

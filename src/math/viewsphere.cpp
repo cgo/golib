@@ -132,6 +132,22 @@ bool goMath::euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T&
     return true;
 }
 
+template <class T>
+bool goMath::euclideanToSphere (const goVector<T>& x, goVector<T>& phitheta, T* radiusRet)
+{
+    if (x.getSize() != 3)
+        return false;
+    if (phitheta.getSize() != 2)
+        phitheta.resize(2);
+
+    if (radiusRet)
+        *radiusRet = x.norm2();
+    phitheta[1] = ::atan2 (sqrt(x[0]*x[0] + x[1]*x[1]), x[2]); // theta
+    phitheta[0] = ::atan2 (x[1], x[0]);                        // phi
+
+    return true;
+}
+
 template 
 bool goMath::sphereToEuclidean<goFloat> (goFloat phi, goFloat theta, goFloat radius,
                                 goVector<goFloat>* positionRet, goVector<goFloat>* upRet);
@@ -142,6 +158,10 @@ template
 bool goMath::euclideanToSphere<goFloat> (const goVector<goFloat>& , goFloat& , goFloat& , goFloat&);
 template
 bool goMath::euclideanToSphere<goDouble> (const goVector<goDouble>& , goDouble& , goDouble& , goDouble&);
+template
+bool goMath::euclideanToSphere<goFloat> (const goVector<goFloat>&, goVector<goFloat>&, goFloat*);
+template
+bool goMath::euclideanToSphere<goDouble> (const goVector<goDouble>&, goVector<goDouble>&, goDouble*);
 
 template 
 bool goMath::sampleSphere<goFloat> (goFloat dist, goFloat radius, goMatrix<goFloat>& viewSphereRet);

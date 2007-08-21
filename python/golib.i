@@ -852,14 +852,14 @@
 %inline %{
     // Namespaces are not used, but maybe they will in a future swig?
     namespace goMath {
-        void euclideanToSphere (const goVectorf& x, float *phiRet, float *thetaRet, float *radiusRet)
-        {
-            goFloat phi, theta, radius;
-            goMath::euclideanToSphere (x, phi, theta, radius);
-            *phiRet = phi;
-            *thetaRet = theta;
-            *radiusRet = radius;
-        }
+        //void euclideanToSphere (const goVectorf& x, float *phiRet, float *thetaRet, float *radiusRet)
+        //{
+        //    goFloat phi, theta, radius;
+        //    goMath::euclideanToSphere (x, phi, theta, radius);
+        //    *phiRet = phi;
+        //    *thetaRet = theta;
+        //    *radiusRet = radius;
+        //}
         //goVectorf sphereToEuclidean (goFloat phi, goFloat theta, goFloat radius)
         //{
         //    goVectorf ret(3);
@@ -952,6 +952,13 @@
             upRet  = goVectord()
             goSphereToEuclideand (phi, theta, radius, posRet, upRet)
             return posRet, upRet
+
+        def euclideanToSphere (x):
+            v = goVectord(3)
+            v.setArray(x)
+            phitheta = goVectord(2)
+            goEuclideanToSphered (v, phitheta)
+            return phitheta[0], phitheta[1]
 
         def planeLineCut (planeNormal, planePoint, lineDirection, linePoint):
             if isinstance(planeNormal,goVectorf):
@@ -1061,6 +1068,8 @@
 
 %template(goSphereToEuclideanf) goMath::sphereToEuclidean<goFloat>;
 %template(goSphereToEuclideand) goMath::sphereToEuclidean<goDouble>;
+%template(goEuclideanToSpheref) goMath::euclideanToSphere<goFloat>;
+%template(goEuclideanToSphered) goMath::euclideanToSphere<goDouble>;
 
 %template(goIntegratef)    goMath::integrate<goFloat>;
 %template(goIntegrated)    goMath::integrate<goDouble>;
