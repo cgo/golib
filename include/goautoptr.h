@@ -20,7 +20,7 @@ class goRRefPtr
             }
             if (myPtr)
             {
-                // printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
+                //printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
                 myMutex.lock();
                 delete myPtr;
                 myPtr = 0;
@@ -39,6 +39,7 @@ class goRRefPtr
         goRRefPtr<T>& operator= (goRRefPtr<To>& other)
         {
             myMutex.lock();
+            //printf ("goRRefPtr = with refcount %d, ptr %p\n", other.myRefCount, other.myPtr);
             this->myRefCount = other.myRefCount;
             this->myPtr = static_cast<T*>(other.myPtr);
             myMutex.unlock();
@@ -131,6 +132,22 @@ class goAutoPtr
             myRRefPtr = new goRRefPtr<T>(p);
         };
 
+        T* get ()
+        {
+            if (myRRefPtr)
+                return myRRefPtr->myPtr;
+            else
+                return 0;
+        };
+
+        const T* get () const
+        {
+            if (myRRefPtr)
+                return myRRefPtr->myPtr;
+            else
+                return 0;
+        };
+
         /** 
          * @brief Reset the pointer and reference count.
          * Decrements the current reference count, if a pointer is set,
@@ -177,11 +194,10 @@ class goAutoPtr
          *
          * @param other Other auto ptr.
          */
-        template <class To>
-        goAutoPtr (const goAutoPtr<To>& other)
+        goAutoPtr (const goAutoPtr<T>& other)
             : myRRefPtr (0)
         {
-            *this = const_cast<goAutoPtr<To>&>(other);
+            *this = const_cast<goAutoPtr<T>&>(other);
         };
 
         goRRefPtr<T>* getRRefPtr () { return this->myRRefPtr; };
@@ -226,7 +242,8 @@ class goAutoPtr
 
         bool isNull () const
         {
-            return ((const T*)(*this) == 0);
+            return (this->myRRefPtr == 0 || this->myRRefPtr->myPtr == 0);
+            // return ((const T*)(*this) == 0);
         };
 
         bool operator== (const goAutoPtr<T>& other) const
@@ -271,6 +288,7 @@ class goAutoPtr
             return myRRefPtr->myPtr;
         };
 
+#if 1
         operator T* () 
         {
             if (!myRRefPtr)
@@ -284,6 +302,7 @@ class goAutoPtr
                 return 0;
             return myRRefPtr->myPtr;
         };
+#endif
 
     private:
         goRRefPtr<T>* myRRefPtr;
