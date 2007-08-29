@@ -14,6 +14,13 @@ class goPython
 
         bool call (const goString& cmd);
         bool call (const char* cmd);
+        PyObject* run (const goString& cmd);
+
+        PyObject* getObject (const char* name);
+        goFloat   getFloat (const char* name);
+        goDouble  getDouble (const char* name);
+        void      set (const char* name, goFloat value);
+        void      set (const char* name, goDouble value);
         
     private:
         goPythonPrivate* myPrivate;

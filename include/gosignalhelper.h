@@ -40,5 +40,6 @@ bool     goRGBAtoScalar       (const goSignal3DBase<void>* sig, goSignal3DBase<v
 void     goSignalInfoText     (const goSignal3DBase<void>& sig, goString& strRet, bool html = false);
 goDouble goSignalMean         (const goSignal3DBase<void>& sig);
 void     goSignalMeanVariance (const goSignal3DBase<void>& sig, goDouble& mean, goDouble& variance);
+void     goSignalFlipY        (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target);
 /*! @} */
 #endif

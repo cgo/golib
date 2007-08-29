@@ -48,8 +48,6 @@
  * of a separable filter,
  * or implement another filter class.
  *
- * @todo Implement a separable filter class.
- * 
  * \author Christian Gosch
  **/
 template<class T_IN, class T_OUT>

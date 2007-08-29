@@ -52,7 +52,7 @@ class goFileIO {
 
   /** @addtogroup signal */
   /** @{ */
-  static bool  readImage  (const char* filename, goSignal3D<void>* signal) throw (goFileIOException, goTypeException);
+  static bool  readImage  (const char* filename, goSignal3D<void>* signal, bool linear = false) throw (goFileIOException, goTypeException);
   static bool  writeImage (const char* filename, const goSignal3DBase<void>* signal) throw (goFileIOException, goTypeException);
   /** @} */
   template <class T> static bool  writeBinaryMatrix (const goMatrix<T>&, FILE* f);
