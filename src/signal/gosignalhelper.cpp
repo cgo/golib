@@ -1100,6 +1100,25 @@ void goSignalMeanVariance (const goSignal3DBase<void>& sig,
     }
 }
 
+void goSignalFlipY (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target)
+{
+    if (sig.getSize() != target.getSize())
+    {
+        goLog::warning ("goSignalFlipY(): sig and target must be of the same size.");
+        return;
+    }
+    goSignal3DBase<void>* sigp = const_cast<goSignal3DBase<void>*>(&sig);
+    goSubSignal3D<void> sub (sigp, sig.getSizeX(), 1, 1);
+    goSubSignal3D<void> subtarget (&target, target.getSizeX(), 1, 1);
+    
+    goSize_t sz = sig.getSizeY();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        sub.setPosition (0, i, 0);
+        subtarget.setPosition (0, target.getSizeY() - 1 - i, 0);
+        goCopySignal (&sub, &subtarget);
+    }
+}
 
 template bool goCopySignalArray<goInt8>   (const goInt8*, goSignal3DBase<void>*);
 template bool goCopySignalArray<goUInt8>  (const goUInt8*, goSignal3DBase<void>*);

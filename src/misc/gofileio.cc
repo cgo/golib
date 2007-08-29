@@ -229,17 +229,20 @@ goFileIO::readJPEG (const char* filename, goSignal2D<goInt32>*& signal)
 #ifdef HAVE_LIBIL
 
 template <class T> 
-static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s)
+static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int width, int height, goSignal3D<void>* s, bool linear)
 {
     s->destroy ();
     goSize3D border (goMath::min<int> (width-1, 32), goMath::min<int> (height - 1, 32), 0);
+    goSize3D blockSize (32,32,1);
+    if (linear)
+        blockSize = goSize3D(width, height, 1);
     if (format == IL_RGBA)
     {
-        s->make (goSize3D(width, height, 1), goSize3D(32, 32, 1), border, 4);
+        s->make (goSize3D(width, height, 1), blockSize, border, 4);
     }
     else
     {
-        s->make (goSize3D(width, height, 1), goSize3D(32, 32, 1), border, 1);
+        s->make (goSize3D(width, height, 1), blockSize, border, 1);
     }
     if (ilConvertImage (format, type) == IL_FALSE)
     {
@@ -316,6 +319,8 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  *                  In that case, sig will always contain
  *                  GO_UINT8, 4 channel data containing
  *                  red, green, blue, and alpha values.
+ * @param linear    If true, sig will be allocated linearly in memory. Otherwise,
+ *                  block size will be 32x32x1 (default: false).
  *        
  *        
  * \note This method only works when libGo was compiled with 
@@ -326,7 +331,7 @@ static inline bool ILtoGOSIGNAL (ILint format, ILint type, ILuint imageName, int
  * @return  True if successful, false otherwise.
  **/
 bool
-goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileIOException, goTypeException)
+goFileIO::readImage (const char* filename, goSignal3D<void>* sig, bool linear) throw (goFileIOException, goTypeException)
 {
     if (!sig)
     {
@@ -414,7 +419,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
     {
         case GO_INT8:
             {
-                if (!ILtoGOSIGNAL<goInt8> (imageFormat, IL_BYTE, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt8> (imageFormat, IL_BYTE, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -422,7 +427,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_UINT8:
             {
-                if (!ILtoGOSIGNAL<goUInt8> (imageFormat, IL_UNSIGNED_BYTE, imageName, width, height,  s))
+                if (!ILtoGOSIGNAL<goUInt8> (imageFormat, IL_UNSIGNED_BYTE, imageName, width, height,  s, linear))
                 {
                     return false;
                 }
@@ -430,7 +435,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_INT16:
             {
-                if (!ILtoGOSIGNAL<goInt16> (imageFormat, IL_SHORT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt16> (imageFormat, IL_SHORT, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -438,7 +443,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_UINT16:
             {
-                if (!ILtoGOSIGNAL<goUInt16> (imageFormat, IL_UNSIGNED_SHORT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goUInt16> (imageFormat, IL_UNSIGNED_SHORT, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -446,7 +451,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_INT32:
             {
-                if (!ILtoGOSIGNAL<goInt32> (imageFormat, IL_INT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goInt32> (imageFormat, IL_INT, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -454,7 +459,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_UINT32:
             {
-                if (!ILtoGOSIGNAL<goUInt32> (imageFormat, IL_UNSIGNED_INT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goUInt32> (imageFormat, IL_UNSIGNED_INT, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -462,7 +467,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_FLOAT:
             {
-                if (!ILtoGOSIGNAL<goFloat> (imageFormat, IL_FLOAT, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goFloat> (imageFormat, IL_FLOAT, imageName, width, height, s, linear))
                 {
                     return false;
                 }
@@ -470,7 +475,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig) throw (goFileI
             break;
         case GO_DOUBLE:
             {
-                if (!ILtoGOSIGNAL<goDouble> (imageFormat, IL_DOUBLE, imageName, width, height, s))
+                if (!ILtoGOSIGNAL<goDouble> (imageFormat, IL_DOUBLE, imageName, width, height, s, linear))
                 {
                     return false;
                 }

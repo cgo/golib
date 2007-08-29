@@ -1517,6 +1517,22 @@ static void flip_array (T* array, goSize_t sz)
     }
 }
 
+template <class T>
+static void flip_diff_array (T* array, goSize_t sz)
+{
+    goSize_t i = 0;
+    goSize_t j = sz - 1;
+    T* a = array;
+    T* e = &array[sz-1];
+    T temp = array[j];
+    while (j > 0)
+    {
+        array[j] = -array[j-1];
+        --j;
+    }
+    array[0] = -temp;
+}
+
 /** 
  * @brief BROKEN. Fix when there's time.
  *
@@ -1541,18 +1557,23 @@ goSignal3DBase<T>::flip (int axis)
                 {
                     *a *= static_cast<goPtrdiff_t>(-1);
                 }
+                this->ptr = this->getPtr(0,0,0);
+                this->real_ptr = this->ptr;
             }
             break;
         case GO_Y: 
             {
-                goSize_t sz = this->getSizeY() + 2 * this->getBorderY();
-                flip_array (this->real_myYJump, sz);
-                flip_array (this->real_yDiff, sz);
-                goPtrdiff_t* a = this->real_yDiff;
-                for (goSize_t i = 0; i < sz; ++i, ++a)
-                {
-                    *a *= static_cast<goPtrdiff_t>(-1);
-                }
+                goSize_t sz = this->getSizeY();
+                flip_array (this->myYJump, sz);
+                flip_diff_array (this->yDiff, sz);
+                this->applyBorderFlags (GO_Y);
+                //goPtrdiff_t* a = this->real_myYJump;
+                //for (goSize_t i = 0; i < sz; ++i, ++a)
+                //{
+                //    *a = *a * static_cast<goPtrdiff_t>(-1) ;
+                //}
+                // this->ptr = this->getPtr(0,0,0);
+                // this->real_ptr = this->ptr;
             }
             break;
         case GO_Z: 
@@ -1565,6 +1586,8 @@ goSignal3DBase<T>::flip (int axis)
                 {
                     *a *= static_cast<goPtrdiff_t>(-1);
                 }
+                this->ptr = this->getPtr(0,0,0);
+                this->real_ptr = this->ptr;
             }
             break;
         default: return; break;
