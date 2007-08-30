@@ -1,7 +1,8 @@
 INCLUDE (UsePkgConfig)
 PROJECT             (Gogui)
 SET                 (TARGETNAME Gogui)
-SET                 (SOURCES src/control.cpp
+SET                 (SOURCES src/draw.cpp
+                             src/control.cpp
                              src/helper.cpp
                              src/about.cpp
                              src/mainwindow.cpp

@@ -45,6 +45,8 @@ namespace goGUI
             goVectorf position;
             goVectorf up;
             goVectorf focus;
+
+            sigc::signal<void> signal_changed;
     };
 }
 
@@ -246,6 +248,7 @@ void goGUI::OFFView::glDraw ()
     // printf ("%s\n", gluErrorString (n));
     glFlush ();
     this->swapBuffers ();
+    myPrivate->signal_changed.emit();
     glDisable (GL_POLYGON_SMOOTH);
     glDisable (GL_LINE_SMOOTH);
 }
@@ -253,4 +256,9 @@ void goGUI::OFFView::glDraw ()
 goGL::OFFFile& goGUI::OFFView::getOFFFile ()
 {
     return this->off;
+}
+
+sigc::signal<void> goGUI::OFFView::signalChanged()
+{
+    return myPrivate->signal_changed;
 }

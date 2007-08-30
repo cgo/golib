@@ -83,13 +83,13 @@ MainWindow::~MainWindow ()
     }
 }
 
-void MainWindow::addControl (goGUI::Control& c)
+void MainWindow::addControl (goGUI::Control& c, bool active)
 {
     myControlBox.pack_start (c, Gtk::PACK_SHRINK);
     myPrivate->controls.append (&c);
     
     Gtk::CheckMenuItem* item = Gtk::manage (new Gtk::CheckMenuItem (c.get_label()));
-    item->set_active (true);
+    item->set_active (active);
     this->getControlsMenu()->append (*item);
 #ifdef HAVE_GTK_2_4
     item->signal_toggled().connect (sigc::bind<goGUI::Control*, Gtk::CheckMenuItem*> (sigc::mem_fun (this, &MainWindow::controlsToggled), &c, item));

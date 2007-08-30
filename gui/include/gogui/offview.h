@@ -26,6 +26,8 @@ class OFFView : public goGUI::GLWidget
 
         goGL::OFFFile& getOFFFile ();
 
+        sigc::signal<void> signalChanged();
+
     private:
         goGL::OFFFile         off;
         int                   myList;

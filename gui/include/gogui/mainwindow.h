@@ -34,7 +34,7 @@ class MainWindow : public Gtk::Window
         MainWindow ();
         virtual ~MainWindow ();
 
-        void addControl (goGUI::Control& c);
+        void addControl (goGUI::Control& c, bool active = true);
 
         Gtk::Menu*     addMenu     (const char* label);
         Gtk::MenuItem* addMenuItem (Gtk::Menu*, const char* label);

@@ -9,11 +9,11 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS)
 
 LD		= g++
-LDARGS		= $(GTKMM_LDFLAGS)
+LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui
+LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui -lGogl -lpython2.4
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
 
