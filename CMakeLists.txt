@@ -7,6 +7,7 @@ INCLUDE             (CheckFunctionExists)
 
 SET (HAVE_MATLAB_GEQ_2007A FALSE CACHE BOOL "Have Matlab >= 2007a? Also see BUILD_WITH_GCC_3_3")
 SET (BUILD_WITH_GCC_3_3 FALSE CACHE BOOL "Enable/disable gcc-3.3 (for matlab < 2007a)")
+SET (BUILD_WITH_GCC_3_4 FALSE CACHE BOOL "Enable/disable gcc-3.3 (for matlab >= 2006b)")
 SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
 SET (BUILD_PYTHON_MODULE FALSE CACHE BOOL "Enable/disable building the python module")
 SET (BUILD_PYTHON_EMBED FALSE CACHE BOOL "Enable/disable embedding python (goPython)")
@@ -377,6 +378,10 @@ IF (BUILD_WITH_GCC_3_3)
     SET (CMAKE_CXX_COMPILER g++-3.3)
     SET (CMAKE_C_COMPILER gcc-3.3)
 ENDIF (BUILD_WITH_GCC_3_3)
+IF (BUILD_WITH_GCC_3_4)
+    SET (CMAKE_CXX_COMPILER g++-3.4)
+    SET (CMAKE_C_COMPILER gcc-3.4)
+ENDIF (BUILD_WITH_GCC_3_4)
                      
 # Add -MT flag!
 IF(UNIX)

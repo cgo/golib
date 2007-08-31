@@ -23,6 +23,7 @@
 #ifndef GOSORT_H
 # include <gosort.h>
 #endif
+#include <goconfig.h>
 
 /*!
  * \addtogroup math
@@ -1622,9 +1623,9 @@ bool goSparseMatrix::vectorMatrixMult (goArray<goDouble>& ret, const goArray<goD
 */
 static bool goGetMatlabSparse (mxArray* target, goSparseMatrix& matrix)
 {
-    //int*     mMatlabColFirstIndex = 0;        // mCols + 1            , Jc from mxArray
     mwIndex*     mMatlabColFirstIndex = 0;        // mCols + 1            , Jc from mxArray
     mwIndex*     mMatlabRowIndex = 0;             // max. mMaxElementCount, Ir from mxArray
+    //int*     mMatlabColFirstIndex = 0;        // mCols + 1            , Jc from mxArray
     //int*     mMatlabRowIndex = 0;             // max. mMaxElementCount, Ir from mxArray
     double*  mMatlabData = 0;                 // max. mMaxElementCount, Pr from mxArray
     // For the matlab fill routines

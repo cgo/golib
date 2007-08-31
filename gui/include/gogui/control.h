@@ -22,6 +22,7 @@ class Control : public Gtk::Frame
         virtual ~Control ();
 
         virtual void warning (const char* text);
+        virtual void message (const char* text);
         virtual void print   (const char* text);
 
         //= Signals

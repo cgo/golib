@@ -41,6 +41,16 @@ void Control::warning (const char* text)
 #endif
 }
 
+void Control::message (const char* text)
+{
+#ifdef HAVE_GTK_2
+    Gtk::MessageDialog msg (text, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
+#elif defined HAVE_GTK_2_4
+    Gtk::MessageDialog msg (text, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
+#endif
+    msg.run();
+}
+
 void Control::print (const char* text)
 {
     this->signal_print (goString(text));

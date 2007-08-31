@@ -3,10 +3,10 @@
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
 
-CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -O2 $(CPPFLAGS)
+CXX		= g++-3.4
+CXXARGS		= -c   -D HAVE_CONFIG_H -O2 $(CPPFLAGS) -fPIC -fexceptions
 
-LD		= g++
+LD		= g++-3.4
 LDARGS		=  
 
 LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab

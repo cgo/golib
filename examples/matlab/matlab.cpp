@@ -3,17 +3,23 @@
 #include <engine.h>
 #include <gomatlab.h>
 #include <stdlib.h>
+#include <goprocess.h>
 
 #include <iostream>
 int main (int argc, char* argv[])
 {
-    Engine* engine = engOpen ("/usr/bin/xterm\0");
+    //Engine* engine = engOpen("/opt/matlab73/bin/matlab -nodesktop -nosplash");
+    Engine* engine = engOpen("matlab");
     if (!engine)
         printf ("First attempt failed.\n");
     else
         printf ("First attempt succeeded.\n");
-    
     char i;
+    std::cin >> i;
+
+    goProcess p;
+    p.run ("matlab", "");
+
     std::cin >> i;
 
     goMatlab matlab;

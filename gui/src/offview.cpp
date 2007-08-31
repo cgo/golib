@@ -29,7 +29,7 @@ namespace goGUI
     class OFFViewPrivate
     {
         public:
-            OFFViewPrivate () : rotation (3), position(3), up(3), focus(3)
+            OFFViewPrivate () : rotation (3), position(3), up(3), focus(3), signal_changed()
             {
                 rotation.fill (0.0f);
                 rotation[0] = 1.0f;
@@ -248,7 +248,7 @@ void goGUI::OFFView::glDraw ()
     // printf ("%s\n", gluErrorString (n));
     glFlush ();
     this->swapBuffers ();
-    myPrivate->signal_changed.emit();
+    myPrivate->signal_changed();
     glDisable (GL_POLYGON_SMOOTH);
     glDisable (GL_LINE_SMOOTH);
 }

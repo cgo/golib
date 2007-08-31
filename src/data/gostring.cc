@@ -624,6 +624,14 @@ goString::operator+= (float i) {
     return (*this);
 }
 
+goString&
+goString::operator+= (double i) {
+    char s[250];
+    sprintf(&s[0], "%lf", i);
+    (*this) += &s[0];
+    return (*this);
+}
+
 bool
 operator== (const goString& str,const char* s) {
   goIndex_t i = 0;

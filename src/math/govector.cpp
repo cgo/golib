@@ -1,6 +1,10 @@
 #include <govector.h>
 #include <gomatrix.h>
 #include <golog.h>
+#include <gotypes.h>
+#ifndef GOFILEIO_H
+# include <gofileio.h>
+#endif
 #if 1
 extern "C"
 {
@@ -267,6 +271,105 @@ void goVector<T>::fillRange (const T& start, const T& step, const T& end)
     }
 }
 
+template <class T>
+bool goVector<T>::readASCII (const char* filename)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f)
+        return false;
+    bool ok = this->readASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
+template <class T>
+bool goVector<T>::readASCII (FILE* file)
+{
+    if (!file)
+        return false;
+
+    goString line = "";
+    goFileIO::readASCIILine (file, line);
+    if (line != "goVector")
+    {
+        goString s = "goVector::readASCII(): expected goVector, got ";
+        s += line;
+        goLog::warning (s);
+        return false;
+    }
+    line = "";
+    goFileIO::readASCIILine (file, line);
+    goList<goString> words;
+    line.getWords (words);
+    if (words.getSize() != 2 || words.getFront() != "size")
+    {
+        goString s = "goVector::readASCII(): expected size, got ";
+        s += line;
+        goLog::warning (s);
+        return false;
+    }
+    goSize_t sz = 0;
+    sz = words(1)->elem.toInt();
+    this->resize (sz);
+    goSize_t i = 0;
+    while (!::feof(file) && i < sz)
+    {
+        line = "";
+        goFileIO::readASCIILine (file, line);
+        (*this)[i] = T(line.toDouble());
+        ++i;
+    }
+    return true;
+}
+
+template <class T>
+bool goVector<T>::writeASCII (const char* filename)
+{
+    FILE* f = ::fopen (filename, "w");
+    if (!f)
+        return false;
+    bool ok = this->writeASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
+template <class T>
+bool goVector<T>::writeASCII (FILE* file)
+{
+    if (!file)
+    {
+        return false;
+    }
+    goFileIO::writeASCII (file, "goVector\n");
+    goString s = "size ";
+    s += (int)this->getSize();
+    s += "\n";
+    goFileIO::writeASCII (file, s);
+    goSize_t sz = this->getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        s = "";
+        s += (double)(*this)[i];
+        s += "\n";
+        goFileIO::writeASCII (file, s);
+    }
+    return true;
+}
+
+template <>
+bool goVector<goComplexf>::writeASCII (FILE*)
+{
+    goLog::error ("goVector::writeASCII() not implemented for goComplexf");
+    return false;
+}
+
+template <>
+bool goVector<goComplexf>::readASCII (FILE*)
+{
+    goLog::error ("goVector::readASCII() not implemented for goComplexf");
+    return false;
+}
+
 // =====================================
 
 template <>
@@ -350,6 +453,7 @@ void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatri
         }
     }
 }
+
 
 template class goVector<goFloat>;
 template class goVector<goDouble>;

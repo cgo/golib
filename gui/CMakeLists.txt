@@ -21,6 +21,11 @@ IF (BUILD_WITH_GCC_3_3)
     SET (CMAKE_CXX_COMPILER g++-3.3)
     SET (CMAKE_C_COMPILER gcc-3.3)
 ENDIF (BUILD_WITH_GCC_3_3)
+IF (BUILD_WITH_GCC_3_4)
+    SET (CMAKE_CXX_COMPILER g++-3.4)
+    SET (CMAKE_C_COMPILER gcc-3.4)
+ENDIF (BUILD_WITH_GCC_3_4)
+
 
 # If the the environment variable MATLAB is set, add include path.
 #IF($ENV{MATLAB})

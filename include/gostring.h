@@ -93,6 +93,8 @@ public:
   goString&   operator+= (goUInt64 i);
   ///
   goString&   operator+= (float f);
+  ///
+  goString&   operator+= (double f);
 
   // ONLY USE THIS IF YOU KNOW EXACTLY WHAT YOU ARE DOING. 
   // ALWAYS AVOID USING THIS METHOD IF THERE'S A WAY TO DO IT IN A CLEAN WAY!

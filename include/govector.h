@@ -442,6 +442,11 @@ class goVector : public goFixedArray<T>
         };
 
         void fillRange (const T& start, const T& step, const T& end);
+
+        bool readASCII  (const char* filename);
+        bool readASCII  (FILE* file);
+        bool writeASCII (const char* filename);
+        bool writeASCII (FILE* file);
 };
 
 

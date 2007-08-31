@@ -119,7 +119,7 @@ const goVectorf& goGUI::GLWidget::getRotationEnd () const
 
 void goGUI::GLWidget::glDraw ()
 {
-    printf ("goGUI::GLWidget::glDraw(): doing nothing...\n");
+    // printf ("goGUI::GLWidget::glDraw(): doing nothing...\n");
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
@@ -181,13 +181,13 @@ bool goGUI::GLWidget::buttonSlot (GdkEventButton* e)
     switch (e->type)
     {
         case GDK_BUTTON_PRESS:
-            printf ("Button press: %f %f\n", e->x, e->y);
+            // printf ("Button press: %f %f\n", e->x, e->y);
             myPrivate->mode = GLWidgetPrivate::MOUSE_ROTATION;
             myPrivate->rotationStart[0] = e->x;
             myPrivate->rotationStart[1] = e->y;
             break;
         case GDK_BUTTON_RELEASE:
-            printf ("Button release: %f %f\n", e->x, e->y);
+            // printf ("Button release: %f %f\n", e->x, e->y);
             myPrivate->mode = GLWidgetPrivate::IDLE;
             break;
         default: return false; break;
