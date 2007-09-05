@@ -170,17 +170,26 @@
 {
     %pythoncode %{
         def setArray (self, A):
-            rows = len(A)
-            if (rows < 1):
-                return
-            cols = len(A[0])
-            if cols < 1:
-                return
-            if rows != self.getRows() or cols != self.getColumns():
-                self.resize(rows,cols)
-            for i in xrange(rows):
-                for j in xrange(cols):
-                    self.set(i,j,A[i][j])
+            if isinstance(A, goMatrixf) or isinstance(A, goMatrixd):
+                rows = A.getRows()
+                cols = A.getColumns()
+                if rows != self.getRows() or cols != self.getColumns():
+                    self.resize(rows,cols)
+                for i in xrange(rows):
+                    for j in xrange(cols):
+                        self.set(i,j,A.get(i,j))
+            else:
+                rows = len(A)
+                if (rows < 1):
+                    return
+                cols = len(A[0])
+                if cols < 1:
+                    return
+                if rows != self.getRows() or cols != self.getColumns():
+                    self.resize(rows,cols)
+                for i in xrange(rows):
+                    for j in xrange(cols):
+                        self.set(i,j,A[i][j])
     %}
 
     // goFloat __getitem__(int i)
@@ -231,17 +240,26 @@
 {
     %pythoncode %{
         def setArray (self, A):
-            rows = len(A)
-            if (rows < 1):
-                return
-            cols = len(A[0])
-            if cols < 1:
-                return
-            if rows != self.getRows() or cols != self.getColumns():
-                self.resize(rows,cols)
-            for i in xrange(rows):
-                for j in xrange(cols):
-                    self.set(i,j,A[i][j])
+            if isinstance(A, goMatrixf) or isinstance(A, goMatrixd):
+                rows = A.getRows()
+                cols = A.getColumns()
+                if rows != self.getRows() or cols != self.getColumns():
+                    self.resize(rows,cols)
+                for i in xrange(rows):
+                    for j in xrange(cols):
+                        self.set(i,j,A.get(i,j))
+            else:
+                rows = len(A)
+                if (rows < 1):
+                    return
+                cols = len(A[0])
+                if cols < 1:
+                    return
+                if rows != self.getRows() or cols != self.getColumns():
+                    self.resize(rows,cols)
+                for i in xrange(rows):
+                    for j in xrange(cols):
+                        self.set(i,j,A[i][j])
     %}
     char *__str__()
     {
