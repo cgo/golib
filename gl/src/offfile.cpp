@@ -307,3 +307,8 @@ goFixedArray<goVectorf>& goGL::OFFFile::getVertices ()
 {
     return myPrivate->vertices;
 }
+
+goFixedArray<goVector<int> >& goGL::OFFFile::getFaces ()
+{
+    return myPrivate->faces;
+}

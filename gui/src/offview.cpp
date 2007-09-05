@@ -192,8 +192,8 @@ void goGUI::OFFView::glDraw ()
     
     const goVectorf& min = this->off.getMin ();
     const goVectorf& max = this->off.getMax ();
-    printf ("max: %f %f %f\n", max[0], max[1], max[2]);
-    printf ("min: %f %f %f\n", min[0], min[1], min[2]);
+    // printf ("max: %f %f %f\n", max[0], max[1], max[2]);
+    // printf ("min: %f %f %f\n", min[0], min[1], min[2]);
 
     glViewport (0, 0, this->get_width(), this->get_height());
     glMatrixMode (GL_PROJECTION);

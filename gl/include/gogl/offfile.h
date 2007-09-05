@@ -23,6 +23,7 @@ namespace goGL
             const goVectorf& getMax () const;
             // bool write (const char* filename, int listName);
             goFixedArray<goVectorf>& getVertices ();
+            goFixedArray<goVector<int> >& getFaces ();
 
         private:
             OFFFile (OFFFile&);

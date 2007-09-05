@@ -290,7 +290,7 @@
  *  As Fortran stores in column major order the leading dimension is the number of rows."
  */
  /**
-  * \page notes_matlab Nodes on the matlab module
+  * \page notes_matlab Notes on the matlab module
   * Deeply buried in the more or less sensible information that
   * can be found on the Mathworks web site, you can find
   * that you <b>must have csh installed</b> in order to run
