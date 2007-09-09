@@ -117,6 +117,24 @@ void goPlot::Plot::plot ()
     mp.plot (&myPrivate->gp);
 }
 
+void goPlot::Plot::plotPause ()
+{
+    printf ("Entered plotPause()\n");
+    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
+    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
+    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
+
+    while (pel && cel)
+    {
+        mp.addPlot (*(pel->elem), cel->elem[1], cel->elem[0]);
+        pel = pel->next;
+        cel = cel->next;
+    }
+
+    mp.setPauseFlag (true);
+    mp.plot ();
+}
+
 goGnuplot& goPlot::Plot::getGnuplot ()
 {
     return myPrivate->gp;

@@ -23,6 +23,15 @@
 
 class goDWT3DPrivate;
 
+/**
+ * \addtogroup signal
+ * @{
+ */
+/** 
+ * @brief 3D discrete wavelet transform.
+ *
+ * @author Christian Gosch
+ */
 class
 goDWT3D : public goObjectBase
 {
@@ -64,5 +73,6 @@ goDWT3D : public goObjectBase
     private:
         goDWT3DPrivate* myPrivate;
 };
+/** @} */
 
 #endif

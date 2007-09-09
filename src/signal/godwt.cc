@@ -1,3 +1,10 @@
+/* Sat Sep  8 15:54:25 CEST 2007
+ * Removed specialisations so that no goSubSignal<T> is 
+ * needed. This code is therefore currently
+ * not used and not usable. 
+ * TODO: Make available for <void> type signal3d,
+ * for the integer types. */
+
 #include <godwt.h>
 #include <gosignal3d.h>
 #include <gosubsignal3d.h>
@@ -788,7 +795,7 @@ goDWT<T>::haar(goSignal3D<T>& signal, goSignal3D<godwt_t>& targetSignal)
 //   goError::note("goDWT::haar()","Not implemented for this data type. Please use haar(goSignal3D, goSignal3D)");
 //   exit(2);
 // }
-
+#if 0
 template<> void
 goDWT<goFloat>::haar(goSubSignal3D<goFloat>& signal)
 {
@@ -832,7 +839,7 @@ goDWT<goDouble>::haar(goSubSignal3D<goDouble>& signal)
    */
   haarFilterZInplace (signal, tp0, tp1);   
 }
-
+#endif
 
 template< class T >
 void
@@ -856,6 +863,7 @@ goDWT<T>::unHaar (goSignal3D<godwt_t>& haarSignal, goSignal3D<T>& targetSignal)
   temp2.destroy();
 } 
 
+#if 0
 template<> void
 goDWT<goFloat>::unHaar(goSubSignal3D<goFloat>& haarSignal)
 {
@@ -877,7 +885,7 @@ goDWT<goDouble>::unHaar (goSubSignal3D<goDouble>& haarSignal)
   haarReverseYInplace (haarSignal, tp0, tp1);
   haarReverseXInplace (haarSignal, tp0, tp1);
 } 
-
+#endif
 
 template< class T >
 int
@@ -1313,6 +1321,7 @@ goDWT<__TYPE>::unHaar (goSubSignal3D<__TYPE> &signal) {				\
  * and I have to do some specialised member.
  * Unfortunately, my c++ compiler apparently does not handle inline templates.
  */
+#if 0
 GO_DWT_INTEGER_HAAR_METHOD(goInt8)
 //GO_DWT_INTEGER_HAAR_METHOD(goUInt8)
 GO_DWT_INTEGER_HAAR_METHOD(goInt16)
@@ -1326,7 +1335,7 @@ GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goUInt16)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goInt32)
 //GO_DWT_INTEGER_UNHAAR_METHOD(goUInt32)
-    
+#endif 
 
 /*
  * Static function STZ is used to perform the transform along the 3rd axis.
@@ -1371,7 +1380,7 @@ GO_DWT_INTEGER_UNHAAR_METHOD(goInt16)
 //   return stage;
 // }
 
-
+#if 0
 template class goDWT<goInt8>;
 //template class goDWT<goUInt8>;
 template class goDWT<goInt16>;
@@ -1380,3 +1389,4 @@ template class goDWT<goInt16>;
 //template class goDWT<goUInt32>;
 template class goDWT<goFloat>;
 template class goDWT<goDouble>;
+#endif

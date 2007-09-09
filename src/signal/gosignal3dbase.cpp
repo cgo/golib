@@ -2668,6 +2668,7 @@ goSignal3DBase<T>::writeSlice (ofstream &f, goIndex_t slice, bool no_extra_memor
 
 #endif
 
+#if 0
 template class goSignal3DBase< goInt8 >;
 template class goSignal3DBase< goUInt8 >;
 template class goSignal3DBase< goInt16 >;
@@ -2680,6 +2681,7 @@ template class goSignal3DBase< goInt64 >;
 template class goSignal3DBase< goFloat >;
 template class goSignal3DBase< goDouble >;
 template class goSignal3DBase< goComplex<goFloat> >;
+#endif
 template class goSignal3DBase< void* >;
 template class goSignal3DBase< void >;
 

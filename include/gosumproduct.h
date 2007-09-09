@@ -44,6 +44,7 @@
      Bishop, C.M. 
      Pattern Recognition and Machine Learning 
      Springer, 2006 \endverbatim
+ * \example sumproduct/sp.cpp
  * @author Christian Gosch
  */
 template <class T, class Tfloat>

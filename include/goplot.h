@@ -328,6 +328,7 @@ namespace goPlot
             void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot ();
+            void plotPause ();
 
             goAutoPtr<goSinglePlot> getPlotp (goSize_t x, goSize_t y);
             goSinglePlot& getPlot (goSize_t x, goSize_t y);

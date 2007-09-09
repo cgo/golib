@@ -29,6 +29,9 @@
 #ifndef GORESAMPLE_H
 # include <goresample.h>
 #endif
+#ifndef GOCONTOURS_H
+# include <gocontours.h>
+#endif
 
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask

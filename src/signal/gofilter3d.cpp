@@ -445,8 +445,10 @@ goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
 #endif
 
 
+#if 0
 template class goFilter3D<goFloat, goFloat>;
 template class goFilter3D<goFloat, goDouble>;
 template class goFilter3D<goDouble, goFloat>;
 template class goFilter3D<goDouble, goDouble>;
+#endif
 template class goFilter3D<void, void>;

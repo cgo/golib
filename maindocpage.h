@@ -7,6 +7,27 @@
  * \page main Main Documentation
  * <b>A current version is not available online. If you are really interested in
  *    trying the library, please drop me a line.</b>
+ *
+ * \section license License
+ * Please read the files COPYING and README in the distribution directory. 
+ * This library is distributed under the terms of the GNU General Public License version 3,
+ * but if there is demand, I will provide a <b>commercial license</b> in addition to that
+ * (the GPL'ed version will not be touched by this).
+ * Of course a commercial version would <b>not</b> be free but would enable
+ * you to use the library in a closed source, commercial product.
+ * 
+ * If you should find that the version you downloaded is out of date
+ * and does not match this documentation, please notify the me, the author,
+ * at <code>christian __at__ goschs __ de</code>.
+ * Since it is under construction quite heavily at the moment,
+ * that might well be the case. <br>
+ * <strong> 
+ * 		Version 0.2.1 of this library is NOT free and NOT for the open
+ *		public. If you have it and don't know if you are allowed 
+ * 		to use it, please contact the author or simply delete the code
+ *		and get another version!
+ * </strong>
+ * 
  * \section intro What it is
  * \subsection intro2 Introduction
  * goLib is a C++ class library written by 
@@ -186,7 +207,8 @@
  *            Python module, etc., and do<br>
  *           make<br>
  *           make install<br>
- *          again.
+ *          again. <b>This will be changed. The modules will get their own make files, so that
+ *          they will be decoupled from the main library.</b>
  *    </ul>
  * 
  *	\subsection examples Examples
@@ -238,26 +260,6 @@
  * <b>A current version is not available online. If you are really interested in
  *    trying the library, please drop me a line.</b>
  * 
- * 
- * \section license License
- * Please read the files COPYING and README in the distribution directory. 
- * This library is distributed under the terms of the GNU General Public License,
- * but if there is demand, I will provide a <b>commercial license</b> in addition to that
- * (the GPL'ed version will not be touched by this).
- * Of course a commercial version would <b>not</b> be free but would enable
- * you to use the library in a closed source, commercial product.
- * 
- * If you should find that the version you downloaded is out of date
- * and does not match this documentation, please notify the me, the author,
- * at <code>christian __at__ goschs __ de</code>.
- * Since it is under construction quite heavily at the moment,
- * that might well be the case. <br>
- * <strong> 
- * 		Version 0.2.1 of this library is NOT free and NOT for the open
- *		public. If you have it and don't know if you are allowed 
- * 		to use it, please contact the author or simply delete the code
- *		and get another version!
- * </strong>
  * 
  * \section warranty Warranty
  * This is very simple. There is no warranty at all, since this software is provided

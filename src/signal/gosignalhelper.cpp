@@ -19,6 +19,9 @@
 # include <gotype.hpp>
 #endif
 
+/** \addtogroup signal
+ * @{
+ */
 template <class T>
 static void goNormalizeSignal__ (T minimum, T maximum, 
                           const goSignal3DBase<void>* sig, 
@@ -195,6 +198,17 @@ bool goFindZeroCrossings__ (const goSignal3DBase<void>* sig, goArray<goPointf>& 
     return true;
 }
 
+/** 
+ * @brief Find zero crossings in \c sig and return an array of points.
+ * 
+ * On returning true, \c pointsRet will contain the point coordinates
+ * of zero crossings on the grid lines of \c sig.
+ *
+ * @param sig       Signal to search in.
+ * @param pointsRet Points array (return value).
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goFindZeroCrossings (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet)
 {
     if (!sig)
@@ -321,7 +335,7 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
     return true;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Convert a signal to another signal with a given data type.
  * 
  * The signal sig will be converted if possible to targetSig. The target data type
@@ -334,7 +348,7 @@ static bool convertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>
  * @param targetSig  Pointer to the target signal. The size must be the same as sig.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 bool goConvertSignal (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig)
 {
     if (!targetSig)
@@ -595,6 +609,16 @@ static bool copySignalLinear (const goSignal3DBase<void>* sig, targetT* targetAr
     return true;
 }
 
+/** 
+ * @brief Copies the signal values to the linear array \c targetArray.
+ * 
+ * The values will be copied in the order X, then Y, then Z.
+ *
+ * @param sig           Signal to copy.
+ * @param targetArray   Linear target array.
+ * 
+ * @return True if successful, false otherwise.
+ */
 template <class T>
 bool goCopySignalArray (const goSignal3DBase<void>* sig, T* targetArray)
 {
@@ -654,6 +678,17 @@ static bool copySignalLinear (const T* array, goSignal3DBase<void>* targetSig)
     return true;
 }
 
+/** 
+ * @brief Copies the values in a linear array to a signal.
+ * 
+ * The size of \c targetSig must be pre-set and it must be allocated
+ * ( e.g. with \c make() ).
+ *
+ * @param array Array containing values.
+ * @param targetSig Target signal.
+ * 
+ * @return 
+ */
 template <class T>
 bool goCopySignalArray (const T* array, goSignal3DBase<void>* targetSig)
 {
@@ -832,7 +867,7 @@ static bool _fillSignal (goSignal3DBase<void>* sig, goFloat value)
     return true;
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Fills a signal with a float value (will be converted).
  * 
  * @param sig   Signal to fill.
@@ -840,7 +875,7 @@ static bool _fillSignal (goSignal3DBase<void>* sig, goFloat value)
  *              data type for the signal.
  * 
  * @return True if successful, false otherwise.
- ----------------------------------------------------------------------------*/
+ */
 bool goFillSignal (goSignal3DBase<void>* sig, goFloat value)
 {
     if (!sig)
@@ -934,27 +969,27 @@ MAKE_SIGNAL_SIGNAL_OPERATOR3(+=,PlusEqual);
 // MAKE_SIGNAL_SIGNAL_OPERATOR2(*=,TimesEqual);
 // MAKE_SIGNAL_SIGNAL_OPERATOR3(*=,TimesEqual);
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Adds two signals.
  * 
  * Adds other to sig.
  * 
  * @param sig   Signal 1. Will also hold the sum of both signals.
  * @param other The signal to add to the first argument, sig.
- ----------------------------------------------------------------------------*/
+ */
 void goSignalPlus (goSignal3DBase<void>& sig, const goSignal3DBase<void>& other)
 {
     _signalOperatorPlusEqual (sig, other);
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Get some description (as ASCII text) for a signal.
  * 
  * @param sig    Signal to get the description for.
  * @param strRet String to hold the description.
  * @param html   If true, the text will be HTML formatted, if false, the text
  *               will be plain ASCII.
- ----------------------------------------------------------------------------*/
+ */
 void goSignalInfoText (const goSignal3DBase<void>& sig, goString& strRet, bool html)
 {
     if (html)
@@ -1017,14 +1052,14 @@ template <typename T> static goDouble signalMean (const goSignal3DBase<void>& si
     return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Calculate the signal mean.
  * 
  * @param sig  Signal to calculate the mean of.
  * 
  * @return  Mean value as goDouble. For multichannel signals,
  *          just do setChannel() and then goSignalMean() for each channel.
- ----------------------------------------------------------------------------*/
+ */
 goDouble goSignalMean (const goSignal3DBase<void>& sig)
 {
     switch (sig.getDataType().getID())
@@ -1070,13 +1105,13 @@ template <typename T> static goDouble signalVariance (const goSignal3DBase<void>
     return ret / static_cast<goDouble>(sig.getSizeX() * sig.getSizeY() * sig.getSizeZ());
 }
 
-/** --------------------------------------------------------------------------
+/** 
  * @brief Calculate mean and variance of a signal.
  * 
  * @param sig       Signal.
  * @param mean      After returning, holds the mean value as double.
  * @param variance  After returning, holds the variance as double.
- ----------------------------------------------------------------------------*/
+ */
 void goSignalMeanVariance (const goSignal3DBase<void>& sig, 
                            goDouble& mean, 
                            goDouble& variance)
@@ -1100,6 +1135,17 @@ void goSignalMeanVariance (const goSignal3DBase<void>& sig,
     }
 }
 
+/** 
+ * @brief Flip the signal data in Y direction.
+ *
+ * This does a deep copy. The actual flip() method for goSignal3DBase is defunct,
+ * so this was written as a hack to be able to flip images conveniently.
+ * It is, however, slow due to the copy procedure.
+ * 
+ * @param sig Original signal.
+ * @param target Target, contains the flipped \c sig after return.
+ * \c target must be the same size as \c sig, or nothing will be copied (check log file).
+ */
 void goSignalFlipY (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target)
 {
     if (sig.getSize() != target.getSize())
@@ -1119,6 +1165,8 @@ void goSignalFlipY (const goSignal3DBase<void>& sig, goSignal3DBase<void>& targe
         goCopySignal (&sub, &subtarget);
     }
 }
+
+/** @} */
 
 template bool goCopySignalArray<goInt8>   (const goInt8*, goSignal3DBase<void>*);
 template bool goCopySignalArray<goUInt8>  (const goUInt8*, goSignal3DBase<void>*);

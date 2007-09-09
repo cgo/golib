@@ -415,6 +415,7 @@ goSignal3D<T>::fillByte (goInt8 b)
             this->getDataType().getSize() * this->mySize.x * this->mySize.y * this->mySize.z * this->getChannelCount()); 
 }
 
+#if 0
 template class goSignal3D< goInt8 >;
 template class goSignal3D< goUInt8 >;
 template class goSignal3D< goInt16 >;
@@ -425,5 +426,6 @@ template class goSignal3D< goInt64 >;
 template class goSignal3D< goFloat >;
 template class goSignal3D< goDouble >;
 template class goSignal3D< goComplex<goFloat> >;
+#endif
 template class goSignal3D< void* >;
 template class goSignal3D< void >;
