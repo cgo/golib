@@ -81,6 +81,7 @@ class goSinglePlot : public goObjectBase
 
         bool addImage (const goMatrixf& m, const char* title, const char* plotOptions = 0);
         bool addImage (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+        bool addImage (const goSignal3DBase<void>& m, const char* title, const char* plotOptions = 0);
 
         template <class pointT>
             bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)
@@ -327,6 +328,7 @@ namespace goPlot
             void plot (const goVectord& px, const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plotImage (const goSignal3DBase<void>& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
             void plot ();
             void plotPause ();
 

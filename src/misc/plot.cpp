@@ -43,7 +43,6 @@ goAutoPtr<goSinglePlot> goPlot::Plot::getPlotp (goSize_t x, goSize_t y)
     goVectori v(2);
     v[0] = x; v[1] = y;
     goSize_t i = myPrivate->plotPositions.findIndex (v);
-    printf ("found index %d\n", i);
     if (i >= myPrivate->plotPositions.getSize())
     {
         if (x >= myPrivate->cols)
@@ -52,7 +51,6 @@ goAutoPtr<goSinglePlot> goPlot::Plot::getPlotp (goSize_t x, goSize_t y)
             myPrivate->rows = y + 1;
         
         myPrivate->plots.append (goAutoPtr<goSinglePlot>(new goSinglePlot));
-        printf ("Appended to list\n");
         myPrivate->plotPositions.append (v);
 
         return myPrivate->plots.getTail();
@@ -78,31 +76,32 @@ void goPlot::Plot::plot (const goMatrixd& curve, const char* title, const char* 
 void goPlot::Plot::plot (const goVectorf& px, const goVectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = goAutoPtr<goSinglePlot>(this->getPlotp (x, y));
-    printf ("Took plot in plot (...)\n");
     pe->addCurve (px, py, title, options);
 }
 void goPlot::Plot::plot (const goVectord& px, const goVectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = goAutoPtr<goSinglePlot>(this->getPlotp (x, y));
-    printf ("Took plot in plot (...)\n");
     pe->addCurve (px, py, title, options);
 }
 void goPlot::Plot::plot (const goVectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
-    printf ("Took plot in plot (...)\n");
     pe->addCurve (py, title, options);
 }
 void goPlot::Plot::plot (const goVectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
-    printf ("Took plot in plot (...)\n");
     pe->addCurve (py, title, options);
+}
+
+void goPlot::Plot::plotImage (const goSignal3DBase<void>& image, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addImage (image, title, options);
 }
 
 void goPlot::Plot::plot ()
 {
-    printf ("Entered plot()\n");
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
     goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
     goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
@@ -119,7 +118,6 @@ void goPlot::Plot::plot ()
 
 void goPlot::Plot::plotPause ()
 {
-    printf ("Entered plotPause()\n");
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
     goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
     goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();

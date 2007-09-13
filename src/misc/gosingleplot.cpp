@@ -1,6 +1,8 @@
 #include <goplot.h>
 #include <gofileio.h>
 #include <goautoptr.h>
+#include <gosignal3dgenericiterator.h>
+#include <gosignalhelper.h>
 
 class goPlotElement
 {
@@ -35,6 +37,61 @@ class goPlotElement
         goString myPlotOptions;
         goString myPlotCommand;
         goString myFilename;
+};
+
+template <class T>
+static void signalImageData (const goSignal3DBase<void>& M, goString& ret)
+{
+    goSignal3DGenericConstIterator it (&M);
+
+    goSize_t i = 0;
+    while (!it.endY())
+    {
+        it.resetX();
+        goSize_t j = 0;
+        while (!it.endX())
+        {
+            ret += (int)j; ret += " "; ret += (int)i; ret += " "; ret += (float)*(T*)*it; ret += "\n";
+            ++j;
+            it.incrementX();
+        }
+        ++i;
+        it.incrementY();
+    }
+}
+
+/*
+ * @brief 
+ * @todo Mehrkanaldaten
+ */
+class goPlotElementSignalImage : public goPlotElement
+{
+    public:
+        goPlotElementSignalImage (const goSignal3DBase<void>& M) : goPlotElement ("plot", "-", "with image"), mySignal () 
+        { 
+            mySignal.setDataType (M.getDataType().getID());
+            mySignal.make (M.getSize(), M.getBlockSize(), M.getBorderSize(), M.getChannelCount());
+            goCopySignal (&M, &mySignal);
+        };
+        virtual ~goPlotElementSignalImage () {};
+
+        virtual void data (goString& ret) const
+        {
+            switch (mySignal.getDataType().getID())
+            {
+                case GO_INT8: signalImageData<goInt8> (mySignal, ret); break;
+                case GO_UINT8: signalImageData<goUInt8> (mySignal, ret); break;
+                case GO_INT16: signalImageData<goInt16> (mySignal, ret); break;
+                case GO_UINT16: signalImageData<goUInt16> (mySignal, ret); break;
+                case GO_INT32: signalImageData<goInt32> (mySignal, ret); break;
+                case GO_UINT32: signalImageData<goUInt32> (mySignal, ret); break;
+                case GO_FLOAT: signalImageData<goFloat> (mySignal, ret); break;
+                case GO_DOUBLE: signalImageData<goDouble> (mySignal, ret); break;
+                default: goLog::warning ("goPlotElementSignalImage::data(): type error."); break;
+            }
+        };
+
+        goSignal3D<void> mySignal;
 };
 
 template <class T>
@@ -745,6 +802,30 @@ bool goSinglePlot::addImage (const goMatrixd& m, const char* title, const char* 
 
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixImage<goDouble>(m));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::addImage (const goSignal3DBase<void>& m, const char* title, const char* plotOptions)
+{
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
+    }
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementSignalImage(m));
     if (plotOptions)
         aptr->setPlotOptions (plotOptions);
     if (title)

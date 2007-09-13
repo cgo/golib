@@ -308,7 +308,7 @@ goSignal3DBase : public goObjectBase
          *
          * All operator [/+-*]= work on all channels.
          * 
-         * @param other Signal to combine with.
+         * @param scalar Scalar to multiply each value in this signal with.
          * 
          * @return Reference to *this.
          */

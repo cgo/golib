@@ -266,6 +266,9 @@ bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
 template <class T>
+T stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s);
+
+template <class T>
 goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
 
 /* 
