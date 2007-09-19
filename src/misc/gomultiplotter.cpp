@@ -409,17 +409,27 @@ bool goMultiPlotter::plot (goGnuplot* gp)
  * Same as plotFile (filename, goString("postscript colour"));
  *
  * @param filename Postscript file name.
+ * @param sizeX    X size of canvas in cm.
+ * @param sizeY    Y size of canvas in cm.
  * 
  * @return True if successful, false otherwise.
  */
-bool goMultiPlotter::plotPostscript (const goString& filename)
+bool goMultiPlotter::plotPostscript (const goString& filename, goFloat sizeX, goFloat sizeY)
 {
-    return this->plotFile (filename, goString("postscript colour"));
+    goString termString = "postscript color enhanced";
+    if (sizeX > 0.0 && sizeY > 0.0)
+    {
+        termString += " size ";
+        termString += (float)(sizeX / 2.54f);
+        termString += ",";
+        termString += (float)(sizeY / 2.54f);
+    }
+    return this->plotFile (filename, termString);
 }
 
-bool goMultiPlotter::plotPostscript (const char* filename)
+bool goMultiPlotter::plotPostscript (const char* filename, goFloat sizeX, goFloat sizeY)
 {
-    return this->plotFile (goString(filename), goString("postscript colour"));
+    return this->plotPostscript (goString(filename), sizeX, sizeY);
 }
 
 /** 
@@ -433,11 +443,11 @@ bool goMultiPlotter::plotPostscript (const char* filename)
  */
 bool goMultiPlotter::plotEPS (const goString& filename)
 {
-    return this->plotFile (filename, goString("postscript eps colour"));
+    return this->plotFile (filename, goString("postscript eps colour enhanced "));
 }
 bool goMultiPlotter::plotEPS (const char* filename)
 {
-    return this->plotFile (goString(filename), goString("postscript eps colour"));
+    return this->plotFile (goString(filename), goString("postscript eps colour enhanced"));
 }
 
 /** 

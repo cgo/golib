@@ -9,6 +9,12 @@
  *    trying the library, please drop me a line.</b>
  *
  * \section license License
+ * <b>Important notice:</b> Even though this library carries the
+ * GNU General Public License, it is currently not in a state in which I want
+ * to publish it. There are too many pending changes, many of which concerning
+ * the API. For that reason, I do not want you to give the code or
+ * binary to anyone.<br>
+ *
  * Please read the files COPYING and README in the distribution directory. 
  * This library is distributed under the terms of the GNU General Public License version 3,
  * but if there is demand, I will provide a <b>commercial license</b> in addition to that

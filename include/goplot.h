@@ -207,10 +207,10 @@ class goMultiPlotter : public goObjectBase
         bool makePlotCommands (goString& plotCommandsRet);
 
         virtual bool plot           (goGnuplot *gp = 0);
-        virtual bool plotPostscript (const goString& filename);
+        virtual bool plotPostscript (const goString& filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
         virtual bool plotEPS        (const goString& filename);
         virtual bool plotFile       (const goString& filename, const goString& type);
-        bool plotPostscript (const char* filename);
+        bool plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
         bool plotEPS        (const char* filename);
         bool plotFile       (const char* filename, const char* type);
 
@@ -329,8 +329,13 @@ namespace goPlot
             void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plotImage (const goSignal3DBase<void>& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
+            void plotPoint (goDouble px, goDouble py, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
+            void plotPoint (const goVectorf& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
+            void plotPoint (const goVectord& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
             void plot ();
+            void plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
             void plotPause ();
+            void saveGnuplot (const char* filename);
 
             goAutoPtr<goSinglePlot> getPlotp (goSize_t x, goSize_t y);
             goSinglePlot& getPlot (goSize_t x, goSize_t y);

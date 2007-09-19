@@ -100,6 +100,27 @@ void goPlot::Plot::plotImage (const goSignal3DBase<void>& image, const char* tit
     pe->addImage (image, title, options);
 }
 
+void goPlot::Plot::plotPoint (goDouble px, goDouble py, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    goVectord p (2);
+    p[0] = px;
+    p[1] = py;
+    pe->addPoint (p, title, options);
+}
+
+void goPlot::Plot::plotPoint (const goVectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addPoint (p, title, options);
+}
+
+void goPlot::Plot::plotPoint (const goVectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addPoint (p, title, options);
+}
+
 void goPlot::Plot::plot ()
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
@@ -114,6 +135,22 @@ void goPlot::Plot::plot ()
     }
 
     mp.plot (&myPrivate->gp);
+}
+
+void goPlot::Plot::plotPostscript (const char* filename, goFloat sizeX, goFloat sizeY)
+{
+    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
+    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
+    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
+
+    while (pel && cel)
+    {
+        mp.addPlot (*(pel->elem), cel->elem[1], cel->elem[0]);
+        pel = pel->next;
+        cel = cel->next;
+    }
+
+    mp.plotPostscript (filename, sizeX, sizeY);
 }
 
 void goPlot::Plot::plotPause ()
@@ -131,6 +168,22 @@ void goPlot::Plot::plotPause ()
 
     mp.setPauseFlag (true);
     mp.plot ();
+}
+
+void goPlot::Plot::saveGnuplot (const char* filename)
+{
+    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
+    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
+    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
+
+    while (pel && cel)
+    {
+        mp.addPlot (*(pel->elem), cel->elem[1], cel->elem[0]);
+        pel = pel->next;
+        cel = cel->next;
+    }
+
+    mp.saveGnuplot (filename);
 }
 
 goGnuplot& goPlot::Plot::getGnuplot ()
