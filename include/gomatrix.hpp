@@ -666,6 +666,36 @@ goMatrix<T>& goMatrix<T>::operator+= (const goMatrix<T>& other)
     return *this;
 }
 
+template <class T>
+goMatrix<T>& goMatrix<T>::operator+= (T scalar)
+{
+    goSize_t i;
+    goSize_t j;
+    for (i = 0; i < this->getRows(); ++i)
+    {
+        for (j = 0; j < this->getColumns(); ++j)
+        {
+            (*this)(i,j) += scalar;
+        }
+    }
+    return *this;
+}
+
+template <class T>
+goMatrix<T>& goMatrix<T>::operator-= (T scalar)
+{
+    goSize_t i;
+    goSize_t j;
+    for (i = 0; i < this->getRows(); ++i)
+    {
+        for (j = 0; j < this->getColumns(); ++j)
+        {
+            (*this)(i,j) -= scalar;
+        }
+    }
+    return *this;
+}
+
 //= Quite slow, quick hack.
 template <class T>
 goMatrix<T> goMatrix<T>::operator+ (const goMatrix<T>& other) const

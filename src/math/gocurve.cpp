@@ -251,8 +251,6 @@ bool goCurve<T>::setPoints (const goMatrix<T>& m)
 }
 
 /**
- * @bug Check this -- this can't be the right solution.
- * If this is not present, setPoints() from goPointCloud can not be used because of the overloaded versions in goCurve.
  */
 template <class T>
 bool goCurve<T>::setPoints (const goList<goVector<T> >& l)
@@ -379,7 +377,7 @@ goDouble goCurve<T>::euclideanDistance (const goCurve<T>& other, bool forward) c
     return sum;
 }
 
-/**
+/*
  * @brief Uniformly resamples the curve with the given number of points.
  *
  * @note This uses approximating splines. The original points are not interpolated!
@@ -436,7 +434,7 @@ bool goCurve<T>::resample (goIndex_t pointCount, goCurve<T>& ret) const
     return this->resample (pointCount, ret.getPoints());
 }
 
-/** 
+/* 
  * @brief 
  * 
  * @note This uses approximating splines. The original points are not interpolated!
@@ -476,7 +474,7 @@ bool goCurve<T>::resample (typename goList<goVector<T> >::ConstElement* begin, g
     return goCurve<T>::resampleLinear (begin,pointCount,resamplePointCount,ret,closedCurve);
 }
 
-/** 
+/* 
  * @brief 
  *
  * @note This uses approximating splines. The original points are not interpolated!
@@ -513,14 +511,14 @@ bool goCurve<pointT>::resampleNUBS (typename goList<goVector<T> >::ConstElement*
 /** 
  * @brief 
  *
- * @note This uses approximating splines. The original points are not interpolated!
+ * @note This uses linear splines. The original points are interpolated.
  * 
  * @param begin 
  * @param pointCount 
  * @param resamplePointCount 
  * @param ret 
  * 
- * @return 
+ * @return True if successful, false otherwise.
  */
 template<class T>
 bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve)

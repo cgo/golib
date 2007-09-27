@@ -37,6 +37,7 @@ template <class T>
 class goMatrix 
 {
  public:
+     typedef T value_type;
   /*!
    * @param y Number of rows.
    * @param x Number of columns.
@@ -515,7 +516,9 @@ class goMatrix
 
   goMatrix<T>&		operator*= (const goMatrix<T>& other);
   goMatrix<T>&		operator+= (const goMatrix<T>& other);
+  goMatrix<T>&		operator+= (T scalar);
   goMatrix<T>&		operator-= (const goMatrix<T>& other);
+  goMatrix<T>&		operator-= (T scalar);
 
   goVector<T>       operator*  (const goVector<T>& v) const;
 //  goVector<T>       operator*  (const goVector<goDouble>& v) const;

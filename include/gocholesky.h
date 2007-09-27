@@ -8,12 +8,15 @@
 namespace goMath
 {
 
-    
-/** 
+/*
+ * Apparently taken out.
+ */
+
+/* 
  * \addtogroup math
  * @{
  */
-/*!
+/*
  * \internal
  * \brief Cholesky factorization
  *
@@ -52,11 +55,11 @@ namespace goMath
 
    */
 template <class Real>
-class goCholesky
+class Cholesky
 {
     public:
-        goCholesky ();
-        goCholesky (const goMatrix<Real> &A);
+        Cholesky ();
+        Cholesky (const goMatrix<Real> &A);
         const goMatrix<Real>& getL   () const;
         bool  solve  (const goArray<Real> &B, goArray<Real>& xRet);
         bool  solve  (const goMatrix<Real> &B, goMatrix<Real>& XRet);
@@ -67,7 +70,7 @@ class goCholesky
         int isspd;				// 1 if matrix to be factored was SPD
 
 };
-/*! @} */
+/* @} */
 
 }
 

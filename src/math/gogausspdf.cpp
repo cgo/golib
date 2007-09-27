@@ -9,8 +9,8 @@
 namespace goMath
 {
     template <class input_type, class output_type>
-    goGaussPDF<input_type, output_type>::goGaussPDF ()
-        : goPDF<input_type, output_type> (),
+    GaussPDF<input_type, output_type>::GaussPDF ()
+        : PDF<input_type, output_type> (),
           myMean                ((input_type)0.0),
           myVariance            ((input_type)1.0),
           myVarianceReciprocal2 ((input_type)1.0)
@@ -20,24 +20,24 @@ namespace goMath
     }
 
     template <class input_type, class output_type>
-    goGaussPDF<input_type, output_type>::~goGaussPDF ()
+    GaussPDF<input_type, output_type>::~GaussPDF ()
     {
     }
 
     template <class input_type, class output_type>
     void
-    goGaussPDF<input_type, output_type>::setMean (const input_type& mean)
+    GaussPDF<input_type, output_type>::setMean (const input_type& mean)
     {
         myMean = mean;
     }
     
     template <class input_type, class output_type>
     void
-    goGaussPDF<input_type, output_type>::setVariance (const input_type& variance)
+    GaussPDF<input_type, output_type>::setVariance (const input_type& variance)
     {
         if (variance <= 0.0f)
         {
-            goLog::warning ("goGaussPDF::setVariance(): Variance is zero or lower than zero");
+            goLog::warning ("GaussPDF::setVariance(): Variance is zero or lower than zero");
             myVariance            = 0.0;
             myVarianceReciprocal2 = 1.0;
             myNormFactor          = 1.0;
@@ -53,9 +53,9 @@ namespace goMath
     
     template <class input_type, class output_type>
     output_type
-    goGaussPDF<input_type, output_type>::operator () (const input_type& input) const
+    GaussPDF<input_type, output_type>::operator () (const input_type& input) const
     {
-        //goLog::warning ("goGaussPDF::operator() not defined for this input/output type combination.");
+        //goLog::warning ("GaussPDF::operator() not defined for this input/output type combination.");
         //assert (false);
         //return (output_type)1;
         return myNormFactor * ::exp (-(input - myMean) * (input - myMean) * myVarianceReciprocal2);
@@ -63,8 +63,8 @@ namespace goMath
     
     //===================================================================
     template <class input_vector, class scalar_type>
-    goMultiGaussPDF<input_vector, scalar_type>::goMultiGaussPDF ()
-        : goPDF<input_vector, scalar_type> (),
+    MultiGaussPDF<input_vector, scalar_type>::MultiGaussPDF ()
+        : PDF<input_vector, scalar_type> (),
           myMean          (),
           myCovariance    (),
           myCovarianceInv (),
@@ -75,27 +75,27 @@ namespace goMath
     };
 
     template <class input_vector, class scalar_type>
-    goMultiGaussPDF<input_vector, scalar_type>::goMultiGaussPDF (const input_vector& mean, 
+    MultiGaussPDF<input_vector, scalar_type>::MultiGaussPDF (const input_vector& mean, 
                                                                  const goMatrix<scalar_type>& cov, 
                                                                  scalar_type normFactor)
-        : goPDF<input_vector, scalar_type> (),
+        : PDF<input_vector, scalar_type> (),
           myMean          (mean),
           myCovarianceInv (cov),
           myNormFactor    (normFactor)
     {
         if (!myCovarianceInv.invert())
         {
-            goLog::warning ("goMultiGaussPDF::goMultiGaussPDF(): could not invert covariance matrix.", this);
+            goLog::warning ("MultiGaussPDF::MultiGaussPDF(): could not invert covariance matrix.", this);
         }
     };
 
     template<class input_vector, class scalar_type>
-    goMultiGaussPDF<input_vector, scalar_type>::~goMultiGaussPDF ()
+    MultiGaussPDF<input_vector, scalar_type>::~MultiGaussPDF ()
     {
     };
 
     template<class input_vector, class scalar_type>
-    scalar_type goMultiGaussPDF<input_vector, scalar_type>::operator() (const input_vector& input) const
+    scalar_type MultiGaussPDF<input_vector, scalar_type>::operator() (const input_vector& input) const
     {
 //        if (myNormFactor == 0.0f)
 //        {
@@ -118,7 +118,7 @@ namespace goMath
      * update() call will set the sizes then.
      */
     template<class input_vector, class scalar_type>
-        void goMultiGaussPDF<input_vector, scalar_type>::reset (goSize_t N)
+        void MultiGaussPDF<input_vector, scalar_type>::reset (goSize_t N)
         {
             this->myMean.resize (N);
             this->myMean.fill (scalar_type(0));
@@ -141,7 +141,7 @@ namespace goMath
      * @param input Sample vector.
      */
     template<class input_vector, class scalar_type>
-        void goMultiGaussPDF<input_vector, scalar_type>::update (const input_vector& input)
+        void MultiGaussPDF<input_vector, scalar_type>::update (const input_vector& input)
         {
             goFloat factor = 1.0f / (this->N + 1.0f);
             this->sum_xxT *= this->N * factor;
@@ -167,14 +167,14 @@ namespace goMath
      * distribution, you must call updateFlush() before use.
      */
     template<class input_vector, class scalar_type>
-        void goMultiGaussPDF<input_vector, scalar_type>::updateFlush ()
+        void MultiGaussPDF<input_vector, scalar_type>::updateFlush ()
         {
             //= Also sets inverse covariance.
             this->setCovariance (this->myCovariance);
         }
     
 //    template<class input_vector, class scalar_type>
-//    bool goMultiGaussPDF<input_vector, scalar_type>::fromSamples (const input_vector* vectors, goIndex_t count)
+//    bool MultiGaussPDF<input_vector, scalar_type>::fromSamples (const input_vector* vectors, goIndex_t count)
 //    {
 //        assert (vectors);
 //        if (count < 1 || !vectors)
@@ -189,13 +189,13 @@ namespace goMath
 //    }
 
     template <class input_vector, class scalar_type>
-        void goMultiGaussPDF<input_vector,scalar_type>::setCovariance (const goMatrix<scalar_type>& cov)
+        void MultiGaussPDF<input_vector,scalar_type>::setCovariance (const goMatrix<scalar_type>& cov)
         {
             myCovariance = cov;
             myCovarianceInv = cov;
             if (!myCovarianceInv.invert())
             {
-                goLog::warning ("goMultiGaussPDF::setCovariance(): could not invert covariance matrix. Setting it to identity.", this);
+                goLog::warning ("MultiGaussPDF::setCovariance(): could not invert covariance matrix. Setting it to identity.", this);
                 myCovariance.setIdentity();
                 myCovarianceInv = myCovariance;
             }
@@ -216,31 +216,31 @@ namespace goMath
         }
 
     template <class input_vector, class scalar_type>
-        const goMatrix<scalar_type>& goMultiGaussPDF<input_vector,scalar_type>::getCovarianceInv () const
+        const goMatrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovarianceInv () const
         {
             return this->myCovarianceInv;
         }
     template <class input_vector, class scalar_type>
-        const goMatrix<scalar_type>& goMultiGaussPDF<input_vector,scalar_type>::getCovariance () const
+        const goMatrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovariance () const
         {
             return this->myCovariance;
         }
     
     template <class input_vector, class scalar_type>
-        void goMultiGaussPDF<input_vector,scalar_type>::setMean (const input_vector& m)
+        void MultiGaussPDF<input_vector,scalar_type>::setMean (const input_vector& m)
         {
             this->myMean = m;
         }
 
     template <class input_vector, class scalar_type>
-        const input_vector& goMultiGaussPDF<input_vector,scalar_type>::getMean () const
+        const input_vector& MultiGaussPDF<input_vector,scalar_type>::getMean () const
         {
             return this->myMean;
         }
 };
 
-template class goMath::goGaussPDF <goDouble, goDouble>;
-template class goMath::goGaussPDF <goFloat, goFloat>;
-template class goMath::goMultiGaussPDF <goVectorf, goFloat>;
-template class goMath::goMultiGaussPDF <goVectord, goDouble>;
-// template class goMath::goMultiGaussPDF <goVectord, goDouble>;
+template class goMath::GaussPDF <goDouble, goDouble>;
+template class goMath::GaussPDF <goFloat, goFloat>;
+template class goMath::MultiGaussPDF <goVectorf, goFloat>;
+template class goMath::MultiGaussPDF <goVectord, goDouble>;
+// template class goMath::MultiGaussPDF <goVectord, goDouble>;

@@ -11,10 +11,12 @@
 #include <golu.h>
 #include <iostream>
 
-/*! \addtogroup math
+/* Use goMatrix instead. */
+
+/* \addtogroup math
  * @{
  */
-/*!
+/*
  * 4x4 Matrix.
  * @todo Either throw this class away or rework it a bit.
  */

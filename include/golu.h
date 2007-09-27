@@ -292,10 +292,7 @@ class LU
    						of A.
    @return x a vector (goVector> so that L*U*x = b(piv), if B is nonconformant,
    					returns 0x0 (null) array.
-   @todo  Add solve() method that takes the return value reference 
-          as the second parameter.
    */
-
    bool solve (const goVector<Real> &b, goVector<Real>& retValue) 
    {
 

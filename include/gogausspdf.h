@@ -14,11 +14,11 @@ namespace goMath
     /*! \brief Gauss' probability density function.
      */
     template <class input_type, class output_type>
-    class goGaussPDF : public goPDF<input_type, output_type>
+    class GaussPDF : public PDF<input_type, output_type>
     {
         public:
-            goGaussPDF ();
-            virtual ~goGaussPDF ();
+            GaussPDF ();
+            virtual ~GaussPDF ();
 
             virtual output_type operator () (const input_type& input) const;
             void                setMean     (const input_type& mean);
@@ -41,15 +41,15 @@ namespace goMath
      * @todo Normalisation factor.
      */
     template <class input_vector, class scalar_type>
-    class goMultiGaussPDF : public goPDF<input_vector, scalar_type>
+    class MultiGaussPDF : public PDF<input_vector, scalar_type>
     {
         public:
-            goMultiGaussPDF ();
-            goMultiGaussPDF (const input_vector& mean, const goMatrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
+            MultiGaussPDF ();
+            MultiGaussPDF (const input_vector& mean, const goMatrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
 
             //= The standard operator= and copy constructor will do.
 
-            virtual ~goMultiGaussPDF ();
+            virtual ~MultiGaussPDF ();
             virtual scalar_type           operator()    (const input_vector& input) const;
 
             void                          reset         (goSize_t N = 1);

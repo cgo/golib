@@ -6,11 +6,13 @@
 #include <goarray.h>
 #include <iostream>
 
-/*!
+/* Throw this code away. */
+
+/*
  * \addtogroup math
  * @{
  */
-/**
+/*
  * \brief Somewhat deprecated vector class.
  * @note DEPRECATED -- do not use.
  * This implements a vector of arbitrary length.
@@ -20,20 +22,20 @@
 template<class T>
 class goNVector : public goArray<T> {
  public:
-  /**
+  /*
    * Constructor.
    */
   goNVector  (goUInt32 n);
   goNVector  ();
 
-	/*!
+	/*
 	 * @attention The internal pointer gets deleted ALWAYS when the
 	 * destructor is called, even if you set it by setVectorPtr().
 	 * Therefore, be very careful with the setVectorPtr() method.
 	 */
   ~goNVector ();
 
-  /**
+  /*
    * Sets internal vector pointer to ptr. This is useful if you don't
    * want to deep-copy your data for performance reasons.
    * @attention See the destructor for important notes.
@@ -41,23 +43,23 @@ class goNVector : public goArray<T> {
    */
   inline void  setVectorPtr (T* ptr);
 
-  /**
+  /*
    * Sets size of the vector in elements.
    * This should only be used together with setVectorPtr ().
    */
   void 	   setSize (int sz) { this->resize(sz); absValid = false;}
 
-  /**
+  /*
    * Adds two NVectors.
    */
   inline goNVector<T>& 	operator+= (goNVector<T>& other);
 
-  /**
+  /*
    * Subtracts two NVectors.
    */
   inline goNVector<T>& 	operator-= (goNVector<T>& other);
 
-  /**
+  /*
    * Calculates the absolute value of the vector.
    * DOES ONLY WORK WITH DOUBLE TYPE YET !
    */
@@ -67,7 +69,7 @@ class goNVector : public goArray<T> {
   T	   absValue;
   bool	   absValid;
 };
-/*! æ} */
+/* æ} */
 
   /*
    * This still is no real solution.

@@ -13,10 +13,9 @@
 
 template <class T> class goVector;
 
-/** \addtogroup math 
- * @{ */
+/* This is deprecated. */
 
-/*!
+/*
  * \brief Matrix class.
  *
  * This class uses goSignal3D for low level data storage and 
@@ -33,7 +32,7 @@ template <class T>
 class goMatrixSignal 
 {
  public:
-  /*!
+  /*
    * @param y Number of rows.
    * @param x Number of columns.
    * @param linear If true, the data is stored linearly in memory.
@@ -68,11 +67,11 @@ class goMatrixSignal
   // TNT compatibility methods END  
   
   inline T&         elem (goSize_t i, goSize_t j);
-  /*!
+  /*
    * @return Number of columns
    */
   inline goSize_t	getSizeX() const; 
-  /*!
+  /*
    * @return Number of rows
    */
   inline goSize_t	getSizeY() const;
@@ -95,9 +94,9 @@ class goMatrixSignal
 
   T                 norm () const;
 
-  /// Loads identity
+  // Loads identity
   void setUnity();
-  /// Loads identity
+  // Loads identity
   void setIdentity();
   void fill(T v);
   void print();
@@ -112,7 +111,5 @@ class goMatrixSignal
 
 typedef goMatrixSignal<goDouble> goMatrixSignald;
 typedef goMatrixSignal<goFloat>  goMatrixSignalf;
-/** @} */
-
 
 #endif 

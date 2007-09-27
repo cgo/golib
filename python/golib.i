@@ -102,6 +102,7 @@
 #include <gomath.h>
 #include <golu.h>
 #include <gosvd.h>
+#include <goeigenvalue.h>
 #include <goresample.h>
 #include <gorandom.h>
 #include <gognuplot.h>
@@ -153,6 +154,7 @@
 %include <gomath.h>
 %include <golu.h>
 %include <gosvd.h>
+%include <goeigenvalue.h>
 %include <goresample.h>
 %include <gorandom.h>
 %include <gognuplot.h>
@@ -1061,6 +1063,8 @@
 %template(goThinSVDd)      goMath::ThinSVD<goDouble>;
 %template(goLUf)           goMath::LU<goFloat>;
 %template(goLUd)           goMath::LU<goDouble>;
+%template(goEigenvaluef)   goMath::Eigenvalue<goFloat>;
+%template(goEigenvalued)   goMath::Eigenvalue<goDouble>;
 
 %template(goSinf)          goMath::sin<goFloat>;
 %template(goSind)          goMath::sin<goDouble>;

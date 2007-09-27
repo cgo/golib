@@ -18,17 +18,17 @@ namespace goMath
 * input_type is the function's input, e.g. float, double, or a vector of floats or doubles.
 */
 template <class input_type, class output_type>
-class goPDF : public goObjectBase
+class PDF : public goObjectBase
 {
     public:
-        virtual ~goPDF () {};
+        virtual ~PDF () {};
 
         virtual output_type operator() (const input_type&) const = 0;
 
         // FIXME: add things common to all probability density functions here
 
     protected:
-        goPDF () { this->setClassID(GO_PDF); };
+        PDF () { this->setClassID(GO_PDF); };
 };
 /*! @} */
 

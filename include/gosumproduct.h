@@ -36,7 +36,6 @@
  * \addtogroup gm
  * @{
  */
-
 /** 
  * @brief The sum-product algorithm.
  * \par References:
@@ -55,6 +54,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             : goMessagePassing <T,Tfloat> ()
         {
         };
+
         virtual ~goSumProduct () {};
 
         /** 
@@ -649,7 +649,6 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return marginal.sum ();
         };
 };
-
 /** @} */
 
 #endif

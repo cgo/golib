@@ -44,18 +44,21 @@ bool goMatrix<goFloat>::invert ()
         goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
         return false;
     }
-    int* P = new int [M * M];
+    int* P = new int [M];
     if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
     {
         delete[] P;
+        P = 0;
         return false;
     }
     if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
     {
         delete[] P;
+        P = 0;
         return false;
     }
     delete[] P;
+    P = 0;
     return true;
 }
 
