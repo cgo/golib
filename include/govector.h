@@ -35,9 +35,12 @@ class goVector : public goFixedArray<T>
         goVector ();
         goVector (goSize_t s, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0);
         goVector (T* ptr, goSize_t size, goIndex_t stride = 1) : goFixedArray<T> (ptr, size, stride) {};
-        goVector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
+        goVector (const goFixedArray<T>& o);
+        // goVector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
         // template <class To> goVector (const goFixedArray<To>& o) : goFixedArray<T> (o) {};
         virtual ~goVector ();
+
+        goVector<T>& operator= (const goFixedArray<T>& other);
 
         void resize (goSize_t s)
         {

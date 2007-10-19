@@ -1,6 +1,10 @@
 #ifndef GOLAPACK_H
 #define GOLAPACK_H
 
+#ifndef GOMATH_H
+# include <gomath.h>
+#endif
+
 #include <f2c.h>
 extern "C" 
 {
@@ -8,6 +12,9 @@ extern "C"
  #include <clapack.h>
 }
 
+//=
+//= These are from the clapack.h header file from netlib's clapack (not ATLAS),
+//= which you can find at http://www.netlib.org/clapack/clapack.h
 extern "C" {
 /* Subroutine */ int sgesvd_(char *jobu, char *jobvt, integer *m, integer *n, 
 	real *a, integer *lda, real *s, real *u, integer *ldu, real *vt, 
@@ -16,6 +23,21 @@ extern "C" {
 	doublereal *a, integer *lda, doublereal *s, doublereal *u, integer *
 	ldu, doublereal *vt, integer *ldvt, doublereal *work, integer *lwork, 
 	integer *info);
+/* Subroutine */ int sgels_(char *trans, integer *m, integer *n, integer *
+	nrhs, real *a, integer *lda, real *b, integer *ldb, real *work, 
+	integer *lwork, integer *info);
+/* Subroutine */ int dgels_(char *trans, integer *m, integer *n, integer *
+	nrhs, doublereal *a, integer *lda, doublereal *b, integer *ldb, 
+	doublereal *work, integer *lwork, integer *info);
+ 
+/* Subroutine */ int sgelss_(integer *m, integer *n, integer *nrhs, real *a, 
+	integer *lda, real *b, integer *ldb, real *s, real *rcond, integer *
+	rank, real *work, integer *lwork, integer *info);
+
+/* Subroutine */ int dgelss_(integer *m, integer *n, integer *nrhs, 
+	doublereal *a, integer *lda, doublereal *b, integer *ldb, doublereal *
+	s, doublereal *rcond, integer *rank, doublereal *work, integer *lwork,
+	 integer *info);
 }
 
 namespace goMath { namespace Lapack {
@@ -25,6 +47,15 @@ namespace goMath { namespace Lapack {
 
     template <class matrix_type, class pivot_vector>
         bool getrs (const matrix_type& A, bool transA, matrix_type& B, const pivot_vector& ipiv);
+    template <class matrix_type, class pivot_vector>
+        bool getri (matrix_type& A, const pivot_vector& ipiv);
+
+    template <class matrix_type, class vector_type>
+        bool gels (matrix_type& A, bool transA, vector_type& b);
+
+    // FIXME
+    template <class matrix_type, class vector_type>
+        bool gelss (matrix_type& A, bool transA, vector_type& b, vector_type* singularValues = 0);
 
     template <class T>
     class TypeDriver
@@ -32,10 +63,32 @@ namespace goMath { namespace Lapack {
         public:
             static bool getrf (const enum CBLAS_ORDER order, const int M, const int N, T* A, const int lda, int *ipiv);
             static bool getrs (const enum CBLAS_ORDER order, const enum CBLAS_TRANSPOSE trans, const int N, const int NRHS, const T* A, const int lda, const int* ipiv, T* B, const int ldb);
+            static bool getri (const enum CBLAS_ORDER order, const int N, T* A, const int lda, const int* ipiv);
+            static bool gels (char *trans, integer *m, integer *n, integer *
+                    nrhs, T *a, integer *lda, T *b, integer *ldb, T *work, 
+                    integer *lwork, integer *info);
+            static bool gelss (integer *m, integer *n, integer *nrhs, T *a, 
+                    integer *lda, T *b, integer *ldb, T *s, T *rcond, integer *
+                    rank, T *work, integer *lwork, integer *info);
     };
 
 }; };
 
+/** \addtogroup math
+ * @brief Lapack getrf.
+ * 
+ * @note Uses ATLAS' clapack implementation.
+ *
+ * Replaces A by its LU-decomposed form,
+ * \f$$ A \gets LU, \, ipiv \gets P \f$$
+ * so that
+ * \f$$ AP = LU \, . \f$$
+ * U is unit diagonal, P pivots columns.
+ * @param A Matrix to be decomposed.
+ * @param ipiv Pivot vector (filled by this function).
+ * 
+ * @return True if successful, false otherwise.
+ */
 template <class matrix_type, class pivot_vector>
 bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
 {
@@ -48,6 +101,8 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
 
 /** \addtogroup math
  * @brief Lapack getrs.
+ *
+ * @note Uses ATLAS' clapack implementation.
  *
  * Calculates \f$$ B^top \gets A x = B^top \f$$, assuming A is LU-decomposed e.g. with
  * getrf(). Implemented for goFloat and goDouble. pivot_vector must be of type \c int,
@@ -74,7 +129,113 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, matrix_type& B, c
     int NRHS = B.getRows();
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
-//    return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
     return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
 }
+
+/** \addtogroup math
+ * @brief Lapack getri, invert a LU-decomposed matrix.
+ *
+ * @note Uses ATLAS' clapack implementation.
+ *
+ * The matrix must be in LU-form created by getrf().
+ * 
+ * @param A Matrix to invert. Must be in LU form and must be quadratic.
+ * @param ipiv Pivot vector as created by getrf().
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class matrix_type, class pivot_vector>
+bool goMath::Lapack::getri (matrix_type& A, const pivot_vector& ipiv)
+{
+    if (A.getRows() != A.getColumns())
+    {
+        return false;
+    }
+    int N = A.getRows();
+    return TypeDriver<typename matrix_type::value_type>::getri (CblasRowMajor, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
+}
+
+/** 
+ * @brief Lapack gels. Least square solution of a linear system.
+ *
+ * For \f$$ A \in \mathbb{R}^{m \times n}\f$$ solves
+ * \f$$ \min_x \|Ax - b\|\f$$
+ * or
+ * \f$$ \min_x \|A^\top x - b\|\f$$
+ * if m >= n, or it finds the minimum norm solution of
+ * \f$$ Ax = b \f$$ or 
+ * \f$$ A^\top x = b \f$$
+ * if m < n, so that \f$ Ax = b\f$ is underdetermined.
+ * A must have full rank.
+ * 
+ * @param A Matrix A. Will be overwritten by QR or LQ decompositions.
+ * @param transA If true, A is used transposed.
+ * @param b Right hand side vector. Will be overwritten with the solution vector.
+ * 
+ * @return True if successful, false otherwise.
+ * @bug Appears not to work -- needs testing (examples/lapack.cpp)
+ */
+template <class matrix_type, class vector_type>
+bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
+{
+    //= Note: gels_() expects column major -- so MxN means in C columns x rows and 
+    //= transposed usage of A.
+    integer M = A.getColumns();
+    integer N = A.getRows();
+    integer NRHS = 1;
+    char trans = transA ? 'N' : 'T';  //= The other way around since we use row major
+    //= This is from the documentation at http://www.netlib.org/lapack/single/sgels.f
+    integer LWORK = goMath::max<integer> (1, M * N + goMath::max<integer> (M * N, NRHS));
+    goVector<typename matrix_type::value_type> WORK (LWORK);
+    integer info = 0;
+    integer lda = A.getLeadingDimension();
+    integer ldb = b.getSize();
+    return TypeDriver<typename matrix_type::value_type>::gels (&trans, &M, &N, &NRHS, A.getPtr(), &lda, b.getPtr(), &ldb, WORK.getPtr(), &LWORK, &info);
+}
+
+/** 
+ * @brief Lapack gelss.
+ *
+ * @note NEEDS TESTING, UNTESTED. Possibly the LDA is wrong if the matrix is not
+ * square (which is true in general).
+ * 
+ * @param A 
+ * @param transA 
+ * @param b 
+ * @param singularValues 
+ * 
+ * @return 
+ */
+template <class matrix_type, class vector_type>
+bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_type* singularValues)
+{
+    if (!transA)
+        A.transpose();
+
+    //= Note: gelss_() expects column major -- so MxN means in C columns x rows and 
+    //= transposed usage of A.
+    integer M = A.getColumns();
+    integer N = A.getRows();
+
+    integer NRHS = 1;
+    //= This is from the documentation at http://www.netlib.org/lapack/single/sgelss.f
+    // LWORK >= 3*min(M,N) + max( 2*min(M,N), max(M,N), NRHS ) --- larger for better performance.
+    integer LWORK = 3 * goMath::min<integer> (M,N) + goMath::max<integer> (2 * goMath::min<integer> (M,N), goMath::max<integer> (goMath::max<integer> (M,N), NRHS));
+    goVector<typename matrix_type::value_type> WORK (LWORK);
+    integer info = 0;
+    integer lda = A.getLeadingDimension();
+    integer ldb = b.getSize();
+    typename matrix_type::value_type rcond = -1.0f;
+    integer rank = 0;
+    vector_type temp_sv(0);
+    if (singularValues)
+        singularValues->resize (goMath::min<integer>(M,N));
+    else
+        temp_sv.resize (goMath::min<integer>(M,N));
+
+    return TypeDriver<typename matrix_type::value_type>::gelss (&M, &N, &NRHS, A.getPtr(), 
+            &lda, b.getPtr(), &ldb, singularValues ? singularValues->getPtr() : temp_sv.getPtr(), 
+            &rcond, &rank, WORK.getPtr(), &LWORK, &info);
+}
+
 #endif

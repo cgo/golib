@@ -108,3 +108,63 @@ bool goGL::viewSphere (goFloat phi, goFloat theta, goFloat radius,
     return true;
 }
 
+/** 
+ * @brief Find neighbouring vertices for each vertex in a triangle mesh.
+ * 
+ * @note Triangles may not occur twice in the faces array, e.g. in permuted form.
+ *
+ * @param Nvertices 
+ * @param faces Actually triangles (must be triangles)
+ * @param ret Matrix, containing for each vertex i the neighbouring vertices in row i.
+ * The matrix is Nvertices X 6. If a vertex has less than 6 neighbours, the remaining
+ * entries are -1.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goGL::findNeighbouringVertices (goSize_t Nvertices, const goFixedArray<goVector<int> >& faces, goMatrix<goIndex_t>& ret)
+{
+    goSize_t Nfaces = faces.getSize();
+    ret.resize (Nvertices, 6);
+    ret.fill (-1);
+    for (goSize_t i = 0; i < Nvertices; ++i)
+    {
+        goSize_t neigh_index = 0;
+        for (goSize_t j = 0; j < Nfaces; ++j)
+        {
+            const goVector<int>& v = faces[j];
+            for (goSize_t k = 0; k < v.getSize(); ++k)
+            {
+                if (v[k] == i)  // contains vertex
+                {
+                    //= Add all except i to row i in ret, and do not add
+                    //= already added points.
+                    for (goSize_t k2 = 0; k2 < v.getSize(); ++k2)
+                    {
+                        if (v[k2] != i) 
+                        {
+                            bool contained = false;
+                            for (goSize_t k3 = 0; k3 < 6; ++k3)
+                            {
+                                if (ret(i,k3) == v[k2]) 
+                                {
+                                    contained = true;
+                                    break;
+                                }
+                            }
+                            if (!contained)
+                            {
+                                ret(i,neigh_index) = v[k2];
+                                ++neigh_index;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            //= Sicher ist sicher .. sollte aber nicht passieren.
+            if (neigh_index >= 6)
+                break;
+        }
+    }
+}
+

@@ -28,6 +28,54 @@ goVector<T>::~goVector ()
 {
 }
 
+template <class T>
+goVector<T>::goVector (const goFixedArray<T>& other)
+{
+    *this = other;
+}
+
+template<>
+goVector<goFloat>& goVector<goFloat>::operator= (const goFixedArray<goFloat>& other)
+{
+    goSize_t N = other.getSize();
+    if (this->getSize() != N)
+    {
+        this->resize (N);
+    }
+    cblas_scopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template<>
+goVector<goDouble>& goVector<goDouble>::operator= (const goFixedArray<goDouble>& other)
+{
+    goSize_t N = other.getSize();
+    if (this->getSize() != N)
+    {
+        this->resize (N);
+    }
+    cblas_dcopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator= (const goFixedArray<T>& other)
+{
+    if (other.getStride() != 1)
+    {
+        goFixedArray<T>::operator= (other);
+        return *this;
+    }
+    if (this->getSize() == other.getSize() && this->getStride() == 1)
+    {
+        memcpy (this->getPtr(), other.getPtr(), this->getSize() * sizeof(T));
+        return *this;
+    }
+    this->resize (other.getSize());
+    memcpy (this->getPtr(), other.getPtr(), this->getSize() * sizeof(T));
+    return *this;
+}
+
 //= Was inlined.
 #if 0
 template <class T>

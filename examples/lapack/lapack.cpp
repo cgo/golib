@@ -23,9 +23,28 @@ int main ()
     A.invert();
     A.print();
 
+    goMatrixf A2(A);
+
     goVector<int> ipiv;
     goMath::Lapack::getrf (A, ipiv);
     goMath::Lapack::getrs (A, false, B, ipiv);
-
     B.print ();
+
+    {
+        printf ("Testing gels()\n");
+        printf ("A2:\n");
+        A2.print ();
+        goVectorf B(3);
+        B[0] = 1.0; B[1] = 2.0; B[2] = 3.0;
+        printf ("B:\n");
+        B._print ();
+        //if (!goMath::Lapack::gels (A, false, B))
+        //{
+        //    printf ("gels() failed.\n");
+        //}
+        goMath::Lapack::gelss (A, false, B);
+        printf ("Solution:\n");
+        B._print ();
+    }
+
 }

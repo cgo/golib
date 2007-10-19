@@ -1069,7 +1069,7 @@ bool goCurve<T>::getGrad (goList<goVector<T> >& diff) const
             p2 = &el->next->elem;
         else
             p2 = p1;
-        d = p2 - p1;
+        d = *p2 - *p1;
         // d.x = p2->x - p1->x;
         // d.y = p2->y - p1->y;
         diff.append (d);
