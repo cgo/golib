@@ -24,6 +24,10 @@ namespace goGL
             // bool write (const char* filename, int listName);
             goFixedArray<goVectorf>& getVertices ();
             goFixedArray<goVector<int> >& getFaces ();
+            const goFixedArray<goVectorf>& getVertices () const;
+            const goFixedArray<goVector<int> >& getFaces () const;
+            void getAdjacencyLists (goFixedArray<goList<int> >& ret) const;
+           
 
         private:
             OFFFile (OFFFile&);

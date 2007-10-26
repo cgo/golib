@@ -160,6 +160,14 @@
 %include <gognuplot.h>
 %include <gofilter1d.h>
 
+%extend goList<int>
+{
+    int get_current_value ()
+    {
+        return self->getCurrent();
+    }
+};
+
 %extend goString
 {
     char *__str__ ()
@@ -442,6 +450,7 @@
         printf ("\n");
     }
 }
+
 %extend goFixedArray<goDouble>
 {
     %pythoncode %{
@@ -646,6 +655,71 @@
     {
         return (*self)[i];
     }
+}
+
+%extend goFixedArray<goList<int> >
+{
+//    %pythoncode %{
+//        def setArray (self, A):
+//            if len(A) != self.getSize():
+//                self.setSize(len(A))
+//            for i in xrange(len(A)):
+//                self[i] = A[i]
+//    %}
+    goList<int> __getitem__(int i)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goFixedArray: range error.");
+        }
+        return (*self)[i];
+    };
+    void __setitem__(int i, goList<int> f)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goFixedArray: range error.");
+        }
+        (*self)[i] = f;
+    };
+//    char *__str__()
+//    {
+//        static goString str;
+//        str = "";
+//        goSize_t sz = self->getSize();
+//        for (goSize_t i = 0; i < sz; ++i)
+//        {
+//            str += (float)(*self)[i];
+//            if (i < sz-1)
+//                str += " ";
+//        }
+//        return str.getPtr();
+//    };
+    unsigned int __len__()
+    {
+        return self->getSize();
+    };
+
+//    goFloat mean ()
+//    {
+//        return goMath::mean<goFixedArray<goFloat>,goFloat> (*self, self->getSize());
+//    }
+    
+//    void set (goIndex_t i, goFloat v)
+//    {
+//        (*self)[i] = v;
+//    }
+//    goFloat get (goIndex_t i)
+//    {
+//        return (*self)[i];
+//    }
+//    void _print ()
+//    {
+//        goSize_t sz = (*self).getSize();
+//        for (goSize_t i = 0; i < sz; ++i)
+//            printf ("%f ", (*self)[i]);
+//        printf ("\n");
+//    }
 }
 
 %extend goVector<goFloat>
@@ -1025,11 +1099,15 @@
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
 
+%template(goListElementInt) goListElement<int>;   // Needed in gogl python module
+%template(goListInt) goList<int>;   // Needed in gogl python module
+
 %template(goFixedArrayf)   goFixedArray<goFloat>;
 %template(goFixedArrayd)   goFixedArray<goDouble>;
 %template(goFixedArraySize_t)   goFixedArray<goSize_t>;
 %template(goFixedArrayBool)   goFixedArray<bool>;
 %template(goFixedArraySignal3D)   goFixedArray<goAutoPtr<goSignal3D<void> > >;
+%template(goFixedArraygoListInt) goFixedArray<goList<int> >;   // Needed only in gogl python module
 
 %template(goVectorf)       goVector<goFloat>;
 %template(goVectord)       goVector<goDouble>;

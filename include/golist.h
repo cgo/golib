@@ -17,7 +17,7 @@ class goListElement {
  public:
     goListElement () :
      elem(), next(0), prev(0), index(0) {};
-     ~goListElement () {};
+     virtual ~goListElement () {};
 
   T                 elem;
   goListElement*    next;
@@ -31,7 +31,7 @@ class goListIterator
     public:
         goListIterator () : el (0) {};
         goListIterator (goListElement<T>* e) : el (e) {};
-        ~goListIterator () {};
+        virtual ~goListIterator () {};
 
         T& operator* () { return el->elem; };
         const T& operator* () const { return el->elem; };
@@ -54,7 +54,7 @@ class goListConstIterator
     public:
         goListConstIterator () : el (0) {};
         goListConstIterator (const goListElement<T>* e) : el (e) {};
-        ~goListConstIterator () {};
+        virtual ~goListConstIterator () {};
 
         const T& operator* () const { return el->elem; };
         
@@ -93,7 +93,7 @@ class goList {
   {
       *this = other;
   };
-  ~goList ()
+  virtual ~goList ()
   {
       position = front;
       this->erase ();
@@ -195,6 +195,13 @@ class goList {
           el = el->next;
       }
       return sz + 1;
+  };
+
+  bool contains (const T& e) const
+  {
+      if (this->find(e))
+          return true;
+      return false;
   };
 
   /** 

@@ -444,6 +444,9 @@ class goVector : public goFixedArray<T>
             return retValue;
         };
 
+        T min () const;
+        T max () const;
+
         void fillRange (const T& start, const T& step, const T& end);
 
         bool readASCII  (const char* filename);

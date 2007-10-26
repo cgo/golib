@@ -312,3 +312,43 @@ goFixedArray<goVector<int> >& goGL::OFFFile::getFaces ()
 {
     return myPrivate->faces;
 }
+
+const goFixedArray<goVectorf>& goGL::OFFFile::getVertices () const
+{
+    return myPrivate->vertices;
+}
+
+const goFixedArray<goVector<int> >& goGL::OFFFile::getFaces () const
+{
+    return myPrivate->faces;
+}
+
+/** 
+ * @brief Build adjacency lists for all vertices of this object.
+ *
+ * @note The adjacency lists contain the graph structure only for triangular meshes.
+ * For quadrilaterals, also the diagonal points are added as being adjacent.
+ */
+void goGL::OFFFile::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
+{
+    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    int N = this->getVertices().getSize();
+    ret.setSize (0);
+    ret.setSize (N);
+    int Nfaces = faces.getSize();
+    for (int fi = 0; fi < Nfaces; ++fi)
+    {
+        const goVector<int>& v = faces[fi];
+        int Nv = v.getSize();
+        for (int j = 0; j < Nv; ++j)
+        {
+            for (int k = 0; k < Nv; ++k)
+            {
+                if (j != k && !ret[v[j]].contains(v[k])) 
+                {
+                    ret[v[j]].append(v[k]);
+                }
+            }
+        }
+    }
+}

@@ -80,6 +80,20 @@ int main (int argc, char* argv[])
         printf ("Everything seems to be ok.\n");
     }
 
+    goFixedArray<goList<int> > adj;
+    f.getAdjacencyLists (adj);
+    for (goSize_t i = 0; i < adj.getSize(); ++i)
+    {
+        printf ("%d -> ", i);
+        goList<int>::Element* el = adj[i].getFrontElement();
+        while (el)
+        {
+            printf ("%d ", el->elem);
+            el = el->next;
+        }
+        printf ("\n");
+    }
+
     Gtk::Main kit(argc, argv);
     gdk_gl_init (&argc, &argv);
     gtk_gl_init (&argc, &argv);

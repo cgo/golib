@@ -418,6 +418,32 @@ bool goVector<goComplexf>::readASCII (FILE*)
     return false;
 }
 
+template <>
+goComplexf goVector<goComplexf>::min () const
+{
+    goLog::error ("goVector::min() not implemented for goComplexf");
+    return false;
+}
+
+template <>
+goComplexf goVector<goComplexf>::max () const
+{
+    goLog::error ("goVector::max() not implemented for goComplexf");
+    return false;
+}
+
+template <class T>
+T goVector<T>::min () const
+{
+    return goMath::min<T> (*this);
+}
+
+template <class T>
+T goVector<T>::max () const
+{
+    return goMath::max<T> (*this);
+}
+
 // =====================================
 
 template <>

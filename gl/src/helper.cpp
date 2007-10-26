@@ -108,7 +108,9 @@ bool goGL::viewSphere (goFloat phi, goFloat theta, goFloat radius,
     return true;
 }
 
-/** 
+/* 
+ * Unused, not useful, remove.
+ *
  * @brief Find neighbouring vertices for each vertex in a triangle mesh.
  * 
  * @note Triangles may not occur twice in the faces array, e.g. in permuted form.
