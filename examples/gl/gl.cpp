@@ -1,6 +1,7 @@
 #include <gogl/offfile.h>
 #include <gogui/glwidget.h>
 #include <gogui/offview.h>
+#include <gogui/offviewcontrol.h>
 #include <gogui/mainwindow.h>
 #include <gogui/helper.h>
 
@@ -26,13 +27,16 @@ class MyWindow : public goGUI::MainWindow
 {
     public:
         MyWindow ()
-            : goGUI::MainWindow (), glw ()
+            : goGUI::MainWindow (), glw (), vc ()
         {
             Gtk::Frame* F = Gtk::manage (new Gtk::Frame);
             this->getPaned().pack1 (*F);
             F->add (glw);
             F->show ();
             glw.show ();
+            
+            this->vc.setOFFView (&this->glw);
+            this->addControl (this->vc, true);
 
             Gtk::MenuItem* item = this->addMenuItem (this->getFileMenu(),
                 "Open");
@@ -59,41 +63,44 @@ class MyWindow : public goGUI::MainWindow
         };
 
         goGUI::OFFView glw;
+        goGUI::OFFViewControl vc;
 };
 
 int main (int argc, char* argv[])
 {
-    if (argc < 2)
-    {
-        printf ("Tell me the .off filename.\n");
-        exit (-1);
-    }
+    //if (argc < 2)
+    //{
+    //    printf ("Tell me the .off filename.\n");
+    //    exit (-1);
+    //}
 
-    const char* filename = argv[1];
-    goGL::OFFFile f;
-    if (!f.read (filename))
+    if (argc >= 2)
     {
-        printf ("There was an error.\n");
-    }
-    else
-    {
-        printf ("Everything seems to be ok.\n");
-    }
-
-    goFixedArray<goList<int> > adj;
-    f.getAdjacencyLists (adj);
-    for (goSize_t i = 0; i < adj.getSize(); ++i)
-    {
-        printf ("%d -> ", i);
-        goList<int>::Element* el = adj[i].getFrontElement();
-        while (el)
+        const char* filename = argv[1];
+        goGL::OFFFile f;
+        if (!f.read (filename))
         {
-            printf ("%d ", el->elem);
-            el = el->next;
+            printf ("There was an error.\n");
         }
-        printf ("\n");
-    }
+        else
+        {
+            printf ("Everything seems to be ok.\n");
+        }
 
+        goFixedArray<goList<int> > adj;
+        f.getAdjacencyLists (adj);
+        for (goSize_t i = 0; i < adj.getSize(); ++i)
+        {
+            printf ("%d -> ", i);
+            goList<int>::Element* el = adj[i].getFrontElement();
+            while (el)
+            {
+                printf ("%d ", el->elem);
+                el = el->next;
+            }
+            printf ("\n");
+        }
+    }
     Gtk::Main kit(argc, argv);
     gdk_gl_init (&argc, &argv);
     gtk_gl_init (&argc, &argv);
