@@ -23,6 +23,7 @@
 #include <gocurve.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
+#include <goofffile.h>
 %}
 %import ../../python/golib.i
 

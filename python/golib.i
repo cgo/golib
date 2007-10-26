@@ -107,6 +107,7 @@
 #include <gorandom.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
+#include <goofffile.h>
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
@@ -159,6 +160,40 @@
 %include <gorandom.h>
 %include <gognuplot.h>
 %include <gofilter1d.h>
+%include <goofffile.h>
+
+%extend goOFFFile 
+{
+    %pythoncode{
+        def get_adjacency_lists(self):
+            """Python version of the adjacency lists.
+               Returns: List of lists, one adjacency list for each vertex. Numbers start at 0."""
+            lists = goFixedArraygoListInt()
+            self.getAdjacencyLists (lists)
+            ret = []
+            for i in xrange(len(lists)):
+                newlist = []
+                # el = lists[i].getFrontElement()
+                for j in xrange(lists[i].getSize()):
+                    newlist.append (lists[i](j).elem) # el.elem)
+                    # el = el.next  # This does not work ... dont know why.
+                ret.append (newlist)
+            return ret
+
+        def get_faces(self):
+            """Python version of the faces list.
+               Return: list of lists, each list containing 3 or 4 integer entries denoting
+                       a vertex each."""
+            triangles = self.getFaces()
+            ret = []
+            for i in xrange(triangles.getSize()):
+                temp = []
+                for j in xrange(len(triangles[i])):
+                    temp.append (triangles[i][j])
+                ret.append (temp)
+            return ret
+    %}
+}
 
 %extend goList<int>
 {
@@ -559,6 +594,49 @@
         printf ("\n");
     }
 }
+%extend goFixedArray<int>
+{
+    %pythoncode %{
+        def setArray (self, A):
+            if len(A) != self.getSize():
+                self.setSize(len(A))
+            for i in xrange(len(A)):
+                self[i] = A[i]
+    %}
+    int __getitem__(int i)
+    {
+        return (*self)[i];
+    };
+    void __setitem__(int i, int f)
+    {
+        (*self)[i] = f;
+    };
+    char *__str__()
+    {
+        static goString str;
+        str = "";
+        goSize_t sz = self->getSize();
+        for (goSize_t i = 0; i < sz; ++i)
+        {
+            str += (int)(*self)[i];
+            if (i < sz-1)
+                str += " ";
+        }
+        return str.getPtr();
+    };
+    unsigned int __len__()
+    {
+        return self->getSize();
+    };
+
+    void _print ()
+    {
+        goSize_t sz = (*self).getSize();
+        for (goSize_t i = 0; i < sz; ++i)
+            printf ("%d ", (*self)[i]);
+        printf ("\n");
+    }
+}
 %extend goFixedArray<bool>
 {
     %pythoncode %{
@@ -720,6 +798,37 @@
 //            printf ("%f ", (*self)[i]);
 //        printf ("\n");
 //    }
+}
+
+%extend goFixedArray<goVector<int> >
+{
+//    %pythoncode %{
+//        def setArray (self, A):
+//            if len(A) != self.getSize():
+//                self.setSize(len(A))
+//            for i in xrange(len(A)):
+//                self[i] = A[i]
+//    %}
+    goVector<int> __getitem__(int i)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goVector: range error.");
+        }
+        return (*self)[i];
+    };
+    void __setitem__(int i, goVector<int> f)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goVector: range error.");
+        }
+        (*self)[i] = f;
+    };
+    unsigned int __len__()
+    {
+        return self->getSize();
+    };
 }
 
 %extend goVector<goFloat>
@@ -1104,13 +1213,16 @@
 
 %template(goFixedArrayf)   goFixedArray<goFloat>;
 %template(goFixedArrayd)   goFixedArray<goDouble>;
+%template(goFixedArrayi)   goFixedArray<int>;
 %template(goFixedArraySize_t)   goFixedArray<goSize_t>;
 %template(goFixedArrayBool)   goFixedArray<bool>;
 %template(goFixedArraySignal3D)   goFixedArray<goAutoPtr<goSignal3D<void> > >;
 %template(goFixedArraygoListInt) goFixedArray<goList<int> >;   // Needed only in gogl python module
+%template(goFixedArraygoVectori) goFixedArray<goVector<int> >;
 
 %template(goVectorf)       goVector<goFloat>;
 %template(goVectord)       goVector<goDouble>;
+%template(goVectori)       goVector<int>;
 %template(goArrayf)        goArray<goFloat>;
 %template(goArrayd)        goArray<goDouble>;
 %template(goArrayi)        goArray<goInt32>;

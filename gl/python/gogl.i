@@ -34,22 +34,3 @@
 %include <gogl/helper.h>
 %include <gogl/offfile.h>
 
-%extend goGL::OFFFile 
-{
-    %pythoncode{
-        def get_adjacency_lists(self):
-            """Python version of the adjacency lists.
-               Returns: List of lists, one adjacency list for each vertex. Numbers start at 0."""
-            lists = golib.goFixedArraygoListInt()
-            self.getAdjacencyLists (lists)
-            ret = []
-            for i in xrange(len(lists)):
-                newlist = []
-                # el = lists[i].getFrontElement()
-                for j in xrange(lists[i].getSize()):
-                    newlist.append (lists[i](j).elem) # el.elem)
-                    # el = el.next  # This does not work ... dont know why.
-                ret.append (newlist)
-            return ret
-    %}
-}
