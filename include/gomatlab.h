@@ -76,6 +76,10 @@ enum {
     GO_MATLAB_EVALUATE
 };
 
+/** 
+* @brief Matlab interface.
+* @note You need Matlab in order to use this.
+*/
 class goMatlab : public goObjectBase 
 {
     public:

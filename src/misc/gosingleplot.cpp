@@ -996,6 +996,11 @@ bool goSinglePlot::addCurveMatrix (const goMatrixf& m, const char* title, const 
 //    m.refColumn (0, x);
 //    m.refColumn (1, y);
 //    return this->addCurve (x, y, title, plotOptions);
+    if (myPrivate->plotType != goPlot::Surface && m.getColumns() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixCurve<goFloat>(m));
     if (plotOptions)
@@ -1019,6 +1024,11 @@ bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const 
     //m.refColumn (0, x);
     //m.refColumn (1, y);
     //return this->addCurve (x, y, title, plotOptions);
+    if (myPrivate->plotType != goPlot::Surface && m.getColumns() > 2)
+    {
+        // this->clear (); //= This deletes all labels ... not good.
+        myPrivate->plotType = goPlot::Surface;
+    }
     //= New
     goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMatrixCurve<goDouble>(m));
     if (plotOptions)

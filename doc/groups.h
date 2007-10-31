@@ -101,7 +101,7 @@
  *  (however unlikely). However, I think
  *  in this case it can mean significant speed-ups.
  */
-/*!
+/**
  * \defgroup math Mathematics
  *  \section math-la Linear Algebra Objects
  *  Use goMatrix and goVector for matrix and vector operations.
@@ -112,7 +112,7 @@
  *  for a specific platform outside of golib.
  *  The operator* and operator*= operators use CBLAS.
  *  For best performance, when you want to do something like
- *  \f$C = A^\top \cdot B + C\f$, use goMatrixMult().
+ *  C = A^\top \cdot B + C, use goMatrixMult().
  *  Explicitly transposing a matrix should not be necessary,
  *  if I find it is for some operation, I will add functions
  *  that overcome this. Transposition of a goMatrix is possible
@@ -124,7 +124,8 @@
  *  Both are adapted versions from the Template Numerical Toolkit, 
  *  a freely available implementation of a few linear algebra 
  *  algorithms.
- *  
+ */
+/*!
  * \defgroup misc Miscellaneous and basic classes
  *  \section misc-intro Introduction
  *   This group contains miscellaneous and basic classes, like the goObjectBase class.

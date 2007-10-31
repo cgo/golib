@@ -74,7 +74,11 @@ namespace goMath { namespace Lapack {
 
 }; };
 
-/** \addtogroup math
+/**
+ * \addtogroup math
+ * @{
+ */
+/** 
  * @brief Lapack getrf.
  * 
  * @note Uses ATLAS' clapack implementation.
@@ -99,7 +103,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
     return TypeDriver<typename matrix_type::value_type>::getrf (CblasRowMajor, M, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
 }
 
-/** \addtogroup math
+/** 
  * @brief Lapack getrs.
  *
  * @note Uses ATLAS' clapack implementation.
@@ -132,7 +136,7 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, matrix_type& B, c
     return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
 }
 
-/** \addtogroup math
+/** 
  * @brief Lapack getri, invert a LU-decomposed matrix.
  *
  * @note Uses ATLAS' clapack implementation.
@@ -237,5 +241,5 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
             &lda, b.getPtr(), &ldb, singularValues ? singularValues->getPtr() : temp_sv.getPtr(), 
             &rcond, &rank, WORK.getPtr(), &LWORK, &info);
 }
-
+/** @} */
 #endif

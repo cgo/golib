@@ -235,6 +235,12 @@
                 for i in xrange(rows):
                     for j in xrange(cols):
                         self.set(i,j,A[i][j])
+        def copy_row (self, i):
+            N = self.getColumns()
+            ret = goVectorf(N)
+            for j in xrange(N):
+                ret[j] = self.get(i,j)
+            return ret
     %}
 
     // goFloat __getitem__(int i)
@@ -305,6 +311,12 @@
                 for i in xrange(rows):
                     for j in xrange(cols):
                         self.set(i,j,A[i][j])
+        def copy_row (self, i):
+            N = self.getColumns()
+            ret = goVectord(N)
+            for j in xrange(N):
+                ret[j] = self.get(i,j)
+            return ret
     %}
     char *__str__()
     {
@@ -356,6 +368,12 @@
             for i in xrange(rows):
                 for j in xrange(cols):
                     self.set(i,j,A[i][j])
+        def copy_row (self, i):
+            N = self.getColumns()
+            ret = goVectori(N)
+            for j in xrange(N):
+                ret[j] = self.get(i,j)
+            return ret
     %}
 
     char *__str__()
