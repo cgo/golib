@@ -186,6 +186,39 @@ void goPlot::Plot::saveGnuplot (const char* filename)
     mp.saveGnuplot (filename);
 }
 
+/** 
+ * @brief Removes all plots.
+ */
+void goPlot::Plot::clear ()
+{
+    myPrivate->plots.erase ();
+    myPrivate->plotPositions.erase ();
+//    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
+
+//    while (pel)
+//    {
+//        pel->elem.clear ();
+//        pel = pel->next;
+//    }
+}
+
+/** 
+ * @brief Clears plot (x,y), if it exists.
+ *
+ * If the plot does not exist, does nothing.
+ * 
+ * @param x x position of the plot.
+ * @param y y position of the plot.
+ */
+void goPlot::Plot::clear (goSize_t x, goSize_t y)
+{
+    goVectori temp(2);
+    temp[0] = x; temp[1] = y;
+    if (!myPrivate->plotPositions.contains(temp))
+        return;
+    this->getPlot(x,y).clear ();
+}
+
 goGnuplot& goPlot::Plot::getGnuplot ()
 {
     return myPrivate->gp;
