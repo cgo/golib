@@ -203,6 +203,9 @@ class goMultiPlotter : public goObjectBase
         void setBarycentric (const goMatrixd& triangle);
        
         void setPrefix (const goString&);
+        void setPrefix (const char*);
+        void setPostfix (const goString&);
+        void setPostfix (const char*);
 
         bool makePlotCommands (goString& plotCommandsRet);
 
@@ -336,6 +339,9 @@ namespace goPlot
             void plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
             void plotPause ();
             void saveGnuplot (const char* filename);
+
+            void clear ();
+            void clear (goSize_t x, goSize_t y);
 
             goAutoPtr<goSinglePlot> getPlotp (goSize_t x, goSize_t y);
             goSinglePlot& getPlot (goSize_t x, goSize_t y);
