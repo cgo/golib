@@ -112,25 +112,25 @@ template <class T> class goFixedArray
 
         T&       operator() (goIndex_t i)
         {
-            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
+            //assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i * myStride];
         };
 
         T&       operator[] (goIndex_t i)
         {
-            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
+            //assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i * myStride];
         };
 
         const T& operator() (goIndex_t i) const
         {
-            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
+            //assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i * myStride];
         };
 
         const T& operator[] (goIndex_t i) const
         {
-            assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
+            //assert (i >= -myLeftBorder && i < (goIndex_t)mySize + myRightBorder);
             return myArray[i * myStride];
         };
 
