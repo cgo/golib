@@ -419,7 +419,7 @@ class goVector : public goFixedArray<T>
          */
         T norm2 () const;
         /**
-         * @brief 2-Norm of this vector.
+         * @brief 1-Norm of this vector: The sum of absolute values.
          *
          * Uses cblas_<>asum().
          * Not implemented for goComplex types.
@@ -451,8 +451,8 @@ class goVector : public goFixedArray<T>
 
         bool readASCII  (const char* filename);
         bool readASCII  (FILE* file);
-        bool writeASCII (const char* filename);
-        bool writeASCII (FILE* file);
+        bool writeASCII (const char* filename) const;
+        bool writeASCII (FILE* file) const;
 };
 
 
