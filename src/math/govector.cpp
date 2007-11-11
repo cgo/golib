@@ -371,7 +371,7 @@ bool goVector<T>::readASCII (FILE* file)
 }
 
 template <class T>
-bool goVector<T>::writeASCII (const char* filename)
+bool goVector<T>::writeASCII (const char* filename) const
 {
     FILE* f = ::fopen (filename, "w");
     if (!f)
@@ -382,7 +382,7 @@ bool goVector<T>::writeASCII (const char* filename)
 }
 
 template <class T>
-bool goVector<T>::writeASCII (FILE* file)
+bool goVector<T>::writeASCII (FILE* file) const
 {
     if (!file)
     {
@@ -405,7 +405,7 @@ bool goVector<T>::writeASCII (FILE* file)
 }
 
 template <>
-bool goVector<goComplexf>::writeASCII (FILE*)
+bool goVector<goComplexf>::writeASCII (FILE*) const
 {
     goLog::error ("goVector::writeASCII() not implemented for goComplexf");
     return false;
