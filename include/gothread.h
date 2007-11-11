@@ -139,6 +139,8 @@ public:
   /// Resets the ints made by {\tt makeInt()} to zero.
   void		resetInt ();
 
+  void      getIndexRange (int threadNumber, int N, int& myStart, int& myEnd);
+
   ///
   int		getNumOfThreads () { return numberOfThreads; }
   
