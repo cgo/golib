@@ -138,6 +138,46 @@ goThread::resetInt () {
   intCount = 0;
 }
 
+/** 
+ * @brief Calculate a mutually exclusive index range for this thread.
+ * 
+ * Given you are working on a data set of N-1 data of index range 0..N-1, this
+ * method calculates a range startRet..endRet that belongs to this thread.
+ * You can calculate a thread number by using makeInt(); remember to
+ * reset the values using resetInt() if using a thread object multiple times.
+ *
+ * Notice \c endRet and \c startRet are used as in
+ * <code>for (i = startRet; i < endRet; ++i) {...}<\code>.
+ * \c startRet is the first index, \c endRet is the last index plus one.
+ *
+ * @param threadNumber Number of this thread (e.g. with makeInt())
+ * @param N Number of data items
+ * @param startRet Start index (on return)
+ * @param endRet End index (on return)
+ */
+void goThread::getIndexRange (int threadNumber, int N, int& startRet, int& endRet)
+{
+    // const goSize_t N = this->null_basis->getColumns();
+    int myStart = 0;
+    int myN = 0;
+    int count = this->getNumOfThreads();
+    //printf ("myID: %d started.\n", myID);
+    if (threadNumber < count - 1) //= not the last thread
+    {
+        myN = N / count;
+        myStart = threadNumber * myN;
+    }
+    else
+    {
+        myStart = threadNumber * (N / count);
+        myN = N - myStart;
+    }
+
+    myN += myStart;
+    startRet = myStart;
+    endRet = myN;
+}
+
 #ifndef WIN32
 int
 goThread::howManyProcessors () {
