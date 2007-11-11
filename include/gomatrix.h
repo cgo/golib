@@ -28,15 +28,13 @@ template <class T> class goVector;
  *
  * There is no support for [i][j] indexing anymore. Use (i,j) instead.
  * 
- * If you need to instantiate the template for a new type,
- * include gomatrix.hpp and know about the implications.
- *
  * \author Christian Gosch
  */
 template <class T>
 class goMatrix 
 {
  public:
+     static const bool rowMajor;
      typedef T value_type;
   /*!
    * @param y Number of rows.
@@ -58,9 +56,8 @@ class goMatrix
   * @param r Rows
   * @param c Columns
   * @param leadingDim leading dimension -- if 0, is set to c.
-  * @param rowMajor Leave at true (default) -- not implemented yet (and might never be).
   */
-  goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0, bool rowMajor = true);
+  goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
 
   virtual ~goMatrix ();
   
@@ -87,7 +84,7 @@ class goMatrix
   void shiftColumns (goIndex_t offset, goMatrix<T>& ret) const;
 
   //= FIXME: column major is almost not implemented yet. It may never be.
-  bool getRowMajor () const { return this->rowMajor; };
+  // bool getRowMajor () const { return this->rowMajor; };
 
   goMatrix<T>& operator= (const goMatrix<T>& other);
 
@@ -152,76 +149,9 @@ class goMatrix
     return this->leadingDimension;
   };
 
-  inline T sum () const
-  {
-      T s = T(0);
-      goSize_t r = this->getRows();
-      goSize_t c = this->getColumns();
-      for (goSize_t i = 0; i < r; ++i)
-      {
-          for (goSize_t j = 0; j < c; ++j)
-          {
-              s += (*this)(i,j);
-          }
-      }
-      return s;
-  };
-
-  /** 
-   * @brief Sum over all columns / all rows.
-   * 
-   * @param dimension If 0, sums over all columns and the result is a row vector.
-   * Else, sums over all rows and the result is a column vector.
-   * @param ret Result.
-   */
-  template <class To>
-  inline void sum (int dimension, goMatrix<To>& ret) const
-  {
-      if (dimension == 0)
-      {
-          goSize_t r = this->getRows();
-          goSize_t c = this->getColumns();
-          ret.resize (1, c);
-          ret.fill (T(0));
-          for (goSize_t i = 0; i < r; ++i)
-          {
-              for (goSize_t j = 0; j < c; ++j)
-              {
-                  ret(0,j) += (*this)(i,j);
-              }
-          }
-      }
-      else
-      {
-          goSize_t r = this->getRows();
-          goSize_t c = this->getColumns();
-          ret.resize (r, 1);
-          ret.fill (T(0));
-          for (goSize_t i = 0; i < r; ++i)
-          {
-              T temp = T(0);
-              for (goSize_t j = 0; j < c; ++j)
-              {
-                  temp += (*this)(i,j);
-              }
-              ret(i,0) = temp;
-          }
-      }
-  };
-  template <class To>
-  inline void sum (int dimension, goVector<To>& ret) const
-  {
-      goMatrix<To> M;
-      this->sum (dimension, M);
-      if (dimension == 0)
-      {
-          M.copyRow (0, ret);
-      }
-      else
-      {
-          M.copyColumn (0, ret);
-      }
-  };
+  T sum () const;
+  void sum (int dimension, goMatrix<T>& ret) const;
+  void sum (int dimension, goVector<T>& ret) const;
 
   // TNT compatibility methods BEGIN
   inline int        dim1 () const { return this->getRows(); };
@@ -609,7 +539,6 @@ class goMatrix
   goSize_t           rows;
   goSize_t           columns;
   goSize_t           leadingDimension;
-  bool               rowMajor;
 };
 
 /** 

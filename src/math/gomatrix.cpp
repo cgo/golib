@@ -1,5 +1,5 @@
 #include <gomatrix.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 #include <gocomplex.h>
 #include <gomath.h>		// MAX()
 #ifndef GOEIGENVALUE_H
@@ -27,6 +27,7 @@ extern "C"
  #include <clapack.h>
 }
 
+template<class T>
 const bool goMatrix<T>::rowMajor = true;
 
 /*!
@@ -65,7 +66,7 @@ goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
 {
     if (leadingDim == 0)
     {
-        if (row_major)
+        if (goMatrix<T>::rowMajor)
             leadingDimension = columns;
         else
             leadingDimension = rows;
@@ -450,6 +451,84 @@ template <class T>
 bool goMatrix<T>::operator!= (const goMatrix<T>& other) const
 {
     return !(*this == other);
+}
+
+/** 
+ * @brief Sum over all elements.
+ * 
+ * @return Sum over all elements.
+ */
+template <class T>
+T goMatrix<T>::sum () const
+{
+    T s = T(0);
+    goSize_t r = this->getRows();
+    goSize_t c = this->getColumns();
+    for (goSize_t i = 0; i < r; ++i)
+    {
+        for (goSize_t j = 0; j < c; ++j)
+        {
+            s += (*this)(i,j);
+        }
+    }
+    return s;
+}
+
+/** 
+ * @brief Sum over all columns / all rows.
+ * 
+ * @param dimension If 0, sums over all columns and the result is a row vector.
+ * Else, sums over all rows and the result is a column vector.
+ * @param ret Result.
+ */
+template <class T>
+void goMatrix<T>::sum (int dimension, goMatrix<T>& ret) const
+{
+    if (dimension == 0)
+    {
+        goSize_t r = this->getRows();
+        goSize_t c = this->getColumns();
+        ret.resize (1, c);
+        ret.fill (T(0));
+        for (goSize_t i = 0; i < r; ++i)
+        {
+            for (goSize_t j = 0; j < c; ++j)
+            {
+                ret(0,j) += (*this)(i,j);
+            }
+        }
+    }
+    else
+    {
+        goSize_t r = this->getRows();
+        goSize_t c = this->getColumns();
+        ret.resize (r, 1);
+        ret.fill (T(0));
+        for (goSize_t i = 0; i < r; ++i)
+        {
+            T temp = T(0);
+            for (goSize_t j = 0; j < c; ++j)
+            {
+                temp += (*this)(i,j);
+            }
+            ret(i,0) = temp;
+        }
+    }
+}
+
+template <class T>
+void goMatrix<T>::sum (int dimension, goVector<T>& ret) const
+{
+    goMatrix<T> M;
+    this->sum (dimension, M);
+    if (dimension == 0)
+    {
+        M.copyRow (0, ret);
+    }
+    else
+    {
+        M.copyColumn (0, ret);
+    }
 }
 
 /*

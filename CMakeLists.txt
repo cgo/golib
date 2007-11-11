@@ -53,7 +53,7 @@ SET                 (SOURCES
  src/math/go3vectori.cc 
  src/math/go44matrix.cc 
  src/math/go4vectori.cc 
- src/math/gomatrixi.cc 
+ src/math/gomatrix.cpp 
  src/math/gocomplex.cc 
  src/math/goposition.cc 
  src/math/goquaternion.cc 

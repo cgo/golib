@@ -1,5 +1,4 @@
 #include <gomatrix.h>
-#include <gomatrix.hpp>
 #include <gopoint.h>
 #include <go44matrix.h>
 #include <gocomplex.h>

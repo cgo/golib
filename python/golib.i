@@ -90,7 +90,7 @@
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goexception.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 #include <gomatrix.h>
 #include <govector.h>
 #include <goplot.h>
@@ -1202,6 +1202,17 @@
                 for i in xrange(len(temp)):
                     ret.append(temp[i])
                 return ret
+        def resampleCubic (points, N, closed = False):
+            if isinstance (points,goMatrixf):
+                ret = goMatrixf()
+                goResampleCubicf (points, ret, N, closed)
+                return ret
+            elif isinstance (points, goMatrixd):
+                ret = goMatrixd()
+                goResampleCubicd (points, ret, N, closed)
+                return ret
+            else:
+                raise TypeError
 %}
 
 // Auto pointers

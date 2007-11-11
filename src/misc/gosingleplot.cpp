@@ -304,13 +304,16 @@ class goPlotElementVectorCurve : public goPlotElement
                         ret += "\n";
                     }
                 }
-                if (haveY)
-                {
-                    ret += (float)myX[i]; ret += " "; ret += (float)myY[i]; ret += "\n";
-                }
                 else
                 {
-                    ret += (int)i; ret += " "; ret += (float)myX[i]; ret += "\n";
+                    if (haveY)
+                    {
+                        ret += (float)myX[i]; ret += " "; ret += (float)myY[i]; ret += "\n";
+                    }
+                    else
+                    {
+                        ret += (int)i; ret += " "; ret += (float)myX[i]; ret += "\n";
+                    }
                 }
             }
         };

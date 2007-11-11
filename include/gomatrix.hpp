@@ -21,14 +21,15 @@ extern "C"
  #include <clapack.h>
 }
 
+const bool goMatrix<T>::rowMajor = true;
+
 /*!
 * @param y Number of rows.
 * @param x Number of columns.
 */
 template <class T>
 goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
-    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols),
-      rowMajor (true)
+    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
 {
     this->matrix = new T[rows * cols];
 }
@@ -40,7 +41,7 @@ goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
 */
 template <class T>
 goMatrix<T>::goMatrix (const goMatrix<T>& other)
-    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0), rowMajor (other.getRowMajor())
+    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0)
 {
     *this = other;
 }
@@ -53,9 +54,8 @@ goMatrix<T>::goMatrix (const goMatrix<T>& other)
 * @param c Columns
 */
 template <class T>
-goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim, bool row_major)
-    : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim),
-      rowMajor (row_major)
+goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
+    : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim)
 {
     if (leadingDim == 0)
     {
@@ -98,7 +98,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     this->matrix = new T[rows * cols];
     this->rows = rows;
     this->columns = cols;
-    if (this->rowMajor)
+    if (goMatrix<T>::rowMajor)
     {
         this->leadingDimension = cols;
     }
@@ -132,7 +132,7 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
     this->columns = c;
     if (leadingDim == 0)
     {
-        if (this->rowMajor)
+        if (goMatrix<T>::rowMajor)
         {
             this->leadingDimension = c;
         }
@@ -174,7 +174,7 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
     const_cast<goMatrix<T>*>(this)->columns = c;
     if (leadingDim == 0)
     {
-        if (this->rowMajor)
+        if (goMatrix<T>::rowMajor)
         {
             const_cast<goMatrix<T>*>(this)->leadingDimension = c;
         }

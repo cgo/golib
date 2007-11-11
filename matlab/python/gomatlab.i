@@ -14,7 +14,7 @@
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goexception.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 #include <gomatrix.h>
 #include <govector.h>
 #include <goplot.h>

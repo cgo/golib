@@ -3,8 +3,8 @@
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
 
-CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
+CXX		= g++ 
+CXXARGS		= -c   -D HAVE_CONFIG_H -O0 $(CPPFLAGS)
 
 LD		= g++
 LDARGS		=  
