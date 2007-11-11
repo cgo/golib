@@ -6,7 +6,7 @@ class goMultiPlotterPrivate
 {
     public:
         goMultiPlotterPrivate ()
-          : prefixCommands(), shellPostfix(), waitFlag(true), 
+          : prefixCommands(), postfixCommands(), shellPostfix(), waitFlag(true), 
             pauseFlag(false), autoPosition(true), barycentric(false),
             barycentricTriangle(2,3), cmdFilename(), 
             plots(), inputFD(-1), outputFD(-1) {};
@@ -14,6 +14,7 @@ class goMultiPlotterPrivate
 
 
         goString               prefixCommands;
+        goString               postfixCommands;
         goString               shellPostfix;
 
         bool              waitFlag;
@@ -305,7 +306,29 @@ void goMultiPlotter::setBarycentric (const goMatrixd& triangle)
  */
 void goMultiPlotter::setPrefix (const goString& p)
 {
+    this->setPrefix (p.toCharPtr());
+}
+
+void goMultiPlotter::setPrefix (const char* p)
+{
     myPrivate->prefixCommands = p;
+}
+
+/** 
+ * @brief Set a gnuplot command postfix.
+ *
+ * This string is appended to the complete command string.
+ * @see setPrefix()
+ * @param str gnuplot commands. 
+ */
+void goMultiPlotter::setPostfix (const goString& str)
+{
+    this->setPostfix (str.toCharPtr());
+}
+
+void goMultiPlotter::setPostfix (const char* s)
+{
+    myPrivate->postfixCommands = s;
 }
 
 bool goMultiPlotter::makePlotCommands (goString& plotCommands)
@@ -378,6 +401,7 @@ bool goMultiPlotter::plot (goGnuplot* gp)
     {
         goString postfix = "unset multiplot\n";
         plotCommands += postfix;
+        plotCommands += myPrivate->postfixCommands;
         return gp->call (plotCommands);
     }
     else
@@ -387,6 +411,7 @@ bool goMultiPlotter::plot (goGnuplot* gp)
         {
             postfix += "pause -1\n";
         }
+        postfix += myPrivate->postfixCommands;
         plotCommands += postfix;
         bool ok = goPlot::callGnuplot (plotCommands, 
                 myPrivate->shellPostfix != "" ? myPrivate->shellPostfix.toCharPtr() : 0, 
