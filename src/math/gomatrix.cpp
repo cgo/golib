@@ -38,7 +38,10 @@ template <class T>
 goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
     : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
 {
-    this->matrix = new T[rows * cols];
+    if (rows * cols > 0)
+    {
+        this->matrix = new T[rows * cols];
+    }
 }
 
 /** 
@@ -101,8 +104,12 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     if (!this->externalData && this->matrix)
     {
         delete[] this->matrix;
+        this->matrix = 0;
     }
-    this->matrix = new T[rows * cols];
+    if (rows * cols > 0)
+    {
+        this->matrix = new T[rows * cols];
+    }
     this->rows = rows;
     this->columns = cols;
     if (goMatrix<T>::rowMajor)
