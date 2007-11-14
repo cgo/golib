@@ -83,6 +83,7 @@
 #include <goobjectbase.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <gosubsignal3d.h>
 #include <godwt3d.h>
 #include <goarray.h>
 #include <gofixedarray.h>
@@ -139,6 +140,7 @@
 %include <gotype.h>
 %include <gosignal3dbase.h>
 %include <gosignal3d.h>
+%include <gosubsignal3d.h>
 %include <godwt3d.h>
 %include <gofileio.h>
 %include <gosignalhelper.h>
@@ -447,6 +449,7 @@
                 self.setSize(len(A))
             for i in xrange(len(A)):
                 self[i] = A[i]
+
     %}
     goFloat __getitem__(int i)
     {
@@ -1236,6 +1239,7 @@
 
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
+%template(goSubSignal3Dv)     goSubSignal3D<void>;
 
 %template(goListElementInt) goListElement<int>;   // Needed in gogl python module
 %template(goListInt) goList<int>;   // Needed in gogl python module
@@ -1324,3 +1328,13 @@
 
 %template(writeBinaryMatrixf) goFileIO::writeBinaryMatrix<goFloat>;
 %template(writeBinaryMatrixd) goFileIO::writeBinaryMatrix<goDouble>;
+
+%pythoncode %{
+        class Matrix (goMatrixd): pass
+        class Vector (goVectord): pass
+        class SVD    (goSVDd): pass
+        class LU     (goLUd): pass
+        class Signal3D (goSignal3Dv): pass
+        class SubSignal3D (goSubSignal3Dv): pass
+%}
+

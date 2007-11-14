@@ -316,6 +316,89 @@ bool goMatlab::putSparse (goSparseMatrix* sm, const char* name)
     return this->sparseToMatlabSparse (sm, name);
 }
 
+template <class T>
+static bool put_matrix (goMatlab& m, const goMatrix<T>& matrix, const char* name)
+{
+    if (!m.getEngine())
+    {
+        goLog::warning ("goMatlab::putMatrix(): No matlab engine.");
+        return false;
+    }
+    goIndex_t M = matrix.getRows();
+    goIndex_t N = matrix.getColumns();
+    mxArray* mMatrix = m.matlabCreateMatrix (M,N);
+    if (!mMatrix)
+    {
+        return false;
+    }
+    goIndex_t i;
+    goIndex_t j;
+    double* mP = mxGetPr (mMatrix);
+    for (j = 0; j < N; ++j)
+    {
+        for (i = 0; i < M; ++i)
+        {
+            *mP = matrix(i,j);
+            ++mP;
+        }
+    }
+    engPutVariable (m.getEngine(), name, mMatrix);
+    mxDestroyArray (mMatrix);
+    return true;
+}
+
+template <class T>
+static bool get_matrix (goMatlab& m, goMatrix<T>& matrix, const char* name)
+{
+    if (!m.getEngine())
+    {
+        goLog::warning ("goMatlab::getMatrix(): No matlab engine.");
+        return false;
+    }
+    mxArray* temp = engGetVariable (m.getEngine(), name);
+    if (!temp)
+    {
+        return false;
+    }
+    if (!matrix.resize (mxGetM(temp), mxGetN(temp)))
+    {
+        return false;
+    }
+    double* mP = mxGetPr (temp);
+    goSize_t N = matrix.getColumns();
+    goSize_t M = matrix.getRows();
+    for (goSize_t j = 0; j < N; ++j)
+    {
+        for (goSize_t i = 0; i < M; ++i)
+        {
+            matrix(i,j) = *mP;
+            ++mP;
+        }
+    }
+    return true;
+}
+
+bool goMatlab::putMatrix (const goMatrixd& matrix, const char *name)
+{
+    return put_matrix<goDouble> (*this, matrix, name);
+}
+
+bool goMatlab::getMatrix (goMatrixd& matrix, const char* name)
+{
+    return get_matrix<goDouble> (*this, matrix, name);
+}
+
+bool goMatlab::putMatrix (const goMatrixf& matrix, const char *name)
+{
+    return put_matrix<goFloat> (*this, matrix, name);
+}
+
+bool goMatlab::getMatrix (goMatrixf& matrix, const char* name)
+{
+    return get_matrix<goFloat> (*this, matrix, name);
+}
+
+
 /** 
  * @brief Put 2d points from list to matlab matrix.
  *

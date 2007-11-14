@@ -101,7 +101,11 @@ class goMatlab : public goObjectBase
         bool     putDouble (goDouble d, const char* name);
         bool     getDouble (goDouble& d, const char* name);
         bool     putSparse (goSparseMatrix* sm, const char* name);
-
+        bool     putMatrix (const goMatrixf& matrix, const char* name);
+        bool     getMatrix (goMatrixf& matrix, const char* name);
+        bool     putMatrix (const goMatrixd& matrix, const char* name);
+        bool     getMatrix (goMatrixd& matrix, const char* name);
+#if 0
         template <class T>
             bool     putMatrix (const goMatrix<T>& matrix, const char* name)
             {
@@ -162,7 +166,7 @@ class goMatlab : public goObjectBase
                 }
                 return true;
             };
-
+#endif
         bool     put2DPoints (const goList<goVectorf>& l, const char* variableName);
         bool     put2DPoints (const goList<goVectord>& l, const char* variableName);
         bool     get2DPoints (goList<goVectorf>& l, const char* variableName);
