@@ -101,8 +101,8 @@
  *  (however unlikely). However, I think
  *  in this case it can mean significant speed-ups.
  */
-/**
- * \defgroup math Mathematics
+/*!
+ * \defgroup math Mathematics and numerics
  *  \section math-la Linear Algebra Objects
  *  Use goMatrix and goVector for matrix and vector operations.
  *  Others, like go4Vector and such will be deprecated and replaced

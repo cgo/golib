@@ -40,6 +40,18 @@ namespace goMath
 {
     extern const goFloat epsilon;
    
+/**
+ * \addtogroup math
+ * @{
+ */
+    /** 
+     * @brief Modulus function.
+     * 
+     * @param value 
+     * @param modulus 
+     * 
+     * @return \c value mod \c modulus
+     */
     template <class T>
         T mod (T value, T modulus)
         {
@@ -48,6 +60,9 @@ namespace goMath
                 m = modulus + m;
             return m;
         }
+/**
+ * @}
+ */
 
 /**
  * \addtogroup math
@@ -61,6 +76,9 @@ Real abs(Real a)
 {
 	return  (a > 0 ? a : -a);
 }
+/**
+ * @}
+ */
 
 /**
  * \addtogroup math

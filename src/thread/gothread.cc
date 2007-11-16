@@ -138,6 +138,9 @@ goThread::resetInt () {
   intCount = 0;
 }
 
+/**
+ * @addtogroup thread
+ */
 /** 
  * @brief Calculate a mutually exclusive index range for this thread.
  * 
@@ -177,7 +180,9 @@ void goThread::getIndexRange (int threadNumber, int N, int& startRet, int& endRe
     startRet = myStart;
     endRet = myN;
 }
-
+/**
+ * @}
+ */
 #ifndef WIN32
 int
 goThread::howManyProcessors () {

@@ -84,9 +84,9 @@ namespace goMath { namespace Lapack {
  * @note Uses ATLAS' clapack implementation.
  *
  * Replaces A by its LU-decomposed form,
- * \f$$ A \gets LU, \, ipiv \gets P \f$$
+ * \f$ A \gets LU, \, ipiv \gets P \f$
  * so that
- * \f$$ AP = LU \, . \f$$
+ * \f$ AP = LU \, . \f$
  * U is unit diagonal, P pivots columns.
  * @param A Matrix to be decomposed.
  * @param ipiv Pivot vector (filled by this function).
@@ -108,7 +108,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
  *
  * @note Uses ATLAS' clapack implementation.
  *
- * Calculates \f$$ B^top \gets A x = B^top \f$$, assuming A is LU-decomposed e.g. with
+ * Solves \f$ A x = B^\top \f$ for x, assuming A is LU-decomposed e.g. with
  * getrf(). Implemented for goFloat and goDouble. pivot_vector must be of type \c int,
  * and provide getSize(), resize() as well as getPtr() methods (such as goVector).
  * matrix_type must essentially be goMatrix.
@@ -118,7 +118,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
  *
  * @param A         Matrix A
  * @param transA    Use A transposed
- * @param B         Right hand side (the right hand side vectors are in the \c rows of B, not the columns!)
+ * @param B         Right hand side (the right hand side vectors are in the \c rows of B, not the columns!). On success, the rows contain the solutions.
  * @param ipiv      Pivot vector (from getrf()).
  * 
  * @return True if successful, false otherwise.
@@ -162,13 +162,13 @@ bool goMath::Lapack::getri (matrix_type& A, const pivot_vector& ipiv)
 /** 
  * @brief Lapack gels. Least square solution of a linear system.
  *
- * For \f$$ A \in \mathbb{R}^{m \times n}\f$$ solves
- * \f$$ \min_x \|Ax - b\|\f$$
+ * For \f$ A \in R^{m \times n}\f$ solves
+ * \f$ \min_x \|Ax - b\|\f$
  * or
- * \f$$ \min_x \|A^\top x - b\|\f$$
+ * \f$ \min_x \|A^T x - b\|\f$
  * if m >= n, or it finds the minimum norm solution of
- * \f$$ Ax = b \f$$ or 
- * \f$$ A^\top x = b \f$$
+ * \f$ Ax = b \f$ or 
+ * \f$ A^T x = b \f$
  * if m < n, so that \f$ Ax = b\f$ is underdetermined.
  * A must have full rank.
  * 
