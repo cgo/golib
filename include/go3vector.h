@@ -145,7 +145,7 @@ go3Vector {
 
   GO3VECTOR_FUNCTION_PREFIX goDouble abs() 
     {
-      return (goDouble)sqrt((x * x) + 
+      return (goDouble)::sqrt((x * x) + 
 			    (y * y) + 
 			    (z * z));
     }

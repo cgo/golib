@@ -83,6 +83,7 @@
 #include <goobjectbase.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <gosignal3dref.h>
 #include <gosubsignal3d.h>
 #include <godwt3d.h>
 #include <goarray.h>
@@ -109,6 +110,8 @@
 #include <gognuplot.h>
 #include <gofilter1d.h>
 #include <goofffile.h>
+
+#include <go3vector.h>
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
@@ -163,6 +166,8 @@
 %include <gognuplot.h>
 %include <gofilter1d.h>
 %include <goofffile.h>
+
+%include <go3vector.h>
 
 %extend goOFFFile 
 {
@@ -1329,6 +1334,11 @@
 %template(writeBinaryMatrixf) goFileIO::writeBinaryMatrix<goFloat>;
 %template(writeBinaryMatrixd) goFileIO::writeBinaryMatrix<goDouble>;
 
+%template(go3VectorgoSize_t) go3Vector<goSize_t>;
+
+// Depends on goSignal3DBase, and that appears to have to be %templated before.
+%include <gosignal3dref.h>
+
 %pythoncode %{
         class Matrix (goMatrixd): pass
         class Vector (goVectord): pass
@@ -1336,5 +1346,8 @@
         class LU     (goLUd): pass
         class Signal3D (goSignal3Dv): pass
         class SubSignal3D (goSubSignal3Dv): pass
+        class Signal3DRef (goSignal3DRef): pass
+
+        class goSize3D (go3VectorgoSize_t): pass
 %}
 

@@ -972,6 +972,90 @@ goSignal3DBase<void>::getMinimum() const
     }
     return 0.0;
 }
+
+template<> void
+goSignal3DBase<void>::getMinMax(goDouble& minRet, goDouble& maxRet) const
+{
+    const goUInt8 *p = (goUInt8*)this->getPtr();
+    goSize_t x,y,z;
+    goSize_t xSize, ySize, zSize;
+    xSize = getSizeX();
+    ySize = getSizeY();
+    zSize = getSizeZ();
+
+    const goUInt8* minVal = p;
+    const goUInt8* maxVal = p;
+    goCompareFunction lowerThan = getDataType().getLowerThanFunction();
+    goCompareFunction greaterThan = getDataType().getGreaterThanFunction();
+    for (z = 0; z < zSize; z++)
+    {
+        for (y = 0; y < ySize; y++)
+        {
+            p = (goUInt8*)getPtr (0, y, z);
+            for (x = 0; x < xSize; x++)
+            {
+                if (lowerThan(p,minVal))
+                {
+                    minVal = p;
+                }
+                if (greaterThan(p,maxVal))
+                {
+                    maxVal = p;
+                }
+                p += xDiff[x];
+            }
+        }
+    }
+
+    switch (getDataType().getID())
+    {
+        case GO_INT8:         
+            minRet = (goDouble)*(const goInt8*)minVal; 
+            maxRet = (goDouble)*(const goInt8*)maxVal; 
+            break;
+        case GO_INT16:        
+            minRet = (goDouble)*(const goInt16*)minVal; 
+            maxRet = (goDouble)*(const goInt16*)maxVal; 
+            break;
+        case GO_INT32:        
+            minRet = (goDouble)*(const goInt32*)minVal; 
+            maxRet = (goDouble)*(const goInt32*)maxVal; 
+            break;
+#ifdef HAVE_INT64
+        case GO_INT64:        
+            minRet = (goDouble)*(const goInt64*)minVal; 
+            maxRet = (goDouble)*(const goInt64*)maxVal; 
+            break;
+#endif
+        case GO_UINT8:        
+            minRet = (goDouble)*(const goUInt8*)minVal; 
+            maxRet = (goDouble)*(const goUInt8*)maxVal; 
+            break;
+        case GO_UINT16:       
+            minRet = (goDouble)*(const goUInt16*)minVal; 
+            maxRet = (goDouble)*(const goUInt16*)maxVal; 
+            break;
+        case GO_UINT32:       
+            minRet = (goDouble)*(const goUInt32*)minVal; 
+            maxRet = (goDouble)*(const goUInt32*)maxVal; 
+            break;
+        case GO_FLOAT:        
+            minRet = (goDouble)*(const goFloat*)minVal; 
+            maxRet = (goDouble)*(const goFloat*)maxVal; 
+            break;
+        case GO_DOUBLE:       
+            minRet = (goDouble)*(const goDouble*)minVal; 
+            maxRet = (goDouble)*(const goDouble*)maxVal; 
+            break;
+        default: goLog::warning ("getMinimum() not implemented for this type.",this); break;
+    }
+}
+
+template<class T> void
+goSignal3DBase<T>::getMinMax(goDouble& minRet, goDouble& maxRet) const
+{
+    goLog::warning ("getMinMax() not implemented for this template instantiation.", this);
+}
     
 template< class T >
 goDouble

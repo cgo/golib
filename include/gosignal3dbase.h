@@ -1,6 +1,6 @@
 /*
  * This file and the programs contained in it and in associated files
- * are copyright 2002 by Christian Gosch.
+ * are copyright by Christian Gosch.
  * Email: christian@goschs.de
  * If no other license is supplied with this file, 
  * assume it is distributable under the GNU General Public License (GPL).
@@ -211,6 +211,7 @@ goSignal3DBase : public goObjectBase
 
         goDouble	getMaximum() const;
         goDouble	getMinimum() const;
+        void        getMinMax(goDouble& minRet, goDouble& maxRet) const;
         virtual void fill (const T* value);
         virtual void fill (goDouble value);
 

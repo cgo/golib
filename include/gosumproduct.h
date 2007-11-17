@@ -38,11 +38,13 @@
  */
 /** 
  * @brief The sum-product algorithm.
+ *
  * \par References:
-   \verbatim
+    \verbatim
      Bishop, C.M. 
      Pattern Recognition and Machine Learning 
-     Springer, 2006 \endverbatim
+     Springer, 2006 
+    \endverbatim
  * \example sumproduct/sp.cpp
  * @author Christian Gosch
  */
@@ -649,6 +651,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return marginal.sum ();
         };
 };
+
 /** @} */
 
 #endif

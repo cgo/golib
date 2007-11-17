@@ -12,6 +12,8 @@
 #include <goobjectbase.h>
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
+#include <gosubsignal3d.h>
+#include <gosignal3dref.h>
 #include <godwt3d.h>
 #include <goarray.h>
 #include <gofixedarray.h>
