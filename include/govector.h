@@ -245,6 +245,19 @@ class goVector : public goFixedArray<T>
             return *this;
         };
 
+        goVector<T>& operator-= (T s)
+        {
+            goIndex_t max = this->getSize();
+            T* array = this->getPtr();
+            goIndex_t stride = this->getStride();
+            for (goIndex_t i = 0; i < max; ++i)
+            {
+                *array -= s;
+                array += stride;
+            }
+            return *this;
+        };
+
         template <class To>
         goVector<T>& operator+= (const goVector<To>& other)
         {
@@ -264,6 +277,19 @@ class goVector : public goFixedArray<T>
                 *array += *otherArray;
                 array += stride;
                 otherArray += otherStride;
+            }
+            return *this;
+        };
+
+        goVector<T>& operator+= (T s)
+        {
+            goIndex_t max = this->getSize();
+            T* array = this->getPtr();
+            goIndex_t stride = this->getStride();
+            for (goIndex_t i = 0; i < max; ++i)
+            {
+                *array += s;
+                array += stride;
             }
             return *this;
         };

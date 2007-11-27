@@ -475,6 +475,34 @@ void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
     }
 }
 
+#if 0
+template <class T>
+void invert (const goVector<T>& f, goVector<T>& fInvRet)
+{
+    goIndex_t sz = f.getSize();
+    if (fInvRet.getSize() != sz)
+        fInvRet.resize (sz);
+
+    for (goIndex_t i = 0; i < sz; ++i)
+    {
+        goIndex_t x = 0;
+        goIndex_t i1, i2;
+        T fx, fxp1;
+        while (x < sz - 1)
+        {
+            fx = f[x];
+            fxp1 = f[x + 1];
+            i1 = goIndex_t (fx);
+            i2 = goIndex_t (fxp1);
+            if (i1 = i2)
+            {
+                T m = (fxp1 - fx); // / 1.0;
+            }
+        }
+    }
+}
+#endif
+
 /** 
  * @brief Student t density function.
  * 

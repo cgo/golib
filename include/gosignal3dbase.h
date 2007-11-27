@@ -240,6 +240,8 @@ goSignal3DBase : public goObjectBase
         const T*   getClosest (go3Vector<goFloat>& point) const;
         goFloat    sample (go3Vector<goFloat>& point);
 
+        goDouble sum () const;
+
         /** 
          * @brief Element-wise operator.
          *

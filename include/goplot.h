@@ -196,6 +196,8 @@ class goMultiPlotter : public goObjectBase
         bool getWaitFlag () const;
         void setPauseFlag (bool p);
         bool getPauseFlag () const;
+        void setSingleFlag (bool s);
+        bool getSingleFlag () const;
         void setAutoPosition (bool a);
         bool getAutoPosition () const;
 
@@ -332,6 +334,8 @@ namespace goPlot
             void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plotImage (const goSignal3DBase<void>& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
+            void plotImage (const goMatrixf& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
+            void plotImage (const goMatrixd& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
             void plotPoint (goDouble px, goDouble py, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
             void plotPoint (const goVectorf& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
             void plotPoint (const goVectord& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);

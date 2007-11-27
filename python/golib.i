@@ -84,6 +84,7 @@
 #include <gosignal3dbase.h>
 #include <gosignal3d.h>
 #include <gosignal3dref.h>
+#include <gosignalmacros.h>
 #include <gosubsignal3d.h>
 #include <godwt3d.h>
 #include <goarray.h>

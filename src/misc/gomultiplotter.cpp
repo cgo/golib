@@ -7,7 +7,7 @@ class goMultiPlotterPrivate
     public:
         goMultiPlotterPrivate ()
           : prefixCommands(), postfixCommands(), shellPostfix(), waitFlag(true), 
-            pauseFlag(false), autoPosition(true), barycentric(false),
+            pauseFlag(false), autoPosition(true), barycentric(false), singlePlot(true),
             barycentricTriangle(2,3), cmdFilename(), 
             plots(), inputFD(-1), outputFD(-1) {};
         ~goMultiPlotterPrivate () {};
@@ -21,6 +21,7 @@ class goMultiPlotterPrivate
         bool              pauseFlag;
         bool              autoPosition;
         bool              barycentric;
+        bool              singlePlot;    // If false, "set multiplot" is set even if there is only one plot, so single plotting is disabled.
         goMatrixd         barycentricTriangle;
         goString          cmdFilename;
         goList<goSinglePlot> plots;
@@ -241,6 +242,16 @@ bool goMultiPlotter::getPauseFlag () const
     return myPrivate->pauseFlag;
 }
 
+void goMultiPlotter::setSingleFlag (bool s)
+{
+    myPrivate->singlePlot = s;
+}
+
+bool goMultiPlotter::getSingleFlag () const
+{
+    return myPrivate->singlePlot;
+}
+
 void goMultiPlotter::setAutoPosition (bool a)
 {
     myPrivate->autoPosition = a;
@@ -339,7 +350,7 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
     goDouble stepY = -1.0 / static_cast<goDouble>(this->getRows());
 
     goString prefix = myPrivate->prefixCommands;
-    if (myPrivate->rows > 1 || myPrivate->columns > 1 || myPrivate->barycentric)
+    if (myPrivate->rows > 1 || myPrivate->columns > 1 || myPrivate->barycentric || !myPrivate->singlePlot)
     {
         prefix += "set multiplot\n";
     }

@@ -59,7 +59,7 @@ T goMath::integrate (const goVector<T>& v)
  *
  * The composite Simpson rule is
  * \f$ \int_a^b v(t) \, dt \approx \frac{h}{3} \left( v_0 + 2 \cdot \sum\limits_{j=1}^{n/2-1} v_{2j} + 4 \cdot \sum\limits_{j=1}^{n/2} v_{2j-1} + v_n\right) \f$, 
- * if the continuous * function v(t) is divided 
+ * if the continuous function v(t) is divided 
  * into an even number n of equidistant intervals with distance h.
  * Note that \c integrateSimpson samples linearly between points given in \c v to obtain an even number of sampled points.
  * Also, only the division by 6 (not 3!) is done, since the step width h is assumed to be one. Normalisation

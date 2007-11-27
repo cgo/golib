@@ -1965,6 +1965,32 @@ goSignal3DBase<T>::getChannelCount () const
     return myChannelCount;
 }
 
+template<>
+goDouble goSignal3DBase<void>::sum () const
+{
+    goDouble ret = 0.0;
+    switch (this->getDataType().getID())
+    {
+        case GO_INT8: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goInt8*)__ptr, (*this)); break;
+        case GO_INT16: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goInt16*)__ptr, (*this)); break;
+        case GO_INT32: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goInt32*)__ptr, (*this)); break;
+        case GO_UINT8: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goUInt8*)__ptr, (*this)); break;
+        case GO_UINT16: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goUInt16*)__ptr, (*this)); break;
+        case GO_UINT32: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goUInt32*)__ptr, (*this)); break;
+        case GO_FLOAT: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goFloat*)__ptr, (*this)); break;
+        case GO_DOUBLE: GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (ret += *(goDouble*)__ptr, (*this)); break;
+        default: return 0.0;
+    }
+    return ret;
+}
+
+template <class T>
+goDouble goSignal3DBase<T>::sum () const
+{
+    goLog::warning ("sum() not implemented for this instantiation.", this);
+    return 0.0;
+}
+
 /// \todo This will be a problem with const objects. Find out how that can be solved without const_cast<>
 template <class T>
 void

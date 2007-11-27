@@ -100,6 +100,18 @@ void goPlot::Plot::plotImage (const goSignal3DBase<void>& image, const char* tit
     pe->addImage (image, title, options);
 }
 
+void goPlot::Plot::plotImage (const goMatrixf& image, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addImage (image, title, options);
+}
+
+void goPlot::Plot::plotImage (const goMatrixd& image, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addImage (image, title, options);
+}
+
 void goPlot::Plot::plotPoint (goDouble px, goDouble py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
