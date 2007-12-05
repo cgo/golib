@@ -133,6 +133,18 @@ void goPlot::Plot::plotPoint (const goVectord& p, const char* title, const char*
     pe->addPoint (p, title, options);
 }
 
+void goPlot::Plot::plotLine  (const goVectorf& n, const goVectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addLine (n, p, title, options);
+}
+
+void goPlot::Plot::plotLine  (const goVectord& n, const goVectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
+{
+    goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
+    pe->addLine (n, p, title, options);
+}
+
 void goPlot::Plot::plot ()
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);

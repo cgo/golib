@@ -1,5 +1,6 @@
 #include <goplot.h>
 #include <gofileio.h>
+#include <gostring.h>
 #include <goautoptr.h>
 #include <gosignal3dgenericiterator.h>
 #include <gosignalhelper.h>
@@ -10,7 +11,8 @@ class goPlotElement
         goPlotElement (const char* command = "plot", const char* fn = "-" , const char* options = "with lines")
             : myPlotOptions (options),
               myPlotCommand (command),
-              myFilename (fn)
+              myFilename (fn),
+              myDataFlag (true)
         {
         };
         virtual ~goPlotElement () 
@@ -27,16 +29,19 @@ class goPlotElement
         void setPlotOptions (const goString& cmd) { myPlotOptions = cmd; };
         void setFilename    (const char* fn) { myFilename = fn; };
         void setFilename    (const goString& fn) { myFilename = fn; };
+        void setDataFlag    (bool f) { myDataFlag = f; };
 
         const goString& plotCommand () const { return myPlotCommand; };
         const goString& plotOptions () const { return myPlotOptions; };
         const goString& filename    () const { return myFilename; };
 
         virtual void data (goString& ret) const {};
+        bool haveData () const { return myDataFlag; };
 
         goString myPlotOptions;
         goString myPlotCommand;
         goString myFilename;
+        bool     myDataFlag;   //= If true, object needs to create data using data().
 };
 
 template <class T>
@@ -250,6 +255,29 @@ class goPlotElementMatrixCurve : public goPlotElement
         };
 
         goMatrix<T> myMatrix;
+};
+
+class goPlotElementMisc : public goPlotElement
+{
+    public:
+        goPlotElementMisc (const char* commands, bool splot = false) : 
+            goPlotElement ("", "", ""), myCommands (commands), mySplot (splot) 
+        {
+            if (splot)
+                this->setPlotCommand ("splot");
+            else
+                this->setPlotCommand ("plot");
+            this->setDataFlag (false);
+        };
+        virtual ~goPlotElementMisc () {};
+
+        virtual void data (goString& str) const
+        {
+            str = myCommands;
+        };
+
+        goString myCommands;
+        bool     mySplot;
 };
 
 template <class T>
@@ -843,6 +871,34 @@ bool goSinglePlot::addImage (const goSignal3DBase<void>& m, const char* title, c
     return true;
 }
 
+bool goSinglePlot::add (const char* commands)
+{
+    if (myPrivate->plotType != goPlot::Normal)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Normal;
+    }
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, false));
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
+bool goSinglePlot::add3D (const char* commands)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, true));
+    myPrivate->plotElements.append (aptr);
+    return true;
+}
+
 /** 
  * @brief Add a curve to the plot.
  * 
@@ -1418,10 +1474,21 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
             goFileIO::writeASCII (f, dataString);
             fclose (f);
         }
-        plotCommandsRet += "\"";
-        plotCommandsRet += el->elem->filename();
-        plotCommandsRet += "\" "; 
-        plotCommandsRet += el->elem->plotOptions();
+        //= This is used to identify goPlotElementMisc objects, which only
+        //= give a plot string.
+        if (el->elem->filename() == "")
+        {
+            goString temp;
+            el->elem->data (temp);
+            plotCommandsRet += temp;
+        }
+        else
+        {
+            plotCommandsRet += "\"";
+            plotCommandsRet += el->elem->filename();
+            plotCommandsRet += "\" "; 
+            plotCommandsRet += el->elem->plotOptions();
+        }
         if (el->next)
             plotCommandsRet += ",";
         else
@@ -1433,8 +1500,11 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
     {
         while (el)
         {
-            el->elem->data(plotCommandsRet);
-            plotCommandsRet += "e\n";
+            if (el->elem->haveData())
+            {
+                el->elem->data(plotCommandsRet);
+                plotCommandsRet += "e\n";
+            }
             el = el->next;
         }
     }

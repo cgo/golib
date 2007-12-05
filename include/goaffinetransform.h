@@ -10,12 +10,12 @@
 
 namespace goMath
 {
-    template <class T> class affineTransform
+    template <class T> class AffineTransform
     {
         public:
-            affineTransform ();
-            affineTransform (const goMatrix<T>& A, const goVector<T>& t);
-            virtual ~affineTransform ();
+            AffineTransform ();
+            AffineTransform (const goMatrix<T>& A, const goVector<T>& t);
+            virtual ~AffineTransform ();
 
             void set (const goMatrix<T>& A_, const goVector<T>& t_)
             {

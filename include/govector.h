@@ -47,8 +47,9 @@ class goVector : public goFixedArray<T>
             this->setSize (s,this->getLeftBorder(),this->getRightBorder());
         }
 
-        void _print (const char* formatstring = "%f\n") const;
+        void print (const char* formatstring = "%f\n") const;
 
+#if 0
         template <class To>
         goVector<T> operator- (const goVector<To>& other) const
         {
@@ -100,16 +101,10 @@ class goVector : public goFixedArray<T>
             }
             return ret;
         };
+#endif
+        // goVector<T> operator* (T scalar) const;
 
-        /**
-         * @brief Inner product.
-         *
-         * @note Uses CBLAS.
-         *
-         * @return The inner product this * other.
-         **/
-        T operator* (const goVector<T>& other) const;
-
+#if 0
         // template <class ScalarType>
         goVector<T> operator* (goFloat n) const
         {
@@ -141,8 +136,9 @@ class goVector : public goFixedArray<T>
             }
             return ret;
         };
+#endif
 
-        /** 
+        /**
          * @brief Quite inefficient vector-matrix multiplication.
          * 
          * If possible, avoid this or use only matrices in your programs
@@ -164,6 +160,7 @@ class goVector : public goFixedArray<T>
             return ret;
         };
 
+#if 0
         goVector<T>& operator*= (goFloat n)
         {
             goIndex_t max = this->getSize();
@@ -190,7 +187,7 @@ class goVector : public goFixedArray<T>
             }
             return *this;
         };
-
+#endif
         goVector<T> cross (const goVector<T>& other) const
         {
             goVector<T> v(3);
@@ -222,6 +219,25 @@ class goVector : public goFixedArray<T>
             return true;
         };
 
+        /**
+         * @brief Inner product.
+         *
+         * @note Uses CBLAS.
+         *
+         * @return The inner product this * other.
+         **/
+        T operator* (const goVector<T>& other) const;
+        goVector<T>& operator*= (T scalar);
+        goVector<T>& operator/= (T scalar);
+        goVector<T>& operator-= (T s);
+        goVector<T>& operator+= (T s);
+        goVector<T>& operator+= (const goVector<T>& other);
+        goVector<T>& operator-= (const goVector<T>& other);
+        goVector<T> operator- (const goVector<T>& other) const;
+        goVector<T> operator+ (const goVector<T>& other) const;
+        goVector<T> operator* (T scalar) const;
+        goVector<T> operator/ (T scalar) const;
+#if 0
         template <class To>
         goVector<T>& operator-= (const goVector<To>& other)
         {
@@ -293,6 +309,7 @@ class goVector : public goFixedArray<T>
             }
             return *this;
         };
+#endif
 
         //= Element-wise (Hadamard) multiplication.
         template <class To>
@@ -381,7 +398,7 @@ class goVector : public goFixedArray<T>
         template <class To>
         bool copy (To* target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const
         {
-            assert (this->getSize() > startIndex);
+            assert (this->getSize() > (goSize_t)startIndex);
             assert (skip >= 0);
             if (lastIndex < 0)
             {

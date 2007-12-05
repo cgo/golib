@@ -450,6 +450,8 @@ void atan (goFixedArray<T>& a);
 template <class T>
 void exp (goFixedArray<T>& a);
 template <class T>
+void exp (const goFixedArray<T>& a, goFixedArray<T>& target);
+template <class T>
 void log (goFixedArray<T>& a);
 
 template <class vectorT, class T>

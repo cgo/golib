@@ -106,7 +106,7 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
 #endif
 
 template<>
-void goVector<goFloat>::_print (const char* formatstring) const
+void goVector<goFloat>::print (const char* formatstring) const
 {
     goSize_t sz = this->getSize();
 
@@ -118,7 +118,7 @@ void goVector<goFloat>::_print (const char* formatstring) const
 }
 
 template<>
-void goVector<goDouble>::_print (const char* formatstring) const
+void goVector<goDouble>::print (const char* formatstring) const
 {
     goSize_t sz = this->getSize();
 
@@ -130,7 +130,7 @@ void goVector<goDouble>::_print (const char* formatstring) const
 }
 
 template <class T>
-void goVector<T>::_print (const char*) const
+void goVector<T>::print (const char*) const
 {
     printf ("goVector<T>::_print() not defined for this type.\n");
 }
@@ -443,6 +443,266 @@ T goVector<T>::max () const
 {
     return goMath::max<T> (*this);
 }
+
+template <class T>
+goVector<T>& goVector<T>::operator/= (T s)
+{
+    return this->operator*= (T(1)/s);
+}
+
+template <>
+goVector<goFloat>& goVector<goFloat>::operator*= (goFloat n)
+{
+    cblas_sscal (this->getSize(), n, this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <>
+goVector<goDouble>& goVector<goDouble>::operator*= (goDouble n)
+{
+    cblas_dscal (this->getSize(), n, this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator*= (T n)
+{
+    goIndex_t max = this->getSize();
+    T* array = this->getPtr();
+    goIndex_t stride = this->getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *array = static_cast<T>(*array * n);
+        // *array *= n;
+        array += stride;
+    }
+    return *this;
+}
+
+template <>
+goVector<goFloat>& goVector<goFloat>::operator-= (const goVector<goFloat>& other)
+{
+    cblas_saxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <>
+goVector<goDouble>& goVector<goDouble>::operator-= (const goVector<goDouble>& other)
+{
+    cblas_daxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator-= (const goVector<T>& other)
+{
+#ifdef GO_USE_EXCEPTIONS
+    if (this->getSize() != other.getSize())
+    {
+        throw goMathException (goMathException::SIZE_MISMATCH);
+    }
+#endif
+    goIndex_t max = this->getSize();
+    T* array = this->getPtr();
+    const T* otherArray = other.getPtr();
+    goIndex_t stride = this->getStride();
+    goIndex_t otherStride = other.getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *array -= *otherArray;
+        array += stride;
+        otherArray += otherStride;
+    }
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator-= (T s)
+{
+    goIndex_t max = this->getSize();
+    T* array = this->getPtr();
+    goIndex_t stride = this->getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *array -= s;
+        array += stride;
+    }
+    return *this;
+};
+
+template <>
+goVector<goFloat>& goVector<goFloat>::operator+= (const goVector<goFloat>& other)
+{
+    cblas_saxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <>
+goVector<goDouble>& goVector<goDouble>::operator+= (const goVector<goDouble>& other)
+{
+    cblas_daxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator+= (const goVector<T>& other)
+{
+#ifdef GO_USE_EXCEPTIONS
+    if (this->getSize() != other.getSize())
+    {
+        throw goMathException (goMathException::SIZE_MISMATCH);
+    }
+#endif
+    goIndex_t max = this->getSize();
+    T* array = this->getPtr();
+    const T* otherArray = other.getPtr();
+    goIndex_t stride = this->getStride();
+    goIndex_t otherStride = other.getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *array += *otherArray;
+        array += stride;
+        otherArray += otherStride;
+    }
+    return *this;
+}
+
+template <class T>
+goVector<T>& goVector<T>::operator+= (T s)
+{
+    goIndex_t max = this->getSize();
+    T* array = this->getPtr();
+    goIndex_t stride = this->getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *array += s;
+        array += stride;
+    }
+    return *this;
+}
+
+template<>
+goVector<goFloat> goVector<goFloat>::operator- (const goVector<goFloat>& other) const
+{
+    goVector<goFloat> ret (*this);
+    ret -= other;
+    return ret;
+}
+
+template<>
+goVector<goDouble> goVector<goDouble>::operator- (const goVector<goDouble>& other) const
+{
+    goVector<goDouble> ret (*this);
+    ret -= other;
+    return ret;
+}
+
+template<>
+goVector<goFloat> goVector<goFloat>::operator+ (const goVector<goFloat>& other) const
+{
+    goVector<goFloat> ret (*this);
+    ret += other;
+    return ret;
+}
+
+template<>
+goVector<goDouble> goVector<goDouble>::operator+ (const goVector<goDouble>& other) const
+{
+    goVector<goDouble> ret (*this);
+    ret += other;
+    return ret;
+}
+
+
+template <class T>
+goVector<T> goVector<T>::operator- (const goVector<T>& other) const
+{
+#ifdef GO_USE_EXCEPTIONS
+    if (this->getSize() != other.getSize())
+    {
+        throw goMathException (goMathException::SIZE_MISMATCH);
+    }
+#endif
+    goVector<T> ret (this->getSize());
+    goIndex_t max = this->getSize();
+    T* retArray = ret.getPtr();
+    const T* array = this->getPtr();
+    const T* otherArray = other.getPtr();
+    goIndex_t stride = this->getStride();
+    goIndex_t otherStride = other.getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *retArray = *array - *otherArray;
+        array += stride;
+        otherArray += otherStride;
+        ++retArray;
+    }
+    return ret;
+}
+
+template<class T>
+goVector<T> goVector<T>::operator+ (const goVector<T>& other) const
+{
+#ifdef GO_USE_EXCEPTIONS
+    if (this->getSize() != other.getSize())
+    {
+        throw goMathException (goMathException::SIZE_MISMATCH);
+    }
+#endif
+    goVector<T> ret (this->getSize());
+    goIndex_t max = this->getSize();
+    T* retArray = ret.getPtr();
+    const T* array = this->getPtr();
+    const T* otherArray = other.getPtr();
+    goIndex_t stride = this->getStride();
+    goIndex_t otherStride = other.getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *retArray = *array + *otherArray;
+        array += stride;
+        otherArray += otherStride;
+        ++retArray;
+    }
+    return ret;
+}
+
+template<class T>
+goVector<T> goVector<T>::operator* (T n) const
+{
+    goVector<T> ret (*this);
+    ret *= n;
+    return ret;
+}
+
+template<class T>
+goVector<T> goVector<T>::operator/ (T n) const
+{
+    goVector<T> ret (*this);
+    ret *= T(1)/n;
+    return ret;
+}
+
+
+
+#if 0
+template<class T>
+goVector<T> goVector<T>::operator* (T n) const
+{
+    goVector<T> ret (this->getSize());
+    goIndex_t max = this->getSize();
+    const T* array = this->getPtr();
+    T* retArray = ret.getPtr();
+    goIndex_t stride = this->getStride();
+    for (goIndex_t i = 0; i < max; ++i)
+    {
+        *retArray = static_cast<T>(*array * n);
+        array += stride;
+        ++retArray;
+    }
+    return ret;
+}
+#endif
+
 
 // =====================================
 

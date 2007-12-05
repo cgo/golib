@@ -31,6 +31,7 @@
 #include <gognuplot.h>
 #include <gofilter1d.h>
 #include <golist.h>
+#include <gotimerobject.h>
 %}
 %import ../../python/golib.i
 %include <gogl/helper.h>

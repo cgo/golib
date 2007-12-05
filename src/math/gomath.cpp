@@ -220,6 +220,44 @@ void goMath::atan (goFixedArray<T>& a)
     }
 }
 
+// Macro from Schraudolph, 1998:
+// Schraudolph, N. N. 
+// A Fast, Compact Approximation of the Exponential Function 
+// 1998
+// Rumgetrickse mit IEEE 754 Zahlen; schneller als ::exp()
+// FUNKTIONIERT NUR MIT DOUBLE
+static union
+{
+    double d;
+    struct
+    {
+#ifdef LITTLE_ENDIAN
+        int j, i;
+#else
+        int i, j;
+#endif
+    } n;
+} _eco;
+#define EXP_A (1048576 / M_LN2)
+#define EXP_C 60801
+#define EXP(y) (_eco.n.i = EXP_A * (y) + (1072693248 - EXP_C), _eco.d)
+
+template <class T>
+void goMath::exp (const goFixedArray<T>& a, goFixedArray<T>& target)
+{
+    const T* ap = a.getPtr();
+    int as = a.getStride();
+    T* tp = target.getPtr();
+    int ts = target.getStride();
+    const goSize_t N = a.getSize();
+    for (goSize_t i = 0; i < N; ++i)
+    {
+        *tp = ::exp (*ap);
+        // *tp = EXP (*ap);
+        tp += ts;
+        ap += as;
+    }
+}
 template <class T>
 void goMath::exp (goFixedArray<T>& a)
 {
@@ -227,8 +265,10 @@ void goMath::exp (goFixedArray<T>& a)
     for (goSize_t i = 0; i < sz; ++i)
     {
         a[i] = ::exp(a[i]);
+        // a[i] = EXP(a[i]);
     }
 }
+
 
 template <class T>
 void goMath::log (goFixedArray<T>& a)
@@ -247,6 +287,7 @@ template void goMath::asin<goFloat> (goFixedArray<goFloat>&);
 template void goMath::acos<goFloat> (goFixedArray<goFloat>&);
 template void goMath::atan<goFloat> (goFixedArray<goFloat>&);
 template void goMath::exp<goFloat> (goFixedArray<goFloat>&);
+template void goMath::exp<goFloat> (const goFixedArray<goFloat>&, goFixedArray<goFloat>&);
 template void goMath::log<goFloat> (goFixedArray<goFloat>&);
 template void goMath::sin<goDouble> (goFixedArray<goDouble>&);
 template void goMath::cos<goDouble> (goFixedArray<goDouble>&);
@@ -255,6 +296,7 @@ template void goMath::asin<goDouble> (goFixedArray<goDouble>&);
 template void goMath::acos<goDouble> (goFixedArray<goDouble>&);
 template void goMath::atan<goDouble> (goFixedArray<goDouble>&);
 template void goMath::exp<goDouble> (goFixedArray<goDouble>&);
+template void goMath::exp<goDouble> (const goFixedArray<goDouble>&, goFixedArray<goDouble>&);
 template void goMath::log<goDouble> (goFixedArray<goDouble>&);
 
 template bool goMath::centerOfMass<goFloat> (const goList<goVector<goFloat> >&, goVector<goFloat>&);

@@ -113,6 +113,7 @@
 #include <goofffile.h>
 
 #include <go3vector.h>
+#include <gotimerobject.h>
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
@@ -169,6 +170,7 @@
 %include <goofffile.h>
 
 %include <go3vector.h>
+%include <gotimerobject.h>
 
 %extend goOFFFile 
 {
@@ -870,34 +872,34 @@
     {
         return (*self) += other;
     };
-    goVector<goFloat>& operator+= (const goVector<goDouble>& other)
-    {
-        return (*self) += other;
-    };
+//    goVector<goFloat>& operator+= (const goVector<goDouble>& other)
+//    {
+//        return (*self) += other;
+//    };
     goVector<goFloat> operator+ (const goVector<goFloat>& other)
     {
         return (*self) + other;
     };
-    goVector<goFloat> operator+ (const goVector<goDouble>& other)
-    {
-        return (*self) + other;
-    };
+//    goVector<goFloat> operator+ (const goVector<goDouble>& other)
+//    {
+//        return (*self) + other;
+//    };
     goVector<goFloat>& operator-= (const goVector<goFloat>& other)
     {
         return (*self) -= other;
     };
-    goVector<goFloat>& operator-= (const goVector<goDouble>& other)
-    {
-        return (*self) -= other;
-    };
+//    goVector<goFloat>& operator-= (const goVector<goDouble>& other)
+//    {
+//        return (*self) -= other;
+//    };
     goVector<goFloat> operator- (const goVector<goFloat>& other)
     {
         return (*self) - other;
     };
-    goVector<goFloat> operator- (const goVector<goDouble>& other)
-    {
-        return (*self) - other;
-    };
+//    goVector<goFloat> operator- (const goVector<goDouble>& other)
+//    {
+//        return (*self) - other;
+//    };
     goVector<goFloat> operator* (goFloat n)
     {
         return (*self) * n;
@@ -911,11 +913,11 @@
         (*self) *= other;
         return (*self);
     };
-    goVector<goFloat>& operator*= (const goVector<goDouble>& other)
-    {
-        (*self) *= other;
-        return (*self);
-    };
+//    goVector<goFloat>& operator*= (const goVector<goDouble>& other)
+//    {
+//        (*self) *= other;
+//        return (*self);
+//    };
 }
 %extend goVector<goDouble>
 {
@@ -924,34 +926,34 @@
         return (*self).copy (target, startIndex, skip, lastIndex);
     };
     // FIXME: Add +-*= operators (can I instantiate the members explicitly?)
-    goVector<goDouble>& operator+= (const goVector<goFloat>& other)
-    {
-        return (*self) += other;
-    };
+//    goVector<goDouble>& operator+= (const goVector<goFloat>& other)
+//    {
+//        return (*self) += other;
+//    };
     goVector<goDouble>& operator+= (const goVector<goDouble>& other)
     {
         return (*self) += other;
     };
-    goVector<goDouble> operator+ (const goVector<goFloat>& other)
-    {
-        return (*self) + other;
-    };
+//    goVector<goDouble> operator+ (const goVector<goFloat>& other)
+//    {
+//        return (*self) + other;
+//    };
     goVector<goDouble> operator+ (const goVector<goDouble>& other)
     {
         return (*self) + other;
     };
-    goVector<goDouble>& operator-= (const goVector<goFloat>& other)
-    {
-        return (*self) -= other;
-    };
+//    goVector<goDouble>& operator-= (const goVector<goFloat>& other)
+//    {
+//        return (*self) -= other;
+//    };
     goVector<goDouble>& operator-= (const goVector<goDouble>& other)
     {
         return (*self) -= other;
     };
-    goVector<goDouble> operator- (const goVector<goFloat>& other)
-    {
-        return (*self) - other;
-    };
+//    goVector<goDouble> operator- (const goVector<goFloat>& other)
+//    {
+//        return (*self) - other;
+//    };
     goVector<goDouble> operator- (const goVector<goDouble>& other)
     {
         return (*self) - other;
@@ -964,11 +966,11 @@
     {
         return (*self) * n;
     };
-    goVector<goDouble>& operator*= (const goVector<goFloat>& other)
-    {
-        (*self) *= other;
-        return (*self);
-    };
+//    goVector<goDouble>& operator*= (const goVector<goFloat>& other)
+//    {
+//        (*self) *= other;
+//        return (*self);
+//    };
     goVector<goDouble>& operator*= (const goVector<goDouble>& other)
     {
         (*self) *= other;
