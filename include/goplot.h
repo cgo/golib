@@ -147,6 +147,7 @@ class goSinglePlot : public goObjectBase
         const goString&  getPrefix () const;
         void setTitle    (const goString& s);
         void setTitle    (const char* s);
+        const goString& getTitle () const;
         bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "");
         bool addLabel    (const char* l, goDouble x, goDouble y, const char* colourspec = "");
         bool addLabel    (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec = "");
@@ -211,6 +212,7 @@ class goMultiPlotter : public goObjectBase
         void setPrefix (const char*);
         void setPostfix (const goString&);
         void setPostfix (const char*);
+        void setTitle (const char*);
 
         bool makePlotCommands (goString& plotCommandsRet);
 
@@ -344,10 +346,16 @@ namespace goPlot
             void plotPoint (const goVectord& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
             void plotLine  (const goVectorf& n, const goVectorf& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plotLine  (const goVectord& n, const goVectord& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (goMultiPlotter& mp);
             void plot ();
             void plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
             void plotPause ();
             void saveGnuplot (const char* filename);
+            void setPrefix (const char* p);
+            void addPrefix (const char* p);
+            void setPostfix (const char* p);
+            void addPostfix (const char* p);
+            void setTitle (const char* s);
 
             void clear ();
             void clear (goSize_t x, goSize_t y);

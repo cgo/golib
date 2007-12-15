@@ -5,7 +5,7 @@
 class goPlot::PlotPrivate
 {
     public:
-        PlotPrivate () : plots(), plotPositions(), gp(), rows(1), cols(1) {};
+        PlotPrivate () : plots(), plotPositions(), gp(), rows(1), cols(1), prefix (""), postfix (""), title ("") {};
         ~PlotPrivate () {};
 
         goList<goAutoPtr<goSinglePlot> >    plots;
@@ -14,6 +14,10 @@ class goPlot::PlotPrivate
 
         goSize_t          rows;
         goSize_t          cols;
+
+        goString          prefix;
+        goString          postfix;
+        goString          title;
 };
 
 goPlot::Plot::Plot ()
@@ -145,9 +149,8 @@ void goPlot::Plot::plotLine  (const goVectord& n, const goVectord& p, const char
     pe->addLine (n, p, title, options);
 }
 
-void goPlot::Plot::plot ()
+void goPlot::Plot::plot (goMultiPlotter& mp)
 {
-    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
     goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
     goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
 
@@ -158,38 +161,32 @@ void goPlot::Plot::plot ()
         cel = cel->next;
     }
 
+    if (myPrivate->prefix != "")
+        mp.setPrefix (myPrivate->prefix);
+    if (myPrivate->postfix != "")
+        mp.setPostfix (myPrivate->postfix);
+    if (myPrivate->title != "")
+        mp.setTitle (myPrivate->title.toCharPtr());
+}
+
+void goPlot::Plot::plot ()
+{
+    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
+    this->plot (mp);
     mp.plot (&myPrivate->gp);
 }
 
 void goPlot::Plot::plotPostscript (const char* filename, goFloat sizeX, goFloat sizeY)
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
-    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
-    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
-
-    while (pel && cel)
-    {
-        mp.addPlot (*(pel->elem), cel->elem[1], cel->elem[0]);
-        pel = pel->next;
-        cel = cel->next;
-    }
-
+    this->plot (mp);
     mp.plotPostscript (filename, sizeX, sizeY);
 }
 
 void goPlot::Plot::plotPause ()
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
-    goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
-    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
-
-    while (pel && cel)
-    {
-        mp.addPlot (*(pel->elem), cel->elem[1], cel->elem[0]);
-        pel = pel->next;
-        cel = cel->next;
-    }
-
+    this->plot (mp);
     mp.setPauseFlag (true);
     mp.plot ();
 }
@@ -207,7 +204,36 @@ void goPlot::Plot::saveGnuplot (const char* filename)
         cel = cel->next;
     }
 
+    if (myPrivate->prefix != "")
+        mp.setPrefix (myPrivate->prefix);
+    if (myPrivate->postfix != "")
+        mp.setPostfix (myPrivate->postfix);
     mp.saveGnuplot (filename);
+}
+
+void goPlot::Plot::setPrefix (const char* p)
+{
+    myPrivate->prefix = p;
+}
+
+void goPlot::Plot::addPrefix (const char* p)
+{
+    myPrivate->prefix += p;
+}
+
+void goPlot::Plot::setPostfix (const char* p)
+{
+    myPrivate->postfix = p;
+}
+
+void goPlot::Plot::addPostfix (const char* p)
+{
+    myPrivate->postfix += p;
+}
+
+void goPlot::Plot::setTitle (const char* s)
+{
+    myPrivate->title = s;
 }
 
 /** 

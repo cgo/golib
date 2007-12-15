@@ -6,7 +6,7 @@ class goMultiPlotterPrivate
 {
     public:
         goMultiPlotterPrivate ()
-          : prefixCommands(), postfixCommands(), shellPostfix(), waitFlag(true), 
+          : prefixCommands(), postfixCommands(), shellPostfix(), title(), waitFlag(true), 
             pauseFlag(false), autoPosition(true), barycentric(false), singlePlot(true),
             barycentricTriangle(2,3), cmdFilename(), 
             plots(), inputFD(-1), outputFD(-1) {};
@@ -16,6 +16,7 @@ class goMultiPlotterPrivate
         goString               prefixCommands;
         goString               postfixCommands;
         goString               shellPostfix;
+        goString               title;
 
         bool              waitFlag;
         bool              pauseFlag;
@@ -342,6 +343,11 @@ void goMultiPlotter::setPostfix (const char* s)
     myPrivate->postfixCommands = s;
 }
 
+void goMultiPlotter::setTitle (const char* s)
+{
+    myPrivate->title = s;
+}
+
 bool goMultiPlotter::makePlotCommands (goString& plotCommands)
 {
     assert (!myPrivate->plots.isClosed());
@@ -352,11 +358,28 @@ bool goMultiPlotter::makePlotCommands (goString& plotCommands)
     goString prefix = myPrivate->prefixCommands;
     if (myPrivate->rows > 1 || myPrivate->columns > 1 || myPrivate->barycentric || !myPrivate->singlePlot)
     {
-        prefix += "set multiplot\n";
+        prefix += "set multiplot";
+        if (myPrivate->title != "")
+        {
+            prefix += " title ";
+            prefix += "\"";
+            prefix += myPrivate->title;
+            prefix += "\"";
+        }
+        prefix += "\n";
+
     }
     else
     {
         prefix += "unset multiplot\n";
+        //= If only one plot: mp's title takes precedence.
+        if (myPrivate->title != "")
+        {
+            if (myPrivate->plots.getFrontElement())
+            {
+                myPrivate->plots.getFront().setTitle (myPrivate->title);
+            }
+        }
     }
     //set size ";
     //prefix += (float)stepX;

@@ -74,6 +74,7 @@ class goMatrix
 
   void transpose ();
   void getTranspose (goMatrix<T>& trans) const;
+  goMatrix<T> getTranspose () const;
 
   bool invert ();
 
@@ -500,6 +501,7 @@ class goMatrix
   bool multiplyElements (const goMatrix<T>& other);
 
   T norm () const;
+  T trace () const;
 
   /** 
   * @brief Load identity matrix.

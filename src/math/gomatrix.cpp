@@ -229,6 +229,13 @@ void goMatrix<T>::getTranspose (goMatrix<T>& trans) const
     }
 }
 
+template <class T>
+goMatrix<T> goMatrix<T>::getTranspose () const
+{
+    goMatrix<T> trans;
+    this->getTranspose (trans);
+    return trans;
+}
 
 /** 
  * @brief Flip in row or column direction.
@@ -907,6 +914,21 @@ bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
     return true;
 }
 
+//template <class T>
+//T goMatrix<T>::norm () const
+//{
+//    goSize_t sz = this->getRows() * this->getColumns();
+//    goSize_t i;
+//    double retValue = 0.0;
+//    T* mptr = this->matrix;
+//    for (i = 0; i < sz; ++i)
+//    {
+//        retValue += *mptr * *mptr;
+//        ++mptr;
+//    }
+//    return static_cast<T>(sqrt(retValue));
+//}
+
 /** 
  * @brief Calculate the Frobenius norm \f$ \left( \sum_i\sum_j |a_{i,j}|^2 \right)^{\frac{1}{2}} = \left(\mathrm{trace} (A A^T)\right)^\frac{1}{2} = \left( \sum_i \sigma_i^2 \right)^\frac{1}{2} \f$
  * where \f$ \sigma_i \f$ is the \f$ i\f$'th singular value.
@@ -916,16 +938,78 @@ bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
 template <class T>
 T goMatrix<T>::norm () const
 {
-    goSize_t sz = this->getRows() * this->getColumns();
+    goSize_t i,j;
+    double retValue = 0.0;
+    goSize_t R = this->getRows();
+    goSize_t C = this->getColumns();
+    for (i = 0; i < R; ++i)
+    {
+        T temp = T(0);
+        for (j = 0; j < C; ++j)
+        {
+            temp = (*this)(i,j);
+            retValue += temp * temp;
+        }
+    }
+//    goSize_t sz = this->getRows() * this->getColumns();
+//    T* mptr = this->matrix;
+//    for (i = 0; i < sz; ++i)
+//    {
+//        retValue += *mptr * *mptr;
+//        ++mptr;
+//    }
+    return static_cast<T>(sqrt(retValue));
+}
+
+template <>
+goComplexf goMatrix<goComplexf>::trace () const
+{
+    goLog::error ("goMatrix::trace() not implemented for complex.");
+    return goComplexf (0.0,0.0);
+}
+//    goSize_t i,j;
+//    goComplexf retValue (0.0,0.0);
+//    goSize_t R = goMath::min<goSize_t> (this->getRows(),this->getColumns());
+//    for (i = 0; i < R; ++i)
+//    {
+//        retValue = retValue + (*this)(i,i);
+//    }
+//    goSize_t sz = this->getRows() * this->getColumns();
+//    T* mptr = this->matrix;
+//    for (i = 0; i < sz; ++i)
+//    {
+//        retValue += *mptr * *mptr;
+//        ++mptr;
+//    }
+//    return static_cast<T>(sqrt(retValue));
+//}
+
+/** 
+ * @brief Calculates the trace \f$ tr(A) = \sum_i A_{i,i} \f$.
+ *
+ * Works also for non-square matrices; in that case, the loop runs
+ * to the smaller of the two dimensions.
+ *
+ * @return The trace of the matrix.
+ */
+template <class T>
+T goMatrix<T>::trace () const
+{
     goSize_t i;
     double retValue = 0.0;
-    T* mptr = this->matrix;
-    for (i = 0; i < sz; ++i)
+    goSize_t R = goMath::min<goSize_t> (this->getRows(),this->getColumns());
+    for (i = 0; i < R; ++i)
     {
-        retValue += *mptr * *mptr;
-        ++mptr;
+        retValue += (*this)(i,i);
     }
-    return static_cast<T>(sqrt(retValue));
+//    goSize_t sz = this->getRows() * this->getColumns();
+//    T* mptr = this->matrix;
+//    for (i = 0; i < sz; ++i)
+//    {
+//        retValue += *mptr * *mptr;
+//        ++mptr;
+//    }
+    return static_cast<T>(retValue);
 }
 
 /** 

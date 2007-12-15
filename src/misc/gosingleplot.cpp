@@ -1292,6 +1292,11 @@ void goSinglePlot::setTitle (const char* s)
     this->setTitle (goString(s));
 }
 
+const goString& goSinglePlot::getTitle () const
+{
+    return myPrivate->title;
+}
+
 bool goSinglePlot::writeGnuplotDataFiles () const
 {
     switch (myPrivate->plotType)
