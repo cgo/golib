@@ -899,6 +899,30 @@ bool goSinglePlot::add3D (const char* commands)
     return true;
 }
 
+bool goSinglePlot::addSphere (const char* plotOptions, goFloat radius, bool autoRange)
+{
+    if (myPrivate->plotType != goPlot::Surface)
+    {
+        this->clear ();
+        myPrivate->plotType = goPlot::Surface;
+    }
+    myPrivate->prefixCommands += "set parametric\n";
+    if (autoRange)
+    {
+        myPrivate->prefixCommands += "set urange [-pi/2:pi/2]\nset vrange [0:2*pi]\n";
+    }
+    goString tr = "*";
+    tr += (float)radius;
+    goString cmd = "cos(u)*cos(v)"; cmd += tr;
+    cmd += ",cos(u)*sin(v)"; cmd += tr;
+    cmd += ",sin(u)"; cmd += tr; cmd += " ";
+    if (plotOptions && plotOptions != "")
+    {
+        cmd += plotOptions;
+    }
+    this->add3D (cmd.toCharPtr());
+}
+
 /** 
  * @brief Add a curve to the plot.
  * 
@@ -1544,11 +1568,12 @@ void goSinglePlot::removeFiles () const
 
 /** 
  * @brief Clears all curves.
+ * Does not clear the prefix command string.
  */
 void goSinglePlot::clear ()
 {
     myPrivate->plotElements.erase ();
-    myPrivate->title = "";
+    // myPrivate->title = "";
 
     myPrivate->plotX.erase ();
     myPrivate->plotY.erase ();
@@ -1561,7 +1586,7 @@ void goSinglePlot::clear ()
     myPrivate->titles.erase ();
     myPrivate->labels.erase ();
     myPrivate->plotCommands.erase ();
-    myPrivate->prefixCommands = "";
+    // myPrivate->prefixCommands = "";
     myPrivate->dataFilenames.erase ();
 }
 

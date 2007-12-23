@@ -20,18 +20,22 @@ class OFFView : public goGUI::GLWidget
 
         virtual void glDraw ();
 
-        void setRotation (const goVectorf& angles);
+        void setRadius (goFloat);
+        void setSphericalPosition (const goVectorf& phiThetaRadius);
         void setView (const goVectorf& position, const goVectorf& up, const goVectorf& focus);
-        const goVectorf& getRotation () const;
+        const goVectorf& getSphericalPosition () const;
 
         goGL::OFFFile& getOFFFile ();
 
         sigc::signal<void> signalChanged();
+        sigc::signal<void> signalChangedFinal();
+        sigc::signal<void> signalRotated();
+        bool motionSlot (GdkEventMotion* e);
+        bool buttonSlot (GdkEventButton* e);
 
     private:
         goGL::OFFFile         off;
         int                   myList;
-        goQuaternion<goFloat> myRotation; // This is not used.
 
         OFFViewPrivate* myPrivate;
 };

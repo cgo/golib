@@ -85,6 +85,7 @@ class goSinglePlot : public goObjectBase
 
         bool add (const char* commands);
         bool add3D (const char* commands);
+        bool addSphere (const char* plotOptions = 0, goFloat radius = 1.0f, bool autoRange = true);
 
         template <class pointT>
             bool addCurve (const goList<pointT>& points, const char* title, const char* plotOptions = 0)

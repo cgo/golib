@@ -240,7 +240,12 @@ static union
 } _eco;
 #define EXP_A (1048576 / M_LN2)
 #define EXP_C 60801
-#define EXP(y) (_eco.n.i = EXP_A * (y) + (1072693248 - EXP_C), _eco.d)
+#define IEEE_EXP(y) (_eco.n.i = EXP_A * (y) + (1072693248 - EXP_C), _eco.d)
+
+double goMath::EXP (double d)
+{
+    return IEEE_EXP (d);
+}
 
 template <class T>
 void goMath::exp (const goFixedArray<T>& a, goFixedArray<T>& target)

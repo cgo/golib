@@ -46,9 +46,9 @@ goGUI::GLWidget::GLWidget ()
     this->add_events (Gdk::EXPOSURE_MASK | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK
             | Gdk::BUTTON_RELEASE_MASK);
     this->signal_expose_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::exposeSlot));
-    this->signal_motion_notify_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::motionSlot));
-    this->signal_button_press_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
-    this->signal_button_release_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
+//    this->signal_motion_notify_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::motionSlot));
+//    this->signal_button_press_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
+//    this->signal_button_release_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
 }
 
 goGUI::GLWidget::~GLWidget ()

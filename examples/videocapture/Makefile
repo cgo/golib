@@ -7,9 +7,9 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
 
 LD		= g++
-LDARGS		=  
+LDARGS		= $(LDFLAGS)
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  -lGo
 
 INCLUDE		=  -I$(GOPATH)/include
 

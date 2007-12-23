@@ -32,6 +32,9 @@
 #ifndef GOCONTOURS_H
 # include <gocontours.h>
 #endif
+#ifndef GOMANIFOLD_H
+# include <gomanifold.h>
+#endif
 
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask
@@ -436,6 +439,9 @@ T fastVariance (const vectorT& v, goSize_t sz, T mean)
 }
 
 template <class T>
+void covariance (const goMatrix<T>& points, const goVector<T>& mean, goMatrix<T>& ret);
+
+template <class T>
 void sin (goFixedArray<T>& a);
 template <class T>
 void cos (goFixedArray<T>& a);
@@ -453,6 +459,8 @@ template <class T>
 void exp (const goFixedArray<T>& a, goFixedArray<T>& target);
 template <class T>
 void log (goFixedArray<T>& a);
+
+double EXP (double d);
 
 template <class vectorT, class T>
 void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)

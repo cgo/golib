@@ -50,6 +50,7 @@ int main()
 
             //= Swap R and B channels (seem to come in different byte order from 
             //= our logitech camera).
+            #if 0
             {
                 goSubSignal3D<void> sub0 (&sig,sig.getSizeX(),sig.getSizeY(),sig.getSizeZ());
                 goSignal3D<void> temp;
@@ -62,7 +63,7 @@ int main()
                 goCopySignalChannel(&sub0,&sig);
                 goCopySignalChannel(&temp,&sub0);
             }
-
+            #endif
             goString name = filebase;
             sprintf(num.getPtr(),"%3d",j);
             name += num;

@@ -16,6 +16,13 @@
 
 namespace goMath
 {
+    /** \addtogroup math
+    * @{
+    */
+
+    /** 
+    * @brief Cubic interpolating splines.
+    */
     template <class T>
         class CubicSpline
         {
@@ -40,6 +47,7 @@ namespace goMath
                 goMatrix<T> myA_inv;
                 goMatrix<T> myM;
         };
+        /** @} */
 };
 
 typedef goMath::CubicSpline<goFloat> goCubicSplinef;

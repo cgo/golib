@@ -1112,6 +1112,16 @@
     {
         goMath::centerOfMass (m, v);
     };
+
+    FILE* cfopen (const char* filename, const char* mode)
+    {
+        FILE* f = ::fopen (filename, mode);
+        return f;
+    };
+    void cfclose (FILE* f)
+    {
+        ::fclose (f);
+    };
 %}
 
 %pythoncode %{
@@ -1224,6 +1234,19 @@
                 return ret
             else:
                 raise TypeError
+
+        def covariance (points, mean):
+            if isinstance (points, goMatrixf):
+                ret = goMatrixf()
+                goCovariancef (points, mean, ret)
+                return ret
+            elif isinstance (points, goMatrixd):
+                ret = goMatrixd()
+                goCovarianced (points, mean, ret)
+                return ret
+            else:
+                raise TypeError
+
 %}
 
 // Auto pointers
@@ -1309,6 +1332,9 @@
 %template(goExpd)          goMath::exp<goDouble>;
 %template(goLogf)          goMath::log<goFloat>;
 %template(goLogd)          goMath::log<goDouble>;
+
+%template(goCovariancef)   goMath::covariance<goFloat>;
+%template(goCovarianced)   goMath::covariance<goDouble>;
 
 %template(goPlaneLineCutf) goMath::planeLineCut<goFloat>;
 %template(goPlaneLineCutd) goMath::planeLineCut<goDouble>;

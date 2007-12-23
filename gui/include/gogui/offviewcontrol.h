@@ -18,7 +18,9 @@ namespace goGUI
             goGUI::OFFView* getOFFView ();
             void            addWidget  (Gtk::Widget& w);
 
-            void angleChanged ();
+            void OFFViewRotated ();
+            // void angleChanged ();
+            void radiusChanged ();
             void loadOFF ();
             void align ();
 
@@ -27,6 +29,7 @@ namespace goGUI
 
             goFloat getRadius () const;
             void    setRadius (goFloat r);
+            sigc::signal<void, goVectorf> angleChangedSignal ();
 
         protected:
             OFFViewControlPrivate* myPrivate;

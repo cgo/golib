@@ -35,6 +35,8 @@ SET                 (SOURCES
  src/data/gostring.cc
  src/data/gohashtablei.cpp
  # src/math/contours.cpp
+ src/math/covariance.cpp
+ src/math/gomanifold.cpp
  src/math/lapack.cpp
  src/math/stencil.cpp
  src/math/planelinecut.cpp

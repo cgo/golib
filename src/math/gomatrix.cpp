@@ -371,13 +371,15 @@ bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, g
  * 
  * Copies from this matrix the sub-matrix (startRow...endRow , startCol...endCol) to the sub-matrix in target starting at target_row,target_col.
  *
- * @param startRow 
- * @param startCol 
- * @param endRow 
- * @param endCol 
- * @param target_row 
- * @param target_col 
- * @param target 
+ * Does not do resizing. If the target is too small, nothing is copied.
+ *
+ * @param startRow Starting row in this matrix.
+ * @param startCol Starting column in this matrix.
+ * @param endRow   End row in this matrix (inclusive)
+ * @param endCol   End column in this matrix (inclusive)
+ * @param target_row Starting row in target
+ * @param target_col Starting column in target
+ * @param target     Target matrix.
  * 
  * @return True if successful, false otherwise.
  */
