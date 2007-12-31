@@ -47,6 +47,7 @@ static void goNormalizeSignal__ (T minimum, T maximum,
  * the signal is normalized to it.
  * If (maxValue - minValue) <= 1.0, the signal values are just translated into
  * [0,1].
+ * This function works only on the currently selected channel.
  * 
  * @param sig        Signal to be normalized.
  * @param targetSig  Target containing the normalized signal after the call.
