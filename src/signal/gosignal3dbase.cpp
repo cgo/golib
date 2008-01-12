@@ -310,6 +310,8 @@ goSignal3DBase<T>::initialize (T*       dataptr,
 
     for (i = 0; i < (goIndex_t)mySize.z; ++i)
     {
+        //= FIXME: Why is this myChannelCount**2 ?
+        //= Wed Jan  2 14:28:28 CET 2008
         zDiff[i] = myBlockSize.x * myBlockSize.y * myChannelCount * myChannelCount;
     }
 

@@ -365,6 +365,9 @@ bool affineMatch(
         goMatrix<T>& A,
         goVector<T>& t);
 
+template <class T>
+bool binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
+
 /** 
  * @brief Mean calculation.
  *
@@ -512,6 +515,33 @@ void invert (const goVector<T>& f, goVector<T>& fInvRet)
     }
 }
 #endif
+
+/* 
+ * @brief Regularised Heaviside function.
+ * 
+ * @param x 
+ * @param epsilon 
+ * 
+ * @return 
+ */
+inline goDouble heaviside2 (goDouble x, goDouble epsilon)
+{
+    static goDouble co = 2.0 / (goDouble)M_PI;
+    return 0.5*(1.0+co*::atan2(x,epsilon));
+}
+
+/* 
+ * @brief Regularised dirac pulse.
+ * 
+ * @param x 
+ * @param epsilon 
+ * 
+ * @return 
+ */
+inline goDouble dirac2 (goDouble x, goDouble epsilon)
+{
+    return 0.3183098861837907/(epsilon*(1 + x*x/(epsilon*epsilon)));
+}
 
 /** 
  * @brief Student t density function.
