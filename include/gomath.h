@@ -318,6 +318,12 @@ bool divergence (const goSignal3DBase<void>& x, const goSignal3DBase<void>& y, g
  */
 bool centralDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0, const goSignal3DBase<void>* mask = 0);
 
+bool forwardDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0, const goSignal3DBase<void>* mask = 0);
+
+bool backwardDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0, const goSignal3DBase<void>* mask = 0);
+
+bool curvatureDirect2D (const goSignal3DBase<void>& input, goSignal3D<void>& result, goDouble hx = 1.0, goDouble hy = 1.0);
+
 /** 
  * @brief Conjugate gradients solver.
  * 
