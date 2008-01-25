@@ -1275,21 +1275,21 @@ bool goSinglePlot::addLine (const goVectord& n, const goVectord& p, const char* 
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, const char* colourspec)
+bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, const char* colourspec, const char* options)
 {
-    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, 0.0, colourspec));
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, 0.0, colourspec, options));
 }
-bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, const char* colourspec)
+bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, const char* colourspec, const char* options)
 {
-    return this->addLabel (goString(l), x, y, 0.0, colourspec);
+    return this->addLabel (goString(l), x, y, 0.0, colourspec, options);
 }
-bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec)
+bool goSinglePlot::addLabel (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec, const char* options)
 {
-    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, z, colourspec));
+    return myPrivate->labels.append (goPlotterLabel(l.toCharPtr(), x, y, z, colourspec, options));
 }
-bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec)
+bool goSinglePlot::addLabel (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec, const char* options)
 {
-    return this->addLabel (goString(l), x, y, z, colourspec);
+    return this->addLabel (goString(l), x, y, z, colourspec, options);
 }
 
 void goSinglePlot::setPrefix (const goString& p)
@@ -1439,6 +1439,11 @@ bool goSinglePlot::makePlot (goString& plotCommandsRet, bool useDataFiles) const
                 prefix += " ";
                 prefix += "textcolor ";
                 prefix += el->elem.colourspec.toCharPtr();
+            }
+            if (el->elem.options != "")
+            {   
+                prefix += " ";
+                prefix += el->elem.options;
             }
             prefix += "\n";
             el = el->next;

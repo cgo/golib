@@ -281,3 +281,52 @@ void goOFFFile::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
         }
     }
 }
+
+/** 
+ * @brief This is very slow -- calculate normals for all vertices.
+ * 
+ * @param normals Normals for each vertex.
+ */
+void goOFFFile::calculateNormals (goMatrixf& normals) const
+{
+    const goFixedArray<goVectorf>& vertices = this->getVertices();
+    const goFixedArray<goVector<int> >& faces = this->getFaces();
+
+    const goSize_t N = vertices.getSize();
+    if (N <= 0)
+        return;
+    const goSize_t dim = vertices[0].getSize();
+    const goSize_t N_faces = faces.getSize();
+
+    goMatrixf face_normals (N_faces, dim);
+    goVectorf normal;
+    for (goSize_t i = 0; i < N_faces; ++i)
+    {
+        face_normals.refRow (i, normal);
+        (vertices[faces[i][0]] - vertices[faces[i][1]]).cross (vertices[faces[i][1]] - vertices[faces[i][2]], normal);
+        normal *= 1.0 / normal.norm2();
+    }
+
+    normals.resize (N, dim);
+    for (goSize_t i = 0; i < N; ++i)
+    {
+        goFloat n = 0.0f;
+        normals.refRow (i, normal);
+        for (goSize_t j = 0; j < N_faces; ++j)
+        {
+            for (goSize_t k = 0; k < faces[j].getSize(); ++k)
+            {
+                if (k == i)
+                {
+                    normal += face_normals[j];
+                    n += 1.0;
+                    break;
+                }
+            }
+        }
+        if (normal.norm2() > 0.0f)
+            normal *= 1.0f / normal.norm2();
+        else
+            normal.fill (1.0f/3.0f);
+    }
+}

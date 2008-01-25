@@ -27,10 +27,10 @@ class goSinglePlotPrivate;
 class goPlotterLabel
 {
     public:
-        goPlotterLabel (const char* l, goDouble x_, goDouble y_, goDouble z_ = 0.0, const char* colourspec_ = "") 
-            : label(l), x(x_), y(y_), z(z_), colourspec(colourspec_) {};
+        goPlotterLabel (const char* l, goDouble x_, goDouble y_, goDouble z_ = 0.0, const char* colourspec_ = "", const char* options_ = "") 
+            : label(l), x(x_), y(y_), z(z_), colourspec(colourspec_), options(options_) {};
         goPlotterLabel ()
-            : label(""), x(0.0), y(0.0), z(0.0), colourspec("") {};
+            : label(""), x(0.0), y(0.0), z(0.0), colourspec(""), options("") {};
         goPlotterLabel (const goPlotterLabel& other)
         {
             *this = other;
@@ -51,6 +51,7 @@ class goPlotterLabel
         goDouble y;
         goDouble z;
         goString colourspec;
+        goString options;
 };
 
 /** 
@@ -149,10 +150,10 @@ class goSinglePlot : public goObjectBase
         void setTitle    (const goString& s);
         void setTitle    (const char* s);
         const goString& getTitle () const;
-        bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "");
-        bool addLabel    (const char* l, goDouble x, goDouble y, const char* colourspec = "");
-        bool addLabel    (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec = "");
-        bool addLabel    (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec = "");
+        bool addLabel    (const goString& l, goDouble x, goDouble y, const char* colourspec = "", const char* options = "");
+        bool addLabel    (const char* l, goDouble x, goDouble y, const char* colourspec = "", const char* options = "");
+        bool addLabel    (const goString& l, goDouble x, goDouble y, goDouble z, const char* colourspec = "", const char* options = "");
+        bool addLabel    (const char* l, goDouble x, goDouble y, goDouble z, const char* colourspec = "", const char* options = "");
         bool writeGnuplotDataFiles () const;
         bool makePlot    (goString& plotCommandsRet, bool useDataFiles = false) const;
         bool addGnuplotCommands (goString& commandsRet) const;

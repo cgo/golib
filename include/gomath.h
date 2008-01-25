@@ -289,6 +289,24 @@ bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 template <class T>
 T stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s);
 
+/* 
+ * @brief 2D euclidean transformation of an image.
+ * 
+ * @param source 
+ * @param scale 
+ * @param angle 
+ * @param t_x 
+ * @param t_y 
+ * @param target 
+ */
+void transform2D (
+        const goSignal3DBase<void>& source, 
+        goDouble scale,
+        goDouble angle,
+        goDouble t_x,
+        goDouble t_y,
+        goSignal3D<void>& target);
+
 template <class T>
 goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
 

@@ -13,6 +13,12 @@
 #ifndef GOOBJECTBASE_H
 # include <goobjectbase.h>
 #endif
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 class goOFFFilePrivate;
 
@@ -22,7 +28,7 @@ class goOFFFile : public goObjectBase
         goOFFFile ();
         virtual ~goOFFFile ();
 
-        bool read (const char* filename);
+        virtual bool read (const char* filename);
         bool align ();
         // bool toList (int listName);
         // bool draw ();
@@ -36,6 +42,7 @@ class goOFFFile : public goObjectBase
         const goFixedArray<goVector<int> >& getFaces () const;
         void getAdjacencyLists (goFixedArray<goList<int> >& ret) const;
        
+        void calculateNormals (goMatrixf& normals) const;
 
     private:
         goOFFFile (goOFFFile&);

@@ -8,11 +8,15 @@ namespace goGL
 {
     // class OFFFilePrivate;
 
+    class OFFFilePrivate;
+
     class OFFFile : public goOFFFile
     {
         public:
             OFFFile ();
             virtual ~OFFFile ();
+            
+            virtual bool read (const char* filename);
 
             bool toList (int listName);
             bool draw ();
@@ -21,6 +25,7 @@ namespace goGL
             OFFFile (OFFFile&);
             OFFFile& operator= (OFFFile&);
 
+            OFFFilePrivate* myPrivate;
             // goGL::OFFFilePrivate* myPrivate;
     };
 };

@@ -167,7 +167,6 @@ goSignal3D<void>::make (goSize_t x, goSize_t y, goSize_t z,
 template<> const goSignal3D<void>&
 goSignal3D<void>::copy (const goSignal3DBase<void>& other)
 {
-    goLog::message("goSignal3D<void>::operator=()");
     this->destroy();
     this->setDataType (other.getDataType().getID());
     this->make (other.getSizeX(),

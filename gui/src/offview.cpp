@@ -123,7 +123,7 @@ void goGUI::OFFView::load (const char* filename)
 
     check_gl_error ("1");
 
-    this->lighting ();
+    // this->lighting ();
 
     check_gl_error ("2");
     this->GLWidgetEnd ();
@@ -183,7 +183,7 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting6");
     glEnable (GL_LIGHT0);
     check_gl_error ("lighting7");
-    glEnable (GL_LIGHT1);
+    // glEnable (GL_LIGHT1);
     check_gl_error ("lighting8");
     //glEnable (GL_LIGHT2);
     //glEnable (GL_LIGHT3);
@@ -194,8 +194,9 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting10");
     glEnable (GL_AUTO_NORMAL);
     check_gl_error ("lighting11");
-    glShadeModel (GL_SMOOTH);
-    //glShadeModel (GL_FLAT);
+    //glShadeModel (GL_CONSTANT);
+    //glShadeModel (GL_SMOOTH);
+    glShadeModel (GL_FLAT);
     check_gl_error ("lighting12");
 }
 

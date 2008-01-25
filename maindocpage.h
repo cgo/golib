@@ -9,18 +9,14 @@
  *    trying the library, please drop me a line.</b>
  *
  * \section license License
- * <b>Important notice:</b> Even though this library carries the
- * GNU General Public License, it is currently not in a state in which I want
- * to publish it. There are too many pending changes, many of which concerning
- * the API. For that reason, I do not want you to give the code or
- * binary to anyone.<br>
- *
- * Please read the files COPYING and README in the distribution directory. 
- * This library is distributed under the terms of the GNU General Public License version 3,
- * but if there is demand, I will provide a <b>commercial license</b> in addition to that
- * (the GPL'ed version will not be touched by this).
- * Of course a commercial version would <b>not</b> be free but would enable
- * you to use the library in a closed source, commercial product.
+ * I first indended to release the library under the GPL, but
+ * I have no time to think about licensing issues now.
+ * Therefore, copying, changing, or in any way using this library
+ * is <b>not</b> allowed without my prior written consent.
+ * If you have the code or binary and do not agree to these terms,
+ * do not use it and delete it immediately.
+ * If you have questions, please contact me.
+ * <br>
  * 
  * If you should find that the version you downloaded is out of date
  * and does not match this documentation, please notify the me, the author,

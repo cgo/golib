@@ -7,13 +7,31 @@
 #include <golist.h>
 #include <gopointcloud.h>
 
-goGL::OFFFile::OFFFile ()
-    : goOFFFile()
+namespace goGL
 {
+    class OFFFilePrivate
+    {
+        public:
+            OFFFilePrivate () : normals() {};
+            ~OFFFilePrivate () {};
+
+            goMatrixf normals;
+    };
+};
+
+goGL::OFFFile::OFFFile ()
+    : goOFFFile(), myPrivate (0)
+{
+    myPrivate = new OFFFilePrivate;
 }
 
 goGL::OFFFile::~OFFFile ()
 {
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = 0;
+    }
 }
 
 static void check_gl_error (const char* name)
@@ -24,6 +42,21 @@ static void check_gl_error (const char* name)
     }
 }
 
+bool goGL::OFFFile::read (const char* filename)
+{
+    if (!goOFFFile::read (filename))
+        return false;
+
+    this->calculateNormals (myPrivate->normals);
+}
+
+static inline void normal (const goMatrixf& normals, goSize_t i)
+{
+    const goVectorf n(0);
+    normals.refRow (i, n);
+    glNormal3f (n[0], n[1], n[2]);
+}
+
 bool goGL::OFFFile::draw ()
 {
     goSize_t i = 0;
@@ -31,7 +64,7 @@ bool goGL::OFFFile::draw ()
     while (i < sz)
     {
         // printf ("faces size == %d\n", this->getFaces()[i].getSize());
-            if (i < sz && this->getFaces()[i].getSize() == 3)
+        if (i < sz && this->getFaces()[i].getSize() == 3)
         {
             glBegin (GL_TRIANGLES);
             while (i < sz && this->getFaces()[i].getSize() == 3)
@@ -39,8 +72,11 @@ bool goGL::OFFFile::draw ()
                 // printf ("3-face\n");
                 // glColor3f (1.0, 1.0, 1.0);
                 goVector<int>& face = this->getFaces()[i];
+                normal (myPrivate->normals, face[0]);
                 glVertex3fv (this->getVertices()[face[0]].getPtr());
+                normal (myPrivate->normals, face[1]);
                 glVertex3fv (this->getVertices()[face[1]].getPtr());
+                normal (myPrivate->normals, face[2]);
                 glVertex3fv (this->getVertices()[face[2]].getPtr());
                 ++i;
             }
@@ -55,9 +91,13 @@ bool goGL::OFFFile::draw ()
                 // printf ("4-face\n");
                 // glColor3f (1.0, 1.0, 1.0);
                 goVector<int>& face = this->getFaces()[i];
+                normal (myPrivate->normals, face[0]);
                 glVertex3fv (this->getVertices()[face[0]].getPtr());
+                normal (myPrivate->normals, face[1]);
                 glVertex3fv (this->getVertices()[face[1]].getPtr());
+                normal (myPrivate->normals, face[2]);
                 glVertex3fv (this->getVertices()[face[2]].getPtr());
+                normal (myPrivate->normals, face[3]);
                 glVertex3fv (this->getVertices()[face[3]].getPtr());
                 ++i;
             }
