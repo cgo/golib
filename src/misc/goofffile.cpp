@@ -2,6 +2,125 @@
 #include <gofileio.h>
 #include <gopointcloud.h>
 
+#include <gosort.h>
+
+class goMeshEdge
+{
+    public:
+        goMeshEdge (goIndex_t i=0, goIndex_t j=0)
+            : a(i), b(j)
+        {
+        };
+
+        ~goMeshEdge () {};
+        
+        void swap ()
+        {
+            goIndex_t t = this->a;
+            this->a = this->b;
+            this->b = t;
+        };
+
+        goIndex_t key () const { return goMath::min<goIndex_t> (a,b); };
+        
+        bool operator== (const goMeshEdge& o) const
+        {
+            return goMath::min<goIndex_t> (this->a,this->b) == goMath::min<goIndex_t> (o.a,o.b) &&
+                goMath::max<goIndex_t> (this->a,this->b) == goMath::max<goIndex_t> (o.a,o.b);
+        };
+
+        bool operator!= (const goMeshEdge& o) const { return !(*this == o); };
+
+        goIndex_t a;
+        goIndex_t b;
+};
+
+#include <gohashtable.h>
+#ifndef GOHASHTABLE_HPP
+# include <gohashtable.hpp>
+#endif
+
+template <class T>
+bool goFixMeshDirection (goFixedArray<goVector<T> >& vertices, goFixedArray<goVector<int> >& faces)
+{
+    goSize_t sz = faces.getSize();
+    if (sz == 0)
+        return true;
+
+    goHashTable<goIndex_t, goMeshEdge> edgeTable;
+    
+    goSize_t edgesInTable = 0;
+    goSize_t sz_f = faces[0].getSize();
+    for (goSize_t i = 0; i < sz_f; ++i)
+    {
+        goMeshEdge e (faces[0][i],faces[0][(i+1) % sz_f]);
+        edgeTable.add (e.key(), e);
+        ++edgesInTable;
+    }
+
+    goFixedArray<bool> facesDone(sz);
+    facesDone.fill (false);
+    facesDone[0] = true;
+    goSize_t totalFacesDone = 1;
+    bool changed = true;
+
+    while (changed)
+    {
+        changed = false;
+        for (goSize_t i = 1; i < sz; ++i)
+        {
+            //= Ist eine Kante schon in der Tabelle?
+            goVector<int>& face = faces[i];
+            goSize_t sz_f = face.getSize();
+            for (goSize_t j = 0; j < sz_f; ++j)
+            {
+                //= Falls ja, face umdrehen und andere Kanten markieren (== in Tabelle einfuegen)
+                goIndex_t key_bak = face[j];
+                goMeshEdge& e = edgeTable[key_bak];
+                if (!edgeTable.fail())
+                {
+                    if (!facesDone[i])
+                    {
+                        //= Falls edge e in face in die gleiche Richtung zeigt, umdrehen.
+                        for (goSize_t k = 0; k < sz_f; ++k)
+                        {
+                            goMeshEdge e2 (face[k], face[(k+1) % sz_f]);
+                            if (e == e2)
+                            {
+                                if (e.a == e2.a)
+                                {
+                                    face.flip();
+                                    changed = true;
+                                    break;
+                                }
+                            }
+                        }
+                        facesDone[i] = true;
+                        ++totalFacesDone;
+                        printf ("totalFacesDone == %d\n", totalFacesDone);
+                        for (goSize_t k = 0; k < sz_f; ++k)
+                        {
+                            goMeshEdge e2 (face[k], face[(k+1) % sz_f]);
+                            if (e != e2)
+                            {
+                                edgeTable.add (e2.key(), e2);
+                                ++edgesInTable;
+                                //printf ("edgesInTable == %d\n", edgesInTable);
+                            }
+                        }
+                    }
+                    //edgeTable.remove (key_bak);
+                    //--edgesInTable;
+                    //printf ("edgesInTable == %d\n", edgesInTable);
+                    break;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 class goOFFFilePrivate
 {
     public:
@@ -206,6 +325,7 @@ bool goOFFFile::read (const char* filename)
     fclose (f);
 
     return true;
+    // return goFixMeshDirection<goFloat> (myPrivate->vertices, myPrivate->faces);
 }
 
 bool goOFFFile::align ()
@@ -303,11 +423,15 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
     for (goSize_t i = 0; i < N_faces; ++i)
     {
         face_normals.refRow (i, normal);
-        (vertices[faces[i][0]] - vertices[faces[i][1]]).cross (vertices[faces[i][1]] - vertices[faces[i][2]], normal);
-        normal *= 1.0 / normal.norm2();
+        //goVector<int> temp = faces[i];
+        //goSort (temp.getPtr(), temp.getSize());
+        //(vertices[temp[1]] - vertices[temp[0]]).cross (vertices[temp[2]] - vertices[temp[0]], normal);
+        (vertices[faces[i][2]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
+        // normal *= 1.0 / normal.norm2();
     }
 
     normals.resize (N, dim);
+    normals.fill (0.0f);
     for (goSize_t i = 0; i < N; ++i)
     {
         goFloat n = 0.0f;
@@ -316,7 +440,7 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
         {
             for (goSize_t k = 0; k < faces[j].getSize(); ++k)
             {
-                if (k == i)
+                if (faces[j][k] == i)
                 {
                     normal += face_normals[j];
                     n += 1.0;
@@ -327,6 +451,32 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
         if (normal.norm2() > 0.0f)
             normal *= 1.0f / normal.norm2();
         else
-            normal.fill (1.0f/3.0f);
+            normal.fill (0.0f);
+    }
+}
+
+/** 
+ * @brief Calculate a normal for each face.
+ * 
+ * @param face_normals Contains the face normals, on return.
+ */
+void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const
+{
+    const goFixedArray<goVectorf>& vertices = this->getVertices();
+    const goFixedArray<goVector<int> >& faces = this->getFaces();
+
+    const goSize_t N = vertices.getSize();
+    if (N <= 0)
+        return;
+    const goSize_t dim = vertices[0].getSize();
+    const goSize_t N_faces = faces.getSize();
+
+    face_normals.resize (N_faces, dim);
+    goVectorf normal;
+    for (goSize_t i = 0; i < N_faces; ++i)
+    {
+        face_normals.refRow (i, normal);
+        (vertices[faces[i][2]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
+        normal *= 1.0 / normal.norm2();
     }
 }

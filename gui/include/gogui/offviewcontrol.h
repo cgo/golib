@@ -18,6 +18,9 @@ namespace goGUI
             goGUI::OFFView* getOFFView ();
             void            addWidget  (Gtk::Widget& w);
 
+            void lightDialog ();
+            void lightChangedSlot ();
+
             void OFFViewRotated ();
             // void angleChanged ();
             void radiusChanged ();

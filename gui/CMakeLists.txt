@@ -1,7 +1,11 @@
 INCLUDE (UsePkgConfig)
 PROJECT             (Gogui)
 SET                 (TARGETNAME Gogui)
-SET                 (SOURCES src/draw.cpp
+SET                 (SOURCES 
+                             src/multivectorinput.cpp
+                             src/vectorinput.cpp
+                             src/imageview.cpp
+                             src/draw.cpp
                              src/control.cpp
                              src/helper.cpp
                              src/about.cpp
@@ -13,7 +17,8 @@ IF (BUILD_GUI_MODULE_OPENGL)
     SET (SOURCES ${SOURCES}
             src/offviewcontrol.cpp          
             src/offview.cpp
-            src/glwidget.cpp)
+            src/glwidget.cpp
+            src/gllightinput.cpp)
     PKGCONFIG (gtkglext-1.0 GTKGL_INCLUDE_DIR GTKGL_LIB_DIR GTKGL_LDFLAGS GTKGL_CFLAGS)
 ENDIF (BUILD_GUI_MODULE_OPENGL)
 

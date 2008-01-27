@@ -1355,6 +1355,9 @@
 %template(goIntegrateSimpsonf)    goMath::integrateSimpson<goFloat>;
 %template(goIntegrateSimpsond)    goMath::integrateSimpson<goDouble>;
 
+%template(goBinaryImagef)   goMath::binaryImage<goFloat>;
+%template(goBinaryImaged)   goMath::binaryImage<goDouble>;
+
 %template(goPlotf)         goPlot::plot<goFloat>;
 %template(goPlotd)         goPlot::plot<goDouble>;
 %template(goPlot3Df)       goPlot::plot3D<goFloat>;

@@ -1,6 +1,8 @@
 #include <gogui/offview.h>
 #include <gogl/offfile.h>
 #include <gogl/helper.h>
+#include <gogl/camera.h>
+#include <gogl/light.h>
 #include <gogui/glwidget.h>
 #include <gogui/helper.h>
 
@@ -30,7 +32,11 @@ namespace goGUI
     class OFFViewPrivate
     {
         public:
-            OFFViewPrivate () : spherical (3), position(3), up(3), focus(3), so3(), 
+            OFFViewPrivate () : spherical (3), 
+                camera (100,100),
+                light (GL_LIGHT0),
+                //    position(3), up(3), focus(3), 
+                so3(), 
                 rotationMatrix (3,3),
                 p0 (3),
                 signal_changed(),
@@ -41,9 +47,9 @@ namespace goGUI
                 spherical.fill (0.0f);
                 spherical[2] = 1.0f;
 
-                position.fill (0.0f);
-                up[0] = 1.0f; up[1] = 0.0f; up[2] = 1.0f;
-                focus.fill (0.0f);
+                //position.fill (0.0f);
+                //up[0] = 1.0f; up[1] = 0.0f; up[2] = 1.0f;
+                //focus.fill (0.0f);
 
                 rotationMatrix.setIdentity();
                 goMath::sphereToEuclidean<goDouble> (0.0, 0.0, 1.0, &p0, 0);
@@ -52,9 +58,13 @@ namespace goGUI
 
             goVectorf spherical;  //= Spherical coordinates
 
-            goVectorf position;
-            goVectorf up;
-            goVectorf focus;
+            //= Observer position
+            //goVectorf position;
+            //goVectorf up;
+            //goVectorf focus;
+            goGL::Camera camera;
+
+            goGL::Light light;
 
             //= For rotation calculations.
             goMath::SO3<goDouble> so3;
@@ -123,7 +133,7 @@ void goGUI::OFFView::load (const char* filename)
 
     check_gl_error ("1");
 
-    // this->lighting ();
+    this->lighting ();
 
     check_gl_error ("2");
     this->GLWidgetEnd ();
@@ -141,18 +151,41 @@ void goGUI::OFFView::lighting ()
 {
     glEnable (GL_NORMALIZE);  //= Automatically normalise normal vectors
 
-    GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 0.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 0.0 };
+    //= General ambient light
+    GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+    glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glLightModelfv (GL_LIGHT_MODEL_AMBIENT, lm_ambient);
+
+    myPrivate->light();
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
+    glEnable (GL_DEPTH_TEST);
+    glShadeModel (GL_SMOOTH);
+    return;
+
+#if 0
+    GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_shininess[] = { 50.0 };
-    GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+
     // GLfloat light_position[] = { myPrivate->position[0], myPrivate->position[1], myPrivate->position[2], 1.0 };
-    GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 0.0 };
+    //GLfloat lm_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
     check_gl_error ("lighting1");
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
     check_gl_error ("lighting2");
     glLightfv (GL_LIGHT0, GL_POSITION, light_position);
+
+    glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glLightModelfv (GL_LIGHT_MODEL_AMBIENT, lm_ambient);
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
+    glEnable (GL_DEPTH_TEST);
+    glShadeModel (GL_SMOOTH);
+    return;
+
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, lm_ambient);
     check_gl_error ("lighting3");
     glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
@@ -183,7 +216,7 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting6");
     glEnable (GL_LIGHT0);
     check_gl_error ("lighting7");
-    // glEnable (GL_LIGHT1);
+    glEnable (GL_LIGHT1);
     check_gl_error ("lighting8");
     //glEnable (GL_LIGHT2);
     //glEnable (GL_LIGHT3);
@@ -192,12 +225,27 @@ void goGUI::OFFView::lighting ()
     check_gl_error ("lighting9");
     glEnable(GL_DEPTH_TEST);
     check_gl_error ("lighting10");
-    glEnable (GL_AUTO_NORMAL);
+    // glEnable (GL_AUTO_NORMAL);
     check_gl_error ("lighting11");
-    //glShadeModel (GL_CONSTANT);
-    //glShadeModel (GL_SMOOTH);
-    glShadeModel (GL_FLAT);
+    glShadeModel (GL_SMOOTH);
+    //glShadeModel (GL_FLAT);
     check_gl_error ("lighting12");
+#endif
+}
+
+void goGUI::OFFView::setLight (const goGL::Light& light)
+{
+    myPrivate->light = light;
+    this->GLWidgetBegin ();
+    this->lighting ();
+    this->glDraw ();
+    this->GLWidgetEnd ();
+    this->swapBuffers ();
+}
+
+goGL::Light& goGUI::OFFView::getLight ()
+{
+    return myPrivate->light;
 }
 
 const goVectorf& goGUI::OFFView::getSphericalPosition () const
@@ -208,7 +256,7 @@ const goVectorf& goGUI::OFFView::getSphericalPosition () const
 void goGUI::OFFView::setRadius (goFloat r)
 {
     myPrivate->spherical[2] = r;
-    goMath::sphereToEuclidean (myPrivate->spherical[0], myPrivate->spherical[1], myPrivate->spherical[2], &myPrivate->position, &myPrivate->up);
+    goMath::sphereToEuclidean (myPrivate->spherical[0], myPrivate->spherical[1], myPrivate->spherical[2], &myPrivate->camera.myPosition, &myPrivate->camera.myUp);
 }
 
 void goGUI::OFFView::setSphericalPosition (const goVectorf& r)
@@ -227,13 +275,19 @@ void goGUI::OFFView::setSphericalPosition (const goVectorf& r)
 
 void goGUI::OFFView::setView (const goVectorf& position, const goVectorf& up, const goVectorf& focus)
 {
-    myPrivate->position = position;
-    myPrivate->up = up;
-    myPrivate->focus = focus;
+    //myPrivate->position = position;
+    //myPrivate->up = up;
+    //myPrivate->focus = focus;
+
+    myPrivate->camera.myPosition = position;
+    myPrivate->camera.myUp = up;
+    myPrivate->camera.myLookat = focus;
 }
 
 void goGUI::OFFView::glDraw ()
 {
+    glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glFrontFace (GL_CW);
     glDisable (GL_CULL_FACE);
     
@@ -242,53 +296,41 @@ void goGUI::OFFView::glDraw ()
     // printf ("max: %f %f %f\n", max[0], max[1], max[2]);
     // printf ("min: %f %f %f\n", min[0], min[1], min[2]);
 
-    glViewport (0, 0, this->get_width(), this->get_height());
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective (30.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
+    myPrivate->camera.myWidth = this->get_width();
+    myPrivate->camera.myHeight = this->get_height();
+    //myPrivate->camera();
+    myPrivate->camera.setProjection();
     glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+    {
+        goFloat ttemp[] = {0.1f, 0.1f, -1.0f, 1.0f};
+        goVectorf temp(ttemp, 4, 1);
+        myPrivate->light.myPosition = temp;
+    }
+    myPrivate->light.setPosition();
+    myPrivate->camera.setViewingTransformation();
 
-    glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity ();
+    // glViewport (0, 0, this->get_width(), this->get_height());
+    // glMatrixMode (GL_PROJECTION);
+    // glLoadIdentity ();
+    // gluPerspective (30.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
+    // glMatrixMode (GL_MODELVIEW);
+    // glLoadIdentity ();
 
-//    if (myPrivate->rotation[1] == 0.0f)
-//    {
-//        myPrivate->rotation[1] = 0.0001f; //= bloody libc cos() ...
-//    }
-//    else if (myPrivate->rotation[1] == 180.0f)
-//    {
-//        myPrivate->rotation[1] = 180.0f - 0.0001f; //= bloody libc cos() ...
-//    }
-    // goDouble temp = myPrivate->rotation[1] / 180.0f * M_PI;
-    const goVectorf& pos = myPrivate->position;
-    const goVectorf& up  = myPrivate->up;
-    const goVectorf& focus  = myPrivate->focus;
+    // const goVectorf& pos = myPrivate->position;
+    // const goVectorf& up  = myPrivate->up;
+    // const goVectorf& focus  = myPrivate->focus;
 
-    glLoadIdentity ();
-    gluLookAt (pos[0], pos[1], pos[2],
-               focus[0], focus[1], focus[2],
-               up[0], up[1], up[2]);
+    // glLoadIdentity ();
+    // gluLookAt (pos[0], pos[1], pos[2],
+    //            focus[0], focus[1], focus[2],
+    //            up[0], up[1], up[2]);
 
-
-    //glPushMatrix ();
-    //glLoadIdentity ();
-    //GLfloat light_position[] = { pos[0] + up[0], pos[1] + up[1], pos[2] + up[2], 0.0 };
-    //GLfloat light_dir[] = { -pos[0] - up[0], -pos[1] - up[1], -pos[2] - up[2], 1.0 };
-    //glLightfv (GL_LIGHT0, GL_POSITION, light_position);
-    //glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 75.0);
-    //glLightfv (GL_LIGHT0, GL_SPOT_DIRECTION, light_dir);
-    //glEnable (GL_LIGHT0);
-    //glPopMatrix ();
-
-    const float list_diffuse[] = {0.3f, 0.3f, 0.7f, 1.0f};
+    const float list_diffuse[] = {0.7f, 0.7f, 0.7f, 0.7f};
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
-    glEnable (GL_LINE_SMOOTH);
+    //glEnable (GL_LINE_SMOOTH);
     glEnable (GL_POLYGON_SMOOTH);
     glCallList (this->myList);
-    // this->off.draw ();
-    // int n = check_gl_error ("calllist");
-    // printf ("%s\n", gluErrorString (n));
     glFlush ();
     this->swapBuffers ();
     myPrivate->signal_changed();
@@ -329,14 +371,14 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
 
         goMatrixf R (3,3);
         goMath::SO3<goFloat> so3f;
-        goVectorf axis = myPrivate->position.cross(myPrivate->up).cross(myPrivate->up);
+        goVectorf axis = myPrivate->camera.myPosition.cross(myPrivate->camera.myUp).cross(myPrivate->camera.myUp);
         axis *= 1.0 / axis.norm2() * (myPrivate->rotationStart[0] - myPrivate->rotationEnd[0]) / 180.0 * M_PI;
         so3f.matrix (axis, R);
-        myPrivate->up *= R;
+        myPrivate->camera.myUp *= R;
 
         //= Re-rectify (for numerical errors over time)
-        myPrivate->up = myPrivate->position.cross(myPrivate->up).cross(myPrivate->position);
-        myPrivate->up *= 1.0 / myPrivate->up.norm2();
+        myPrivate->camera.myUp = myPrivate->camera.myPosition.cross(myPrivate->camera.myUp).cross(myPrivate->camera.myPosition);
+        myPrivate->camera.myUp *= 1.0 / myPrivate->camera.myUp.norm2();
 
         myPrivate->rotationStart = myPrivate->rotationEnd;
         myPrivate->signal_rotated();
@@ -350,12 +392,12 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
 
         //= Calculate euclidean position of current view point
         goVectord p (3); goVectord up (3);
-        p[0] = myPrivate->position[0];
-        p[1] = myPrivate->position[1];
-        p[2] = myPrivate->position[2];
-        up[0] = myPrivate->up[0];
-        up[1] = myPrivate->up[1];
-        up[2] = myPrivate->up[2];
+        p[0] = myPrivate->camera.myPosition[0];
+        p[1] = myPrivate->camera.myPosition[1];
+        p[2] = myPrivate->camera.myPosition[2];
+        up[0] = myPrivate->camera.myUp[0];
+        up[1] = myPrivate->camera.myUp[1];
+        up[2] = myPrivate->camera.myUp[2];
         
         //goMath::sphereToEuclidean<goDouble> (myPrivate->spherical[0] / 180.0 * M_PI, myPrivate->spherical[1] / 180.0 * M_PI, myPrivate->spherical[2], &p, &up);
         //= Calculate rotation matrix
@@ -377,16 +419,16 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
         myPrivate->spherical[0] = phi;
         myPrivate->spherical[1] = theta;
 
-        myPrivate->position[0] = p[0];
-        myPrivate->position[1] = p[1];
-        myPrivate->position[2] = p[2];
-        myPrivate->up[0] = up[0];
-        myPrivate->up[1] = up[1];
-        myPrivate->up[2] = up[2];
+        myPrivate->camera.myPosition[0] = p[0];
+        myPrivate->camera.myPosition[1] = p[1];
+        myPrivate->camera.myPosition[2] = p[2];
+        myPrivate->camera.myUp[0] = up[0];
+        myPrivate->camera.myUp[1] = up[1];
+        myPrivate->camera.myUp[2] = up[2];
 
         //= Re-rectify (for numerical errors over time)
-        myPrivate->up = myPrivate->position.cross(myPrivate->up).cross(myPrivate->position);
-        myPrivate->up *= 1.0 / myPrivate->up.norm2();
+        myPrivate->camera.myUp = myPrivate->camera.myPosition.cross(myPrivate->camera.myUp).cross(myPrivate->camera.myPosition);
+        myPrivate->camera.myUp *= 1.0 / myPrivate->camera.myUp.norm2();
 
         //this->GLWidgetBegin ();
         //this->glDraw ();

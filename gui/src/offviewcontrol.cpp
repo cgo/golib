@@ -1,5 +1,6 @@
 #include <gogui/offviewcontrol.h>
 #include <gogui/helper.h>
+#include <gogui/gllightinput.h>
 
 namespace goGUI
 {
@@ -9,6 +10,9 @@ namespace goGUI
             OFFViewControlPrivate ()
                 : loadButton ("Load OFF"),
                   alignButton ("Align"),
+                  lightButton ("Light"),
+                  lightDialog ("Light"),
+                  lightInput  (),
                   phi ("0.00"),
                   theta ("0.00"),
                   radius (),
@@ -28,6 +32,9 @@ namespace goGUI
 
             Gtk::Button loadButton;
             Gtk::Button alignButton;
+            Gtk::Button lightButton;
+            Gtk::Dialog lightDialog;
+            goGUI::GLLightInput lightInput;
             Gtk::Label phi;
             Gtk::Label theta;
             Gtk::SpinButton radius;
@@ -64,15 +71,21 @@ goGUI::OFFViewControl::OFFViewControl ()
     buttonBox->pack_start (myPrivate->loadButton, Gtk::PACK_SHRINK);
     myPrivate->tips.set_tip (myPrivate->loadButton, "Load OFF file");
     buttonBox->pack_start (myPrivate->alignButton, Gtk::PACK_SHRINK);
+    buttonBox->pack_start (myPrivate->lightButton, Gtk::PACK_SHRINK);
     myPrivate->tips.set_tip (myPrivate->alignButton, "Align object with principal axes");
     myPrivate->vbox.pack_start (*buttonBox, Gtk::PACK_SHRINK);
     this->add (myPrivate->vbox);
+
+    myPrivate->lightDialog.get_vbox()->pack_start (myPrivate->lightInput, Gtk::PACK_SHRINK);
+    myPrivate->lightDialog.hide ();
+    myPrivate->lightInput.signalChanged().connect (sigc::mem_fun (*this, &OFFViewControl::lightChangedSlot));
 
     //myPrivate->phi.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
     //myPrivate->theta.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
     myPrivate->radius.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::radiusChanged));
     myPrivate->loadButton.signal_clicked().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::loadOFF));
     myPrivate->alignButton.signal_clicked().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::align));
+    myPrivate->lightButton.signal_clicked().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::lightDialog));
 }
 
 goGUI::OFFViewControl::~OFFViewControl ()
@@ -232,3 +245,21 @@ goGUI::OFFViewControl::angleChangedSignal ()
     return myPrivate->angle_changed;
 }
 
+void goGUI::OFFViewControl::lightDialog ()
+{
+    if (myPrivate->view)
+    {
+        myPrivate->lightInput.set (myPrivate->view->getLight());
+        myPrivate->lightDialog.show_all ();
+    }
+}
+
+void goGUI::OFFViewControl::lightChangedSlot ()
+{
+    if (myPrivate->view)
+    {
+        goGL::Light light;
+        myPrivate->lightInput.get (light);
+        myPrivate->view->setLight (light);
+    }
+}

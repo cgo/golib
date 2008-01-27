@@ -305,7 +305,17 @@ void transform2D (
         goDouble angle,
         goDouble t_x,
         goDouble t_y,
-        goSignal3D<void>& target);
+        goSignal3D<void>& target,
+        bool setsize = true);
+
+void scale2D (const goSignal3DBase<void>& source, goSignal3DBase<void>& target, bool keep_aspect = false);
+void paste2D (const goSignal3DBase<void>& source, 
+        goDouble scale,
+        goDouble angle,
+        goDouble t_x,
+        goDouble t_y,
+        goSignal3D<void>& target,
+        goFloat bgColour);
 
 template <class T>
 goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);

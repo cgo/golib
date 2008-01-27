@@ -99,6 +99,7 @@ SET                 (SOURCES
  src/network/gonetwork.cc 
  src/network/goserver.cc
  src/nifty/gorandom.cc
+ src/signal/centerofmass.cpp
  src/signal/transform.cpp
  src/signal/gosignal3dref.cpp
  src/signal/gogaussimage.cpp

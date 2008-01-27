@@ -41,5 +41,6 @@ void     goSignalInfoText     (const goSignal3DBase<void>& sig, goString& strRet
 goDouble goSignalMean         (const goSignal3DBase<void>& sig);
 void     goSignalMeanVariance (const goSignal3DBase<void>& sig, goDouble& mean, goDouble& variance);
 void     goSignalFlipY        (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target);
+bool     goSignalCOM          (const goSignal3DBase<void>& sig, goVectord& comRet);
 /*! @} */
 #endif

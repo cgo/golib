@@ -2,6 +2,7 @@
 #define GOGUI_OFFVIEW_H
 
 #include <gogl/offfile.h>
+#include <gogl/light.h>
 #include <gogui/glwidget.h>
 
 namespace goGUI
@@ -17,6 +18,9 @@ class OFFView : public goGUI::GLWidget
         void lighting ();
         void load (const char* filename);
         void align ();
+
+        void setLight (const goGL::Light& light);
+        goGL::Light& getLight ();
 
         virtual void glDraw ();
 
