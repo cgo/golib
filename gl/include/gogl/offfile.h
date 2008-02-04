@@ -2,7 +2,9 @@
 #define GOGL_OFFFILE_H
 
 #include <goofffile.h>
-#include <govector.h>
+#ifndef GOVECTOR_H
+# include <govector.h>
+#endif
 
 namespace goGL
 {

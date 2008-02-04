@@ -30,7 +30,7 @@ bool goGL::Camera::setProjection () const
     {
         aspect = (float)myWidth / (float)myHeight;
     }
-    gluPerspective (30.0, aspect, 0.1, 1000.0);
+    gluPerspective (myFOVAngle, aspect, myNearClip, myFarClip);
     glMatrixMode (GL_MODELVIEW);
 
     return true;

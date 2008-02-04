@@ -80,6 +80,9 @@ int main (int argc, char* argv[])
         printf ("Everything seems to be ok.\n");
     }
 
+    goMatrixf normals;
+    f.calculateNormals (normals);
+
     goFixedArray<goList<int> > adj;
     f.getAdjacencyLists (adj);
     for (goSize_t i = 0; i < adj.getSize(); ++i)

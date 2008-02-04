@@ -6,16 +6,18 @@
 #include <gofileio.h>
 #include <golist.h>
 #include <gopointcloud.h>
+#include <gomatrix.h>
 
 namespace goGL
 {
     class OFFFilePrivate
     {
         public:
-            OFFFilePrivate () : normals() {};
+            OFFFilePrivate () : normals(), vertexNormals() {};
             ~OFFFilePrivate () {};
 
             goMatrixf normals;
+            goMatrixf vertexNormals;
     };
 };
 
@@ -48,6 +50,7 @@ bool goGL::OFFFile::read (const char* filename)
         return false;
 
     this->calculateFaceNormals (myPrivate->normals);
+    this->calculateNormals (myPrivate->vertexNormals);
 }
 
 static inline void normal (const goMatrixf& normals, goSize_t i)
@@ -75,12 +78,19 @@ bool goGL::OFFFile::draw ()
                 //goVectorf n(3);
                 //(this->getVertices()[face[2]] - this->getVertices()[face[0]]).cross (this->getVertices()[face[1]] - this->getVertices()[face[0]], n);
                 //n *= 1.0f / n.norm2();
-                glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+
+                glNormal3f (myPrivate->vertexNormals(face[0],0), myPrivate->vertexNormals(face[0],1), myPrivate->vertexNormals(face[0],2));
+
                 // normal (myPrivate->normals, face[0]);
                 glVertex3fv (this->getVertices()[face[0]].getPtr());
                 // normal (myPrivate->normals, face[1]);
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[1],0), myPrivate->vertexNormals(face[1],1), myPrivate->vertexNormals(face[1],2));
                 glVertex3fv (this->getVertices()[face[1]].getPtr());
                 // normal (myPrivate->normals, face[2]);
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[2],0), myPrivate->vertexNormals(face[2],1), myPrivate->vertexNormals(face[2],2));
                 glVertex3fv (this->getVertices()[face[2]].getPtr());
                 ++i;
             }
@@ -99,14 +109,21 @@ bool goGL::OFFFile::draw ()
                 //(this->getVertices()[face[2]] - this->getVertices()[face[0]]).cross (this->getVertices()[face[1]] - this->getVertices()[face[0]], n);
                 //n *= 1.0f / n.norm2();
                 //glNormal3f (n[0], n[1], n[2]);
-                glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[0],0), myPrivate->vertexNormals(face[0],1), myPrivate->vertexNormals(face[0],2));
                 //normal (myPrivate->normals, face[0]);
                 glVertex3fv (this->getVertices()[face[0]].getPtr());
                 //normal (myPrivate->normals, face[1]);
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[1],0), myPrivate->vertexNormals(face[1],1), myPrivate->vertexNormals(face[1],2));
                 glVertex3fv (this->getVertices()[face[1]].getPtr());
                 //normal (myPrivate->normals, face[2]);
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[2],0), myPrivate->vertexNormals(face[2],1), myPrivate->vertexNormals(face[2],2));
                 glVertex3fv (this->getVertices()[face[2]].getPtr());
                 //normal (myPrivate->normals, face[3]);
+                //glNormal3f (myPrivate->normals(i,0), myPrivate->normals(i,1), myPrivate->normals(i,2));
+                glNormal3f (myPrivate->vertexNormals(face[3],0), myPrivate->vertexNormals(face[3],1), myPrivate->vertexNormals(face[3],2));
                 glVertex3fv (this->getVertices()[face[3]].getPtr());
                 ++i;
             }

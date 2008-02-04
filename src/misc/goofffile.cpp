@@ -2,15 +2,18 @@
 #include <gofileio.h>
 #include <gopointcloud.h>
 
+#include <gotypes.h>
+
 #include <gosort.h>
+
+// #include <govector.h>
 
 class goMeshEdge
 {
     public:
         goMeshEdge (goIndex_t i=0, goIndex_t j=0)
             : a(i), b(j)
-        {
-        };
+        {};
 
         ~goMeshEdge () {};
         
@@ -324,8 +327,49 @@ bool goOFFFile::read (const char* filename)
     }
     fclose (f);
 
+    this->removeDoubles ();
     return true;
     // return goFixMeshDirection<goFloat> (myPrivate->vertices, myPrivate->faces);
+}
+
+bool goOFFFile::removeDoubles ()
+{
+    goFixedArray<goVector<int> >& faces = myPrivate->faces;
+    goList<goVector<int> > newFaces;
+
+    goSize_t sz = faces.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        goVector<int>& v = faces[i];
+        goSize_t n = v.getSize ();
+        bool bad_face = false;
+        for (goSize_t j = 0; j < n - 1 && !bad_face; ++j)
+        {
+            int vj = v[j];
+            for (goSize_t k = j + 1; k < n; ++k)
+            {
+                if (vj == v[k])
+                {
+                    bad_face = true;
+                    break;
+                }
+            }
+        }
+        if (!bad_face)
+            newFaces.append (v);
+    }
+    faces.setSize (newFaces.getSize());
+    goList<goVector<int> >::Element* el = newFaces.getFrontElement ();
+    sz = faces.getSize ();
+    goSize_t i = 0;
+    while (el && i < sz)
+    {
+        faces[i] = el->elem;
+        el = el->next;
+        ++i;
+    }
+
+    return true;
 }
 
 bool goOFFFile::align ()
@@ -391,15 +435,77 @@ void goOFFFile::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
         int Nv = v.getSize();
         for (int j = 0; j < Nv; ++j)
         {
-            for (int k = 0; k < Nv; ++k)
+            int neigh1 = (j + 1) % Nv;
+            int neigh2 = (j - 1);
+            if (neigh2 < 0)
+                neigh2 += Nv;
+            if (!ret[v[j]].contains(neigh1)) 
             {
-                if (j != k && !ret[v[j]].contains(v[k])) 
-                {
-                    ret[v[j]].append(v[k]);
-                }
+                ret[v[j]].append(neigh1);
+            }
+            if (!ret[v[j]].contains(neigh2)) 
+            {
+                ret[v[j]].append(neigh2);
+            }
+
+//            for (int k = 0; k < Nv; ++k)
+//            {
+//                if (j != k && !ret[v[j]].contains(v[k])) 
+//                {
+//                    ret[v[j]].append(v[k]);
+//                }
+//            }
+        }
+    }
+}
+
+/** 
+ * @brief For each vertex, compute the list of faces it is contained in.
+ * 
+ * @param ret For each vertex, contains the list of faces the vertex is contained in.
+ */
+void goOFFFile::getAdjacentFaces (goFixedArray<goList<int> >& ret) const
+{
+    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    int N = this->getVertices().getSize();
+    ret.setSize (0);
+    ret.setSize (N);
+    int Nfaces = faces.getSize();
+    for (int fi = 0; fi < Nfaces; ++fi)
+    {
+        const goVector<int>& v = faces[fi];
+        int Nv = v.getSize();
+        for (goSize_t i = 0; i < Nv; ++i)
+        {
+            if (!ret[v[i]].contains (fi))
+            {
+                ret[v[i]].append (fi);
             }
         }
     }
+}
+
+template <class T>
+static bool contains (const goFixedArray<T>& a, T v)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        if (a[i] == v)
+            return true;
+    }
+    return false;
+}
+template <class T>
+static bool contains (const goVector<T>& a, T v)
+{
+    goSize_t sz = a.getSize();
+    for (goSize_t i = 0; i < sz; ++i)
+    {
+        if (a[i] == v)
+            return true;
+    }
+    return false;
 }
 
 /** 
@@ -419,40 +525,226 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
     const goSize_t N_faces = faces.getSize();
 
     goMatrixf face_normals (N_faces, dim);
-    goVectorf normal;
-    for (goSize_t i = 0; i < N_faces; ++i)
-    {
-        face_normals.refRow (i, normal);
-        //goVector<int> temp = faces[i];
-        //goSort (temp.getPtr(), temp.getSize());
-        //(vertices[temp[1]] - vertices[temp[0]]).cross (vertices[temp[2]] - vertices[temp[0]], normal);
-        (vertices[faces[i][2]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
-        // normal *= 1.0 / normal.norm2();
-    }
+    this->calculateFaceNormals (face_normals);
+    goFloat _normal[3];
+    goVectorf normal (_normal, 3, 1);
+
+    goFixedArray<goList<int> > adj;
+    this->getAdjacencyLists (adj);
+
+    goFixedArray<goList<int> > adjFaces;
+    this->getAdjacentFaces (adjFaces);
 
     normals.resize (N, dim);
+
+    if (adj.getSize() != N || adjFaces.getSize() != N)
+    {
+        goLog::error ("goOFFFile::calculateNormals(): adjacency size != vertex count");
+        return;
+    }
+
+#if 0
+    //= Zweiter Versuch: gehe immer zu gemeinsamem, noch nicht besuchtem Nachbarn.
+    {
+        for (goSize_t i = 0; i < N; ++i)
+        {
+            goSize_t vertexCount = adj[i].getSize();
+            if (faceCount == 0 || vertexCount == 0)
+            {
+                goLog::warning ("goOFFFile::calculateNormals(): adjFaces or adj is empty.");
+                continue;
+            }
+
+            int _verticesVisited[vertexCount];
+            goFixedArray<int> verticesVisited (_verticesVisited, vertexCount, 1);
+            verticesVisited.fill (-1);
+
+            int p = (int)i;
+            int f = adjFaces[i].getFront();  // Start with the first face in the adjacency list
+            int k = adj[i].getFront();
+            verticesVisited[0] = k;
+            {
+                //= Find a common adjacent vertex of 
+                goList<int>::Element* adjEl = adj[i].getFrontElement();
+                while (adjEl)
+                {
+                    goList<int>::Element* el = adj[adjEl->elem].getFrontElement();
+                    while (el)
+                    {
+
+                    }
+                    adjEl = adjEl->next;
+                }
+            }
+
+        }
+    }
+#endif
+
+#if 0
+    {
+        goFloat _temp_vec[3];
+        goVectorf temp_vec (_temp_vec, 3, 1);
+        temp_vec.fill (0.0f);
+        goFloat temp_count = 0.0f;
+        for (goSize_t i = 0; i < N; ++i)
+        {
+            goSize_t faceCount = adjFaces[i].getSize();
+            goSize_t vertexCount = adj[i].getSize();
+            if (faceCount == 0 || vertexCount == 0)
+            {
+                goLog::warning ("goOFFFile::calculateNormals(): adjFaces or adj is empty.");
+                continue;
+            }
+
+            int _facesVisited[faceCount];
+            goFixedArray<int> facesVisited (_facesVisited, faceCount, 1);
+            facesVisited.fill (-1);
+            
+            int _verticesVisited[vertexCount];
+            goFixedArray<int> verticesVisited (_verticesVisited, vertexCount, 1);
+            verticesVisited.fill (-1);
+            
+            int p = (int)i;
+            int f = adjFaces[i].getFront();  // Start with the first face in the adjacency list
+            int k = -1;
+            
+            int lf = 0;
+            for (int lv = 0; lv < (int)vertexCount; ++lv)
+            {
+                for (goSize_t j = 0; j < faces[f].getSize(); ++j)
+                {
+                    if (!contains (verticesVisited, faces[f][j]) && faces[f][j] != i && adj[i].contains (faces[f][j]))
+                    {
+                        k = faces[f][j];
+                        break;
+                    }
+                }
+
+                verticesVisited[lv] = k;
+                facesVisited[lf] = f;
+                ++lf;
+                //= ATTENTION lf may not by larger than faceCount-1!
+                goList<int>::Element* el = adjFaces[i].getFrontElement();
+                bool foundone = false;
+                while (el)
+                {
+                    if (!contains (facesVisited, el->elem))
+                    {
+                        if (contains<int> (faces[el->elem], k) && contains<int> (faces[el->elem], i))
+                        {
+                            f = el->elem;
+                            foundone = true;
+                            break;
+                        }
+                    }
+                    el = el->next;
+                }
+                if (!foundone)
+                {
+                    printf ("Did not find one. lv == %d, lf == %d\n", lv, lf);
+                    break;
+                }
+            }
+            printf ("Visited vertices: ");
+            for (goSize_t j = 0; j < verticesVisited.getSize(); ++j)
+                printf ("%d ", verticesVisited[j]);
+            printf ("\n");
+            printf ("Visited faces: ");
+            for (goSize_t j = 0; j < facesVisited.getSize(); ++j)
+                printf ("%d ", facesVisited[j]);
+            printf ("\n");
+
+            normal.fill (0.0f);
+            temp_count = 0.0f;
+            for (goSize_t j = 0; j < vertexCount - 1 && verticesVisited[j] >= 0 && verticesVisited[j+1] >= 0; ++j)
+            {
+                (vertices[i] - vertices[verticesVisited[j]]).cross (vertices[i] - vertices[verticesVisited[j + 1]], temp_vec);
+                normal += temp_vec;
+                temp_count += 1.0f;
+            }
+            if (temp_count > 0.0f)
+            {
+                normal /= temp_count;
+                normal /= normal.norm2();
+            }
+            normals.setRow (i, normal);
+            printf ("Normal: ");
+            normal.print ();
+        }
+    }
+#endif
+
+#if 1
+    normals.resize (N, dim);
     normals.fill (0.0f);
+    goVectorf fn_row (0);
     for (goSize_t i = 0; i < N; ++i)
     {
-        goFloat n = 0.0f;
         normals.refRow (i, normal);
+        normal.fill (0.0f);
+        goList<int>::Element* el = adjFaces[i].getFrontElement();
+        while (el)
+        {
+            face_normals.refRow (el->elem, fn_row);
+//            if (normal * fn_row < 0.0)
+//            {
+//                normal -= fn_row; // / fn_row.norm2();
+//            }
+//            else
+//            {
+                normal += fn_row; // / fn_row.norm2();
+//            }
+            el = el->next;
+        }
+#if 0
         for (goSize_t j = 0; j < N_faces; ++j)
         {
             for (goSize_t k = 0; k < faces[j].getSize(); ++k)
             {
                 if (faces[j][k] == i)
                 {
-                    normal += face_normals[j];
+                    face_normals.refRow (j, fn_row);
+                    normal += fn_row;
                     n += 1.0;
                     break;
+                    if (normal * fn_row >= 0.0)
+                    {
+                        normal -= fn_row;
+                        n += 1.0;
+                    }
+                    else
+                    {
+                        normal += fn_row;
+                        n += 1.0;
+                    }
                 }
             }
         }
+#endif
         if (normal.norm2() > 0.0f)
             normal *= 1.0f / normal.norm2();
         else
-            normal.fill (0.0f);
+        {
+            printf ("goOFFFile: ***************** NORMAL WAS 0 !!!! *********************\n");
+            normal.fill (1.0/3.0);
+            printf ("Face normals:\n");
+            goList<int>::Element* el = adjFaces[i].getFrontElement();
+            while (el)
+            {
+                goVectorf temp (0);
+                printf ("face %d: ", el->elem);
+                face_normals.refRow (el->elem, temp);
+                for (goSize_t j = 0; j < temp.getSize(); ++j)
+                {
+                    printf ("%.3f ", temp[j]);
+                }
+                printf ("\n");
+                el = el->next;
+            }
+        }
     }
+#endif
 }
 
 /** 
@@ -468,7 +760,7 @@ void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const
     const goSize_t N = vertices.getSize();
     if (N <= 0)
         return;
-    const goSize_t dim = vertices[0].getSize();
+    const goSize_t dim = 3;
     const goSize_t N_faces = faces.getSize();
 
     face_normals.resize (N_faces, dim);
@@ -476,7 +768,35 @@ void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const
     for (goSize_t i = 0; i < N_faces; ++i)
     {
         face_normals.refRow (i, normal);
-        (vertices[faces[i][2]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
-        normal *= 1.0 / normal.norm2();
+        if (faces[i].getSize() < 4)
+        {
+            (vertices[faces[i][2]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
+        }
+        else
+        {
+            (vertices[faces[i][3]] - vertices[faces[i][0]]).cross (vertices[faces[i][1]] - vertices[faces[i][0]], normal);
+        }
+        if (normal.norm2() == 0.0f)
+        {
+            goString s;
+            s = "goOFFFile::calculateFaceNormals(): normal is 0.\n";
+            s += "Face: "; s += (int)i; s += "\n";
+            s += "vertices: \n";
+            for (goSize_t j = 0; j < faces[i].getSize(); ++j)
+            {
+                s += (int)faces[i][j]; s += ": ";
+                for (goSize_t k = 0; k < vertices[faces[i][j]].getSize(); ++k)
+                {
+                    s += (float)vertices[faces[i][j]][k];
+                    s += " ";
+                }
+                s += "\n";
+            }
+            goLog::warning (s.toCharPtr());
+        }
+        else
+        {
+            normal *= 1.0 / normal.norm2();
+        }
     }
 }

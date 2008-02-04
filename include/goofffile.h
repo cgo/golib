@@ -29,6 +29,7 @@ class goOFFFile : public goObjectBase
         virtual ~goOFFFile ();
 
         virtual bool read (const char* filename);
+        bool removeDoubles ();
         bool align ();
         // bool toList (int listName);
         // bool draw ();
@@ -41,9 +42,10 @@ class goOFFFile : public goObjectBase
         const goFixedArray<goVectorf>& getVertices () const;
         const goFixedArray<goVector<int> >& getFaces () const;
         void getAdjacencyLists (goFixedArray<goList<int> >& ret) const;
+        void getAdjacentFaces (goFixedArray<goList<int> >& ret) const;
        
         void calculateNormals (goMatrixf& normals) const;
-        void calculateFaceNormals (goMatrixf& face_normals) const;
+        void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const;
 
     private:
         goOFFFile (goOFFFile&);

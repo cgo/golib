@@ -156,11 +156,11 @@ void goGUI::OFFView::lighting ()
     glLightModeli (GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, lm_ambient);
 
+    glShadeModel (GL_SMOOTH);
     myPrivate->light();
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
     glEnable (GL_DEPTH_TEST);
-    glShadeModel (GL_SMOOTH);
     return;
 
 #if 0
@@ -302,35 +302,27 @@ void goGUI::OFFView::glDraw ()
     myPrivate->camera.setProjection();
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
-    {
-        goFloat ttemp[] = {0.1f, 0.1f, -1.0f, 1.0f};
-        goVectorf temp(ttemp, 4, 1);
-        myPrivate->light.myPosition = temp;
-    }
+//    glLoadIdentity();
+//    {
+//        goFloat ttemp[] = {0.0f, 0.0f, 0.0f, 1.0f};
+//        goVectorf temp(ttemp, 4, 1);
+//        myPrivate->light.myPosition = temp;
+//    }
     myPrivate->light.setPosition();
-    myPrivate->camera.setViewingTransformation();
 
-    // glViewport (0, 0, this->get_width(), this->get_height());
-    // glMatrixMode (GL_PROJECTION);
-    // glLoadIdentity ();
-    // gluPerspective (30.0, (float)this->get_width() / (float)this->get_height(), 0.1, 1000.0);
-    // glMatrixMode (GL_MODELVIEW);
-    // glLoadIdentity ();
+    //glPushMatrix();
+    {
+        myPrivate->camera.setViewingTransformation();
 
-    // const goVectorf& pos = myPrivate->position;
-    // const goVectorf& up  = myPrivate->up;
-    // const goVectorf& focus  = myPrivate->focus;
+        const float list_diffuse[] = {0.7f, 0.7f, 0.7f, 0.7f};
+        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
+        // glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, list_diffuse);
+        //glEnable (GL_LINE_SMOOTH);
+        // glEnable (GL_POLYGON_SMOOTH);
+        glCallList (this->myList);
+    }
+    //glPopMatrix();
 
-    // glLoadIdentity ();
-    // gluLookAt (pos[0], pos[1], pos[2],
-    //            focus[0], focus[1], focus[2],
-    //            up[0], up[1], up[2]);
-
-    const float list_diffuse[] = {0.7f, 0.7f, 0.7f, 0.7f};
-    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
-    //glEnable (GL_LINE_SMOOTH);
-    glEnable (GL_POLYGON_SMOOTH);
-    glCallList (this->myList);
     glFlush ();
     this->swapBuffers ();
     myPrivate->signal_changed();
