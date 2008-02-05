@@ -33,3 +33,48 @@ bool goGL::Material::operator() () const
 
     return true;
 }
+
+bool goGL::Material::writeASCII (FILE* f) const
+{
+    bool ok = myAmbient.writeASCII (f);
+    ok = ok && mySpecular.writeASCII (f);
+    ok = ok && myDiffuse.writeASCII (f);
+    goVectorf temp (1);
+    temp[0] = myShininess;
+    ok = ok && temp.writeASCII (f);
+    ok = ok && myEmission.writeASCII (f);
+
+    return ok;
+}
+
+bool goGL::Material::writeASCII (const char* filename) const
+{
+    FILE* f = ::fopen (filename, "w");
+    if (!f) return false;
+    bool ok = this->writeASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
+bool goGL::Material::readASCII (FILE* f)
+{
+    bool ok = myAmbient.readASCII (f);
+    ok = ok && mySpecular.readASCII (f);
+    ok = ok && myDiffuse.readASCII (f);
+    goVectorf temp (1);
+    ok = ok && temp.readASCII (f);
+    if (ok) myShininess = temp[0];
+    ok = ok && myEmission.readASCII (f);
+
+    return ok;
+}
+
+bool goGL::Material::readASCII (const char* filename)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f) return false;
+    bool ok = this->readASCII (f);
+    ::fclose (f);
+    return ok;
+}
+

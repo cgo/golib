@@ -71,6 +71,10 @@ void goGUI::VectorInput::connectAll ()
 {
     for (goSize_t i = 0; i < myPrivate->spinButtons.getSize(); ++i)
     {
+        if (myPrivate->connections[i].connected())
+        {
+            myPrivate->connections[i].disconnect();
+        }
         myPrivate->connections[i] = myPrivate->spinButtons[i].signal_value_changed().connect (sigc::mem_fun (*this, &VectorInput::valueChangedSlot));
     }
 }
@@ -79,7 +83,10 @@ void goGUI::VectorInput::disconnectAll ()
 {
     for (goSize_t i = 0; i < myPrivate->spinButtons.getSize(); ++i)
     {
-        myPrivate->connections[i].disconnect();
+        if (myPrivate->connections[i].connected())
+        {
+            myPrivate->connections[i].disconnect();
+        }
     }
 }
 
@@ -145,7 +152,6 @@ void goGUI::VectorInput::getVector (goVectord& v) const
     {
         v[i] = myPrivate->spinButtons[i].get_value ();
     }
-
 }
 
 void goGUI::VectorInput::setVector (const goVectorf& v)
@@ -155,6 +161,7 @@ void goGUI::VectorInput::setVector (const goVectorf& v)
     for (goSize_t i = 0; i < sz; ++i)
     {
         myPrivate->spinButtons[i].set_value (v[i]);
+        myPrivate->spinButtons[i].update ();
     }
     this->connectAll ();
 }
@@ -166,6 +173,7 @@ void goGUI::VectorInput::setVector (const goVectord& v)
     for (goSize_t i = 0; i < sz; ++i)
     {
         myPrivate->spinButtons[i].set_value (v[i]);
+        myPrivate->spinButtons[i].update ();
     }
     this->connectAll ();
 }

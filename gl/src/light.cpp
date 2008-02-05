@@ -49,3 +49,51 @@ bool goGL::Light::operator() () const
 
     return true;
 }
+
+bool goGL::Light::writeASCII (FILE* f) const
+{
+    bool ok = myPosition.writeASCII (f);
+    ok = ok && myAmbient.writeASCII (f);
+    ok = ok && mySpecular.writeASCII (f);
+    ok = ok && myDiffuse.writeASCII (f);
+    goVectorf temp(1);
+    temp[0] = (float)myLightEnum;
+    ok = ok && temp.writeASCII (f);
+    temp[0] = myEnabled ? 1.0f : 0.0f;
+    ok = ok && temp.writeASCII (f);
+
+    return ok;
+}
+
+bool goGL::Light::writeASCII (const char* filename) const
+{
+    FILE* f = ::fopen (filename, "w");
+    if (!f) return false;
+    bool ok = this->writeASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
+bool goGL::Light::readASCII (FILE* f)
+{
+    bool ok = myPosition.readASCII (f);
+    ok = ok && myAmbient.readASCII (f);
+    ok = ok && mySpecular.readASCII (f);
+    ok = ok && myDiffuse.readASCII (f);
+    goVectorf temp(1);
+    ok = ok && temp.readASCII (f);
+    if (ok) myLightEnum = (GLenum)temp[0];
+    ok = ok && temp.readASCII (f);
+    if (ok) myEnabled = (temp[0] == 1.0f) ? true : false;
+
+    return ok;
+}
+
+bool goGL::Light::readASCII (const char* filename)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f) return false;
+    bool ok = this->readASCII (f);
+    ::fclose (f);
+    return ok;
+}

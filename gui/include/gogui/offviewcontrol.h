@@ -14,7 +14,6 @@ namespace goGUI
             OFFViewControl ();
             virtual ~OFFViewControl ();
 
-            void            setOFFView (goGUI::OFFView* view);
             goGUI::OFFView* getOFFView ();
             void            addWidget  (Gtk::Widget& w);
 
@@ -27,12 +26,15 @@ namespace goGUI
             void loadOFF ();
             void align ();
 
+            void onShow ();
+            void onHide ();
+
             void setRotation (const goVectorf& v);
             void getRotation (goVectorf& v) const;
 
             goFloat getRadius () const;
             void    setRadius (goFloat r);
-            sigc::signal<void, goVectorf> angleChangedSignal ();
+            sigc::signal<void, goVectorf>& angleChangedSignal ();
 
         protected:
             OFFViewControlPrivate* myPrivate;

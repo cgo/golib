@@ -18,6 +18,11 @@ namespace goGL
             bool setPosition () const;
             virtual bool operator() () const;
 
+            virtual bool writeASCII (FILE* f) const;
+            virtual bool writeASCII (const char* filename) const;
+            virtual bool readASCII (FILE* f);
+            virtual bool readASCII (const char* filename);
+
             goVectorf myPosition;
             goVectorf myAmbient;
             goVectorf mySpecular;

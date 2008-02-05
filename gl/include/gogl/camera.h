@@ -20,6 +20,14 @@ namespace goGL
             bool setViewingTransformation () const;
             virtual bool operator() () const;
 
+            goFloat viewPortWidth () const;
+            goFloat viewPortHeight () const;
+
+            virtual bool writeASCII (FILE* f) const;
+            virtual bool writeASCII (const char* filename) const;
+            virtual bool readASCII (FILE* f);
+            virtual bool readASCII (const char* filename);
+
             int myWidth;
             int myHeight;
             goFloat myFOVAngle;

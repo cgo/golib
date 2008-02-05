@@ -57,3 +57,80 @@ bool goGL::Camera::operator() () const
     bool ok = this->setProjection ();
     return ok && this->setViewingTransformation ();
 }
+
+/** 
+ * @brief Calculate the viewport width in scene coordinates.
+ * 
+ * @return Width.
+ */
+goFloat goGL::Camera::viewPortWidth () const
+{
+    return 2.0f * myNearClip * ::tan (myFOVAngle * 0.5f);
+}
+
+/** 
+ * @brief Calculate the viewport height in scene coordinates.
+ * 
+ * @return Height.
+ */
+goFloat goGL::Camera::viewPortHeight () const
+{
+    return this->viewPortWidth() / myXYAspect;
+}
+
+bool goGL::Camera::writeASCII (FILE* f) const
+{
+    goVectorf temp (6);
+    temp[0] = myWidth;
+    temp[1] = myHeight;
+    temp[2] = myFOVAngle;
+    temp[3] = myXYAspect;
+    temp[4] = myNearClip;
+    temp[5] = myFarClip;
+    
+    bool ok = temp.writeASCII (f);
+    ok = ok && myPosition.writeASCII (f);
+    ok = ok && myLookat.writeASCII (f);
+    ok = ok && myUp.writeASCII (f);
+
+    return ok;
+
+}
+
+bool goGL::Camera::writeASCII (const char* filename) const
+{
+    FILE* f = ::fopen (filename, "w");
+    if (!f) return false;
+    bool ok = this->writeASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
+bool goGL::Camera::readASCII (FILE* f)
+{
+    goVectorf temp (6);
+    bool ok = temp.readASCII (f);
+    if (ok && temp.getSize() == 6)
+    {
+        myWidth = (int)temp[0];
+        myHeight = (int)temp[1];
+        myFOVAngle = temp[2];
+        myXYAspect = temp[3];
+        myNearClip = temp[4];
+        myFarClip = temp[5];
+    }
+    ok = ok && myPosition.readASCII (f);
+    ok = ok && myLookat.readASCII (f);
+    ok = ok && myUp.readASCII (f);
+
+    return ok;
+}
+
+bool goGL::Camera::readASCII (const char* filename)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f) return false;
+    bool ok = this->readASCII (f);
+    ::fclose (f);
+    return ok;
+}

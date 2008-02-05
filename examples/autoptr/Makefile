@@ -7,7 +7,7 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
 
 LD		= g++
-LDARGS		=  
+LDARGS		= $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 

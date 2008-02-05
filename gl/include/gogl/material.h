@@ -17,6 +17,11 @@ namespace goGL
 
             virtual bool operator() () const;
 
+            bool writeASCII (FILE* f) const;
+            bool writeASCII (const char* filename) const;
+            bool readASCII (FILE* f);
+            bool readASCII (const char* filename);
+
             goVectorf myAmbient;
             goVectorf mySpecular;
             goVectorf myDiffuse;

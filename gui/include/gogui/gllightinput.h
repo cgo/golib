@@ -3,6 +3,9 @@
 
 #include <gogui/multivectorinput.h>
 #include <gogl/light.h>
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 namespace goGUI
 {
@@ -14,6 +17,9 @@ namespace goGUI
             GLLightInput ();
             virtual ~GLLightInput ();
             
+//            void setLight (goAutoPtr<goGL::Light> l);
+//            goAutoPtr<goGL::Light> getLight ();
+
             void set (const goGL::Light& light);
             void get (goGL::Light& light);
             void inputChangedSlotLight ();

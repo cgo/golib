@@ -18,7 +18,8 @@ namespace goGUI
                   radius (),
                   vbox (),
                   tips (),
-                  view (0),
+                  view (),
+                  viewWindow (),
                   viewConnection ()
             {
                 this->radius.set_range (0.0, 10000.0);
@@ -41,7 +42,8 @@ namespace goGUI
             Gtk::VBox   vbox;
             Gtk::Tooltips tips;
 
-            goGUI::OFFView* view;
+            goGUI::OFFView view;
+            Gtk::Window viewWindow;
             sigc::signal<void, goVectorf> angle_changed;
 
             sigc::connection viewConnection;
@@ -52,9 +54,18 @@ goGUI::OFFViewControl::OFFViewControl ()
     : goGUI::Control ("OFFView"), myPrivate (0)
 {
     myPrivate = new goGUI::OFFViewControlPrivate;
-    
-    myPrivate->tips.enable ();
+   
+    {
+        myPrivate->viewWindow.set_title ("OFF View");
+        myPrivate->viewWindow.add (myPrivate->view);
+        myPrivate->viewWindow.show_all ();
 
+        this->signal_hide().connect (sigc::mem_fun (*this, &OFFViewControl::onHide));
+        this->signal_show().connect (sigc::mem_fun (*this, &OFFViewControl::onShow));
+        myPrivate->viewConnection = myPrivate->view.signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
+    }
+
+    myPrivate->tips.enable ();
     {
         Gtk::HBox* labelBox = Gtk::manage (new Gtk::HBox);
         labelBox->set_spacing (10);
@@ -97,49 +108,45 @@ goGUI::OFFViewControl::~OFFViewControl ()
     }
 }
 
-void goGUI::OFFViewControl::setOFFView (goGUI::OFFView* view)
-{
-    myPrivate->view = view;
-    myPrivate->viewConnection.disconnect();
-    if (view)
-    {
-        myPrivate->viewConnection = view->signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
-    }
-}
+//void goGUI::OFFViewControl::setOFFView (goGUI::OFFView* view)
+//{
+//    myPrivate->view = view;
+//    myPrivate->viewConnection.disconnect();
+//    if (view)
+//    {
+//        myPrivate->viewConnection = view->signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
+//    }
+//}
 
 void goGUI::OFFViewControl::OFFViewRotated ()
 {
-    if (myPrivate->view)
-    {
-        goVectorf rotation = myPrivate->view->getSphericalPosition ();
-        goString s; 
-        s.resize (1024);
-        sprintf (s.getPtr(), "%.2f", rotation[0]);
-        myPrivate->phi.set_label (s.toCharPtr());
-        sprintf (s.getPtr(), "%.2f", rotation[1]);
-        myPrivate->theta.set_label (s.toCharPtr());
+    goVectorf rotation = myPrivate->view.getSphericalPosition ();
+    goString s; 
+    s.resize (1024);
+    sprintf (s.getPtr(), "%.2f", rotation[0]);
+    myPrivate->phi.set_label (s.toCharPtr());
+    sprintf (s.getPtr(), "%.2f", rotation[1]);
+    myPrivate->theta.set_label (s.toCharPtr());
 
-//        myPrivate->phi.set_value (rotation[0]);
-//        myPrivate->theta.set_value (rotation[1]);
-        myPrivate->radius.set_value (rotation[2]);
-        // myPrivate->view->setRotation (rotation);
-        myPrivate->view->GLWidgetBegin();
-        myPrivate->view->glDraw();
-        myPrivate->view->GLWidgetEnd();
-        myPrivate->angle_changed(rotation);
-    }
+    //        myPrivate->phi.set_value (rotation[0]);
+    //        myPrivate->theta.set_value (rotation[1]);
+    myPrivate->radius.set_value (rotation[2]);
+    // myPrivate->view->setRotation (rotation);
+    myPrivate->view.queue_draw();
+//    myPrivate->view.GLWidgetBegin();
+//    myPrivate->view.glDraw();
+//    myPrivate->view.GLWidgetEnd();
+    // myPrivate->angle_changed(rotation);
 }
 
 void goGUI::OFFViewControl::radiusChanged ()
 {
     goFloat r = myPrivate->radius.get_value();
-    if (myPrivate->view)
-    {
-        myPrivate->view->setRadius (r);
-        myPrivate->view->GLWidgetBegin ();
-        myPrivate->view->glDraw ();
-        myPrivate->view->GLWidgetEnd ();
-    }
+    myPrivate->view.setRadius (r);
+    myPrivate->view.queue_draw ();
+    //myPrivate->view.GLWidgetBegin ();
+    //myPrivate->view.glDraw ();
+    //myPrivate->view.GLWidgetEnd ();
 }
 
 //void goGUI::OFFViewControl::angleChanged ()
@@ -165,11 +172,6 @@ void goGUI::OFFViewControl::addWidget (Gtk::Widget& w)
 
 void goGUI::OFFViewControl::loadOFF ()
 {
-    if (!myPrivate->view)
-    {
-        this->warning ("No view set.");
-        return;
-    }
     goString filename;
     static goString lastFilename;
     if (!goGUI::getFilenameOpen (filename, lastFilename, "Open"))
@@ -180,27 +182,22 @@ void goGUI::OFFViewControl::loadOFF ()
     myPrivate->radius.set_value (1.0f);
     goVectorf r (3);
     r[0] = 0.0; r[1] = 0.0; r[2] = 1.0;
-    myPrivate->view->setSphericalPosition (r);
-    myPrivate->view->load (filename.toCharPtr());
-    myPrivate->view->GLWidgetBegin ();
-    myPrivate->view->glDraw ();
-    myPrivate->view->GLWidgetEnd ();
+    myPrivate->view.setSphericalPosition (r);
+    myPrivate->view.load (filename.toCharPtr());
+    myPrivate->view.queue_draw ();
+    //myPrivate->view.GLWidgetBegin ();
+    //myPrivate->view.glDraw ();
+    //myPrivate->view.GLWidgetEnd ();
 }
 
 void goGUI::OFFViewControl::align ()
 {
-    if (!myPrivate->view)
-    {
-        this->warning ("No view set.");
-        return;
-    }
-    
-    myPrivate->view->align ();
+    myPrivate->view.align ();
 }
 
 goGUI::OFFView* goGUI::OFFViewControl::getOFFView ()
 {
-    return myPrivate->view;
+    return &myPrivate->view;
 }
 
 void goGUI::OFFViewControl::setRotation (const goVectorf& r)
@@ -220,10 +217,7 @@ void goGUI::OFFViewControl::getRotation (goVectorf& r) const
     {
         r.resize (3);
     }
-    if (myPrivate->view)
-    {
-        r = myPrivate->view->getSphericalPosition();
-    }
+    r = myPrivate->view.getSphericalPosition();
 //    r[0] = myPrivate->phi.get_value();
 //    r[1] = myPrivate->theta.get_value();
 //    r[2] = myPrivate->radius.get_value();
@@ -239,7 +233,7 @@ void goGUI::OFFViewControl::setRadius (goFloat r)
     myPrivate->radius.set_value (r);
 }
 
-sigc::signal<void, goVectorf> 
+sigc::signal<void, goVectorf>&
 goGUI::OFFViewControl::angleChangedSignal ()
 {
     return myPrivate->angle_changed;
@@ -247,19 +241,23 @@ goGUI::OFFViewControl::angleChangedSignal ()
 
 void goGUI::OFFViewControl::lightDialog ()
 {
-    if (myPrivate->view)
-    {
-        myPrivate->lightInput.set (myPrivate->view->getLight());
-        myPrivate->lightDialog.show_all ();
-    }
+    myPrivate->lightInput.set (myPrivate->view.getLight());
+    myPrivate->lightDialog.show_all ();
 }
 
 void goGUI::OFFViewControl::lightChangedSlot ()
 {
-    if (myPrivate->view)
-    {
-        goGL::Light light;
-        myPrivate->lightInput.get (light);
-        myPrivate->view->setLight (light);
-    }
+    goGL::Light light;
+    myPrivate->lightInput.get (light);
+    myPrivate->view.setLight (light);
+}
+
+void goGUI::OFFViewControl::onHide ()
+{
+    myPrivate->viewWindow.hide ();
+}
+
+void goGUI::OFFViewControl::onShow ()
+{
+    myPrivate->viewWindow.show ();
 }
