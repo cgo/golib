@@ -1,5 +1,6 @@
 #include <gogl/light.h>
 #include <GL/gl.h>
+#include <godefs.h>
 
 goGL::Light::Light (GLenum light_enum)
     : goObjectBase(),
@@ -7,8 +8,10 @@ goGL::Light::Light (GLenum light_enum)
       myAmbient(4),
       mySpecular(4),
       myDiffuse(4),
-      myLightEnum(light_enum)
+      myLightEnum(light_enum),
+      myEnabled(false)
 {
+    this->setClassID (GO_GL_LIGHT);
     myPosition[0] = 1.0f;
     myPosition[1] = 1.0f;
     myPosition[2] = 1.0f;
@@ -17,6 +20,10 @@ goGL::Light::Light (GLenum light_enum)
     myAmbient[3] = 1.0f;
     mySpecular.fill(1.0f);
     myDiffuse.fill(1.0f);
+    if (myLightEnum == GL_LIGHT0)
+    {
+        myEnabled = true;
+    }
 }
 
 goGL::Light::~Light ()

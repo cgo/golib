@@ -47,6 +47,7 @@ namespace goMath
             virtual void     log (const Element& e1, const Element& e2, Tangent& ret);
             virtual goDouble innerProduct (const Element& e, const Tangent& v1, const Tangent& v2);
             void matrix (const goVector<T>& w, goMatrix<T>& ret);
+            void vector (const goMatrix<T>& ret, goVector<T>& w);
 
         private:
             Element myId;

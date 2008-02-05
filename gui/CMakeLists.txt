@@ -2,6 +2,8 @@ INCLUDE (UsePkgConfig)
 PROJECT             (Gogui)
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
+                             src/scenecontrol.cpp
+                             src/sceneview.cpp
                              src/multivectorinput.cpp
                              src/vectorinput.cpp
                              src/imageview.cpp
@@ -18,7 +20,10 @@ IF (BUILD_GUI_MODULE_OPENGL)
             src/offviewcontrol.cpp          
             src/offview.cpp
             src/glwidget.cpp
-            src/gllightinput.cpp)
+            src/gllightinput.cpp
+            src/globjectinput.cpp
+            src/gldrawableobjectinput.cpp
+            src/glmaterialinput.cpp)
     PKGCONFIG (gtkglext-1.0 GTKGL_INCLUDE_DIR GTKGL_LIB_DIR GTKGL_LDFLAGS GTKGL_CFLAGS)
 ENDIF (BUILD_GUI_MODULE_OPENGL)
 

@@ -45,7 +45,7 @@ class goOFFFile : public goObjectBase
         void getAdjacentFaces (goFixedArray<goList<int> >& ret) const;
        
         void calculateNormals (goMatrixf& normals) const;
-        void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const;
+        void calculateFaceNormals (goMatrixf& face_normals) const;
 
     private:
         goOFFFile (goOFFFile&);

@@ -1,12 +1,14 @@
 #include <gogl/camera.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <godefs.h>
 
 goGL::Camera::Camera (int width, int height, goFloat fov_angle, goFloat xy_aspect, goFloat near_clip, goFloat far_clip) 
     : goObjectBase (),
       myWidth(width), myHeight(height), myFOVAngle(fov_angle), myXYAspect(xy_aspect), myNearClip(near_clip), myFarClip(far_clip),
       myPosition(3), myLookat(3), myUp(3)
 {
+    this->setClassID (GO_GL_CAMERA);
     myPosition[0] = -1.0f;
     myPosition[1] = 0.0f;
     myPosition[2] = 0.0f;

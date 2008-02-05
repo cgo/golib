@@ -3,6 +3,8 @@
 #include <gogl/helper.h>
 #include <gogl/camera.h>
 #include <gogl/light.h>
+#include <gogl/scene.h>
+
 #include <gogui/glwidget.h>
 #include <gogui/helper.h>
 
@@ -35,6 +37,7 @@ namespace goGUI
             OFFViewPrivate () : spherical (3), 
                 camera (100,100),
                 light (GL_LIGHT0),
+                scene (),
                 //    position(3), up(3), focus(3), 
                 so3(), 
                 rotationMatrix (3,3),
@@ -65,6 +68,8 @@ namespace goGUI
             goGL::Camera camera;
 
             goGL::Light light;
+
+            goGL::Scene scene;
 
             //= For rotation calculations.
             goMath::SO3<goDouble> so3;
@@ -129,7 +134,23 @@ void goGUI::OFFView::load (const char* filename)
     // this->myList = glGenLists (1);
     check_gl_error ("glGenLists");
     this->GLWidgetBegin ();
-    this->off.toList (this->myList);
+    // this->off.toList (this->myList);
+
+    goGL::MeshObject* obj = new goGL::MeshObject;
+    {
+        //= Copy vertices and faces to obj
+        goMatrixf& V = obj->getVertices();
+        obj->getFaces() = this->off.getFaces();
+        V.resize (this->off.getVertices().getSize(), 3);
+        for (goSize_t i = 0; i < V.getRows(); ++i)
+        {
+            V.setRow (i, this->off.getVertices()[i]);
+        }
+        obj->init ();
+        //= Add object to scene
+        myPrivate->scene.add (goAutoPtr<goGL::DrawableObject>(obj));
+        //= The scene is rendered (experimentally) later.
+    }
 
     check_gl_error ("1");
 
@@ -236,6 +257,7 @@ void goGUI::OFFView::lighting ()
 void goGUI::OFFView::setLight (const goGL::Light& light)
 {
     myPrivate->light = light;
+    // (*myPrivate->scene.getLight(0)) = light;
     this->GLWidgetBegin ();
     this->lighting ();
     this->glDraw ();
@@ -282,6 +304,8 @@ void goGUI::OFFView::setView (const goVectorf& position, const goVectorf& up, co
     myPrivate->camera.myPosition = position;
     myPrivate->camera.myUp = up;
     myPrivate->camera.myLookat = focus;
+
+    // (*myPrivate->scene.getCamera()) = myPrivate->camera;
 }
 
 void goGUI::OFFView::glDraw ()
@@ -290,7 +314,21 @@ void goGUI::OFFView::glDraw ()
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glFrontFace (GL_CW);
     glDisable (GL_CULL_FACE);
-    
+
+    //= Experimentation with Scene
+//    {
+//        (*myPrivate->scene.getCamera()) = myPrivate->camera;
+//        myPrivate->scene.getCamera()->myWidth  = this->get_width();
+//        myPrivate->scene.getCamera()->myHeight = this->get_height();
+//        
+//        (*myPrivate->scene.getLight(0)) = myPrivate->light;
+//        myPrivate->scene.render ();
+//        glFlush ();
+//        this->swapBuffers ();
+//        myPrivate->signal_changed();
+//        return;
+//    }
+
     const goVectorf& min = this->off.getMin ();
     const goVectorf& max = this->off.getMax ();
     // printf ("max: %f %f %f\n", max[0], max[1], max[2]);
@@ -373,6 +411,9 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
         myPrivate->camera.myUp *= 1.0 / myPrivate->camera.myUp.norm2();
 
         myPrivate->rotationStart = myPrivate->rotationEnd;
+
+        // (*myPrivate->scene.getCamera()) = myPrivate->camera;
+
         myPrivate->signal_rotated();
         return true;
     }
@@ -425,6 +466,7 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
         //this->GLWidgetBegin ();
         //this->glDraw ();
         //this->GLWidgetEnd ();
+        // (*myPrivate->scene.getCamera()) = myPrivate->camera;
         myPrivate->signal_rotated();
 
         myPrivate->rotationStart = myPrivate->rotationEnd;

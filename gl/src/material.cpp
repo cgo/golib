@@ -29,7 +29,7 @@ bool goGL::Material::operator() () const
     glMaterialfv (myFace, GL_DIFFUSE, myDiffuse.getPtr());
     glMaterialfv (myFace, GL_SPECULAR, mySpecular.getPtr());
     glMaterialf (myFace, GL_SHININESS, myShininess);
-    glMaterialfv (myFace, GL_EMSSION, myEmission.getPtr());
+    glMaterialfv (myFace, GL_EMISSION, myEmission.getPtr());
 
     return true;
 }

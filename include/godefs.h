@@ -37,7 +37,9 @@ enum {
     GO_BTREE,
     GO_ROWVECTOR,
     GO_MATLAB,
-    
+    GO_GL_LIGHT,
+    GO_GL_CAMERA,
+
     GO_CLASSID_USER = 0x00010000
 };
 

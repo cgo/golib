@@ -12,15 +12,15 @@ namespace goGUI
             {
                 for (goSize_t i = 0; i < vectorInputs.getSize(); ++i)
                 {
-                    vectorInputs[i] = new goGUI::VectorInput (0, ns[i], 0);
+                    vectorInputs[i] = Gtk::manage (new goGUI::VectorInput (0, ns[i], 0));
                 }
             };
             ~MultiVectorInputPrivate ()
             {
-                for (goSize_t i = 0; i < vectorInputs.getSize(); ++i)
-                {
-                    delete vectorInputs[i];
-                }
+                //for (goSize_t i = 0; i < vectorInputs.getSize(); ++i)
+                //{
+                    // delete vectorInputs[i];
+                //}
                 vectorInputs.setSize (0);
             };
 

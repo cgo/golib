@@ -100,14 +100,14 @@ void goMath::SO3<T>::log (const Element& e1, const Element& e2, Tangent& ret)
     //=
     //= Handle special cases where theta close to 0 or pi:
     //=
-    if (fabs(theta) < 1e-1)
+    if (fabs(theta) < 1e-2)
     {
         //= Taylor approximation
         Sr = (R - R.getTranspose()) * (0.5 * (1.0 + theta*theta / 6.0));
         tangentVector (Sr, ret);
         return;
     }
-    else if (fabs(M_PI - theta) < 1e-1)
+    else if (fabs(M_PI - theta) < 1e-2)
     {
         //=
         //= From Pennec's notes on rotations:
@@ -148,7 +148,8 @@ void goMath::SO3<T>::log (const Element& e1, const Element& e2, Tangent& ret)
         ret.resize (3);
         for (goIndex_t i = 0; i < 3; ++i)
         {
-            T temp = eps[i] * ::sqrt (1.0 + rho * (R(i,i) - 1.0));
+            T temp = eps[i] * ::sqrt (goMath::max<goDouble>(1.0 + rho * (R(i,i) - 1.0), 0.0));  //= Use max(,) to prevent numerical error to produce 
+                                                                                                //= values < 0 which lead to NaN.
             ret[i] = temp * theta;
         }
         return;
@@ -167,6 +168,12 @@ template <class T>
 void goMath::SO3<T>::matrix (const goVector<T>& w, goMatrix<T>& ret)
 {
     this->exp (myId, w, ret);
+}
+
+template <class T>
+void goMath::SO3<T>::vector (const goMatrix<T>& r, goVector<T>& ret)
+{
+    this->log (myId, r, ret);
 }
 
 template class goMath::SO3<goFloat>;

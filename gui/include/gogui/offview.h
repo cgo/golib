@@ -3,6 +3,7 @@
 
 #include <gogl/offfile.h>
 #include <gogl/light.h>
+#include <gogl/meshobject.h>
 #include <gogui/glwidget.h>
 
 namespace goGUI
@@ -30,6 +31,7 @@ class OFFView : public goGUI::GLWidget
         const goVectorf& getSphericalPosition () const;
 
         goGL::OFFFile& getOFFFile ();
+        // goGL::MeshObject& getMesh ();
 
         sigc::signal<void> signalChanged();
         sigc::signal<void> signalChangedFinal();

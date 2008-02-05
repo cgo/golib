@@ -100,10 +100,10 @@ goGUI::VectorInput::~VectorInput ()
     }
 }
 
-sigc::signal<void, goVectorf>& goGUI::VectorInput::signalChangedVector ()
-{
-    return myPrivate->signalChangedVector;
-}
+//sigc::signal<void, goVectorf>& goGUI::VectorInput::signalChangedVector ()
+//{
+//    return myPrivate->signalChangedVector;
+//}
 
 sigc::signal<void>& goGUI::VectorInput::signalChanged ()
 {

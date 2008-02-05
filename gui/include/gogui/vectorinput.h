@@ -25,7 +25,7 @@ namespace goGUI
             void connectAll ();
             void disconnectAll ();
 
-            sigc::signal<void, goVectorf>& signalChangedVector ();
+            // sigc::signal<void, goVectorf>& signalChangedVector ();
             sigc::signal<void>& signalChanged ();
 
         private:

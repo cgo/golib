@@ -23,6 +23,8 @@ namespace goGL
             goVectorf mySpecular;
             goVectorf myDiffuse;
             GLenum    myLightEnum;
+
+            bool      myEnabled;
     };
 };
 

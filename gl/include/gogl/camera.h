@@ -13,7 +13,7 @@ namespace goGL
     class Camera : public goObjectBase
     {
         public:
-            Camera (int width, int height, goFloat fov_angle=30.0f, goFloat xy_aspect=-1.0f, goFloat near_clip=0.1f, goFloat far_clip=1000.0f);
+            Camera (int width = 640, int height = 480, goFloat fov_angle=30.0f, goFloat xy_aspect=-1.0f, goFloat near_clip=0.1f, goFloat far_clip=1000.0f);
             virtual ~Camera ();
 
             bool setProjection () const;
