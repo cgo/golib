@@ -26,6 +26,9 @@
 #ifndef GOCUBICSPLINE_H
 # include <gocubicspline.h>
 #endif
+#ifndef GOCUBICSPLINEND_H
+# include <gocubicsplinend.h>
+#endif
 #ifndef GORESAMPLE_H
 # include <goresample.h>
 #endif

@@ -17,6 +17,7 @@ SET                 (SOURCES
 IF (BUILD_GUI_MODULE_OPENGL)
     ADD_DEFINITIONS (-DGOGUI_MAKE_OPENGL)
     SET (SOURCES ${SOURCES}
+            src/glanimation.cpp
             src/offviewcontrol.cpp          
             src/offview.cpp
             src/glwidget.cpp

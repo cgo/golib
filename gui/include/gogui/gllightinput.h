@@ -26,6 +26,10 @@ namespace goGUI
             sigc::signal<void, goGL::Light>& signalChangedLight ();
 
         private:
+            GLLightInput (const GLLightInput&);
+            GLLightInput& operator= (const GLLightInput&);
+
+        private:
             GLLightInputPrivate* myPrivate;
     };
 };

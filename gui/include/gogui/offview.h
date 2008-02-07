@@ -40,6 +40,10 @@ class OFFView : public goGUI::GLWidget
         bool buttonSlot (GdkEventButton* e);
 
     private:
+        OFFView (const OFFView&);
+        OFFView& operator= (const OFFView&);
+
+    private:
         goGL::OFFFile         off;
         int                   myList;
 

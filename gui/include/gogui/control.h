@@ -29,6 +29,10 @@ class Control : public Gtk::Frame
         SigC::Signal1<void,const goString&> signal_print;
 
     private:
+        Control (const Control&);
+        Control& operator= (const Control&);
+
+    private:
         ControlPrivate* myPrivate;
 };
 };

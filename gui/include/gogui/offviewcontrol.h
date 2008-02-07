@@ -36,6 +36,10 @@ namespace goGUI
             void    setRadius (goFloat r);
             sigc::signal<void, goVectorf>& angleChangedSignal ();
 
+        private:
+            OFFViewControl (const OFFViewControl&);
+            OFFViewControl& operator= (const OFFViewControl&);
+
         protected:
             OFFViewControlPrivate* myPrivate;
     };

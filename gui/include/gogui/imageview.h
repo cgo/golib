@@ -28,6 +28,10 @@ namespace goGUI
             virtual bool on_expose_event (GdkEventExpose* event);
 
         private:
+            ImageView (const ImageView&);
+            ImageView& operator= (const ImageView&);
+
+        private:
             ImageViewPrivate* myPrivate;
     };
 };

@@ -11,7 +11,7 @@ int main ()
     p1[0] = 2; p1[1] = 1;
     p2[0] = 3; p2[1] = 0;
 
-    goMath::CubicSpline<goFloat> spline (pm1, p0, p1, p2);
+    goMath::CubicSplineND<goFloat> spline (pm1, p0, p1, p2);
 
     const goSize_t N = 100;
     goMatrixf M (N, 2);

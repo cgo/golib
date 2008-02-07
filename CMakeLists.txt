@@ -43,6 +43,7 @@ SET                 (SOURCES
  src/math/planelinecut.cpp
  src/math/barycentric.cpp
  src/math/gocubicspline.cpp
+ src/math/gocubicsplinend.cpp
  src/math/viewsphere.cpp
  src/math/pairwisedistances.cpp
  src/math/gosvd.cpp

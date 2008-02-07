@@ -21,6 +21,10 @@ namespace goGUI
             sigc::signal<void>& signalChanged ();
 
         private:
+            MultiVectorInput (const MultiVectorInput&);
+            MultiVectorInput& operator= (const MultiVectorInput&);
+
+        private:
             MultiVectorInputPrivate* myPrivate;
     };
 };

@@ -51,6 +51,8 @@ bool goGL::OFFFile::read (const char* filename)
 
     this->calculateFaceNormals (myPrivate->normals);
     this->calculateNormals (myPrivate->vertexNormals);
+
+    return true;
 }
 
 static inline void normal (const goMatrixf& normals, goSize_t i)
