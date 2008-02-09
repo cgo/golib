@@ -8,13 +8,15 @@ namespace goGUI
     {
         public:
             GLDrawableObjectInputPrivate () 
-                : materialInput (), material (), signalChanged (), object (0) {};
+                : materialInput (), material (), 
+                callerChanged (), object (0) {};
             ~GLDrawableObjectInputPrivate () {};
 
             goGUI::GLMaterialInput materialInput;
             goGL::Material         material;
 
-            sigc::signal<void> signalChanged;
+            // sigc::signal<void> signalChanged;
+            goCaller0<int> callerChanged;
 
             goAutoPtr<goGL::DrawableObject> object;
     };
@@ -27,8 +29,10 @@ goGUI::GLDrawableObjectInput::GLDrawableObjectInput ()
     myPrivate = new GLDrawableObjectInputPrivate;
     this->getBox()->pack_start (myPrivate->materialInput);
     myPrivate->materialInput.set (myPrivate->material);
-    this->signalObjectInputChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
-    myPrivate->materialInput.signalChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    // this->signalObjectInputChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    this->callerObjectInputChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    // myPrivate->materialInput.signalChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    myPrivate->materialInput.callerChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
 }
 
 goGUI::GLDrawableObjectInput::~GLDrawableObjectInput ()
@@ -103,12 +107,12 @@ void goGUI::GLDrawableObjectInput::getDrawable (goGL::DrawableObject& o)
  *
  * Updates the object and emits \c signalDrawableObjectInputChanged().
  */
-void goGUI::GLDrawableObjectInput::inputChangedSlotDrawableObject ()
+int goGUI::GLDrawableObjectInput::inputChangedSlotDrawableObject ()
 {
     if (!myPrivate->object.isNull())
         this->getDrawable (*myPrivate->object);
 
-    myPrivate->signalChanged ();
+    myPrivate->callerChanged ();
 }
 
 /** 
@@ -116,7 +120,13 @@ void goGUI::GLDrawableObjectInput::inputChangedSlotDrawableObject ()
  * 
  * @return Signal.
  */
-sigc::signal<void>& goGUI::GLDrawableObjectInput::signalDrawableObjectInputChanged ()
+goCaller0<int>& goGUI::GLDrawableObjectInput::callerDrawableObjectInputChanged ()
 {
-    return myPrivate->signalChanged;
+    return myPrivate->callerChanged;
 }
+
+//sigc::signal<void>& goGUI::GLDrawableObjectInput::signalDrawableObjectInputChanged ()
+//{
+//    return myPrivate->signalChanged;
+//}
+

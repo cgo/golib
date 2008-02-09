@@ -434,17 +434,20 @@ bool goGUI::SceneView::motionSlot (GdkEventMotion* e)
         
         if (!obj.isNull())
         {
-            goFloat w = cam.viewPortWidth ();
-            goFloat h = cam.viewPortHeight ();
-            goFloat delta_x = screen_trans[0] / (float)cam.myWidth * w;
-            goFloat delta_y = screen_trans[1] / (float)cam.myHeight * h;
+            goFloat w = cam.viewPortWidth (obj->getTranslation());
+            goFloat h = cam.viewPortHeight (obj->getTranslation());
+            goFloat delta_x = -screen_trans[0] / (float)cam.myWidth * w;
+            goFloat delta_y = -screen_trans[1] / (float)cam.myHeight * h;
 
-            goVectorf n = cam.myLookat - cam.myPosition;
-            n /= n.norm2 ();
-            goFloat l2 = n * (obj->getTranslation() - cam.myPosition);
+            screen_trans[0] = 0.5 * delta_x;
+            screen_trans[1] = 0.5 * delta_y;
+
+            //goVectorf n = cam.myLookat - cam.myPosition;
+            //n /= n.norm2 ();
+            //goFloat l2 = n * (obj->getTranslation() - cam.myPosition);
             
-            screen_trans[0] = delta_x * l2 / cam.myNearClip;
-            screen_trans[1] = delta_y * l2 / cam.myNearClip;
+            //screen_trans[0] = delta_x * l2 / cam.myNearClip;
+            //screen_trans[1] = delta_y * l2 / cam.myNearClip;
         }
 
         // screen_trans *= 0.01;
@@ -475,16 +478,18 @@ bool goGUI::SceneView::motionSlot (GdkEventMotion* e)
         if (!obj.isNull())
         {
             // goFloat w = cam.viewPortWidth ();
-            goFloat h = cam.viewPortHeight ();
+            goFloat h = cam.viewPortHeight (obj->getTranslation());
             // goFloat delta_x = screen_trans[0] / (float)cam.myWidth * w;
-            goFloat delta_y = screen_trans[2] / (float)cam.myHeight * h;
+            goFloat delta_y = -screen_trans[2] / (float)cam.myHeight * h;
 
-            goVectorf n = cam.myLookat - cam.myPosition;
-            n /= n.norm2 ();
-            goFloat l2 = n * (obj->getTranslation() - cam.myPosition);
+            screen_trans[2] = delta_y; 
+
+            //goVectorf n = cam.myLookat - cam.myPosition;
+            //n /= n.norm2 ();
+            //goFloat l2 = n * (obj->getTranslation() - cam.myPosition);
             
-            // screen_trans[0] = delta_x * l2 / cam.myNearClip;
-            screen_trans[2] = delta_y * l2 / cam.myNearClip;
+            //// screen_trans[0] = delta_x * l2 / cam.myNearClip;
+            //screen_trans[2] = delta_y * l2 / cam.myNearClip;
         }
 
         // screen_trans *= 0.01;

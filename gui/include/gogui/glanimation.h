@@ -6,6 +6,9 @@
 #ifndef GOAUTOPTR_H
 # include <goautoptr.h>
 #endif
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 namespace goGUI
 {
@@ -22,6 +25,10 @@ namespace goGUI
             goAutoPtr<goGL::Waypoint> getWaypoint ();
 
             void addWaypoint (const goGL::Waypoint& wp);
+            void removeWaypoint (int wp_index);
+            void prependWaypoint (const goGL::Waypoint& wp, int wp_index);
+            void appendWaypoint (const goGL::Waypoint& wp, int wp_index);
+
             goAutoPtr<goGL::Waypoint> getSelectedWaypoint ();
 
             //= Slots
@@ -32,8 +39,11 @@ namespace goGUI
 
             int selectedWaypoint ();
 
-            sigc::signal<void>&     signalPositionChanged ();
-            sigc::signal<void>&     signalWaypointSelected ();
+            //sigc::signal<void>&     signalPositionChanged ();
+            //sigc::signal<void>&     signalWaypointSelected ();
+
+            goCaller0<int>&         waypointSelectedCaller ();
+            goCaller0<int>&         positionChangedCaller ();
 
         private:
             GLAnimation (const GLAnimation& o);

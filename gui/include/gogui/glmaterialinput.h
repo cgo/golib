@@ -16,8 +16,9 @@ namespace goGUI
             
             void set (const goGL::Material& m);
             void get (goGL::Material& m);
-            void inputChangedSlotMaterial ();
-            sigc::signal<void>& signalChangedMaterial ();
+            int inputChangedSlotMaterial ();
+            // sigc::signal<void>& signalChangedMaterial ();
+            goCaller0<int>& callerChangedMaterial ();
 
         private:
             GLMaterialInput (const GLMaterialInput&);

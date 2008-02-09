@@ -8,7 +8,8 @@ namespace goGUI
             MultiVectorInputPrivate (const int* ns, int n) 
                 : vectorInputs (n),
                   box (0),
-                  signalChanged ()
+                  changedCaller ()
+                  //signalChanged ()
             {
                 for (goSize_t i = 0; i < vectorInputs.getSize(); ++i)
                 {
@@ -28,7 +29,8 @@ namespace goGUI
 
             Gtk::Box* box;
 
-            sigc::signal<void> signalChanged;
+            // sigc::signal<void> signalChanged;
+            goCaller0<int> changedCaller;
     };
 };
 
@@ -70,12 +72,18 @@ goGUI::VectorInput& goGUI::MultiVectorInput::getInput (int index)
     }
 }
 
-sigc::signal<void>& goGUI::MultiVectorInput::signalChanged ()
+//sigc::signal<void>& goGUI::MultiVectorInput::signalChanged ()
+//{
+//    return myPrivate->signalChanged;
+//}
+
+goCaller0<int>& goGUI::MultiVectorInput::callerChanged ()
 {
-    return myPrivate->signalChanged;
+    return myPrivate->changedCaller;
 }
 
 void goGUI::MultiVectorInput::inputChangedSlot ()
 {
-    myPrivate->signalChanged ();
+    // myPrivate->signalChanged ();
+    myPrivate->changedCaller ();
 }

@@ -89,7 +89,9 @@ goGUI::OFFViewControl::OFFViewControl ()
 
     myPrivate->lightDialog.get_vbox()->pack_start (myPrivate->lightInput, Gtk::PACK_SHRINK);
     myPrivate->lightDialog.hide ();
-    myPrivate->lightInput.signalChanged().connect (sigc::mem_fun (*this, &OFFViewControl::lightChangedSlot));
+
+    // myPrivate->lightInput.signalChanged().connect (sigc::mem_fun (*this, &OFFViewControl::lightChangedSlot));
+    myPrivate->lightInput.callerChanged().connect (goMemberFunction<OFFViewControl,int> (this, &OFFViewControl::lightChangedSlot));
 
     //myPrivate->phi.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
     //myPrivate->theta.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
@@ -245,11 +247,12 @@ void goGUI::OFFViewControl::lightDialog ()
     myPrivate->lightDialog.show_all ();
 }
 
-void goGUI::OFFViewControl::lightChangedSlot ()
+int goGUI::OFFViewControl::lightChangedSlot ()
 {
     goGL::Light light;
     myPrivate->lightInput.get (light);
     myPrivate->view.setLight (light);
+    return 0;
 }
 
 void goGUI::OFFViewControl::onHide ()

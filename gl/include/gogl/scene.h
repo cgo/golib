@@ -19,6 +19,7 @@ namespace goGL
 
             bool render ();
             bool add (goAutoPtr<goGL::DrawableObject> o);
+            bool removeObject (int i);
 
             virtual bool writeASCII (FILE* f) const;
             virtual bool readASCII (FILE* f);

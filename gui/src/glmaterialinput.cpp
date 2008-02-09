@@ -5,11 +5,14 @@ namespace goGUI
     class GLMaterialInputPrivate
     {
         public:
-            GLMaterialInputPrivate () : material (), signalChangedMaterial () {};
+            GLMaterialInputPrivate () 
+                : material (), 
+                  callerChangedMaterial () {};
             ~GLMaterialInputPrivate () {};
 
             goGL::Material material;
-            sigc::signal<void> signalChangedMaterial;
+            // sigc::signal<void> signalChangedMaterial;
+            goCaller0<int> callerChangedMaterial;
     };
 
     static int GLMaterialInputV_[] = {4, 4, 4, 1, 4};
@@ -66,13 +69,17 @@ void goGUI::GLMaterialInput::get (goGL::Material& m)
     this->getInput (4).getVector (m.myEmission);
 }
 
-void goGUI::GLMaterialInput::inputChangedSlotMaterial ()
+int goGUI::GLMaterialInput::inputChangedSlotMaterial ()
 {
     this->get (myPrivate->material);
-    myPrivate->signalChangedMaterial ();
+    return myPrivate->callerChangedMaterial ();
 }
 
-sigc::signal<void>& goGUI::GLMaterialInput::signalChangedMaterial ()
+goCaller0<int>& goGUI::GLMaterialInput::callerChangedMaterial ()
 {
-    return myPrivate->signalChangedMaterial;
+    return myPrivate->callerChangedMaterial;
 }
+//sigc::signal<void>& goGUI::GLMaterialInput::signalChangedMaterial ()
+//{
+//    return myPrivate->signalChangedMaterial;
+//}

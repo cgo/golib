@@ -21,12 +21,13 @@ namespace goGUI
 
             virtual void updateInput ();
 
-            sigc::signal<void>& signalDrawableObjectInputChanged ();
+            // sigc::signal<void>& signalDrawableObjectInputChanged ();
+            goCaller0<int>& callerDrawableObjectInputChanged ();
 
         protected:
             void setDrawable (const goGL::DrawableObject& o);
             void getDrawable (goGL::DrawableObject& o);
-            void inputChangedSlotDrawableObject ();
+            int inputChangedSlotDrawableObject ();
 
         private:
             GLDrawableObjectInput (const GLDrawableObjectInput&);

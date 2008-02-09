@@ -5,6 +5,9 @@
 #include <gtkmm.h>
 
 #include <gogl/scene.h>
+#include <gogl/helper.h>
+#include <gogl/textureimage.h>
+#include <gofileio.h>
 
 namespace goGUI
 {
@@ -19,10 +22,19 @@ namespace goGUI
                   viewWindow (),
                   objectPropButton ("Object Properties"),
                   loadOFFButton ("Load OFF"),
+                  deleteObjectButton ("Delete Object"),
+                  loadImageButton ("Load BG Image"),
                   saveSceneButton ("Save Scene"),
                   loadSceneButton ("Load Scene"),
+                  waypointButtonsBox (),
                   addWaypointButton ("Add Waypoint"),
+                  removeWaypointButton ("Remove WP"),
+                  prependWaypointButton ("Prepend WP"),
+                  appendWaypointButton ("Append WP"),
                   editWaypointButton ("Edit Selected Waypoint"),
+                  createMovieButton ("Create Movie"),
+                  movieStepsButton (),
+                  tooltips (),
                   editWaypointConnection1 (),
                   editWaypointConnection2 (),
                   objectInput (),
@@ -30,6 +42,25 @@ namespace goGUI
                   glanimation ()
             {
                 scene.set (new goGL::Scene);
+
+                movieStepsButton.set_digits (0);
+                movieStepsButton.set_range (0, std::numeric_limits<int>::max ());
+                movieStepsButton.set_increments (1, 10);
+                movieStepsButton.set_value (25);
+
+                tooltips.enable ();
+                tooltips.set_tip (objectPropButton, "Translation, Rotation, Scale, Material of active object.");
+                tooltips.set_tip (loadOFFButton, "Load an object in OFF file format.");
+                tooltips.set_tip (loadImageButton, "Load an image and create a plane object.");
+                tooltips.set_tip (saveSceneButton, "Save scene (OFF file names, transformations, materials.\nNo lights and images yet.");
+                tooltips.set_tip (loadSceneButton, "Load a saved scene.");
+                tooltips.set_tip (addWaypointButton, "Add a new waypoint to the animation.");
+                tooltips.set_tip (removeWaypointButton, "Remove the current waypoint from the animation.");
+                tooltips.set_tip (prependWaypointButton, "Prepend new waypoint before current waypoint.");
+                tooltips.set_tip (appendWaypointButton, "Append new waypoint after current waypoint.");
+                tooltips.set_tip (editWaypointButton, "Edit the current waypoint.");
+                tooltips.set_tip (createMovieButton, "Create image sequence from current animation.");
+                tooltips.set_tip (movieStepsButton, "Number of images to save for the movie.");
             };
             ~SceneControlPrivate () {};
 
@@ -54,12 +85,24 @@ namespace goGUI
 
             Gtk::Button objectPropButton;
             Gtk::Button loadOFFButton;
+            Gtk::Button deleteObjectButton;
+            Gtk::Button loadImageButton;
             Gtk::Button saveSceneButton;
             Gtk::Button loadSceneButton;
 
             //= For animation
+            Gtk::VBox   waypointButtonsBox;
             Gtk::Button addWaypointButton;
+            Gtk::Button removeWaypointButton;
+            Gtk::Button prependWaypointButton;
+            Gtk::Button appendWaypointButton;
             Gtk::CheckButton editWaypointButton;
+
+            Gtk::Button createMovieButton;
+            Gtk::SpinButton movieStepsButton;
+
+            Gtk::Tooltips tooltips;
+
             sigc::connection editWaypointConnection1;
             sigc::connection editWaypointConnection2;
 
@@ -97,6 +140,8 @@ goGUI::SceneControl::SceneControl ()
         Gtk::HBox* hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->objectPropButton, Gtk::PACK_SHRINK);
         hbox->pack_start (myPrivate->loadOFFButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->deleteObjectButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->loadImageButton, Gtk::PACK_SHRINK);
         vbox->pack_start (*hbox);
 
         hbox = Gtk::manage (new Gtk::HBox);
@@ -106,8 +151,25 @@ goGUI::SceneControl::SceneControl ()
 
         hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->addWaypointButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->removeWaypointButton, Gtk::PACK_SHRINK);
+        myPrivate->waypointButtonsBox.pack_start (*hbox, Gtk::PACK_SHRINK);
+        // vbox->pack_start (*hbox);
+        hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->prependWaypointButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->appendWaypointButton, Gtk::PACK_SHRINK);
+        myPrivate->waypointButtonsBox.pack_start (*hbox, Gtk::PACK_SHRINK);
+
+        hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->createMovieButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->movieStepsButton, Gtk::PACK_SHRINK);
+        myPrivate->waypointButtonsBox.pack_start (*hbox, Gtk::PACK_SHRINK);
+
+        vbox->pack_start (myPrivate->waypointButtonsBox, Gtk::PACK_SHRINK);
+
+        hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->editWaypointButton, Gtk::PACK_SHRINK);
-        vbox->pack_start (*hbox);
+        vbox->pack_start (*hbox, Gtk::PACK_SHRINK);
+
 
         myHBox->pack_start (*vbox, Gtk::PACK_SHRINK);
     }
@@ -118,7 +180,10 @@ goGUI::SceneControl::SceneControl ()
     }
 
     {
-        myPrivate->glanimation.signalWaypointSelected().connect (sigc::mem_fun (*this, &SceneControl::transformToSelectedWaypoint));
+        //= THIS CRASHES ONLY AT UNI -- SOMETHING WRONG WITH GTKMM/SIGC ????
+        // myPrivate->glanimation.signalWaypointSelected().connect (sigc::mem_fun (*this, &SceneControl::transformToSelectedWaypoint));
+        //= Workaround for the crash mentioned above.
+        myPrivate->glanimation.waypointSelectedCaller().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::transformToSelectedWaypoint));
         // myPrivate->view.signalChanged().connect (sigc::mem_fun (*this, &SceneControl::editWaypoint));
     }
 
@@ -128,15 +193,26 @@ goGUI::SceneControl::SceneControl ()
     }
     {
         myPrivate->objectPropButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::objectProperties));
-        myPrivate->objectInput.signalDrawableObjectInputChanged().connect (sigc::mem_fun (*this, &SceneControl::objectPropChanged));
+        // myPrivate->objectInput.signalDrawableObjectInputChanged().connect (sigc::mem_fun (*this, &SceneControl::objectPropChanged));
+        myPrivate->objectInput.callerDrawableObjectInputChanged().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::objectPropChanged));
         myPrivate->loadOFFButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadOFF));
+        myPrivate->deleteObjectButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::deleteObject));
+        myPrivate->loadImageButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadImage));
 
         myPrivate->saveSceneButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::saveScene));
         myPrivate->loadSceneButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadScene));
         myPrivate->addWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::addWaypoint));
+        myPrivate->removeWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::removeWaypoint));
+        myPrivate->prependWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::prependWaypoint));
+        myPrivate->appendWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::appendWaypoint));
+
+        myPrivate->createMovieButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::createMovie));
+
         myPrivate->editWaypointButton.signal_toggled().connect (sigc::mem_fun (*this, &SceneControl::editWaypointToggled));
 
-        myPrivate->glanimation.signalPositionChanged().connect (sigc::mem_fun (*this, &SceneControl::animationPositionChanged));
+        //= BUG IN UNIVERSITY COMPUTER'S SIGC/GTKMM???
+        // myPrivate->glanimation.signalPositionChanged().connect (sigc::mem_fun (*this, &SceneControl::animationPositionChanged));
+        myPrivate->glanimation.positionChangedCaller().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::animationPositionChanged));
     }
 
     myPrivate->viewWindow.add (myPrivate->view);
@@ -158,6 +234,8 @@ goGUI::SceneControl::SceneControl ()
 
     this->add (*myVBox);
     this->show_all ();
+
+
 }
 
 void goGUI::SceneControl::objectProperties ()
@@ -166,10 +244,10 @@ void goGUI::SceneControl::objectProperties ()
     myPrivate->objectInputWindow.show ();
 }
 
-void goGUI::SceneControl::objectPropChanged ()
+int goGUI::SceneControl::objectPropChanged ()
 {
     myPrivate->view.queue_draw();
-    return;
+    return 0;
 }
 
 goGUI::SceneView& goGUI::SceneControl::getSceneView ()
@@ -219,6 +297,54 @@ void goGUI::SceneControl::loadOFF ()
     myPrivate->view.GLWidgetBegin();
     myPrivate->view.glDraw();
     myPrivate->view.GLWidgetEnd();
+}
+
+void goGUI::SceneControl::deleteObject ()
+{
+    //= set current object's properties
+    int activeObject = myPrivate->objectBox.get_active_row_number() - 1;
+    if (activeObject < 0)
+        return;
+
+    myPrivate->scene->removeObject (activeObject);
+    myPrivate->objectInput.updateInput ();
+    myPrivate->updateBoxes ();
+    myPrivate->view.GLWidgetBegin ();
+    myPrivate->view.glDraw ();
+    myPrivate->view.swapBuffers ();
+    myPrivate->view.GLWidgetEnd ();
+}
+
+void goGUI::SceneControl::loadImage ()
+{
+    static goString path = "./";
+    goString fname;
+    if (!goGUI::getFilenameOpen (fname, path, "Scene Control: Open BG Image"))
+    {
+        return;
+    }
+    fname.getPathName (path);
+
+    goSignal3D<void> image;
+    try
+    {
+        goFileIO::readImage (fname.toCharPtr(), &image, false);
+    }
+    catch (goFileIOException ex)
+    {
+        this->warning ("Could not load image.");
+        return;
+    }
+
+    myPrivate->view.GLWidgetBegin ();
+
+    goGL::TextureImage* img = new goGL::TextureImage;
+    img->setImage (image);
+    goAutoPtr<goGL::DrawableObject> obj (img);
+    myPrivate->scene->add (obj);
+    myPrivate->view.GLWidgetEnd ();
+    myPrivate->updateBoxes ();
+    // myPrivate->view.queue_draw ();
 }
 
 void goGUI::SceneControl::onHide ()
@@ -306,12 +432,53 @@ void goGUI::SceneControl::addWaypoint ()
     myPrivate->glanimation.addWaypoint (wp);
 }
 
-void goGUI::SceneControl::animationPositionChanged ()
+void goGUI::SceneControl::removeWaypoint ()
+{
+    myPrivate->glanimation.removeWaypoint (myPrivate->glanimation.selectedWaypoint());
+}
+
+void goGUI::SceneControl::prependWaypoint ()
 {
     int active_object = myPrivate->objectBox.get_active_row_number () - 1;
     if (active_object < 0)
     {
         return;
+    }
+
+    goAutoPtr<goGL::DrawableObject> obj = myPrivate->scene->getObject (active_object);
+
+    goGL::Waypoint wp;
+    wp.setTranslation (obj->getTranslation());
+    wp.setRotation (obj->getRotation());
+    wp.setScale (obj->getScale());
+    
+    myPrivate->glanimation.prependWaypoint (wp, myPrivate->glanimation.selectedWaypoint());
+}
+
+void goGUI::SceneControl::appendWaypoint ()
+{
+    int active_object = myPrivate->objectBox.get_active_row_number () - 1;
+    if (active_object < 0)
+    {
+        return;
+    }
+
+    goAutoPtr<goGL::DrawableObject> obj = myPrivate->scene->getObject (active_object);
+
+    goGL::Waypoint wp;
+    wp.setTranslation (obj->getTranslation());
+    wp.setRotation (obj->getRotation());
+    wp.setScale (obj->getScale());
+    
+    myPrivate->glanimation.appendWaypoint (wp, myPrivate->glanimation.selectedWaypoint());
+}
+
+int goGUI::SceneControl::animationPositionChanged ()
+{
+    int active_object = myPrivate->objectBox.get_active_row_number () - 1;
+    if (active_object < 0)
+    {
+        return 0;
     }
 
     if (myPrivate->editWaypointButton.get_active())
@@ -322,16 +489,107 @@ void goGUI::SceneControl::animationPositionChanged ()
     goAutoPtr<goGL::Waypoint> wp = myPrivate->glanimation.getWaypoint();
     
     obj->setTranslation (wp->getTranslation());
+    obj->setRotation (wp->getRotation());
     myPrivate->view.GLWidgetBegin ();
     myPrivate->view.glDraw ();
     myPrivate->view.swapBuffers ();
     myPrivate->view.GLWidgetEnd ();
+
+    return 0;
+}
+
+void goGUI::SceneControl::createMovie ()
+{
+    int active_object = myPrivate->objectBox.get_active_row_number () - 1;
+    if (active_object < 0)
+    {
+        this->warning ("Activate the appropriate object first.");
+        return;
+    }
+
+    goAutoPtr<goGL::DrawableObject> obj = myPrivate->scene->getObject (active_object);
+
+    static goString path = "./";
+    goString fname;
+    if (!goGUI::getFilenameSave (fname, path, "Choose Movie Images Base Name"))
+    {
+        return;
+    }
+
+    fname.getPathName (path);
+   
+    goSize_t steps = myPrivate->movieStepsButton.get_value_as_int();
+
+    goDouble dt = 1.0 / (float)(steps - 1);
+    goDouble t = 0.0;
+    goGL::Waypoint wp;
+    goAutoPtr<goGL::Animation> A = myPrivate->glanimation.getAnimation();
+    if (A.isNull())
+    {
+        this->warning ("Animation object is null.");
+        return;
+    }
+
+    goString cfname;
+    char n[16];
+    goSignal3D<void> image2;
+    goSignal3D<void> image;
+    image.setDataType (GO_UINT8);
+    image2.setDataType (GO_UINT8);
+    image2.make (32,32,1,32,32,1,4,4,0,3);
+    for (goSize_t i = 0; i < steps; ++i)
+    {
+        A->interpolate (t, wp);
+        obj->setTranslation (wp.getTranslation());
+        obj->setRotation (wp.getRotation());
+
+        cfname = fname;
+        cfname += "_";
+        sprintf (n, "%.5d", i);
+        cfname += n;
+        cfname += ".jpg";
+        myPrivate->view.GLWidgetBegin ();
+        myPrivate->view.glDraw ();
+        myPrivate->view.swapBuffers ();
+        goGL::getGLBuffer (image2);
+        myPrivate->view.GLWidgetEnd ();
+        //= Flip Y
+        if (image2.getSize() != image.getSize())
+        {
+            image.make (image2.getSize(), image2.getBlockSize(), image2.getBorderSize(), image2.getChannelCount());
+        }
+        goSignalFlipY (image2, image);
+
+        try
+        {
+            goFileIO::writeImage (cfname.toCharPtr(), &image);
+        }
+        catch (goFileIOException ex)
+        {
+            if (ex.code == goFileIOException::EXISTS)
+            {
+                goFileIO::remove (cfname.toCharPtr());
+            }
+            try
+            {
+                goFileIO::writeImage (cfname.toCharPtr(), &image);
+            }
+            catch (goFileIOException ex2)
+            {
+                this->warning ("Writing image failed!");
+                return;
+            }
+        }
+
+        t = goMath::min<goDouble> (1.0, t + dt);
+    }
 }
 
 void goGUI::SceneControl::editWaypointToggled ()
 {
     bool is_editing = myPrivate->editWaypointButton.get_active();
-    myPrivate->addWaypointButton.set_sensitive (!is_editing);
+    //myPrivate->addWaypointButton.set_sensitive (!is_editing);
+    myPrivate->waypointButtonsBox.set_sensitive (!is_editing);
     myPrivate->glanimation.set_sensitive (!is_editing);
     if (is_editing)
     {
@@ -365,22 +623,24 @@ void goGUI::SceneControl::editWaypoint ()
     myPrivate->glanimation.getAnimation()->setWaypoint (i, wp);
 }
 
-void goGUI::SceneControl::transformToSelectedWaypoint ()
+int goGUI::SceneControl::transformToSelectedWaypoint ()
 {
     int active_object = myPrivate->objectBox.get_active_row_number () - 1;
     if (active_object < 0)
     {
-        return;
+        return 0;
     }
 
     goAutoPtr<goGL::DrawableObject> obj = myPrivate->scene->getObject (active_object);
 
     goAutoPtr<goGL::Waypoint> wp = myPrivate->glanimation.getSelectedWaypoint();
     if (wp.isNull())
-        return;
+        return 0;
 
     obj->setTranslation (wp->getTranslation());
     myPrivate->view.queue_draw ();
-    // obj->setRotation (wp->getRotation());
+    obj->setRotation (wp->getRotation());
     // obj->setScale (wp->getScale());
+
+    return 0;
 }

@@ -63,9 +63,9 @@ bool goGL::Camera::operator() () const
  * 
  * @return Width.
  */
-goFloat goGL::Camera::viewPortWidth () const
+goFloat goGL::Camera::viewPortWidth (const goVectorf& at) const
 {
-    return 2.0f * myNearClip * ::tan (myFOVAngle * 0.5f);
+    return this->viewPortHeight(at) * myXYAspect;
 }
 
 /** 
@@ -73,9 +73,10 @@ goFloat goGL::Camera::viewPortWidth () const
  * 
  * @return Height.
  */
-goFloat goGL::Camera::viewPortHeight () const
+goFloat goGL::Camera::viewPortHeight (const goVectorf& at) const
 {
-    return this->viewPortWidth() / myXYAspect;
+    goFloat l = (at - this->myPosition) * ( (this->myLookat - this->myPosition) / ((this->myLookat - this->myPosition).norm2 ()) );
+    return 2.0f * l * ::tan (myFOVAngle * 0.5f);
 }
 
 bool goGL::Camera::writeASCII (FILE* f) const

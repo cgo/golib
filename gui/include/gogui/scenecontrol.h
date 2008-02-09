@@ -17,13 +17,15 @@ namespace goGUI
             goGUI::SceneView& getSceneView ();
 
             void loadOFF ();
+            void deleteObject ();
+            void loadImage ();
             void onHide ();
             void onShow ();
 
             void objectBoxChangedSlot ();
             void lightBoxChangedSlot ();
 
-            void objectPropChanged ();
+            int objectPropChanged ();
             void objectProperties ();
 
             void viewChanged ();
@@ -32,11 +34,16 @@ namespace goGUI
             void loadScene ();
 
             void addWaypoint ();
-            void animationPositionChanged ();
+            void removeWaypoint ();
+            void prependWaypoint ();
+            void appendWaypoint ();
+            int  animationPositionChanged ();
+            void createMovie ();
 
             void editWaypointToggled ();
             void editWaypoint ();
-            void transformToSelectedWaypoint ();
+            
+            int transformToSelectedWaypoint ();
 
         private:
             SceneControl (const SceneControl&);

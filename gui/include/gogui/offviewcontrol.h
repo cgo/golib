@@ -18,7 +18,7 @@ namespace goGUI
             void            addWidget  (Gtk::Widget& w);
 
             void lightDialog ();
-            void lightChangedSlot ();
+            int lightChangedSlot ();
 
             void OFFViewRotated ();
             // void angleChanged ();

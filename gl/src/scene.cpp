@@ -127,6 +127,11 @@ bool goGL::Scene::add (goAutoPtr<goGL::DrawableObject> o)
     return myPrivate->drawables.append (o);
 }
 
+bool goGL::Scene::removeObject (int i)
+{
+    return myPrivate->drawables.remove (myPrivate->drawables(i));
+}
+
 goSize_t goGL::Scene::getObjectCount () const
 {
     return myPrivate->drawables.getSize ();

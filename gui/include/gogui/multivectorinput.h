@@ -4,6 +4,9 @@
 #include <gtkmm.h>
 #include <gogui/vectorinput.h>
 #include <gofixedarray.h>
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 namespace goGUI
 {
@@ -18,7 +21,8 @@ namespace goGUI
             goGUI::VectorInput& getInput (int index);
             void inputChangedSlot ();
 
-            sigc::signal<void>& signalChanged ();
+            // sigc::signal<void>& signalChanged ();
+            goCaller0<int>& callerChanged();
 
         private:
             MultiVectorInput (const MultiVectorInput&);

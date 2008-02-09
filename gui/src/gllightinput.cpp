@@ -5,11 +5,16 @@ namespace goGUI
     class GLLightInputPrivate
     {
         public:
-            GLLightInputPrivate () : light (), signalChangedLight () {};
+            GLLightInputPrivate () 
+                : light (), 
+                  callerChangedLight ()
+                  // signalChangedLight () 
+            {};
             ~GLLightInputPrivate () {};
 
             goGL::Light light;
-            sigc::signal<void, goGL::Light> signalChangedLight;
+            // sigc::signal<void, goGL::Light> signalChangedLight;
+            goCaller0<int> callerChangedLight;
     };
 
     static int GLLightInputV_[] = {4, 4, 4, 4};
@@ -28,7 +33,8 @@ goGUI::GLLightInput::GLLightInput ()
 
     this->set (myPrivate->light);
 
-    this->signalChanged().connect (sigc::mem_fun (*this, &GLLightInput::inputChangedSlotLight));
+    // this->signalChanged().connect (sigc::mem_fun (*this, &GLLightInput::inputChangedSlotLight));
+    this->callerChanged().connect (goMemberFunction<GLLightInput,int> (this, &GLLightInput::inputChangedSlotLight));
     this->show_all ();
 }
 
@@ -58,13 +64,19 @@ void goGUI::GLLightInput::get (goGL::Light& light)
     this->getInput (3).getVector (light.myDiffuse);
 }
 
-void goGUI::GLLightInput::inputChangedSlotLight ()
+int goGUI::GLLightInput::inputChangedSlotLight ()
 {
-    this->get (myPrivate->light);
-    myPrivate->signalChangedLight (myPrivate->light);
+    // this->get (myPrivate->light);
+    // myPrivate->signalChangedLight (myPrivate->light);
+    myPrivate->callerChangedLight ();
 }
 
-sigc::signal<void, goGL::Light>& goGUI::GLLightInput::signalChangedLight ()
+//sigc::signal<void, goGL::Light>& goGUI::GLLightInput::signalChangedLight ()
+//{
+//    return myPrivate->signalChangedLight;
+//}
+
+goCaller0<int>& goGUI::GLLightInput::callerChangedLight ()
 {
-    return myPrivate->signalChangedLight;
+    return myPrivate->callerChangedLight;
 }

@@ -23,12 +23,13 @@ namespace goGUI
 
             virtual void updateInput ();
 
-            sigc::signal<void>& signalObjectInputChanged ();
+            // sigc::signal<void>& signalObjectInputChanged ();
+            goCaller0<int>& callerObjectInputChanged ();
 
         protected:
             void set (const goGL::Object& o);
             void get (goGL::Object& o);
-            void inputChangedSlotObject ();
+            int inputChangedSlotObject ();
             Gtk::Box* getBox ();
 
         private:
@@ -47,15 +48,17 @@ namespace goGUI
             
             void set (const goGL::Object& o);
             void get (goGL::Object& o);
-            void inputChangedSlotObject ();
-            sigc::signal<void>& signalObjectInputChanged ();
+            int inputChangedSlotObject ();
+            // sigc::signal<void>& signalObjectInputChanged ();
+            goCaller0<int>& callerObjectInputChanged ();
 
         private:
             GLObjectVectorInput (const GLObjectVectorInput&);
             GLObjectVectorInput& operator= (const GLObjectVectorInput&);
 
         private:
-            sigc::signal<void> myInputChangedSignal;
+            // sigc::signal<void> myInputChangedSignal;
+            goCaller0<int> myInputChangedCaller;
     };
 };
 

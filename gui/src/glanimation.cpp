@@ -1,5 +1,6 @@
 #include <gogui/glanimation.h>
 #include <gogui/helper.h>
+#include <gofunctor.h>
 
 namespace goGUI
 {
@@ -14,8 +15,10 @@ namespace goGUI
                   waypointsButton (),
                   tScale (0.0, 1.0, 0.01),
                   tAdjustment (0.0, 0.0, 1.0, 0.01, 0.1),
-                  signalPositionChanged (),
-                  signalWaypointSelected ()
+                  //signalPositionChanged (),
+                  //signalWaypointSelected (),
+                  waypointSelectedCaller (),
+                  positionChangedCaller ()
             {
                 tScale.set_adjustment (tAdjustment);
                 waypointsButton.set_digits (0);
@@ -47,8 +50,11 @@ namespace goGUI
             Gtk::HScale         tScale;
             Gtk::Adjustment     tAdjustment;
 
-            sigc::signal<void>  signalPositionChanged;
-            sigc::signal<void>  signalWaypointSelected;
+            // sigc::signal<void>  signalPositionChanged;
+            // sigc::signal<void>  signalWaypointSelected;
+            
+            goCaller0<int>      waypointSelectedCaller;  // workaround for bug at uni -- signalWaypointSelected() crashes when called (?????).
+            goCaller0<int>      positionChangedCaller;
     };
 };
 
@@ -85,6 +91,8 @@ goGUI::GLAnimation::GLAnimation ()
 
 goGUI::GLAnimation::~GLAnimation ()
 {
+    printf ("~GLAnimation\n");
+    fflush (stdout);
     if (myPrivate)
     {
         delete myPrivate;
@@ -107,6 +115,33 @@ void goGUI::GLAnimation::addWaypoint (const goGL::Waypoint& wp)
     if (!myPrivate->animation.isNull())
     {
         myPrivate->animation->addWaypoint (wp);
+        myPrivate->updateWaypoints ();
+    }
+}
+
+void goGUI::GLAnimation::removeWaypoint (int index)
+{
+    if (!myPrivate->animation.isNull())
+    {
+        myPrivate->animation->removeWaypoint (index);
+        myPrivate->updateWaypoints ();
+    }
+}
+
+void goGUI::GLAnimation::prependWaypoint (const goGL::Waypoint& wp, int index)
+{
+    if (!myPrivate->animation.isNull())
+    {
+        myPrivate->animation->insertWaypoint (index, wp);
+        myPrivate->updateWaypoints ();
+    }
+}
+
+void goGUI::GLAnimation::appendWaypoint (const goGL::Waypoint& wp, int index)
+{
+    if (!myPrivate->animation.isNull())
+    {
+        myPrivate->animation->insertWaypoint (index + 1, wp);
         myPrivate->updateWaypoints ();
     }
 }
@@ -163,7 +198,20 @@ void goGUI::GLAnimation::saveAnimation ()
 
 void goGUI::GLAnimation::waypointSelected ()
 {
-    myPrivate->signalWaypointSelected ();
+    printf ("%p\n", this);
+    printf ("WP %d selected.\n", this->selectedWaypoint());
+    // myPrivate->signalWaypointSelected ();
+    myPrivate->waypointSelectedCaller ();
+}
+
+goCaller0<int>& goGUI::GLAnimation::waypointSelectedCaller ()
+{
+    return myPrivate->waypointSelectedCaller;
+}
+
+goCaller0<int>& goGUI::GLAnimation::positionChangedCaller ()
+{
+    return myPrivate->positionChangedCaller;
 }
 
 void goGUI::GLAnimation::tValueChanged ()
@@ -174,21 +222,21 @@ void goGUI::GLAnimation::tValueChanged ()
     goDouble t = myPrivate->tScale.get_value ();
     myPrivate->animation->interpolate (t, *myPrivate->waypoint);
 
-    printf ("t == %.4f\n", t);
     myPrivate->waypoint->getTranslation().print ();
 
-    myPrivate->signalPositionChanged ();
+    // myPrivate->signalPositionChanged ();
+    myPrivate->positionChangedCaller ();
 }
 
-sigc::signal<void>& goGUI::GLAnimation::signalPositionChanged ()
-{
-    return myPrivate->signalPositionChanged;
-}
+//sigc::signal<void>& goGUI::GLAnimation::signalPositionChanged ()
+//{
+//    return myPrivate->signalPositionChanged;
+//}
 
-sigc::signal<void>& goGUI::GLAnimation::signalWaypointSelected ()
-{
-    return myPrivate->signalWaypointSelected;
-}
+//sigc::signal<void>& goGUI::GLAnimation::signalWaypointSelected ()
+//{
+//    return myPrivate->signalWaypointSelected;
+//}
 
 goAutoPtr<goGL::Waypoint> goGUI::GLAnimation::getWaypoint ()
 {

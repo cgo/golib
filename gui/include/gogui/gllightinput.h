@@ -22,8 +22,9 @@ namespace goGUI
 
             void set (const goGL::Light& light);
             void get (goGL::Light& light);
-            void inputChangedSlotLight ();
-            sigc::signal<void, goGL::Light>& signalChangedLight ();
+            int inputChangedSlotLight ();
+            // sigc::signal<void, goGL::Light>& signalChangedLight ();
+            goCaller0<int>& callerChangedLight ();
 
         private:
             GLLightInput (const GLLightInput&);

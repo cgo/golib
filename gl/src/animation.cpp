@@ -100,6 +100,14 @@ const goGL::Waypoint& goGL::Animation::getWaypoint (goIndex_t i) const
     return myPrivate->waypoints (i)->elem;
 }
 
+/** 
+ * @brief Prepends \c wp before waypoint \c i.
+ *
+ * If \c i is larger than the highest index, \c wp gets appended.
+ *
+ * @param i  Index
+ * @param wp New waypoint
+ */
 void goGL::Animation::insertWaypoint (goIndex_t i, const goGL::Waypoint& wp)
 {
     if (i < myPrivate->waypoints.getSize())
@@ -205,7 +213,6 @@ void goGL::Animation::initInterpolation ()
         return;
     }
 
-    goSize_t steps = myPrivate->steps;
     goMatrixf& positions = myPrivate->positions;
     positions.resize (this->getWaypoints().getSize(), 3);
 
@@ -220,7 +227,10 @@ void goGL::Animation::initInterpolation ()
     
     goMatrixf resampled (0,0);
 
-    goMath::resampleCubic<goFloat> (positions, resampled, steps, false, &myPrivate->accumLength);
+    //= FIXME: This is only used to estimate the accumLength array,
+    //=        which would be the time line normally. It is only a quick hack, so fix it
+    //=        by only calculating the lengths directly or by adding a "real" editable time line.
+    goMath::resampleCubic<goFloat> (positions, resampled, positions.getRows(), false, &myPrivate->accumLength);
 
     myPrivate->initialised = true;
 }
@@ -248,14 +258,15 @@ void goGL::Animation::interpolate (goDouble t, Waypoint& ret)
         ++i;
     }
     
-    if (i < 1)
-    {
-        goLog::error ("goGL::Animation::interpolate(): i < 1 but it should not.");
-        return;
-    }
     if (i >= sz)
     {
         i = sz - 1;
+    }
+
+    if (i < 1)
+    {
+        // goLog::error ("goGL::Animation::interpolate(): i < 1 but it should not.");
+        return;
     }
 
     goVectorf pm1(0), p0(0), p1(0), p2(0);
@@ -300,5 +311,55 @@ void goGL::Animation::interpolate (goDouble t, Waypoint& ret)
     ret.setTranslation (*s);
 
     //= Interpolate rotation at tt between the rotation at waypoints i-1 and i.
-    //...
+    {
+        goMath::SO3<goFloat> so3;
+        goFloat _temp[] = {1.0f, 0.0f, 0.0f};
+        goVectorf temp (_temp, 3, 1);
+        goFloat _s0[9], _s1[9];
+        goMatrixf s0 (_s0, 3, 3, 3), s1 (_s1, 3, 3, 3);
+        s0.setIdentity (); s1.setIdentity ();
+        goFloat _tangent[] = {1.0f, 0.0f, 0.0f};
+        goVectorf tangent (_tangent, 3, 1);
+
+        //= FIXME: This is slow. Replace; add a rotation and scale parameter matrix like for translation.
+        const goVectorf& R0 = myPrivate->waypoints(i-1)->elem.getRotation ();
+        const goVectorf& R1 = myPrivate->waypoints(i)->elem.getRotation ();
+        printf ("R0, R1:\n");
+        R0.print ();
+        R1.print ();
+        temp[0] = R0[1]; temp[1] = R0[2]; temp[2] = R0[3]; 
+        if (temp.norm2() != 0.0f) temp *= 1.0f / temp.norm2() * R0[0] / 180.0f * M_PI;
+        so3.matrix (temp, s0);
+
+        temp[0] = R1[1]; temp[1] = R1[2]; temp[2] = R1[3]; 
+        if (temp.norm2() != 0.0f) temp *= 1.0f / temp.norm2() * R1[0] / 180.0f * M_PI;
+        so3.matrix (temp, s1);
+        
+        so3.log (s0, s1, tangent);
+
+        printf ("s0:\n");
+        s0.print ();
+        printf ("s1:\n");
+        s1.print ();
+        printf ("s0 -- s1 at tt == %.3f\n", tt);
+        so3.exp (s0, tangent * tt, s1);
+        s1.print ();
+        printf ("s0 -- s1 at tt == 0\n");
+        so3.exp (s0, tangent * 0.0f, s1);
+        s1.print ();
+        printf ("s0 -- s1 at tt == 1\n");
+        so3.exp (s0, tangent * 1.0f, s1);
+        s1.print ();
+
+        so3.exp (s0, tangent * tt, s1);
+        so3.vector (s1, temp);
+        goFloat angle = temp.norm2 ();
+        if (angle != 0.0f)
+        {
+            temp /= angle;
+        }
+        ret.setRotation (angle * 180.0f / M_PI, temp[0], temp[1], temp[2]);
+        printf ("Rotation:\n");
+        ret.getRotation().print ();
+    }
 }

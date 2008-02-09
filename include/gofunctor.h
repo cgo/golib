@@ -32,6 +32,27 @@ class goFunctorBase
         // virtual Tret operator () (Targ1 p) = 0;
 };
 
+template <class Tret>
+class goFunctorBase0 : public goFunctorBase <Tret, void, void, void, void ,void, void, void, void ,void, void>
+{
+    public:
+        goFunctorBase0 ()
+            : goFunctorBase <Tret, void, void, void, void ,void, void, void, void ,void, void> ()
+        {
+        };
+        virtual ~goFunctorBase0 ()
+        {
+        };
+
+        /** 
+         * @brief Purely virtual function. In derived classes,
+         * calls the function represented by this functor.
+         * 
+         * @return Any value.
+         */
+        virtual Tret operator () () = 0;
+};
+
 template <class Tret, class Targ1>
 class goFunctorBase1 : public goFunctorBase <Tret, Targ1, void, void, void ,void, void, void, void ,void, void>
 {
@@ -72,6 +93,45 @@ class goFunctorBase2 : public goFunctorBase <Tret, Targ1, Targ2, void, void ,voi
          * @return Any value.
          */
         virtual Tret operator () (Targ1 p, Targ2 p2) = 0;
+};
+
+template <class Tret, class Tclass>
+class goFunctor0 : public goFunctorBase0<Tret>
+{
+    public:
+        typedef Tret(Tclass::*function_t)();
+
+    public:
+        goFunctor0 (Tclass* object, function_t function)
+            : goFunctorBase0<Tret>(), myObject (object), myFunction (function)
+        {
+        };
+        virtual ~goFunctor0 () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual Tret operator () ()
+        {
+            // printf ("Functor called.\n");
+            if (myObject && myFunction)
+            {
+                return (myObject->*myFunction)();
+            }
+            else
+            {
+                Tret dummy;
+                return dummy;
+            }
+        };
+
+    private:
+        Tclass* myObject;
+        function_t myFunction;
 };
 
 /** 
@@ -161,6 +221,45 @@ class goFunctor2 : public goFunctorBase2<Tret, Targ1, Targ2>
  * @todo Fix the goList issue. golist.hpp must be included at the
  * end of one source file that uses this class.
  */
+template <class Tret>
+class goCaller0
+{
+    public:
+        goCaller0 ()
+            : fList () {};
+        virtual ~goCaller0 () {fList.erase ();};
+
+        //= Take very much care here that
+        //= 1. This class gets notified if functors are destroyed.
+        //= 2. Everything is thread safe.
+        //= It may be a good idea to introduce a managed pointer class.
+        void connect (goAutoPtr<goFunctorBase0<Tret> > f)
+        {
+            this->fList.append (f);
+        };
+
+        virtual Tret operator () ()
+        {
+            typename goList< goAutoPtr<goFunctorBase0<Tret> > >::Element* el = this->fList.getFrontElement ();
+            Tret ret;
+            while (el)
+            {
+                ret = (*el->elem)();
+                el = el->next;
+            }
+            return ret;
+        };
+
+    private:
+        goList< goAutoPtr<goFunctorBase0<Tret> > > fList;
+};
+
+/** 
+ * @brief Broadcasting caller class,
+ * like signals in the "signal/slot" paradigm.
+ * @todo Fix the goList issue. golist.hpp must be included at the
+ * end of one source file that uses this class.
+ */
 template <class Tret, class Targ1>
 class goCaller1
 {
@@ -191,6 +290,14 @@ class goCaller1
     private:
         goList< goAutoPtr<goFunctorBase1<Tret,Targ1> > > fList;
 };
+
+
+template <class Tclass, class Tret>
+goAutoPtr<goFunctorBase0<Tret> >
+goMemberFunction (Tclass* c, typename goFunctor0<Tret, Tclass>::function_t f)
+{
+    return goAutoPtr<goFunctorBase0<Tret> > (static_cast<goFunctorBase0<Tret>*> (new goFunctor0<Tret, Tclass> (c, f)));
+}
 
 /** 
  * @brief Create a member function functor object, encapsulated

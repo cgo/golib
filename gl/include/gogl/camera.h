@@ -20,8 +20,8 @@ namespace goGL
             bool setViewingTransformation () const;
             virtual bool operator() () const;
 
-            goFloat viewPortWidth () const;
-            goFloat viewPortHeight () const;
+            goFloat viewPortWidth (const goVectorf& at) const;
+            goFloat viewPortHeight (const goVectorf& at) const;
 
             virtual bool writeASCII (FILE* f) const;
             virtual bool writeASCII (const char* filename) const;

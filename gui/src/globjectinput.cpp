@@ -8,14 +8,16 @@ namespace goGUI
         public:
             GLObjectInputPrivate () 
                 : objectVectorInput (),
-                  objectInputChangedSignal (),
+                  // objectInputChangedSignal (),
+                  objectInputChangedCaller (),
                   box (),
                   object (0)
             {};
             ~GLObjectInputPrivate () {};
 
             GLObjectVectorInput objectVectorInput;
-            sigc::signal<void>  objectInputChangedSignal;
+            // sigc::signal<void>  objectInputChangedSignal;
+            goCaller0<int> objectInputChangedCaller;
 
             Gtk::VBox box;
 
@@ -34,7 +36,8 @@ goGUI::GLObjectInput::GLObjectInput ()
     this->add (myPrivate->box);
     this->show_all ();
 
-    myPrivate->objectVectorInput.signalChanged().connect (sigc::mem_fun (*this, &GLObjectInput::inputChangedSlotObject));
+    // myPrivate->objectVectorInput.signalChanged().connect (sigc::mem_fun (*this, &GLObjectInput::inputChangedSlotObject));
+    myPrivate->objectVectorInput.callerChanged().connect (goMemberFunction<GLObjectInput,int> (this, &GLObjectInput::inputChangedSlotObject));
 }
 
 goGUI::GLObjectInput::~GLObjectInput ()
@@ -57,16 +60,22 @@ void goGUI::GLObjectInput::get (goGL::Object& o)
 }
 
 
-void goGUI::GLObjectInput::inputChangedSlotObject ()
+int goGUI::GLObjectInput::inputChangedSlotObject ()
 {
     if (!myPrivate->object.isNull())
         this->get (*myPrivate->object);
-    myPrivate->objectInputChangedSignal ();
+    // myPrivate->objectInputChangedSignal ();
+    return myPrivate->objectInputChangedCaller ();
 }
 
-sigc::signal<void>& goGUI::GLObjectInput::signalObjectInputChanged ()
+//sigc::signal<void>& goGUI::GLObjectInput::signalObjectInputChanged ()
+//{
+//    return myPrivate->objectInputChangedSignal;
+//}
+
+goCaller0<int>& goGUI::GLObjectInput::callerObjectInputChanged ()
 {
-    return myPrivate->objectInputChangedSignal;
+    return myPrivate->objectInputChangedCaller;
 }
 
 Gtk::Box* goGUI::GLObjectInput::getBox ()
@@ -96,7 +105,7 @@ void goGUI::GLObjectInput::updateInput ()
 
 goGUI::GLObjectVectorInput::GLObjectVectorInput ()
     : MultiVectorInput (GLObjectVectorInputV_, 3),
-      myInputChangedSignal ()
+      myInputChangedCaller ()
 {
     this->getInput (0).set_label ("Translation (x, y, z)");
     this->getInput (1).set_label ("Rotation (angle, x axis, y axis, z axis)");
@@ -128,13 +137,19 @@ void goGUI::GLObjectVectorInput::get (goGL::Object& o)
     o.setScale (v);
 }
 
-void goGUI::GLObjectVectorInput::inputChangedSlotObject ()
+int goGUI::GLObjectVectorInput::inputChangedSlotObject ()
 {
-    this->myInputChangedSignal();
+    this->myInputChangedCaller ();
+    return 0;
 }
 
-sigc::signal<void>& goGUI::GLObjectVectorInput::signalObjectInputChanged ()
+//sigc::signal<void>& goGUI::GLObjectVectorInput::signalObjectInputChanged ()
+//{
+//    return this->myInputChangedSignal;
+//}
+
+goCaller0<int>& goGUI::GLObjectVectorInput::callerObjectInputChanged ()
 {
-    return this->myInputChangedSignal;
+    return this->myInputChangedCaller;
 }
 
