@@ -12,6 +12,9 @@ namespace goGL
 
     class OFFFilePrivate;
 
+/** @addtogroup gl
+ * @{
+ */
     class OFFFile : public goOFFFile
     {
         public:
@@ -30,6 +33,9 @@ namespace goGL
             OFFFilePrivate* myPrivate;
             // goGL::OFFFilePrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

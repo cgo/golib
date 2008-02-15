@@ -3,6 +3,15 @@
 #include <gogui/helper.h>
 #include <gtkmm.h>
 
+/** 
+ * @brief Open a file dialog and get a filename.
+ * 
+ * @param fname On return, contains the selected file name.
+ * @param start Starting path.
+ * @param title Title of the dialog.
+ * 
+ * @return True if a file name was selected, false if cancel was pressed.
+ */
 bool goGUI::getFilenameOpen (goString& fname, const goString& start, const goString& title)
 {
 #ifdef HAVE_GTK_2
@@ -30,6 +39,15 @@ bool goGUI::getFilenameOpen (goString& fname, const goString& start, const goStr
     return true;
 }
 
+/** 
+ * @brief Open a dialog and get a folder name.
+ * 
+ * @param fname On return, contains the selected folder name.
+ * @param start Starting path.
+ * @param title Title of the dialog.
+ * 
+ * @return True if a folder name was selected, false if cancel was pressed.
+ */
 bool goGUI::getFoldername (goString& fname, const goString& start, const goString& title)
 {
 #ifdef HAVE_GTK_2
@@ -57,6 +75,15 @@ bool goGUI::getFoldername (goString& fname, const goString& start, const goStrin
     return true;
 }
 
+/** 
+ * @brief Open a file dialog and get a filename.
+ * 
+ * @param fname On return, contains the selected file name.
+ * @param start Starting path.
+ * @param title Title of the dialog.
+ * 
+ * @return True if a file name was selected, false if cancel was pressed.
+ */
 bool goGUI::getFilenameSave (goString& fname, const goString& start, const goString& title)
 {
 #ifdef HAVE_GTK_2
@@ -97,6 +124,15 @@ bool goGUI::getFilenameSave (goString& fname, const goString& start, const goStr
     return true;
 }
 
+/** 
+ * @brief Open a dialog and get a bunch of file names.
+ * 
+ * @param filenames On return, contains the selected file names.
+ * @param start Starting path.
+ * @param title Title of the dialog.
+ * 
+ * @return True if files were selected, false if cancel was pressed.
+ */
 bool goGUI::getFilenames (goFixedArray<goString>& filenames, const goString& start, const goString& title)
 {
 #ifdef HAVE_GTK_2

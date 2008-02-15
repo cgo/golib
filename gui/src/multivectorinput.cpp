@@ -34,6 +34,12 @@ namespace goGUI
     };
 };
 
+/** 
+ * @brief Constructor.
+ * 
+ * @param ns Array of integers, the \c i'th entry denotes the size of the \c i'th vector.
+ * @param n Size of \c ns.
+ */
 goGUI::MultiVectorInput::MultiVectorInput (const int* ns, int n)
     : Gtk::Frame (),
       myPrivate (0)
@@ -60,6 +66,13 @@ goGUI::MultiVectorInput::~MultiVectorInput ()
     }
 }
 
+/** 
+ * @brief Get the \c index'th \c VectorInput
+ * 
+ * @param index Index of input.
+ * 
+ * @return Reference to a \c VectorInput
+ */
 goGUI::VectorInput& goGUI::MultiVectorInput::getInput (int index)
 {
     if (index >= 0 && index < (int)myPrivate->vectorInputs.getSize())
@@ -77,6 +90,14 @@ goGUI::VectorInput& goGUI::MultiVectorInput::getInput (int index)
 //    return myPrivate->signalChanged;
 //}
 
+/** 
+ * @brief Get a caller that calls its connections every time the input gets changed.
+ *
+ * @note This was used in place of a sigc::signal here and in other places since 
+ * in some configuration, an application using sigc crashed. It works with \c goCaller.
+ * 
+ * @return The goCaller object.
+ */
 goCaller0<int>& goGUI::MultiVectorInput::callerChanged ()
 {
     return myPrivate->changedCaller;

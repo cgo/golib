@@ -23,7 +23,7 @@ namespace goGUI
                   objectPropButton ("Object Properties"),
                   loadOFFButton ("Load OFF"),
                   deleteObjectButton ("Delete Object"),
-                  loadImageButton ("Load BG Image"),
+                  loadImageButton ("Load Image As Plane"),
                   saveSceneButton ("Save Scene"),
                   loadSceneButton ("Load Scene"),
                   waypointButtonsBox (),
@@ -49,10 +49,13 @@ namespace goGUI
                 movieStepsButton.set_value (25);
 
                 tooltips.enable ();
+                tooltips.set_tip (objectBox, "Select the currently active object here.");
+                tooltips.set_tip (lightBox, "Select the currently active light here.\nThis currently has no function.");
                 tooltips.set_tip (objectPropButton, "Translation, Rotation, Scale, Material of active object.");
+                tooltips.set_tip (deleteObjectButton, "Delete the currently active object.");
                 tooltips.set_tip (loadOFFButton, "Load an object in OFF file format.");
                 tooltips.set_tip (loadImageButton, "Load an image and create a plane object.");
-                tooltips.set_tip (saveSceneButton, "Save scene (OFF file names, transformations, materials.\nNo lights and images yet.");
+                tooltips.set_tip (saveSceneButton, "Save scene (OFF file names, transformations, materials).\nNo lights and images yet.");
                 tooltips.set_tip (loadSceneButton, "Load a saved scene.");
                 tooltips.set_tip (addWaypointButton, "Add a new waypoint to the animation.");
                 tooltips.set_tip (removeWaypointButton, "Remove the current waypoint from the animation.");
@@ -139,8 +142,11 @@ goGUI::SceneControl::SceneControl ()
         Gtk::VBox* vbox = Gtk::manage (new Gtk::VBox);
         Gtk::HBox* hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->objectPropButton, Gtk::PACK_SHRINK);
-        hbox->pack_start (myPrivate->loadOFFButton, Gtk::PACK_SHRINK);
         hbox->pack_start (myPrivate->deleteObjectButton, Gtk::PACK_SHRINK);
+        vbox->pack_start (*hbox);
+
+        hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->loadOFFButton, Gtk::PACK_SHRINK);
         hbox->pack_start (myPrivate->loadImageButton, Gtk::PACK_SHRINK);
         vbox->pack_start (*hbox);
 
@@ -250,11 +256,20 @@ int goGUI::SceneControl::objectPropChanged ()
     return 0;
 }
 
+/** 
+ * @brief Get the \c goGUI::SceneView widget used by this
+ * control.
+ * 
+ * @return The \c SceneView widget.
+ */
 goGUI::SceneView& goGUI::SceneControl::getSceneView ()
 {
     return myPrivate->view;
 }
 
+/** 
+ * @brief Slot called whenever the view changes (by user input).
+ */
 void goGUI::SceneControl::viewChanged ()
 {
     //= set current object's properties
@@ -280,6 +295,9 @@ goGUI::SceneControl::~SceneControl ()
     }
 }
 
+/** 
+ * @brief Load an object in Object File Format (OFF).
+ */
 void goGUI::SceneControl::loadOFF ()
 {
     static goString path = "./";
@@ -299,6 +317,9 @@ void goGUI::SceneControl::loadOFF ()
     myPrivate->view.GLWidgetEnd();
 }
 
+/** 
+ * @brief Deletes the currently active object.
+ */
 void goGUI::SceneControl::deleteObject ()
 {
     //= set current object's properties
@@ -315,11 +336,14 @@ void goGUI::SceneControl::deleteObject ()
     myPrivate->view.GLWidgetEnd ();
 }
 
+/** 
+ * @brief Loads an image as a plane in OpenGL (goGL::TextureImage).
+ */
 void goGUI::SceneControl::loadImage ()
 {
     static goString path = "./";
     goString fname;
-    if (!goGUI::getFilenameOpen (fname, path, "Scene Control: Open BG Image"))
+    if (!goGUI::getFilenameOpen (fname, path, "Scene Control: Open Image As Plane"))
     {
         return;
     }
@@ -414,6 +438,9 @@ void goGUI::SceneControl::loadScene ()
     myPrivate->view.queue_draw ();
 }
 
+/** 
+ * @brief Adds a waypoint to the current animation.
+ */
 void goGUI::SceneControl::addWaypoint ()
 {
     int active_object = myPrivate->objectBox.get_active_row_number () - 1;

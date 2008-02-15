@@ -111,6 +111,13 @@ goGUI::SceneView::~SceneView ()
 }
 
 //= FIXME: This must go into the control.
+/** 
+ * @brief Load an OFF into the scene.
+ *
+ * @todo This is a little misplaced here --- move it to SceneControl.
+ * 
+ * @param filename 
+ */
 void goGUI::SceneView::loadOFF (const char* filename)
 {
     if (myPrivate->scene.isNull())
@@ -152,6 +159,13 @@ void goGUI::SceneView::loadOFF (const char* filename)
     }
 }
 
+/** 
+ * @brief Set the light GL_LIGHT0.
+ * 
+ * @todo Remove --- the lights are all stored in the scene.
+ *
+ * @param light 
+ */
 void goGUI::SceneView::setLight (const goGL::Light& light)
 {
     if (!myPrivate->scene.isNull())
@@ -164,21 +178,45 @@ void goGUI::SceneView::setLight (const goGL::Light& light)
     }
 }
 
+/** 
+ * @brief Get goAutoPtr to the scene.
+ * 
+ * @return 
+ */
 goAutoPtr<goGL::Scene> goGUI::SceneView::getScene ()
 {
     return myPrivate->scene;
 }
 
+/** 
+ * @brief Set the scene.
+ * 
+ * @param s The scene. It is not copied, the same pointer is used.
+ */
 void goGUI::SceneView::setScene (goAutoPtr<goGL::Scene> s)
 {
     myPrivate->scene = s;
 }
 
+/** 
+ * @brief Get the spherical position of the camera around the scene.
+ *
+ * This is a remnant from \c OFFView -- keep it or not?
+ * 
+ * @return Vector containing the phi,theta pair.
+ */
 const goVectorf& goGUI::SceneView::getSphericalPosition () const
 {
     return myPrivate->spherical;
 }
 
+/** 
+ * @brief Set radius of the sphere around the origin at which the camera resides.
+ *
+ * This is a remnant from \c OFFView -- keep it or not?
+ * 
+ * @param r 
+ */
 void goGUI::SceneView::setRadius (goFloat r)
 {
     if (myPrivate->scene.isNull())
@@ -189,6 +227,13 @@ void goGUI::SceneView::setRadius (goFloat r)
     goMath::sphereToEuclidean (myPrivate->spherical[0], myPrivate->spherical[1], myPrivate->spherical[2], &cam.myPosition, &cam.myUp);
 }
 
+/** 
+ * @brief Set the spherical position of the camera.
+ * 
+ * This is a remnant from \c OFFView -- keep it or not?
+ *
+ * @param r 
+ */
 void goGUI::SceneView::setSphericalPosition (const goVectorf& r)
 {
     myPrivate->spherical = r;
@@ -203,6 +248,15 @@ void goGUI::SceneView::setSphericalPosition (const goVectorf& r)
     this->setView (pos, up, focus);
 }
 
+/** 
+ * @brief Set the camera position.
+ * 
+ * This is a remnant from \c OFFView -- keep it or not?
+ *
+ * @param position Position of the camera
+ * @param up       Up vector
+ * @param focus    Point the camera looks at.
+ */
 void goGUI::SceneView::setView (const goVectorf& position, const goVectorf& up, const goVectorf& focus)
 {
     if (myPrivate->scene.isNull())
@@ -215,6 +269,10 @@ void goGUI::SceneView::setView (const goVectorf& position, const goVectorf& up, 
     cam.myLookat = focus;
 }
 
+/** 
+ * @brief Sets the camera width/height to this widget's 
+ * size and calls \c goGL::Scene::render().
+ */
 void goGUI::SceneView::glDraw ()
 {
     if (myPrivate->scene.isNull())

@@ -10,6 +10,12 @@ namespace goGUI
 {
     class GLDrawableObjectInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input object for \c goGL::DrawableObject objects.
+     */
     class GLDrawableObjectInput : public GLObjectInput
     {
         public:
@@ -36,6 +42,9 @@ namespace goGUI
         private:
             GLDrawableObjectInputPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 
 };
 

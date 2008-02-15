@@ -12,6 +12,14 @@ namespace goGUI
 {
     class GLObjectInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input widget for \c goGL::Object objects.
+     *
+     * Provides for translation, rotation, and scale inputs.
+     */
     class GLObjectInput : public Gtk::Frame
     {
         public:
@@ -40,6 +48,9 @@ namespace goGUI
             GLObjectInputPrivate* myPrivate;
     };
 
+    /** 
+     * @brief Helper class for \c GLObjectInput.
+     */
     class GLObjectVectorInput : public MultiVectorInput
     {
         public:
@@ -60,6 +71,9 @@ namespace goGUI
             // sigc::signal<void> myInputChangedSignal;
             goCaller0<int> myInputChangedCaller;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

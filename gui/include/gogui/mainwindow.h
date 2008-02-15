@@ -9,6 +9,9 @@ namespace goGUI
 
     class MainWindowPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
     /** 
      * @brief Base class for a main application window.
      * Provides a menu bar, a standard File menu with about and quit items,
@@ -64,6 +67,9 @@ class MainWindow : public Gtk::Window
 
         MainWindowPrivate* myPrivate;
 };
+/** 
+ * @}
+ */
 };
 
 #endif

@@ -9,6 +9,12 @@ namespace goGL
 {
     class DrawableObjectPrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Drawable OpenGL object.
+     */
     class DrawableObject : public Object
     {
         public:
@@ -43,6 +49,9 @@ namespace goGL
         private:
             DrawableObjectPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

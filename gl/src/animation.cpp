@@ -58,11 +58,23 @@ goGL::Animation& goGL::Animation::operator= (const Animation& o)
     return *this;
 }
 
+/** 
+ * @brief 
+ * @deprecated
+ * 
+ * @param s 
+ */
 void goGL::Animation::setSteps (goSize_t s)
 {
     myPrivate->steps = s;
 }
 
+/** 
+ * @brief 
+ * @deprecated
+ * 
+ * @return 
+ */
 goSize_t goGL::Animation::getSteps () const
 {
     return myPrivate->steps;
@@ -73,11 +85,21 @@ goSize_t goGL::Animation::getSteps () const
 //    return myPrivate->waypoints;
 //}
 
+/** 
+ * @brief Get the list of waypoints.
+ * 
+ * @return The list of waypoints.
+ */
 const goList<goGL::Waypoint>& goGL::Animation::getWaypoints () const
 {
     return myPrivate->waypoints;
 }
 
+/** 
+ * @brief Add a waypoint to the end of the waypoint list.
+ * 
+ * @param wp Waypoint to add.
+ */
 void goGL::Animation::addWaypoint (const Waypoint& wp)
 {
     myPrivate->waypoints.append (wp);
@@ -89,12 +111,25 @@ void goGL::Animation::addWaypoint (const Waypoint& wp)
 //    return myPrivate->waypoints (i)->elem;
 //}
 
+/** 
+ * @brief Set a specific waypoint that already exists.
+ * 
+ * @param i   Index of the waypoints.
+ * @param wp  Waypoint to copy the data from.
+ */
 void goGL::Animation::setWaypoint (goIndex_t i, const goGL::Waypoint& wp)
 {
     myPrivate->waypoints(i)->elem = wp;
     myPrivate->initialised = false;
 }
 
+/** 
+ * @brief Get a specific existing waypoint.
+ * 
+ * @param i Index of the waypoint.
+ * 
+ * @return The waypoint number \c i.
+ */
 const goGL::Waypoint& goGL::Animation::getWaypoint (goIndex_t i) const
 {
     return myPrivate->waypoints (i)->elem;
@@ -123,12 +158,24 @@ void goGL::Animation::insertWaypoint (goIndex_t i, const goGL::Waypoint& wp)
     myPrivate->initialised = false;
 }
 
+/** 
+ * @brief Remove a specific waypoint.
+ * 
+ * @param i Index of the waypoint to remove.
+ */
 void goGL::Animation::removeWaypoint (goIndex_t i)
 {
     myPrivate->waypoints.remove (myPrivate->waypoints(i));
     myPrivate->initialised = false;
 }
 
+/** 
+ * @brief Write this animation to a file.
+ * 
+ * @param f File pointer.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goGL::Animation::writeASCII (FILE* f) const
 {
     goString s = "waypoints\n";
@@ -164,6 +211,13 @@ static inline bool CHECK_LINE (FILE* f, goString& s, const char* sought) {
     return ok;
 }
 
+/** 
+ * @brief Read animation into this object from a file.
+ * 
+ * @param f File pointer to read from.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goGL::Animation::readASCII (FILE* f)
 {
     myPrivate->waypoints.erase ();
@@ -206,6 +260,12 @@ bool goGL::Animation::readASCII (const char* fname)
     return ok;
 }
 
+/** 
+ * @brief Initialise the interpolation.
+ *
+ * This gets automatically called by \c interpolate() if
+ * something changed.
+ */
 void goGL::Animation::initInterpolation ()
 {
     if (this->getWaypoints().getSize() < 1)
@@ -235,6 +295,16 @@ void goGL::Animation::initInterpolation ()
     myPrivate->initialised = true;
 }
 
+/** 
+ * @brief Interpolate a waypoint at time \f$ t \in [0,1] \f$.
+ * 
+ * Currently, the translation of the waypoint is interpolated using
+ * cubic splines, and the rotation is interpolated by 
+ * linear interpolation on the space of rotations SO3.
+ *
+ * @param t   Time in the interval [0,1].
+ * @param ret The interpolated waypoint.
+ */
 void goGL::Animation::interpolate (goDouble t, Waypoint& ret)
 {
     if (!myPrivate->initialised)

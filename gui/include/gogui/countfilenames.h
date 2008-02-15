@@ -12,6 +12,9 @@
 namespace goGUI
 {
 
+/** @addtogroup gui
+ * @{
+ */
     /** 
      * @brief Widget that lets the user enter a base file name
      * and an extension and provides for a spin button to enter
@@ -41,6 +44,9 @@ namespace goGUI
             Gtk::SpinButton myCount;
             Gtk::Entry      mySuffixEntry;
     };
+/** 
+ * @}
+ */
 
 };
 #endif

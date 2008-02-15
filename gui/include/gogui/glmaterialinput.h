@@ -8,6 +8,12 @@ namespace goGUI
 {
     class GLMaterialInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input widget for \c goGL::Material objects.
+     */
     class GLMaterialInput : public MultiVectorInput
     {
         public:
@@ -27,6 +33,9 @@ namespace goGUI
         private:
             GLMaterialInputPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

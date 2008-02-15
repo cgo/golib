@@ -10,6 +10,21 @@ namespace goGUI
 {
     class GLWidgetPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief OpenGL widget.
+     *
+     * Derives from Gtk::DrawingArea. The GL capabilities are added using the
+     * gdkgl extension library.
+     * When using GL commands, always use them between calls to
+     * \c GLWidgetBegin and \c GLWidgetEnd.
+     * Use \c swapBuffers to swap buffers.
+     *
+     * When deriving from \c GLWidget, implement \c glDraw() to contain 
+     * any drawing routines (such as drawing opengl scenes).
+     */
     class GLWidget : public Gtk::DrawingArea
     {
         public:
@@ -35,6 +50,9 @@ namespace goGUI
         private:
             GLWidgetPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 }
 
 #endif

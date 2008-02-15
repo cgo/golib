@@ -9,6 +9,12 @@
 
 namespace goGL
 {
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Material object for OpenGL.
+     */
     class Material : public goObjectBase
     {
         public:
@@ -29,6 +35,9 @@ namespace goGL
             goVectorf myEmission;
             GLenum    myFace;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

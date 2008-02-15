@@ -13,6 +13,17 @@ static int check_gl_error (const char* name)
     return n;
 }
 
+/** 
+ * @brief Get the current OpenGL buffer into a \c goSignal3D<void>.
+ * 
+ * @param ret The image taken from the OpenGL buffer.
+ * It will have the data type that \c ret had before the call, and
+ * the format will depend on its channel count: If it has 1 channel,
+ * GL_LUMINANCE will be read, if 3, GL_RGB will be read, and if 4 channels GL_RGBA will be read.
+ * Any othe channel count will result in an error (return false).
+ *
+ * @return True if successful, false otherwise.
+ */
 bool goGL::getGLBuffer (goSignal3D<void>& ret)
 {
     glReadBuffer (GL_FRONT);

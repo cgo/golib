@@ -10,6 +10,9 @@ namespace goGUI
 
 class ControlPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
 /** 
  * @brief Control frame base class.
  * This is a frame that can be used as a base for all sorts of 
@@ -35,6 +38,9 @@ class Control : public Gtk::Frame
     private:
         ControlPrivate* myPrivate;
 };
+/** 
+ * @}
+ */
 };
 
 #endif

@@ -10,6 +10,12 @@
 
 namespace goGL
 {
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Camera object.
+     */
     class Camera : public goObjectBase
     {
         public:
@@ -39,6 +45,9 @@ namespace goGL
             goVectorf myLookat;
             goVectorf myUp;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

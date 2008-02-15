@@ -157,4 +157,15 @@
  * \defgroup thread Multithreading classes
  * \defgroup video Video capture and related
  * \defgroup gm Belief propagation and factor graphs
+ * 
+ * \defgroup gui GUI elements
+ * \todo Documentation is rudimentary.
+ *
+ * This module contains GUI elements that use the GTKMM library.
+ *
+ * \defgroup gl OpenGL related
+ * \todo Documentation is rudimentary.
+ *
+ * This module provides a few classes that allow building simple scenes in OpenGL,
+ * create textures, display images as textures in OpenGL, and so on.
  */

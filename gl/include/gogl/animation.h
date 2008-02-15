@@ -8,6 +8,16 @@ namespace goGL
 {
     class AnimationPrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Animation object.
+     *
+     * Given a set of waypoints (or "keyframes"),
+     * interpolates between these points the translation and rotation
+     * on a curve interpolating these waypoints.
+     */
     class Animation : public goObjectBase
     {
         public:
@@ -41,6 +51,9 @@ namespace goGL
         private:
             AnimationPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

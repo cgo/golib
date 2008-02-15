@@ -6,6 +6,18 @@
 
 namespace goGUI
 {
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Interface for drawing on a drawable widget.
+     *
+     * This currently uses Gdk::Drawable, and will in the future use
+     * Cairo (in newer versions of gtkmm).
+     *
+     * In the constructor, give e.g. the result from \c Widget::get_window().
+     *
+     */
     class Draw
     {
         public:
@@ -23,6 +35,9 @@ namespace goGUI
             Glib::RefPtr<Gdk::Drawable> myDrawable;
             Glib::RefPtr<Gdk::GC>       myGC;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

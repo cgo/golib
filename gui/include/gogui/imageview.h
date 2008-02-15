@@ -10,6 +10,15 @@ namespace goGUI
 {
     class ImageViewPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Image display widget.
+     *
+     * This widget can display images from \c goSignal3DBase<void> objects
+     * and additionally can draw curves given as point matrices.
+     */
     class ImageView : public Gtk::DrawingArea
     {
         public:
@@ -34,6 +43,9 @@ namespace goGUI
         private:
             ImageViewPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

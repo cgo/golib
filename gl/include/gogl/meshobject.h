@@ -19,6 +19,12 @@ namespace goGL
 {
     class MeshObjectPrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief A mesh object for OpenGL.
+     */
     class MeshObject : public DrawableObject
     {
         public:
@@ -63,6 +69,9 @@ namespace goGL
         private:
             MeshObjectPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

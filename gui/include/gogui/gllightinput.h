@@ -11,6 +11,12 @@ namespace goGUI
 {
     class GLLightInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input widget for \c goGL::Light objects.
+     */
     class GLLightInput : public MultiVectorInput
     {
         public:
@@ -33,6 +39,9 @@ namespace goGUI
         private:
             GLLightInputPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

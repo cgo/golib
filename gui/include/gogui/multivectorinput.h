@@ -12,6 +12,14 @@ namespace goGUI
 {
     class MultiVectorInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input for multiple vectors.
+     *
+     * Contains several \c goGUI::VectorInput inputs.
+     */
     class MultiVectorInput : public Gtk::Frame
     {
         public:
@@ -31,6 +39,9 @@ namespace goGUI
         private:
             MultiVectorInputPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

@@ -7,6 +7,12 @@ namespace goGL
 {
     class WaypointPrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Waypoint to \c goGL::Animation objects.
+     */
     class Waypoint : public Object
     {
         public:
@@ -19,6 +25,9 @@ namespace goGL
         private:
             WaypointPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

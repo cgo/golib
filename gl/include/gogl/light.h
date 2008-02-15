@@ -9,6 +9,12 @@
 
 namespace goGL
 {
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Light object for OpenGL.
+     */
     class Light : public goObjectBase
     {
         public:
@@ -31,6 +37,9 @@ namespace goGL
 
             bool      myEnabled;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

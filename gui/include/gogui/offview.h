@@ -10,6 +10,17 @@ namespace goGUI
 {
     class OFFViewPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief View widget for OFF files (OpenGL).
+     *
+     * This is somewhat deprecated but still used; if
+     * making something new, use \c SceneView instead.
+     * This will not be removed in the near future, just do not use
+     * it in new code.
+     */
 class OFFView : public goGUI::GLWidget
 {
     public: 
@@ -49,6 +60,9 @@ class OFFView : public goGUI::GLWidget
 
         OFFViewPrivate* myPrivate;
 };
+/** 
+ * @}
+ */
 }
 
 #endif

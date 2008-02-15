@@ -10,6 +10,12 @@ namespace goGL
 {
     class ObjectPrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief Base class for OpenGL scene objects.
+     */
     class Object : public goObjectBase
     {
         public:
@@ -42,6 +48,9 @@ namespace goGL
         private:
             ObjectPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

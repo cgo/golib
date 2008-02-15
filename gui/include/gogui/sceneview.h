@@ -11,6 +11,12 @@ namespace goGUI
 {
     class SceneViewPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Scene view widget, showing a \c goGL::Scene.
+     */
 class SceneView : public goGUI::GLWidget
 {
     public: 
@@ -45,6 +51,9 @@ class SceneView : public goGUI::GLWidget
     private:
         SceneViewPrivate* myPrivate;
 };
+/** 
+ * @}
+ */
 }
 
 #endif

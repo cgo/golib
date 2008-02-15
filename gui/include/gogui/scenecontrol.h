@@ -8,6 +8,12 @@ namespace goGUI
 {
     class SceneControlPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Control for a \c goGUI::SceneView.
+     */
     class SceneControl : public Control
     {
         public:
@@ -52,6 +58,9 @@ namespace goGUI
         private:
             SceneControlPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

@@ -14,6 +14,12 @@ namespace goGUI
 {
     class GLAnimationPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input widget for goGL::Animation objects.
+     */
     class GLAnimation : public Gtk::Frame
     {
         public:
@@ -53,6 +59,9 @@ namespace goGUI
         private:
             GLAnimationPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

@@ -11,6 +11,12 @@ namespace goGL
 {
     class ScenePrivate;
 
+/** @addtogroup gl
+ * @{
+ */
+    /** 
+     * @brief OpenGL scene class.
+     */
     class Scene : public Object
     {
         public:
@@ -41,6 +47,9 @@ namespace goGL
         private:
             ScenePrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif

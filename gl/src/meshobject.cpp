@@ -67,6 +67,11 @@ goGL::MeshObject& goGL::MeshObject::operator= (const MeshObject& o)
     return *this;
 }
 
+/** 
+ * @brief Calls everything necessary for OpenGL to draw this object.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goGL::MeshObject::operator () () const
 {
     glPushMatrix ();
@@ -89,6 +94,12 @@ bool goGL::MeshObject::operator () () const
     return true;
 }
 
+/** 
+ * @brief Searches for faces containing double vertices and and removes
+ * the bad faces.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goGL::MeshObject::removeDoubles ()
 {
     goFixedArray<goVector<int> >& faces = myPrivate->faces;
@@ -129,6 +140,11 @@ bool goGL::MeshObject::removeDoubles ()
     return true;
 }
 
+/** 
+ * @brief Get the minimum coordinates of all vertices.
+ * 
+ * @return goVectorf pointer, containing the minimum coordinates.
+ */
 goAutoPtr<goVectorf> goGL::MeshObject::getMin () const
 {
     goSize_t N = myPrivate->vertices.getColumns ();
@@ -142,6 +158,11 @@ goAutoPtr<goVectorf> goGL::MeshObject::getMin () const
     return ret;
 }
 
+/** 
+ * @brief Get the maximum coordinates of all vertices.
+ * 
+ * @return goVectorf pointer, containing the maximum coordinates.
+ */
 goAutoPtr<goVectorf> goGL::MeshObject::getMax () const
 {
     goSize_t N = myPrivate->vertices.getColumns ();
@@ -155,21 +176,37 @@ goAutoPtr<goVectorf> goGL::MeshObject::getMax () const
     return ret;
 }
 
+/** 
+ * @brief Get the matrix with the vertices of this object.
+ * 
+ * @return Matrix containing a vertex per row.
+ */
 goMatrixf& goGL::MeshObject::getVertices ()
 {
     return myPrivate->vertices;
 }
 
+/** 
+ * @brief Get the faces of this object.
+ * 
+ * @return Array containing the indices of vertices for each face.
+ */
 goFixedArray<goVector<int> >& goGL::MeshObject::getFaces ()
 {
     return myPrivate->faces;
 }
 
+/** 
+ * @brief See non-const version.
+ */
 const goMatrixf& goGL::MeshObject::getVertices () const
 {
     return myPrivate->vertices;
 }
 
+/** 
+ * @brief See non-const version.
+ */
 const goFixedArray<goVector<int> >& goGL::MeshObject::getFaces () const
 {
     return myPrivate->faces;
@@ -258,9 +295,10 @@ static bool contains (const goVector<T>& a, T v)
 }
 
 /** 
- * @brief This is very slow -- calculate normals for all vertices.
+ * @brief Calculate normals for all vertices and faces.
  * 
  * @param normals Normals for each vertex.
+ * @param face_normals Normals for each face.
  */
 void goGL::MeshObject::calculateNormals (goMatrixf& normals, goMatrixf& face_normals) const
 {
@@ -551,11 +589,19 @@ bool goGL::MeshObject::readASCII (FILE* f)
     return ok;
 }
 
+/** 
+ * @brief Set a filename that will be stored with \c writeASCII().
+ * 
+ * @param filename 
+ */
 void goGL::MeshObject::setFilename (const char* filename)
 {
     myPrivate->filename = filename;
 }
 
+/** 
+ * @brief Get the filename that will be stored with \c writeASCII().
+ */
 const char* goGL::MeshObject::getFilename () const
 {
     return myPrivate->filename.toCharPtr ();

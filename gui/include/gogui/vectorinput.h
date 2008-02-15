@@ -8,6 +8,15 @@ namespace goGUI
 {
     class VectorInputPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Input for a vector.
+     *
+     * For each entry in the vector, a spin button is created.
+     * Each time an entry changes, \c signalChanged() is emitted.
+     */
     class VectorInput : public Gtk::Frame
     {
         public:
@@ -35,6 +44,9 @@ namespace goGUI
         private:
             VectorInputPrivate* myPrivate;
     };
+/** 
+ * @}
+ */
 };
 
 #endif
