@@ -10,14 +10,27 @@
  *
  * \section license License
  * I first indended to release the library under the GPL, but
- * I have no time to think about licensing issues now.
+ * for various reasons this is not the current license.
  * Therefore, copying, changing, or in any way using this library
  * is <b>not</b> allowed without my prior written consent.
  * If you have the code or binary and do not agree to these terms,
  * do not use it and delete it immediately.
  * If you have questions, please contact me.
- * <br>
- * 
+ * So, here come the
+ * \subsection lic_reg Regulations
+ * License regulations for golib (in the following also "code", "software").<br>
+1. This code is written by and 
+   copyright by Christian Gosch ("the author"),
+   <christian <AT> goschs dot de> <br>
+2. No copying is allowed without prior written consent
+   from the author. <br>
+3. Neither commercial nor any other use of the code is allowed
+   without prior written consent from the author. <br>
+4. Modifications of the code are not allowed without prior written
+   consent from the author. Modified versions of the code
+   may not be handed on to a third party, regardless of
+   agreements with the author concerning the unmodified code.<br>
+ *
  * If you should find that the version you downloaded is out of date
  * and does not match this documentation, please notify the me, the author,
  * at <code>christian __at__ goschs __ de</code>.

@@ -280,11 +280,13 @@ class goCaller1
         virtual Tret operator () (Targ1 a1)
         {
             typename goList< goAutoPtr<goFunctorBase1<Tret,Targ1> > >::Element* el = this->fList.getFrontElement ();
+            Tret ret;
             while (el)
             {
-                (*el->elem)(a1);
+                ret = (*el->elem)(a1);
                 el = el->next;
             }
+            return ret;
         };
 
     private:

@@ -20,6 +20,8 @@ namespace goGUI
                   tips (),
                   view (),
                   viewWindow (),
+                  angle_changed (),
+                  angle_changed_caller (),
                   viewConnection ()
             {
                 this->radius.set_range (0.0, 10000.0);
@@ -45,6 +47,7 @@ namespace goGUI
             goGUI::OFFView view;
             Gtk::Window viewWindow;
             sigc::signal<void, goVectorf> angle_changed;
+            goCaller1<int, goVectorf> angle_changed_caller;
 
             sigc::connection viewConnection;
     };
@@ -138,7 +141,7 @@ void goGUI::OFFViewControl::OFFViewRotated ()
 //    myPrivate->view.GLWidgetBegin();
 //    myPrivate->view.glDraw();
 //    myPrivate->view.GLWidgetEnd();
-    // myPrivate->angle_changed(rotation);
+    myPrivate->angle_changed_caller (rotation);
 }
 
 void goGUI::OFFViewControl::radiusChanged ()
@@ -239,6 +242,12 @@ sigc::signal<void, goVectorf>&
 goGUI::OFFViewControl::angleChangedSignal ()
 {
     return myPrivate->angle_changed;
+}
+
+goCaller1<int, goVectorf>&
+goGUI::OFFViewControl::angleChangedCaller ()
+{
+    return myPrivate->angle_changed_caller;
 }
 
 void goGUI::OFFViewControl::lightDialog ()

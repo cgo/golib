@@ -357,7 +357,9 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig, bool linear) t
     if (ilLoadImage (fn.getPtr()) == IL_FALSE)
     {
         ilDeleteImages (1, &imageName);
-        goLog::warning("goFileIO::readImage(): IL could not load image.");
+        goString s = "goFileIO::readImage(): IL could not load image ";
+        s += fn;
+        goLog::warning(s);
         throw goFileIOException(goFileIOException::FAILED);
         return false;
     }

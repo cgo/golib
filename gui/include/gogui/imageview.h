@@ -31,7 +31,9 @@ namespace goGUI
             void              setImage  (const goSignal3DBase<void>& image);
             goSignal3D<void>& getImage  ();
             void              addCurve  (const goMatrixd& M);
-            goList<goMatrixd>& getCurves  ();
+            void              removeCurve (goIndex_t i);
+            void              setCurve (goIndex_t i, const goMatrixd& M);
+            const goList<goMatrixd>& getCurves  () const;
 
         protected:
             virtual bool on_expose_event (GdkEventExpose* event);

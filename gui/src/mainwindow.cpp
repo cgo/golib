@@ -89,13 +89,17 @@ void MainWindow::addControl (goGUI::Control& c, bool active)
     myPrivate->controls.append (&c);
     
     Gtk::CheckMenuItem* item = Gtk::manage (new Gtk::CheckMenuItem (c.get_label()));
-    item->set_active (active);
     this->getControlsMenu()->append (*item);
 #ifdef HAVE_GTK_2_4
     item->signal_toggled().connect (sigc::bind<goGUI::Control*, Gtk::CheckMenuItem*> (sigc::mem_fun (this, &MainWindow::controlsToggled), &c, item));
 #elif HAVE_GTK_2
     item->signal_toggled().connect (SigC::bind<goGUI::Control*, Gtk::CheckMenuItem*> (SigC::slot (this, &MainWindow::controlsToggled), &c, item));
 #endif
+    item->set_active (active);
+    if (!active)
+        c.hide ();
+    else
+        c.show ();
 
     // Add standard connections if any come up.
 #ifdef HAVE_GTK_2
@@ -103,6 +107,32 @@ void MainWindow::addControl (goGUI::Control& c, bool active)
 #elif defined HAVE_GTK_2_4
     //menuItem->signal_activate().connect (sigc::mem_fun (*this, &MainWindow::fileAbout));
 #endif
+}
+
+/** 
+ * @brief Shows/hides controls as indicated by the controls menu.
+ */
+void MainWindow::setControlsVisibility ()
+{
+    Gtk::Menu_Helpers::MenuList& ml = this->getControlsMenu()->items ();
+    goSize_t i = 0;
+    Gtk::Menu_Helpers::MenuList::iterator it = ml.begin ();
+    Gtk::Menu_Helpers::MenuList::iterator itend = ml.end ();
+    goList<void*>::Element* el = myPrivate->controls.getFrontElement ();
+    while (it != itend && el)
+    {
+        Gtk::CheckMenuItem* mi = dynamic_cast<Gtk::CheckMenuItem*> (&*it);
+        if (mi)
+        {
+            if (mi->get_active())
+                static_cast<Control*> (el->elem)->show ();
+            else
+                static_cast<Control*> (el->elem)->hide ();
+            ++i;
+            el = el->next;
+        }
+        ++it;
+    }
 }
 
 void MainWindow::addFileAbout (const char* aboutText)

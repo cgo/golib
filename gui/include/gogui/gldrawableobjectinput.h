@@ -34,6 +34,7 @@ namespace goGUI
             void setDrawable (const goGL::DrawableObject& o);
             void getDrawable (goGL::DrawableObject& o);
             int inputChangedSlotDrawableObject ();
+            void inputChangedShadeModel ();
 
         private:
             GLDrawableObjectInput (const GLDrawableObjectInput&);

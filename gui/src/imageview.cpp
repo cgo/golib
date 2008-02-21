@@ -4,13 +4,38 @@
 
 namespace goGUI
 {
+    class ImageViewCurveAttr
+    {
+        public:
+            ImageViewCurveAttr ()
+                : thickness (1),
+                  linestyle (Gdk::LINE_SOLID),
+                  capstyle (Gdk::CAP_ROUND),
+                  joinstyle (Gdk::JOIN_ROUND),
+                  colour (3)
+            {
+                colour[0] = 1.0f;
+                colour[1] = 0.0f;
+                colour[2] = 0.0f;
+            };
+
+            ~ImageViewCurveAttr () {};
+
+            int thickness;
+            Gdk::LineStyle linestyle;
+            Gdk::CapStyle capstyle;
+            Gdk::JoinStyle joinstyle;
+            goVectorf colour;
+    };
+
     class ImageViewPrivate
     {
         public:
             ImageViewPrivate() : curves(), image() {};
             ~ImageViewPrivate () {};
 
-            goList<goMatrixd> curves;
+            goList<goMatrixd>          curves;
+            goList<ImageViewCurveAttr> curveAttributes;  //= These are not used yet. Add them.
             goSignal3D<void>  image;
     };
 };
@@ -39,15 +64,16 @@ goGUI::ImageView::~ImageView ()
 void goGUI::ImageView::drawCurve (const goMatrixd& curve)
 {
     goGUI::Draw draw (this->get_window());
+    ImageViewCurveAttr attr;
     Gdk::Color c;
-    c.set_rgb_p (1.0, 0.0, 0.0);
+    c.set_rgb_p (attr.colour[0], attr.colour[1], attr.colour[2]);
     if (!(bool)(draw.getGC()->get_colormap()))
     {
         printf ("ImageView::drawCurve(): Do not have a colormap.");
     }
     //draw.getGC()->set_foreground (c);
     draw.getGC()->set_rgb_fg_color (c);
-    draw.getGC()->set_line_attributes (3, Gdk::LINE_SOLID, Gdk::CAP_ROUND, Gdk::JOIN_ROUND);
+    draw.getGC()->set_line_attributes (attr.thickness, attr.linestyle, attr.capstyle, attr.joinstyle);
     draw.curve (curve);
 }
 
@@ -111,9 +137,33 @@ void goGUI::ImageView::addCurve (const goMatrixd& M)
  * 
  * @return List of matrices.
  */
-goList<goMatrixd>& goGUI::ImageView::getCurves ()
+const goList<goMatrixd>& goGUI::ImageView::getCurves () const
 {
     return myPrivate->curves;
+}
+
+/** 
+ * @brief Remove curve \c i.
+ * 
+ * @param i Index of curve to remove.
+ */
+void goGUI::ImageView::removeCurve (goIndex_t i)
+{
+    myPrivate->curves.remove (myPrivate->curves (i));
+}
+
+/** 
+ * @brief Set the curve points of curve \c i.
+ * 
+ * @param i Index of curve.
+ * @param M N x 2 Matrix of curve points.
+ */
+void goGUI::ImageView::setCurve (goIndex_t i, const goMatrixd& M)
+{
+    goList<goMatrixd>::Element* el = myPrivate->curves (i);
+    if (!el)
+        return;
+    el->elem = M;
 }
 
 /** 

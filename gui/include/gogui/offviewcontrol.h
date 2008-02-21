@@ -4,6 +4,9 @@
 #include <gogui/control.h>
 #include <gogui/offview.h>
 #include <gtkmm.h>
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 namespace goGUI
 {
@@ -35,6 +38,8 @@ namespace goGUI
             goFloat getRadius () const;
             void    setRadius (goFloat r);
             sigc::signal<void, goVectorf>& angleChangedSignal ();
+
+            goCaller1<int, goVectorf>& angleChangedCaller ();
 
         private:
             OFFViewControl (const OFFViewControl&);

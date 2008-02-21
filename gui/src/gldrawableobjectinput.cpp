@@ -1,6 +1,7 @@
 #include <gogui/gldrawableobjectinput.h>
 #include <gogl/material.h>
 #include <gogui/glmaterialinput.h>
+#include <gtkmm.h>
 
 namespace goGUI
 {
@@ -9,11 +10,19 @@ namespace goGUI
         public:
             GLDrawableObjectInputPrivate () 
                 : materialInput (), material (), 
-                callerChanged (), object (0) {};
+                shadeModelInput (),
+                shadeModelConnection (),
+                callerChanged (), 
+                object (0)
+            {
+            };
+
             ~GLDrawableObjectInputPrivate () {};
 
             goGUI::GLMaterialInput materialInput;
             goGL::Material         material;
+            Gtk::ComboBoxText      shadeModelInput;
+            sigc::connection       shadeModelConnection;
 
             // sigc::signal<void> signalChanged;
             goCaller0<int> callerChanged;
@@ -28,11 +37,24 @@ goGUI::GLDrawableObjectInput::GLDrawableObjectInput ()
 {
     myPrivate = new GLDrawableObjectInputPrivate;
     this->getBox()->pack_start (myPrivate->materialInput);
+    {
+        myPrivate->shadeModelInput.append_text ("Smooth");
+        myPrivate->shadeModelInput.append_text ("Flat");
+        myPrivate->shadeModelInput.set_active (0);
+        Gtk::HBox* hbox = Gtk::manage (new Gtk::HBox);
+        Gtk::Label* l = Gtk::manage (new Gtk::Label);
+        l->set_text ("Shade model: ");
+        hbox->pack_start (*l, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->shadeModelInput, Gtk::PACK_SHRINK);
+        this->getBox()->pack_start (*hbox);
+        hbox->show_all ();
+    }
     myPrivate->materialInput.set (myPrivate->material);
     // this->signalObjectInputChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
     this->callerObjectInputChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
     // myPrivate->materialInput.signalChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
     myPrivate->materialInput.callerChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    myPrivate->shadeModelConnection = myPrivate->shadeModelInput.signal_changed().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedShadeModel));
 }
 
 goGUI::GLDrawableObjectInput::~GLDrawableObjectInput ()
@@ -87,8 +109,17 @@ void goGUI::GLDrawableObjectInput::updateInput ()
  */
 void goGUI::GLDrawableObjectInput::setDrawable (const goGL::DrawableObject& o)
 {
+    //= If we do not disconnect here, an application may crash.
+    myPrivate->shadeModelConnection.disconnect ();
     GLObjectInput::set (o);
     myPrivate->materialInput.set (o.getMaterial ());
+    switch (o.getShadeModel())
+    {
+        case GL_SMOOTH: myPrivate->shadeModelInput.set_active (0); break;
+        case GL_FLAT: myPrivate->shadeModelInput.set_active (1); break;
+        default: goLog::warning ("goGUI::GLDrawableObjectInput::setDrawable (): unknown shade model.");
+    }
+    myPrivate->shadeModelConnection = myPrivate->shadeModelInput.signal_changed().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedShadeModel));
 }
 
 /** 
@@ -100,6 +131,12 @@ void goGUI::GLDrawableObjectInput::getDrawable (goGL::DrawableObject& o)
 {
     GLObjectInput::get (o);
     myPrivate->materialInput.get (o.getMaterial ());
+    switch (myPrivate->shadeModelInput.get_active_row_number ())
+    {
+        case 0: o.setShadeModel (GL_SMOOTH); break;
+        case 1: o.setShadeModel (GL_FLAT); break;
+        default: goLog::warning ("goGUI::GLDrawableObjectInput::getDrawable (): unknown shade model.");
+    }
 }
 
 /** 
@@ -112,7 +149,13 @@ int goGUI::GLDrawableObjectInput::inputChangedSlotDrawableObject ()
     if (!myPrivate->object.isNull())
         this->getDrawable (*myPrivate->object);
 
-    myPrivate->callerChanged ();
+    return myPrivate->callerChanged ();
+}
+
+void goGUI::GLDrawableObjectInput::inputChangedShadeModel ()
+{
+    //= Just relay
+    this->inputChangedSlotDrawableObject ();
 }
 
 /** 

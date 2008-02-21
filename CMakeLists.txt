@@ -320,7 +320,7 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
 #FIND_LIBRARY (ATLAS NAMES atlas PATHS ${GOPATH}/extra/lib)
 #FIND_LIBRARY (CBLAS NAMES cblas PATHS ${GOPATH}/extra/lib)
-#FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS ${GOPATH}/extra/lib)
+FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
 FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
 FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
 FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
