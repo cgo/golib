@@ -65,7 +65,8 @@ goGUI::OFFViewControl::OFFViewControl ()
 
         this->signal_hide().connect (sigc::mem_fun (*this, &OFFViewControl::onHide));
         this->signal_show().connect (sigc::mem_fun (*this, &OFFViewControl::onShow));
-        myPrivate->viewConnection = myPrivate->view.signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
+        //myPrivate->viewConnection = myPrivate->view.signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
+        myPrivate->view.callerRotated().connect (goMemberFunction<OFFViewControl,int> (this, &goGUI::OFFViewControl::OFFViewRotated));
     }
 
     myPrivate->tips.enable ();
@@ -123,8 +124,9 @@ goGUI::OFFViewControl::~OFFViewControl ()
 //    }
 //}
 
-void goGUI::OFFViewControl::OFFViewRotated ()
+int goGUI::OFFViewControl::OFFViewRotated ()
 {
+    printf ("OFFViewControl::OFFViewRotated()\n");
     goVectorf rotation = myPrivate->view.getSphericalPosition ();
     goString s; 
     s.resize (1024);
@@ -137,7 +139,6 @@ void goGUI::OFFViewControl::OFFViewRotated ()
     //        myPrivate->theta.set_value (rotation[1]);
     myPrivate->radius.set_value (rotation[2]);
     // myPrivate->view->setRotation (rotation);
-    myPrivate->view.queue_draw();
 //    myPrivate->view.GLWidgetBegin();
 //    myPrivate->view.glDraw();
 //    myPrivate->view.GLWidgetEnd();

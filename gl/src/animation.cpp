@@ -2,6 +2,8 @@
 #include <gofileio.h>
 #include <gomath.h>
 
+#include <assert.h>
+
 namespace goGL
 {
     class AnimationPrivate
@@ -12,6 +14,9 @@ namespace goGL
                   positions (),
                   initialised (false),
                   accumLength (),
+                  times (),
+                  constantSpeedFromPosition (true),
+                  autoTime (true),
                   steps (100)
             {};
             ~AnimationPrivate () {};
@@ -22,7 +27,11 @@ namespace goGL
             bool initialised;
 
             goFixedArray<goDouble> accumLength;
-
+            goFixedArray<goDouble> times;
+            bool constantSpeedFromPosition; //= Use the positions to calculate frames with roughly constant speed --
+                                            //= this only works when the position curve is regular, i.e. no subsequent positions
+                                            //= are equal!
+            bool autoTime;
             goSize_t steps;
     };
 };
@@ -170,6 +179,62 @@ void goGL::Animation::removeWaypoint (goIndex_t i)
 }
 
 /** 
+ * @brief Set how to calculate the point in time for each waypoint.
+ * 
+ * If set to true, the time for each waypoint is calculated from its translation,
+ * to yield a roughly constant speed.
+ * If set to false, the time points set in the waypoints themselves are used.
+ * @note No subsequent positions may be equal if this is set to true.
+ * Set to false if you want to interpolate e.g. only rotations.
+ * The default for this property is \c true.
+ *
+ * @param t Flag, true or false.
+ */
+void goGL::Animation::setConstantSpeedFromPosition (bool t)
+{
+    myPrivate->constantSpeedFromPosition = t;
+}
+
+/** 
+ * @brief Get the constant speed flag.
+ *
+ * @see setConstantSpeedFromPosition().
+ * 
+ * @return The constant speed flag.
+ */
+bool goGL::Animation::getConstantSpeedFromPosition () const
+{
+    return myPrivate->constantSpeedFromPosition;
+}
+
+/** 
+ * @brief Set whether to fill time points when initialising.
+ * 
+ * If set to \c true (default), \c initInterpolation() will fill the
+ * time of each waypoint, uniformly filling the time between 0 and 1.
+ *
+ * If set to \c false, the times are untouched.
+ *
+ * @param t True of false.
+ */
+void goGL::Animation::setAutoTime (bool t)
+{
+    myPrivate->autoTime = t;
+}
+
+/** 
+ * @brief Get the auto time flag.
+ *
+ * @seet setAutoTime()
+ * 
+ * @return The auto time flag.
+ */
+bool goGL::Animation::getAutoTime () const
+{
+    return myPrivate->autoTime;
+}
+
+/** 
  * @brief Write this animation to a file.
  * 
  * @param f File pointer.
@@ -276,21 +341,78 @@ void goGL::Animation::initInterpolation ()
     goMatrixf& positions = myPrivate->positions;
     positions.resize (this->getWaypoints().getSize(), 3);
 
+    goFixedArray<goDouble>& times = myPrivate->times;
+    times.setSize (this->getWaypoints().getSize());
+
     goList<Waypoint>::Element* el = myPrivate->waypoints.getFrontElement ();
     goSize_t i = 0;
     while (el && i < positions.getRows())
     {
         positions.setRow (i, el->elem.getTranslation());
+        if (this->getAutoTime())
+            el->elem.setTime ((goDouble)i);
         ++i;
         el = el->next;
     }
     
-    goMatrixf resampled (0,0);
+    if (myPrivate->constantSpeedFromPosition)
+    {
+        //= FIXME: This is only used to estimate the accumLength array,
+        //=        which would be the time line normally. It is only a quick hack, so fix it
+        //=        by only calculating the lengths directly or by adding a "real" editable time line.
+        goMatrixf resampled (0,0);
+        goMath::resampleCubic<goFloat> (positions, resampled, positions.getRows(), false, &myPrivate->accumLength);
 
-    //= FIXME: This is only used to estimate the accumLength array,
-    //=        which would be the time line normally. It is only a quick hack, so fix it
-    //=        by only calculating the lengths directly or by adding a "real" editable time line.
-    goMath::resampleCubic<goFloat> (positions, resampled, positions.getRows(), false, &myPrivate->accumLength);
+        //= Initialise points in time from the accumulated curve length at each position
+        el = myPrivate->waypoints.getFrontElement();
+        i = 0;
+        goSize_t N = myPrivate->accumLength.getSize();
+        goDouble lastL = myPrivate->accumLength[N - 1];
+        if (lastL == 0.0)
+        {
+            goLog::warning ("goGL::Animation::initInterpolation(): lastL == 0. Not initialising.");
+            return;
+        }
+        while (el && i < N)
+        {
+            el->elem.setTime (myPrivate->accumLength[i] / lastL);
+            times[i] = el->elem.getTime ();
+            ++i;
+            el = el->next;
+        }
+    }
+    else
+    {
+        //= Check if points in time are sensible and renormalise them to be between 0 and 1
+        goDouble last_t = 1.0;
+        {
+            goList<Waypoint>::Element* e = myPrivate->waypoints.getTailElement ();
+            if (e)
+                last_t = e->elem.getTime ();
+        }
+        if (last_t == 0.0)
+        {
+            goLog::warning ("goGL::Animation::initInterpolation(): last_t == 0. Something is wrong with the time of the last waypoint. Not initialising.");
+            return;
+        }
+        el = myPrivate->waypoints.getFrontElement ();
+        if (el && el->elem.getTime() != 0.0)
+            el->elem.setTime (0.0);
+        el = el->next;
+        times[0] = 0.0;
+        i = 1;
+        while (el)
+        {
+            el->elem.setTime (el->elem.getTime() / last_t); 
+            if (el->elem.getTime() <= el->prev->elem.getTime())
+            {
+                goLog::warning ("goGL::Animation::initInterpolation(): points in time for waypoints must be increasing!");
+            }
+            times[i] = el->elem.getTime ();
+            ++i;
+            el = el->next;
+        }
+    }
 
     myPrivate->initialised = true;
 }
@@ -315,15 +437,16 @@ void goGL::Animation::interpolate (goDouble t, Waypoint& ret)
     //=
 
     //= Total curve length
-    goDouble L = myPrivate->accumLength[myPrivate->accumLength.getSize() - 1];
+    //goDouble L = myPrivate->accumLength[myPrivate->accumLength.getSize() - 1];
 
     //= Length at which to interpolate
-    goDouble l = t * L;
+    //goDouble l = t * L;
     
     //= Find points which enclose l
     goSize_t i = 0;
-    goSize_t sz = myPrivate->accumLength.getSize();
-    while (i < sz && myPrivate->accumLength[i] <= l)
+    //goSize_t sz = myPrivate->accumLength.getSize();
+    goSize_t sz = myPrivate->times.getSize ();
+    while (i < sz && myPrivate->times[i] <= t)
     {
         ++i;
     }
@@ -369,12 +492,17 @@ void goGL::Animation::interpolate (goDouble t, Waypoint& ret)
         myPrivate->positions.refRow (i+1, p2);
     }
 
-    goFixedArray<goDouble>& accumLength = myPrivate->accumLength;
+    // goFixedArray<goDouble>& accumLength = myPrivate->accumLength;
+    goFixedArray<goDouble>& times = myPrivate->times;
 
-    goDouble ll = accumLength[i] - accumLength[i - 1];
-    
+    //goDouble ll = accumLength[i] - accumLength[i - 1];
+    goDouble ttt = times[i] - times[i - 1];
+
+    assert (ttt != 0.0);
+
     //= Local t
-    goDouble tt = 1.0 - (accumLength[i] - l) / ll;
+    //goDouble tt = 1.0 - (accumLength[i] - l) / ll;
+    goDouble tt = 1.0 - (times[i] - t) / ttt;
     //= Interpolate translation
     goMath::CubicSplineND<goFloat> spline (pm1, p0, p1, p2);
     goAutoPtr<goVectorf> s = spline ( tt );

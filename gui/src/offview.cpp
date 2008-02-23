@@ -44,7 +44,8 @@ namespace goGUI
                 p0 (3),
                 signal_changed(),
                 signal_changed_final(),
-                signal_rotated(),
+                // signal_rotated(),
+                caller_rotated(),
                 rotationStart (2), rotationEnd (2)
             {
                 spherical.fill (0.0f);
@@ -78,7 +79,11 @@ namespace goGUI
 
             sigc::signal<void> signal_changed;       // emitted any time the image changed
             sigc::signal<void> signal_changed_final; // emitted e.g. when the mouse pointer is released after rotation
-            sigc::signal<void> signal_rotated;
+            // sigc::signal<void> signal_rotated;
+
+            //goCaller0<int> caller_changed;
+            //goCaller0<int> caller_changed_final;
+            goCaller0<int> caller_rotated;
 
             enum Mode
             {
@@ -373,20 +378,25 @@ goGL::OFFFile& goGUI::OFFView::getOFFFile ()
     return this->off;
 }
 
-sigc::signal<void> goGUI::OFFView::signalChanged()
+sigc::signal<void>& goGUI::OFFView::signalChanged()
 {
     return myPrivate->signal_changed;
 }
 
-sigc::signal<void> goGUI::OFFView::signalChangedFinal()
+sigc::signal<void>& goGUI::OFFView::signalChangedFinal()
 {
     return myPrivate->signal_changed_final;
 }
 
-sigc::signal<void> goGUI::OFFView::signalRotated()
+goCaller0<int>& goGUI::OFFView::callerRotated()
 {
-    return myPrivate->signal_rotated;
+    return myPrivate->caller_rotated;
 }
+
+//sigc::signal<void>& goGUI::OFFView::signalRotated()
+//{
+//    return myPrivate->signal_rotated;
+//}
 
 bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
 {
@@ -413,8 +423,8 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
         myPrivate->rotationStart = myPrivate->rotationEnd;
 
         // (*myPrivate->scene.getCamera()) = myPrivate->camera;
-
-        myPrivate->signal_rotated();
+        this->queue_draw ();
+        myPrivate->caller_rotated();
         return true;
     }
 
@@ -463,11 +473,13 @@ bool goGUI::OFFView::motionSlot (GdkEventMotion* e)
         myPrivate->camera.myUp = myPrivate->camera.myPosition.cross(myPrivate->camera.myUp).cross(myPrivate->camera.myPosition);
         myPrivate->camera.myUp *= 1.0 / myPrivate->camera.myUp.norm2();
 
+        this->queue_draw ();
+
         //this->GLWidgetBegin ();
         //this->glDraw ();
         //this->GLWidgetEnd ();
         // (*myPrivate->scene.getCamera()) = myPrivate->camera;
-        myPrivate->signal_rotated();
+        myPrivate->caller_rotated();
 
         myPrivate->rotationStart = myPrivate->rotationEnd;
     }

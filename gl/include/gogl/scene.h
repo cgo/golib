@@ -40,6 +40,11 @@ namespace goGL
 
             goAutoPtr<goGL::Camera> getCamera ();
 
+            const goVectorf& getClearColour () const;
+            void             setClearColour (const goVectorf& cc);
+            const goVectorf& getAmbient () const;
+            void             setAmbient (const goVectorf& a);
+
         private:
             Scene (const Scene& o);
             Scene& operator= (const Scene& o);

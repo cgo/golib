@@ -5,8 +5,12 @@ namespace goGL
     class WaypointPrivate
     {
         public:
-            WaypointPrivate () {};
+            WaypointPrivate () 
+                : time (0.0) 
+            {};
             ~WaypointPrivate () {};
+
+            goDouble time;
     };
 };
 
@@ -38,4 +42,14 @@ goGL::Waypoint& goGL::Waypoint::operator= (const Waypoint& o)
 {
     *(Object*)this = *(Object*)(&o);
     return *this;
+}
+
+void goGL::Waypoint::setTime (goDouble t)
+{
+    myPrivate->time = t;
+}
+
+goDouble goGL::Waypoint::getTime () const
+{
+    return myPrivate->time;
 }

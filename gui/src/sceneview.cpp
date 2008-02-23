@@ -42,6 +42,7 @@ namespace goGUI
                 signal_changed(),
                 signal_changed_final(),
                 signal_rotated(),
+                //caller_changed_final(),
                 pointerStart (2), pointerEnd (2)
             {
                 spherical.fill (0.0f);
@@ -67,6 +68,7 @@ namespace goGUI
             sigc::signal<void> signal_changed;       // emitted any time the image changed
             sigc::signal<void> signal_changed_final; // emitted e.g. when the mouse pointer is released after rotation
             sigc::signal<void> signal_rotated;
+            // goCaller0<int> caller_changed_final;
 
             enum Mode
             {
@@ -288,17 +290,17 @@ void goGUI::SceneView::glDraw ()
     // myPrivate->signal_changed();   // FIXME this may cause problems.
 }
 
-sigc::signal<void> goGUI::SceneView::signalChanged()
+sigc::signal<void>& goGUI::SceneView::signalChanged()
 {
     return myPrivate->signal_changed;
 }
 
-sigc::signal<void> goGUI::SceneView::signalChangedFinal()
+sigc::signal<void>& goGUI::SceneView::signalChangedFinal()
 {
     return myPrivate->signal_changed_final;
 }
 
-sigc::signal<void> goGUI::SceneView::signalRotated()
+sigc::signal<void>& goGUI::SceneView::signalRotated()
 {
     return myPrivate->signal_rotated;
 }
@@ -632,6 +634,7 @@ bool goGUI::SceneView::buttonSlot (GdkEventButton* e)
             printf ("Button release: %f %f\n", e->x, e->y);
             myPrivate->mode = SceneViewPrivate::IDLE;
             myPrivate->signal_changed_final();
+            // myPrivate->caller_changed_final();
             break;
         default: return false; break;
     }

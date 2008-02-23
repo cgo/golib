@@ -38,6 +38,10 @@ namespace goGUI
 
             void saveScene ();
             void loadScene ();
+            void saveImage ();
+
+            void clearColourChanged ();
+            void ambientChanged ();
 
             void addWaypoint ();
             void removeWaypoint ();
@@ -45,6 +49,7 @@ namespace goGUI
             void appendWaypoint ();
             int  animationPositionChanged ();
             void createMovie ();
+            void constantSpeedToggled ();
 
             void editWaypointToggled ();
             void editWaypoint ();

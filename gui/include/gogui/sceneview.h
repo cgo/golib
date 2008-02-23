@@ -38,9 +38,9 @@ class SceneView : public goGUI::GLWidget
 
         void setActiveObject (goIndex_t i);
 
-        sigc::signal<void> signalChanged();
-        sigc::signal<void> signalChangedFinal();
-        sigc::signal<void> signalRotated();
+        sigc::signal<void>& signalChanged();
+        sigc::signal<void>& signalChangedFinal();
+        sigc::signal<void>& signalRotated();
         bool motionSlot (GdkEventMotion* e);
         bool buttonSlot (GdkEventButton* e);
 

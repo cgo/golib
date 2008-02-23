@@ -19,6 +19,9 @@ namespace goGL
             Waypoint ();
             virtual ~Waypoint ();
 
+            void     setTime (goDouble t);
+            goDouble getTime () const;
+
             Waypoint (const Waypoint& o);
             Waypoint& operator= (const Waypoint& o);
 

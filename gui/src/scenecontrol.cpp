@@ -2,6 +2,7 @@
 #include <gogui/helper.h>
 #include <gogui/gldrawableobjectinput.h>
 #include <gogui/glanimation.h>
+#include <gogui/vectorinput.h>
 #include <gtkmm.h>
 
 #include <gogl/scene.h>
@@ -26,6 +27,9 @@ namespace goGUI
                   loadImageButton ("Load Image As Plane"),
                   saveSceneButton ("Save Scene"),
                   loadSceneButton ("Load Scene"),
+                  saveImageButton ("Save image"),
+                  clearColourInput ("Clear colour", 4),
+                  ambientInput ("Global light", 4),
                   waypointButtonsBox (),
                   addWaypointButton ("Add Waypoint"),
                   removeWaypointButton ("Remove WP"),
@@ -33,6 +37,7 @@ namespace goGUI
                   appendWaypointButton ("Append WP"),
                   editWaypointButton ("Edit Selected Waypoint"),
                   createMovieButton ("Create Movie"),
+                  constantSpeedButton ("Speed from translation"),
                   movieStepsButton (),
                   tooltips (),
                   editWaypointConnection1 (),
@@ -57,12 +62,14 @@ namespace goGUI
                 tooltips.set_tip (loadImageButton, "Load an image and create a plane object.");
                 tooltips.set_tip (saveSceneButton, "Save scene (OFF file names, transformations, materials).\nNo lights and images yet.");
                 tooltips.set_tip (loadSceneButton, "Load a saved scene.");
+                tooltips.set_tip (saveImageButton, "Save OpenGL image.");
                 tooltips.set_tip (addWaypointButton, "Add a new waypoint to the animation.");
                 tooltips.set_tip (removeWaypointButton, "Remove the current waypoint from the animation.");
                 tooltips.set_tip (prependWaypointButton, "Prepend new waypoint before current waypoint.");
                 tooltips.set_tip (appendWaypointButton, "Append new waypoint after current waypoint.");
                 tooltips.set_tip (editWaypointButton, "Edit the current waypoint.");
                 tooltips.set_tip (createMovieButton, "Create image sequence from current animation.");
+                tooltips.set_tip (constantSpeedButton, "If set, time steps for waypoints are calculated from\nthe translation.\nIf not set, time is set incrementally.\nUnset if translation does not change\n between two consecutive frames!");
                 tooltips.set_tip (movieStepsButton, "Number of images to save for the movie.");
             };
             ~SceneControlPrivate () {};
@@ -92,6 +99,10 @@ namespace goGUI
             Gtk::Button loadImageButton;
             Gtk::Button saveSceneButton;
             Gtk::Button loadSceneButton;
+            Gtk::Button saveImageButton;
+
+            goGUI::VectorInput clearColourInput;
+            goGUI::VectorInput ambientInput;
 
             //= For animation
             Gtk::VBox   waypointButtonsBox;
@@ -101,8 +112,9 @@ namespace goGUI
             Gtk::Button appendWaypointButton;
             Gtk::CheckButton editWaypointButton;
 
-            Gtk::Button createMovieButton;
-            Gtk::SpinButton movieStepsButton;
+            Gtk::Button      createMovieButton;
+            Gtk::CheckButton constantSpeedButton;
+            Gtk::SpinButton  movieStepsButton;
 
             Gtk::Tooltips tooltips;
 
@@ -130,6 +142,14 @@ goGUI::SceneControl::SceneControl ()
     myPrivate->objectInputWindow.set_title ("Object Properties");
     myPrivate->objectInput.show ();
 
+    myPrivate->constantSpeedButton.set_active (true);
+
+    if (!myPrivate->scene.isNull())
+    {
+        myPrivate->ambientInput.setVector (myPrivate->scene->getAmbient());
+        myPrivate->clearColourInput.setVector (myPrivate->scene->getClearColour());
+    }
+
     Gtk::VBox* myVBox = Gtk::manage (new Gtk::VBox);
     Gtk::HBox* myHBox = Gtk::manage (new Gtk::HBox);
     {
@@ -156,6 +176,17 @@ goGUI::SceneControl::SceneControl ()
         vbox->pack_start (*hbox);
 
         hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->saveImageButton, Gtk::PACK_SHRINK);
+        vbox->pack_start (*hbox);
+
+        hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->clearColourInput, Gtk::PACK_SHRINK);
+        vbox->pack_start (*hbox);
+        hbox = Gtk::manage (new Gtk::HBox);
+        hbox->pack_start (myPrivate->ambientInput, Gtk::PACK_SHRINK);
+        vbox->pack_start (*hbox);
+
+        hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->addWaypointButton, Gtk::PACK_SHRINK);
         hbox->pack_start (myPrivate->removeWaypointButton, Gtk::PACK_SHRINK);
         myPrivate->waypointButtonsBox.pack_start (*hbox, Gtk::PACK_SHRINK);
@@ -168,6 +199,7 @@ goGUI::SceneControl::SceneControl ()
         hbox = Gtk::manage (new Gtk::HBox);
         hbox->pack_start (myPrivate->createMovieButton, Gtk::PACK_SHRINK);
         hbox->pack_start (myPrivate->movieStepsButton, Gtk::PACK_SHRINK);
+        hbox->pack_start (myPrivate->constantSpeedButton, Gtk::PACK_SHRINK);
         myPrivate->waypointButtonsBox.pack_start (*hbox, Gtk::PACK_SHRINK);
 
         vbox->pack_start (myPrivate->waypointButtonsBox, Gtk::PACK_SHRINK);
@@ -207,12 +239,18 @@ goGUI::SceneControl::SceneControl ()
 
         myPrivate->saveSceneButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::saveScene));
         myPrivate->loadSceneButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadScene));
+        myPrivate->saveImageButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::saveImage));
+
+        myPrivate->clearColourInput.signalChanged().connect (sigc::mem_fun (*this, &SceneControl::clearColourChanged));
+        myPrivate->ambientInput.signalChanged().connect (sigc::mem_fun (*this, &SceneControl::ambientChanged));
+
         myPrivate->addWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::addWaypoint));
         myPrivate->removeWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::removeWaypoint));
         myPrivate->prependWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::prependWaypoint));
         myPrivate->appendWaypointButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::appendWaypoint));
 
         myPrivate->createMovieButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::createMovie));
+        myPrivate->constantSpeedButton.signal_toggled().connect (sigc::mem_fun (*this, &SceneControl::constantSpeedToggled));
 
         myPrivate->editWaypointButton.signal_toggled().connect (sigc::mem_fun (*this, &SceneControl::editWaypointToggled));
 
@@ -240,8 +278,6 @@ goGUI::SceneControl::SceneControl ()
 
     this->add (*myVBox);
     this->show_all ();
-
-
 }
 
 void goGUI::SceneControl::objectProperties ()
@@ -438,6 +474,77 @@ void goGUI::SceneControl::loadScene ()
     myPrivate->view.queue_draw ();
 }
 
+void goGUI::SceneControl::saveImage ()
+{
+    static goString path = "./";
+    goString fname;
+    if (!goGUI::getFilenameSave (fname, path, "Save Image"))
+        return;
+
+    fname.getPathName (path);
+
+
+    goSignal3D<void> image2;
+    goSignal3D<void> image;
+    image.setDataType (GO_UINT8);
+    image2.setDataType (GO_UINT8);
+    image2.make (32,32,1,32,32,1,4,4,0,3);
+    myPrivate->view.GLWidgetBegin ();
+    myPrivate->view.glDraw ();
+    myPrivate->view.swapBuffers ();
+    goGL::getGLBuffer (image2);
+    myPrivate->view.GLWidgetEnd ();
+    //= Flip Y
+    if (image2.getSize() != image.getSize())
+    {
+        image.make (image2.getSize(), image2.getBlockSize(), image2.getBorderSize(), image2.getChannelCount());
+    }
+    goSignalFlipY (image2, image);
+
+    try
+    {
+        goFileIO::writeImage (fname.toCharPtr(), &image);
+    }
+    catch (goFileIOException ex)
+    {
+        if (ex.code == goFileIOException::EXISTS)
+        {
+            goFileIO::remove (fname.toCharPtr());
+        }
+        try
+        {
+            goFileIO::writeImage (fname.toCharPtr(), &image);
+        }
+        catch (goFileIOException ex2)
+        {
+            this->warning ("Writing image failed.");
+            return;
+        }
+    }
+}
+
+void goGUI::SceneControl::clearColourChanged ()
+{
+    if (!myPrivate->scene.isNull ())
+    {
+        goVectorf temp;
+        myPrivate->clearColourInput.getVector (temp);
+        myPrivate->scene->setClearColour (temp);
+        myPrivate->view.queue_draw ();
+    }
+}
+
+void goGUI::SceneControl::ambientChanged ()
+{
+    if (!myPrivate->scene.isNull ())
+    {
+        goVectorf temp;
+        myPrivate->ambientInput.getVector (temp);
+        myPrivate->scene->setAmbient (temp);
+        myPrivate->view.queue_draw ();
+    }
+}
+
 /** 
  * @brief Adds a waypoint to the current animation.
  */
@@ -609,6 +716,14 @@ void goGUI::SceneControl::createMovie ()
         }
 
         t = goMath::min<goDouble> (1.0, t + dt);
+    }
+}
+
+void goGUI::SceneControl::constantSpeedToggled ()
+{
+    if (!myPrivate->glanimation.getAnimation().isNull ())
+    {
+        myPrivate->glanimation.getAnimation()->setConstantSpeedFromPosition (myPrivate->constantSpeedButton.get_active());
     }
 }
 

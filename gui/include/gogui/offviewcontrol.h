@@ -23,7 +23,7 @@ namespace goGUI
             void lightDialog ();
             int lightChangedSlot ();
 
-            void OFFViewRotated ();
+            int OFFViewRotated ();
             // void angleChanged ();
             void radiusChanged ();
             void loadOFF ();

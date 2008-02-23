@@ -12,8 +12,11 @@ namespace goGL
                 : drawables (),
                   lights (7),
                   camera (),
+                  clearColour (0),
                   ambient (0)
             {
+                clearColour.setData (_clearColour, 4, 1);
+                clearColour.fill (0.0f);
                 ambient.setData (_ambient, 4, 1);
                 ambient.fill (0.4f);
                 ambient[3] = 1.0f;
@@ -41,6 +44,9 @@ namespace goGL
             goList<goAutoPtr<goGL::DrawableObject> > drawables;
             goFixedArray<goAutoPtr<goGL::Light> >    lights;
             goAutoPtr<goGL::Camera>                  camera;
+
+            goFloat _clearColour[4];
+            goVectorf clearColour;
 
             goFloat _ambient[4];
             goVectorf ambient;
@@ -72,8 +78,9 @@ bool goGL::Scene::render ()
 
     //=
     //= Set background colour, clear depth buffer
-    //= 
-    glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+    //=
+    const goVectorf& cc = this->getClearColour ();
+    glClearColor (cc[0], cc[1], cc[2], cc[3]);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable (GL_CULL_FACE);
     glEnable (GL_DEPTH_TEST);
@@ -163,6 +170,38 @@ goAutoPtr<goGL::Light> goGL::Scene::getLight (goSize_t i)
 goAutoPtr<goGL::Camera> goGL::Scene::getCamera ()
 {
     return myPrivate->camera;
+}
+
+const goVectorf& goGL::Scene::getClearColour () const
+{
+    return myPrivate->clearColour;
+}
+
+void goGL::Scene::setClearColour (const goVectorf& cc)
+{
+    if (cc.getSize() >= 4)
+    {
+        for (goSize_t i = 0; i < 4; ++i)
+            myPrivate->clearColour[i] = cc[i];
+    }
+
+    this->render ();
+}
+
+const goVectorf& goGL::Scene::getAmbient () const
+{
+    return myPrivate->ambient;
+}
+
+void goGL::Scene::setAmbient (const goVectorf& a)
+{
+    if (a.getSize() >= 4)
+    {
+        for (goSize_t i = 0; i < 4; ++i)
+            myPrivate->ambient[i] = a[i];
+    }
+
+    this->render ();
 }
 
 bool goGL::Scene::writeASCII (FILE* f) const

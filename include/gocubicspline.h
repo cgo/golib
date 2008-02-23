@@ -38,6 +38,7 @@ namespace goMath
                 goAutoPtr<goVector<T> > operator() (T t) const; //= eval()
                 bool eval (T t, goVector<T>& ret) const;
                 bool D (T t, goVector<T>& ret) const;
+                T integrate (T t1, T t2);
                 bool fit (const goMatrix<T>& points);
                 bool fit (const goVector<T>& pm1,
                           const goVector<T>& p0,

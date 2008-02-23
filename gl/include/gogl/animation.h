@@ -30,15 +30,18 @@ namespace goGL
             void setSteps (goSize_t s);
             goSize_t getSteps () const;
 
-            // goList<Waypoint>&       getWaypoints ();
             const goList<Waypoint>& getWaypoints () const;
 
-            void            addWaypoint (const Waypoint& wp);
-            // Waypoint&       getWaypoint (goIndex_t i);
-            const Waypoint& getWaypoint (goIndex_t i) const;
-            void setWaypoint (goIndex_t i, const goGL::Waypoint& wp);
-            void insertWaypoint (goIndex_t i, const goGL::Waypoint& wp);
-            void removeWaypoint (goIndex_t i);
+            void            addWaypoint    (const Waypoint& wp);
+            const Waypoint& getWaypoint    (goIndex_t i) const;
+            void            setWaypoint    (goIndex_t i, const goGL::Waypoint& wp);
+            void            insertWaypoint (goIndex_t i, const goGL::Waypoint& wp);
+            void            removeWaypoint (goIndex_t i);
+
+            void            setConstantSpeedFromPosition (bool t);
+            bool            getConstantSpeedFromPosition () const;
+            void            setAutoTime (bool t);
+            bool            getAutoTime () const;
 
             virtual bool writeASCII (FILE* f) const;
             virtual bool readASCII  (FILE* f);

@@ -57,10 +57,7 @@ goGUI::VectorInput::VectorInput (const char* title, int n, int direction)
     {
         this->set_label (title);
     }
-    else
-    {
-        this->add (*box);
-    }
+    this->add (*box);
 
     this->connectAll ();
 

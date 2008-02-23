@@ -106,5 +106,32 @@ bool goMath::CubicSpline<T>::fit (const goVector<T>& pm1,
     return true;
 }
 
+/** 
+ * @brief Integrate the function interpolated by this object.
+ * 
+ * This makes only sense when the interpolating spline represents a 
+ * one dimensional function.
+ *
+ * @param t1 Start point of integration
+ * @param t2 End point of integration
+ * 
+ * @return \f$ \int_{t_1}^{t_2} f(x) \, dx\f$
+ */
+template <class T>
+T goMath::CubicSpline<T>::integrate (T t1, T t2)
+{
+    T a = this->myM(1,0); 
+    T b = this->myM(1,1); 
+    T c = this->myM(1,2); 
+    T d = this->myM(1,3);
+    T t2_p2 = t2 * t2;
+    T t2_p3 = t2_p2 * t2;
+    T t2_p4 = t2_p3 * t2;
+    T t1_p2 = t1 * t1;
+    T t1_p3 = t1_p2 * t1;
+    T t1_p4 = t1_p3 * t1;
+    return (3.0*a*t2_p4+4.0*b*t2_p3+6.0*c*t2_p2+12.0*d*t2-3.0*a*t1_p4-4.0*b*t1_p3-6.0*c*t1_p2-12.0*d*t1)/12.0;
+}
+
 template class goMath::CubicSpline<goFloat>;
 template class goMath::CubicSpline<goDouble>;

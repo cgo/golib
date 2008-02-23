@@ -6,6 +6,8 @@
 #include <gogl/meshobject.h>
 #include <gogui/glwidget.h>
 
+#include <gofunctor.h>
+
 namespace goGUI
 {
     class OFFViewPrivate;
@@ -44,9 +46,10 @@ class OFFView : public goGUI::GLWidget
         goGL::OFFFile& getOFFFile ();
         // goGL::MeshObject& getMesh ();
 
-        sigc::signal<void> signalChanged();
-        sigc::signal<void> signalChangedFinal();
-        sigc::signal<void> signalRotated();
+        sigc::signal<void>& signalChanged();
+        sigc::signal<void>& signalChangedFinal();
+        // sigc::signal<void>& signalRotated();
+        goCaller0<int>&     callerRotated();
         bool motionSlot (GdkEventMotion* e);
         bool buttonSlot (GdkEventButton* e);
 

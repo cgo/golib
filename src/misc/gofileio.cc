@@ -698,6 +698,10 @@ goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) 
     catch (goFileIOException ex)
     {
         ilDeleteImages (1, &imageName);
+        ILenum er = ilGetError ();
+        goString s = "goFileIO::writeImage(): IL error ";
+        s += iluErrorString (er);
+        goLog::warning (s);
         return false;
     }
     
@@ -711,6 +715,9 @@ goFileIO::writeImage (const char* filename, const goSignal3DBase<void>* signal) 
     {
         ilDeleteImages (1, &imageName);
         goString msg = "goFileIO::writeImage(): IL ERROR.\n";
+        msg += "File: "; 
+        msg += fname;
+        msg += "\n";
         msg += iluErrorString (er);
         goLog::warning(msg);
         if (er == IL_FILE_ALREADY_EXISTS)

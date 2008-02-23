@@ -1332,6 +1332,10 @@
 %template(goExpd)          goMath::exp<goDouble>;
 %template(goLogf)          goMath::log<goFloat>;
 %template(goLogd)          goMath::log<goDouble>;
+%template(goMinf)          goMath::min<goFloat>;
+%template(goMind)          goMath::min<goDouble>;
+%template(goMaxf)          goMath::max<goFloat>;
+%template(goMaxd)          goMath::max<goDouble>;
 
 %template(goCovariancef)   goMath::covariance<goFloat>;
 %template(goCovarianced)   goMath::covariance<goDouble>;
