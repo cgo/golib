@@ -15,12 +15,14 @@ template <class T>
 goVector<T>::goVector () 
     : goFixedArray<T> (1,0,0) 
 {
+    this->fill (T(0));
 }
 
 template <class T>
 goVector<T>::goVector (goSize_t s, goIndex_t leftBorder, goIndex_t rightBorder) 
     : goFixedArray<T> (s,leftBorder,rightBorder) 
 {
+    this->fill (T(0));
 }
 
 template <class T>
@@ -396,10 +398,11 @@ bool goVector<T>::writeASCII (FILE* file) const
     goSize_t sz = this->getSize();
     for (goSize_t i = 0; i < sz; ++i)
     {
-        s = "";
-        s += (double)(*this)[i];
-        s += "\n";
-        goFileIO::writeASCII (file, s);
+        fprintf (file, "%.20lf\n", (double)(*this)[i]);
+        //s = "";
+        //s += (double)(*this)[i];
+        //s += "\n";
+        //goFileIO::writeASCII (file, s);
     }
     return true;
 }

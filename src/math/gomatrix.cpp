@@ -1068,7 +1068,7 @@ bool goMatrix<T>::writeASCII (FILE* f) const
         for (c = 0; c < C; ++c)
         {
             d = (goDouble)(*this)(r,c);
-            fprintf (f, "%lf ", d);
+            fprintf (f, "%.20lf ", d);
         }
         fprintf (f, "\n");
     }
