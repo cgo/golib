@@ -122,17 +122,17 @@ class goFunctor0 : public goFunctorBase0<Tret>
             {
                 return (myObject->*myFunction)();
             }
-            else
-            {
-                Tret dummy;
-                return dummy;
-            }
+            //else
+            //{
+            //    Tret dummy;
+            //    return dummy;
+           // }
         };
-
     private:
         Tclass* myObject;
         function_t myFunction;
 };
+
 
 /** 
  * @brief Implementation template for

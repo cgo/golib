@@ -26,6 +26,7 @@ ENDIF (HAVE_MATLAB_GEQ_2007A)
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
+    src/signal/gosignaloperation.cpp
  src/data/goarrayi.cc 
  # src/data/golisti.cc 
  # src/data/goheapi.cc 

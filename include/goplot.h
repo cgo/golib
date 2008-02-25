@@ -351,6 +351,7 @@ namespace goPlot
             void plot (goMultiPlotter& mp);
             void plot ();
             void plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
+            void plotFile (const char* filename, const char* termstring);
             void plotPause ();
             void saveGnuplot (const char* filename);
             void setPrefix (const char* p);

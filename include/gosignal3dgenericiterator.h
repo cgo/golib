@@ -89,6 +89,26 @@ class goSignal3DGenericIterator
                 dyStart = dy;
                 dzStart = dz;
             };
+        goSignal3DGenericIterator  ()
+        : sig (0),
+          dx (NULL), dy (NULL), dz (NULL),
+          dxStart (NULL), dyStart (NULL), dzStart (NULL),
+          px (NULL), py (NULL), pz (NULL),
+          posX (0) , posY (0) , posZ (0),
+          maxX (0), maxY (0), maxZ(0)
+        {
+        };
+        void init (goSignal3DBase<void>* s)
+          {
+              this->sig = s;
+              this->maxX = s->getSizeX() - 1;
+              this->maxY = s->getSizeY() - 1;
+              this->maxZ = s->getSizeZ() - 1;
+               this->setPosition (0,0,0);
+               dxStart = dx;
+               dyStart = dy;
+               dzStart = dz;
+          };
 
         goSignal3DGenericIterator  (const goSignal3DGenericIterator& other)
         : sig (other.sig),
@@ -441,6 +461,26 @@ class goSignal3DGenericConstIterator
           posX (0) , posY (0) , posZ (0),
           maxX (s->getSizeX()-1), maxY (s->getSizeY()-1), maxZ(s->getSizeZ()-1)
           {
+               this->setPosition (0,0,0);
+               dxStart = dx;
+               dyStart = dy;
+               dzStart = dz;
+          };
+        goSignal3DGenericConstIterator  ()
+        : sig (0),
+          dx (NULL), dy (NULL), dz (NULL),
+          dxStart (NULL), dyStart (NULL), dzStart (NULL),
+          px (NULL), py (NULL), pz (NULL),
+          posX (0) , posY (0) , posZ (0),
+          maxX (0), maxY (0), maxZ(0)
+        {
+        };
+        void init (const goSignal3DBase<void>* s)
+          {
+              this->sig = s;
+              this->maxX = s->getSizeX() - 1;
+              this->maxY = s->getSizeY() - 1;
+              this->maxZ = s->getSizeZ() - 1;
                this->setPosition (0,0,0);
                dxStart = dx;
                dyStart = dy;

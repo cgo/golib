@@ -183,6 +183,13 @@ void goPlot::Plot::plotPostscript (const char* filename, goFloat sizeX, goFloat 
     mp.plotPostscript (filename, sizeX, sizeY);
 }
 
+void goPlot::Plot::plotFile (const char* filename, const char* termstring)
+{
+    goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
+    this->plot (mp);
+    mp.plotFile (filename, termstring);
+}
+
 void goPlot::Plot::plotPause ()
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
