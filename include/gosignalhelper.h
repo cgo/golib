@@ -22,6 +22,12 @@
 #ifndef GOARRAY_H
 # include <goarray.h>
 #endif
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 /*!
  * \addtogroup signal
@@ -42,5 +48,13 @@ goDouble goSignalMean         (const goSignal3DBase<void>& sig);
 void     goSignalMeanVariance (const goSignal3DBase<void>& sig, goDouble& mean, goDouble& variance);
 void     goSignalFlipY        (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target);
 bool     goSignalCOM          (const goSignal3DBase<void>& sig, goVectord& comRet);
+bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
+bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goAutoPtr<goFunctorBase1<bool, goDouble> > f, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
+bool     goSignalMinMaxCoordHigher  (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
+bool     goSignalCrop         (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goDouble thresh);
+bool     goSignalCrop         (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goAutoPtr<goFunctorBase1<bool, goDouble> > f);
+bool     goSignalCropHigher   (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goDouble thresh);
+bool     goSignalMax          (const goSignal3DBase<void>& sig1, const goSignal3DBase<void>& sig2, goSignal3DBase<void>& target);
+bool     goSignalMin          (const goSignal3DBase<void>& sig1, const goSignal3DBase<void>& sig2, goSignal3DBase<void>& target);
 /*! @} */
 #endif

@@ -1287,6 +1287,7 @@
 %template(goVectorf)       goVector<goFloat>;
 %template(goVectord)       goVector<goDouble>;
 %template(goVectori)       goVector<int>;
+%template(goVectorsz)      goVector<goSize_t>;
 %template(goArrayf)        goArray<goFloat>;
 %template(goArrayd)        goArray<goDouble>;
 %template(goArrayi)        goArray<goInt32>;

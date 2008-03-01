@@ -95,6 +95,44 @@ class goFunctorBase2 : public goFunctorBase <Tret, Targ1, Targ2, void, void ,voi
         virtual Tret operator () (Targ1 p, Targ2 p2) = 0;
 };
 
+template <class Tret>
+class goFunction0 : public goFunctorBase0<Tret>
+{
+    public:
+        typedef Tret (*function_t)();
+
+    public:
+        goFunction0 (function_t function)
+            : goFunctorBase0<Tret>(), myFunction (function)
+        {
+        };
+        virtual ~goFunction0 () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual Tret operator () ()
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)();
+            }
+            //else
+            //{
+            //    Tret dummy;
+            //    return dummy;
+           // }
+        };
+
+    private:
+        function_t myFunction;
+};
+
 template <class Tret, class Tclass>
 class goFunctor0 : public goFunctorBase0<Tret>
 {
@@ -133,6 +171,41 @@ class goFunctor0 : public goFunctorBase0<Tret>
         function_t myFunction;
 };
 
+/** @brief Implementation template for
+ * functions with 1 argument.
+ */
+template <class Tret, class Targ1>
+class goFunction1 : public goFunctorBase1<Tret, Targ1>
+{
+    public:
+        typedef Tret(*function_t)(Targ1);
+
+    public:
+        goFunction1 (function_t function)
+            : goFunctorBase1<Tret, Targ1>(), myFunction (function)
+        {
+        };
+        virtual ~goFunction1 () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual Tret operator () (Targ1 p)
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)(p);
+            }
+        };
+
+    private:
+        function_t myFunction;
+};
 
 /** 
  * @brief Implementation template for
@@ -177,6 +250,41 @@ class goFunctor1 : public goFunctorBase1<Tret, Targ1>
         function_t myFunction;
 };
 
+/** @brief Implementation template for
+ * functors representing simple functions with 2 arguments.
+ */
+template <class Tret, class Targ1, class Targ2>
+class goFunction2 : public goFunctorBase2<Tret, Targ1, Targ2>
+{
+    public:
+        typedef Tret(*function_t)(Targ1, Targ2);
+
+    public:
+        goFunction2 (function_t function)
+            : goFunctorBase2<Tret, Targ1, Targ2>(), myFunction (function)
+        {
+        };
+        virtual ~goFunction2 () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual Tret operator () (Targ1 p, Targ2 p2)
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)(p, p2);
+            }
+        };
+
+    private:
+        function_t myFunction;
+};
 /** 
  * @brief Implementation template for
  * functors with 2 arguments.
@@ -299,6 +407,27 @@ goAutoPtr<goFunctorBase0<Tret> >
 goMemberFunction (Tclass* c, typename goFunctor0<Tret, Tclass>::function_t f)
 {
     return goAutoPtr<goFunctorBase0<Tret> > (static_cast<goFunctorBase0<Tret>*> (new goFunctor0<Tret, Tclass> (c, f)));
+}
+
+template <class Tret>
+goAutoPtr<goFunctorBase0<Tret> >
+goFunction (typename goFunction0<Tret>::function_t f)
+{
+    return goAutoPtr<goFunctorBase0<Tret> > (static_cast<goFunctorBase0<Tret>*> (new goFunction0<Tret> (f)));
+}
+
+template <class Tret, class Targ1>
+goAutoPtr<goFunctorBase1<Tret, Targ1> >
+goFunction (typename goFunction1<Tret, Targ1>::function_t f)
+{
+    return goAutoPtr<goFunctorBase1<Tret, Targ1> > (static_cast<goFunctorBase1<Tret, Targ1>*> (new goFunction1<Tret, Targ1> (f)));
+}
+
+template <class Tret, class Targ1, class Targ2>
+goAutoPtr<goFunctorBase2<Tret, Targ1, Targ2> >
+goFunction (typename goFunction2<Tret, Targ1, Targ2>::function_t f)
+{
+    return goAutoPtr<goFunctorBase2<Tret, Targ1, Targ2> > (static_cast<goFunctorBase2<Tret, Targ1, Targ2>*> (new goFunction2<Tret, Targ1, Targ2> (f)));
 }
 
 /** 
