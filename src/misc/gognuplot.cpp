@@ -8,7 +8,13 @@ class goGnuplotPrivate
 {
     public:
         goGnuplotPrivate () 
-            : process () {};
+            : process () 
+        {
+            pipe1[0] = 0;
+            pipe1[1] = 0;
+            pipe2[0] = 0;
+            pipe2[1] = 0;
+        };
         ~goGnuplotPrivate () {};
 
         goProcess process;
@@ -23,12 +29,12 @@ goGnuplot::goGnuplot() : goObjectBase(), myPrivate(0)
     if (::pipe(myPrivate->pipe1) != 0)
     {
         goLog::warning("goGnuplot: Error opening pipe 1\n");
-        exit(1);
+        // exit(1);
     }
     if (::pipe(myPrivate->pipe2) != 0)
     {
         goLog::warning("goGnuplot: Error opening pipe 2\n");
-        exit(1);
+        // exit(1);
     }
     //= Make the pipes the standard i/o file descriptors of the process.
     myPrivate->process.setInput(myPrivate->pipe1[0]);    // read end of pipe 1

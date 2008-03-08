@@ -22,16 +22,32 @@ goProcess::goProcess ()
 
 goProcess::~goProcess () 
 {
+    if (this->inputFD >= 0)
+    {
+        ::close (this->inputFD);
+    }
+    if (this->outputFD >= 0)
+    {
+        ::close (this->outputFD);
+    }
     this->deleteTemp ();
 }
 
 void goProcess::setInput (int fd)
 {
+    if (this->inputFD >= 0)
+    {
+        ::close (this->inputFD);
+    }
     this->inputFD = fd;
 }
 
 void goProcess::setOutput (int fd)
 {
+    if (this->outputFD >= 0)
+    {
+        ::close (this->outputFD);
+    }
     this->outputFD = fd;
 }
 
