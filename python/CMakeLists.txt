@@ -11,7 +11,7 @@ FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
 #EXEC_PROGRAM        (${GUILE_CONFIG} ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
-                        ARGS -I../include -python -addextern -c++ -oh golib_python.h golib.i )
+                        ARGS -I../include -python -fcompact -addextern -c++ golib.i )
 FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 #SET                 (GOMATLAB_LIB "-lGomatlab")
 LINK_LIBRARIES      (${GOLIB})

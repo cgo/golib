@@ -16,6 +16,10 @@ class goSignalOperation
         goSignalOperation ();
 };
 
+/**
+* @addtogroup signal
+* @{
+*/
 /** 
  * @brief Generic value-wise operations.
  * @note Not yet implemented, just a stub.
@@ -36,6 +40,11 @@ class goSignalOperationGeneric
         KernelMethod myKernelMethod;
 };
 
+/** 
+* @brief Element-wise operation of two sources into one target.
+* @see goMemberFunction
+* @see goFunction
+*/
 template <class T>
 class goSignalOperation3
 {
@@ -53,6 +62,11 @@ class goSignalOperation3
         KernelMethod myKernelMethod;
 };
 
+/** 
+* @brief Element-wise operation of one source into one target.
+* @see goMemberFunction
+* @see goFunction
+*/
 template <class T>
 class goSignalOperation2
 {
@@ -70,6 +84,11 @@ class goSignalOperation2
         KernelMethod myKernelMethod;
 };
 
+/** 
+* @brief Element-wise in-place operation.
+* @see goMemberFunction
+* @see goFunction
+*/
 template <class T>
 class goSignalOperation1
 {
@@ -87,6 +106,11 @@ class goSignalOperation1
         KernelMethod myKernelMethod;
 };
 
+/** 
+* @brief Element-wise in-place operation on constant data.
+* @see goMemberFunction
+* @see goFunction
+*/
 template <class T>
 class goSignalOperation1Const
 {
@@ -104,4 +128,5 @@ class goSignalOperation1Const
         KernelMethod myKernelMethod;
 };
 
+/** @} */
 #endif

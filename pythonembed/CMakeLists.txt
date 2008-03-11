@@ -1,0 +1,33 @@
+INCLUDE (UsePkgConfig)
+PROJECT             (Gopython)
+SET                 (TARGETNAME Gopython)
+SET                 (SOURCES src/gopython.cpp)
+
+# SET (PYTHON_VERSION "2.4" CACHE STRING "Python version")
+
+EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
+SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
+EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
+
+SET (EXTRA_LIBS ${EXTRA_LIBS} ${PYTHON_LDFLAGS})
+
+INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
+                     ${GOPATH}/include)
+                     
+IF (BUILD_WITH_GCC_3_3)
+    SET (CMAKE_CXX_COMPILER g++-3.3)
+    SET (CMAKE_C_COMPILER gcc-3.3)
+ENDIF (BUILD_WITH_GCC_3_3)
+IF (BUILD_WITH_GCC_3_4)
+    SET (CMAKE_CXX_COMPILER g++-3.4)
+    SET (CMAKE_C_COMPILER gcc-3.4)
+ENDIF (BUILD_WITH_GCC_3_4)
+
+# Add -MT flag!
+IF(UNIX)
+ ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
+ENDIF(UNIX)
+
+ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
+TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+INSTALL_TARGETS     (/lib ${TARGETNAME})
