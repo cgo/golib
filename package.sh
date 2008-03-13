@@ -11,6 +11,7 @@ tar -czvh --exclude=".svn" --exclude="CVS" --exclude=".libs" --exclude=".deps" -
  golib/NEWS\
  golib/README\
  golib/RELEASE\
+ golib/IDEEN\
  golib/doc\
  golib/examples\
  golib/include\

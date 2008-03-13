@@ -79,6 +79,20 @@ goVideoCapture::goVideoCapture ()
     myPrivate = new goVideoCapturePrivate;
 }
 
+goVideoCapture::goVideoCapture (const char* devname, goSize_t width, goSize_t height)
+    : goObjectBase (),
+      myPrivate (0)
+{
+    this->setClassID(GO_VIDEOCAPTURE);
+    myPrivate = new goVideoCapturePrivate;
+
+    this->setDevice (devname);
+    this->open ();
+    this->getSettings ();
+    this->setCaptureSize (width, height);
+    this->setSettings ();
+}
+
 goVideoCapture::~goVideoCapture ()
 {
     if (myPrivate)
@@ -278,6 +292,28 @@ bool goVideoCapture::grab (void* target, goSize_t sz)
 }
 
 /** 
+ * @brief Convenience method.
+ * 
+ * Calls grab (goSignal3DBase<void>&), changing type and size of target
+ * if necessary.
+ * 
+ * @param target Target containing the image if return value is true.
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goVideoCapture::grab (goSignal3D<void>& target)
+{
+    if (target.getSizeX() != this->getCaptureWidth() || target.getSizeY() != this->getCaptureHeight() || target.getSizeX() != target.getBlockSizeX() || target.getSizeY() != target.getBlockSizeY() || target.getChannelCount() != 3 || target.getDataType().getID() != GO_UINT8)
+    {
+        target.setDataType (GO_UINT8);
+        goSize3D sz (this->getCaptureWidth(), this->getCaptureHeight(), 1);
+        target.make (sz, sz, goSize3D (4,4,0), 3);
+    }
+
+    return this->grab (*static_cast<goSignal3DBase<void>*> (&target));
+}
+
+/** 
  * @brief Grab a frame from the open device.
  * 
  * @param target Target. Must currently be linear in memory (block size == signal size), of type GO_UINT8 and
@@ -296,7 +332,7 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
                         target.getDataType().getID() != GO_UINT8 ||
                         target.getBlockSizeX() != target.getSizeX() || target.getBlockSizeY() != target.getSizeY())
                 {
-                    goLog::warning ("grab RGB24 : Unsupported target.",this);
+                    goLog::warning ("grab RGB24 : Unsupported target. Data type must be uint8 and block size must equal size.",this);
                     return false;
                 }
                 if (target.getChannelCount() != 3)

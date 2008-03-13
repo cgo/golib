@@ -26,6 +26,7 @@
 #include <gognuplot.h>
 #include <gofilter1d.h>
 #include <goofffile.h>
+#include <govideocapture.h>
 #include <gotimerobject.h>
 %}
 %import ../../python/golib.i

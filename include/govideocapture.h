@@ -7,6 +7,9 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 
 class goVideoCapturePrivate;
 
@@ -40,8 +43,9 @@ class goVideoCapture : public goObjectBase
             GREY            // 8 bits grey
         };
         
-        goVideoCapture();
-        virtual ~goVideoCapture();
+        goVideoCapture ();
+        goVideoCapture (const char* devname, goSize_t width, goSize_t height);
+        virtual ~goVideoCapture ();
 
         bool setDevice         (const char* name);
         void setFileDescriptor (int fd);
@@ -54,6 +58,7 @@ class goVideoCapture : public goObjectBase
         bool open              ();
         void close             ();
         bool grab              (goSignal3DBase<void>& signal);
+        bool grab              (goSignal3D<void>& signal);
         bool grab              (void* buffer, goSize_t size);
 
         bool checkCapture      () const;

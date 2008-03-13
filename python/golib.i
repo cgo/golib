@@ -111,6 +111,7 @@
 #include <gognuplot.h>
 #include <gofilter1d.h>
 #include <goofffile.h>
+#include <govideocapture.h>
 
 #include <go3vector.h>
 #include <gotimerobject.h>
@@ -168,6 +169,7 @@
 %include <gognuplot.h>
 %include <gofilter1d.h>
 %include <goofffile.h>
+%include <govideocapture.h>
 
 %include <go3vector.h>
 %include <gotimerobject.h>

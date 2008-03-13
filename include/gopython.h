@@ -20,11 +20,18 @@
 # include <gomatrix.h>
 #endif
 
+/**
+ * @addtogroup pythonembed
+ * @{
+ */
 /** 
  * @brief Python embedding.
  * Make sure there exists only one python interpreter.
  * Possibly there can be one per thread, but that is not tested.
  * This is all quite new. 
+ *
+ * Programs using this must know the path to the python include file \c Python.h
+ * when compiling, else compilation will fail.
  *
  * There are set/get methods for some golib objects, they all look like <br>
  * <code>set (const char* name, TYPE *o, bool own_it);</code> <br>
@@ -32,6 +39,14 @@
  * Examples are 
  * <code> goVectorf* getVectorf (...) </code>
  * <code> goSignal3D<void>* getSignal3D (...) </code>
+ *
+ * All set/get function pairs for swig wrapped objects are created with 
+ * the macros \c GOPYTHON_GETSET_DEFINITION and \c GOPYTHON_GETSET_DECLARATION
+ * for definition and declaration, respectively.
+ * These macros can also be used to extend this namespace in other 
+ * libraries / applications. The above macros are just for convenience and
+ * create functions the \c setSwigPointer / \c getSwigPointer.
+ * Functions for simple types should be declared and defined separately.
  */
 namespace goPython
 {
@@ -130,6 +145,17 @@ namespace goPython
 
         //= Terribly sorry. But this makes it quicker to write down.
         //= Declares set and get methods for wrapped golib objects.
+        /** 
+         * @brief Macro to create a get/set function pair declaration.
+         * 
+         * Creates <br>
+         * <code> set (const char* name, type_spec *o, bool own_it = false); </code> <br>
+         * and <br>
+         * <code> type_spec* get##spec (const char* name, bool own_it = false); </code> <br>
+         *
+         * @param type_spec C++ type of the object.
+         * @param spec      Extension for the get function.
+         */
 #define GOPYTHON_GETSET_DECLARATION(type_spec,spec) \
     type_spec* get##spec (const char* name, bool own_it = false); \
         void set (const char* name, type_spec *o, bool own_it = false);
@@ -169,6 +195,8 @@ namespace goPython
     { \
         const char* type_str = #py_type_spec " *"; \
         setSwigPointer<type_spec> (name, o, own_it, type_str); \
-    } \
+    }
+
+/** @} */
 
 #endif

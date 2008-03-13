@@ -168,4 +168,17 @@
  *
  * This module provides a few classes that allow building simple scenes in OpenGL,
  * create textures, display images as textures in OpenGL, and so on.
+ *
+ * \defgroup pythonembed Python embedding
+ * The namespace goPython contains wrappers and helpers to simplify
+ * setting/getting, amongst others, SWIG wrapped objects to and from
+ * an embedded interpreter.
+ * \c goPython::init() initialises the interpreter, \c goPython::final() ends it.
+ * There are several set and get functions to enable cooperation between
+ * C++ and the python interpreter by sharing variables.
+ * All SWIG wrapped variables are shared over their pointers, so there is no
+ * deep copying involved.
+ * More set/get function pairs can be easily added for other swig wrapped objects
+ * by using the provided macros or the \c setSwigPointer() and \c getSwigPointer()
+ * template functions.
  */

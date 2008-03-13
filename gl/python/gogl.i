@@ -32,6 +32,7 @@
 #include <gofilter1d.h>
 #include <golist.h>
 #include <gotimerobject.h>
+#include <govideocapture.h>
 %}
 %import ../../python/golib.i
 %include <gogl/helper.h>
