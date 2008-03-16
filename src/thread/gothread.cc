@@ -192,7 +192,7 @@ goThread::howManyProcessors () {
 #endif
 
 #ifdef WIN32
-bool goThread::isCurrentThread (int threadNumber)
+bool goThread::isCurrentThread (int threadNumber) const
 {
     goLog::warning ("goThread::isCurrentThread() is not implemented for Windows.");
     return false;
@@ -313,7 +313,9 @@ goCondition::wait ()
 #endif
     mutex.unlock();
 }
+#endif
 
+#if defined HAVE_LIBPTHREAD
 goSemaphore::goSemaphore()
 {
     sem_init (&semaphore, 0, 0);     // Make a non-shared semaphore with initial value = 0
@@ -350,5 +352,34 @@ goSemaphore::inc ()
     // cout << "Calling sem_post" << endl;
     sem_post (&semaphore);
 }
+#elif defined WIN32
+goSemaphore::goSemaphore()
+{
+    this->semaphore = CreateSemaphore (NULL, 0, std::numeric_limits<LONG>::max(), NULL);
+    // sem_init (&semaphore, 0, 0);     // Make a non-shared semaphore with initial value = 0
+}
 
+goSemaphore::~goSemaphore()
+{
+    // sem_destroy (&semaphore);
+}
+
+/** 
+ * @brief Decrement semaphore.
+ * Waits until the semaphore is > 0 and atomically decrements it by one.
+ */
+void
+goSemaphore::dec ()
+{
+    WaitForSingleObject (this->semaphore, INFINITE);
+}
+
+/** 
+ * @brief Atomically increment the semaphore.
+ */
+void
+goSemaphore::inc ()
+{
+    ReleaseSemaphore (this->semaphore, 1, NULL);
+}
 #endif

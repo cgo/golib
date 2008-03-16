@@ -965,7 +965,27 @@ goFileIO::readASCIILine (FILE* f, goString& target)
     //= This is a gnu extension. Use fgets() on systems without gnu libc.
     char* lineptr = 0;
     size_t N = 0;
+#if not defined WIN32
     ssize_t numRead = getline (&lineptr, &N, f);
+#else
+    ssize_t numRead = 0;
+    ssize_t numRead2 = 0;
+    char chunk [257];
+    chunk[256] = 0;
+    bool stop = false;
+    do
+    {
+        numRead2 = fread (chunk, sizeof (char), 256, f);
+        int i = 0;
+        while (chunk[i] != 10 && i < 256)
+            ++i;
+        if (chunk[i] == 10)
+            stop = true;
+        chunk[i] = 0;
+        target += chunk;
+        numRead += i - 1;
+    } while (!feof (f) && !stop);
+#endif
     if (-1 == numRead)
     {
         return false;
@@ -1081,8 +1101,26 @@ goFileIO::mkdir (const char* pathname)
 {
     if (!pathname)
         return false;
-#ifdef HAVE_MKDIR
+#if defined HAVE_MKDIR and not defined WIN32
     int retval = ::mkdir (pathname, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP);
+    switch (retval)
+    {
+        case 0:
+            return true;
+            break;
+        default:
+            {
+                if (errno == EEXIST)
+                {
+                    return true;
+                }
+                return false;
+            }
+            break;
+    }
+#endif
+#if defined WIN32
+    int retval = _mkdir (pathname);
     switch (retval)
     {
         case 0:

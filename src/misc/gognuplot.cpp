@@ -26,6 +26,7 @@ goGnuplot::goGnuplot() : goObjectBase(), myPrivate(0)
 {
     myPrivate = new goGnuplotPrivate;
 
+#if not defined WIN32
     if (::pipe(myPrivate->pipe1) != 0)
     {
         goLog::warning("goGnuplot: Error opening pipe 1\n");
@@ -53,13 +54,16 @@ goGnuplot::goGnuplot() : goObjectBase(), myPrivate(0)
     //=
     close (myPrivate->pipe1[0]);
     close (myPrivate->pipe2[1]);
+#endif
 }
 
 goGnuplot::~goGnuplot()
 {
+#if not defined WIN32
     ::close (myPrivate->pipe1[1]);
     ::close (myPrivate->pipe2[0]);
     myPrivate->process.kill();
+#endif
     if (myPrivate)
     {
         delete myPrivate;

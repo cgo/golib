@@ -81,27 +81,27 @@ SET                 (SOURCES
  src/math/integrate.cpp
  src/math/getroots.cpp
  src/misc/goofffile.cpp
- src/misc/plot.cpp
- src/misc/gognuplot.cpp
- src/misc/gosingleplot.cpp
- src/misc/gomultiplotter.cpp
- src/misc/goconfigfile.cc 
- src/misc/goconfigfileaccess.cc 
+ # src/misc/plot.cpp
+ # src/misc/gognuplot.cpp      # not plotting in windows!
+ # src/misc/gosingleplot.cpp
+ # src/misc/gomultiplotter.cpp
+ # src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
+ # src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc 
  src/misc/goexception.cc 
  src/misc/gofileio.cc 
  src/misc/goobjectbase.cc 
- src/misc/gostatusobject.cc 
+ # src/misc/gostatusobject.cc  # not in windows!
  src/misc/gotransferfunction.cc 
  src/misc/goobjectmessage.cc 
  src/misc/goglobal.cpp 
  src/misc/golog.cpp
- src/misc/goplot.cpp
- src/misc/govideocapture.cpp
- src/network/goconnection.cc
- src/network/gonetobject.cc 
- src/network/gonetwork.cc 
- src/network/goserver.cc
+ # src/misc/goplot.cpp  # not in windows!
+ # src/misc/govideocapture.cpp # not in windows!
+ # src/network/goconnection.cc # not in windows!
+ # src/network/gonetobject.cc  # not in windows!
+ # src/network/gonetwork.cc # not in windows!
+ # src/network/goserver.cc # not in windows!
  src/nifty/gorandom.cc
  src/signal/centerofmass.cpp
  src/signal/transform.cpp
@@ -119,13 +119,13 @@ SET                 (SOURCES
  src/signal/gohistogram.cpp 
  src/signal/gosignal3diterator.cpp 
  # src/signal/gosignal3dgenericiterator.cpp
- src/system/godirectory.cc
- src/system/goprocess.cc
+ # src/system/godirectory.cc # not in windows!
+ # src/system/goprocess.cc  # not in windows!
  src/system/goenvironment.cpp
  src/thread/gothread.cc 
  src/thread/goconsumer.cc 
  src/thread/goproducer.cc 
- src/thread/gosynchronized.cc 
+ # src/thread/gosynchronized.cc # not in windows!
  src/thread/gothreadobject.cc
  src/types/gotype.cpp
  src/math/gopointcloud.cpp
@@ -326,12 +326,22 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 
 #FIND_LIBRARY (ATLAS NAMES atlas PATHS ${GOPATH}/extra/lib)
 #FIND_LIBRARY (CBLAS NAMES cblas PATHS ${GOPATH}/extra/lib)
-FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
-FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
+IF (WIN32)
+        # FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (ATLAS NAMES atlas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
+        FIND_LIBRARY (LAPACK NAMES lapack PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (BLAS NAMES cblas blas PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (DEVIL NAMES IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+        FIND_LIBRARY (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+        FIND_LIBRARY (PTHREAD NAMES pthread PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+ELSE (WIN32)
+        FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+        FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+        FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
+ENDIF (WIN32)
 #FIND_LIBRARY (F2C NAMES f2c PATHS /usr/lib /usr/local/lib)
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
@@ -377,7 +387,9 @@ ENDIF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
-                     ${GOPATH}/extra/include)
+                     ${GOPATH}/extra/include
+                     $ENV{HOME}/include) # Only in windows!
+                        
 
 ##                 
 ## If your system compiler is a gcc 4.x,

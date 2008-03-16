@@ -17,16 +17,25 @@ goThreadObject::~goThreadObject()
     // thisThread.join(); //= This causes seg fault!
 }
 
+#if defined WIN32
+static void goThreadObject_threadFunction(void* p)
+{
+    ((goThreadObject*)p)->threadMethod();
+}
+#else
 static void* goThreadObject_threadFunction(void* p)
 {
     ((goThreadObject*)p)->threadMethod();
     return NULL;
 }
-
+#endif
 void
 goThreadObject::run(int nt)
 {
-    thisThread.cancel();
+        // Danger in Windows!
+#if not defined WIN32   
+    thisThread.cancel();  
+#endif
     thisThread.create(goThreadObject_threadFunction, (void*)this, nt);
 }
 

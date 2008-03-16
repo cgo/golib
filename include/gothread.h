@@ -98,6 +98,24 @@ class goSemaphore {
  protected:
     sem_t semaphore;
 };
+#else
+#if defined WIN32
+class goSemaphore {
+ public:
+    goSemaphore();
+    virtual ~goSemaphore();
+    /*!
+     * Waits until semaphore is > 0, then decrements it atomically.
+     */
+    void dec();
+    /*!
+     * Increments the semaphore atomically.
+     */ 
+    void inc();
+ protected:
+    HANDLE semaphore;
+};
+#endif
 #endif
 
 /*!
