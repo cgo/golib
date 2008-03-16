@@ -257,6 +257,29 @@ SET                 (SOURCES
  #src/clapack/single/sormqr.c
  )
 
+IF (NOT WIN32)
+    SET (SOURCES ${SOURCES}
+  src/misc/plot.cpp
+  src/misc/gognuplot.cpp      # not plotting in windows!
+  src/misc/gosingleplot.cpp
+  src/misc/gomultiplotter.cpp
+  src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
+  src/misc/goconfigfileaccess.cc 
+  src/misc/goplot.cpp  # not in windows!
+  src/misc/govideocapture.cpp # not in windows!
+  src/system/goprocess.cc  # not in windows!
+  # Can I remove any of these permanently?
+  src/system/godirectory.cc # not in windows!
+  src/network/goconnection.cc # not in windows!
+  src/network/gonetobject.cc  # not in windows!
+  src/network/gonetwork.cc # not in windows!
+  src/network/goserver.cc # not in windows!
+  src/thread/gosynchronized.cc # not in windows!
+ # src/misc/gostatusobject.cc  # not in windows!
+ )
+ENDIF (NOT WIN32)
+
+
 IF (BUILD_PYTHON_EMBED)
     ## SET (SOURCES src/python/gopython.cpp ${SOURCES})
     FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)

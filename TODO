@@ -1,6 +1,7 @@
 Thu Aug 30 11:27:34 CEST 2007
 -----------------------------
 - Move Gomatlab, Gogl, Gogui out of the main build some time in the future
+- Systemabhaengiger und -unabhaengiger Teil
 - Move python embedding in extra library
 - Add level curve extraction for 2D images
 - Add "user manual" or "tutorial" like documentation
