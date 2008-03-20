@@ -25,6 +25,7 @@
 #include <gocurve.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
+#include <gofilter3d.h>
 #include <goofffile.h>
 #include <govideocapture.h>
 #include <gotimerobject.h>

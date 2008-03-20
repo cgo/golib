@@ -58,6 +58,16 @@ bool goPython::final ()
     return true;
 }
 
+PyObject* goPython::getMainMod ()
+{
+    return goPython::mainMod;
+}
+
+PyObject* goPython::getMainNamespace ()
+{
+    return goPython::mainNamespace;
+}
+
 #if 0
 goPython::goPython ()
     : myPrivate (0)
@@ -85,6 +95,18 @@ bool goPython::call (const char* cmd)
 {
     PyRun_SimpleString (cmd);
     return true;
+}
+
+bool goPython::runFile (const char* filename)
+{
+    FILE* f = ::fopen (filename, "r");
+    if (!f)
+        return 0;
+
+    if (PyRun_AnyFile (f, filename) == 0)
+        return true;
+
+    return false;
 }
 
 PyObject* goPython::run (const goString& cmd)

@@ -1,3 +1,14 @@
+/**
+ * @addtogroup matlab
+ * @{
+ * @file videocaptureclose.cpp
+ * This mex module provides a function to close a video4linux
+ * device.
+ * \par Usage
+ * In matlab, call <code> videocaptureclose (fd); </code>
+ * @}
+ */
+
 #include "mex.h"
 #include <govideocapture.h>
 

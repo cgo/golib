@@ -30,6 +30,7 @@
 #include <gocurve.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
+#include <gofilter3d.h>
 #include <golist.h>
 #include <gotimerobject.h>
 #include <govideocapture.h>

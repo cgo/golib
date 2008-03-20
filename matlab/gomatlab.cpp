@@ -2,8 +2,6 @@
  * This file and the programs contained in it and in associated files
  * are copyright 2003 by Christian Gosch.
  * Email: christian@goschs.de
- * If no other license is supplied with this file, 
- * assume it is distributable under the GNU General Public License (GPL).
  * $Id: gomatlab.cpp,v 1.2 2006/04/25 17:01:53 gosch Exp $
  */
 #include <stdio.h>
@@ -21,6 +19,10 @@
 #endif
 
 using namespace std;
+
+/** @addtogroup matlab
+ * @{
+ */
 
 class goMatlabPrivate
 {
@@ -41,6 +43,14 @@ goMatlabPrivate::~goMatlabPrivate ()
 }
 
         
+/*
+ * @brief Copy sig to buffer at mp.
+ * 
+ * @param sig 
+ * @param mp 
+ * 
+ * @return True.
+ */
 template <class T>
 static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
 {
@@ -82,6 +92,14 @@ static bool putRGBImage1 (goSignal3DBase<void>* sig, unsigned char* mp)
     return true;
 }
 
+/** 
+ * @brief Put a string to the matlab engine.
+ * 
+ * @param str  String to put.
+ * @param name Name of the matlab variable.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putString (const goString& str, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -97,6 +115,14 @@ bool goMatlab::putString (const goString& str, const char* name)
     return true;
 }
 
+/** 
+ * @brief Get a string variable from matlab.
+ * 
+ * @param str   Holds the string on successful return.
+ * @param name  Name of the matlab variable.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getString (goString& str, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -174,31 +200,82 @@ bool goMatlab::putRGBImage (const goSignal3DBase<void>* sig, const char* name)
     return ok;
 }
 
+/** 
+ * @brief Put a single channel of \c sig as matrix to matlab.
+ * 
+ * @param sig  Signal to put to matlab.
+ * @param name Variable name in matlab.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putSignal(const goSignal3DBase<void>* sig, const char* name)
 {
     return this->signalToVariable (sig, name);
 }
 
+/** 
+ * @brief Get a matlab matrix as goSignal3D.
+ * 
+ * @param sig   Pointer to a goSignal3D<void> that holds the data on successful return.
+ * If the size of sig does not match the matrix, or if its type is not GO_FLOAT,
+ * the type is set to GO_FLOAT and it is resized.
+ * @param name  Name of the matlab variable.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getSignal(goSignal3D<void>* sig, const char* name)
 {
     return this->variableToSignal (sig, name);
 }
 
+/** 
+ * @brief Put a C array to matlab.
+ * 
+ * @param p       Pointer to first element.
+ * @param length  Length of the array (number of elements).
+ * @param name    Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putArray(const goDouble* p, goSize_t length, const char* name)
 {
     return this->arrayToVariable (p, length, name);
 }
 
+/** 
+ * @brief Put a resizable array to matlab.
+ * 
+ * @param array Array to put.
+ * @param name  Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putArray(const goArray<goDouble>* array, const char* name)
 {
     return this->arrayToVariable (array, name);
 }
 
+/** 
+ * @brief Get array from matlab.
+ * 
+ * @param array Holds the array on successful return.
+ * @param name  Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getArray(goArray<goDouble>* array, const char* name)
 {
     return this->variableToArray (array, name);
 }
 
+/** 
+ * @brief Put a goVector to matlab.
+ * 
+ * @param vec  Vector to put.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putVector(const goVectord* vec, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -219,6 +296,14 @@ bool goMatlab::putVector(const goVectord* vec, const char* name)
     return true;
 }
 
+/** 
+ * @brief Put a goVector to matlab.
+ * 
+ * @param vec  Vector to put.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putVector(const goVectorf* vec, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -239,6 +324,14 @@ bool goMatlab::putVector(const goVectorf* vec, const char* name)
     return true;
 }
 
+/** 
+ * @brief Get a vector from matlab into a goVector.
+ * 
+ * @param vec  goVector that holds the data on successful return.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getVector(goVectord* vec, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -270,6 +363,14 @@ bool goMatlab::getVector(goVectord* vec, const char* name)
     return true;
 }
 
+/** 
+ * @brief Get a vector from matlab into a goVector.
+ * 
+ * @param vec  goVector that holds the data on successful return.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getVector(goVectorf* vec, const char* name)
 {
     if (!myPrivate->matlabEngine)
@@ -301,16 +402,43 @@ bool goMatlab::getVector(goVectorf* vec, const char* name)
     return true;
 }
 
+/** 
+ * @brief Put a double value to matlab.
+ * 
+ * @param d     Value to put.
+ * @param name  Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putDouble (goDouble d, const char* name)
 {
     return this->doubleToVariable (d, name);
 }
 
+/** 
+ * @brief Get a double from matlab.
+ * 
+ * @param d     Variable to hold the result.
+ * @param name  Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getDouble (goDouble& d, const char* name)
 {
     return this->variableToDouble (d, name);
 }
 
+/** 
+ * @brief Put a sparse matrix stored in a goSparseMatrix.
+ *
+ * goSparseMatrix objects can be used to assemble a sparse matrix quicker than
+ * in matlab itself. Its computational possibilities are limited.
+ * 
+ * @param sm   Sparse matrix to put.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putSparse (goSparseMatrix* sm, const char* name)
 {
     return this->sparseToMatlabSparse (sm, name);
@@ -378,21 +506,53 @@ static bool get_matrix (goMatlab& m, goMatrix<T>& matrix, const char* name)
     return true;
 }
 
+/** 
+ * @brief Put a goMatrix to matlab.
+ * 
+ * @param matrix Matrix to put.
+ * @param name   Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putMatrix (const goMatrixd& matrix, const char *name)
 {
     return put_matrix<goDouble> (*this, matrix, name);
 }
 
+/** 
+ * @brief Get a matrix from matlab into a goMatrix object.
+ * 
+ * @param matrix Holds the data upon successful return.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getMatrix (goMatrixd& matrix, const char* name)
 {
     return get_matrix<goDouble> (*this, matrix, name);
 }
 
+/** 
+ * @brief Put a goMatrix to matlab.
+ * 
+ * @param matrix Matrix to put.
+ * @param name   Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::putMatrix (const goMatrixf& matrix, const char *name)
 {
     return put_matrix<goFloat> (*this, matrix, name);
 }
 
+/** 
+ * @brief Get a matrix from matlab into a goMatrix object.
+ * 
+ * @param matrix Holds the data upon successful return.
+ * @param name Matlab variable name.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::getMatrix (goMatrixf& matrix, const char* name)
 {
     return get_matrix<goFloat> (*this, matrix, name);
@@ -436,6 +596,20 @@ bool goMatlab::put2DPoints (const goList<goVectorf>& l, const char* variableName
     return true;
 }
 
+/** 
+ * @brief Put 2d points from list to matlab matrix.
+ *
+ * The x and y coordinates of the points are stored in a matlab matrix
+ * of size 2xN, where N is the number of points. The first row contains the x
+ * coordinates, the second row contains the y coordinates of the points.
+ * 
+ * @see goMatlab::get2DPoints()
+ * 
+ * @param l List of points (only x and y coordinates are used).
+ * @param variableName Name of matlab matrix.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::put2DPoints (const goList<goVectord>& l, const char* variableName)
 {
     assert(this->getEngine());
@@ -507,6 +681,20 @@ bool goMatlab::get2DPoints (goList<goVectorf>& l, const char* variableName)
     return true;
 }
 
+/** 
+ * @brief Get a matrix of 2d points from matlab into a list.
+ * 
+ * Stores the points from a matrix that looks like described in the documentation
+ * of goMatlab::put2DPoints() into a list.
+ * 
+ * @see goMatlab::put2DPoints()
+ * 
+ * @param l The list.
+ * @param variableName The matlab variable name of the matrix containing the 
+ *                     coordinates.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::get2DPoints (goList<goVectord>& l, const char* variableName)
 {
     assert (this->getEngine());
@@ -591,6 +779,11 @@ bool goMatlab::put2DPoints (goList<goVectord>::ConstElement* begin,
     return true;
 }
         
+/** 
+ * @brief Stops the matlab engine.
+ * 
+ * @return True.
+ */
 bool goMatlab::stopEngine ()
 {
     if (myPrivate->matlabEngine)
@@ -601,16 +794,31 @@ bool goMatlab::stopEngine ()
     return true;
 }
 
+/** 
+ * @brief Get the matlab engine structure.
+ * 
+ * @return Pointer to the matlab \c Engine structure.
+ */
 Engine* goMatlab::getEngine ()
 {
     return myPrivate->matlabEngine;
 }
 
+/** 
+ * @brief Get the matlab engine structure.
+ * 
+ * @return Const pointer to the matlab \c Engine structure.
+ */
 const Engine* goMatlab::getEngine () const
 {
     return myPrivate->matlabEngine;
 }
 
+/** 
+ * @brief Starts a new matlab engine.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goMatlab::startEngine ()
 {
     if (myPrivate->matlabEngine)
@@ -1362,3 +1570,4 @@ bool goMatlab::callObjectMethod (int methodID, goObjectMethodParameters* param)
     }
     return goObjectBase::callObjectMethod (methodID, param);
 }
+/** @} */

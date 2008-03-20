@@ -1,3 +1,14 @@
+/**
+ * @addtogroup matlab
+ * @{
+ * @file videocaptureopen.cpp
+ * This mex module provides a function to open a video4linux
+ * device.
+ * \par Usage
+ * In matlab, call <code> fd = videocaptureopen (device_filename, width, height); </code>
+ * @}
+ */
+
 #include "mex.h"
 #include <govideocapture.h>
 

@@ -122,7 +122,7 @@ bool goFilter3D<T_IN,T_OUT>::setMask (const goFloat* mask, goIndex_t sizeX, goIn
             normalizationFactor = 0.0;
             for (i = 0; i < count; ++i,++p)
             {
-                normalizationFactor += *p;
+                normalizationFactor += fabs(*p);
             }
             assert (normalizationFactor != 0.0);
             normalizationFactor = 1.0 / normalizationFactor;

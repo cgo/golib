@@ -158,6 +158,13 @@
  * \defgroup video Video capture and related
  * \defgroup gm Belief propagation and factor graphs
  * 
+ * \defgroup matlab Matlab
+ * goMatlab offers an interface to the matlab engine and some convenience functions to
+ * get and put golib object from and to the matlab engine.
+ * It is in the separate library \c Gomatlab, which can be built optionally.
+ * Also available are a few \c mex modules for some tasks. The only interesting
+ * will probably be the video4linux interfaces.
+ *
  * \defgroup gui GUI elements
  * \todo Documentation is rudimentary.
  *

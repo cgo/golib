@@ -307,7 +307,9 @@ bool goVideoCapture::grab (goSignal3D<void>& target)
     {
         target.setDataType (GO_UINT8);
         goSize3D sz (this->getCaptureWidth(), this->getCaptureHeight(), 1);
-        target.make (sz, sz, goSize3D (4,4,0), 3);
+        goSize3D border (goMath::min<int> (16, sz.x),
+                         goMath::min<int> (16, sz.y), 0);
+        target.make (sz, sz, border, 3);
     }
 
     return this->grab (*static_cast<goSignal3DBase<void>*> (&target));

@@ -110,6 +110,7 @@
 #include <gorandom.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
+#include <gofilter3d.h>
 #include <goofffile.h>
 #include <govideocapture.h>
 
@@ -168,6 +169,7 @@
 %include <gorandom.h>
 %include <gognuplot.h>
 %include <gofilter1d.h>
+%include <gofilter3d.h>
 %include <goofffile.h>
 %include <govideocapture.h>
 
@@ -1273,6 +1275,8 @@
 %template(goSignal3DBasev) goSignal3DBase<void>; 
 %template(goSignal3Dv)     goSignal3D<void>;
 %template(goSubSignal3Dv)     goSubSignal3D<void>;
+
+%template(goFilter3Dv)     goFilter3D<void, void>;
 
 %template(goListElementInt) goListElement<int>;   // Needed in gogl python module
 %template(goListInt) goList<int>;   // Needed in gogl python module

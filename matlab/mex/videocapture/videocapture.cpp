@@ -1,3 +1,14 @@
+/**
+ * @addtogroup matlab
+ * @{
+ * @file videocapture.cpp
+ * This mex module provides a simple video capture function.
+ * \par Usage
+ * In matlab, call <code> image = videocapture (fd); </code> where \c fd is 
+ * a file descriptor from the videocaptureopen mex module.
+ * @}
+ */
+
 #include "mex.h"
 #include <govideocapture.h>
 #include <gocolourspace.h>
