@@ -66,6 +66,7 @@ namespace goPython
         bool call (const goString& cmd);
         bool call (const char* cmd);
         PyObject* run (const goString& cmd);
+        bool runFile (const char* filename);
 
         PyObject* getObject (const char* name);
 

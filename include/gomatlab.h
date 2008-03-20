@@ -77,8 +77,29 @@ enum {
 };
 
 /** 
+ * @addtogroup matlab
+ * @{
+ */
+/**
 * @brief Matlab interface.
 * @note You need Matlab in order to use this.
+*
+* This class provides a convenient interface to use matlab in conjunction with some objects from
+* golib. A simple usage example would be
+  @verbatim
+    ...
+    goMatlab matlab;  // This starts the matlab engine.
+    goMatrixf M;
+    ... // Do some stuff with M
+    matlab.putMatrix (M, "mymatrix");
+    matlab.call ("v = mymatrix * something; % Do whatever you want matlab to do with the data");
+    // Say "v" in matlab is a vector, then
+    goVectorf v;
+    matlab.getVector (&v, "v");
+    ... // Do some stuff with v
+  @endverbatim
+*
+* @todo The interface is a little inconsistent (use references instead of pointers!).
 */
 class goMatlab : public goObjectBase 
 {
@@ -91,6 +112,7 @@ class goMatlab : public goObjectBase
         bool     putRGBImage (const goSignal3DBase<void>* sig, const char* name);
         bool     putSignal (const goSignal3DBase<void>* sig, const char* name);
         bool     getSignal (goSignal3D<void>* sig, const char* name);
+
         bool     putArray  (const goDouble* p, goSize_t length, const char* name);
         bool     putArray  (const goArray<goDouble>* array, const char* name);
         bool     getArray  (goArray<goDouble>* array, const char* name);
@@ -98,6 +120,7 @@ class goMatlab : public goObjectBase
         bool     getVector (goVectord* vec, const char* name);
         bool     putVector (const goVectorf* vec, const char* name);
         bool     getVector (goVectorf* vec, const char* name);
+
         bool     putDouble (goDouble d, const char* name);
         bool     getDouble (goDouble& d, const char* name);
         bool     putSparse (goSparseMatrix* sm, const char* name);
@@ -214,5 +237,6 @@ class goMatlab : public goObjectBase
         goMatlabPrivate* myPrivate;
         
 };
+/** @} */
 
 #endif
