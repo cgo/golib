@@ -1,6 +1,7 @@
 #include <gtkmm.h>
 #include <gogui/imageview.h>
 #include <golist.h>
+#include <goautoptr.h>
 
 namespace goGUI
 {
@@ -31,12 +32,15 @@ namespace goGUI
     class ImageViewPrivate
     {
         public:
-            ImageViewPrivate() : curves(), image() {};
+            ImageViewPrivate() : curves(), image(0) 
+            {
+                image.set (new goSignal3D<void>);
+            };
             ~ImageViewPrivate () {};
 
             goList<goMatrixd>          curves;
             goList<ImageViewCurveAttr> curveAttributes;  //= These are not used yet. Add them.
-            goSignal3D<void>  image;
+            goAutoPtr<goSignal3D<void> >  image;
     };
 };
 
@@ -96,7 +100,7 @@ void goGUI::ImageView::drawCurves ()
 void goGUI::ImageView::drawImage ()
 {
     goGUI::Draw draw (this->get_window());
-    draw.image (myPrivate->image);
+    draw.image (*myPrivate->image);
 }
 
 /** 
@@ -108,8 +112,11 @@ void goGUI::ImageView::drawImage ()
  */
 void goGUI::ImageView::setImage (const goSignal3DBase<void>& image)
 {
-    myPrivate->image.copy (image);
-    this->set_size_request (image.getSizeX(), image.getSizeY());
+    if (!myPrivate->image.isNull())
+    {
+        myPrivate->image->copy (image);
+        this->set_size_request (image.getSizeX(), image.getSizeY());
+    }
 }
 
 /** 
@@ -117,7 +124,7 @@ void goGUI::ImageView::setImage (const goSignal3DBase<void>& image)
  * 
  * @return Reference to the stored image.
  */
-goSignal3D<void>& goGUI::ImageView::getImage ()
+goAutoPtr<goSignal3D<void> > goGUI::ImageView::getImage ()
 {
     return myPrivate->image;
 }

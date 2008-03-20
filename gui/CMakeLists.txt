@@ -1,6 +1,7 @@
 PROJECT             (Gogui)
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
+                             src/videocapturecontrol.cpp
                              src/scenecontrol.cpp
                              src/sceneview.cpp
                              src/multivectorinput.cpp

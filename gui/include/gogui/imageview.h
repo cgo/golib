@@ -5,6 +5,7 @@
 #include <gomatrix.h>
 #include <gosignal3d.h>
 #include <golist.h>
+#include <goautoptr.h>
 
 namespace goGUI
 {
@@ -29,7 +30,7 @@ namespace goGUI
             void              drawCurves ();
             void              drawImage ();
             void              setImage  (const goSignal3DBase<void>& image);
-            goSignal3D<void>& getImage  ();
+            goAutoPtr<goSignal3D<void> > getImage  ();
             void              addCurve  (const goMatrixd& M);
             void              removeCurve (goIndex_t i);
             void              setCurve (goIndex_t i, const goMatrixd& M);
