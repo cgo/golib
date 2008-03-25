@@ -16,6 +16,60 @@
 /** @addtogroup data
  * @{
  */
+template <class NodeType, class EdgeType>
+class goGraph
+{
+    public:
+        typedef goAutoPtr<NodeType> NodePtr;
+        typedef goAutoPtr<EdgeType> EdgePtr;
+        typedef goList< NodePtr >  NodeList;
+        typedef goList< EdgePtr >  EdgeList;
+        
+    public:
+        goGraph ()
+            : myNodes (), myEdges () 
+        {};
+
+        virtual ~goGraph () 
+        {};
+        
+        /** 
+         * @brief Connect \c n1, "slot" \c adjIndex1 to \c n2, "slot" \c adjIndex2.
+         * 
+         * @param n1            Node 1
+         * @param adjIndex1     Index of the edge in node 1
+         * @param n2            Node 2
+         * @param adjIndex2     Index of the edge in node 2
+         */
+        void connect (NodePtr n1, goSize_t adjIndex1, NodePtr n2, goSize_t adjIndex2)
+        {
+            //= Create a new edge
+            myEdges.append (EdgePtr (new EdgeType (n1,n2)));
+            //= Append edge to both nodes and index all edges at each node.
+            n1->adj[adjIndex1] = &*myEdges.getTail();
+            n2->adj[adjIndex2] = &*myEdges.getTail();
+            myEdges.getTail()->setIndex (adjIndex1, adjIndex2);
+        };
+
+        /** 
+         * @brief Set all nodes to \c NodeType::NORMAL state.
+         */
+        void setNormal ()
+        {
+            NodeList::iterator iter = myNodes.begin ();
+            while (iter != myNodes.end())
+            {
+                if (!iter->isNull())
+                    (*iter)->status = NodeType::NORMAL;
+                ++iter;
+            }
+        };
+
+    private:
+        NodeList myNodes;
+        EdgeList myEdges;
+};
+
 /** 
  * @brief Graph node base class.
  *

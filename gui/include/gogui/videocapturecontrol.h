@@ -24,6 +24,10 @@ namespace goGUI
 
             goCaller0<int>& capturedCaller ();
 
+            void setWhiteness ();
+            void setBrightness ();
+            void setColour ();
+
         private:
             VideoCaptureControlPrivate* myPrivate;
     };

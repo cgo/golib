@@ -28,6 +28,7 @@ class goVideoCapturePrivate;
  *
  * @note Please report when a camera/driver works witht this class, it's fairly new and
  * my first time using v4l.
+ * @note Currently only supports video4linux devices under Linux. No Windows support.
  *
  * @author Christian Gosch
  */
@@ -65,6 +66,18 @@ class goVideoCapture : public goObjectBase
         
         bool setSettings       ();
         void getSettings       ();
+        void getValidRanges    ();
+
+        void setBrightness (double b);
+        double  getBrightness () const;
+        void setHue (double b);
+        double  getHue () const;
+        void setColour (double b);
+        double  getColour () const;
+        void setContrast (double b);
+        double  getContrast () const;
+        void setWhiteness (double b);
+        double  getWhiteness () const;
 
     protected:
         void getCapabilities   ();

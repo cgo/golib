@@ -56,6 +56,16 @@ class goVideoCapturePrivate
 #if HAVE_LINUX_VIDEODEV_H
             memset (&this->cap, 0, sizeof(struct video_capability));
 #endif
+            brightnessRange[0] = 0;
+            brightnessRange[1] = 65535;
+            hueRange[0] = 0;
+            hueRange[1] = 65535;
+            colourRange[0] = 0;
+            colourRange[1] = 65535;
+            contrastRange[0] = 0;
+            contrastRange[1] = 65535;
+            whitenessRange[0] = 0;
+            whitenessRange[1] = 65535;
         };
         ~goVideoCapturePrivate() {};
 
@@ -68,6 +78,12 @@ class goVideoCapturePrivate
         struct video_capability cap;
 #endif
         goFixedArray<goUInt8> grabBuffer;
+
+        int brightnessRange[2];
+        int hueRange[2];
+        int colourRange[2];
+        int contrastRange[2];
+        int whitenessRange[2];
 };
 
 
@@ -517,3 +533,155 @@ void goVideoCapture::getCaptureWindow ()
     myPrivate->captureHeight = vw.height;
 #endif
 }
+
+static void getImageProp (struct video_picture* ret, int fd)
+{
+    if (xioctl (fd, VIDIOCGPICT, &ret) < 0)
+    {
+        printf ("VIDIOCGPICT:");
+        perror(0);
+        return;
+    }
+}
+
+static bool setImageProp (struct video_picture* vp, int fd)
+{
+    if (xioctl (fd, VIDIOCSPICT, &vp) < 0)
+    {
+        printf ("VIDIOCSPICT:");
+        perror(0);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Get valid ranges for brightnes etc.
+ * @todo Does not work yet. a) doesn't find the real maximum value the way it works now, b) gets invalid argument all
+ * the time.
+ */
+void goVideoCapture::getValidRanges ()
+{
+    //= Find the max. values
+    struct video_picture vp;
+    int i = 0, step = 0;
+    bool failed = false;
+#define FIND_MAX(entry) \
+    getImageProp (&vp, myPrivate->fileDescriptor); \
+    i = 65535; \
+    step = i / 2; \
+    do \
+    { \
+        vp. entry = i; \
+        failed = !setImageProp (&vp, myPrivate->fileDescriptor); \
+        if (failed) \
+        { \
+            if (i > 0) \
+                i = i - i / 2; \
+        } \
+        else \
+        { \
+            if (i <= 65535) \
+                i = i + (65535 - i) / 2; \
+        } \
+        step = step / 2; \
+        printf (#entry " value: %d\n", i); \
+    } while (i > 1 && i < 65535 && failed); \
+    myPrivate-> entry ## Range[1] = i;
+
+    FIND_MAX(brightness);
+    FIND_MAX(hue);
+    FIND_MAX(colour);
+    FIND_MAX(contrast);
+    FIND_MAX(whiteness);
+#undef FIND_MAX
+}
+
+#define SET_GET_PICT(Entry, entry) \
+void goVideoCapture::set ## Entry (double b) \
+{ \
+    struct video_picture vp; \
+    getImageProp (&vp, myPrivate->fileDescriptor); \
+    vp. entry = (int) ( (b) * (double)myPrivate-> entry ## Range[0] + (1.0 - b) * (double)myPrivate-> entry ## Range[1] ); \
+    printf ("Setting " #entry " to %lf\n", b); \
+    setImageProp (&vp, myPrivate->fileDescriptor); \
+    getImageProp (&vp, myPrivate->fileDescriptor); \
+    printf (#Entry " is now %d\n", vp. entry); \
+} \
+ \
+double goVideoCapture::get ## Entry () const \
+{ \
+    struct video_picture vp; \
+    getImageProp (&vp, myPrivate->fileDescriptor); \
+    return (double) ( (vp. entry) - myPrivate-> entry ## Range[0] ) / (double)(myPrivate-> entry ## Range[1] - myPrivate-> entry ## Range[0] ); \
+}
+
+SET_GET_PICT(Brightness, brightness);
+SET_GET_PICT(Hue, hue);
+SET_GET_PICT(Colour, colour);
+SET_GET_PICT(Contrast, contrast);
+SET_GET_PICT(Whiteness, whiteness);
+
+#undef SET_GET_PICT
+
+#if 0
+void goVideoCapture::setHue (int b)
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    vp.hue = b;
+    setImageProp (&vp, myPrivate->fileDescriptor);
+}
+
+int goVideoCapture::getHue () const
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    return vp.hue;
+}
+
+void goVideoCapture::setColour (int b)
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    vp.colour = b;
+    setImageProp (&vp, myPrivate->fileDescriptor);
+}
+
+int goVideoCapture::getColour () const
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    return vp.colour;
+}
+
+void goVideoCapture::setContrast (int b)
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    vp.contrast = b;
+    setImageProp (&vp, myPrivate->fileDescriptor);
+}
+
+int goVideoCapture::getContrast () const
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    return vp.contrast;
+}
+
+void goVideoCapture::setWhiteness (int b)
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    vp.whiteness = b;
+    setImageProp (&vp, myPrivate->fileDescriptor);
+}
+
+int goVideoCapture::getWhiteness () const
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    return vp.whiteness;
+}
+#endif
