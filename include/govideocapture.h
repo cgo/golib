@@ -79,6 +79,8 @@ class goVideoCapture : public goObjectBase
         void setWhiteness (double b);
         double  getWhiteness () const;
 
+        void printImageProperties (goString& ret);
+
     protected:
         void getCapabilities   ();
         void getCaptureWindow  ();

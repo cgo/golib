@@ -25,8 +25,9 @@ VCGui::VCGui ()
 {
     myPrivate = new VCGuiPrivate;
     this->set_title ("Video Capture");
+    this->addFileAbout ("Video capture example\nusing golib 0.5 and gogui\n\n(C) Christian Gosch");
+    this->getFileMenu()->append (*Gtk::manage (new Gtk::SeparatorMenuItem));
     this->addFileQuit ();
-    this->addFileAbout ("Video capture example\nusing golib 0.5 and gogui");
     this->addControl (myPrivate->vccontrol);
 
     myPrivate->imageContainer.add (myPrivate->imageView);
@@ -36,7 +37,6 @@ VCGui::VCGui ()
     myPrivate->vccontrol.capturedCaller().connect (goMemberFunction<VCGui, int> (this, &VCGui::redrawImage));
 
     this->show_all ();
-
 
     goPython::init ();
     goPython::run ("import golib\n");

@@ -5,7 +5,8 @@ import array
 
 if False:
     mask = golib.goVectorf ()
-    mask.setArray ([1,4,6,4,1])
+    # mask.setArray ([1,4,6,4,1])
+    mask.setArray ([1,2,1])
     gaussfilter = golib.goFilter1D(mask, 1, True)
     mask.setArray ([-1,0,1])
     highfilter = golib.goFilter1D(mask, 1, True)
@@ -22,7 +23,7 @@ if False:
     fimage.make (the_image.getSize(), the_image.getBlockSize(), the_image.getBorderSize(),1)
     golib.goRGBAtoScalar (the_image, fimage)
 
-    for i in xrange(2):
+    for i in xrange(1):
         gaussfilter.filter (fimage)
         fimage.rotateAxes()
         fimage.rotateAxes()

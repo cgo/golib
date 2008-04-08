@@ -21,12 +21,15 @@ namespace goGUI
             void capture ();
             void setTarget (goAutoPtr<goSignal3D<void> > target);
             void contCaptureToggle ();
+            void swapRGBToggle ();
 
             goCaller0<int>& capturedCaller ();
 
             void setWhiteness ();
             void setBrightness ();
             void setColour ();
+            void setHue ();
+            void setContrast ();
 
         private:
             VideoCaptureControlPrivate* myPrivate;

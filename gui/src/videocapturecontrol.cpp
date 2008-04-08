@@ -1,5 +1,6 @@
 #include <gogui/videocapturecontrol.h>
 #include <govideocapture.h>
+#include <gosignalmacros.h>
 
 namespace goGUI
 {
@@ -11,6 +12,7 @@ namespace goGUI
                   target (0),
                   captureButton ("Capture"),
                   contCapture ("Continuous"),
+                  swapRGB ("Swap R/B"),
                   capturedCaller (),
                   brightnessScale (),
                   hueScale (),
@@ -24,14 +26,8 @@ namespace goGUI
                 vc.setCaptureSize (640, 480);
                 vc.setSettings ();
 
-                printf ("Settings:");
-                printf ("%f, %f, %f, %f\n", vc.getBrightness(), vc.getColour(), vc.getHue(), vc.getContrast());
-
-                brightnessScale.set_increments (0.001, 0.1);
-                hueScale.set_increments (0.001, 0.1);
-                colourScale.set_increments (0.001, 0.1);
-                contrastScale.set_increments (0.001, 0.1);
-                whitenessScale.set_increments (0.001, 0.1);
+                //printf ("Settings:");
+                //printf ("%f, %f, %f, %f\n", vc.getBrightness(), vc.getColour(), vc.getHue(), vc.getContrast());
 
                 brightnessScale.set_range (0.0, 1.0);
                 hueScale.set_range (0.0, 1.0);
@@ -45,11 +41,24 @@ namespace goGUI
                 contrastScale.set_value (0.5);
                 whitenessScale.set_value (0.5);
 
-                brightnessScale.set_digits (3);
-                hueScale.set_digits (3);
-                colourScale.set_digits (3);
-                contrastScale.set_digits (3);
-                whitenessScale.set_digits (3);
+                brightnessScale.set_digits (4);
+                hueScale.set_digits (4);
+                colourScale.set_digits (4);
+                contrastScale.set_digits (4);
+                whitenessScale.set_digits (4);
+
+                brightnessScale.set_increments (0.001, 0.1);
+                hueScale.set_increments (0.001, 0.1);
+                colourScale.set_increments (0.001, 0.1);
+                contrastScale.set_increments (0.001, 0.1);
+                whitenessScale.set_increments (0.001, 0.1);
+
+                brightnessScale.set_update_policy (Gtk::UPDATE_CONTINUOUS);
+                hueScale.set_update_policy (Gtk::UPDATE_CONTINUOUS);
+                colourScale.set_update_policy (Gtk::UPDATE_CONTINUOUS);
+                contrastScale.set_update_policy (Gtk::UPDATE_CONTINUOUS);
+                whitenessScale.set_update_policy (Gtk::UPDATE_CONTINUOUS);
+
             };
 
             ~VideoCaptureControlPrivate () 
@@ -57,11 +66,34 @@ namespace goGUI
                 vc.close ();
             };
 
+            void channelSwap ()
+            {
+                if (target.isNull())
+                    return;
+
+                if (target->getDataType().getID() != GO_UINT8)
+                {
+                    goLog::error ("goVideoCapture: channel swapping only for uint8. Not swapping.");
+                    return;
+                }
+
+                if (target->getChannelCount() < 3)
+                    return;
+                target->setChannel (0);
+                goUInt8 temp = 0;
+                size_t s = sizeof (goUInt8);
+                size_t ss = 2 * s;
+                GO_SIGNAL3D_EACHELEMENT_GENERIC (temp = *(goUInt8*)(__ptr + ss);
+                        *(goUInt8*)(__ptr + ss) = *(goUInt8*)__ptr;
+                        *(goUInt8*)(__ptr) = temp;, (*target));
+            };
+
             goVideoCapture vc;
             goAutoPtr<goSignal3D<void> > target;
 
             Gtk::Button      captureButton;
             Gtk::CheckButton contCapture;
+            Gtk::CheckButton swapRGB;
 
             goCaller0<int> capturedCaller;
 
@@ -81,10 +113,12 @@ goGUI::VideoCaptureControl::VideoCaptureControl ()
 
     Gtk::VBox* mainBox = Gtk::manage (new Gtk::VBox);
     {
-        Gtk::HBox* hbox = Gtk::manage (new Gtk::HBox);
-        hbox->pack_start (myPrivate->captureButton);
-        hbox->pack_start (myPrivate->contCapture);
-        mainBox->pack_start (*hbox);
+        Gtk::Table* table = Gtk::manage (new Gtk::Table);
+        table->attach (myPrivate->captureButton, 0, 2, 0, 1);
+        table->attach (myPrivate->contCapture, 0, 1, 1, 2);
+        table->attach (myPrivate->swapRGB, 1, 2, 1, 2);
+        mainBox->pack_start (*table);
+        table->show_all ();
     }
     {
         Gtk::VBox* hbox = Gtk::manage (new Gtk::VBox);
@@ -99,10 +133,19 @@ goGUI::VideoCaptureControl::VideoCaptureControl ()
 
     myPrivate->captureButton.signal_clicked().connect (sigc::mem_fun (*this, &VideoCaptureControl::capture));
     myPrivate->contCapture.signal_toggled().connect (sigc::mem_fun (*this, &VideoCaptureControl::contCaptureToggle));
+    myPrivate->swapRGB.signal_toggled().connect (sigc::mem_fun (*this, &VideoCaptureControl::swapRGBToggle));
 
     myPrivate->whitenessScale.signal_value_changed().connect (sigc::mem_fun (*this, &VideoCaptureControl::setWhiteness));
     myPrivate->brightnessScale.signal_value_changed().connect (sigc::mem_fun (*this, &VideoCaptureControl::setBrightness));
     myPrivate->colourScale.signal_value_changed().connect (sigc::mem_fun (*this, &VideoCaptureControl::setColour));
+    myPrivate->hueScale.signal_value_changed().connect (sigc::mem_fun (*this, &VideoCaptureControl::setHue));
+    myPrivate->contrastScale.signal_value_changed().connect (sigc::mem_fun (*this, &VideoCaptureControl::setContrast));
+
+    this->setWhiteness ();
+    this->setBrightness ();
+    this->setContrast ();
+    this->setHue ();
+    this->setColour ();
 }
 
 goGUI::VideoCaptureControl::~VideoCaptureControl ()
@@ -124,6 +167,10 @@ void goGUI::VideoCaptureControl::capture ()
     if (!myPrivate->target.isNull())
     {
         myPrivate->vc.grab (*myPrivate->target);
+        if (myPrivate->swapRGB.get_active())
+        {
+            myPrivate->channelSwap ();
+        }
         myPrivate->capturedCaller ();
     }
 }
@@ -134,7 +181,8 @@ void goGUI::VideoCaptureControl::contCaptureToggle ()
     {
         struct timespec t_req, t_remain;
         t_req.tv_sec = 0;
-        t_req.tv_nsec = 100000000;
+        // t_req.tv_nsec = 100000000;
+        t_req.tv_nsec = 10000000;
 
         while (myPrivate->contCapture.get_active())
         {
@@ -146,6 +194,14 @@ void goGUI::VideoCaptureControl::contCaptureToggle ()
             
             nanosleep (&t_req, &t_remain);
         }
+    }
+}
+
+void goGUI::VideoCaptureControl::swapRGBToggle ()
+{
+    if (myPrivate->contCapture.get_active())
+    {
+        // FIXME
     }
 }
 
@@ -161,15 +217,25 @@ goCaller0<int>& goGUI::VideoCaptureControl::capturedCaller ()
 
 void goGUI::VideoCaptureControl::setWhiteness ()
 {
-    myPrivate->vc.setWhiteness ((int)(myPrivate->whitenessScale.get_value() * 65535.0));
+    myPrivate->vc.setWhiteness (myPrivate->whitenessScale.get_value());
 }
 
 void goGUI::VideoCaptureControl::setBrightness ()
 {
-    myPrivate->vc.setBrightness ((int)(myPrivate->brightnessScale.get_value() * 65535.0));
+    myPrivate->vc.setBrightness (myPrivate->brightnessScale.get_value());
 }
 
 void goGUI::VideoCaptureControl::setColour ()
 {
-    myPrivate->vc.setColour ((int)(myPrivate->colourScale.get_value() * 65535.0));
+    myPrivate->vc.setColour (myPrivate->colourScale.get_value());
+}
+
+void goGUI::VideoCaptureControl::setContrast ()
+{
+    myPrivate->vc.setContrast (myPrivate->contrastScale.get_value());
+}
+
+void goGUI::VideoCaptureControl::setHue ()
+{
+    myPrivate->vc.setHue (myPrivate->hueScale.get_value());
 }

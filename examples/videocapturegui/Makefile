@@ -6,7 +6,7 @@ GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
 GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) $(CPPFLAGS) 
 
 LD		= g++
 LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)

@@ -536,7 +536,7 @@ void goVideoCapture::getCaptureWindow ()
 
 static void getImageProp (struct video_picture* ret, int fd)
 {
-    if (xioctl (fd, VIDIOCGPICT, &ret) < 0)
+    if (xioctl (fd, VIDIOCGPICT, ret) < 0)
     {
         printf ("VIDIOCGPICT:");
         perror(0);
@@ -546,7 +546,7 @@ static void getImageProp (struct video_picture* ret, int fd)
 
 static bool setImageProp (struct video_picture* vp, int fd)
 {
-    if (xioctl (fd, VIDIOCSPICT, &vp) < 0)
+    if (xioctl (fd, VIDIOCSPICT, vp) < 0)
     {
         printf ("VIDIOCSPICT:");
         perror(0);
@@ -602,8 +602,9 @@ void goVideoCapture::set ## Entry (double b) \
 { \
     struct video_picture vp; \
     getImageProp (&vp, myPrivate->fileDescriptor); \
-    vp. entry = (int) ( (b) * (double)myPrivate-> entry ## Range[0] + (1.0 - b) * (double)myPrivate-> entry ## Range[1] ); \
-    printf ("Setting " #entry " to %lf\n", b); \
+    vp. entry = ((unsigned short) ( b * (double)(myPrivate-> entry ## Range[1]) + (1.0 - b) * (double)myPrivate-> entry ## Range[0] )) & 0xffff; \
+    /* printf ("Setting " #entry " to %lf\n", b); */ \
+    /* printf (#entry " is %d\n", vp. entry);*/ \
     setImageProp (&vp, myPrivate->fileDescriptor); \
     getImageProp (&vp, myPrivate->fileDescriptor); \
     printf (#Entry " is now %d\n", vp. entry); \
@@ -613,7 +614,7 @@ double goVideoCapture::get ## Entry () const \
 { \
     struct video_picture vp; \
     getImageProp (&vp, myPrivate->fileDescriptor); \
-    return (double) ( (vp. entry) - myPrivate-> entry ## Range[0] ) / (double)(myPrivate-> entry ## Range[1] - myPrivate-> entry ## Range[0] ); \
+    return ( (double) ( (vp. entry) - myPrivate-> entry ## Range[0] ) ) / (double)(myPrivate-> entry ## Range[1] - myPrivate-> entry ## Range[0] ); \
 }
 
 SET_GET_PICT(Brightness, brightness);
@@ -623,6 +624,38 @@ SET_GET_PICT(Contrast, contrast);
 SET_GET_PICT(Whiteness, whiteness);
 
 #undef SET_GET_PICT
+
+void goVideoCapture::printImageProperties (goString& ret)
+{
+    struct video_picture vp;
+    getImageProp (&vp, myPrivate->fileDescriptor);
+    ret += "Brightness: "; ret += (int)vp.brightness; ret += "\n";
+    ret += "Hue: "; ret += (int)vp.hue; ret += "\n";
+    ret += "Colour: "; ret += (int)vp.colour; ret += "\n";
+    ret += "Contrast: "; ret += (int)vp.contrast; ret += "\n";
+    ret += "Whiteness: "; ret += (int)vp.whiteness; ret += "\n";
+    ret += "Depth: "; ret += (int)vp.depth; ret += "\n";
+    goString pal;
+    switch (vp.palette)
+    {
+        case VIDEO_PALETTE_GREY: pal = "GREY"; break;
+        case VIDEO_PALETTE_HI240: pal = "HI240"; break;
+        case VIDEO_PALETTE_RGB565: pal = "RGB565"; break;
+        case VIDEO_PALETTE_RGB555: pal = "RGB555"; break;
+        case VIDEO_PALETTE_RGB24: pal = "RGB24"; break;
+        case VIDEO_PALETTE_RGB32: pal = "RGB32"; break;
+        case VIDEO_PALETTE_YUV422: pal = "YUV422"; break;
+        case VIDEO_PALETTE_YUYV: pal = "YUYV"; break;
+        case VIDEO_PALETTE_UYVY: pal = "UYVY"; break;
+        case VIDEO_PALETTE_YUV420: pal = "YUV420"; break;
+        case VIDEO_PALETTE_YUV411: pal = "YUV411"; break;
+        case VIDEO_PALETTE_RAW: pal = "RAW"; break;
+        case VIDEO_PALETTE_YUV422P: pal = "YUV422P"; break;
+        case VIDEO_PALETTE_YUV411P: pal = "YUV411P"; break;
+        default: pal = "unknown"; break;
+    }
+    ret += "Palette: "; ret += pal; ret += "\n";
+}
 
 #if 0
 void goVideoCapture::setHue (int b)
