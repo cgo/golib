@@ -15,7 +15,7 @@ LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
 
 LIBS =  -L$(GOPATH)/../lib -lGo -lGogui -lGogl -lGopython
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/gui/include -I/usr/include/python2.5
+INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/gui/include -I/usr/include/python2.4
 
 TARGET		= vcgui
 

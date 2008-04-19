@@ -1109,10 +1109,16 @@ bool goMatrix<T>::readASCII (FILE* f)
 
     if (s != "goMatrix")
     {
-        goString msg = "goMatrix::readASCII: expected goMatrix, got ";
-        msg += s.toCharPtr ();
-        goLog::warning (msg);
-        return false;
+        ::rewind (f);
+        if (!this->readASCIISimple (f))
+        {
+            goString msg = "goMatrix::readASCII: expected goMatrix, got ";
+            msg += s.toCharPtr ();
+            msg += " and readASCIISimple also failed.";
+            goLog::warning (msg);
+            return false;
+        }
+        return true;
     }
 
     if (!goFileIO::readASCIILine (f,s))
@@ -1148,6 +1154,79 @@ bool goMatrix<T>::readASCII (FILE* f)
             (*this)(r,c) = T(d);
         }
         fscanf (f, "\n");
+    }
+
+    return true;
+}
+
+template <class T>
+bool goMatrix<T>::readASCIISimple (FILE* f)
+{
+    goList<goString> words;
+    goString line;
+    goFileIO::readASCIILine (f, line);
+    line.getWords (words);
+    while (words.getFront()[0] == '#' && !::feof (f))
+    {
+        words.erase ();
+        line = "";
+        goFileIO::readASCIILine (f, line);
+        line.getWords (words);
+    }
+
+    goSize_t columns = words.getSize ();
+    goSize_t rows = 1;
+
+    goSize_t chunkSize = goMath::max<goSize_t> (256, columns);
+    goArray<goDouble> buffer (chunkSize);
+
+    do
+    {
+        if ((goSize_t)words.getSize() != columns)
+        {
+            //goString s = "goMatrix::readASCIISimple(): wrong column count in row ";
+            //s += (int) rows;
+            //s += " -- stopping reading.";
+            //goLog::warning (s);
+            //return false;
+            break;
+        }
+        if (rows * columns >= (goSize_t)buffer.getSize())
+        {
+            buffer.resize (buffer.getSize() + chunkSize);
+        }
+
+        goSize_t start = (rows - 1) * columns;
+        goSize_t i = start;
+        goList<goString>::iterator iter = words.begin ();
+        while (iter != words.end())
+        {
+            buffer[i] = iter->toDouble ();
+            ++i;
+            ++iter;
+        }
+
+        if (::feof (f))
+            break;
+        
+        words.erase ();
+        line = "";
+        goFileIO::readASCIILine (f, line);
+        line.getWords (words);
+        if ((goSize_t)words.getSize() != columns)
+            break;
+
+        ++rows;
+    } while (true);
+
+    this->resize (rows, columns);
+    goSize_t i = 0;
+    for (goSize_t r = 0; r < rows; ++r)
+    {
+        for (goSize_t c = 0; c < columns; ++c, ++i)
+        {
+            (*this)(r, c) = static_cast<T>(buffer[i]);
+        }
     }
 
     return true;

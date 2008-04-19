@@ -260,23 +260,34 @@ class goPlotElementMatrixCurve : public goPlotElement
 class goPlotElementMisc : public goPlotElement
 {
     public:
-        goPlotElementMisc (const char* commands, bool splot = false) : 
-            goPlotElement ("", "", ""), myCommands (commands), mySplot (splot) 
+        goPlotElementMisc (const char* commands, const char* dataString = 0, bool splot = false) : 
+            goPlotElement ("plot", "-", "with lines"), 
+            // myCommands (commands), 
+            myDataString (""),
+            mySplot (splot)
         {
             if (splot)
                 this->setPlotCommand ("splot");
             else
                 this->setPlotCommand ("plot");
-            this->setDataFlag (false);
+            if (!dataString)
+                this->setDataFlag (false);
+            else
+            {
+                this->setDataFlag (true);
+                this->myDataString = dataString;
+            }
+            this->setPlotOptions (commands);
         };
         virtual ~goPlotElementMisc () {};
 
         virtual void data (goString& str) const
         {
-            str = myCommands;
+            str += myDataString;
         };
 
-        goString myCommands;
+        // goString myCommands;
+        goString myDataString;
         bool     mySplot;
 };
 
@@ -871,7 +882,7 @@ bool goSinglePlot::addImage (const goSignal3DBase<void>& m, const char* title, c
     return true;
 }
 
-bool goSinglePlot::add (const char* commands)
+bool goSinglePlot::add (const char* commands, const char* dataString)
 {
     if (myPrivate->plotType != goPlot::Normal)
     {
@@ -880,12 +891,12 @@ bool goSinglePlot::add (const char* commands)
     }
 
     //= New
-    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, false));
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, false));
     myPrivate->plotElements.append (aptr);
     return true;
 }
 
-bool goSinglePlot::add3D (const char* commands)
+bool goSinglePlot::add3D (const char* commands, const char* dataString)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
@@ -894,7 +905,7 @@ bool goSinglePlot::add3D (const char* commands)
     }
 
     //= New
-    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, true));
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, true));
     myPrivate->plotElements.append (aptr);
     return true;
 }

@@ -35,6 +35,9 @@ class goListIterator
 
         T& operator* () { return el->elem; };
         const T& operator* () const { return el->elem; };
+
+        T* operator-> () { return &el->elem; };
+        const T* operator-> () const { return &el->elem; };
         
         bool operator== (const goListIterator<T>& other) const { return this->el == other.el; };
         bool operator!= (const goListIterator<T>& other) const { return !(this->operator== (other)); };

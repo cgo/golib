@@ -32,6 +32,55 @@ namespace goMath
     };
 
     /** 
+     * @brief Karcher mean for generic Riemannian manifolds.
+     * 
+     * @param start     Start iterator.
+     * @param count     Number of elements.
+     * @param manifold  Manifold object.
+     * @param meanRet   Return value, contains the mean after returning true.
+     * @param max_iterations  Max. number of iterations.
+     * @param epsilon   "Small" floating point value.
+     * 
+     * @return True if mean could be found within max_iterations, false otherwise.
+     */
+    template <class iterator_type, class manifold_type>
+        bool karcherMean (iterator_type           start, 
+                          int                     count, 
+                          manifold_type&          manifold, 
+                          typename manifold_type::Element& meanRet, 
+                          int                     max_iterations = 1000, 
+                          double                  epsilon = 1e-6)
+        {
+            typename manifold_type::Element mean = *start;
+            meanRet = mean;
+            typename manifold_type::Tangent sum, temp;
+
+            float f = 1.0f / static_cast<float> (count);
+            iterator_type it;
+            int iterations = 0;
+            while (iterations < max_iterations)
+            {
+                it = start;
+                ++it;
+                manifold.log (mean, *start, sum);
+                for (int i = 1; i < count; ++i, ++it)
+                {
+                    manifold.log (mean, *it, temp);
+                    sum += temp;
+                }
+                sum *= f;
+                manifold.exp (mean, sum, meanRet);
+                printf ("Inner product: %f\n", manifold.innerProduct (mean, sum, sum));
+                if (manifold.innerProduct (mean, sum, sum) < epsilon)
+                    return true;
+                mean = meanRet;
+                ++iterations;
+            }
+
+            return false;
+        };
+
+    /** 
      * @brief Rotation group.
      */
     template <class T>

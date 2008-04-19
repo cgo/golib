@@ -181,7 +181,6 @@ void goGUI::VideoCaptureControl::contCaptureToggle ()
     {
         struct timespec t_req, t_remain;
         t_req.tv_sec = 0;
-        // t_req.tv_nsec = 100000000;
         t_req.tv_nsec = 10000000;
 
         while (myPrivate->contCapture.get_active())

@@ -84,8 +84,8 @@ class goSinglePlot : public goObjectBase
         bool addImage (const goMatrixd& m, const char* title, const char* plotOptions = 0);
         bool addImage (const goSignal3DBase<void>& m, const char* title, const char* plotOptions = 0);
 
-        bool add (const char* commands);
-        bool add3D (const char* commands);
+        bool add (const char* commands, const char* dataString = 0);
+        bool add3D (const char* commands, const char* dataString = 0);
         bool addSphere (const char* plotOptions = 0, goFloat radius = 1.0f, bool autoRange = true);
 
         template <class pointT>

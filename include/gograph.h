@@ -16,6 +16,7 @@
 /** @addtogroup data
  * @{
  */
+#if 0
 template <class NodeType, class EdgeType>
 class goGraph
 {
@@ -69,6 +70,7 @@ class goGraph
         NodeList myNodes;
         EdgeList myEdges;
 };
+#endif
 
 /** 
  * @brief Graph node base class.
