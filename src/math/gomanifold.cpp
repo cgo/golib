@@ -176,5 +176,43 @@ void goMath::SO3<T>::vector (const goMatrix<T>& r, goVector<T>& ret)
     this->log (myId, r, ret);
 }
 
+//================================================================================
+
+template <class T>
+goMath::LinearSpace<T>::LinearSpace ()
+    : goMath::Manifold <goVector<T>, goVector<T> > ()
+{
+}
+
+template <class T>
+goMath::LinearSpace<T>::~LinearSpace ()
+{
+}
+
+template <class T>
+void goMath::LinearSpace<T>::exp (const Element& e, const Tangent& v, Element& ret)
+{
+    ret = e;
+    goVectorAdd<T> (1.0, v, ret);
+}
+
+template <class T>
+void goMath::LinearSpace<T>::log (const Element& e1, const Element& e2, Tangent& ret)
+{
+    ret = e2;
+    goVectorAdd<T> (-1.0, e1, ret);
+}
+
+template <class T>
+goDouble goMath::LinearSpace<T>::innerProduct (const Element& e, 
+        const Tangent& v1, const Tangent& v2)
+{
+    return v1 * v2;
+}
+
+
 template class goMath::SO3<goFloat>;
 template class goMath::SO3<goDouble>;
+
+template class goMath::LinearSpace<goFloat>;
+template class goMath::LinearSpace<goDouble>;

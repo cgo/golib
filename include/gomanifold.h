@@ -34,12 +34,18 @@ namespace goMath
     /** 
      * @brief Karcher mean for generic Riemannian manifolds.
      * 
-     * @param start     Start iterator.
-     * @param count     Number of elements.
-     * @param manifold  Manifold object.
+     * The Karcher mean is calculated by iterating using the update step
+     * \f$ y_{i+1} = \exp_{y_i} \left( \frac{1}{N} \sum_{j=1}^N \log_{y_i} x_j \right) \f$
+     * until \c max_iterations has been reached or until
+     * \f$ \langle t,t \rangle_{y_i} < \varepsilon \f$,
+     * with \f$ t = \frac{1}{N} \sum_{j=1}^N \log_{y_i} x_j\f$.
+     *
+     * @param start     Start iterator, pointing to the first element x_j.
+     * @param count     Number of elements N.
+     * @param manifold  Manifold object (e.g. SO3).
      * @param meanRet   Return value, contains the mean after returning true.
-     * @param max_iterations  Max. number of iterations.
-     * @param epsilon   "Small" floating point value.
+     * @param max_iterations  Max. number of iterations. Default: 1000
+     * @param epsilon   "Small" floating point value. Default: 1e-6
      * 
      * @return True if mean could be found within max_iterations, false otherwise.
      */
@@ -101,5 +107,29 @@ namespace goMath
         private:
             Element myId;
     };
+
+    /** 
+     * @brief Simple linear vector space.
+     */
+    template <class T>
+    class LinearSpace : public Manifold <goVector<T>, goVector<T> >
+    {
+        public:
+            typedef goVector<T> Element;
+            typedef goVector<T> Tangent;
+
+            LinearSpace ();
+            virtual ~LinearSpace ();
+            virtual void     exp (const Element& e, const Tangent& v, Element& ret);
+            virtual void     log (const Element& e1, const Element& e2, Tangent& ret);
+            virtual goDouble innerProduct (const Element& e, const Tangent& v1, const Tangent& v2);
+    };
+
+    /** @example karchermean/km.cpp
+     * Example for Karcher mean calculation using goMath::karcherMean()
+     */
+    /** @example so3/so3.cpp
+     * Example for using the rotation group manifold SO3.
+     */
     /** @} */
 };
