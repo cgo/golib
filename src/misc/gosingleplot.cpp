@@ -8,11 +8,19 @@
 class goPlotElement
 {
     public:
+        enum Types
+        {
+            NORMAL_ELEMENT,
+            MISC_ELEMENT    /* Used to distinguish misc elements when compiling the plot command. */
+        };
+
+    public:
         goPlotElement (const char* command = "plot", const char* fn = "-" , const char* options = "with lines")
             : myPlotOptions (options),
               myPlotCommand (command),
               myFilename (fn),
-              myDataFlag (true)
+              myDataFlag (true),
+              myElementType (NORMAL_ELEMENT)
         {
         };
         virtual ~goPlotElement () 
@@ -42,6 +50,8 @@ class goPlotElement
         goString myPlotCommand;
         goString myFilename;
         bool     myDataFlag;   //= If true, object needs to create data using data().
+
+        int myElementType;  //= MISC_ELEMENT or NORMAL_ELEMENT
 };
 
 template <class T>
@@ -266,12 +276,16 @@ class goPlotElementMisc : public goPlotElement
             myDataString (""),
             mySplot (splot)
         {
+            this->myElementType = MISC_ELEMENT;
             if (splot)
                 this->setPlotCommand ("splot");
             else
                 this->setPlotCommand ("plot");
             if (!dataString)
+            {
                 this->setDataFlag (false);
+                this->setFilename ("");
+            }
             else
             {
                 this->setDataFlag (true);
@@ -891,7 +905,7 @@ bool goSinglePlot::add (const char* commands, const char* dataString)
     }
 
     //= New
-    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, false));
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, true));
     myPrivate->plotElements.append (aptr);
     return true;
 }
@@ -905,7 +919,7 @@ bool goSinglePlot::add3D (const char* commands, const char* dataString)
     }
 
     //= New
-    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, true));
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementMisc (commands, dataString, false));
     myPrivate->plotElements.append (aptr);
     return true;
 }
@@ -931,7 +945,8 @@ bool goSinglePlot::addSphere (const char* plotOptions, goFloat radius, bool auto
     {
         cmd += plotOptions;
     }
-    this->add3D (cmd.toCharPtr());
+
+    return this->add3D (cmd.toCharPtr(), 0);
 }
 
 /** 
@@ -1521,17 +1536,19 @@ bool goSinglePlot::addGnuplotCommands (goString& plotCommandsRet) const
         }
         //= This is used to identify goPlotElementMisc objects, which only
         //= give a plot string.
-        if (el->elem->filename() == "")
+        //{
+        //    goString temp;
+        //    el->elem->data (temp);
+        //    plotCommandsRet += temp;
+       // }
+        //else
         {
-            goString temp;
-            el->elem->data (temp);
-            plotCommandsRet += temp;
-        }
-        else
-        {
-            plotCommandsRet += "\"";
-            plotCommandsRet += el->elem->filename();
-            plotCommandsRet += "\" "; 
+            if (el->elem->myElementType != goPlotElement::MISC_ELEMENT)
+            {
+                plotCommandsRet += "\"";
+                plotCommandsRet += el->elem->filename();
+                plotCommandsRet += "\" "; 
+            }
             plotCommandsRet += el->elem->plotOptions();
         }
         if (el->next)

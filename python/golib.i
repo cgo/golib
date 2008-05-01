@@ -864,6 +864,37 @@
     };
 }
 
+%extend goFixedArray<goVector<goFloat> >
+{
+//    %pythoncode %{
+//        def setArray (self, A):
+//            if len(A) != self.getSize():
+//                self.setSize(len(A))
+//            for i in xrange(len(A)):
+//                self[i] = A[i]
+//    %}
+    goVector<goFloat> __getitem__(int i)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goVector: range error.");
+        }
+        return (*self)[i];
+    };
+    void __setitem__(int i, goVector<goFloat> f)
+    {
+        if (i < 0 || i >= self->getSize())
+        {
+            PyErr_SetString(PyExc_ValueError, "goVector: range error.");
+        }
+        (*self)[i] = f;
+    };
+    unsigned int __len__()
+    {
+        return self->getSize();
+    };
+}
+
 %extend goVector<goFloat>
 {
 
@@ -1289,6 +1320,7 @@
 %template(goFixedArraySignal3D)   goFixedArray<goAutoPtr<goSignal3D<void> > >;
 %template(goFixedArraygoListInt) goFixedArray<goList<int> >;   // Needed only in gogl python module
 %template(goFixedArraygoVectori) goFixedArray<goVector<int> >;
+%template(goFixedArraygoVectorf) goFixedArray<goVector<goFloat> >;
 
 %template(goVectorf)       goVector<goFloat>;
 %template(goVectord)       goVector<goDouble>;
