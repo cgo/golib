@@ -26,6 +26,7 @@ ENDIF (HAVE_MATLAB_GEQ_2007A)
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
 SET                 (SOURCES 
+    src/math/godenoise.cpp
     src/signal/minmax.cpp
     src/signal/crop.cpp
     src/signal/gosignaloperation.cpp
