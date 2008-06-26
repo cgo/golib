@@ -1,0 +1,59 @@
+INCLUDE (UsePkgConfig)
+INCLUDE (FindOpenGL)
+PROJECT             (Gogl)
+SET                 (TARGETNAME Gogl)
+SET                 (SOURCES 
+                             src/texture.cpp
+                             src/textureimage.cpp
+                             src/animation.cpp
+                             src/waypoint.cpp
+                             src/scene.cpp
+                             src/offfile.cpp
+                             src/helper.cpp
+                             src/camera.cpp
+                             src/light.cpp
+                             src/material.cpp
+                             src/object.cpp
+                             src/drawableobject.cpp
+                             src/meshobject.cpp)
+
+# If the the environment variable MATLAB is set, add include path.
+#IF($ENV{MATLAB})
+#    SET (EXTRA_INCLUDE_PATH $ENV{MATLAB}/extern/include)
+#    ADD_DEFINITIONS (-DHAVE_MATLAB)
+#ENDIF($ENV{MATLAB})
+
+#SET (GOPATH $ENV{GOPATH})
+
+#FIND_LIBRARY (GOLIB NAMES Go PATHS ${GOPATH}/../lib /usr/local/lib)
+#FIND_LIBRARY (GOMATLAB NAMES Gomatlab PATHS ${GOPATH}/../lib /usr/local/lib)
+#SET (EXTRA_LIBS ${GOLIB} ${GOMATLAB})
+
+SET (EXTRA_LIBS ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+
+INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
+                     ${Gogl_SOURCE_DIR}/include
+                     ${GOPATH}/include
+                     ${OPENGL_INCLUDE_DIR})
+                     
+IF (BUILD_WITH_GCC_3_3)
+    SET (CMAKE_CXX_COMPILER g++-3.3)
+    SET (CMAKE_C_COMPILER gcc-3.3)
+ENDIF (BUILD_WITH_GCC_3_3)
+IF (BUILD_WITH_GCC_3_4)
+    SET (CMAKE_CXX_COMPILER g++-3.4)
+    SET (CMAKE_C_COMPILER gcc-3.4)
+ENDIF (BUILD_WITH_GCC_3_4)
+
+# Add -MT flag!
+IF(UNIX)
+ ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
+ENDIF(UNIX)
+
+IF (BUILD_PYTHON_MODULE)
+    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/python)
+ENDIF (BUILD_PYTHON_MODULE)
+
+ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
+TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+INSTALL_TARGETS     (/lib ${TARGETNAME})
