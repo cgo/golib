@@ -14,12 +14,18 @@
 #define MIN(_m1,_m2) (_m1 < _m2 ? _m1 : _m2)
 #endif
 
+#if 0
 #ifndef GOSIGNAL3D_H
 # include <gosignal3d.h>
 #endif
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#ifndef GOCONTOURS_H
+# include <gocontours.h>
+#endif
+#endif
+
 #ifndef GOAFFINETRANSFORM_H
 # include <goaffinetransform.h>
 #endif
@@ -31,9 +37,6 @@
 #endif
 #ifndef GORESAMPLE_H
 # include <goresample.h>
-#endif
-#ifndef GOCONTOURS_H
-# include <gocontours.h>
 #endif
 #ifndef GOMANIFOLD_H
 # include <gomanifold.h>
@@ -283,6 +286,9 @@ T minabs (const goFixedArray<T>& a)
 }
 /*! @} */
 
+#if 0
+//= Remove all signal3d dependencies from gomath
+//
 bool gradient2D          (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool laplacian2D         (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 bool ddx2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
@@ -319,10 +325,6 @@ void paste2D (const goSignal3DBase<void>& source,
         goDouble t_y,
         goSignal3D<void>& target,
         goFloat bgColour);
-
-template <class T>
-goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
-
 /* 
  * @brief Divergence of a 2D vector field.
  * 
@@ -354,6 +356,17 @@ bool forwardDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& re
 bool backwardDifferences (const goSignal3DBase<void>& x, goSignal3DBase<void>& retValue, int dimension = 0, goDouble h = 1.0, const goSignal3DBase<void>* mask = 0);
 
 bool curvatureDirect2D (const goSignal3DBase<void>& input, goSignal3D<void>& result, goDouble hx = 1.0, goDouble hy = 1.0);
+
+bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
+
+template <class T>
+bool binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
+
+#endif
+
+template <class T>
+goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
+
 
 /** 
  * @brief Conjugate gradients solver.
@@ -387,7 +400,6 @@ bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t point
 template <class T>
 bool translate (goMatrix<T>& confMatrix, const goVector<T>& trans);
 
-bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
 template <class T>
 bool affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix<T>& A, goVector<T>& t);
@@ -401,9 +413,6 @@ bool affineMatch(
         const goMatrix<T>& s2,
         goMatrix<T>& A,
         goVector<T>& t);
-
-template <class T>
-bool binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
 
 /** 
  * @brief Mean calculation.

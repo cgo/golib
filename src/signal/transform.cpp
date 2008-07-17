@@ -2,6 +2,7 @@
 #include <gosignal3d.h>
 #include <gosignal3dgenericiterator.h>
 #include <gosubsignal3d.h>
+#include <gomathsignal.h>
 
 //= Bilinear sampling at x,y
 template <class T>

@@ -1,3 +1,6 @@
+#ifndef GOMANIFOLD_H
+#define GOMANIFOLD_H
+
 namespace goMath
 {
     /**
@@ -125,6 +128,23 @@ namespace goMath
             virtual goDouble innerProduct (const Element& e, const Tangent& v1, const Tangent& v2);
     };
 
+    /** 
+     * @brief Unit sphere.
+     */
+    template <class T>
+    class UnitSphere : public Manifold <goVector<T>, goVector<T> >
+    {
+        public:
+            typedef goVector<T> Element;
+            typedef goVector<T> Tangent;
+
+            UnitSphere ();
+            virtual ~UnitSphere ();
+            virtual void     exp (const Element& e, const Tangent& v, Element& ret);
+            virtual void     log (const Element& e1, const Element& e2, Tangent& ret);
+            virtual goDouble innerProduct (const Element& e, const Tangent& v1, const Tangent& v2);
+    };
+
     /** @example karchermean/km.cpp
      * Example for Karcher mean calculation using goMath::karcherMean()
      */
@@ -133,3 +153,5 @@ namespace goMath
      */
     /** @} */
 };
+
+#endif

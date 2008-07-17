@@ -25,62 +25,23 @@ ENDIF (HAVE_MATLAB_GEQ_2007A)
 
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
+
+## Aufteilung:
+# thread: Thread-Klasse
+# data/misc/base: Datenstrukturen, Objekte, basic file io, log, object messages, exceptions, types, ...
+# math: Mathematik-Klassen und -Funktionen (keine goSignal!)
+# signal: goSignal3D und alle Funktionen Signalverarbeitungsklassen;
+#         Bilder laden / speichern
+# system: Process, Directory, ...
+# plot: Plotting
+# gui
+# gl
+# matlab
 SET                 (SOURCES 
-    src/math/godenoise.cpp
-    src/signal/minmax.cpp
-    src/signal/crop.cpp
-    src/signal/gosignaloperation.cpp
- src/data/goarrayi.cc 
- # src/data/golisti.cc 
- # src/data/goheapi.cc 
- # src/data/gotreei.cc 
- src/data/gobtreei.cpp 
- src/data/goqueuei.cc
- src/data/gostring.cc
- src/data/gohashtablei.cpp
- # src/math/contours.cpp
- src/math/binaryimage.cpp
- src/math/covariance.cpp
- src/math/gomanifold.cpp
- src/math/lapack.cpp
- src/math/stencil.cpp
- src/math/planelinecut.cpp
- src/math/barycentric.cpp
- src/math/gocubicspline.cpp
- src/math/gocubicsplinend.cpp
- src/math/viewsphere.cpp
- src/math/pairwisedistances.cpp
- src/math/gosvd.cpp
- src/math/goaffinetransform.cpp
- src/math/affinematch.cpp
- src/math/getknee.cpp
- src/math/goresample.cpp
- src/math/govector.cpp
- src/math/gokmeans.cpp 
- src/math/gokmeansspatial.cpp 
- src/math/go3vectori.cc 
- src/math/go44matrix.cc 
- src/math/go4vectori.cc 
- src/math/gomatrix.cpp 
- src/math/gocomplex.cc 
- src/math/goposition.cc 
- src/math/goquaternion.cc 
- # src/math/golinearalgebra.cc 
- # src/math/gopdf.cpp 
- src/math/gogausspdf.cpp 
- src/math/gopoint.cpp 
- src/math/gradient.cpp 
- src/math/gomath.cpp 
- src/math/divnormalizedgrad2d.cpp
- src/math/goeigenvalue.cpp
- src/math/cg.cpp
- src/math/gobiorthowavelet.cpp
- src/math/divergence.cpp
- src/math/vectormult.cpp
  # src/math/mean.cpp
  # src/math/variance.cpp
- src/math/integrate.cpp
- src/math/getroots.cpp
+
+ # src/math/contours.cpp
  src/misc/goofffile.cpp
  # src/misc/plot.cpp
  # src/misc/gognuplot.cpp      # not plotting in windows!
@@ -88,126 +49,24 @@ SET                 (SOURCES
  # src/misc/gomultiplotter.cpp
  # src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
  # src/misc/goconfigfileaccess.cc 
- src/misc/godate.cc 
- src/misc/goexception.cc 
+ src/misc/godate.cc # DEPRECATE
  src/misc/gofileio.cc 
- src/misc/goobjectbase.cc 
  # src/misc/gostatusobject.cc  # not in windows!
- src/misc/gotransferfunction.cc 
- src/misc/goobjectmessage.cc 
- src/misc/goglobal.cpp 
- src/misc/golog.cpp
+ src/misc/gotransferfunction.cc  # DEPRECATE -- apparently only used in the Diplomarbeit renderer
  # src/misc/goplot.cpp  # not in windows!
  # src/misc/govideocapture.cpp # not in windows!
  # src/network/goconnection.cc # not in windows!
  # src/network/gonetobject.cc  # not in windows!
  # src/network/gonetwork.cc # not in windows!
  # src/network/goserver.cc # not in windows!
- src/nifty/gorandom.cc
- src/signal/centerofmass.cpp
- src/signal/transform.cpp
- src/signal/gosignal3dref.cpp
- src/signal/gogaussimage.cpp
- src/signal/gosignal3dbase.cpp 
- src/signal/gosubsignal3d.cc 
- src/signal/gosignal3d.cc 
- src/signal/gofilter3d.cpp 
- src/signal/godwt.cc 
- src/signal/gohaar3d.cpp 
- src/signal/godwt3d.cpp 
- src/signal/gofilter1d.cpp 
- src/signal/gosignalhelper.cpp 
- src/signal/gohistogram.cpp 
- src/signal/gosignal3diterator.cpp 
  # src/signal/gosignal3dgenericiterator.cpp
  # src/system/godirectory.cc # not in windows!
  # src/system/goprocess.cc  # not in windows!
  src/system/goenvironment.cpp
- src/thread/gothread.cc 
- src/thread/goconsumer.cc 
- src/thread/goproducer.cc 
+ src/thread/goconsumer.cc # DEPRECATE
+ src/thread/goproducer.cc # DEPRECATE
  # src/thread/gosynchronized.cc # not in windows!
- src/thread/gothreadobject.cc
- src/types/gotype.cpp
- src/math/gopointcloud.cpp
- src/math/gocurve.cpp
  # src/math/gonubs.cpp
- src/seispack/bakvec.c
- src/seispack/balanc.c
- src/seispack/balbak.c
- src/seispack/bandr.c
- src/seispack/bandv.c
- src/seispack/bisect.c
- src/seispack/bqr.c
- src/seispack/cbabk2.c
- src/seispack/cbal.c
- src/seispack/cdiv.c
- src/seispack/cg.c
- src/seispack/ch.c
- src/seispack/cinvit.c
- src/seispack/combak.c
- src/seispack/comhes.c
- src/seispack/comlr2.c
- src/seispack/comlr.c
- src/seispack/comqr2.c
- src/seispack/comqr.c
- src/seispack/cortb.c
- src/seispack/corth.c
- src/seispack/csroot.c
- src/seispack/elmbak.c
- src/seispack/elmhes.c
- src/seispack/eltran.c
- src/seispack/epslon.c
- src/seispack/figi2.c
- src/seispack/figi.c
- src/seispack/hqr2.c
- src/seispack/hqr.c
- src/seispack/htrib3.c
- src/seispack/htribk.c
- src/seispack/htrid3.c
- src/seispack/htridi.c
- src/seispack/imtql1.c
- src/seispack/imtql2.c
- src/seispack/imtqlv.c
- src/seispack/invit.c
- src/seispack/minfit.c
- src/seispack/ortbak.c
- src/seispack/orthes.c
- src/seispack/ortran.c
- src/seispack/pythag.c
- src/seispack/qzhes.c
- src/seispack/qzit.c
- src/seispack/qzval.c
- src/seispack/qzvec.c
- src/seispack/ratqr.c
- src/seispack/rebakb.c
- src/seispack/rebak.c
- src/seispack/reduc2.c
- src/seispack/reduc.c
- src/seispack/rg.c
- src/seispack/rgg.c
- src/seispack/rsb.c
- src/seispack/rs.c
- src/seispack/rsgab.c
- src/seispack/rsgba.c
- src/seispack/rsg.c
- src/seispack/rsm.c
- src/seispack/rsp.c
- src/seispack/rst.c
- src/seispack/rt.c
- src/seispack/svd.c
- src/seispack/tinvit.c
- src/seispack/tql1.c
- src/seispack/tql2.c
- src/seispack/tqlrat.c
- src/seispack/trbak1.c
- src/seispack/trbak3.c
- src/seispack/tred1.c
- src/seispack/tred2.c
- src/seispack/tred3.c
- src/seispack/tridib.c
- src/seispack/tsturm.c
- src/seispack/r_sign.c
  ### For general SVD:
  ## BLAS part:
  #src/clapack/blas/lsame.c
@@ -352,18 +211,18 @@ CHECK_FUNCTION_EXISTS (mkdir    HAVE_MKDIR)
 #FIND_LIBRARY (CBLAS NAMES cblas PATHS ${GOPATH}/extra/lib)
 IF (WIN32)
         # FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
-        FIND_LIBRARY (F2C NAMES f2c PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
-        FIND_LIBRARY (ATLAS NAMES atlas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
-        FIND_LIBRARY (F77BLAS NAMES f77blas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
-        FIND_LIBRARY (LAPACK NAMES lapack PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-        FIND_LIBRARY (BLAS NAMES cblas blas PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        #        FIND_LIBRARY (F2C NAMES f2c PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
+        #FIND_LIBRARY (ATLAS NAMES atlas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
+        #FIND_LIBRARY (F77BLAS NAMES f77blas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
+        #FIND_LIBRARY (LAPACK NAMES lapack PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+        #FIND_LIBRARY (BLAS NAMES cblas blas PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
         FIND_LIBRARY (DEVIL NAMES DevIL IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (PTHREAD NAMES pthread PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib)
 ELSE (WIN32)
-        FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
-        FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-        FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+    #FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
+    #FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
+    #FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
         FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
@@ -443,52 +302,58 @@ IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
 
-IF (LAPACK_ATLAS)
-    LINK_LIBRARIES (${LAPACK_ATLAS})
-ENDIF (LAPACK_ATLAS)
-IF (LAPACK)
-    LINK_LIBRARIES (${LAPACK})
-ENDIF (LAPACK)
-IF (F77BLAS)
-    LINK_LIBRARIES (${F77BLAS})
-ENDIF (F77BLAS)
-IF (BLAS)
-    LINK_LIBRARIES (${BLAS})
-ENDIF (BLAS)
-IF (CBLAS)
-    LINK_LIBRARIES (${CBLAS})
-ENDIF (CBLAS)
-IF (ATLAS)
-    LINK_LIBRARIES (${ATLAS})
-ENDIF (ATLAS)
-IF (F2C)
-    LINK_LIBRARIES (${F2C})
-ENDIF (F2C)
+#IF (LAPACK_ATLAS)
+#    LINK_LIBRARIES (${LAPACK_ATLAS})
+#ENDIF (LAPACK_ATLAS)
+#IF (LAPACK)
+#    LINK_LIBRARIES (${LAPACK})
+#ENDIF (LAPACK)
+#IF (F77BLAS)
+#    LINK_LIBRARIES (${F77BLAS})
+#ENDIF (F77BLAS)
+#IF (BLAS)
+#    LINK_LIBRARIES (${BLAS})
+#ENDIF (BLAS)
+#IF (CBLAS)
+#    LINK_LIBRARIES (${CBLAS})
+#ENDIF (CBLAS)
+#IF (ATLAS)
+#    LINK_LIBRARIES (${ATLAS})
+#ENDIF (ATLAS)
+#IF (F2C)
+#    LINK_LIBRARIES (${F2C})
+#ENDIF (F2C)
 IF (DEVIL)
     SET (HAVE_LIBIL 1)
-    LINK_LIBRARIES (${DEVIL})
+    #    LINK_LIBRARIES (${DEVIL})
 ENDIF (DEVIL)
 IF (DEVILU)
     SET (HAVE_LIBILU 1)
-    LINK_LIBRARIES (${DEVILU})
+    #    LINK_LIBRARIES (${DEVILU})
 ENDIF (DEVILU)
 IF (PTHREAD)
     SET (HAVE_LIBPTHREAD 1)
-    LINK_LIBRARIES (${PTHREAD})
+    #    LINK_LIBRARIES (${PTHREAD})
 ENDIF (PTHREAD)
 #LINK_LIBRARIES (${F2C})
 
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 
-ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
-TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+# ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
+#TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
+#INSTALL_TARGETS     (/lib ${TARGETNAME})
 
 #IF (BUILD_PYTHON_EMBED)
 #    SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS ${PYTHON_LDFLAGS})
 #ENDIF (BUILD_PYTHON_EMBED)
 
-INSTALL_TARGETS     (/lib ${TARGETNAME})
+ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/thread)
+ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/data)
+ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/math)
+ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/signal)
+
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not
 # automatically descended into. The user has to do that.

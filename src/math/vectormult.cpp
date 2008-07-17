@@ -1,5 +1,5 @@
-#ifndef GOMATH_H
-# include <gomath.h>
+#ifndef GOMATHSIGNAL_H
+# include <gomathsignal.h>
 #endif
 #ifndef GOSIGNAL3DGENERICITERATOR_H
 # include <gosignal3dgenericiterator.h>

@@ -78,7 +78,7 @@ T goMath::integrateSimpson (const goVector<T>& v)
     
     T sum_2 = 0.0;
     T sum_4 = 0.0;
-    for (goSize_t i = 0; i < sz-1; ++i)
+    for (goSize_t i = 0; i < szm1; ++i)
     {
         sum_4 += (v[i] + v[i+1]); // * 0.5 * 4.0;  ==> * 2.0
         sum_2 += v[i+1];  // * 2.0
@@ -86,7 +86,7 @@ T goMath::integrateSimpson (const goVector<T>& v)
     sum_4 *= 2.0;
     sum_2 *= 2.0;
 
-    return (v[0] + sum_2 + sum_4 + v[sz-1]) / 6.0;   
+    return (v[0] + sum_2 + sum_4 + v[szm1]) / 6.0;   
 }
 
 template <class T>

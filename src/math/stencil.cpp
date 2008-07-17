@@ -1,4 +1,4 @@
-#include <gomath.h>
+#include <gomathsignal.h>
 #include <gosignal3dgenericiterator.h>
 
 template <class T2, class T>

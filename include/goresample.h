@@ -2,7 +2,6 @@
 #define __GORESAMPLE_H
 
 #include <gotypes.h>
-#include <gosignal2d.h>
 #ifndef GOMATH_H
 # include <gomath.h>
 #endif

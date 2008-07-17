@@ -1,0 +1,19 @@
+"Documents and Notes"
+---------------------
+Dokumente und (Latex)-Notizen verwalten und verknuepfen.
+
+GUI fuer golib-Funktionen und potentiell andere
+-----------------------------------------------
+- Bilder / goSignal3D Manipulationen
+- Skripte mit Python
+- "Workspace" wie in Matlab?
+- Sowas wie shapegui
+
+0.6
+---
+- Godata, Gomath, Gosignal, Gosystem (threads? Prozesse?), Goplot,
+  Gogui, Gopython, Gomatlab
+- Namespace goData fuer Daten, oder alte Namen lassen?
+- (Iteratoren-Konzept fuer alle Container)
+- Mehr STL benutzen, wo es Sinn macht -- so sind Algorithmen
+  leichter zu benutzen und portierbarer.

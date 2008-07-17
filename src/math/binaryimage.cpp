@@ -10,6 +10,25 @@ static inline void comp_point (int j, int jp1, const goMatrix<T>& MM, goSignal3D
     int x1 = int(floor(MM(j,0)));
     int x2 = int(floor(MM(jp1,0)));
 
+    int ymax = binimg.getSizeY () - 1;
+    int xmax = binimg.getSizeX () - 1;
+    if (y1 < 0)
+        y1 = 0;
+    else if (y1 > ymax)
+        y1 = ymax;
+    if (y2 < 0)
+        y2 = 0;
+    else if (y2 > ymax)
+        y2 = ymax;
+    if (x1 < 0)
+        x1 = 0;
+    else if (x1 > xmax)
+        x1 = xmax;
+    if (x2 < 0)
+        x2 = 0;
+    else if (x2 > xmax)
+        x2 = xmax;
+
     if (y1 > y2)
     {
         int temp = y1;

@@ -1,6 +1,6 @@
 #include <godenoise.h>
-#ifndef GOMATH_H
-# include <gomath.h>
+#ifndef GOMATHSIGNAL_H
+# include <gomathsignal.h>
 #endif
 #include <gosignal3dgenericiterator.h>
 

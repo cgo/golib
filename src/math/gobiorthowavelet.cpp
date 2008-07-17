@@ -2,7 +2,7 @@
 #include <gosubsignal3d.h>
 #include <gofilter1d.h>
 #include <gosignalhelper.h>
-#include <gomath.h>
+#include <gomathsignal.h>
 #include <assert.h>
 
 class goBiorthoWaveletPrivate

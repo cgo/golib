@@ -210,9 +210,57 @@ goDouble goMath::LinearSpace<T>::innerProduct (const Element& e,
     return v1 * v2;
 }
 
+//=================================================================================
+
+template <class T>
+goMath::UnitSphere<T>::UnitSphere ()
+    : Manifold<goVector<T>, goVector<T> > ()
+{
+}
+
+template <class T>
+goMath::UnitSphere<T>::~UnitSphere ()
+{
+}
+
+template <class T>
+void goMath::UnitSphere<T>::exp (const Element& e, const Tangent& v, Element& ret)
+{
+    T v_norm = v.norm2 ();
+    if (v_norm == T(0))
+    {
+        ret = e;
+        return;
+    }
+    ret = e * ::cos (v_norm) + v / v_norm * ::sin (v_norm);
+}
+
+template <class T>
+void goMath::UnitSphere<T>::log (const Element& e1, const Element& e2, Tangent& ret)
+{
+    T l = ::acos (e1 * e2);
+    if (l == T(0))
+    {
+        ret.resize (e1.getSize ());
+        ret.fill (T(0));
+        return;
+    }
+    ret = (e2 - e1 * ::cos (l)) / ::sin (l) * l;
+}
+
+template <class T>
+goDouble goMath::UnitSphere<T>::innerProduct (const Element& e, const Tangent& v1, const Tangent& v2)
+{
+    return v1 * v2;
+}
+
+//=================================================================================
 
 template class goMath::SO3<goFloat>;
 template class goMath::SO3<goDouble>;
 
 template class goMath::LinearSpace<goFloat>;
 template class goMath::LinearSpace<goDouble>;
+
+template class goMath::UnitSphere<goFloat>;
+template class goMath::UnitSphere<goDouble>;

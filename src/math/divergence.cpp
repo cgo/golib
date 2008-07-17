@@ -1,4 +1,4 @@
-#include <gomath.h>
+#include <gomathsignal.h>
 #include <golog.h>
 #include <gosignal3dgenericiterator.h>
 #include <gotype.h>
