@@ -114,6 +114,8 @@
 #include <goofffile.h>
 #include <govideocapture.h>
 
+#include <gomanifold.h>
+
 #include <go3vector.h>
 #include <gotimerobject.h>
 %}
@@ -172,6 +174,8 @@
 %include <gofilter3d.h>
 %include <goofffile.h>
 %include <govideocapture.h>
+
+%include <gomanifold.h>
 
 %include <go3vector.h>
 %include <gotimerobject.h>
@@ -1282,6 +1286,22 @@
             else:
                 raise TypeError
 
+        def variance (vec, mean):
+            if isinstance (vec, goVectorf):
+                return goVariancef (vec, len (vec), mean)
+            elif isinstance (vec, goVectord):
+                return goVarianced (vec, len (vec), mean)
+            else:
+                raise TypeError
+
+        def mean (vec):
+            if isinstance (vec, goVectorf):
+                return goMeanf (vec, len (vec))
+            elif isinstance (vec, goVectord):
+                return goMeand (vec, len (vec))
+            else:
+                raise TypeError
+
 %}
 
 // Auto pointers
@@ -1379,6 +1399,12 @@
 %template(goCovariancef)   goMath::covariance<goFloat>;
 %template(goCovarianced)   goMath::covariance<goDouble>;
 
+%template(goVariancef)     goMath::variance<goVectorf, goFloat>;
+%template(goVarianced)     goMath::variance<goVectord, goDouble>;
+
+%template(goMeanf)     goMath::mean<goVectorf, goFloat>;
+%template(goMeand)     goMath::mean<goVectord, goDouble>;
+
 %template(goPlaneLineCutf) goMath::planeLineCut<goFloat>;
 %template(goPlaneLineCutd) goMath::planeLineCut<goDouble>;
 
@@ -1410,6 +1436,9 @@
 %template(writeBinaryMatrixd) goFileIO::writeBinaryMatrix<goDouble>;
 
 %template(go3VectorgoSize_t) go3Vector<goSize_t>;
+
+%template(goUnitSpheref) goMath::UnitSphere<goFloat>;
+%template(goUnitSphered) goMath::UnitSphere<goDouble>;
 
 // Depends on goSignal3DBase, and that appears to have to be %templated before.
 %include <gosignal3dref.h>

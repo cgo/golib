@@ -96,7 +96,7 @@ void goMath::SO3<T>::log (const Element& e1, const Element& e2, Tangent& ret)
     goMatrix<T> R (3,3);
     goMatrix<T> Sr (3,3);
     goMatrixMult<T> (T(1), e2, false, e1, true, T(0), R);
-    T theta = acos ( (R.trace() - T(1)) * T(0.5) );
+    T theta = goMath::acos ( (R.trace() - T(1)) * T(0.5) );
     //=
     //= Handle special cases where theta close to 0 or pi:
     //=
@@ -238,7 +238,7 @@ void goMath::UnitSphere<T>::exp (const Element& e, const Tangent& v, Element& re
 template <class T>
 void goMath::UnitSphere<T>::log (const Element& e1, const Element& e2, Tangent& ret)
 {
-    T l = ::acos (e1 * e2);
+    T l = goMath::acos (e1 * e2);
     if (l == T(0))
     {
         ret.resize (e1.getSize ());
