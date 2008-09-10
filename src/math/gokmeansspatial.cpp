@@ -8,8 +8,8 @@ class goKMeansSpatialPrivate
         goKMeansSpatialPrivate() : positions () {};
         ~goKMeansSpatialPrivate() {};
 
-        goList<goVectord>       positions;
-        goFixedArray<goVectord> meanPositions;
+        goList<goMath::Vector<goDouble> >       positions;
+        goFixedArray<goMath::Vector<goDouble> > meanPositions;
 };
 
 template <class elementT>
@@ -31,7 +31,7 @@ goKMeansSpatial<elementT>::~goKMeansSpatial()
 }
 
 template <class elementT>
-bool goKMeansSpatial<elementT>::initialisePositions (const goFixedArray<goVectord>& initMeanPos)
+bool goKMeansSpatial<elementT>::initialisePositions (const goFixedArray<goMath::Vector<goDouble> >& initMeanPos)
 {
     myPrivate->meanPositions = initMeanPos;
     return true;
@@ -51,7 +51,7 @@ goSize_t goKMeansSpatial<elementT>::assignment ()
     goSize_t changedElements = 0;
     goIndex_t i = 0;
     typename goList<elementT>::ConstElement* el = this->getElements().getFrontElement();
-    goList<goVectord>::ConstElement* elPos = myPrivate->positions.getFrontElement();
+    goList<goMath::Vector<goDouble> >::ConstElement* elPos = myPrivate->positions.getFrontElement();
     while (el && elPos && i < sz)
     {
         goIndex_t c = 0;
@@ -102,12 +102,12 @@ bool goKMeansSpatial<elementT>::update ()
     goIndex_t sz = this->getElements().getSize();
     goIndex_t K  = this->getMeans().getSize();
     goFixedArray<elementT>  sums(K);
-    goFixedArray<goVectord> sumPositions(K);
+    goFixedArray<goMath::Vector<goDouble> > sumPositions(K);
     goFixedArray<goSize_t>  counts(K);
     counts.fill(0);
     sums.fill(elementT(0));
     typename goList<elementT>::ConstElement* el = this->getElements().getFrontElement();
-    goList<goVectord>::ConstElement* elPos = myPrivate->positions.getFrontElement();
+    goList<goMath::Vector<goDouble> >::ConstElement* elPos = myPrivate->positions.getFrontElement();
     goIndex_t i = 0;
     while (el && elPos && i < sz)
     {
@@ -135,7 +135,7 @@ bool goKMeansSpatial<elementT>::update ()
 }
 
 template <>
-bool goKMeansSpatial<goVectord>::update ()
+bool goKMeansSpatial<goMath::Vector<goDouble> >::update ()
 {
     if (this->getCluster().getSize() != static_cast<goSize_t>(this->getElements().getSize()))
     {
@@ -151,19 +151,19 @@ bool goKMeansSpatial<goVectord>::update ()
     
     goIndex_t sz = this->getElements().getSize();
     goIndex_t K  = this->getMeans().getSize();
-    goFixedArray<goVectord>  sums(K);
-    goFixedArray<goVectord>  sumPositions(K);
+    goFixedArray<goMath::Vector<goDouble> >  sums(K);
+    goFixedArray<goMath::Vector<goDouble> >  sumPositions(K);
     goFixedArray<goSize_t>   counts(K);
     counts.fill(0);
     {
-        goVectord zeroVec (this->getMeans()[0].getSize());
+        goMath::Vector<goDouble>  zeroVec (this->getMeans()[0].getSize());
         zeroVec.fill(0.0);
         sums.fill(zeroVec);
         zeroVec.setSize(myPrivate->meanPositions[0].getSize());
         sumPositions.fill(zeroVec);
     }
-    goList<goVectord>::ConstElement* el = this->getElements().getFrontElement();
-    goList<goVectord>::ConstElement* elPos = myPrivate->positions.getFrontElement();
+    goList<goMath::Vector<goDouble> >::ConstElement* el = this->getElements().getFrontElement();
+    goList<goMath::Vector<goDouble> >::ConstElement* elPos = myPrivate->positions.getFrontElement();
     goIndex_t i = 0;
     while (el && elPos && i < sz)
     {
@@ -190,15 +190,15 @@ bool goKMeansSpatial<goVectord>::update ()
     return true;
 }
 template <class elementT>
-bool goKMeansSpatial<elementT>::addPosition (const goVectord& p)
+bool goKMeansSpatial<elementT>::addPosition (const goMath::Vector<goDouble> & p)
 {
     return myPrivate->positions.append(p);
 }
 
 template <class elementT>
-const goList<goVectord>& goKMeansSpatial<elementT>::getPositions () const
+const goList<goMath::Vector<goDouble> >& goKMeansSpatial<elementT>::getPositions () const
 {
     return myPrivate->positions;
 }
 
-template class goKMeansSpatial <goVectord>;
+template class goKMeansSpatial <goMath::Vector<goDouble> >;

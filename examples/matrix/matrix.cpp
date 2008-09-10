@@ -9,21 +9,21 @@
 #undef HAVE_MATLAB
 #include <gosparsematrix.h>
 
-#define HAVE_MATLAB
-#include <engine.h>
-#include <gomatlab.h>
+//#define HAVE_MATLAB
+//#include <engine.h>
+//#include <gomatlab.h>
 
 int main ()
 {
     {
-        goMatrixf M1 (5,5);
+        goMath::Matrixf M1 (5,5);
         M1.setIdentity();
         for (goSize_t i = 0; i < 5*5; ++i)
         {
             M1[i] = i;
         }
         {
-            goMatrixf M2;
+            goMath::Matrixf M2;
             for (goIndex_t i = 0; i < M1.getRows(); ++i)
             {
                 M1.shiftRows (i, M2);
@@ -47,9 +47,9 @@ int main ()
             exit (1);
         }
         {
-            goMatrixf M2;
+            goMath::Matrixf M2;
             M2.setData (&M1(1,1), 3, 3, M1.getLeadingDimension());
-            goMatrixf M3 (&M1(2,0), 3, 4, M1.getLeadingDimension());
+            goMath::Matrixf M3 (&M1(2,0), 3, 4, M1.getLeadingDimension());
             printf ("M1:\n"); M1.print ();
             printf ("M2:\n"); M2.print ();
             printf ("M3:\n"); M3.print ();
@@ -60,16 +60,16 @@ int main ()
             goVectorf v2 = M2 * v;
             printf ("v2 == %f %f %f\n", v2(0), v2(1), v2(2));
 
-            goMatrixf M4 = M2 * M3;
+            goMath::Matrixf M4 = M2 * M3;
             printf ("M4:\n"); M4.print ();
 
-            goMatrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
+            goMath::matrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
             printf ("M4:\n"); M4.print ();
         } 
         {
-            goMatrixf M2;
+            goMath::Matrixf M2;
             M1 (1,1,3,3,M2);
-            goMatrixf M3;
+            goMath::Matrixf M3;
             M1 (2,0,4,3,M3);
             printf ("M1:\n"); M1.print ();
             printf ("M2:\n"); M2.print ();
@@ -81,10 +81,10 @@ int main ()
             goVectorf v2 = M2 * v;
             printf ("v2 == %f %f %f\n", v2(0), v2(1), v2(2));
 
-            goMatrixf M4 = M2 * M3;
+            goMath::Matrixf M4 = M2 * M3;
             printf ("M4:\n"); M4.print ();
 
-            goMatrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
+            goMath::matrixMult (1.0f, M3, true, M2, false, 0.0f, M4);
             printf ("M4:\n"); M4.print ();
 
             M4.refColumn (0, 2, 3, v);
@@ -98,16 +98,16 @@ int main ()
         // exit (1);
     }
     {
-        goList<goMatrixf> ml;
-        ml.append (goMatrixf (100,2));
-        ml.append (goMatrixf (100,2));
-        ml.append (goMatrixf (100,2));
-        ml.append (goMatrixf (100,2));
+        goList<goMath::Matrixf> ml;
+        ml.append (goMath::Matrixf (100,2));
+        ml.append (goMath::Matrixf (100,2));
+        ml.append (goMath::Matrixf (100,2));
+        ml.append (goMath::Matrixf (100,2));
 
-        goMatrix<goComplexf> x1 (1,100);
-        goMatrix<goComplexf> x2 (100,1);
-        goMatrix<goComplexf> M (100,100);
-        goList<goMatrixf>::Element * el = ml.getFrontElement();
+        goMath::Matrix<goComplexf> x1 (1,100);
+        goMath::Matrix<goComplexf> x2 (100,1);
+        goMath::Matrix<goComplexf> M (100,100);
+        goList<goMath::Matrixf>::Element * el = ml.getFrontElement();
         while (el)
         {
             M += x2 * x1;
@@ -115,7 +115,7 @@ int main ()
         }
 
         {
-            goMatrixf M;
+            goMath::Matrixf M;
             M.resize (5,2);
 
             for (goSize_t i = 0; i < M.getRows(); ++i)
@@ -136,7 +136,7 @@ int main ()
                 v[i] = i + 1;
             }
             {
-                goMatrixf M2;
+                goMath::Matrixf M2;
                 M2.setData (v.getPtr(), 5, 2);
                 M2.print();
                 M2.flip();
@@ -146,6 +146,7 @@ int main ()
 
         // exit(1);
     }
+#if 0
     {
         goMatlab mat;
         goString buffer;
@@ -153,7 +154,7 @@ int main ()
         // printf ("%s\n", buffer.toCharPtr());
         // mat.matlabCall ("M3 = M1 * M2;",0);
         // printf ("%s\n", buffer.toCharPtr());
-        goMatrixd M1,M2,M3;
+        goMath::Matrixd M1,M2,M3;
         M1.setIdentity();
         M2.setIdentity();
         M3.setIdentity();
@@ -164,7 +165,7 @@ int main ()
         M3.print();
         // exit(1);
     }
-
+#endif
     {
         printf ("\nSparse timing\n");
         goSparseMatrix m(1000,1000);
@@ -200,7 +201,7 @@ int main ()
 #if 0
     {
         goVector< goComplex<float> >* test = new goVector< goComplex<float> > [3];
-        goMatrix<goComplexf> m (3,3);
+        goMath::Matrix<goComplexf> m (3,3);
         m(0,0) = goComplexf (1,1);
         m(1,1) = goComplexf (3,2);
         m(2,2) = goComplexf (3,5);
@@ -216,7 +217,7 @@ int main ()
         v2[0] = v1[0].conj();
         v2[1] = v1[1].conj();
         v2[2] = v1[2].conj();
-        goMatrix<goComplexf> m2;
+        goMath::Matrix<goComplexf> m2;
         v1.outerProduct (v2, m2);
         m2.print(); 
         goVectorf v;
@@ -345,7 +346,7 @@ int main ()
     }
     
 # if 0
-    goMatrix<goFloat> m (3,3);
+    goMath::Matrix<goFloat> m (3,3);
     int i;
     for (i = 0; i < 3; ++i)
     {
@@ -354,7 +355,7 @@ int main ()
             m(i,j) = i;
     }
     m.print();
-    goMatrix<goFloat> m2 (3,10);
+    goMath::Matrix<goFloat> m2 (3,10);
     for (i = 0; i < m2.getRows(); ++i)
     {
         int j;
@@ -364,10 +365,10 @@ int main ()
     m2.print ();
     m2.transpose ();
     m2.print ();
-    goMatrix<goFloat> m2_2 (m2);
+    goMath::Matrix<goFloat> m2_2 (m2);
     m2_2.transpose ();
     
-    goMatrix<goFloat> m3;
+    goMath::Matrix<goFloat> m3;
     m3 = m2_2 * m2;
     m3.print(); 
 #endif
@@ -389,10 +390,10 @@ int main ()
                     0, 1, 0, 0.2, 
                     0, 0, 1, 0};
                     // 0.5, 0.2, 0};
-    goMatrixf A (temp, 3, 4);
+    goMath::Matrixf A (temp, 3, 4);
 
     goVectorf y;
-    goMatrixVectorMult<goFloat> (1.0f, A, true, x, 1.0, y);
+    goMath::matrixVectorMult<goFloat> (1.0f, A, true, x, 1.0, y);
 
     printf ("y == ");
     for (goSize_t i = 0; i < y.getSize(); ++i)

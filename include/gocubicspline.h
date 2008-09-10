@@ -28,25 +28,25 @@ namespace goMath
         {
             public:
                 CubicSpline ();
-                CubicSpline (const goMatrix<T>& points);
-                CubicSpline (const goVector<T>& pm1,
-                             const goVector<T>& p0,
-                             const goVector<T>& p1,
-                             const goVector<T>& p2);
+                CubicSpline (const goMath::Matrix<T>& points);
+                CubicSpline (const goMath::Vector<T>& pm1,
+                             const goMath::Vector<T>& p0,
+                             const goMath::Vector<T>& p1,
+                             const goMath::Vector<T>& p2);
                 virtual ~CubicSpline();
                 
-                goAutoPtr<goVector<T> > operator() (T t) const; //= eval()
-                bool eval (T t, goVector<T>& ret) const;
-                bool D (T t, goVector<T>& ret) const;
+                goAutoPtr<goMath::Vector<T> > operator() (T t) const; //= eval()
+                bool eval (T t, goMath::Vector<T>& ret) const;
+                bool D (T t, goMath::Vector<T>& ret) const;
                 T integrate (T t1, T t2);
-                bool fit (const goMatrix<T>& points);
-                bool fit (const goVector<T>& pm1,
-                          const goVector<T>& p0,
-                          const goVector<T>& p1,
-                          const goVector<T>& p2);
+                bool fit (const goMath::Matrix<T>& points);
+                bool fit (const goMath::Vector<T>& pm1,
+                          const goMath::Vector<T>& p0,
+                          const goMath::Vector<T>& p1,
+                          const goMath::Vector<T>& p2);
             private:
-                goMatrix<T> myA_inv;
-                goMatrix<T> myM;
+                goMath::Matrix<T> myA_inv;
+                goMath::Matrix<T> myM;
         };
         /** @} */
 };

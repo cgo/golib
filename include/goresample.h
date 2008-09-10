@@ -9,14 +9,14 @@
 namespace goMath
 {
     template <class T>
-        bool resampleCubic (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount, bool closed = false, goFixedArray<goDouble>* accumLength_ = 0);
+        bool resampleCubic (const goMath::Matrix<T>& source, goMath::Matrix<T>& target, goSize_t resamplePointCount, bool closed = false, goFixedArray<goDouble>* accumLength_ = 0);
 
     template <class T>
         void resampleLinear (const goFixedArray<T>& f, goFixedArray<T>& ret);
 };
 
 template <class T>
-bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount);
+bool goResampleLinear (const goMath::Matrix<T>& source, goMath::Matrix<T>& target, goSize_t resamplePointCount);
 
 //= Check where this class is used if at all, if not, REMOVE THIS CLASS
 //= Used in the filterbank/reverse classes. Remove all this from 0.5.

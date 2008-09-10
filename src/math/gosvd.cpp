@@ -10,25 +10,25 @@
 #endif
 
 template <class T>
-goMatrix<T>& goMath::SVD<T>::getU () { return this->U; };
+goMath::Matrix<T>& goMath::SVD<T>::getU () { return this->U; };
 
 template <class T>
-const goMatrix<T>& goMath::SVD<T>::getU () const { return this->U; };
+const goMath::Matrix<T>& goMath::SVD<T>::getU () const { return this->U; };
 
 template <class T>
-goMatrix<T>& goMath::SVD<T>::getV () { return this->V; };
+goMath::Matrix<T>& goMath::SVD<T>::getV () { return this->V; };
 
 template <class T>
-const goMatrix<T>& goMath::SVD<T>::getV () const { return this->V; };
+const goMath::Matrix<T>& goMath::SVD<T>::getV () const { return this->V; };
 
 template <class T>
-goVector<T>& goMath::SVD<T>::getSingularValues () { return this->s; };
+goMath::Vector<T>& goMath::SVD<T>::getSingularValues () { return this->s; };
 
 template <class T>
-const goVector<T>& goMath::SVD<T>::getSingularValues () const { return this->s; };
+const goMath::Vector<T>& goMath::SVD<T>::getSingularValues () const { return this->s; };
 
 template <class T>
-void goMath::SVD<T>::getS (goMatrix<T>& S) const 
+void goMath::SVD<T>::getS (goMath::Matrix<T>& S) const 
 {
     S.resize (myM, myN);
     S.fill (T(0));
@@ -42,9 +42,9 @@ void goMath::SVD<T>::getS (goMatrix<T>& S) const
 namespace goMath 
 {
     template <>
-        bool SVD<goFloat>::calculate (const goMatrix<goFloat>& A, bool thin)
+        bool SVD<goFloat>::calculate (const goMath::Matrix<goFloat>& A, bool thin)
         {
-            goMatrix<goFloat> AT;
+            goMath::Matrix<goFloat> AT;
             A.getTranspose (AT);
             //= Careful: sgesvd_ expects column major arrays, we use row major.
             //= So we here calculate svd(A), because the f2c-generated code thinks
@@ -85,9 +85,9 @@ namespace goMath
         }
 
     template <>
-        bool SVD<goDouble>::calculate (const goMatrix<goDouble>& A, bool thin)
+        bool SVD<goDouble>::calculate (const goMath::Matrix<goDouble>& A, bool thin)
         {
-            goMatrix<goDouble> AT;
+            goMath::Matrix<goDouble> AT;
             A.getTranspose (AT);
             //= Careful: sgesvd_ expects column major arrays, we use row major.
             //= So we here calculate svd(A), because the f2c-generated code thinks
@@ -127,14 +127,14 @@ namespace goMath
         }
 
     template <class T>
-        bool SVD<T>::calculate (const goMatrix<T>&, bool)
+        bool SVD<T>::calculate (const goMath::Matrix<T>&, bool)
         {
             return false;
         }
 }
 
 template <class T>
-goMath::SVD<T>::SVD (const goMatrix<T>& A, bool thin)
+goMath::SVD<T>::SVD (const goMath::Matrix<T>& A, bool thin)
 : U(), V(), s(), myM(0), myN(0)
 {
     this->calculate (A, thin);
@@ -148,19 +148,19 @@ goMath::SVD<T>::~SVD ()
 //=============================================================================
 
 template <class Real>
-goMath::ThinSVD<Real>::ThinSVD (const goMatrix<Real> &Arg)
+goMath::ThinSVD<Real>::ThinSVD (const goMath::Matrix<Real> &Arg)
     :  U(), V(), s(), m(0), n(0)
 {
     m = Arg.dim1();
     n = Arg.dim2();
     int nu = min(m,n);
     s.resize(min(m+1,n)); 
-    U.resize(m,nu); // = goMatrix<Real>(m, nu);
+    U.resize(m,nu); // = goMath::Matrix<Real>(m, nu);
     U.fill (Real(0));
-    V.resize (n,n); // = goMatrix<Real>(n,n);
+    V.resize (n,n); // = goMath::Matrix<Real>(n,n);
     goArray<Real> e(n);
     goArray<Real> work(m);
-    goMatrix<Real> A(Arg.copy());
+    goMath::Matrix<Real> A(Arg.copy());
     int wantu = 1;  					/* boolean */
     int wantv = 1;  					/* boolean */
     int i=0, j=0, k=0;
@@ -570,11 +570,11 @@ goMath::ThinSVD<Real>::~ThinSVD ()
 }
 
 template <class Real>
-void goMath::ThinSVD<Real>::getU (goMatrix<Real> &A) 
+void goMath::ThinSVD<Real>::getU (goMath::Matrix<Real> &A) 
 {
     int minm = min(m+1,n);
 
-    A = goMatrix<Real>(m, minm);
+    A = goMath::Matrix<Real>(m, minm);
 
     for (int i=0; i<m; i++)
         for (int j=0; j<minm; j++)
@@ -582,31 +582,31 @@ void goMath::ThinSVD<Real>::getU (goMatrix<Real> &A)
 }
 
 template <class Real>
-void goMath::ThinSVD<Real>::getV (goMatrix<Real> &A) 
+void goMath::ThinSVD<Real>::getV (goMath::Matrix<Real> &A) 
 {
     A = V;
 }
 
 template <class Real>
-goMatrix<Real>& goMath::ThinSVD<Real>::getU ()
+goMath::Matrix<Real>& goMath::ThinSVD<Real>::getU ()
 {
     return this->U;
 }
 
 template <class Real>
-const goMatrix<Real>& goMath::ThinSVD<Real>::getU () const
+const goMath::Matrix<Real>& goMath::ThinSVD<Real>::getU () const
 {
     return this->U;
 }
 
 template <class Real>
-goMatrix<Real>& goMath::ThinSVD<Real>::getV ()
+goMath::Matrix<Real>& goMath::ThinSVD<Real>::getV ()
 {
     return this->V;
 }
 
 template <class Real>
-const goMatrix<Real>& goMath::ThinSVD<Real>::getV () const
+const goMath::Matrix<Real>& goMath::ThinSVD<Real>::getV () const
 {
     return this->V;
 }
@@ -614,19 +614,19 @@ const goMatrix<Real>& goMath::ThinSVD<Real>::getV () const
    /** Return the one-dimensional array of singular values */
 
 template <class Real>
-void goMath::ThinSVD<Real>::getSingularValues (goVector<Real> &x) 
+void goMath::ThinSVD<Real>::getSingularValues (goMath::Vector<Real> &x) 
 {
     x = s;
 }
 
 template <class Real>
-goVector<Real>& goMath::ThinSVD<Real>::getSingularValues ()
+goMath::Vector<Real>& goMath::ThinSVD<Real>::getSingularValues ()
 {
     return this->s;
 }
 
 template <class Real>
-const goVector<Real>& goMath::ThinSVD<Real>::getSingularValues () const
+const goMath::Vector<Real>& goMath::ThinSVD<Real>::getSingularValues () const
 {
     return this->s;
 }
@@ -636,9 +636,9 @@ const goVector<Real>& goMath::ThinSVD<Real>::getSingularValues () const
    */
 
 template <class Real>
-void goMath::ThinSVD<Real>::getS (goMatrix<Real> &A) 
+void goMath::ThinSVD<Real>::getS (goMath::Matrix<Real> &A) 
 {
-    A = goMatrix<Real>(n,n);
+    A = goMath::Matrix<Real>(n,n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             A(i,j) = 0.0;

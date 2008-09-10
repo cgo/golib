@@ -17,7 +17,7 @@
  */
 template <class T>
 bool goMath::sphereToEuclidean (T phi, T theta, T radius,
-                                goVector<T>* positionRet, goVector<T>* upRet)
+                                goMath::Vector<T>* positionRet, goMath::Vector<T>* upRet)
 {
     //= Spherical to cartesian coordinates
     T sin_theta = ::sin(theta);
@@ -52,9 +52,9 @@ bool goMath::sphereToEuclidean (T phi, T theta, T radius,
 }
 
 template <class T>
-bool goMath::sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, goList<goVector<T> >& upRet)
+bool goMath::sampleSphere (T dist, T radius, goList<goMath::Vector<T> >& positionRet, goList<goMath::Vector<T> >& upRet)
 {
-    goVector<T> pos(3);
+    goMath::Vector<T> pos(3);
     goDouble phi = 0;
     goDouble d_phi = dist / radius;
     while (phi < M_PI)
@@ -83,7 +83,7 @@ bool goMath::sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, 
             up *= 1.0f / up.abs();
             if (v2.z < 0.0f)
                 up *= -1.0f;
-            goVector<T> temp(3);
+            goMath::Vector<T> temp(3);
             temp[0] = up.x; temp[1] = up.y; temp[2] = up.z;
             upRet.append(temp);
 
@@ -96,9 +96,9 @@ bool goMath::sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, 
 }
 
 template <class T>
-bool goMath::sampleSphere (T dist, T radius, goMatrix<T>& viewSphereRet)
+bool goMath::sampleSphere (T dist, T radius, goMath::Matrix<T>& viewSphereRet)
 {
-    goList<goVector<T> > pl, ul;
+    goList<goMath::Vector<T> > pl, ul;
     if (!goMath::sampleSphere<T> (dist,radius,pl,ul))
     {
         goLog::warning ("sampleViewSphere() failed.");
@@ -109,7 +109,7 @@ bool goMath::sampleSphere (T dist, T radius, goMatrix<T>& viewSphereRet)
     {
         viewSphereRet.resize(N,3);
     }
-    typename goList<goVector<T> >::Element* el = pl.getFrontElement();
+    typename goList<goMath::Vector<T> >::Element* el = pl.getFrontElement();
     for (goSize_t i = 0; i < N && el; ++i, el = el->next)
     {
         viewSphereRet(i,0) = el->elem[0];
@@ -120,7 +120,7 @@ bool goMath::sampleSphere (T dist, T radius, goMatrix<T>& viewSphereRet)
 }
 
 template <class T>
-bool goMath::euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T& radiusRet)
+bool goMath::euclideanToSphere (const goMath::Vector<T>& x, T& phiRet, T& thetaRet, T& radiusRet)
 {
     if (x.getSize() != 3)
         return false;
@@ -133,7 +133,7 @@ bool goMath::euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T&
 }
 
 template <class T>
-bool goMath::euclideanToSphere (const goVector<T>& x, goVector<T>& phitheta, T* radiusRet)
+bool goMath::euclideanToSphere (const goMath::Vector<T>& x, goMath::Vector<T>& phitheta, T* radiusRet)
 {
     if (x.getSize() != 3)
         return false;
@@ -150,25 +150,25 @@ bool goMath::euclideanToSphere (const goVector<T>& x, goVector<T>& phitheta, T* 
 
 template 
 bool goMath::sphereToEuclidean<goFloat> (goFloat phi, goFloat theta, goFloat radius,
-                                goVector<goFloat>* positionRet, goVector<goFloat>* upRet);
+                                goMath::Vector<goFloat>* positionRet, goMath::Vector<goFloat>* upRet);
 template 
 bool goMath::sphereToEuclidean<goDouble> (goDouble phi, goDouble theta, goDouble radius,
-                                goVector<goDouble>* positionRet, goVector<goDouble>* upRet);
+                                goMath::Vector<goDouble>* positionRet, goMath::Vector<goDouble>* upRet);
 template
-bool goMath::euclideanToSphere<goFloat> (const goVector<goFloat>& , goFloat& , goFloat& , goFloat&);
+bool goMath::euclideanToSphere<goFloat> (const goMath::Vector<goFloat>& , goFloat& , goFloat& , goFloat&);
 template
-bool goMath::euclideanToSphere<goDouble> (const goVector<goDouble>& , goDouble& , goDouble& , goDouble&);
+bool goMath::euclideanToSphere<goDouble> (const goMath::Vector<goDouble>& , goDouble& , goDouble& , goDouble&);
 template
-bool goMath::euclideanToSphere<goFloat> (const goVector<goFloat>&, goVector<goFloat>&, goFloat*);
+bool goMath::euclideanToSphere<goFloat> (const goMath::Vector<goFloat>&, goMath::Vector<goFloat>&, goFloat*);
 template
-bool goMath::euclideanToSphere<goDouble> (const goVector<goDouble>&, goVector<goDouble>&, goDouble*);
+bool goMath::euclideanToSphere<goDouble> (const goMath::Vector<goDouble>&, goMath::Vector<goDouble>&, goDouble*);
 
 template 
-bool goMath::sampleSphere<goFloat> (goFloat dist, goFloat radius, goMatrix<goFloat>& viewSphereRet);
+bool goMath::sampleSphere<goFloat> (goFloat dist, goFloat radius, goMath::Matrix<goFloat>& viewSphereRet);
 template 
-bool goMath::sampleSphere<goDouble> (goDouble dist, goDouble radius, goMatrix<goDouble>& viewSphereRet);
+bool goMath::sampleSphere<goDouble> (goDouble dist, goDouble radius, goMath::Matrix<goDouble>& viewSphereRet);
 
 template 
-bool goMath::sampleSphere<goFloat> (goFloat, goFloat, goList<goVector<goFloat> >&, goList<goVector<goFloat> >&);
+bool goMath::sampleSphere<goFloat> (goFloat, goFloat, goList<goMath::Vector<goFloat> >&, goList<goMath::Vector<goFloat> >&);
 template 
-bool goMath::sampleSphere<goDouble> (goDouble, goDouble, goList<goVector<goDouble> >&, goList<goVector<goDouble> >&);
+bool goMath::sampleSphere<goDouble> (goDouble, goDouble, goList<goMath::Vector<goDouble> >&, goList<goMath::Vector<goDouble> >&);

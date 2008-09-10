@@ -22,7 +22,7 @@ goDouble goMath::Manifold<element_type,tangent_type>::d (const Element& e1, cons
 
 template <class T>
 goMath::SO3<T>::SO3 ()
-    : Manifold<goMatrix<T>, goVector<T> > ()
+    : Manifold<goMath::Matrix<T>, Vector<T> > ()
       , myId (3,3)
 {
     myId.setIdentity();
@@ -34,7 +34,7 @@ goMath::SO3<T>::~SO3 ()
 }
 
 template <class T>
-static void tangentMatrix (T x, T y, T z, goMatrix<T>& ret)
+static void tangentMatrix (T x, T y, T z, goMath::Matrix<T>& ret)
 {
     if (ret.getRows() != 3 || ret.getColumns() != 3)
     {
@@ -49,7 +49,7 @@ static void tangentMatrix (T x, T y, T z, goMatrix<T>& ret)
 }
 
 template <class T>
-static void tangentVector (const goMatrix<T>& S, goVector<T>& ret)
+static void tangentVector (const goMath::Matrix<T>& S, goMath::Vector<T>& ret)
 {
     if (ret.getSize() < 3)
     {
@@ -74,11 +74,11 @@ void goMath::SO3<T>::exp (const Element& e, const Tangent& v, Element& ret)
         tangentMatrix (T(0),T(0),T(0),Sn);
     }
     // ret = (myId + Sn * sin(theta) + (Sn*Sn) * (1 - cos(theta))) * e;
-    goMatrix<T> ret2 = Sn;
+    goMath::Matrix<T> ret2 = Sn;
     ret2 *= ::sin(theta);
     ret2 += myId;
-    goMatrixMult<T> (T(1) - ::cos(theta), Sn, false, Sn, false, T(1), ret2);
-    goMatrixMult<T> (T(1), ret2, false, e, false, T(0), ret);
+    goMath::matrixMult<T> (T(1) - ::cos(theta), Sn, false, Sn, false, T(1), ret2);
+    goMath::matrixMult<T> (T(1), ret2, false, e, false, T(0), ret);
 }
 
 /** 
@@ -93,9 +93,9 @@ void goMath::SO3<T>::exp (const Element& e, const Tangent& v, Element& ret)
 template <class T>
 void goMath::SO3<T>::log (const Element& e1, const Element& e2, Tangent& ret)
 {
-    goMatrix<T> R (3,3);
-    goMatrix<T> Sr (3,3);
-    goMatrixMult<T> (T(1), e2, false, e1, true, T(0), R);
+    goMath::Matrix<T> R (3,3);
+    goMath::Matrix<T> Sr (3,3);
+    goMath::matrixMult<T> (T(1), e2, false, e1, true, T(0), R);
     T theta = goMath::acos ( (R.trace() - T(1)) * T(0.5) );
     //=
     //= Handle special cases where theta close to 0 or pi:
@@ -165,13 +165,13 @@ goDouble goMath::SO3<T>::innerProduct (const Element& e, const Tangent& v1, cons
 }
 
 template <class T>
-void goMath::SO3<T>::matrix (const goVector<T>& w, goMatrix<T>& ret)
+void goMath::SO3<T>::matrix (const Vector<T>& w, goMath::Matrix<T>& ret)
 {
     this->exp (myId, w, ret);
 }
 
 template <class T>
-void goMath::SO3<T>::vector (const goMatrix<T>& r, goVector<T>& ret)
+void goMath::SO3<T>::vector (const goMath::Matrix<T>& r, Vector<T>& ret)
 {
     this->log (myId, r, ret);
 }
@@ -180,7 +180,7 @@ void goMath::SO3<T>::vector (const goMatrix<T>& r, goVector<T>& ret)
 
 template <class T>
 goMath::LinearSpace<T>::LinearSpace ()
-    : goMath::Manifold <goVector<T>, goVector<T> > ()
+    : goMath::Manifold <Vector<T>, Vector<T> > ()
 {
 }
 
@@ -193,14 +193,14 @@ template <class T>
 void goMath::LinearSpace<T>::exp (const Element& e, const Tangent& v, Element& ret)
 {
     ret = e;
-    goVectorAdd<T> (1.0, v, ret);
+    vectorAdd<T> (1.0, v, ret);
 }
 
 template <class T>
 void goMath::LinearSpace<T>::log (const Element& e1, const Element& e2, Tangent& ret)
 {
     ret = e2;
-    goVectorAdd<T> (-1.0, e1, ret);
+    vectorAdd<T> (-1.0, e1, ret);
 }
 
 template <class T>
@@ -214,7 +214,7 @@ goDouble goMath::LinearSpace<T>::innerProduct (const Element& e,
 
 template <class T>
 goMath::UnitSphere<T>::UnitSphere ()
-    : Manifold<goVector<T>, goVector<T> > ()
+    : Manifold<Vector<T>, Vector<T> > ()
 {
 }
 

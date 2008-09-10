@@ -18,7 +18,7 @@ class goNUBSPrivate;
  * That's not tested, but should suffice.
  *
  * @todo B is currently calculated recursively. Use de Boor instead.
- * @todo Currently this class is not compiled. Replace the use of goPoint with goVector.
+ * @todo Currently this class is not compiled. Replace the use of goPoint with goMath::Vector.
  * @author Christian Gosch
  */
 class goNUBS

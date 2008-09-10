@@ -72,16 +72,16 @@ class goSinglePlot : public goObjectBase
         goSize_t getRow () const;
         goSize_t getColumn () const;
 
-        bool add3D (const goVectord& x, const goVectord& y, goIndex_t lineLength, 
-                    const goVectord& values, const char* title, const char* plotOptions = 0);
-        bool add3D (const goVectorf& x, const goVectorf& y, goIndex_t lineLength, 
-                    const goVectorf& values, const char* title, const char* plotOptions = 0);
-        bool add3D (const goMatrixf& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
-        bool add3D (const goMatrixd& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
+        bool add3D (const goMath::Vectord& x, const goMath::Vectord& y, goIndex_t lineLength, 
+                    const goMath::Vectord& values, const char* title, const char* plotOptions = 0);
+        bool add3D (const goMath::Vectorf& x, const goMath::Vectorf& y, goIndex_t lineLength, 
+                    const goMath::Vectorf& values, const char* title, const char* plotOptions = 0);
+        bool add3D (const goMath::Matrixf& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
+        bool add3D (const goMath::Matrixd& m, const char* title, const char* plotOptions = 0, bool separateRows = false);
         bool add3D (const goSignal3DBase<void>* image, const char* title, const char* plotOptions = 0);
 
-        bool addImage (const goMatrixf& m, const char* title, const char* plotOptions = 0);
-        bool addImage (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+        bool addImage (const goMath::Matrixf& m, const char* title, const char* plotOptions = 0);
+        bool addImage (const goMath::Matrixd& m, const char* title, const char* plotOptions = 0);
         bool addImage (const goSignal3DBase<void>& m, const char* title, const char* plotOptions = 0);
 
         bool add (const char* commands, const char* dataString = 0);
@@ -98,8 +98,8 @@ class goSinglePlot : public goObjectBase
                 {
                     ++szVec;
                 }
-                goVectord x(szVec);
-                goVectord y(szVec);
+                goMath::Vectord x(szVec);
+                goMath::Vectord y(szVec);
                 goSize_t i = 0;
                 while (i < sz && el)
                 {
@@ -116,25 +116,25 @@ class goSinglePlot : public goObjectBase
                 return this->addCurve (x,y,title,plotOptions);
             };
 
-        bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
-        bool addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions = 0);
-        bool addCurveMatrix (const goMatrixf& m, const char* title, const char* plotOptions = 0);
-        bool addCurveMatrix (const goMatrixd& m, const char* title, const char* plotOptions = 0);
+        bool addCurve (const goMath::Vectord& x, const goMath::Vectord& y, const char* title, const char* plotOptions = 0);
+        bool addCurve (const goMath::Vectorf& x, const goMath::Vectorf& y, const char* title, const char* plotOptions = 0);
+        bool addCurveMatrix (const goMath::Matrixf& m, const char* title, const char* plotOptions = 0);
+        bool addCurveMatrix (const goMath::Matrixd& m, const char* title, const char* plotOptions = 0);
 
-        bool addPoint (const goVectorf& p, const char* title, const char* plotOptions = 0);
-        bool addPoint (const goVectord& p, const char* title, const char* plotOptions = 0);
+        bool addPoint (const goMath::Vectorf& p, const char* title, const char* plotOptions = 0);
+        bool addPoint (const goMath::Vectord& p, const char* title, const char* plotOptions = 0);
 
-        bool addPlane (const goVectorf& n, const goVectorf& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
-        bool addPlane (const goVectord& n, const goVectord& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
-        bool addLine (const goVectorf& n, const goVectorf& p, const char* title = "", const char* plotOptions = 0);
-        bool addLine (const goVectord& n, const goVectord& p, const char* title = "", const char* plotOptions = 0);
+        bool addPlane (const goMath::Vectorf& n, const goMath::Vectorf& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
+        bool addPlane (const goMath::Vectord& n, const goMath::Vectord& p, goDouble dx = 0.1, goDouble dy = 0.1, goDouble sx = 1.0, goDouble sy = 1.0, const char* title = "", const char* plotOptions = 0);
+        bool addLine (const goMath::Vectorf& n, const goMath::Vectorf& p, const char* title = "", const char* plotOptions = 0);
+        bool addLine (const goMath::Vectord& n, const goMath::Vectord& p, const char* title = "", const char* plotOptions = 0);
 
         template <class vectorT>
             bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)
             {
                 goSize_t sz = v.getSize();
-                goVectord x (sz);
-                goVectord y (sz);
+                goMath::Vectord x (sz);
+                goMath::Vectord y (sz);
                 goSize_t i = 0;
                 for (i = 0; i < sz; ++i)
                 {
@@ -207,8 +207,8 @@ class goMultiPlotter : public goObjectBase
         void setAutoPosition (bool a);
         bool getAutoPosition () const;
 
-        void setBarycentric (const goMatrixf& triangle);
-        void setBarycentric (const goMatrixd& triangle);
+        void setBarycentric (const goMath::Matrixf& triangle);
+        void setBarycentric (const goMath::Matrixd& triangle);
        
         void setPrefix (const goString&);
         void setPrefix (const char*);
@@ -253,8 +253,8 @@ class goPlotter : public goObjectBase
                 {
                     ++szVec;
                 }
-                goVectord x(szVec);
-                goVectord y(szVec);
+                goMath::Vectord x(szVec);
+                goMath::Vectord y(szVec);
                 goSize_t i = 0;
                 while (i < sz && el)
                 {
@@ -271,15 +271,15 @@ class goPlotter : public goObjectBase
                 return this->addCurve (x,y,title,plotOptions);
             };
 
-        bool addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions = 0);
-        //bool addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions = 0);
+        bool addCurve (const goMath::Vectord& x, const goMath::Vectord& y, const char* title, const char* plotOptions = 0);
+        //bool addCurve (const goMath::Vectorf& x, const goMath::Vectorf& y, const char* title, const char* plotOptions = 0);
 
         template <class vectorT>
             bool addCurve (const vectorT& v, const char* title, const char* plotOptions = 0)
             {
                 goSize_t sz = v.getSize();
-                goVectord x (sz);
-                goVectord y (sz);
+                goMath::Vectord x (sz);
+                goMath::Vectord y (sz);
                 goSize_t i = 0;
                 for (i = 0; i < sz; ++i)
                 {
@@ -314,16 +314,16 @@ namespace goPlot
     } PlotType;
 
     template <class T>
-        void plot (const goVector<T>& x, const goVector<T>& y, 
+        void plot (const goMath::Vector<T>& x, const goMath::Vector<T>& y, 
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
     template <class T>
-        void plot (const goVector<T>& y, 
+        void plot (const goMath::Vector<T>& y, 
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
     template <class T>
-        void plot (const goMatrix<T>& points,
+        void plot (const goMath::Matrix<T>& points,
                 const char* title = 0, const char* plotOptions = 0, const char* prefix = 0);
     template <class T>
-        void plot3D (const goMatrix<T>& M,
+        void plot3D (const goMath::Matrix<T>& M,
                 const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false);
 
     class PlotPrivate;
@@ -334,20 +334,20 @@ namespace goPlot
             Plot ();
             virtual ~Plot ();
 
-            void plot (const goMatrixf& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plot (const goMatrixd& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plot (const goVectorf& px, const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plot (const goVectord& px, const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plot (const goVectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plot (const goVectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Matrixf& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Matrixd& curve, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Vectorf& px, const goMath::Vectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Vectord& px, const goMath::Vectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Vectorf& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plot (const goMath::Vectord& py, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plotImage (const goSignal3DBase<void>& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
-            void plotImage (const goMatrixf& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
-            void plotImage (const goMatrixd& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
+            void plotImage (const goMath::Matrixf& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
+            void plotImage (const goMath::Matrixd& image, const char* title = "", const char* options = "w image", goSize_t x = 0, goSize_t y = 0);
             void plotPoint (goDouble px, goDouble py, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
-            void plotPoint (const goVectorf& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
-            void plotPoint (const goVectord& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
-            void plotLine  (const goVectorf& n, const goVectorf& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
-            void plotLine  (const goVectord& n, const goVectord& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plotPoint (const goMath::Vectorf& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
+            void plotPoint (const goMath::Vectord& p, const char* title = "", const char* options = "w p", goSize_t x = 0, goSize_t y = 0);
+            void plotLine  (const goMath::Vectorf& n, const goMath::Vectorf& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
+            void plotLine  (const goMath::Vectord& n, const goMath::Vectord& p, const char* title = "", const char* options = "w l", goSize_t x = 0, goSize_t y = 0);
             void plot (goMultiPlotter& mp);
             void plot ();
             void plotPostscript (const char* filename, goFloat sizeX = -1.0f, goFloat sizeY = -1.0f);
@@ -479,11 +479,11 @@ namespace goPlot
                                     goList<goString>& dataFileNameRet);
     //= For 3D-plots
     template <class T>
-        bool writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrix,
+        bool writeGnuplotDataFiles (const goList<goMath::Matrix<T> >*    matrix,
                                     goList<goString>& dataFileNameRet);
     //= For 2D-images
     template <class T>
-        bool writeGnuplotDataFilesBinary (const goList<goMatrix<T> >*    matrix,
+        bool writeGnuplotDataFilesBinary (const goList<goMath::Matrix<T> >*    matrix,
                                     goList<goString>& dataFileNameRet);
 
     //= For 3D-plots

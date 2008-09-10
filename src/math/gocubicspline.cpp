@@ -13,7 +13,7 @@ goMath::CubicSpline<T>::CubicSpline ()
 }
 
 template<class T>
-goMath::CubicSpline<T>::CubicSpline (const goMatrix<T>& points)
+goMath::CubicSpline<T>::CubicSpline (const goMath::Matrix<T>& points)
    : myA_inv(0,0), myM(4,4)
 {
     static T A_inv[] = {T(2), T(-3), T(0), T(1),
@@ -25,10 +25,10 @@ goMath::CubicSpline<T>::CubicSpline (const goMatrix<T>& points)
 }
 
 template<class T>
-goMath::CubicSpline<T>::CubicSpline (const goVector<T>& pm1,
-        const goVector<T>& p0,
-        const goVector<T>& p1,
-        const goVector<T>& p2)
+goMath::CubicSpline<T>::CubicSpline (const Vector<T>& pm1,
+        const Vector<T>& p0,
+        const Vector<T>& p1,
+        const Vector<T>& p2)
    : myA_inv(0,0), myM(4,4)
 {
     static T A_inv[] = {T(2), T(-3), T(0), T(1),
@@ -45,16 +45,16 @@ goMath::CubicSpline<T>::~CubicSpline ()
 }
 
 template<class T>
-goAutoPtr<goVector<T> > 
+goAutoPtr<goMath::Vector<T> > 
 goMath::CubicSpline<T>::operator() (T t) const
 {
-    goAutoPtr<goVector<T> > ret = goAutoPtr<goVector<T> >(new goVector<T>(2));
+    goAutoPtr<Vector<T> > ret = goAutoPtr<Vector<T> >(new Vector<T>(2));
     this->eval (t, *ret);
     return ret;
 }
 
 template<class T>
-bool goMath::CubicSpline<T>::eval (T t, goVector<T>& ret) const
+bool goMath::CubicSpline<T>::eval (T t, Vector<T>& ret) const
 {
     if (ret.getSize() != 2)
         ret.resize(2);
@@ -67,7 +67,7 @@ bool goMath::CubicSpline<T>::eval (T t, goVector<T>& ret) const
 }
 
 template<class T>
-bool goMath::CubicSpline<T>::D (T t, goVector<T>& ret) const
+bool goMath::CubicSpline<T>::D (T t, Vector<T>& ret) const
 {
     if (ret.getSize() != 2)
         ret.resize(2);
@@ -80,9 +80,9 @@ bool goMath::CubicSpline<T>::D (T t, goVector<T>& ret) const
 }
 
 template<class T>
-bool goMath::CubicSpline<T>::fit (const goMatrix<T>& points)
+bool goMath::CubicSpline<T>::fit (const goMath::Matrix<T>& points)
 {
-    goVector<T> pm1, p0, p1, p2;
+    Vector<T> pm1, p0, p1, p2;
     points.refRow(0,pm1);
     points.refRow(1,p0);
     points.refRow(2,p1);
@@ -91,18 +91,18 @@ bool goMath::CubicSpline<T>::fit (const goMatrix<T>& points)
 }
 
 template<class T>
-bool goMath::CubicSpline<T>::fit (const goVector<T>& pm1,
-        const goVector<T>& p0,
-        const goVector<T>& p1,
-        const goVector<T>& p2)
+bool goMath::CubicSpline<T>::fit (const Vector<T>& pm1,
+        const Vector<T>& p0,
+        const Vector<T>& p1,
+        const Vector<T>& p2)
 {
-    static goMatrix<T> P (2,4);
+    static goMath::Matrix<T> P (2,4);
     P.setColumn(0,p0);
     P.setColumn(1,p1);
     P.setColumn(2,(p1-pm1)*0.5);
     P.setColumn(3,(p2-p0)*0.5);
     
-    goMatrixMult<T> (T(1), P, false, this->myA_inv, false, T(0), this->myM);
+    goMath::matrixMult<T> (T(1), P, false, this->myA_inv, false, T(0), this->myM);
     return true;
 }
 

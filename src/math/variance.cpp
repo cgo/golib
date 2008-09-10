@@ -31,7 +31,7 @@ T goMath::fastVariance (const vectorT& v, goSize_t sz, T mean)
 
 template goDouble goMath::variance<goFixedArray<goDouble>,goDouble> (const goFixedArray<goDouble>&, goSize_t sz, goDouble mean);
 template goDouble goMath::fastVariance<goFixedArray<goDouble>,goDouble> (const goFixedArray<goDouble>&, goSize_t sz, goDouble mean);
-template goDouble goMath::variance<goVectord,goDouble> (const goVectord&, goSize_t sz, goDouble mean);
-template goDouble goMath::fastVariance<goVectord,goDouble> (const goVectord&, goSize_t sz, goDouble mean);
+template goDouble goMath::variance<goMath::Vectord,goDouble> (const goMath::Vectord&, goSize_t sz, goDouble mean);
+template goDouble goMath::fastVariance<goMath::Vectord,goDouble> (const goMath::Vectord&, goSize_t sz, goDouble mean);
 template goFloat  goMath::variance<goFixedArray<goFloat>,goFloat> (const goFixedArray<goFloat>&, goSize_t sz, goFloat mean);
 template goFloat  goMath::fastVariance<goFixedArray<goFloat>,goFloat> (const goFixedArray<goFloat>&, goSize_t sz, goFloat mean);

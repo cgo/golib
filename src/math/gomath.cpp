@@ -16,15 +16,15 @@
 const goFloat goMath::epsilon (1e-6);
 
 template <class T>
-bool goMath::centerOfMass (const goList<goVector<T> >& points, goVector<T>& comRet)
+bool goMath::centerOfMass (const goList<Vector<T> >& points, Vector<T>& comRet)
 {
     if (points.isEmpty())
         return false;
 
-    const goVector<T>* p = 0;
+    const Vector<T>* p = 0;
     goIndex_t pointCount = static_cast<goIndex_t>(points.getSize());
     goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
-    typename goList<goVector<T> >::ConstElement* el = points.getFrontElement();
+    typename goList<Vector<T> >::ConstElement* el = points.getFrontElement();
     assert(el);
     goSize_t sz = 0;
     if (el) 
@@ -45,7 +45,7 @@ bool goMath::centerOfMass (const goList<goVector<T> >& points, goVector<T>& comR
 }
 
 template <class T>
-bool goMath::centerOfMass (const goMatrix<T>& confMatrix, goVector<T>& comRet)
+bool goMath::centerOfMass (const goMath::Matrix<T>& confMatrix, Vector<T>& comRet)
 {
     goIndex_t pointCount = static_cast<goIndex_t>(confMatrix.getRows());
     if (pointCount < 1)
@@ -57,7 +57,7 @@ bool goMath::centerOfMass (const goMatrix<T>& confMatrix, goVector<T>& comRet)
     comRet.setSize (confMatrix.getColumns());
     comRet.fill (T(0));
     goIndex_t i = 0;
-    goVector<T> ref;
+    Vector<T> ref;
     for (i = 0; i < pointCount; ++i)
     {
         confMatrix.refRow (i, ref);
@@ -148,9 +148,9 @@ bool goMath::centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMath::translate (goMatrix<T>& confMatrix, const goVector<T>& trans)
+bool goMath::translate (goMath::Matrix<T>& confMatrix, const Vector<T>& trans)
 {
-    goVector<T> ref;
+    Vector<T> ref;
     goSize_t N = confMatrix.getRows();
     for (goSize_t i = 0; i < N; ++i)
     {
@@ -304,15 +304,15 @@ template void goMath::exp<goDouble> (goFixedArray<goDouble>&);
 template void goMath::exp<goDouble> (const goFixedArray<goDouble>&, goFixedArray<goDouble>&);
 template void goMath::log<goDouble> (goFixedArray<goDouble>&);
 
-template bool goMath::centerOfMass<goFloat> (const goList<goVector<goFloat> >&, goVector<goFloat>&);
-template bool goMath::centerOfMass<goDouble> (const goList<goVector<goDouble> >&, goVector<goDouble>&);
-template bool goMath::centerOfMass<goFloat> (const goMatrix<goFloat>&, goVector<goFloat>&);
-template bool goMath::centerOfMass<goDouble> (const goMatrix<goDouble>&, goVector<goDouble>&);
+template bool goMath::centerOfMass<goFloat> (const goList<Vector<goFloat> >&, Vector<goFloat>&);
+template bool goMath::centerOfMass<goDouble> (const goList<Vector<goDouble> >&, Vector<goDouble>&);
+template bool goMath::centerOfMass<goFloat> (const goMath::Matrix<goFloat>&, Vector<goFloat>&);
+template bool goMath::centerOfMass<goDouble> (const goMath::Matrix<goDouble>&, Vector<goDouble>&);
 
 template bool goMath::centerOfMass<goPointf> (const goList<goPointf>& points, goPointf& comRet);
 template bool goMath::centerOfMass<goPointd> (const goList<goPointd>& points, goPointd& comRet);
 template bool goMath::centerOfMass<goPointf> (goList<goPointf>::ConstElement* begin, goIndex_t pointCount, goPointf& comRet);
 template bool goMath::centerOfMass<goPointd> (goList<goPointd>::ConstElement* begin, goIndex_t pointCount, goPointd& comRet);
 
-template bool goMath::translate<goFloat> (goMatrix<goFloat>&, const goVector<goFloat>&);
-template bool goMath::translate<goDouble> (goMatrix<goDouble>&, const goVector<goDouble>&);
+template bool goMath::translate<goFloat> (goMath::Matrix<goFloat>&, const Vector<goFloat>&);
+template bool goMath::translate<goDouble> (goMath::Matrix<goDouble>&, const Vector<goDouble>&);

@@ -15,7 +15,7 @@ namespace goMath
             virtual ~Contours ();
 
             void calculate (const goSignal3DBase<void>& image, goDouble level);
-            goList<goMatrix<goDouble> >& getContours ();
+            goList<goMath::Matrix<goDouble> >& getContours ();
         private:
             ContoursPrivate* myPrivate;
     };

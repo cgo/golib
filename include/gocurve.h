@@ -32,51 +32,51 @@ class goCurve : public goPointCloud<T>
     public:
         goCurve (goSize_t dim = 2);
         goCurve (const goCurve<T>&);
-        goCurve (const goList<goVector<T> >&);
-        goCurve (const goMatrix<T>& confMatrix);
+        goCurve (const goList<goMath::Vector<T> >&);
+        goCurve (const goMath::Matrix<T>& confMatrix);
         virtual ~goCurve ();
         goCurve& operator= (const goCurve<T>&);
 
 
-        virtual bool setPoints    (const goList<goVector<T> >&);
-        virtual bool setPoints    (const goMatrix<T>&);
-        bool     setPoints        (typename goList<goVector<T> >::ConstElement* sourceBegin, 
+        virtual bool setPoints    (const goList<goMath::Vector<T> >&);
+        virtual bool setPoints    (const goMath::Matrix<T>&);
+        bool     setPoints        (typename goList<goMath::Vector<T> >::ConstElement* sourceBegin, 
                                    goIndex_t                              sourcePointCount, 
                                    goIndex_t                              destPointCount, 
                                    bool                                   closed = false);
-        bool     setPoints        (typename goList<goVector<T> >::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed = false);
-        bool     resample         (goIndex_t pointCount, goList<goVector<T> >& ret) const;
+        bool     setPoints        (typename goList<goMath::Vector<T> >::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed = false);
+        bool     resample         (goIndex_t pointCount, goList<goMath::Vector<T> >& ret) const;
         bool     resample         (goIndex_t pointCount, goCurve<T>& ret) const;
         // bool     resampleNUBS     (goIndex_t pointCount, goCurve<T>& ret) const;
         bool     getGradNorm      (goArray<goFloat>& diffNorm) const;
-        bool     getGrad          (goList<goVector<T> >& diff) const;
+        bool     getGrad          (goList<goMath::Vector<T> >& diff) const;
         bool     getCurvNorm      (goArray<goFloat>& curvNorm) const;
         // bool     getAngleFunction (goArray<goFloat>& angles, const go4Vectorf& axis) const;
-        bool     getTurningFunction (goVector<T>& ret) const;
+        bool     getTurningFunction (goMath::Vector<T>& ret) const;
         goDouble getLength        () const;
 
-        // void     affineTransform  (const goMatrix<T>& m);   // Now in pointcloud.
+        // void     affineTransform  (const goMath::Matrix<T>& m);   // Now in pointcloud.
 
         goDouble euclideanDistance (const goCurve<T>& other, bool forward = true) const;
 
-        static goDouble getLength (const goList<goVector<T> >& pl);
+        static goDouble getLength (const goList<goMath::Vector<T> >& pl);
 
-        bool sample (goDouble position, goVector<T>& ret) const;
+        bool sample (goDouble position, goMath::Vector<T>& ret) const;
 
-        bool resample (goDouble start, goDouble end, goSize_t samples, goList<goVector<T> >& ret) const;
+        bool resample (goDouble start, goDouble end, goSize_t samples, goList<goMath::Vector<T> >& ret) const;
 
-        // static bool resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, typename goList<goVector<T> >::ConstElement* end, goIndex_t pointCount, goList<goVector<T> >& ret);
-        // static bool resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret);
-        static bool resample (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve);
-        static bool resampleLinear (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve);
+        // static bool resampleNUBS (typename goList<goMath::Vector<T> >::ConstElement* begin, typename goList<goMath::Vector<T> >::ConstElement* end, goIndex_t pointCount, goList<goMath::Vector<T> >& ret);
+        // static bool resampleNUBS (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret);
+        static bool resample (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret, bool closedCurve);
+        static bool resampleLinear (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret, bool closedCurve);
         
-        static bool readASCII  (FILE* f, goList<goVector<T> >& ret);
-        static bool writeASCII (FILE* f, const goList<goVector<T> >& ret);
+        static bool readASCII  (FILE* f, goList<goMath::Vector<T> >& ret);
+        static bool writeASCII (FILE* f, const goList<goMath::Vector<T> >& ret);
 
-        static goSize_t removeDuplicates (goList<goVector<T> >& pl);
-        static goSize_t removeCloseDuplicates (goList<goVector<T> >& pl, goDouble epsilon);
+        static goSize_t removeDuplicates (goList<goMath::Vector<T> >& pl);
+        static goSize_t removeCloseDuplicates (goList<goMath::Vector<T> >& pl, goDouble epsilon);
         
-        static bool     filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goVector<T> >& pl, goSize_t count = 1);
+        static bool     filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goMath::Vector<T> >& pl, goSize_t count = 1);
 
         bool readASCII  (FILE* f);
         bool writeASCII (FILE* f) const;

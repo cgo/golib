@@ -126,7 +126,7 @@ bool goKMeans<elementT>::update ()
 }
 
 template <>
-bool goKMeans<goVectord>::update () 
+bool goKMeans<goMath::Vector<goDouble> >::update () 
 {
     if (myPrivate->cluster.getSize() != static_cast<goSize_t>(myPrivate->elementList.getSize()))
     {
@@ -136,13 +136,13 @@ bool goKMeans<goVectord>::update ()
 
     goIndex_t sz = myPrivate->elementList.getSize();
     goIndex_t K  = myPrivate->means.getSize();
-    goFixedArray<goVectord> sums(K);
+    goFixedArray<goMath::Vector<goDouble> > sums(K);
     goFixedArray<goSize_t> counts(K);
     counts.fill(0);
-    goVectord zeroVec (myPrivate->means[0].getSize());
+    goMath::Vector<goDouble> zeroVec (myPrivate->means[0].getSize());
     zeroVec.fill(0.0);
     sums.fill(zeroVec);
-    goList<goVectord>::ConstElement* el = myPrivate->elementList.getFrontElement();
+    goList<goMath::Vector<goDouble> >::ConstElement* el = myPrivate->elementList.getFrontElement();
     goIndex_t i = 0;
     while (el && i < sz)
     {
@@ -171,7 +171,7 @@ goDouble goKMeans<elementT>::distance (const elementT& e1, const elementT& e2) c
 }
 
 template <>
-goDouble goKMeans<goVectord>::distance (const goVectord& e1, const goVectord& e2) const
+goDouble goKMeans<goMath::Vector<goDouble> >::distance (const goMath::Vector<goDouble>& e1, const goMath::Vector<goDouble>& e2) const
 {
     return (e1-e2).abs();
 }
@@ -219,5 +219,5 @@ goFixedArray<goIndex_t>& goKMeans<elementT>::getCluster ()
     return myPrivate->cluster;
 }
 
-template class goKMeansPrivate<goVectord>;
-template class goKMeans<goVectord>;
+template class goKMeansPrivate<goMath::Vector<goDouble> >;
+template class goKMeans<goMath::Vector<goDouble> >;

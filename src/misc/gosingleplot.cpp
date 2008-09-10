@@ -113,7 +113,7 @@ template <class T>
 class goPlotElementMatrixImage : public goPlotElement
 {
     public:
-        goPlotElementMatrixImage (const goMatrix<T>& M) : goPlotElement ("plot", "-", "with image"), myMatrix (M) { };
+        goPlotElementMatrixImage (const goMath::Matrix<T>& M) : goPlotElement ("plot", "-", "with image"), myMatrix (M) { };
         virtual ~goPlotElementMatrixImage () {};
 
         virtual void data (goString& ret) const
@@ -127,14 +127,14 @@ class goPlotElementMatrixImage : public goPlotElement
             }
         };
 
-        goMatrix<T> myMatrix;
+        goMath::Matrix<T> myMatrix;
 };
 
 template <class T>
 class goPlotElementMatrixSurface : public goPlotElement
 {
     public:
-        goPlotElementMatrixSurface (const goMatrix<T>& M) : goPlotElement ("splot" , "-", "with lines"), myMatrix (M) { };
+        goPlotElementMatrixSurface (const goMath::Matrix<T>& M) : goPlotElement ("splot" , "-", "with lines"), myMatrix (M) { };
         virtual ~goPlotElementMatrixSurface () {};
 
         virtual void data (goString& ret) const
@@ -149,14 +149,14 @@ class goPlotElementMatrixSurface : public goPlotElement
             }
         };
 
-        goMatrix<T> myMatrix;
+        goMath::Matrix<T> myMatrix;
 };
 
 template <class T>
 class goPlotElementPlane : public goPlotElement
 {
     public:
-        goPlotElementPlane (const goVector<T>& n, const goVector<T>& p, T dx = 0.1, T dy = 0.1, T sx = 1.0, T sy = 1.0) 
+        goPlotElementPlane (const goMath::Vector<T>& n, const goMath::Vector<T>& p, T dx = 0.1, T dy = 0.1, T sx = 1.0, T sy = 1.0) 
             : goPlotElement ("splot" , "-", "with lines"), 
               myNormal (n), 
               myPoint (p),
@@ -170,9 +170,9 @@ class goPlotElementPlane : public goPlotElement
         {
 
             //= Find orthonormal basis of the plane
-            goVector<T> x(3), y(3);
+            goMath::Vector<T> x(3), y(3);
             x[0] = 1.0; x[1] = 0.0; x[2] = 0.0;
-            goVector<T> n (myNormal);
+            goMath::Vector<T> n (myNormal);
             n *= 1.0 / n.norm2();
             if (fabs(1.0 - n * x) < 1e-3)
             {
@@ -183,7 +183,7 @@ class goPlotElementPlane : public goPlotElement
             x *= 1.0 / x.norm2();
             y *= 1.0 / y.norm2();
 
-            goVector<T> p (3);
+            goMath::Vector<T> p (3);
 
             for (T u = -0.5 * mySx; u <= 0.5 * mySx; u += myDx)
             {
@@ -196,8 +196,8 @@ class goPlotElementPlane : public goPlotElement
             }
         };
 
-        goVector<T> myNormal;
-        goVector<T> myPoint;
+        goMath::Vector<T> myNormal;
+        goMath::Vector<T> myPoint;
         T myDx;
         T myDy;
         T mySx;
@@ -208,7 +208,7 @@ template <class T>
 class goPlotElementLine : public goPlotElement
 {
     public:
-        goPlotElementLine (const goVector<T>& n, const goVector<T>& p)
+        goPlotElementLine (const goMath::Vector<T>& n, const goMath::Vector<T>& p)
             : goPlotElement ("plot" , "-", "with lines"), 
               myDirection (n), 
               myPoint (p) 
@@ -233,7 +233,7 @@ class goPlotElementLine : public goPlotElement
                 ret += (float)myPoint[i]; ret += " ";
             }
             ret += "\n";
-            goVector<T> p2 = myPoint + myDirection;
+            goMath::Vector<T> p2 = myPoint + myDirection;
             for (goSize_t i = 0; i < sz; ++i)
             {
                 ret += (float)p2[i]; ret += " ";
@@ -241,15 +241,15 @@ class goPlotElementLine : public goPlotElement
             ret += "\n";
         };
 
-        goVector<T> myDirection;
-        goVector<T> myPoint;
+        goMath::Vector<T> myDirection;
+        goMath::Vector<T> myPoint;
 };
 
 template <class T>
 class goPlotElementMatrixCurve : public goPlotElement
 {
     public:
-        goPlotElementMatrixCurve (const goMatrix<T>& M) : goPlotElement ("plot", "-", "with lines"), myMatrix (M) { };
+        goPlotElementMatrixCurve (const goMath::Matrix<T>& M) : goPlotElement ("plot", "-", "with lines"), myMatrix (M) { };
         virtual ~goPlotElementMatrixCurve () {};
 
         virtual void data (goString& ret) const
@@ -264,7 +264,7 @@ class goPlotElementMatrixCurve : public goPlotElement
             }
         };
 
-        goMatrix<T> myMatrix;
+        goMath::Matrix<T> myMatrix;
 };
 
 class goPlotElementMisc : public goPlotElement
@@ -309,7 +309,7 @@ template <class T>
 class goPlotElementPoint : public goPlotElement
 {
     public:
-        goPlotElementPoint (const goVector<T>& p) : goPlotElement ("plot", "-", "with points"), myPoint (p) { };
+        goPlotElementPoint (const goMath::Vector<T>& p) : goPlotElement ("plot", "-", "with points"), myPoint (p) { };
         virtual ~goPlotElementPoint () {};
 
         virtual void data (goString& ret) const
@@ -321,14 +321,14 @@ class goPlotElementPoint : public goPlotElement
             ret += "\n";
         };
 
-        goVector<T> myPoint;
+        goMath::Vector<T> myPoint;
 };
 
 template <class T>
 class goPlotElementVectorCurve : public goPlotElement
 {
     public:
-        goPlotElementVectorCurve (const goVector<T>* x, const goVector<T>* y, const goVector<T>* z, int linelength) 
+        goPlotElementVectorCurve (const goMath::Vector<T>* x, const goMath::Vector<T>* y, const goMath::Vector<T>* z, int linelength) 
             : goPlotElement ("plot", "-", "with lines"), myX(0), myY(0), myZ(0), myLinelength(linelength)
         {
             if (x)
@@ -371,7 +371,7 @@ class goPlotElementVectorCurve : public goPlotElement
             }
         };
 
-        goVector<T> myX, myY, myZ;
+        goMath::Vector<T> myX, myY, myZ;
         int myLinelength;
 };
 
@@ -407,14 +407,14 @@ class goSinglePlotPrivate
 
         //= Except for labels, these are only for the old interface to gnuplot using temporary files and
         //= the functions in goplot.cpp. These will deprecate in the future.
-        goList<goVectord>      plotX;
-        goList<goVectord>      plotY;
-        goList<goVectord>      plotZ;
-        goList<goMatrixf>      plotMatrixf;
-        goList<goMatrixd>      plotMatrixd;
+        goList<goMath::Vectord>      plotX;
+        goList<goMath::Vectord>      plotY;
+        goList<goMath::Vectord>      plotZ;
+        goList<goMath::Matrixf>      plotMatrixf;
+        goList<goMath::Matrixd>      plotMatrixd;
         goList<const goSignal3DBase<void>*> plotImages;
-        goList<goMatrixf>      plotImageMatrixf;  // For 2D image plotting -- the others are for 3D.
-        goList<goMatrixd>      plotImageMatrixd;  // dito.
+        goList<goMath::Matrixf>      plotImageMatrixf;  // For 2D image plotting -- the others are for 3D.
+        goList<goMath::Matrixd>      plotImageMatrixd;  // dito.
         goIndex_t              lineLength;      // Meaning only in 3D plots -- length of one grid line in x direction.
         goList<goString>       titles;          // These are titles for each of the individual curves
         goList<goPlotterLabel> labels;
@@ -525,9 +525,9 @@ goSize_t goSinglePlot::getColumn () const
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
+bool goSinglePlot::add3D (const goMath::Vectord& x, const goMath::Vectord& y,
                           goIndex_t lineLength,
-                          const goVectord& values, 
+                          const goMath::Vectord& values, 
                           const char* title, 
                           const char* plotOptions)
 {
@@ -570,9 +570,9 @@ bool goSinglePlot::add3D (const goVectord& x, const goVectord& y,
     return true;
 }
 
-bool goSinglePlot::add3D (const goVectorf& x, const goVectorf& y,
+bool goSinglePlot::add3D (const goMath::Vectorf& x, const goMath::Vectorf& y,
                           goIndex_t lineLength,
-                          const goVectorf& values, 
+                          const goMath::Vectorf& values, 
                           const char* title, 
                           const char* plotOptions)
 {
@@ -582,9 +582,9 @@ bool goSinglePlot::add3D (const goVectorf& x, const goVectorf& y,
         myPrivate->plotType = goPlot::Surface;
     }
 
-    goVectord tempx (x.getSize());
-    goVectord tempy (y.getSize());
-    goVectord tempz (values.getSize());
+    goMath::Vectord tempx (x.getSize());
+    goMath::Vectord tempy (y.getSize());
+    goMath::Vectord tempz (values.getSize());
     goSize_t sz = x.getSize();
     for (goSize_t i = 0; i < sz; ++i) tempx[i] = x[i];
     sz = y.getSize();
@@ -595,7 +595,7 @@ bool goSinglePlot::add3D (const goVectorf& x, const goVectorf& y,
     return this->add3D (tempx, tempy, lineLength, tempz, title, plotOptions);
 }
 
-bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plotOptions, bool separateRows)
+bool goSinglePlot::add3D (const goMath::Matrixf& m, const char* title, const char* plotOptions, bool separateRows)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
@@ -635,16 +635,16 @@ bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plo
     }
     else
     {
-        const goMatrixf ref;
+        const goMath::Matrixf ref;
         goSize_t sz = m.getRows();
         for (goSize_t i = 0; i < sz; ++i)
         {
-            goVectorf y (m.getColumns());
+            goMath::Vectorf y (m.getColumns());
             y.fill (float(i));
-            goVectorf x (m.getColumns());
+            goMath::Vectorf x (m.getColumns());
             for (goSize_t j = 0; j < x.getSize(); ++j)
                 x[j] = float(j);
-            const goVectorf z;
+            const goMath::Vectorf z;
             m.refRow (i, z);
             this->add3D (x,y,x.getSize(),z,title,plotOptions);
         }
@@ -653,7 +653,7 @@ bool goSinglePlot::add3D (const goMatrixf& m, const char* title, const char* plo
     return true;
 }
 
-bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plotOptions, bool separateRows)
+bool goSinglePlot::add3D (const goMath::Matrixd& m, const char* title, const char* plotOptions, bool separateRows)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
@@ -701,7 +701,7 @@ bool goSinglePlot::add3D (const goMatrixd& m, const char* title, const char* plo
     }
     else
     {
-        const goMatrixd ref;
+        const goMath::Matrixd ref;
         goSize_t sz = m.getRows();
         for (goSize_t i = 0; i < sz; ++i)
         {
@@ -780,7 +780,7 @@ bool goSinglePlot::add3D (const goSignal3DBase<void>* image, const char* title, 
     return true;
 }
 
-bool goSinglePlot::addImage (const goMatrixf& m, const char* title, const char* plotOptions)
+bool goSinglePlot::addImage (const goMath::Matrixf& m, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Normal)
     {
@@ -826,7 +826,7 @@ bool goSinglePlot::addImage (const goMatrixf& m, const char* title, const char* 
     return true;
 }
 
-bool goSinglePlot::addImage (const goMatrixd& m, const char* title, const char* plotOptions)
+bool goSinglePlot::addImage (const goMath::Matrixd& m, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Normal)
     {
@@ -960,7 +960,7 @@ bool goSinglePlot::addSphere (const char* plotOptions, goFloat radius, bool auto
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions)
+bool goSinglePlot::addCurve (const goMath::Vectord& x, const goMath::Vectord& y, const char* title, const char* plotOptions)
 {
     if (x.getSize() != y.getSize())
     {
@@ -1024,7 +1024,7 @@ bool goSinglePlot::addCurve (const goVectord& x, const goVectord& y, const char*
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions)
+bool goSinglePlot::addCurve (const goMath::Vectorf& x, const goMath::Vectorf& y, const char* title, const char* plotOptions)
 {
     if (x.getSize() != y.getSize())
     {
@@ -1039,8 +1039,8 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
     }
 
     goSize_t sz = x.getSize();
-    goVectord tempX (sz);
-    goVectord tempY (sz);
+    goMath::Vectord tempX (sz);
+    goMath::Vectord tempY (sz);
     for (goSize_t i = 0; i < sz; ++i)
     {
         tempX[i] = x[i];
@@ -1098,10 +1098,10 @@ bool goSinglePlot::addCurve (const goVectorf& x, const goVectorf& y, const char*
  * 
  * @return True if successful, false otherwise.
  */
-bool goSinglePlot::addCurveMatrix (const goMatrixf& m, const char* title, const char* plotOptions)
+bool goSinglePlot::addCurveMatrix (const goMath::Matrixf& m, const char* title, const char* plotOptions)
 {
-//    const goVectorf x;
-//    const goVectorf y;
+//    const goMath::Vectorf x;
+//    const goMath::Vectorf y;
 //    m.refColumn (0, x);
 //    m.refColumn (1, y);
 //    return this->addCurve (x, y, title, plotOptions);
@@ -1126,10 +1126,10 @@ bool goSinglePlot::addCurveMatrix (const goMatrixf& m, const char* title, const 
     return true;
 }
 
-bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const char* plotOptions)
+bool goSinglePlot::addCurveMatrix (const goMath::Matrixd& m, const char* title, const char* plotOptions)
 {
-    //const goVectord x;
-    //const goVectord y;
+    //const goMath::Vectord x;
+    //const goMath::Vectord y;
     //m.refColumn (0, x);
     //m.refColumn (1, y);
     //return this->addCurve (x, y, title, plotOptions);
@@ -1154,7 +1154,7 @@ bool goSinglePlot::addCurveMatrix (const goMatrixd& m, const char* title, const 
     return true;
 }
 
-bool goSinglePlot::addPoint (const goVectorf& p, const char* title, const char* plotOptions)
+bool goSinglePlot::addPoint (const goMath::Vectorf& p, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface && p.getSize() > 2)
     {
@@ -1177,7 +1177,7 @@ bool goSinglePlot::addPoint (const goVectorf& p, const char* title, const char* 
     return true;
 }
 
-bool goSinglePlot::addPoint (const goVectord& p, const char* title, const char* plotOptions)
+bool goSinglePlot::addPoint (const goMath::Vectord& p, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface && p.getSize() > 2)
     {
@@ -1200,7 +1200,7 @@ bool goSinglePlot::addPoint (const goVectord& p, const char* title, const char* 
     return true;
 }
 
-bool goSinglePlot::addPlane (const goVectorf& n, const goVectorf& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
+bool goSinglePlot::addPlane (const goMath::Vectorf& n, const goMath::Vectorf& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
@@ -1223,7 +1223,7 @@ bool goSinglePlot::addPlane (const goVectorf& n, const goVectorf& p, goDouble dx
     return true;
 }
 
-bool goSinglePlot::addPlane (const goVectord& n, const goVectord& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
+bool goSinglePlot::addPlane (const goMath::Vectord& n, const goMath::Vectord& p, goDouble dx, goDouble dy, goDouble sx, goDouble sy, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface)
     {
@@ -1246,7 +1246,7 @@ bool goSinglePlot::addPlane (const goVectord& n, const goVectord& p, goDouble dx
     return true;
 }
 
-bool goSinglePlot::addLine (const goVectorf& n, const goVectorf& p, const char* title, const char* plotOptions)
+bool goSinglePlot::addLine (const goMath::Vectorf& n, const goMath::Vectorf& p, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface && n.getSize() > 2)
     {
@@ -1269,7 +1269,7 @@ bool goSinglePlot::addLine (const goVectorf& n, const goVectorf& p, const char* 
     return true;
 }
 
-bool goSinglePlot::addLine (const goVectord& n, const goVectord& p, const char* title, const char* plotOptions)
+bool goSinglePlot::addLine (const goMath::Vectord& n, const goMath::Vectord& p, const char* title, const char* plotOptions)
 {
     if (myPrivate->plotType != goPlot::Surface && n.getSize() > 2)
     {

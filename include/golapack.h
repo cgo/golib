@@ -110,8 +110,8 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
  *
  * Solves \f$ A x = B^\top \f$ for x, assuming A is LU-decomposed e.g. with
  * getrf(). Implemented for goFloat and goDouble. pivot_vector must be of type \c int,
- * and provide getSize(), resize() as well as getPtr() methods (such as goVector).
- * matrix_type must essentially be goMatrix.
+ * and provide getSize(), resize() as well as getPtr() methods (such as goMath::Vector).
+ * matrix_type must essentially be goMath::Matrix.
  * 
  * @note B contains the right hand side vectors in its \b rows. Always remember this.
  * This is apparently an effect of using row major order which stems from ATLAS.
@@ -190,7 +190,7 @@ bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
     char trans = transA ? 'N' : 'T';  //= The other way around since we use row major
     //= This is from the documentation at http://www.netlib.org/lapack/single/sgels.f
     integer LWORK = goMath::max<integer> (1, M * N + goMath::max<integer> (M * N, NRHS));
-    goVector<typename matrix_type::value_type> WORK (LWORK);
+    goMath::Vector<typename matrix_type::value_type> WORK (LWORK);
     integer info = 0;
     integer lda = A.getLeadingDimension();
     integer ldb = b.getSize();
@@ -225,7 +225,7 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
     //= This is from the documentation at http://www.netlib.org/lapack/single/sgelss.f
     // LWORK >= 3*min(M,N) + max( 2*min(M,N), max(M,N), NRHS ) --- larger for better performance.
     integer LWORK = 3 * goMath::min<integer> (M,N) + goMath::max<integer> (2 * goMath::min<integer> (M,N), goMath::max<integer> (goMath::max<integer> (M,N), NRHS));
-    goVector<typename matrix_type::value_type> WORK (LWORK);
+    goMath::Vector<typename matrix_type::value_type> WORK (LWORK);
     integer info = 0;
     integer lda = A.getLeadingDimension();
     integer ldb = b.getSize();

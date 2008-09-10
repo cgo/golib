@@ -103,13 +103,13 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
             assert ((root->getType() == goFGNode<T,Tfloat>::VARIABLE));
             goIndex_t adjCount = static_cast<goIndex_t>(root->adj.getSize());
             goSize_t vc = this->getValueCount();
-            goVector<Tfloat> sum (vc);
+            goMath::Vector<Tfloat> sum (vc);
             sum.fill (Tfloat(0));
             for (goIndex_t i = 0; i < adjCount; ++i)
             {
                 if (!root->adj[i])
                     continue;
-                goVector<Tfloat>& inMsg = root->adj[i]->getInMsg (root);
+                goMath::Vector<Tfloat>& inMsg = root->adj[i]->getInMsg (root);
                 if (inMsg.getSize() != vc)
                 {
                     goLog::warning ("goMaxSum::run(): inMsg to ROOT of wrong size -- loopy graph?");
@@ -161,7 +161,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
             goIndex_t mu_index = parentIndex;
             if (mu_index < 0)
                 mu_index = 0;
-            goVector<Tfloat>& mu = fgn->adj[mu_index]->getOutMsg (fgn);
+            goMath::Vector<Tfloat>& mu = fgn->adj[mu_index]->getOutMsg (fgn);
             if (mu.getSize() != this->getValueCount())
                 mu.resize (this->getValueCount());
             goIndex_t adjCount = static_cast<goIndex_t>(fgn->adj.getSize());
@@ -188,7 +188,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
         inline bool factorSend (goFGNode<T,Tfloat>* fgn, goSize_t parentIndex)
         {
             //= Make this a function of parentEdge -- the same will be needed on the way back.
-            goVector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
+            goMath::Vector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
             if (mu.getSize() != this->getValueCount())
                 mu.resize (this->getValueCount());
 
@@ -202,7 +202,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
             //= 
             //= Reference and optionally resize storage for maximising variable values.
             //=
-            goMatrix<T>& maxX = factornode->getMaxX();
+            goMath::Matrix<T>& maxX = factornode->getMaxX();
             if (maxX.getRows() != vc || 
                 maxX.getColumns() != fgn->adj.getSize())
             {
@@ -220,9 +220,9 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                 //= Sum over all other variables connected to this 
                 //= factor except for the parent.
                 goSize_t x_index = parentIndex;
-                goVector<T> X (fgn->adj.getSize());
-                goFunctorBase1< Tfloat, const goVector<T>& >* f = factornode->getFunctor();
-                goVector<T> maxXv;
+                goMath::Vector<T> X (fgn->adj.getSize());
+                goFunctorBase1< Tfloat, const goMath::Vector<T>& >* f = factornode->getFunctor();
+                goMath::Vector<T> maxXv;
                 for (goSize_t x = 0; x < vc; ++x)
                 {
                     X.fill (T(0));
@@ -240,7 +240,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
             else
             {
                 //= This must be a leaf node. Send f(x).
-                goVector<T> X(1);
+                goMath::Vector<T> X(1);
                 for (goSize_t i = 0; i < vc; ++i)
                 {
                     X[0] = T(i);
@@ -309,7 +309,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                         goFGNodeFactor<T,Tfloat>* fn = (goFGNodeFactor<T,Tfloat>*)node;
                         assert (fn);
                         //= Get the maximising configuration of the other variable nodes given the value of the parent variable:
-                        goVector<T> maxX;
+                        goMath::Vector<T> maxX;
                         goSize_t parent_value = static_cast<goSize_t>(fn->adj[fn->parent]->getOtherNode(fn)->value);
                         fn->getMaxX().refRow (parent_value, maxX);
                         //= 
@@ -351,12 +351,12 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
          * @return The max/sum value.
          */
         Tfloat maxsum (goFGNodeFactor<T,Tfloat>* factorNode,
-                       goFunctorBase1 <Tfloat, const goVector<T>& >* f, 
-                       goVector<T>& X, 
+                       goFunctorBase1 <Tfloat, const goMath::Vector<T>& >* f, 
+                       goMath::Vector<T>& X, 
                        goSize_t     i, 
                        goSize_t     fixed_index, 
                        Tfloat       currentMax, 
-                       goVector<T>& maxX)
+                       goMath::Vector<T>& maxX)
         {
             goSize_t vc = this->getValueCount();
             if (i >= X.getSize())
@@ -367,7 +367,7 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                {
                    if (!factorNode->adj[j] || j == fixed_index)
                        continue;
-                   goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
+                   goMath::Vector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
                    if (inMsg.getSize() != vc)
                    {
                        goLog::warning ("goMaxSum::maxsum(): inMsg size mismatch, continuing -- loopy graph?");
@@ -557,13 +557,13 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                 assert ((node->getType() == goFGNode<T,Tfloat>::VARIABLE));
                 goIndex_t adjCount = static_cast<goIndex_t>(node->adj.getSize());
                 goSize_t vc = this->getValueCount();
-                goVector<Tfloat> sum (vc);
+                goMath::Vector<Tfloat> sum (vc);
                 sum.fill (Tfloat(0));
                 for (goIndex_t i = 0; i < adjCount; ++i)
                 {
                     if (!node->adj[i])
                         continue;
-                    goVector<Tfloat>& inMsg = node->adj[i]->getInMsg (node);
+                    goMath::Vector<Tfloat>& inMsg = node->adj[i]->getInMsg (node);
                     if (inMsg.getSize() != vc)
                     {
                         goLog::warning ("goMaxSum::flooding(): inMsg to node of wrong size -- loopy graph?");
@@ -613,13 +613,13 @@ class goMaxSum : public goMessagePassing <T,Tfloat>
                 assert ((startNode->getType() == goFGNode<T,Tfloat>::VARIABLE));
                 goIndex_t adjCount = static_cast<goIndex_t>(startNode->adj.getSize());
                 goSize_t vc = this->getValueCount();
-                goVector<Tfloat> sum (vc);
+                goMath::Vector<Tfloat> sum (vc);
                 sum.fill (Tfloat(0));
                 for (goIndex_t i = 0; i < adjCount; ++i)
                 {
                     if (!startNode->adj[i])
                         continue;
-                    goVector<Tfloat>& inMsg = startNode->adj[i]->getInMsg (startNode);
+                    goMath::Vector<Tfloat>& inMsg = startNode->adj[i]->getInMsg (startNode);
                     if (inMsg.getSize() != vc)
                     {
                         goLog::warning ("goMaxSum::flooding(): inMsg to startNode of wrong size -- loopy graph?");

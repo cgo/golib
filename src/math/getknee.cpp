@@ -143,8 +143,8 @@ goSize_t goMath::getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y)
     }
 
     // 2 ... N - 2
-    goVectord temp (N-3);
-    goVectord temp2 (N-3);
+    Vector<goDouble> temp (N-3);
+    Vector<goDouble> temp2 (N-3);
     T minError = RMSE[2];
     goSize_t minIndex = 2;
     for (i = 2; i < N-1; ++i)

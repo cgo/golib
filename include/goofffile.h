@@ -16,9 +16,6 @@
 #ifndef GOMATRIX_H
 # include <gomatrix.h>
 #endif
-#ifndef GOVECTOR_H
-# include <govector.h>
-#endif
 
 class goOFFFilePrivate;
 
@@ -34,18 +31,18 @@ class goOFFFile : public goObjectBase
         // bool toList (int listName);
         // bool draw ();
 
-        const goVectorf& getMin () const;
-        const goVectorf& getMax () const;
+        const goMath::Vectorf& getMin () const;
+        const goMath::Vectorf& getMax () const;
         // bool write (const char* filename, int listName);
-        goFixedArray<goVectorf>& getVertices ();
-        goFixedArray<goVector<int> >& getFaces ();
-        const goFixedArray<goVectorf>& getVertices () const;
-        const goFixedArray<goVector<int> >& getFaces () const;
+        goFixedArray<goMath::Vectorf>& getVertices ();
+        goFixedArray<goMath::Vector<int> >& getFaces ();
+        const goFixedArray<goMath::Vectorf>& getVertices () const;
+        const goFixedArray<goMath::Vector<int> >& getFaces () const;
         void getAdjacencyLists (goFixedArray<goList<int> >& ret) const;
         void getAdjacentFaces (goFixedArray<goList<int> >& ret) const;
        
-        void calculateNormals (goMatrixf& normals) const;
-        void calculateFaceNormals (goMatrixf& face_normals) const;
+        void calculateNormals (goMath::Matrixf& normals) const;
+        void calculateFaceNormals (goMath::Matrixf& face_normals) const;
 
     private:
         goOFFFile (goOFFFile&);

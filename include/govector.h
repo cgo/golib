@@ -11,7 +11,10 @@
 # include <gocomplex.h>
 #endif
 
-template <class T> class goMatrix;
+
+namespace goMath {
+
+    template <class T> class Matrix;
 
 /**
  * @addtogroup math
@@ -29,18 +32,18 @@ template <class T> class goMatrix;
  * @author Christian Gosch
  */
 template<class T>
-class goVector : public goFixedArray<T>
+class Vector : public goFixedArray<T>
 {
     public:
-        goVector ();
-        goVector (goSize_t s, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0);
-        goVector (T* ptr, goSize_t size, goIndex_t stride = 1) : goFixedArray<T> (ptr, size, stride) {};
-        goVector (const goFixedArray<T>& o);
-        // goVector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
-        // template <class To> goVector (const goFixedArray<To>& o) : goFixedArray<T> (o) {};
-        virtual ~goVector ();
+        Vector ();
+        Vector (goSize_t s, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0);
+        Vector (T* ptr, goSize_t size, goIndex_t stride = 1) : goFixedArray<T> (ptr, size, stride) {};
+        Vector (const goFixedArray<T>& o);
+        // Vector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
+        // template <class To> Vector (const goFixedArray<To>& o) : goFixedArray<T> (o) {};
+        virtual ~Vector ();
 
-        goVector<T>& operator= (const goFixedArray<T>& other);
+        Vector<T>& operator= (const goFixedArray<T>& other);
 
         void resize (goSize_t s)
         {
@@ -51,7 +54,7 @@ class goVector : public goFixedArray<T>
 
 #if 0
         template <class To>
-        goVector<T> operator- (const goVector<To>& other) const
+        Vector<T> operator- (const Vector<To>& other) const
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -59,7 +62,7 @@ class goVector : public goFixedArray<T>
                 throw goMathException (goMathException::SIZE_MISMATCH);
             }
         #endif
-            goVector<T> ret (this->getSize());
+            Vector<T> ret (this->getSize());
             goIndex_t max = this->getSize();
             T* retArray = ret.getPtr();
             const T* array = this->getPtr();
@@ -77,7 +80,7 @@ class goVector : public goFixedArray<T>
         };
 
         template <class To>
-        goVector<T> operator+ (const goVector<To>& other) const
+        Vector<T> operator+ (const Vector<To>& other) const
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -85,7 +88,7 @@ class goVector : public goFixedArray<T>
                 throw goMathException (goMathException::SIZE_MISMATCH);
             }
         #endif
-            goVector<T> ret (this->getSize());
+            Vector<T> ret (this->getSize());
             goIndex_t max = this->getSize();
             T* retArray = ret.getPtr();
             const T* array = this->getPtr();
@@ -102,13 +105,13 @@ class goVector : public goFixedArray<T>
             return ret;
         };
 #endif
-        // goVector<T> operator* (T scalar) const;
+        // Vector<T> operator* (T scalar) const;
 
 #if 0
         // template <class ScalarType>
-        goVector<T> operator* (goFloat n) const
+        Vector<T> operator* (goFloat n) const
         {
-            goVector<T> ret (this->getSize());
+            Vector<T> ret (this->getSize());
             goIndex_t max = this->getSize();
             const T* array = this->getPtr();
             T* retArray = ret.getPtr();
@@ -121,9 +124,9 @@ class goVector : public goFixedArray<T>
             }
             return ret;
         };
-        goVector<T> operator* (goDouble n) const
+        Vector<T> operator* (goDouble n) const
         {
-            goVector<T> ret (this->getSize());
+            Vector<T> ret (this->getSize());
             goIndex_t max = this->getSize();
             const T* array = this->getPtr();
             T* retArray = ret.getPtr();
@@ -148,12 +151,12 @@ class goVector : public goFixedArray<T>
          *
          * @return this * M
          */
-        goVector<T> operator* (const goMatrix<T>& M) const
+        Vector<T> operator* (const goMath::Matrix<T>& M) const
         {
-            const goMatrix<T> this_M (0,0);
+            const goMath::Matrix<T> this_M (0,0);
             this_M.setData (&(*this)[0], this->getSize(), 1, this->getStride());
-            goVector<T> ret;
-            goMatrix<T> temp;
+            Vector<T> ret;
+            goMath::Matrix<T> temp;
             temp = this_M * M;
             ret.resize (temp.getRows());
             temp.copyColumn (0, ret);
@@ -161,7 +164,7 @@ class goVector : public goFixedArray<T>
         };
 
 #if 0
-        goVector<T>& operator*= (goFloat n)
+        Vector<T>& operator*= (goFloat n)
         {
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
@@ -174,7 +177,7 @@ class goVector : public goFixedArray<T>
             }
             return *this;
         };
-        goVector<T>& operator*= (goDouble n)
+        Vector<T>& operator*= (goDouble n)
         {
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
@@ -188,18 +191,18 @@ class goVector : public goFixedArray<T>
             return *this;
         };
 #endif
-        goVector<T> cross (const goVector<T>& other) const
+        Vector<T> cross (const Vector<T>& other) const
         {
-            goVector<T> v(3);
+            Vector<T> v(3);
             this->cross (other, v);
             return v;
         };
 
-        bool cross (const goVector<T>& other, goVector<T>& ret) const
+        bool cross (const Vector<T>& other, Vector<T>& ret) const
         {
             if (other.getSize() != 3 || this->getSize() != 3)
             {
-                goLog::warning ("goVector::cross(): vectors must be size 3.");
+                goLog::warning ("Vector::cross(): vectors must be size 3.");
                 return false;
             }
             if (ret.getSize() < 3)
@@ -226,20 +229,20 @@ class goVector : public goFixedArray<T>
          *
          * @return The inner product this * other.
          **/
-        T operator* (const goVector<T>& other) const;
-        goVector<T>& operator*= (T scalar);
-        goVector<T>& operator/= (T scalar);
-        goVector<T>& operator-= (T s);
-        goVector<T>& operator+= (T s);
-        goVector<T>& operator+= (const goVector<T>& other);
-        goVector<T>& operator-= (const goVector<T>& other);
-        goVector<T> operator- (const goVector<T>& other) const;
-        goVector<T> operator+ (const goVector<T>& other) const;
-        goVector<T> operator* (T scalar) const;
-        goVector<T> operator/ (T scalar) const;
+        T operator* (const Vector<T>& other) const;
+        Vector<T>& operator*= (T scalar);
+        Vector<T>& operator/= (T scalar);
+        Vector<T>& operator-= (T s);
+        Vector<T>& operator+= (T s);
+        Vector<T>& operator+= (const Vector<T>& other);
+        Vector<T>& operator-= (const Vector<T>& other);
+        Vector<T> operator- (const Vector<T>& other) const;
+        Vector<T> operator+ (const Vector<T>& other) const;
+        Vector<T> operator* (T scalar) const;
+        Vector<T> operator/ (T scalar) const;
 #if 0
         template <class To>
-        goVector<T>& operator-= (const goVector<To>& other)
+        Vector<T>& operator-= (const Vector<To>& other)
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -261,7 +264,7 @@ class goVector : public goFixedArray<T>
             return *this;
         };
 
-        goVector<T>& operator-= (T s)
+        Vector<T>& operator-= (T s)
         {
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
@@ -275,7 +278,7 @@ class goVector : public goFixedArray<T>
         };
 
         template <class To>
-        goVector<T>& operator+= (const goVector<To>& other)
+        Vector<T>& operator+= (const Vector<To>& other)
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -297,7 +300,7 @@ class goVector : public goFixedArray<T>
             return *this;
         };
 
-        goVector<T>& operator+= (T s)
+        Vector<T>& operator+= (T s)
         {
             goIndex_t max = this->getSize();
             T* array = this->getPtr();
@@ -313,7 +316,7 @@ class goVector : public goFixedArray<T>
 
         //= Element-wise (Hadamard) multiplication.
         template <class To>
-        goVector<T>& operator*= (const goVector<To>& other)
+        Vector<T>& operator*= (const Vector<To>& other)
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -336,7 +339,7 @@ class goVector : public goFixedArray<T>
         };
         //= Element-wise division.
         template <class To>
-        goVector<T>& operator/= (const goVector<To>& other)
+        Vector<T>& operator/= (const Vector<To>& other)
         {
         #ifdef GO_USE_EXCEPTIONS
             if (this->getSize() != other.getSize())
@@ -366,12 +369,12 @@ class goVector : public goFixedArray<T>
          * 
          * @return this = m * this
          */
-        goVector<T>& operator*= (const goMatrix<T>& m);
+        Vector<T>& operator*= (const goMath::Matrix<T>& m);
 
-        void outerProduct (const goVector<T>& other, goMatrix<T>& ret) const;
+        void outerProduct (const Vector<T>& other, goMath::Matrix<T>& ret) const;
 
         template <class To>
-        bool copy (goVector<To>& target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const
+        bool copy (Vector<To>& target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const
         {
             assert (static_cast<goIndex_t>(this->getSize()) > startIndex);
             assert (skip >= 0);
@@ -418,7 +421,7 @@ class goVector : public goFixedArray<T>
 
 
         template <class To, class To2>
-        bool cat (const goVector<To>& other, goVector<To2>& target) const
+        bool cat (const Vector<To>& other, Vector<To2>& target) const
         {
             goSize_t sz1 = this->getSize();
             goSize_t sz2 = other.getSize();
@@ -441,7 +444,7 @@ class goVector : public goFixedArray<T>
         };
 
         T square () const;
-        inline T conjInnerProduct (const goVector<T>&) const;
+        inline T conjInnerProduct (const Vector<T>&) const;
 
         /**
          * @brief Deprecated. Calls norm2() for scalar real types,
@@ -499,10 +502,10 @@ class goVector : public goFixedArray<T>
 };
 
 
-// inline goComplexf goVector<goComplexf>::square () const;
+// inline goComplexf Vector<goComplexf>::square () const;
 
 
-template<> inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVector<goComplexf>& v) const
+template<> inline goComplexf Vector<goComplexf>::conjInnerProduct (const Vector<goComplexf>& v) const
 {
     assert (this->getSize() == v.getSize());
     const goComplexf* array = this->getPtr();
@@ -518,7 +521,7 @@ template<> inline goComplexf goVector<goComplexf>::conjInnerProduct (const goVec
 
 
 template <class T>
-inline T goVector<T>::conjInnerProduct (const goVector<T>& v) const
+inline T Vector<T>::conjInnerProduct (const Vector<T>& v) const
 {
     return *this * v;
 }
@@ -530,7 +533,7 @@ extern "C"
 }
 
 template <class T>
-inline goVector<T> goVector<T>::operator- (const goVector<T>& other) const
+inline Vector<T> Vector<T>::operator- (const Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -538,7 +541,7 @@ inline goVector<T> goVector<T>::operator- (const goVector<T>& other) const
         throw goMathException (goMathException::SIZE_MISMATCH);
     }
 #endif
-    goVector<T> ret (this->getSize());
+    Vector<T> ret (this->getSize());
     goIndex_t max = this->getSize();
     T* retArray = ret.getPtr();
     const T* array = this->getPtr();
@@ -555,7 +558,7 @@ inline goVector<T> goVector<T>::operator- (const goVector<T>& other) const
     return ret;
 };
 template<> 
-inline goFloat goVector<goFloat>::operator* (const goVector<goFloat>& other) const
+inline goFloat Vector<goFloat>::operator* (const Vector<goFloat>& other) const
 {
     assert (other.getSize() == this->getSize());
     return cblas_sdot (this->getSize(), 
@@ -565,7 +568,7 @@ inline goFloat goVector<goFloat>::operator* (const goVector<goFloat>& other) con
 }
 
 template<> 
-inline goDouble goVector<goDouble>::operator* (const goVector<goDouble>& other) const
+inline goDouble Vector<goDouble>::operator* (const Vector<goDouble>& other) const
 {
     assert (other.getSize() == this->getSize());
     return cblas_ddot (this->getSize(), 
@@ -575,11 +578,11 @@ inline goDouble goVector<goDouble>::operator* (const goVector<goDouble>& other) 
 }
 
 template <class T>
-inline goVector<T>& goVector<T>::operator*= (const goMatrix<T>& m)
+inline Vector<T>& Vector<T>::operator*= (const goMath::Matrix<T>& m)
 {
     if (m.getColumns() != this->getSize())
     {
-        goLog::warning ("goVector::operator*= (goMatrix): Matrix has wrong column count.");
+        goLog::warning ("Vector::operator*= (goMath::Matrix): Matrix has wrong column count.");
         return *this;
     }
     *this = m * *this;
@@ -587,20 +590,20 @@ inline goVector<T>& goVector<T>::operator*= (const goMatrix<T>& m)
 }
 
 template <>
-inline goVector<goComplexf>& goVector<goComplexf>::operator*= (const goMatrix<goComplexf>&)
+inline Vector<goComplexf>& Vector<goComplexf>::operator*= (const goMath::Matrix<goComplexf>&)
 {
-    goLog::warning ("goVector::operator*= (goMatrix): Not implemented for complex types.");
+    goLog::warning ("Vector::operator*= (goMath::Matrix): Not implemented for complex types.");
     return *this;
 }
 template <>
-inline goVector<goComplexd>& goVector<goComplexd>::operator*= (const goMatrix<goComplexd>&)
+inline Vector<goComplexd>& Vector<goComplexd>::operator*= (const goMath::Matrix<goComplexd>&)
 {
-    goLog::warning ("goVector::operator*= (goMatrix): Not implemented for complex types.");
+    goLog::warning ("Vector::operator*= (goMath::Matrix): Not implemented for complex types.");
     return *this;
 }
 
 template <class T>
-inline T goVector<T>::operator* (const goVector<T>& other) const
+inline T Vector<T>::operator* (const Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -639,7 +642,7 @@ inline T goVector<T>::operator* (const goVector<T>& other) const
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goVectorAdd (T alpha, const goVector<T>& x, goVector<T>& y);
+bool vectorAdd (T alpha, const Vector<T>& x, Vector<T>& y);
 
 
 /** 
@@ -654,11 +657,17 @@ bool goVectorAdd (T alpha, const goVector<T>& x, goVector<T>& y);
  * @param ret   Return matrix A, of size MxN. Resized and initialised to 0 if it does not have the right size.
  */
 template <class T>
-void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatrix<T>& ret);
-/** @} */
+void vectorOuter (T alpha, const Vector<T>& x, const Vector<T>& y, goMath::Matrix<T>& ret);
 
-typedef goVector<goFloat>  goVectorf;
-typedef goVector<goDouble> goVectord;
-typedef goVector<goInt32>  goVectori;
+typedef goMath::Vector<goFloat>  Vectorf;
+typedef goMath::Vector<goDouble> Vectord;
+typedef goMath::Vector<goInt32>  Vectori;
+/** @} */
+};
+
+typedef goMath::Vector<goFloat>  goVectorf;
+typedef goMath::Vector<goDouble> goVectord;
+typedef goMath::Vector<goInt32>  goVectori;
+
 
 #endif

@@ -93,19 +93,19 @@ namespace goMath
      * @brief Rotation group.
      */
     template <class T>
-    class SO3 : public Manifold <goMatrix<T>, goVector<T> >
+    class SO3 : public Manifold <goMath::Matrix<T>, goMath::Vector<T> >
     {
         public:
-            typedef goMatrix<T> Element;
-            typedef goVector<T> Tangent;
+            typedef goMath::Matrix<T> Element;
+            typedef goMath::Vector<T> Tangent;
 
             SO3 ();
             virtual ~SO3 ();
             virtual void     exp (const Element& e, const Tangent& v, Element& ret);
             virtual void     log (const Element& e1, const Element& e2, Tangent& ret);
             virtual goDouble innerProduct (const Element& e, const Tangent& v1, const Tangent& v2);
-            void matrix (const goVector<T>& w, goMatrix<T>& ret);
-            void vector (const goMatrix<T>& ret, goVector<T>& w);
+            void matrix (const goMath::Vector<T>& w, goMath::Matrix<T>& ret);
+            void vector (const goMath::Matrix<T>& ret, goMath::Vector<T>& w);
 
         private:
             Element myId;
@@ -115,11 +115,11 @@ namespace goMath
      * @brief Simple linear vector space.
      */
     template <class T>
-    class LinearSpace : public Manifold <goVector<T>, goVector<T> >
+    class LinearSpace : public Manifold <goMath::Vector<T>, goMath::Vector<T> >
     {
         public:
-            typedef goVector<T> Element;
-            typedef goVector<T> Tangent;
+            typedef goMath::Vector<T> Element;
+            typedef goMath::Vector<T> Tangent;
 
             LinearSpace ();
             virtual ~LinearSpace ();
@@ -132,11 +132,11 @@ namespace goMath
      * @brief Unit sphere.
      */
     template <class T>
-    class UnitSphere : public Manifold <goVector<T>, goVector<T> >
+    class UnitSphere : public Manifold <goMath::Vector<T>, goMath::Vector<T> >
     {
         public:
-            typedef goVector<T> Element;
-            typedef goVector<T> Tangent;
+            typedef goMath::Vector<T> Element;
+            typedef goMath::Vector<T> Tangent;
 
             UnitSphere ();
             virtual ~UnitSphere ();

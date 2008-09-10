@@ -95,5 +95,5 @@ goDouble goMath::goConjugateGradients (const MatrixType& A, const VectorType& b,
     return abs_r;
 }
 /** @} */
-template goDouble goMath::goConjugateGradients<goSparseMatrix,goVectord>(const goSparseMatrix& A, const goVectord& b, goVectord& x, goDouble);
+template goDouble goMath::goConjugateGradients<goSparseMatrix,goMath::Vectord>(const goSparseMatrix& A, const goMath::Vectord& b, goMath::Vectord& x, goDouble);
 // template goDouble goMath::goConjugateGradients<goSparseMatrix,goSparseMatrix>(const goSparseMatrix& A, const goSparseMatrix& b, goSparseMatrix& x);

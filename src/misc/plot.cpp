@@ -9,7 +9,7 @@ class goPlot::PlotPrivate
         ~PlotPrivate () {};
 
         goList<goAutoPtr<goSinglePlot> >    plots;
-        goList<goVectori> plotPositions;
+        goList<goMath::Vectori> plotPositions;
         goGnuplot         gp;
 
         goSize_t          rows;
@@ -44,7 +44,7 @@ goSinglePlot& goPlot::Plot::getPlot (goSize_t x, goSize_t y)
 
 goAutoPtr<goSinglePlot> goPlot::Plot::getPlotp (goSize_t x, goSize_t y)
 {
-    goVectori v(2);
+    goMath::Vectori v(2);
     v[0] = x; v[1] = y;
     goSize_t i = myPrivate->plotPositions.findIndex (v);
     if (i >= myPrivate->plotPositions.getSize())
@@ -65,34 +65,34 @@ goAutoPtr<goSinglePlot> goPlot::Plot::getPlotp (goSize_t x, goSize_t y)
     }
 }
 
-void goPlot::Plot::plot (const goMatrixf& curve, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Matrixf& curve, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addCurveMatrix (curve, title, options);
 }
 
-void goPlot::Plot::plot (const goMatrixd& curve, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Matrixd& curve, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addCurveMatrix (curve, title, options);
 }
 
-void goPlot::Plot::plot (const goVectorf& px, const goVectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Vectorf& px, const goMath::Vectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = goAutoPtr<goSinglePlot>(this->getPlotp (x, y));
     pe->addCurve (px, py, title, options);
 }
-void goPlot::Plot::plot (const goVectord& px, const goVectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Vectord& px, const goMath::Vectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = goAutoPtr<goSinglePlot>(this->getPlotp (x, y));
     pe->addCurve (px, py, title, options);
 }
-void goPlot::Plot::plot (const goVectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Vectorf& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addCurve (py, title, options);
 }
-void goPlot::Plot::plot (const goVectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plot (const goMath::Vectord& py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addCurve (py, title, options);
@@ -104,13 +104,13 @@ void goPlot::Plot::plotImage (const goSignal3DBase<void>& image, const char* tit
     pe->addImage (image, title, options);
 }
 
-void goPlot::Plot::plotImage (const goMatrixf& image, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotImage (const goMath::Matrixf& image, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addImage (image, title, options);
 }
 
-void goPlot::Plot::plotImage (const goMatrixd& image, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotImage (const goMath::Matrixd& image, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addImage (image, title, options);
@@ -119,31 +119,31 @@ void goPlot::Plot::plotImage (const goMatrixd& image, const char* title, const c
 void goPlot::Plot::plotPoint (goDouble px, goDouble py, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
-    goVectord p (2);
+    goMath::Vectord p (2);
     p[0] = px;
     p[1] = py;
     pe->addPoint (p, title, options);
 }
 
-void goPlot::Plot::plotPoint (const goVectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotPoint (const goMath::Vectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addPoint (p, title, options);
 }
 
-void goPlot::Plot::plotPoint (const goVectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotPoint (const goMath::Vectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addPoint (p, title, options);
 }
 
-void goPlot::Plot::plotLine  (const goVectorf& n, const goVectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotLine  (const goMath::Vectorf& n, const goMath::Vectorf& p, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addLine (n, p, title, options);
 }
 
-void goPlot::Plot::plotLine  (const goVectord& n, const goVectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
+void goPlot::Plot::plotLine  (const goMath::Vectord& n, const goMath::Vectord& p, const char* title, const char* options, goSize_t x, goSize_t y)
 {
     goAutoPtr<goSinglePlot> pe = this->getPlotp (x, y);
     pe->addLine (n, p, title, options);
@@ -152,7 +152,7 @@ void goPlot::Plot::plotLine  (const goVectord& n, const goVectord& p, const char
 void goPlot::Plot::plot (goMultiPlotter& mp)
 {
     goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
-    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
+    goList<goMath::Vectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
 
     while (pel && cel)
     {
@@ -202,7 +202,7 @@ void goPlot::Plot::saveGnuplot (const char* filename)
 {
     goMultiPlotter mp (myPrivate->rows, myPrivate->cols);
     goList<goAutoPtr<goSinglePlot> >::Element* pel = myPrivate->plots.getFrontElement();
-    goList<goVectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
+    goList<goMath::Vectori>::Element* cel = myPrivate->plotPositions.getFrontElement();
 
     while (pel && cel)
     {
@@ -269,7 +269,7 @@ void goPlot::Plot::clear ()
  */
 void goPlot::Plot::clear (goSize_t x, goSize_t y)
 {
-    goVectori temp(2);
+    goMath::Vectori temp(2);
     temp[0] = x; temp[1] = y;
     if (!myPrivate->plotPositions.contains(temp))
         return;

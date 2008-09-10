@@ -89,12 +89,12 @@ enum {
   @verbatim
     ...
     goMatlab matlab;  // This starts the matlab engine.
-    goMatrixf M;
+    goMath::Matrixf M;
     ... // Do some stuff with M
     matlab.putMatrix (M, "mymatrix");
     matlab.call ("v = mymatrix * something; % Do whatever you want matlab to do with the data");
     // Say "v" in matlab is a vector, then
-    goVectorf v;
+    goMath::Vectorf v;
     matlab.getVector (&v, "v");
     ... // Do some stuff with v
   @endverbatim
@@ -116,21 +116,21 @@ class goMatlab : public goObjectBase
         bool     putArray  (const goDouble* p, goSize_t length, const char* name);
         bool     putArray  (const goArray<goDouble>* array, const char* name);
         bool     getArray  (goArray<goDouble>* array, const char* name);
-        bool     putVector (const goVectord* vec, const char* name);
-        bool     getVector (goVectord* vec, const char* name);
-        bool     putVector (const goVectorf* vec, const char* name);
-        bool     getVector (goVectorf* vec, const char* name);
+        bool     putVector (const goMath::Vectord* vec, const char* name);
+        bool     getVector (goMath::Vectord* vec, const char* name);
+        bool     putVector (const goMath::Vectorf* vec, const char* name);
+        bool     getVector (goMath::Vectorf* vec, const char* name);
 
         bool     putDouble (goDouble d, const char* name);
         bool     getDouble (goDouble& d, const char* name);
         bool     putSparse (goSparseMatrix* sm, const char* name);
-        bool     putMatrix (const goMatrixf& matrix, const char* name);
-        bool     getMatrix (goMatrixf& matrix, const char* name);
-        bool     putMatrix (const goMatrixd& matrix, const char* name);
-        bool     getMatrix (goMatrixd& matrix, const char* name);
+        bool     putMatrix (const goMath::Matrixf& matrix, const char* name);
+        bool     getMatrix (goMath::Matrixf& matrix, const char* name);
+        bool     putMatrix (const goMath::Matrixd& matrix, const char* name);
+        bool     getMatrix (goMath::Matrixd& matrix, const char* name);
 #if 0
         template <class T>
-            bool     putMatrix (const goMatrix<T>& matrix, const char* name)
+            bool     putMatrix (const goMath::Matrix<T>& matrix, const char* name)
             {
                 if (!this->getEngine())
                 {
@@ -160,7 +160,7 @@ class goMatlab : public goObjectBase
                 return true;
             };
         template <class T>
-            bool getMatrix (goMatrix<T>& matrix, const char* name)
+            bool getMatrix (goMath::Matrix<T>& matrix, const char* name)
             {
                 if (!this->getEngine())
                 {
@@ -190,14 +190,14 @@ class goMatlab : public goObjectBase
                 return true;
             };
 #endif
-        bool     put2DPoints (const goList<goVectorf>& l, const char* variableName);
-        bool     put2DPoints (const goList<goVectord>& l, const char* variableName);
-        bool     get2DPoints (goList<goVectorf>& l, const char* variableName);
-        bool     get2DPoints (goList<goVectord>& l, const char* variableName);
-        bool     put2DPoints (goList<goVectorf>::ConstElement* begin, 
+        bool     put2DPoints (const goList<goMath::Vectorf>& l, const char* variableName);
+        bool     put2DPoints (const goList<goMath::Vectord>& l, const char* variableName);
+        bool     get2DPoints (goList<goMath::Vectorf>& l, const char* variableName);
+        bool     get2DPoints (goList<goMath::Vectord>& l, const char* variableName);
+        bool     put2DPoints (goList<goMath::Vectorf>::ConstElement* begin, 
                               goIndex_t size, 
                               const char* variableName);
-        bool     put2DPoints (goList<goVectord>::ConstElement* begin, 
+        bool     put2DPoints (goList<goMath::Vectord>::ConstElement* begin, 
                               goIndex_t size, 
                               const char* variableName);
 
@@ -211,14 +211,14 @@ class goMatlab : public goObjectBase
         
         bool     copyToMatlab         (const goSignal3DBase<void>* sig, mxArray* matrix);
         bool     copyToMatlab         (const goArray<goDouble>* array, mxArray* matrix);
-        bool     copyToMatlab         (const goVectord* array, mxArray* matrix);
-        bool     copyToMatlab         (const goVectorf* array, mxArray* matrix);
+        bool     copyToMatlab         (const goMath::Vectord* array, mxArray* matrix);
+        bool     copyToMatlab         (const goMath::Vectorf* array, mxArray* matrix);
         bool     copyToMatlab         (const goDouble* array, goSize_t length, mxArray* matrix);
         bool     copyToMatlab         (goSparseMatrix* sp, mxArray* matrix);
         bool     copyFromMatlab       (mxArray* matrix, goSignal3DBase<void>* sig);
         bool     copyFromMatlab       (mxArray* matrix, goArray<goDouble>* array);
-        bool     copyFromMatlab       (mxArray* matrix, goVectord* array);
-        bool     copyFromMatlab       (mxArray* matrix, goVectorf* array);
+        bool     copyFromMatlab       (mxArray* matrix, goMath::Vectord* array);
+        bool     copyFromMatlab       (mxArray* matrix, goMath::Vectorf* array);
         bool     sparseToMatlabSparse (goSparseMatrix* sp, const char* name);
         bool     signalToVariable     (const goSignal3DBase<void>* sig, const char* name);
         bool     arrayToVariable      (const goArray<goDouble>* array, const char* name);

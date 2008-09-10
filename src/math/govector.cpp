@@ -12,56 +12,58 @@ extern "C"
 }
 
 template <class T>
-goVector<T>::goVector () 
+goMath::Vector<T>::Vector () 
     : goFixedArray<T> (1,0,0) 
 {
     this->fill (T(0));
 }
 
 template <class T>
-goVector<T>::goVector (goSize_t s, goIndex_t leftBorder, goIndex_t rightBorder) 
+goMath::Vector<T>::Vector (goSize_t s, goIndex_t leftBorder, goIndex_t rightBorder) 
     : goFixedArray<T> (s,leftBorder,rightBorder) 
 {
     this->fill (T(0));
 }
 
 template <class T>
-goVector<T>::~goVector ()
+goMath::Vector<T>::~Vector ()
 {
 }
 
 template <class T>
-goVector<T>::goVector (const goFixedArray<T>& other)
+goMath::Vector<T>::Vector (const goFixedArray<T>& other)
 {
     *this = other;
 }
 
-template<>
-goVector<goFloat>& goVector<goFloat>::operator= (const goFixedArray<goFloat>& other)
-{
-    goSize_t N = other.getSize();
-    if (this->getSize() != N)
-    {
-        this->resize (N);
-    }
-    cblas_scopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
-}
+namespace goMath {
+    template<>
+        goMath::Vector<goFloat>& Vector<goFloat>::operator= (const goFixedArray<goFloat>& other)
+        {
+            goSize_t N = other.getSize();
+            if (this->getSize() != N)
+            {
+                this->resize (N);
+            }
+            cblas_scopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
 
-template<>
-goVector<goDouble>& goVector<goDouble>::operator= (const goFixedArray<goDouble>& other)
-{
-    goSize_t N = other.getSize();
-    if (this->getSize() != N)
-    {
-        this->resize (N);
-    }
-    cblas_dcopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
+    template<>
+        goMath::Vector<goDouble>& Vector<goDouble>::operator= (const goFixedArray<goDouble>& other)
+        {
+            goSize_t N = other.getSize();
+            if (this->getSize() != N)
+            {
+                this->resize (N);
+            }
+            cblas_dcopy (N, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
 }
 
 template <class T>
-goVector<T>& goVector<T>::operator= (const goFixedArray<T>& other)
+goMath::Vector<T>& goMath::Vector<T>::operator= (const goFixedArray<T>& other)
 {
     if (other.getStride() != 1)
     {
@@ -81,7 +83,7 @@ goVector<T>& goVector<T>::operator= (const goFixedArray<T>& other)
 //= Was inlined.
 #if 0
 template <class T>
-goVector<T> goVector<T>::operator- (const goVector<T>& other) const
+goMath::Vector<T> goMath::Vector<T>::operator- (const goMath::Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -89,7 +91,7 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
         throw goMathException (goMathException::SIZE_MISMATCH);
     }
 #endif
-    goVector<T> ret (this->getSize());
+    goMath::Vector<T> ret (this->getSize());
     goIndex_t max = this->getSize();
     T* retArray = ret.getPtr();
     const T* array = this->getPtr();
@@ -107,79 +109,84 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
 };
 #endif
 
-template<>
-void goVector<goFloat>::print (const char* formatstring) const
-{
-    goSize_t sz = this->getSize();
+namespace goMath {
+    template<>
+        void Vector<goFloat>::print (const char* formatstring) const
+        {
+            goSize_t sz = this->getSize();
 
-    for (goSize_t i = 0; i < sz; ++i)
-    {
-        printf (formatstring, (*this)[i]);
-    }
-    printf ("\n");
-}
+            for (goSize_t i = 0; i < sz; ++i)
+            {
+                printf (formatstring, (*this)[i]);
+            }
+            printf ("\n");
+        }
 
-template<>
-void goVector<goDouble>::print (const char* formatstring) const
-{
-    goSize_t sz = this->getSize();
+    template<>
+        void Vector<goDouble>::print (const char* formatstring) const
+        {
+            goSize_t sz = this->getSize();
 
-    for (goSize_t i = 0; i < sz; ++i)
-    {
-        printf (formatstring, (*this)[i]);
-    }
-    printf ("\n");
-}
-
-template <class T>
-void goVector<T>::print (const char*) const
-{
-    printf ("goVector<T>::_print() not defined for this type.\n");
-}
-
-template<> 
-goFloat goVector<goFloat>::operator* (const goVector<goFloat>& other) const
-{
-    assert (other.getSize() == this->getSize());
-    return cblas_sdot (this->getSize(), 
-                       this->getPtr(), this->getStride(),
-                       other.getPtr(),
-                       other.getStride());
-}
-
-template<> 
-goDouble goVector<goDouble>::operator* (const goVector<goDouble>& other) const
-{
-    assert (other.getSize() == this->getSize());
-    return cblas_ddot (this->getSize(), 
-                       this->getPtr(), this->getStride(),
-                       other.getPtr(),
-                       other.getStride());
+            for (goSize_t i = 0; i < sz; ++i)
+            {
+                printf (formatstring, (*this)[i]);
+            }
+            printf ("\n");
+        }
 }
 
 template <class T>
-goVector<T>& goVector<T>::operator*= (const goMatrix<T>& m)
+void goMath::Vector<T>::print (const char*) const
+{
+    printf ("goMath::Vector<T>::_print() not defined for this type.\n");
+}
+
+namespace goMath {
+    template<> 
+        goFloat Vector<goFloat>::operator* (const goMath::Vector<goFloat>& other) const
+        {
+            assert (other.getSize() == this->getSize());
+            return cblas_sdot (this->getSize(), 
+                    this->getPtr(), this->getStride(),
+                    other.getPtr(),
+                    other.getStride());
+        }
+
+    template<> 
+        goDouble Vector<goDouble>::operator* (const goMath::Vector<goDouble>& other) const
+        {
+            assert (other.getSize() == this->getSize());
+            return cblas_ddot (this->getSize(), 
+                    this->getPtr(), this->getStride(),
+                    other.getPtr(),
+                    other.getStride());
+        }
+
+    template <>
+        goMath::Vector<goComplexf>& goMath::Vector<goComplexf>::operator*= (const goMath::Matrix<goComplexf>&)
+        {
+            goLog::warning ("goMath::Vector::operator*= (goMath::Matrix): Not implemented for complex types.");
+            return *this;
+        }
+}
+
+template <class T>
+goMath::Vector<T>& goMath::Vector<T>::operator*= (const goMath::Matrix<T>& m)
 {
     if (m.getColumns() != this->getSize())
     {
-        goLog::warning ("goVector::operator*= (goMatrix): Matrix has wrong column count.");
+        goLog::warning ("goMath::Vector::operator*= (goMath::Matrix): Matrix has wrong column count.");
         return *this;
     }
     *this = m * *this;
     return *this;
 }
 
-template <>
-goVector<goComplexf>& goVector<goComplexf>::operator*= (const goMatrix<goComplexf>&)
-{
-    goLog::warning ("goVector::operator*= (goMatrix): Not implemented for complex types.");
-    return *this;
-}
 
 //template <>
-//goVector<goComplexd>& goVector<goComplexd>::operator*= (const goMatrix<goComplexd>&)
+//goMath::Vector<goComplexd>& goMath::Vector<goComplexd>::operator*= (const goMath::Matrix<goComplexd>&)
 //{
-//    goLog::warning ("goVector::operator*= (goMatrix): Not implemented for complex types.");
+//    goLog::warning ("goMath::Vector::operator*= (goMath::Matrix): Not implemented for complex types.");
 //    return *this;
 //}
 
@@ -189,13 +196,13 @@ goVector<goComplexf>& goVector<goComplexf>::operator*= (const goMatrix<goComplex
  * @return 
  **/
 template <class T>
-void goVector<T>::outerProduct (const goVector<T>& other, goMatrix<T>& ret) const
+void goMath::Vector<T>::outerProduct (const goMath::Vector<T>& other, goMath::Matrix<T>& ret) const
 {
-    goVectorOuter<T> (T(1), *this, other, ret);
+    goMath::vectorOuter<T> (T(1), *this, other, ret);
 };
 
 template <class T>
-T goVector<T>::operator* (const goVector<T>& other) const
+T goMath::Vector<T>::operator* (const goMath::Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -219,99 +226,104 @@ T goVector<T>::operator* (const goVector<T>& other) const
 };
 #endif
 
-/**
- * @brief Calculates conj(this) * this.
- *
- * @return The return value is of the form r+i*0, meaning the imaginary part is 0.
- **/
-template<> goComplexf goVector<goComplexf>::square () const
-{
-    const goComplexf* array = this->getPtr();
-    goFloat sum = 0.0;
-    goIndex_t size = this->getSize();
-    for (goIndex_t i = 0; i < size; ++i, ++array)
+namespace goMath {
+    /**
+     * @brief Calculates conj(this) * this.
+     *
+     * @return The return value is of the form r+i*0, meaning the imaginary part is 0.
+     **/
+    template<> goComplexf Vector<goComplexf>::square () const
     {
-        sum += array->re() * array->re() + array->im() * array->im();
+        const goComplexf* array = this->getPtr();
+        goFloat sum = 0.0;
+        goIndex_t size = this->getSize();
+        for (goIndex_t i = 0; i < size; ++i, ++array)
+        {
+            sum += array->re() * array->re() + array->im() * array->im();
+        }
+        return goComplexf (sum, 0.0f);
     }
-    return goComplexf (sum, 0.0f);
 }
 
 template <class T>
-inline T goVector<T>::square () const
+inline T goMath::Vector<T>::square () const
 {
     return *this * *this;
 }
 
-template<> inline goComplexf goVector<goComplexf>::abs () const
-{
-    return goComplexf(sqrt(this->square().re()), 0.0f);
-}
-
-template<> inline goComplexd goVector<goComplexd>::abs () const
-{
-    return goComplexd(sqrt(this->square().re()), 0.0);
-}
-
-template<class T> T goVector<T>::abs () const
+template<class T> T goMath::Vector<T>::abs () const
 {
     return this->norm2 ();
 }
 
-template<> goFloat goVector<goFloat>::norm2 () const
-{
-    return cblas_snrm2 (this->getSize(), this->getPtr(), this->getStride());
+namespace goMath {
+    template<> inline goComplexf Vector<goComplexf>::abs () const
+    {
+        return goComplexf(sqrt(this->square().re()), 0.0f);
+    }
+
+    template<> inline goComplexd Vector<goComplexd>::abs () const
+    {
+        return goComplexd(sqrt(this->square().re()), 0.0);
+    }
+
+
+    template<> goFloat Vector<goFloat>::norm2 () const
+    {
+        return cblas_snrm2 (this->getSize(), this->getPtr(), this->getStride());
+    }
+
+    template<> goDouble Vector<goDouble>::norm2 () const
+    {
+        return cblas_dnrm2 (this->getSize(), this->getPtr(), this->getStride());
+    }
+
+    template<> goFloat Vector<goFloat>::norm1 () const
+    {
+        return cblas_sasum (this->getSize(), this->getPtr(), this->getStride());
+    }
+
+    template<> goDouble Vector<goDouble>::norm1 () const
+    {
+        return cblas_dasum (this->getSize(), this->getPtr(), this->getStride());
+    }
+
+    template<> goComplexf Vector<goComplexf>::norm2 () const
+    {
+        return this->abs();
+    }
+
+    template<> goComplexd Vector<goComplexd>::norm2 () const
+    {
+        return this->abs();
+    }
+
+    template<> goComplexf Vector<goComplexf>::norm1 () const
+    {
+        goLog::error ("goMath::Vector::norm1() not implemented for complex types.");
+        return goComplexf(0.0f,0.0f);
+    }
+
+    template<> goComplexd Vector<goComplexd>::norm1 () const
+    {
+        goLog::error ("goMath::Vector::norm1() not implemented for complex types.");
+        return goComplexd(0.0,0.0);
+    }
 }
 
-template<> goDouble goVector<goDouble>::norm2 () const
-{
-    return cblas_dnrm2 (this->getSize(), this->getPtr(), this->getStride());
-}
-
-template<> goFloat goVector<goFloat>::norm1 () const
-{
-    return cblas_sasum (this->getSize(), this->getPtr(), this->getStride());
-}
-
-template<> goDouble goVector<goDouble>::norm1 () const
-{
-    return cblas_dasum (this->getSize(), this->getPtr(), this->getStride());
-}
-
-template<> goComplexf goVector<goComplexf>::norm2 () const
-{
-    return this->abs();
-}
-
-template<> goComplexd goVector<goComplexd>::norm2 () const
-{
-    return this->abs();
-}
-
-template<> goComplexf goVector<goComplexf>::norm1 () const
-{
-    goLog::error ("goVector::norm1() not implemented for complex types.");
-    return goComplexf(0.0f,0.0f);
-}
-
-template<> goComplexd goVector<goComplexd>::norm1 () const
-{
-    goLog::error ("goVector::norm1() not implemented for complex types.");
-    return goComplexd(0.0,0.0);
-}
-
-template<class T> T goVector<T>::norm2 () const
+template<class T> T goMath::Vector<T>::norm2 () const
 {
     return static_cast<T>(sqrt(static_cast<goDouble>(*this * *this)));
 }
 
-template<class T> T goVector<T>::norm1 () const
+template<class T> T goMath::Vector<T>::norm1 () const
 {
-    goLog::error ("goVector::norm1() not implemented for this type (integer?).");
+    goLog::error ("goMath::Vector::norm1() not implemented for this type (integer?).");
     return T(0);
 }
 
 template <class T>
-void goVector<T>::fillRange (const T& start, const T& step, const T& end)
+void goMath::Vector<T>::fillRange (const T& start, const T& step, const T& end)
 {
     goSize_t i = 0;
     goSize_t sz = this->getSize();
@@ -322,7 +334,7 @@ void goVector<T>::fillRange (const T& start, const T& step, const T& end)
 }
 
 template <class T>
-bool goVector<T>::readASCII (const char* filename)
+bool goMath::Vector<T>::readASCII (const char* filename)
 {
     FILE* f = ::fopen (filename, "r");
     if (!f)
@@ -333,16 +345,16 @@ bool goVector<T>::readASCII (const char* filename)
 }
 
 template <class T>
-bool goVector<T>::readASCII (FILE* file)
+bool goMath::Vector<T>::readASCII (FILE* file)
 {
     if (!file)
         return false;
 
     goString line = "";
     goFileIO::readASCIILine (file, line);
-    if (line != "goVector")
+    if (line != "goMath::Vector")
     {
-        goString s = "goVector::readASCII(): expected goVector, got ";
+        goString s = "goMath::Vector::readASCII(): expected goMath::Vector, got ";
         s += line;
         goLog::warning (s);
         return false;
@@ -353,7 +365,7 @@ bool goVector<T>::readASCII (FILE* file)
     line.getWords (words);
     if (words.getSize() != 2 || words.getFront() != "size")
     {
-        goString s = "goVector::readASCII(): expected size, got ";
+        goString s = "goMath::Vector::readASCII(): expected size, got ";
         s += line;
         goLog::warning (s);
         return false;
@@ -373,7 +385,7 @@ bool goVector<T>::readASCII (FILE* file)
 }
 
 template <class T>
-bool goVector<T>::writeASCII (const char* filename) const
+bool goMath::Vector<T>::writeASCII (const char* filename) const
 {
     FILE* f = ::fopen (filename, "w");
     if (!f)
@@ -384,13 +396,13 @@ bool goVector<T>::writeASCII (const char* filename) const
 }
 
 template <class T>
-bool goVector<T>::writeASCII (FILE* file) const
+bool goMath::Vector<T>::writeASCII (FILE* file) const
 {
     if (!file)
     {
         return false;
     }
-    goFileIO::writeASCII (file, "goVector\n");
+    goFileIO::writeASCII (file, "goMath::Vector\n");
     goString s = "size ";
     s += (int)this->getSize();
     s += "\n";
@@ -407,68 +419,98 @@ bool goVector<T>::writeASCII (FILE* file) const
     return true;
 }
 
-template <>
-bool goVector<goComplexf>::writeASCII (FILE*) const
-{
-    goLog::error ("goVector::writeASCII() not implemented for goComplexf");
-    return false;
-}
+namespace goMath {
+    template <>
+        bool Vector<goComplexf>::writeASCII (FILE*) const
+        {
+            goLog::error ("goMath::Vector::writeASCII() not implemented for goComplexf");
+            return false;
+        }
 
-template <>
-bool goVector<goComplexf>::readASCII (FILE*)
-{
-    goLog::error ("goVector::readASCII() not implemented for goComplexf");
-    return false;
-}
+    template <>
+        bool Vector<goComplexf>::readASCII (FILE*)
+        {
+            goLog::error ("goMath::Vector::readASCII() not implemented for goComplexf");
+            return false;
+        }
 
-template <>
-goComplexf goVector<goComplexf>::min () const
-{
-    goLog::error ("goVector::min() not implemented for goComplexf");
-    return false;
-}
+    template <>
+        goComplexf Vector<goComplexf>::min () const
+        {
+            goLog::error ("goMath::Vector::min() not implemented for goComplexf");
+            return false;
+        }
 
-template <>
-goComplexf goVector<goComplexf>::max () const
-{
-    goLog::error ("goVector::max() not implemented for goComplexf");
-    return false;
+    template <>
+        goComplexf Vector<goComplexf>::max () const
+        {
+            goLog::error ("goMath::Vector::max() not implemented for goComplexf");
+            return false;
+        }
+
+    template <>
+        goMath::Vector<goFloat>& Vector<goFloat>::operator*= (goFloat n)
+        {
+            cblas_sscal (this->getSize(), n, this->getPtr(), this->getStride());
+            return *this;
+        }
+
+    template <>
+        goMath::Vector<goDouble>& Vector<goDouble>::operator*= (goDouble n)
+        {
+            cblas_dscal (this->getSize(), n, this->getPtr(), this->getStride());
+            return *this;
+        }
+
+    template <>
+        goMath::Vector<goFloat>& goMath::Vector<goFloat>::operator-= (const goMath::Vector<goFloat>& other)
+        {
+            cblas_saxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
+
+    template <>
+        goMath::Vector<goDouble>& goMath::Vector<goDouble>::operator-= (const goMath::Vector<goDouble>& other)
+        {
+            cblas_daxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
+
+    template <>
+        goMath::Vector<goFloat>& Vector<goFloat>::operator+= (const goMath::Vector<goFloat>& other)
+        {
+            cblas_saxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
+
+    template <>
+        goMath::Vector<goDouble>& Vector<goDouble>::operator+= (const goMath::Vector<goDouble>& other)
+        {
+            cblas_daxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
+            return *this;
+        }
 }
 
 template <class T>
-T goVector<T>::min () const
+T goMath::Vector<T>::min () const
 {
     return goMath::min<T> (*this);
 }
 
 template <class T>
-T goVector<T>::max () const
+T goMath::Vector<T>::max () const
 {
     return goMath::max<T> (*this);
 }
 
 template <class T>
-goVector<T>& goVector<T>::operator/= (T s)
+goMath::Vector<T>& goMath::Vector<T>::operator/= (T s)
 {
     return this->operator*= (T(1)/s);
 }
 
-template <>
-goVector<goFloat>& goVector<goFloat>::operator*= (goFloat n)
-{
-    cblas_sscal (this->getSize(), n, this->getPtr(), this->getStride());
-    return *this;
-}
-
-template <>
-goVector<goDouble>& goVector<goDouble>::operator*= (goDouble n)
-{
-    cblas_dscal (this->getSize(), n, this->getPtr(), this->getStride());
-    return *this;
-}
-
 template <class T>
-goVector<T>& goVector<T>::operator*= (T n)
+goMath::Vector<T>& goMath::Vector<T>::operator*= (T n)
 {
     goIndex_t max = this->getSize();
     T* array = this->getPtr();
@@ -482,22 +524,8 @@ goVector<T>& goVector<T>::operator*= (T n)
     return *this;
 }
 
-template <>
-goVector<goFloat>& goVector<goFloat>::operator-= (const goVector<goFloat>& other)
-{
-    cblas_saxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
-}
-
-template <>
-goVector<goDouble>& goVector<goDouble>::operator-= (const goVector<goDouble>& other)
-{
-    cblas_daxpy (this->getSize(), -1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
-}
-
 template <class T>
-goVector<T>& goVector<T>::operator-= (const goVector<T>& other)
+goMath::Vector<T>& goMath::Vector<T>::operator-= (const goMath::Vector<T>& other)
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -520,7 +548,7 @@ goVector<T>& goVector<T>::operator-= (const goVector<T>& other)
 }
 
 template <class T>
-goVector<T>& goVector<T>::operator-= (T s)
+goMath::Vector<T>& goMath::Vector<T>::operator-= (T s)
 {
     goIndex_t max = this->getSize();
     T* array = this->getPtr();
@@ -533,22 +561,8 @@ goVector<T>& goVector<T>::operator-= (T s)
     return *this;
 };
 
-template <>
-goVector<goFloat>& goVector<goFloat>::operator+= (const goVector<goFloat>& other)
-{
-    cblas_saxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
-}
-
-template <>
-goVector<goDouble>& goVector<goDouble>::operator+= (const goVector<goDouble>& other)
-{
-    cblas_daxpy (this->getSize(), 1.0f, other.getPtr(), other.getStride(), this->getPtr(), this->getStride());
-    return *this;
-}
-
 template <class T>
-goVector<T>& goVector<T>::operator+= (const goVector<T>& other)
+goMath::Vector<T>& goMath::Vector<T>::operator+= (const goMath::Vector<T>& other)
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -571,7 +585,7 @@ goVector<T>& goVector<T>::operator+= (const goVector<T>& other)
 }
 
 template <class T>
-goVector<T>& goVector<T>::operator+= (T s)
+goMath::Vector<T>& goMath::Vector<T>::operator+= (T s)
 {
     goIndex_t max = this->getSize();
     T* array = this->getPtr();
@@ -584,41 +598,42 @@ goVector<T>& goVector<T>::operator+= (T s)
     return *this;
 }
 
-template<>
-goVector<goFloat> goVector<goFloat>::operator- (const goVector<goFloat>& other) const
-{
-    goVector<goFloat> ret (*this);
-    ret -= other;
-    return ret;
-}
+namespace goMath {
+    template<>
+        goMath::Vector<goFloat> Vector<goFloat>::operator- (const goMath::Vector<goFloat>& other) const
+        {
+            goMath::Vector<goFloat> ret (*this);
+            ret -= other;
+            return ret;
+        }
 
-template<>
-goVector<goDouble> goVector<goDouble>::operator- (const goVector<goDouble>& other) const
-{
-    goVector<goDouble> ret (*this);
-    ret -= other;
-    return ret;
-}
+    template<>
+        goMath::Vector<goDouble> Vector<goDouble>::operator- (const goMath::Vector<goDouble>& other) const
+        {
+            goMath::Vector<goDouble> ret (*this);
+            ret -= other;
+            return ret;
+        }
 
-template<>
-goVector<goFloat> goVector<goFloat>::operator+ (const goVector<goFloat>& other) const
-{
-    goVector<goFloat> ret (*this);
-    ret += other;
-    return ret;
-}
+    template<>
+        goMath::Vector<goFloat> Vector<goFloat>::operator+ (const goMath::Vector<goFloat>& other) const
+        {
+            goMath::Vector<goFloat> ret (*this);
+            ret += other;
+            return ret;
+        }
 
-template<>
-goVector<goDouble> goVector<goDouble>::operator+ (const goVector<goDouble>& other) const
-{
-    goVector<goDouble> ret (*this);
-    ret += other;
-    return ret;
+    template<>
+        goMath::Vector<goDouble> Vector<goDouble>::operator+ (const goMath::Vector<goDouble>& other) const
+        {
+            goMath::Vector<goDouble> ret (*this);
+            ret += other;
+            return ret;
+        }
 }
-
 
 template <class T>
-goVector<T> goVector<T>::operator- (const goVector<T>& other) const
+goMath::Vector<T> goMath::Vector<T>::operator- (const goMath::Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -626,7 +641,7 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
         throw goMathException (goMathException::SIZE_MISMATCH);
     }
 #endif
-    goVector<T> ret (this->getSize());
+    goMath::Vector<T> ret (this->getSize());
     goIndex_t max = this->getSize();
     T* retArray = ret.getPtr();
     const T* array = this->getPtr();
@@ -644,7 +659,7 @@ goVector<T> goVector<T>::operator- (const goVector<T>& other) const
 }
 
 template<class T>
-goVector<T> goVector<T>::operator+ (const goVector<T>& other) const
+goMath::Vector<T> goMath::Vector<T>::operator+ (const goMath::Vector<T>& other) const
 {
 #ifdef GO_USE_EXCEPTIONS
     if (this->getSize() != other.getSize())
@@ -652,7 +667,7 @@ goVector<T> goVector<T>::operator+ (const goVector<T>& other) const
         throw goMathException (goMathException::SIZE_MISMATCH);
     }
 #endif
-    goVector<T> ret (this->getSize());
+    goMath::Vector<T> ret (this->getSize());
     goIndex_t max = this->getSize();
     T* retArray = ret.getPtr();
     const T* array = this->getPtr();
@@ -670,17 +685,17 @@ goVector<T> goVector<T>::operator+ (const goVector<T>& other) const
 }
 
 template<class T>
-goVector<T> goVector<T>::operator* (T n) const
+goMath::Vector<T> goMath::Vector<T>::operator* (T n) const
 {
-    goVector<T> ret (*this);
+    goMath::Vector<T> ret (*this);
     ret *= n;
     return ret;
 }
 
 template<class T>
-goVector<T> goVector<T>::operator/ (T n) const
+goMath::Vector<T> goMath::Vector<T>::operator/ (T n) const
 {
-    goVector<T> ret (*this);
+    goMath::Vector<T> ret (*this);
     ret *= T(1)/n;
     return ret;
 }
@@ -689,9 +704,9 @@ goVector<T> goVector<T>::operator/ (T n) const
 
 #if 0
 template<class T>
-goVector<T> goVector<T>::operator* (T n) const
+goMath::Vector<T> goMath::Vector<T>::operator* (T n) const
 {
-    goVector<T> ret (this->getSize());
+    goMath::Vector<T> ret (this->getSize());
     goIndex_t max = this->getSize();
     const T* array = this->getPtr();
     T* retArray = ret.getPtr();
@@ -709,64 +724,66 @@ goVector<T> goVector<T>::operator* (T n) const
 
 // =====================================
 
-template <>
-bool goVectorAdd<goFloat> (goFloat alpha, const goVector<goFloat>& x, goVector<goFloat>& y)
-{
-    assert (x.getSize() == y.getSize());
-    goSize_t N = x.getSize();
-    if (y.getSize() != N)
-    {
-        return false;
-    }
-    cblas_saxpy (N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride());
-    return true;
-}
+namespace goMath {
+    template <>
+        bool vectorAdd<goFloat> (goFloat alpha, const goMath::Vector<goFloat>& x, goMath::Vector<goFloat>& y)
+        {
+            assert (x.getSize() == y.getSize());
+            goSize_t N = x.getSize();
+            if (y.getSize() != N)
+            {
+                return false;
+            }
+            cblas_saxpy (N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride());
+            return true;
+        }
 
-template <>
-bool goVectorAdd<goDouble> (goDouble alpha, const goVector<goDouble>& x, goVector<goDouble>& y)
-{
-    assert (x.getSize() == y.getSize());
-    goSize_t N = x.getSize();
-    if (y.getSize() != N)
-    {
-        return false;
-    }
-    cblas_daxpy (N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride());
-    return true;
-}
+    template <>
+        bool vectorAdd<goDouble> (goDouble alpha, const goMath::Vector<goDouble>& x, goMath::Vector<goDouble>& y)
+        {
+            assert (x.getSize() == y.getSize());
+            goSize_t N = x.getSize();
+            if (y.getSize() != N)
+            {
+                return false;
+            }
+            cblas_daxpy (N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride());
+            return true;
+        }
 
-template <>
-void goVectorOuter<goFloat> (goFloat alpha, const goVector<goFloat>& x, const goVector<goFloat>& y, goMatrix<goFloat>& ret)
-{
-    goSize_t M = x.getSize();
-    goSize_t N = y.getSize();
+    template <>
+        void vectorOuter<goFloat> (goFloat alpha, const goMath::Vector<goFloat>& x, const goMath::Vector<goFloat>& y, goMath::Matrix<goFloat>& ret)
+        {
+            goSize_t M = x.getSize();
+            goSize_t N = y.getSize();
 
-    if (ret.getRows() != M || ret.getColumns() != N)
-    {
-        ret.resize (M,N);
-        ret.fill (0.0f);
-    }
+            if (ret.getRows() != M || ret.getColumns() != N)
+            {
+                ret.resize (M,N);
+                ret.fill (0.0f);
+            }
 
-    cblas_sger (CblasRowMajor, M, N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride(), ret.getPtr(), ret.getLeadingDimension());
-}
+            cblas_sger (CblasRowMajor, M, N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride(), ret.getPtr(), ret.getLeadingDimension());
+        }
 
-template <>
-void goVectorOuter<goDouble> (goDouble alpha, const goVector<goDouble>& x, const goVector<goDouble>& y, goMatrix<goDouble>& ret)
-{
-    goSize_t M = x.getSize();
-    goSize_t N = y.getSize();
+    template <>
+        void vectorOuter<goDouble> (goDouble alpha, const goMath::Vector<goDouble>& x, const goMath::Vector<goDouble>& y, goMath::Matrix<goDouble>& ret)
+        {
+            goSize_t M = x.getSize();
+            goSize_t N = y.getSize();
 
-    if (ret.getRows() != M || ret.getColumns() != N)
-    {
-        ret.resize (M,N);
-        ret.fill (0.0);
-    }
+            if (ret.getRows() != M || ret.getColumns() != N)
+            {
+                ret.resize (M,N);
+                ret.fill (0.0);
+            }
 
-    cblas_dger (CblasRowMajor, M, N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride(), ret.getPtr(), ret.getLeadingDimension());
+            cblas_dger (CblasRowMajor, M, N, alpha, x.getPtr(), x.getStride(), y.getPtr(), y.getStride(), ret.getPtr(), ret.getLeadingDimension());
+        }
 }
 
 template <class T>
-void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatrix<T>& ret)
+void goMath::vectorOuter (T alpha, const goMath::Vector<T>& x, const goMath::Vector<T>& y, goMath::Matrix<T>& ret)
 {
     goSize_t M = x.getSize();
     goSize_t N = y.getSize();
@@ -792,9 +809,9 @@ void goVectorOuter (T alpha, const goVector<T>& x, const goVector<T>& y, goMatri
 }
 
 
-template class goVector<goFloat>;
-template class goVector<goDouble>;
-template class goVector<goComplexf>;
-// template class goVector<goComplexd>;
-template class goVector<goIndex_t>;
-template class goVector<goSize_t>;
+template class goMath::Vector<goFloat>;
+template class goMath::Vector<goDouble>;
+template class goMath::Vector<goComplexf>;
+// template class goMath::Vector<goComplexd>;
+template class goMath::Vector<goIndex_t>;
+template class goMath::Vector<goSize_t>;

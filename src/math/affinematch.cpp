@@ -16,7 +16,7 @@
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMath::affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix<T>& A, goVector<T>& t)
+bool goMath::affineMatch (const goMath::Matrix<T>& X1, const goMath::Matrix<T>& X2, goMath::Matrix<T>& A, Vector<T>& t)
 {
     if (X1.getRows() != X2.getRows() ||
         X1.getColumns() != X2.getColumns())
@@ -29,14 +29,14 @@ bool goMath::affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix
     goSize_t n = X1.getColumns();
     T m_ = T(1) / T(m);
 
-    goMatrix<T> X2T_one (n, 1);
-    goMatrix<T> X1T_one (n, 1);
-    goMatrix<T> X2TX1;
-    goMatrix<T> X1TX1;
+    goMath::Matrix<T> X2T_one (n, 1);
+    goMath::Matrix<T> X1T_one (n, 1);
+    goMath::Matrix<T> X2TX1;
+    goMath::Matrix<T> X1TX1;
     //= X2'*X1
-    goMatrixMult<T> (T(1), X2, true, X1, false, 0.0f, X2TX1);
+    goMath::matrixMult<T> (T(1), X2, true, X1, false, 0.0f, X2TX1);
     //= X1'*X1
-    goMatrixMult<T> (T(1), X1, true, X1, false, 0.0f, X1TX1);
+    goMath::matrixMult<T> (T(1), X1, true, X1, false, 0.0f, X1TX1);
 
     X2T_one.fill (T(0));
     //= Sum all points over all dimensions:
@@ -50,16 +50,16 @@ bool goMath::affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix
     }
 
     //= X2'*X1 - 1/m * X2T_one * X1T_one'
-    goMatrixMult<T> (-m_, X2T_one, false, X1T_one, true, 1.0f, X2TX1);
+    goMath::matrixMult<T> (-m_, X2T_one, false, X1T_one, true, 1.0f, X2TX1);
     //= X1'*X1 - 1/m * X1T_one * X1T_one'
-    goMatrixMult<T> (-m_, X1T_one, false, X1T_one, true, 1.0f, X1TX1);
+    goMath::matrixMult<T> (-m_, X1T_one, false, X1T_one, true, 1.0f, X1TX1);
     
     X1TX1.invert ();
    
     //= A = (X2'*X1 - 1/m * X2T_one * X1T_one') * inv(X1'*X1 - 1/m * X1T_one * X1T_one')
-    goMatrixMult<T> (T(1), X2TX1, false, X1TX1, false, T(0), A);
+    goMath::matrixMult<T> (T(1), X2TX1, false, X1TX1, false, T(0), A);
     //= t = 1/m * (A * X1T_one - X2T_one)
-    goMatrixMult<T> (m_, A, false, X1T_one, false, -m_, X2T_one);
+    goMath::matrixMult<T> (m_, A, false, X1T_one, false, -m_, X2T_one);
 
     assert (X2T_one.getRows() == n);
     assert (X2T_one.getColumns() == 1);
@@ -90,13 +90,13 @@ bool goMath::affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix
  */
 template <class T>
 bool goMath::affineMatch(
-        const goMatrix<T>& q,
-        const goMatrix<T>& s,
+        const goMath::Matrix<T>& q,
+        const goMath::Matrix<T>& s,
         goDouble beta,
-        const goMatrix<T>& q2,
-        const goMatrix<T>& s2,
-        goMatrix<T>& A,
-        goVector<T>& t)
+        const goMath::Matrix<T>& q2,
+        const goMath::Matrix<T>& s2,
+        goMath::Matrix<T>& A,
+        Vector<T>& t)
 {
     if (s.getRows() != q.getRows() || 
         s.getColumns() != q.getColumns())
@@ -138,7 +138,7 @@ bool goMath::affineMatch(
     return;
 #endif
 
-    goMatrix<T> b1, b2, b; //= b1 = ones^T * q 
+    goMath::Matrix<T> b1, b2, b; //= b1 = ones^T * q 
                            //= b2 = ones^T * q2
                            //= b = b1 + beta * b2
     {
@@ -150,7 +150,7 @@ bool goMath::affineMatch(
     //= factor = 1 / (m + beta*m2)
     T factor = T(1) / (T(s.getRows()) + beta * T(s2.getRows()));
 
-    goMatrix<T> a1, a2, a; //= a1 = (s^T*ones)^T
+    goMath::Matrix<T> a1, a2, a; //= a1 = (s^T*ones)^T
                            //= a2 = (s2^T*ones)^T
                            //= a = a1 + beta * a2
     {
@@ -159,23 +159,23 @@ bool goMath::affineMatch(
         a = a1 + a2 * beta;
     }
    
-    goMatrix<T> B;
-    goMatrixMult<T> (T(factor), a, true, b, false, T(0), B);
-    goMatrixMult<T> (T(beta), s2, true, q2, false, T(-1), B);
-    goMatrixMult<T> (T(1), s, true, q, false, T(1), B);
+    goMath::Matrix<T> B;
+    goMath::matrixMult<T> (T(factor), a, true, b, false, T(0), B);
+    goMath::matrixMult<T> (T(beta), s2, true, q2, false, T(-1), B);
+    goMath::matrixMult<T> (T(1), s, true, q, false, T(1), B);
     
-    goMatrix<T> C;
-    goMatrixMult<T> (factor, b, true, b, false, T(0), C);
-    goMatrixMult<T> (T(beta), q2, true, q2, false, T(-1), C);
-    goMatrixMult<T> (T(1), q, true, q, false, T(1), C);
+    goMath::Matrix<T> C;
+    goMath::matrixMult<T> (factor, b, true, b, false, T(0), C);
+    goMath::matrixMult<T> (T(beta), q2, true, q2, false, T(-1), C);
+    goMath::matrixMult<T> (T(1), q, true, q, false, T(1), C);
 
     C.invert ();
     
-    goMatrixMult<T> (T(1), B, false, C, false, T(0), A);
+    goMath::matrixMult<T> (T(1), B, false, C, false, T(0), A);
 
     //= t:
-    goMatrixMult<T> (factor*beta, A, false, b2, true, T(0), B);
-    goMatrixMult<T> (factor, A, false, b1, true, T(1), B);
+    goMath::matrixMult<T> (factor*beta, A, false, b2, true, T(0), B);
+    goMath::matrixMult<T> (factor, A, false, b1, true, T(1), B);
     a.getTranspose (C);
     C *= -factor;
 
@@ -185,23 +185,23 @@ bool goMath::affineMatch(
     return true;
 }
 
-template bool goMath::affineMatch<goFloat> (const goMatrix<goFloat>&, const goMatrix<goFloat>&, 
-                                            goMatrix<goFloat>&, goVector<goFloat>&);
-template bool goMath::affineMatch<goDouble> (const goMatrix<goDouble>&, const goMatrix<goDouble>&, 
-                                            goMatrix<goDouble>&, goVector<goDouble>&);
+template bool goMath::affineMatch<goFloat> (const goMath::Matrix<goFloat>&, const goMath::Matrix<goFloat>&, 
+                                            goMath::Matrix<goFloat>&, Vector<goFloat>&);
+template bool goMath::affineMatch<goDouble> (const goMath::Matrix<goDouble>&, const goMath::Matrix<goDouble>&, 
+                                            goMath::Matrix<goDouble>&, Vector<goDouble>&);
 template bool goMath::affineMatch<goFloat>(
-        const goMatrix<goFloat>&,
-        const goMatrix<goFloat>&,
+        const goMath::Matrix<goFloat>&,
+        const goMath::Matrix<goFloat>&,
         goDouble ,
-        const goMatrix<goFloat>&,
-        const goMatrix<goFloat>&,
-        goMatrix<goFloat>&,
-        goVector<goFloat>&);
+        const goMath::Matrix<goFloat>&,
+        const goMath::Matrix<goFloat>&,
+        goMath::Matrix<goFloat>&,
+        Vector<goFloat>&);
 template bool goMath::affineMatch<goDouble>(
-        const goMatrix<goDouble>&,
-        const goMatrix<goDouble>&,
+        const goMath::Matrix<goDouble>&,
+        const goMath::Matrix<goDouble>&,
         goDouble ,
-        const goMatrix<goDouble>&,
-        const goMatrix<goDouble>&,
-        goMatrix<goDouble>&,
-        goVector<goDouble>&);
+        const goMath::Matrix<goDouble>&,
+        const goMath::Matrix<goDouble>&,
+        goMath::Matrix<goDouble>&,
+        Vector<goDouble>&);

@@ -45,7 +45,7 @@ namespace goMath
     {
         public:
             MultiGaussPDF ();
-            MultiGaussPDF (const input_vector& mean, const goMatrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
+            MultiGaussPDF (const input_vector& mean, const goMath::Matrix<scalar_type>& cov, scalar_type normFactor = scalar_type(1));
 
             //= The standard operator= and copy constructor will do.
 
@@ -57,20 +57,20 @@ namespace goMath
             void                          updateFlush   ();
             
             // bool                          fromSamples   (const input_vector* vectors, goIndex_t count);
-            void                          setCovariance (const goMatrix<scalar_type>& cov);
-            const goMatrix<scalar_type>&  getCovarianceInv () const;
-            const goMatrix<scalar_type>&  getCovariance () const;
+            void                          setCovariance (const goMath::Matrix<scalar_type>& cov);
+            const goMath::Matrix<scalar_type>&  getCovarianceInv () const;
+            const goMath::Matrix<scalar_type>&  getCovariance () const;
             void                          setMean       (const input_vector& m);
             const input_vector&           getMean       () const;
 
         private:
             input_vector          myMean;
-            goMatrix<scalar_type> myCovariance;
-            goMatrix<scalar_type> myCovarianceInv;
+            goMath::Matrix<scalar_type> myCovariance;
+            goMath::Matrix<scalar_type> myCovarianceInv;
             scalar_type           myNormFactor;
 
             //= For learning
-            goMatrix<scalar_type> sum_xxT;
+            goMath::Matrix<scalar_type> sum_xxT;
             goFloat               N;
     };
     /*! @} */

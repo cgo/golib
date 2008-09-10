@@ -104,11 +104,11 @@ class goSparseMatrix
 
         inline bool matrixVectorMult (goArray<goDouble>&  ret, const goArray<goDouble>&  v);
         template <class Tv>
-        inline bool matrixVectorMult     (goVector<Tv>&       ret, const goVector<Tv>&       v);
+        inline bool matrixVectorMult     (goMath::Vector<Tv>&       ret, const goMath::Vector<Tv>&       v);
         inline bool vectorMatrixMult     (goArray<goDouble>&  ret, const goArray<goDouble>&  v);
         inline bool matrixVectorMult     (goSparseMatrix&     ret, const goArray<goDouble>&  v);
         template <class Tv>
-        inline bool matrixVectorMult     (goSparseMatrix&     ret, const goVector<Tv>&       v);
+        inline bool matrixVectorMult     (goSparseMatrix&     ret, const goMath::Vector<Tv>&       v);
         inline bool vectorMatrixMult     (goSparseMatrix&     ret, const goArray<goDouble>&  v);
         inline bool matrixMatrixMult     (goSparseMatrix&     ret, goSparseMatrix& m);
         inline bool matrixMatrixAdd      (goSparseMatrix&     ret, goSparseMatrix& m);
@@ -118,7 +118,7 @@ class goSparseMatrix
         inline goSparseMatrix operator* (const goSparseMatrix& other) const;
 
         template <class Tv>
-        inline goVector<Tv> operator* (const goVector<Tv>& v) const;
+        inline goMath::Vector<Tv> operator* (const goMath::Vector<Tv>& v) const;
         inline goSparseMatrix operator* (goDouble s) const;
         inline goSparseMatrix operator+ (const goSparseMatrix& m) const;
         inline goSparseMatrix operator- (const goSparseMatrix& m) const;
@@ -599,7 +599,7 @@ bool goSparseMatrix::matrixVectorMult (goArray<goDouble>& ret, const goArray<goD
 * @return 
 **/
 template <class Tv>
-bool goSparseMatrix::matrixVectorMult (goVector<Tv>& ret, const goVector<Tv>& v)
+bool goSparseMatrix::matrixVectorMult (goMath::Vector<Tv>& ret, const goMath::Vector<Tv>& v)
 {
     // printf ("Matrix vector mult %dx%d * %d\n", this->getRowCount(), this->getColumnCount(), v.getSize());
     if (mCols != (int)v.getSize())
@@ -706,7 +706,7 @@ bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goArray<goDoub
 * @return 
 **/
 template <class Tv>
-bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goVector<Tv>& v)
+bool goSparseMatrix::matrixVectorMult (goSparseMatrix& ret, const goMath::Vector<Tv>& v)
 {
     if (mCols != v.getSize())
     {
@@ -1458,9 +1458,9 @@ goSparseMatrix goSparseMatrix::operator* (const goSparseMatrix& other) const
 }
 
 template <class Tv>
-goVector<Tv> goSparseMatrix::operator* (const goVector<Tv>& v) const
+goMath::Vector<Tv> goSparseMatrix::operator* (const goMath::Vector<Tv>& v) const
 {
-    goVector<Tv> ret;
+    goMath::Vector<Tv> ret;
     goSparseMatrix temp = *this;
     //= Hack to avoid the const for the *Mult() methods. Using operator* should be avoided in speed-relevant code anyway
     //= because of the copy operations.

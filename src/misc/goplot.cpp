@@ -17,8 +17,8 @@ class goPlotterPrivate
                              waitFlag(true), pauseFlag(false), cmdFilename(""), dataFilenames() {};
         ~goPlotterPrivate() {};
 
-        goList<goVectord>      plotX;
-        goList<goVectord>      plotY;
+        goList<goMath::Vectord>      plotX;
+        goList<goMath::Vectord>      plotY;
         goList<goString>       titles;
         goList<goPlotterLabel> labels;
         goList<goString>       plotCommands;
@@ -62,7 +62,7 @@ const goPlotter& goPlotter::operator= (const goPlotter& other)
     return *this;
 }
 
-bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* title, const char* plotOptions)
+bool goPlotter::addCurve (const goMath::Vectord& x, const goMath::Vectord& y, const char* title, const char* plotOptions)
 {
     if (x.getSize() != y.getSize())
     {
@@ -84,16 +84,16 @@ bool goPlotter::addCurve (const goVectord& x, const goVectord& y, const char* ti
 }
 
 #if 0
-bool goPlotter::addCurve (const goVectorf& x, const goVectorf& y, const char* title, const char* plotOptions)
+bool goPlotter::addCurve (const goMath::Vectorf& x, const goMath::Vectorf& y, const char* title, const char* plotOptions)
 {
     if (x.getSize() != y.getSize())
     {
         goLog::warning("addCurve(): x and y array sizes mismatch.",this);
         return false;
     }
-    goVectord xx;
+    goMath::Vectord xx;
     xx = x;
-    goVectord yy;
+    goMath::Vectord yy;
     yy = y;
     myPrivate->plotX.append(xx);
     myPrivate->plotY.append(yy);
@@ -796,7 +796,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<arrayT>* arrayListX,
 }
 
 template <class T>
-bool goPlot::writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrices,
+bool goPlot::writeGnuplotDataFiles (const goList<goMath::Matrix<T> >*    matrices,
                                     goList<goString>&     dataFileNameRet)
 {
     goList<goString>* filenames = &dataFileNameRet;
@@ -804,14 +804,14 @@ bool goPlot::writeGnuplotDataFiles (const goList<goMatrix<T> >*    matrices,
     // filenames->erase(); 
     goString filename;
 
-    typename goList<goMatrix<T> >::ConstElement* el = matrices->getFrontElement ();
+    typename goList<goMath::Matrix<T> >::ConstElement* el = matrices->getFrontElement ();
     while (el)
     {
         FILE* file = goFileIO::createTempFile (filename);
         if (!file)
             return false;
         filenames->append(filename);
-        const goMatrix<T>& matrix = el->elem;
+        const goMath::Matrix<T>& matrix = el->elem;
         for (goSize_t row = 0; row < matrix.getRows(); ++row)
         {
             for (goSize_t col = 0; col < matrix.getColumns(); ++col)
@@ -851,11 +851,11 @@ static bool writeGnuplotDataFilesSignal3D (
 }
 
 template <class T>
-bool goPlot::writeGnuplotDataFilesBinary (const goList<goMatrix<T> >* images,
+bool goPlot::writeGnuplotDataFilesBinary (const goList<goMath::Matrix<T> >* images,
                                           goList<goString>&        dataFileNameRet)
 {
     goString filename;
-    typename goList<goMatrix<T> >::ConstElement *el = images->getFrontElement();
+    typename goList<goMath::Matrix<T> >::ConstElement *el = images->getFrontElement();
     while (el)
     {
         FILE* f = goFileIO::createTempFile (filename);
@@ -929,7 +929,7 @@ bool goPlot::writeGnuplotDataFiles (const goList<const goSignal3DBase<void>*>* i
  * @param prefix Prefix commands for gnuplot (like "set ..." commands)
  */
 template <class T>
-void goPlot::plot (const goVector<T>& x, const goVector<T>& y, 
+void goPlot::plot (const goMath::Vector<T>& x, const goMath::Vector<T>& y, 
                 const char* title, const char* plotOptions, const char* prefix)
 {
     goMultiPlotter plotter (1,1);
@@ -943,7 +943,7 @@ void goPlot::plot (const goVector<T>& x, const goVector<T>& y,
 }
 
 template <class T>
-void goPlot::plot (const goVector<T>& y, 
+void goPlot::plot (const goMath::Vector<T>& y, 
                 const char* title, const char* plotOptions, const char* prefix)
 {
     goMultiPlotter plotter (1,1);
@@ -970,7 +970,7 @@ void goPlot::plot (const goVector<T>& y,
  * @param prefix Prefix commands for gnuplot (like "set ..." commands)
  */
 template <class T>
-void goPlot::plot (const goMatrix<T>& points,
+void goPlot::plot (const goMath::Matrix<T>& points,
                 const char* title, const char* plotOptions, const char* prefix)
 {
     goMultiPlotter plotter (1,1);
@@ -984,7 +984,7 @@ void goPlot::plot (const goMatrix<T>& points,
 }
 
 template <class T>
-void goPlot::plot3D (const goMatrix<T>& M,
+void goPlot::plot3D (const goMath::Matrix<T>& M,
         const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false)
 {
     goMultiPlotter plotter (1,1);
@@ -1055,11 +1055,11 @@ template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<TYPE>* arrayList
                                     goList<goString>& dataFileNameRet);
 
 #define GOPLOT_WRITEFILES_INSTANTIATE3(TYPE) \
-template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<goMatrix<TYPE> >*    matrix, \
+template bool goPlot::writeGnuplotDataFiles<TYPE> (const goList<goMath::Matrix<TYPE> >*    matrix, \
                                     goList<goString>&     dataFileNameRet);
 
 #define GOPLOT_WRITEFILES_BINARY_INSTANTIATE(TYPE) \
-template bool goPlot::writeGnuplotDataFilesBinary<TYPE> (const goList<goMatrix<TYPE> >*    matrix, \
+template bool goPlot::writeGnuplotDataFilesBinary<TYPE> (const goList<goMath::Matrix<TYPE> >*    matrix, \
                                     goList<goString>&     dataFileNameRet);
 
 GOPLOT_INSTANTIATE(goArray<goFloat>);
@@ -1072,8 +1072,8 @@ GOPLOT_INSTANTIATE2(goFixedArray<goFloat>,goFixedArray<goFloat>);
 GOPLOT_INSTANTIATE2(goFixedArray<goDouble>,goFixedArray<goDouble>);
 GOPLOT_INSTANTIATE_LIST(goFixedArray<goFloat>);
 GOPLOT_INSTANTIATE_LIST(goFixedArray<goDouble>);
-GOPLOT_INSTANTIATE_LIST(goVectorf);
-GOPLOT_INSTANTIATE_LIST(goVectord);
+GOPLOT_INSTANTIATE_LIST(goMath::Vectorf);
+GOPLOT_INSTANTIATE_LIST(goMath::Vectord);
 GOPLOT_WRITEFILES_INSTANTIATE(goArray<goFloat>);
 GOPLOT_WRITEFILES_INSTANTIATE(goArray<goDouble>);
 GOPLOT_WRITEFILES_INSTANTIATE(goFixedArray<goFloat>);
@@ -1082,10 +1082,10 @@ GOPLOT_WRITEFILES_INSTANTIATE2(goArray<goFloat>);
 GOPLOT_WRITEFILES_INSTANTIATE2(goArray<goDouble>);
 GOPLOT_WRITEFILES_INSTANTIATE2(goFixedArray<goFloat>);
 GOPLOT_WRITEFILES_INSTANTIATE2(goFixedArray<goDouble>);
-GOPLOT_WRITEFILES_INSTANTIATE(goVectorf);
-GOPLOT_WRITEFILES_INSTANTIATE(goVectord);
-GOPLOT_WRITEFILES_INSTANTIATE2(goVectorf);
-GOPLOT_WRITEFILES_INSTANTIATE2(goVectord);
+GOPLOT_WRITEFILES_INSTANTIATE(goMath::Vectorf);
+GOPLOT_WRITEFILES_INSTANTIATE(goMath::Vectord);
+GOPLOT_WRITEFILES_INSTANTIATE2(goMath::Vectorf);
+GOPLOT_WRITEFILES_INSTANTIATE2(goMath::Vectord);
 GOPLOT_WRITEFILES_INSTANTIATE3(goFloat);
 GOPLOT_WRITEFILES_INSTANTIATE3(goDouble);
 GOPLOT_WRITEFILES_BINARY_INSTANTIATE(goFloat);
@@ -1093,37 +1093,37 @@ GOPLOT_WRITEFILES_BINARY_INSTANTIATE(goDouble);
 
 template 
 void goPlot::plot<goFloat> (
-        const goVector<goFloat>&, 
-        const goVector<goFloat>&, 
+        const goMath::Vector<goFloat>&, 
+        const goMath::Vector<goFloat>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot<goDouble> (
-        const goVector<goDouble>&, 
-        const goVector<goDouble>&, 
+        const goMath::Vector<goDouble>&, 
+        const goMath::Vector<goDouble>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot<goFloat> (
-        const goVector<goFloat>&, 
+        const goMath::Vector<goFloat>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot<goDouble> (
-        const goVector<goDouble>&, 
+        const goMath::Vector<goDouble>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot<goFloat> (
-        const goMatrix<goFloat>&, 
+        const goMath::Matrix<goFloat>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot<goDouble> (
-        const goMatrix<goDouble>&, 
+        const goMath::Matrix<goDouble>&, 
         const char*, const char*, const char*);
 template 
 void goPlot::plot3D<goFloat> (
-        const goMatrix<goFloat>&, 
+        const goMath::Matrix<goFloat>&, 
         const char*, const char*, const char*, bool);
 template 
 void goPlot::plot3D<goDouble> (
-        const goMatrix<goDouble>&, 
+        const goMath::Matrix<goDouble>&, 
         const char*, const char*, const char*, bool);
 
 #if 0

@@ -76,7 +76,7 @@ namespace goMath
 
     template <class input_vector, class scalar_type>
     MultiGaussPDF<input_vector, scalar_type>::MultiGaussPDF (const input_vector& mean, 
-                                                                 const goMatrix<scalar_type>& cov, 
+                                                                 const goMath::Matrix<scalar_type>& cov, 
                                                                  scalar_type normFactor)
         : PDF<input_vector, scalar_type> (),
           myMean          (mean),
@@ -145,16 +145,16 @@ namespace goMath
         {
             goFloat factor = 1.0f / (this->N + 1.0f);
             this->sum_xxT *= this->N * factor;
-            goVectorOuter<scalar_type> (scalar_type(factor), input, input, this->sum_xxT);
+            vectorOuter<scalar_type> (scalar_type(factor), input, input, this->sum_xxT);
 
             this->myMean *= this->N * factor;
-            goVectorAdd<scalar_type> (scalar_type(factor), input, this->myMean);
+            vectorAdd<scalar_type> (scalar_type(factor), input, this->myMean);
             
             if (this->N >= 2)
             {
                 this->myCovariance = this->sum_xxT;
                 factor = -1.0f; 
-                goVectorOuter<scalar_type> (scalar_type(factor), this->myMean, this->myMean, this->myCovariance);
+                vectorOuter<scalar_type> (scalar_type(factor), this->myMean, this->myMean, this->myCovariance);
             }
             this->N += 1.0f;
         }
@@ -189,7 +189,7 @@ namespace goMath
 //    }
 
     template <class input_vector, class scalar_type>
-        void MultiGaussPDF<input_vector,scalar_type>::setCovariance (const goMatrix<scalar_type>& cov)
+        void MultiGaussPDF<input_vector,scalar_type>::setCovariance (const goMath::Matrix<scalar_type>& cov)
         {
             myCovariance = cov;
             myCovarianceInv = cov;
@@ -216,12 +216,12 @@ namespace goMath
         }
 
     template <class input_vector, class scalar_type>
-        const goMatrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovarianceInv () const
+        const goMath::Matrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovarianceInv () const
         {
             return this->myCovarianceInv;
         }
     template <class input_vector, class scalar_type>
-        const goMatrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovariance () const
+        const goMath::Matrix<scalar_type>& MultiGaussPDF<input_vector,scalar_type>::getCovariance () const
         {
             return this->myCovariance;
         }

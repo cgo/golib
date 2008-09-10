@@ -4,7 +4,7 @@
 #include <gosignaloperation.h>
 
 template <class T>
-static inline bool _minMaxCoord (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet)
+static inline bool _minMaxCoord (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     goSignal3DGenericConstIterator it (&sig);
    
@@ -47,7 +47,7 @@ static inline bool _minMaxCoord (const goSignal3DBase<void>& sig, goDouble thres
 }
 
 template <class T>
-static inline bool _minMaxCoordGeneric (const goSignal3DBase<void>& sig, goFunctorBase1<bool, goDouble>& f, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet)
+static inline bool _minMaxCoordGeneric (const goSignal3DBase<void>& sig, goFunctorBase1<bool, goDouble>& f, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     goSignal3DGenericConstIterator it (&sig);
    
@@ -104,7 +104,7 @@ static inline bool _minMaxCoordGeneric (const goSignal3DBase<void>& sig, goFunct
  * 
  * @return True if successful, false otherwise.
  */
-bool goSignalMinMaxCoord (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet)
+bool goSignalMinMaxCoord (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     if (minRet.getSize() < 3)
         minRet.resize (3);
@@ -145,7 +145,7 @@ bool goSignalMinMaxCoord (const goSignal3DBase<void>& sig, goDouble thresh, goVe
 * 
 * @return True if success, false otherwise.
 */
-bool goSignalMinMaxCoord (const goSignal3DBase<void>& sig, goAutoPtr<goFunctorBase1<bool, goDouble> > f, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet)
+bool goSignalMinMaxCoord (const goSignal3DBase<void>& sig, goAutoPtr<goFunctorBase1<bool, goDouble> > f, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     if (minRet.getSize() < 3)
         minRet.resize (3);
@@ -184,8 +184,8 @@ bool goSignalCrop (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goDou
 {
     goSize_t _min[3];
     goSize_t _max[3];
-    goVector<goSize_t> min (_min, 3, 1);
-    goVector<goSize_t> max (_max, 3, 1);
+    goMath::Vector<goSize_t> min (_min, 3, 1);
+    goMath::Vector<goSize_t> max (_max, 3, 1);
 
     if (!goSignalMinMaxCoord (sig, thresh, min, max))
     {
@@ -244,8 +244,8 @@ bool goSignalCropHigher (goSignal3DBase<void>& sig, goSubSignal3D<void>& target,
 {
     goSize_t _min[3];
     goSize_t _max[3];
-    goVector<goSize_t> min (_min, 3, 1);
-    goVector<goSize_t> max (_max, 3, 1);
+    goMath::Vector<goSize_t> min (_min, 3, 1);
+    goMath::Vector<goSize_t> max (_max, 3, 1);
 
     _lower_or_equal leq (thresh);
     return goSignalCrop (sig, target, goMemberFunction<_lower_or_equal, bool, goDouble> (&leq, &_lower_or_equal::eval));
@@ -268,8 +268,8 @@ bool goSignalCrop (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goAut
 {
     goSize_t _min[3];
     goSize_t _max[3];
-    goVector<goSize_t> min (_min, 3, 1);
-    goVector<goSize_t> max (_max, 3, 1);
+    goMath::Vector<goSize_t> min (_min, 3, 1);
+    goMath::Vector<goSize_t> max (_max, 3, 1);
 
     if (!goSignalMinMaxCoord (sig, f, min, max))
     {
@@ -307,7 +307,7 @@ bool goSignalCrop (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goAut
 * 
 * @return True if successful, false otherwise.
 */
-bool goSignalMinMaxCoordHigher (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet)
+bool goSignalMinMaxCoordHigher (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     _lower_or_equal leq (thresh);
     return goSignalMinMaxCoord (sig, goMemberFunction<_lower_or_equal, bool, goDouble> (&leq, &_lower_or_equal::eval), minRet, maxRet);

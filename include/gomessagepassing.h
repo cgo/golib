@@ -58,7 +58,7 @@ class goMessagePassing : public goGraphAlgorithm< goFGNode<T,Tfloat>, goFGEdge<T
          * 
          * @return The sum of f over all variables except fixed_index.
          */
-        inline goDouble sum (goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
+        inline goDouble sum (goFunctorBase1 <Tfloat, const goMath::Vector<T>& >* f, goMath::Vector<T>& X, goSize_t i, goSize_t fixed_index)
         {
             if (i >= X.getSize())
             {

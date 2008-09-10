@@ -14,26 +14,26 @@ namespace goMath
     {
         public:
             AffineTransform ();
-            AffineTransform (const goMatrix<T>& A, const goVector<T>& t);
+            AffineTransform (const goMath::Matrix<T>& A, const goMath::Vector<T>& t);
             virtual ~AffineTransform ();
 
-            void set (const goMatrix<T>& A_, const goVector<T>& t_)
+            void set (const goMath::Matrix<T>& A_, const goMath::Vector<T>& t_)
             {
                 this->A = A_;
                 this->t = t_;
             };
 
-            goMatrix<T>& getA () { return this->A; };
-            goVector<T>& getT () { return this->t; };
-            const goMatrix<T>& getA () const { return this->A; };
-            const goVector<T>& getT () const { return this->t; };
+            goMath::Matrix<T>& getA () { return this->A; };
+            goMath::Vector<T>& getT () { return this->t; };
+            const goMath::Matrix<T>& getA () const { return this->A; };
+            const goMath::Vector<T>& getT () const { return this->t; };
 
-            void apply (goVector<T>& v);
-            void apply (const goMatrix<T>& confMatrix, goMatrix<T>& ret);
+            void apply (goMath::Vector<T>& v);
+            void apply (const goMath::Matrix<T>& confMatrix, goMath::Matrix<T>& ret);
 
         private:
-            goMatrix<T> A;
-            goVector<T> t;
+            goMath::Matrix<T> A;
+            goMath::Vector<T> t;
     };
 };
 

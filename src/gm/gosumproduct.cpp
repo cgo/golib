@@ -55,7 +55,7 @@ template <class T, class Tfloat>
 bool goSumProduct<T,Tfloat>::marginal (
         goFGNodeVariable<T,Tfloat>* variable, 
         goSize_t                    valueCount,
-        goVector<Tfloat>&           marginalRet)
+        goMath::Vector<Tfloat>&           marginalRet)
 {
     goSize_t adjCount = variable->adj.getSize();
     if (marginalRet.getSize() != valueCount)
@@ -85,7 +85,7 @@ bool goSumProduct<T,Tfloat>::marginal (
 template <class T, class Tfloat>
 Tfloat goSumProduct<T,Tfloat>::norm (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
 {
-    goVector<Tfloat> marginal (valueCount);
+    goMath::Vector<Tfloat> marginal (valueCount);
     this->marginal (fg.myVariables[0], valueCount, marginal);
     return marginal.sum ();
 }

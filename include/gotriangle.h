@@ -5,7 +5,7 @@ template <class T>
 class goTriangle
 {
     public: 
-        goTriangle(goVector<T>* p1, goVector<T>* p2, goVector<T>* p3)
+        goTriangle(goMath::Vector<T>* p1, goMath::Vector<T>* p2, goMath::Vector<T>* p3)
             : myVertices (3), myNeighbours (3), myAdjVertices (3)
         {
             myVertices[0] = p1;
@@ -24,9 +24,9 @@ class goTriangle
         void              setNeigh (goIndex_t i, goTriangle* t) { myNeighbours[i] = t; };
 
     private:
-        goFixedArray<goVector<T>*>   myVertices;
+        goFixedArray<goMath::Vector<T>*>   myVertices;
         goFixedArray<goTriangle<T>*> myNeighbours;
-        goFixedArray<goVector<T>*>   myAdjVertices;
+        goFixedArray<goMath::Vector<T>*>   myAdjVertices;
 };
 
 template <class T> class goTriangleMeshPrivate;

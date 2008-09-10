@@ -2,7 +2,7 @@
 #include <gosignal3dgenericiterator.h>
 
 template <class T2, class T>
-static T calculate_stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s)
+static T calculate_stencil (const goSignal3DBase<void>& sig, const goMath::Matrix<T>& s)
 {
     goSignal3DGenericConstIterator it (&sig);
 
@@ -44,7 +44,7 @@ static T calculate_stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& 
  * @return The sum of the elements in \c sig weighted with \c s.
  */
 template <class T>
-T goMath::stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s)
+T goMath::stencil (const goSignal3DBase<void>& sig, const goMath::Matrix<T>& s)
 {
     if (s.getRows() != sig.getSizeX() || s.getColumns() != sig.getSizeY())
     {
@@ -66,5 +66,5 @@ T goMath::stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s)
 }
 /** @} */
 
-template goFloat goMath::stencil <goFloat> (const goSignal3DBase<void>&, const goMatrix<goFloat>&);
-template goDouble goMath::stencil <goDouble> (const goSignal3DBase<void>&, const goMatrix<goDouble>&);
+template goFloat goMath::stencil <goFloat> (const goSignal3DBase<void>&, const goMath::Matrix<goFloat>&);
+template goDouble goMath::stencil <goDouble> (const goSignal3DBase<void>&, const goMath::Matrix<goDouble>&);

@@ -3,7 +3,7 @@
 #include <gosignal3dgenericiterator.h>
 
 template <class T, class sigT>
-static inline void comp_point (int j, int jp1, const goMatrix<T>& MM, goSignal3D<void>& binimg)
+static inline void comp_point (int j, int jp1, const goMath::Matrix<T>& MM, goSignal3D<void>& binimg)
 {
     int y1 = int(floor(MM(j,1)));
     int y2 = int(floor(MM(jp1,1)));
@@ -59,7 +59,7 @@ static inline void comp_point (int j, int jp1, const goMatrix<T>& MM, goSignal3D
 }
 
 template <class T, class sigT>
-static inline bool binaryImage2 (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height)
+static inline bool binaryImage2 (const goMath::Matrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height)
 {
     if (ret.getSizeX() != width || ret.getSizeY() != height)
     {
@@ -119,7 +119,7 @@ static inline bool binaryImage2 (const goMatrix<T>& boundary, goSignal3D<void>& 
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMath::binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height)
+bool goSignal::binaryImage (const goMath::Matrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height)
 {
     switch (ret.getDataType().getID())
     {
@@ -137,5 +137,5 @@ bool goMath::binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, go
 }
 /** @} */
 
-template bool goMath::binaryImage<goFloat> (const goMatrix<goFloat>&, goSignal3D<void>&, goSize_t, goSize_t);
-template bool goMath::binaryImage<goDouble> (const goMatrix<goDouble>&, goSignal3D<void>&, goSize_t, goSize_t);
+template bool goSignal::binaryImage<goFloat> (const goMath::Matrix<goFloat>&, goSignal3D<void>&, goSize_t, goSize_t);
+template bool goSignal::binaryImage<goDouble> (const goMath::Matrix<goDouble>&, goSignal3D<void>&, goSize_t, goSize_t);

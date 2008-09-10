@@ -28,14 +28,14 @@ extern "C"
 }
 
 template<class T>
-const bool goMatrix<T>::rowMajor = true;
+const bool goMath::Matrix<T>::rowMajor = true;
 
 /*!
 * @param y Number of rows.
 * @param x Number of columns.
 */
 template <class T>
-goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
+goMath::Matrix<T>::Matrix (goSize_t rows, goSize_t cols)
     : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
 {
     if (rows * cols > 0)
@@ -50,7 +50,7 @@ goMatrix<T>::goMatrix (goSize_t rows, goSize_t cols)
 * @param other Other matrix. Will be deep copied.
 */
 template <class T>
-goMatrix<T>::goMatrix (const goMatrix<T>& other)
+goMath::Matrix<T>::Matrix (const goMath::Matrix<T>& other)
     : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (0)
 {
     *this = other;
@@ -64,12 +64,12 @@ goMatrix<T>::goMatrix (const goMatrix<T>& other)
 * @param c Columns
 */
 template <class T>
-goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
+goMath::Matrix<T>::Matrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
     : externalData (true), matrix (data), rows (r), columns (c), leadingDimension (leadingDim)
 {
     if (leadingDim == 0)
     {
-        if (goMatrix<T>::rowMajor)
+        if (goMath::Matrix<T>::rowMajor)
             leadingDimension = columns;
         else
             leadingDimension = rows;
@@ -77,7 +77,7 @@ goMatrix<T>::goMatrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
 }
 
 template <class T>
-goMatrix<T>::~goMatrix ()
+goMath::Matrix<T>::~Matrix ()
 {
     if (!this->externalData && this->matrix)
     {
@@ -99,7 +99,7 @@ goMatrix<T>::~goMatrix ()
  * @return  True if successful, false otherwise. Currently always true.
  */
 template <class T>
-bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
+bool goMath::Matrix<T>::resize (goSize_t rows, goSize_t cols)
 {
     if (!this->externalData && this->matrix)
     {
@@ -112,7 +112,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     }
     this->rows = rows;
     this->columns = cols;
-    if (goMatrix<T>::rowMajor)
+    if (goMath::Matrix<T>::rowMajor)
     {
         this->leadingDimension = cols;
     }
@@ -134,7 +134,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
  * @return True.
  */
 template <class T>
-bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
+bool goMath::Matrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
 {
     if (this->matrix && !this->externalData)
     {
@@ -146,7 +146,7 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
     this->columns = c;
     if (leadingDim == 0)
     {
-        if (goMatrix<T>::rowMajor)
+        if (goMath::Matrix<T>::rowMajor)
         {
             this->leadingDimension = c;
         }
@@ -174,7 +174,7 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
  * @return True.
  */
 template <class T>
-bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim) const
+bool goMath::Matrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim) const
 {
     //= FORGIVE ME PLEASE PLEASE PLEASE PLEASE ....
     if (this->matrix && !this->externalData)
@@ -182,24 +182,24 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
         delete[] const_cast<T*>(this->matrix);
     }
 
-    const_cast<goMatrix<T>*>(this)->externalData = true;
-    const_cast<goMatrix<T>*>(this)->matrix = const_cast<T*>(data);
-    const_cast<goMatrix<T>*>(this)->rows = r;
-    const_cast<goMatrix<T>*>(this)->columns = c;
+    const_cast<goMath::Matrix<T>*>(this)->externalData = true;
+    const_cast<goMath::Matrix<T>*>(this)->matrix = const_cast<T*>(data);
+    const_cast<goMath::Matrix<T>*>(this)->rows = r;
+    const_cast<goMath::Matrix<T>*>(this)->columns = c;
     if (leadingDim == 0)
     {
-        if (goMatrix<T>::rowMajor)
+        if (goMath::Matrix<T>::rowMajor)
         {
-            const_cast<goMatrix<T>*>(this)->leadingDimension = c;
+            const_cast<goMath::Matrix<T>*>(this)->leadingDimension = c;
         }
         else
         {
-            const_cast<goMatrix<T>*>(this)->leadingDimension = r;
+            const_cast<goMath::Matrix<T>*>(this)->leadingDimension = r;
         }
     }
     else
     {
-        const_cast<goMatrix<T>*>(this)->leadingDimension = leadingDim;
+        const_cast<goMath::Matrix<T>*>(this)->leadingDimension = leadingDim;
     }
     return true; 
 }
@@ -210,7 +210,7 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
  * @param trans Contains the transpose after the method returned.
  */
 template <class T>
-void goMatrix<T>::getTranspose (goMatrix<T>& trans) const
+void goMath::Matrix<T>::getTranspose (goMath::Matrix<T>& trans) const
 {
     if (trans.getColumns() != this->getRows() || trans.getRows() != this->getColumns())
     {
@@ -230,9 +230,9 @@ void goMatrix<T>::getTranspose (goMatrix<T>& trans) const
 }
 
 template <class T>
-goMatrix<T> goMatrix<T>::getTranspose () const
+goMath::Matrix<T> goMath::Matrix<T>::getTranspose () const
 {
-    goMatrix<T> trans;
+    goMath::Matrix<T> trans;
     this->getTranspose (trans);
     return trans;
 }
@@ -243,7 +243,7 @@ goMatrix<T> goMatrix<T>::getTranspose () const
  * @param dim If 0, flips rows, otherwise flips columns.
  */
 template <class T>
-void goMatrix<T>::flip (goSize_t dim)
+void goMath::Matrix<T>::flip (goSize_t dim)
 {
     if (dim == 0)
     {
@@ -299,7 +299,7 @@ void goMatrix<T>::flip (goSize_t dim)
  * @param ret    On return, contains the shifted matrix.
  */
 template <class T>
-void goMatrix<T>::shiftRows (goIndex_t offset, goMatrix<T>& ret) const
+void goMath::Matrix<T>::shiftRows (goIndex_t offset, goMath::Matrix<T>& ret) const
 {
     if (ret.getRows() != this->getRows() || ret.getColumns() != this->getColumns())
     {
@@ -308,7 +308,7 @@ void goMatrix<T>::shiftRows (goIndex_t offset, goMatrix<T>& ret) const
 
     goSize_t sz = this->getRows();
     goSize_t newIndex = (offset >= 0) ? (offset) : (sz + offset);
-    const goVector<T> ref(0);
+    const goMath::Vector<T> ref(0);
     for (goSize_t oldIndex = 0; oldIndex < sz; ++oldIndex, ++newIndex)
     {
         if (newIndex >= sz)
@@ -328,7 +328,7 @@ void goMatrix<T>::shiftRows (goIndex_t offset, goMatrix<T>& ret) const
  * @param ret    On return, contains the shifted matrix.
  */
 template <class T>
-void goMatrix<T>::shiftColumns (goIndex_t offset, goMatrix<T>& ret) const
+void goMath::Matrix<T>::shiftColumns (goIndex_t offset, goMath::Matrix<T>& ret) const
 {
     if (ret.getRows() != this->getRows() || ret.getColumns() != this->getColumns())
     {
@@ -337,7 +337,7 @@ void goMatrix<T>::shiftColumns (goIndex_t offset, goMatrix<T>& ret) const
 
     goSize_t sz = this->getColumns();
     goSize_t newIndex = (offset >= 0) ? (offset) : (sz + offset);
-    const goVector<T> ref(0);
+    const goMath::Vector<T> ref(0);
     for (goSize_t oldIndex = 0; oldIndex < sz; ++oldIndex, ++newIndex)
     {
         if (newIndex >= sz)
@@ -361,7 +361,7 @@ void goMatrix<T>::shiftColumns (goIndex_t offset, goMatrix<T>& ret) const
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMatrix<T>& target) const
+bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMath::Matrix<T>& target) const
 {
     return this->copy (startRow, startCol, endRow, endCol, 0, 0, target);
 }
@@ -384,18 +384,18 @@ bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, g
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMatrix<T>& target) const
+bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMath::Matrix<T>& target) const
 {
     goSize_t num_rows = endRow - startRow + 1;
     goSize_t num_cols = endCol - startCol + 1;
     if (target.getRows() - target_row < num_rows || target.getColumns() - target_col < num_cols)
     {
-        goLog::warning ("goMatrix::copy(): target too small. Not copying.");
+        goLog::warning ("goMath::Matrix::copy(): target too small. Not copying.");
         return false;
     }
-    goMatrix<T> refM(0,0);
+    goMath::Matrix<T> refM(0,0);
     this->ref (startRow, startCol, num_rows, num_cols, refM);
-    goMatrix<T> refTarget(0,0);
+    goMath::Matrix<T> refTarget(0,0);
     target.ref (target_row, target_col, num_rows, num_cols, refTarget);
     refTarget = refM;
 
@@ -413,7 +413,7 @@ bool goMatrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, g
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMatrix<T>::copy (goMatrix<T>& target) const
+bool goMath::Matrix<T>::copy (goMath::Matrix<T>& target) const
 {
     return this->copy (0, 0, this->getRows() - 1, this->getColumns() - 1, 0, 0, target);
 }
@@ -422,16 +422,16 @@ bool goMatrix<T>::copy (goMatrix<T>& target) const
 /** 
  * @brief Transpose the data.
  * This is very slow and should be used scarcely.
- * For Multiplication with transposition, use goMatrixMult().
+ * For Multiplication with transposition, use goMath::MatrixMult().
  */
 template <class T>
-void goMatrix<T>::transpose ()
+void goMath::Matrix<T>::transpose ()
 {
     if (this->externalData)
     {
-        goLog::warning ("goMatrix::transpose() called on a matrix with external data. The matrix will not be a reference to the external data any more -- is this what you want?");
+        goLog::warning ("goMath::Matrix::transpose() called on a matrix with external data. The matrix will not be a reference to the external data any more -- is this what you want?");
     }
-    goMatrix<T> temp;
+    goMath::Matrix<T> temp;
     this->getTranspose(temp);
     if (this->externalData)
     {
@@ -441,7 +441,7 @@ void goMatrix<T>::transpose ()
 }
 
 template <class T>
-bool goMatrix<T>::operator== (const goMatrix<T>& other) const
+bool goMath::Matrix<T>::operator== (const goMath::Matrix<T>& other) const
 {
     goSize_t R = this->getRows();
     goSize_t C = this->getColumns();
@@ -464,7 +464,7 @@ bool goMatrix<T>::operator== (const goMatrix<T>& other) const
 }
 
 template <class T>
-bool goMatrix<T>::operator!= (const goMatrix<T>& other) const
+bool goMath::Matrix<T>::operator!= (const goMath::Matrix<T>& other) const
 {
     return !(*this == other);
 }
@@ -475,7 +475,7 @@ bool goMatrix<T>::operator!= (const goMatrix<T>& other) const
  * @return Sum over all elements.
  */
 template <class T>
-T goMatrix<T>::sum () const
+T goMath::Matrix<T>::sum () const
 {
     T s = T(0);
     goSize_t r = this->getRows();
@@ -498,7 +498,7 @@ T goMatrix<T>::sum () const
  * @param ret Result.
  */
 template <class T>
-void goMatrix<T>::sum (int dimension, goMatrix<T>& ret) const
+void goMath::Matrix<T>::sum (int dimension, goMath::Matrix<T>& ret) const
 {
     if (dimension == 0)
     {
@@ -533,9 +533,9 @@ void goMatrix<T>::sum (int dimension, goMatrix<T>& ret) const
 }
 
 template <class T>
-void goMatrix<T>::sum (int dimension, goVector<T>& ret) const
+void goMath::Matrix<T>::sum (int dimension, goMath::Vector<T>& ret) const
 {
-    goMatrix<T> M;
+    goMath::Matrix<T> M;
     this->sum (dimension, M);
     if (dimension == 0)
     {
@@ -550,13 +550,13 @@ void goMatrix<T>::sum (int dimension, goVector<T>& ret) const
 /*
  * @brief Convenience method for in-line use in calculations.
  * 
- * THIS DOES NOT WORK AS SOON AS SOMETHING LIKE THIS APPEARS: goMatrixf M4 = M1(1,1,3,3) * M1(2,0,4,3);
+ * THIS DOES NOT WORK AS SOON AS SOMETHING LIKE THIS APPEARS: goMath::Matrixf M4 = M1(1,1,3,3) * M1(2,0,4,3);
  * THEREFORE IT IS DUMPED AND LEFT HERE AS WARNING FOR THE FUTURE.
  */
 //template <class T>
-//const goMatrix<T>& goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2) const
+//const goMath::Matrix<T>& goMath::Matrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2) const
 //{
-//    static const goMatrix<T> retRef;
+//    static const goMath::Matrix<T> retRef;
 //    retRef.setData (&(*this)(i1,j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
 //    return retRef;
 //}
@@ -567,10 +567,10 @@ void goMatrix<T>::sum (int dimension, goVector<T>& ret) const
  * To make clear it is referencing, use the ref() method.
  */
 template <class T>
-void goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, goMatrix<T>& target) const
+void goMath::Matrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, goMath::Matrix<T>& target) const
 {
     assert (i1 <= i2 && j1 <= j2);
-    const goMatrix<T> temp;
+    const goMath::Matrix<T> temp;
     temp.setData (&(*this)(i1, j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
     target = temp;
 }
@@ -581,67 +581,136 @@ void goMatrix<T>::operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex
  * @note Dimensions must agree and are assert()ed. Check logfile for warnings.
  */
 template <class T>
-void goMatrix<T>::operator () (const goMatrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2)
+void goMath::Matrix<T>::operator () (const goMath::Matrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2)
 {
     assert (source.getRows() == (goSize_t)(i2-i1+1));
     assert (source.getColumns() == (goSize_t)(j2-j1+1));
     if (source.getRows() != static_cast<goSize_t>(i2-i1+1) || source.getColumns() != static_cast<goSize_t>(j2-j1+1))
     {
-        goLog::warning ("goMatrix::operator(): source dimensions do not agree with sub-matrix. Not copying.");
+        goLog::warning ("goMath::Matrix::operator(): source dimensions do not agree with sub-matrix. Not copying.");
         return;
     }
-    goMatrix<T> temp (&(*this)(i1, j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
+    goMath::Matrix<T> temp (&(*this)(i1, j1), i2-i1+1, j2-j1+1, this->getLeadingDimension());
     temp = source;
 }
 
-template<>
-goMatrix<goDouble> goMatrix<goDouble>::operator* (const goMatrix<goDouble>& other) const
-{
-    goSize_t M = this->getRows();
-    goSize_t N = other.getColumns();
-    goSize_t K = this->getColumns();
-    goMatrix<goDouble> C (this->getRows(), other.getColumns());
-    C.fill (0.0);
-    cblas_dgemm (CblasRowMajor, 
-                 CblasNoTrans, 
-                 CblasNoTrans,
-                 M, N, K, 1.0,
-                 this->getData(), this->getLeadingDimension(),
-                 other.getData(), other.getLeadingDimension(),
-                 0.0, C.getData(), C.getLeadingDimension());
-    return C;
-};
-template<>
-goMatrix<goFloat> goMatrix<goFloat>::operator* (const goMatrix<goFloat>& other) const
-{
-    goSize_t M = this->getRows();
-    goSize_t N = other.getColumns();
-    goSize_t K = this->getColumns();
-    goMatrix<goFloat> C (this->getRows(), other.getColumns());
-    C.fill (0.0);
-    cblas_sgemm (CblasRowMajor, 
-                 CblasNoTrans, 
-                 CblasNoTrans,
-                 M, N, K, 1.0,
-                 this->getData(), this->getLeadingDimension(),
-                 other.getData(), other.getLeadingDimension(),
-                 0.0, C.getData(), C.getLeadingDimension());
-    return C;
+namespace goMath {
+    template<>
+        goMath::Matrix<goDouble> Matrix<goDouble>::operator* (const goMath::Matrix<goDouble>& other) const
+        {
+            goSize_t M = this->getRows();
+            goSize_t N = other.getColumns();
+            goSize_t K = this->getColumns();
+            goMath::Matrix<goDouble> C (this->getRows(), other.getColumns());
+            C.fill (0.0);
+            cblas_dgemm (CblasRowMajor, 
+                    CblasNoTrans, 
+                    CblasNoTrans,
+                    M, N, K, 1.0,
+                    this->getData(), this->getLeadingDimension(),
+                    other.getData(), other.getLeadingDimension(),
+                    0.0, C.getData(), C.getLeadingDimension());
+            return C;
+        };
+    template<>
+        goMath::Matrix<goFloat> Matrix<goFloat>::operator* (const goMath::Matrix<goFloat>& other) const
+        {
+            goSize_t M = this->getRows();
+            goSize_t N = other.getColumns();
+            goSize_t K = this->getColumns();
+            goMath::Matrix<goFloat> C (this->getRows(), other.getColumns());
+            C.fill (0.0);
+            cblas_sgemm (CblasRowMajor, 
+                    CblasNoTrans, 
+                    CblasNoTrans,
+                    M, N, K, 1.0,
+                    this->getData(), this->getLeadingDimension(),
+                    other.getData(), other.getLeadingDimension(),
+                    0.0, C.getData(), C.getLeadingDimension());
+            return C;
+        };
+
+    template<>
+        Matrix<goFloat>& Matrix<goFloat>::operator*= (const Matrix<goFloat>& other)
+        {
+            goSize_t M = this->getRows();
+            goSize_t N = other.getColumns();
+            goSize_t K = this->getColumns();
+            Matrix<goFloat> C (this->getRows(), other.getColumns());
+            C.fill (0.0);
+            cblas_sgemm (CblasRowMajor, 
+                    CblasNoTrans, 
+                    CblasNoTrans,
+                    M, N, K, 1.0,
+                    this->getData(), this->getLeadingDimension(),
+                    other.getData(), other.getLeadingDimension(),
+                    0.0, C.getData(), C.getLeadingDimension());
+            *this = C;             
+            return *this;
+        }
+
+    template<>
+        Matrix<goDouble>& Matrix<goDouble>::operator*= (const Matrix<goDouble>& other)
+        {
+            goSize_t M = this->getRows();
+            goSize_t N = other.getColumns();
+            goSize_t K = this->getColumns();
+            Matrix<goDouble> C (this->getRows(), other.getColumns());
+            C.fill (0.0);
+            cblas_dgemm (CblasRowMajor, 
+                    CblasNoTrans, 
+                    CblasNoTrans,
+                    M, N, K, 1.0,
+                    this->getData(), this->getLeadingDimension(),
+                    other.getData(), other.getLeadingDimension(),
+                    0.0, C.getData(), C.getLeadingDimension());
+            *this = C;             
+            return *this;
+        }
+    template<>
+        goMath::Vector<goFloat> Matrix<goFloat>::operator* (const goMath::Vector<goFloat>& v) const
+        {
+            assert (v.getSize() == this->getColumns());
+            goMath::Vector<goFloat> y (this->getRows());
+            y.fill (0.0f);
+            cblas_sgemv (CblasRowMajor, CblasNoTrans, 
+                    this->getRows(), this->getColumns(), 
+                    1.0, this->matrix, this->getLeadingDimension(), 
+                    v.getPtr(), v.getStride(), 
+                    0.0f, y.getPtr(), y.getStride());
+            return y;
+        }
+
+
+    template<>
+        goMath::Vector<goDouble> Matrix<goDouble>::operator* (const goMath::Vector<goDouble>& v) const
+        {
+            assert (v.getSize() == this->getColumns());
+            goMath::Vector<goDouble> y (this->getRows());
+            y.fill (0.0f);
+            cblas_dgemv (CblasRowMajor, CblasNoTrans, 
+                    this->getRows(), this->getColumns(), 
+                    1.0, this->matrix, this->getLeadingDimension(), 
+                    v.getPtr(), v.getStride(), 
+                    0.0f, y.getPtr(), y.getStride());
+            return y;
+        }
+
 };
 
 template <class T>
-goMatrix<T> goMatrix<T>::operator* (const goMatrix<T>& other) const
+goMath::Matrix<T> goMath::Matrix<T>::operator* (const goMath::Matrix<T>& other) const
 {
     if (this->getColumns() != other.getRows())
     {
-        goLog::warning ("goMatrix::operator*: Matrix dimensions do not match.");
-        return goMatrix<T> (1,1);
+        goLog::warning ("goMath::Matrix::operator*: Matrix dimensions do not match.");
+        return goMath::Matrix<T> (1,1);
     }
-    goMatrix<T> retval (getRows(), other.getColumns());
+    goMath::Matrix<T> retval (getRows(), other.getColumns());
     goSize_t x, y;
     goSize_t columns = retval.getColumns();
-    goVector<T> row;
-    goVector<T> column;
+    goMath::Vector<T> row;
+    goMath::Vector<T> column;
     for (y = 0; y < retval.getRows(); ++y) 
     {
         for (x = 0; x < columns; ++x) 
@@ -654,87 +723,20 @@ goMatrix<T> goMatrix<T>::operator* (const goMatrix<T>& other) const
     return retval;
 }
 
-template<>
-goMatrix<goFloat>& goMatrix<goFloat>::operator*= (const goMatrix<goFloat>& other)
-{
-    goSize_t M = this->getRows();
-    goSize_t N = other.getColumns();
-    goSize_t K = this->getColumns();
-    goMatrix<goFloat> C (this->getRows(), other.getColumns());
-    C.fill (0.0);
-    cblas_sgemm (CblasRowMajor, 
-                 CblasNoTrans, 
-                 CblasNoTrans,
-                 M, N, K, 1.0,
-                 this->getData(), this->getLeadingDimension(),
-                 other.getData(), other.getLeadingDimension(),
-                 0.0, C.getData(), C.getLeadingDimension());
-    *this = C;             
-    return *this;
-}
-
-template<>
-goMatrix<goDouble>& goMatrix<goDouble>::operator*= (const goMatrix<goDouble>& other)
-{
-    goSize_t M = this->getRows();
-    goSize_t N = other.getColumns();
-    goSize_t K = this->getColumns();
-    goMatrix<goDouble> C (this->getRows(), other.getColumns());
-    C.fill (0.0);
-    cblas_dgemm (CblasRowMajor, 
-                 CblasNoTrans, 
-                 CblasNoTrans,
-                 M, N, K, 1.0,
-                 this->getData(), this->getLeadingDimension(),
-                 other.getData(), other.getLeadingDimension(),
-                 0.0, C.getData(), C.getLeadingDimension());
-    *this = C;             
-    return *this;
-}
-
 /** 
  * @brief this = this * other
  * @note Uses CLBLAS for goFloat and goDouble types.
- * @see goMatrixMult()
+ * @see goMath::MatrixMult()
  * @param other A Matrix.
  * 
  * @return Reference to this.
  */
 template <class T>
-goMatrix<T>& goMatrix<T>::operator*= (const goMatrix<T>& other)
+goMath::Matrix<T>& goMath::Matrix<T>::operator*= (const goMath::Matrix<T>& other)
 {
     // Slow and reliable (and quick to hack).
     *this = *this * other;
     return *this;
-}
-
-template<>
-goVector<goFloat> goMatrix<goFloat>::operator* (const goVector<goFloat>& v) const
-{
-    assert (v.getSize() == this->getColumns());
-    goVector<goFloat> y (this->getRows());
-    y.fill (0.0f);
-    cblas_sgemv (CblasRowMajor, CblasNoTrans, 
-                 this->getRows(), this->getColumns(), 
-                 1.0, this->matrix, this->getLeadingDimension(), 
-                 v.getPtr(), v.getStride(), 
-                 0.0f, y.getPtr(), y.getStride());
-    return y;
-}
-
-
-template<>
-goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v) const
-{
-    assert (v.getSize() == this->getColumns());
-    goVector<goDouble> y (this->getRows());
-    y.fill (0.0f);
-    cblas_dgemv (CblasRowMajor, CblasNoTrans, 
-                 this->getRows(), this->getColumns(), 
-                 1.0, this->matrix, this->getLeadingDimension(), 
-                 v.getPtr(), v.getStride(), 
-                 0.0f, y.getPtr(), y.getStride());
-    return y;
 }
 
   /** 
@@ -745,7 +747,7 @@ goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goDouble>& v) c
   * @return this = this + other
   */
 template <class T>
-goMatrix<T>& goMatrix<T>::operator+= (const goMatrix<T>& other)
+goMath::Matrix<T>& goMath::Matrix<T>::operator+= (const goMath::Matrix<T>& other)
 {
     assert (this->getRows() == other.getRows());
     assert (this->getColumns() == other.getColumns());
@@ -768,7 +770,7 @@ goMatrix<T>& goMatrix<T>::operator+= (const goMatrix<T>& other)
 }
 
 template <class T>
-goMatrix<T>& goMatrix<T>::operator+= (T scalar)
+goMath::Matrix<T>& goMath::Matrix<T>::operator+= (T scalar)
 {
     goSize_t i;
     goSize_t j;
@@ -783,7 +785,7 @@ goMatrix<T>& goMatrix<T>::operator+= (T scalar)
 }
 
 template <class T>
-goMatrix<T>& goMatrix<T>::operator-= (T scalar)
+goMath::Matrix<T>& goMath::Matrix<T>::operator-= (T scalar)
 {
     goSize_t i;
     goSize_t j;
@@ -799,13 +801,13 @@ goMatrix<T>& goMatrix<T>::operator-= (T scalar)
 
 //= Quite slow, quick hack.
 template <class T>
-goMatrix<T> goMatrix<T>::operator+ (const goMatrix<T>& other) const
+goMath::Matrix<T> goMath::Matrix<T>::operator+ (const goMath::Matrix<T>& other) const
 {
     assert (this->getRows() == other.getRows());
     assert (this->getColumns() == other.getColumns());
     goSize_t i;
     goSize_t j;
-    goMatrix<T> C (this->getRows(), this->getColumns());
+    goMath::Matrix<T> C (this->getRows(), this->getColumns());
     for (i = 0; i < this->getRows(); ++i)
     {
         for (j = 0; j < this->getColumns(); ++j)
@@ -818,13 +820,13 @@ goMatrix<T> goMatrix<T>::operator+ (const goMatrix<T>& other) const
 
 //= Quite slow, quick hack.
 template <class T>
-goMatrix<T> goMatrix<T>::operator-  (const goMatrix<T>& other) const
+goMath::Matrix<T> goMath::Matrix<T>::operator-  (const goMath::Matrix<T>& other) const
 {
     assert (this->getRows() == other.getRows());
     assert (this->getColumns() == other.getColumns());
     goSize_t i;
     goSize_t j;
-    goMatrix<T> C (this->getRows(), this->getColumns());
+    goMath::Matrix<T> C (this->getRows(), this->getColumns());
     for (i = 0; i < this->getRows(); ++i)
     {
         for (j = 0; j < this->getColumns(); ++j)
@@ -843,7 +845,7 @@ goMatrix<T> goMatrix<T>::operator-  (const goMatrix<T>& other) const
  * @return this = this - other
  */
 template <class T>
-goMatrix<T>& goMatrix<T>::operator-= (const goMatrix<T>& other)
+goMath::Matrix<T>& goMath::Matrix<T>::operator-= (const goMath::Matrix<T>& other)
 {
     assert (this->getRows() == other.getRows());
     assert (this->getColumns() == other.getColumns());
@@ -871,7 +873,7 @@ goMatrix<T>& goMatrix<T>::operator-= (const goMatrix<T>& other)
  * @return Reference to this matrix.
  */
 template <class T>
-goMatrix<T>& goMatrix<T>::operator= (const goMatrix<T>& other)
+goMath::Matrix<T>& goMath::Matrix<T>::operator= (const goMath::Matrix<T>& other)
 {
     if (this->rows != other.getRows() || this->columns != other.getColumns())
     {
@@ -901,7 +903,7 @@ goMatrix<T>& goMatrix<T>::operator= (const goMatrix<T>& other)
  * @return True
  */
 template <class T>
-bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
+bool goMath::Matrix<T>::multiplyElements (const goMath::Matrix<T>& other)
 {
     assert (this->getRows() == other.getRows() && this->getColumns() == other.getColumns());
     goSize_t i;
@@ -917,7 +919,7 @@ bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
 }
 
 //template <class T>
-//T goMatrix<T>::norm () const
+//T goMath::Matrix<T>::norm () const
 //{
 //    goSize_t sz = this->getRows() * this->getColumns();
 //    goSize_t i;
@@ -938,7 +940,7 @@ bool goMatrix<T>::multiplyElements (const goMatrix<T>& other)
  * @return The Frobenius norm of this matrix.
  */
 template <class T>
-T goMatrix<T>::norm () const
+T goMath::Matrix<T>::norm () const
 {
     goSize_t i,j;
     double retValue = 0.0;
@@ -963,12 +965,6 @@ T goMatrix<T>::norm () const
     return static_cast<T>(sqrt(retValue));
 }
 
-template <>
-goComplexf goMatrix<goComplexf>::trace () const
-{
-    goLog::error ("goMatrix::trace() not implemented for complex.");
-    return goComplexf (0.0,0.0);
-}
 //    goSize_t i,j;
 //    goComplexf retValue (0.0,0.0);
 //    goSize_t R = goMath::min<goSize_t> (this->getRows(),this->getColumns());
@@ -995,7 +991,7 @@ goComplexf goMatrix<goComplexf>::trace () const
  * @return The trace of the matrix.
  */
 template <class T>
-T goMatrix<T>::trace () const
+T goMath::Matrix<T>::trace () const
 {
     goSize_t i;
     double retValue = 0.0;
@@ -1018,7 +1014,7 @@ T goMatrix<T>::trace () const
  * @brief Load identity matrix.
  */
 template <class T>
-void goMatrix<T>::setIdentity()
+void goMath::Matrix<T>::setIdentity()
 {
     this->fill(T(0));
     goSize_t n = goMath::min(this->getRows(), this->getColumns());
@@ -1035,7 +1031,7 @@ void goMatrix<T>::setIdentity()
  * @param v Value to fill with.
  */
 template <class T>
-void goMatrix<T>::fill(T v)
+void goMath::Matrix<T>::fill(T v)
 {
     T* row = this->matrix;
     for (goSize_t i = 0; i < this->rows; ++i)
@@ -1050,7 +1046,7 @@ void goMatrix<T>::fill(T v)
 }
 
 template<class T>
-bool goMatrix<T>::writeASCII (FILE* f) const
+bool goMath::Matrix<T>::writeASCII (FILE* f) const
 {
     if (!f)
     {
@@ -1060,7 +1056,7 @@ bool goMatrix<T>::writeASCII (FILE* f) const
     goSize_t R = this->getRows();
     goSize_t C = this->getColumns();
     goSize_t r, c;
-    fprintf (f, "goMatrix\n");
+    fprintf (f, "goMath::Matrix\n");
     fprintf (f, "size %d %d\n", (int)R, (int)C);
     goDouble d;
     for (r = 0; r < R; ++r)
@@ -1076,7 +1072,7 @@ bool goMatrix<T>::writeASCII (FILE* f) const
 }
 
 template<class T>
-bool goMatrix<T>::writeASCII (const char* fname) const
+bool goMath::Matrix<T>::writeASCII (const char* fname) const
 {
     if (!fname)
     {
@@ -1093,7 +1089,7 @@ bool goMatrix<T>::writeASCII (const char* fname) const
 }
 
 template<class T>
-bool goMatrix<T>::readASCII (FILE* f)
+bool goMath::Matrix<T>::readASCII (FILE* f)
 {
     if (!f)
     {
@@ -1107,12 +1103,12 @@ bool goMatrix<T>::readASCII (FILE* f)
         return false;
     }
 
-    if (s != "goMatrix")
+    if (s != "goMath::Matrix")
     {
         ::rewind (f);
         if (!this->readASCIISimple (f))
         {
-            goString msg = "goMatrix::readASCII: expected goMatrix, got ";
+            goString msg = "goMath::Matrix::readASCII: expected goMath::Matrix, got ";
             msg += s.toCharPtr ();
             msg += " and readASCIISimple also failed.";
             goLog::warning (msg);
@@ -1131,7 +1127,7 @@ bool goMatrix<T>::readASCII (FILE* f)
 
     if (words.getSize() != 3 || words.getFrontElement()->elem != "size")
     {
-        goString msg = "goMatrix::readASCII: expected size x y, got ";
+        goString msg = "goMath::Matrix::readASCII: expected size x y, got ";
         msg += s.toCharPtr ();
         goLog::warning (msg);
         return false;
@@ -1160,7 +1156,7 @@ bool goMatrix<T>::readASCII (FILE* f)
 }
 
 template <class T>
-bool goMatrix<T>::readASCIISimple (FILE* f)
+bool goMath::Matrix<T>::readASCIISimple (FILE* f)
 {
     goList<goString> words;
     goString line;
@@ -1184,7 +1180,7 @@ bool goMatrix<T>::readASCIISimple (FILE* f)
     {
         if ((goSize_t)words.getSize() != columns)
         {
-            //goString s = "goMatrix::readASCIISimple(): wrong column count in row ";
+            //goString s = "goMath::Matrix::readASCIISimple(): wrong column count in row ";
             //s += (int) rows;
             //s += " -- stopping reading.";
             //goLog::warning (s);
@@ -1233,7 +1229,7 @@ bool goMatrix<T>::readASCIISimple (FILE* f)
 }
 
 template<class T>
-bool goMatrix<T>::readASCII (const char* fname) 
+bool goMath::Matrix<T>::readASCII (const char* fname) 
 {
     if (!fname)
     {
@@ -1250,10 +1246,10 @@ bool goMatrix<T>::readASCII (const char* fname)
 }
 #if 0
 template<>
-goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goFloat>& v) const
+goMath::Vector<goDouble> goMath::Matrix<goDouble>::operator* (const goMath::Vector<goFloat>& v) const
 {
     assert (v.getSize() == this->getColumns());
-    goVector<goDouble> y (v.getSize());
+    goMath::Vector<goDouble> y (v.getSize());
     y.fill (0.0f);
     matrixVectorMult (*this, v, y);
     return y;
@@ -1261,7 +1257,7 @@ goVector<goDouble> goMatrix<goDouble>::operator* (const goVector<goFloat>& v) co
 #endif
 
 template <class Tm, class Tv, class Tr>
-static void matrixVectorMult (const goMatrix<Tm>& m, const goVector<Tv>& v, goVector<Tr>& r)
+static void matrixVectorMult (const goMath::Matrix<Tm>& m, const goMath::Vector<Tv>& v, goMath::Vector<Tr>& r)
 {
     goSize_t N = m.getRows();
     goSize_t M = m.getColumns();
@@ -1289,135 +1285,33 @@ static void matrixVectorMult (const goMatrix<Tm>& m, const goVector<Tv>& v, goVe
   * @return (*this) * v
   */
 template<class T>
-goVector<T> goMatrix<T>::operator* (const goVector<T>& v) const
+goMath::Vector<T> goMath::Matrix<T>::operator* (const goMath::Vector<T>& v) const
 {
     assert (v.getSize() == this->getColumns());
-    goVector<T> y (v.getSize());
+    goMath::Vector<T> y (v.getSize());
     y.fill (T(0));
     matrixVectorMult (*this, v, y);
     return y;
 }
 #endif
 
-template <>
-goComplexf goMatrix<goComplexf>::norm () const
-{
-    goLog::error("goMatrix::norm not implemented for complex types.");
-    return goComplexf(0.0f,0.0f);
-}
-
-//template <>
-//goComplexd goMatrix<goComplexd>::norm () const
-//{
-//    goLog::error("goMatrix::norm not implemented for complex types.");
-//    return goComplexd(0.0f,0.0f);
-//}
-
-template <>
-bool goMatrix<goComplexf>::writeASCII (FILE* f) const
-{
-    goLog::error ("read/write for goMatrix not implemented for complex types.");
-    return false;
-};
-template <>
-bool goMatrix<goComplexf>::readASCII (FILE* f)
-{
-    goLog::error ("read/write for goMatrix not implemented for complex types.");
-    return false;
-};
-
-template <>
-bool goMatrix<goFloat>::invert ()
-{
-    //= Factorise A P = L U
-    goSize_t M = this->getColumns();
-    if (M != this->getRows())
-    {
-        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
-        return false;
-    }
-    int* P = new int [M];
-    if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        P = 0;
-        return false;
-    }
-    if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        P = 0;
-        return false;
-    }
-    delete[] P;
-    P = 0;
-    return true;
-}
-
-template <>
-bool goMatrix<goDouble>::invert ()
-{
-    //= Factorise A P = L U
-    goSize_t M = this->getColumns();
-    if (M != this->getRows())
-    {
-        goLog::warning ("goMatrix::invert(): tried to invert non-quadratic matrix.");
-        return false;
-    }
-    int* P = new int [M * M];
-    if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    if (clapack_dgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-    {
-        delete[] P;
-        return false;
-    }
-    delete[] P;
-    return true;
-}
 
 template <class T>
-bool goMatrix<T>::invert ()
+bool goMath::Matrix<T>::invert ()
 {
-    goLog::error ("goMatrix::invert() not implemented for types other than goFloat and goDouble.");
+    goLog::error ("goMath::Matrix::invert() not implemented for types other than goFloat and goDouble.");
     return false;
 }
 
-template <>
-void goMatrix<goFloat>::power (goFloat scalar)
-{
-    goMatrixPower<goFloat> (*this, scalar);
-}
-
-template <>
-void goMatrix<goDouble>::power (goDouble scalar)
-{
-    goMatrixPower<goDouble> (*this, scalar);
-}
 
 template <class T>
-void goMatrix<T>::power (T)
+void goMath::Matrix<T>::power (T)
 {
     goLog::warning ("goMatrix::power() not defined for this type.");
 }
 
-template<>
-void goMatrixPower (goMatrix<goComplexf>& A, goComplexf scalar)
-{
-    goLog::error ("goMatrixPower() not implemented for complex.");
-}
-
-template<>
-void goMatrixPower (goMatrix<goComplexd>& A, goComplexd scalar)
-{
-    goLog::error ("goMatrixPower() not implemented for complex.");
-}
-
 template<class T>
-void goMatrixPower (goMatrix<T>& A, T scalar)
+void goMath::matrixPower (goMath::Matrix<T>& A, T scalar)
 {
     if (A.getRows() != A.getColumns())
     {
@@ -1425,141 +1319,251 @@ void goMatrixPower (goMatrix<T>& A, T scalar)
         return;
     }
     goMath::Eigenvalue<T> eig (A);
-    const goMatrix<T>& V = eig.getV();
-    goMatrix<T> Vtemp = V;
-    goVector<T>& d = eig.getRealEigenvalues();
+    const goMath::Matrix<T>& V = eig.getV();
+    goMath::Matrix<T> Vtemp = V;
+    goMath::Vector<T>& d = eig.getRealEigenvalues();
     //= V * D.^scalar * V'
     goSize_t n = d.getSize();
     for (goSize_t i = 0; i < n; ++i)
         d[i] = T(::pow (d[i],scalar));
     n = Vtemp.getRows ();
-    goVector<T> refV;
+    goMath::Vector<T> refV;
     for (goSize_t i = 0; i < n; ++i)
     {
         Vtemp.refRow (i,refV);
         refV *= d;  //= Element-wise multiplication
     }
-    goMatrixMult<T> (T(1), Vtemp, false, V, true, T(0), A);
+    goMath::matrixMult<T> (T(1), Vtemp, false, V, true, T(0), A);
 }
 
-template<>
-void goMatrixMult<goFloat> (goFloat alpha, const goMatrix<goFloat>& A, bool transA, 
-                                           const goMatrix<goFloat>& B, bool transB, 
-                            goFloat beta, goMatrix<goFloat>& C)
-{
-    goSize_t M = transA ? A.getColumns() : A.getRows();
-    goSize_t N = transB ? B.getRows() : B.getColumns();
-    goSize_t K = transA ? A.getRows() : A.getColumns();
-    if (C.getRows() != M || C.getColumns() != N)
-    {
-        C.resize (M,N);
-        C.fill (0.0f);
-    }
-    cblas_sgemm (CblasRowMajor, 
-                 transA ? CblasTrans : CblasNoTrans, 
-                 transB ? CblasTrans : CblasNoTrans,
-                 M, N, K, alpha,
-                 A.getData(), A.getLeadingDimension(),
-                 B.getData(), B.getLeadingDimension(),
-                 beta, C.getData(), C.getLeadingDimension());
-}
+namespace goMath {
+    template<>
+        void matrixPower (goMath::Matrix<goComplexf>& A, goComplexf scalar)
+        {
+            goLog::error ("goMath::MatrixPower() not implemented for complex.");
+        }
 
-template<>
-void goMatrixMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, bool transA, 
-                                           const goMatrix<goDouble>& B, bool transB, 
-                            goDouble beta, goMatrix<goDouble>& C)
-{
-    goSize_t M = transA ? A.getColumns() : A.getRows();
-    goSize_t N = transB ? B.getRows() : B.getColumns();
-    goSize_t K = transA ? A.getRows() : A.getColumns();
-    if (C.getRows() != M || C.getColumns() != N)
-    {
-        C.resize (M,N);
-        C.fill (0.0);
-    }
-    cblas_dgemm (CblasRowMajor, 
-                 transA ? CblasTrans : CblasNoTrans, 
-                 transB ? CblasTrans : CblasNoTrans,
-                 M, N, K, alpha,
-                 A.getData(), A.getLeadingDimension(),
-                 B.getData(), B.getLeadingDimension(),
-                 beta, C.getData(), C.getLeadingDimension());
-}
+    template<>
+        void matrixPower (goMath::Matrix<goComplexd>& A, goComplexd scalar)
+        {
+            goLog::error ("goMath::MatrixPower() not implemented for complex.");
+        }
+    template <>
+        goComplexf Matrix<goComplexf>::trace () const
+        {
+            goLog::error ("goMath::Matrix::trace() not implemented for complex.");
+            return goComplexf (0.0,0.0);
+        }
+    template <>
+        void Matrix<goFloat>::power (goFloat scalar)
+        {
+            matrixPower<goFloat> (*this, scalar);
+        }
 
-template<>
-bool goMatrixVectorMult<goFloat> (goFloat alpha, const goMatrix<goFloat>& A, bool transA,
-                                  const goVector<goFloat>& x, goFloat beta, goVector<goFloat>& y)
-{
-    goSize_t M = 0;
-    goSize_t N = 0;
-    if (transA)
-    {
-        M = A.getColumns();
-        N = A.getRows();
-    }
-    else
-    {
-        M = A.getRows();
-        N = A.getColumns();
-    }
+    template <>
+        void Matrix<goDouble>::power (goDouble scalar)
+        {
+            matrixPower<goDouble> (*this, scalar);
+        }
+    template <>
+        goComplexf Matrix<goComplexf>::norm () const
+        {
+            goLog::error("goMath::Matrix::norm not implemented for complex types.");
+            return goComplexf(0.0f,0.0f);
+        }
 
-    if (x.getSize() != N)
-    {
-        return false;
-    }
-    if (y.getSize() != M)
-    {
-        y.resize (M);
-        y.fill (0.0f);
-    }
-    
-    //= M,N parameters are here rows(A), columns(A) no matter what transA is.
-    cblas_sgemv (CblasRowMajor,
-                 transA ? CblasTrans : CblasNoTrans, A.getRows(), A.getColumns(),
-                 alpha, A.getPtr(), A.getLeadingDimension(), x.getPtr(), x.getStride(), beta, y.getPtr(), y.getStride());
+    //template <>
+    //goComplexd goMath::Matrix<goComplexd>::norm () const
+    //{
+    //    goLog::error("goMath::Matrix::norm not implemented for complex types.");
+    //    return goComplexd(0.0f,0.0f);
+    //}
 
-    return true;
-}
+    template <>
+        bool Matrix<goComplexf>::writeASCII (FILE* f) const
+        {
+            goLog::error ("read/write for goMath::Matrix not implemented for complex types.");
+            return false;
+        };
+    template <>
+        bool Matrix<goComplexf>::readASCII (FILE* f)
+        {
+            goLog::error ("read/write for goMath::Matrix not implemented for complex types.");
+            return false;
+        };
 
-template<>
-bool goMatrixVectorMult<goDouble> (goDouble alpha, const goMatrix<goDouble>& A, bool transA,
-                                   const goVector<goDouble>& x, goDouble beta, goVector<goDouble>& y)
-{
-    goSize_t M = 0;
-    goSize_t N = 0;
-    if (transA)
-    {
-        M = A.getColumns();
-        N = A.getRows();
-    }
-    else
-    {
-        M = A.getRows();
-        N = A.getColumns();
-    }
+    template <>
+        bool Matrix<goFloat>::invert ()
+        {
+            //= Factorise A P = L U
+            goSize_t M = this->getColumns();
+            if (M != this->getRows())
+            {
+                goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
+                return false;
+            }
+            int* P = new int [M];
+            if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            {
+                delete[] P;
+                P = 0;
+                return false;
+            }
+            if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            {
+                delete[] P;
+                P = 0;
+                return false;
+            }
+            delete[] P;
+            P = 0;
+            return true;
+        }
 
-    if (x.getSize() != N)
-    {
-        return false;
-    }
-    if (y.getSize() != M)
-    {
-        y.resize (M);
-        y.fill (0.0f);
-    }
-    
-    cblas_dgemv (CblasRowMajor,
-                 transA ? CblasTrans : CblasNoTrans, A.getRows(), A.getColumns(),
-                 alpha, A.getPtr(), A.getLeadingDimension(), x.getPtr(), x.getStride(), beta, y.getPtr(), y.getStride());
+    template <>
+        bool Matrix<goDouble>::invert ()
+        {
+            //= Factorise A P = L U
+            goSize_t M = this->getColumns();
+            if (M != this->getRows())
+            {
+                goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
+                return false;
+            }
+            int* P = new int [M * M];
+            if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            {
+                delete[] P;
+                return false;
+            }
+            if (clapack_dgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            {
+                delete[] P;
+                return false;
+            }
+            delete[] P;
+            return true;
+        }
 
-    return true;
-}
 
+    template<>
+        void matrixMult<goFloat> (goFloat alpha, const goMath::Matrix<goFloat>& A, bool transA, 
+                const goMath::Matrix<goFloat>& B, bool transB, 
+                goFloat beta, goMath::Matrix<goFloat>& C)
+        {
+            goSize_t M = transA ? A.getColumns() : A.getRows();
+            goSize_t N = transB ? B.getRows() : B.getColumns();
+            goSize_t K = transA ? A.getRows() : A.getColumns();
+            if (C.getRows() != M || C.getColumns() != N)
+            {
+                C.resize (M,N);
+                C.fill (0.0f);
+            }
+            cblas_sgemm (CblasRowMajor, 
+                    transA ? CblasTrans : CblasNoTrans, 
+                    transB ? CblasTrans : CblasNoTrans,
+                    M, N, K, alpha,
+                    A.getData(), A.getLeadingDimension(),
+                    B.getData(), B.getLeadingDimension(),
+                    beta, C.getData(), C.getLeadingDimension());
+        }
+
+    template<>
+        void matrixMult<goDouble> (goDouble alpha, const goMath::Matrix<goDouble>& A, bool transA, 
+                const goMath::Matrix<goDouble>& B, bool transB, 
+                goDouble beta, goMath::Matrix<goDouble>& C)
+        {
+            goSize_t M = transA ? A.getColumns() : A.getRows();
+            goSize_t N = transB ? B.getRows() : B.getColumns();
+            goSize_t K = transA ? A.getRows() : A.getColumns();
+            if (C.getRows() != M || C.getColumns() != N)
+            {
+                C.resize (M,N);
+                C.fill (0.0);
+            }
+            cblas_dgemm (CblasRowMajor, 
+                    transA ? CblasTrans : CblasNoTrans, 
+                    transB ? CblasTrans : CblasNoTrans,
+                    M, N, K, alpha,
+                    A.getData(), A.getLeadingDimension(),
+                    B.getData(), B.getLeadingDimension(),
+                    beta, C.getData(), C.getLeadingDimension());
+        }
+
+    template<>
+        bool matrixVectorMult<goFloat> (goFloat alpha, const goMath::Matrix<goFloat>& A, bool transA,
+                const goMath::Vector<goFloat>& x, goFloat beta, goMath::Vector<goFloat>& y)
+        {
+            goSize_t M = 0;
+            goSize_t N = 0;
+            if (transA)
+            {
+                M = A.getColumns();
+                N = A.getRows();
+            }
+            else
+            {
+                M = A.getRows();
+                N = A.getColumns();
+            }
+
+            if (x.getSize() != N)
+            {
+                return false;
+            }
+            if (y.getSize() != M)
+            {
+                y.resize (M);
+                y.fill (0.0f);
+            }
+
+            //= M,N parameters are here rows(A), columns(A) no matter what transA is.
+            cblas_sgemv (CblasRowMajor,
+                    transA ? CblasTrans : CblasNoTrans, A.getRows(), A.getColumns(),
+                    alpha, A.getPtr(), A.getLeadingDimension(), x.getPtr(), x.getStride(), beta, y.getPtr(), y.getStride());
+
+            return true;
+        }
+
+    template<>
+        bool matrixVectorMult<goDouble> (goDouble alpha, const goMath::Matrix<goDouble>& A, bool transA,
+                const goMath::Vector<goDouble>& x, goDouble beta, goMath::Vector<goDouble>& y)
+        {
+            goSize_t M = 0;
+            goSize_t N = 0;
+            if (transA)
+            {
+                M = A.getColumns();
+                N = A.getRows();
+            }
+            else
+            {
+                M = A.getRows();
+                N = A.getColumns();
+            }
+
+            if (x.getSize() != N)
+            {
+                return false;
+            }
+            if (y.getSize() != M)
+            {
+                y.resize (M);
+                y.fill (0.0f);
+            }
+
+            cblas_dgemv (CblasRowMajor,
+                    transA ? CblasTrans : CblasNoTrans, A.getRows(), A.getColumns(),
+                    alpha, A.getPtr(), A.getLeadingDimension(), x.getPtr(), x.getStride(), beta, y.getPtr(), y.getStride());
+
+            return true;
+        }
+};
 /* Instantiation */
-template void  goMatrixPower<goFloat> (goMatrix<goFloat>& A, goFloat);
-template class goMatrix<goDouble>;
-template class goMatrix<goFloat>;
-template class goMatrix<goIndex_t>;
-template class goMatrix<goSize_t>;
-// template class goMatrix<goInt32>;
-template class goMatrix<goComplexf>;
+template void  goMath::matrixPower<goFloat> (goMath::Matrix<goFloat>& A, goFloat);
+template class goMath::Matrix<goDouble>;
+template class goMath::Matrix<goFloat>;
+template class goMath::Matrix<goIndex_t>;
+template class goMath::Matrix<goSize_t>;
+// template class goMath::Matrix<goInt32>;
+template class goMath::Matrix<goComplexf>;

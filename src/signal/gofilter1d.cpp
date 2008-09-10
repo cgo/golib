@@ -59,7 +59,7 @@ goFilter1D::goFilter1D (const goArray<goFloat>& mask, goIndex_t center, bool nor
         this->normalize();
 }
 
-goFilter1D::goFilter1D (const goVector<goFloat>& mask, goIndex_t center, bool normalize)
+goFilter1D::goFilter1D (const goMath::Vector<goFloat>& mask, goIndex_t center, bool normalize)
     : goObjectBase (),
       myPrivate (0)
 {
@@ -116,7 +116,7 @@ bool goFilter1D::setMask (const goArray<goFloat>& m)
     return true;
 }
 
-bool goFilter1D::setMask (const goVector<goFloat>& m)
+bool goFilter1D::setMask (const goMath::Vector<goFloat>& m)
 {
     goSize_t sz = m.getSize();
     myPrivate->mask.resize (sz);
@@ -262,7 +262,7 @@ bool goFilter1D::filter (goSignal3DBase<void>& sig)
 }
 
 template <class T, int type_enum>
-static inline bool _filterMatrix (goMatrix<T>& m, goArray<goFloat>& mask, goIndex_t center, int direction)
+static inline bool _filterMatrix (goMath::Matrix<T>& m, goArray<goFloat>& mask, goIndex_t center, int direction)
 {
     goSize3D sz (m.getColumns(), m.getRows(), 1);
     //= "Simulate" the stride (not implemented in matrices yet) with number of channels -- 
@@ -275,12 +275,12 @@ static inline bool _filterMatrix (goMatrix<T>& m, goArray<goFloat>& mask, goInde
     return true;
 }
 
-bool goFilter1D::filter (goMatrixf& m, int direction)
+bool goFilter1D::filter (goMath::Matrixf& m, int direction)
 {
     return _filterMatrix<goFloat,GO_FLOAT> (m, myPrivate->mask, myPrivate->center, direction);
 }
 
-bool goFilter1D::filter (goMatrixd& m, int direction)
+bool goFilter1D::filter (goMath::Matrixd& m, int direction)
 {
     return _filterMatrix<goDouble,GO_DOUBLE> (m, myPrivate->mask, myPrivate->center, direction);
 }

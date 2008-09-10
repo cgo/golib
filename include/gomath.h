@@ -296,7 +296,7 @@ bool ddy2D               (const goSignal3DBase<void>& sig, goSignal3DBase<void>&
 bool divNormalizedGrad2D (const goSignal3DBase<void>& sig, goSignal3DBase<void>& retValue);
 
 template <class T>
-T stencil (const goSignal3DBase<void>& sig, const goMatrix<T>& s);
+T stencil (const goSignal3DBase<void>& sig, const goMath::Matrix<T>& s);
 
 /* 
  * @brief 2D euclidean transformation of an image.
@@ -359,8 +359,9 @@ bool curvatureDirect2D (const goSignal3DBase<void>& input, goSignal3D<void>& res
 
 bool vectorMult (const goSignal3DBase<void>& V1, const goSignal3DBase<void>& V2, goSignal3DBase<void>& result);
 
+// Moved to signalhelper
 template <class T>
-bool binaryImage (const goMatrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
+bool binaryImage (const goMath::Matrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
 
 #endif
 
@@ -373,7 +374,7 @@ goSize_t getKnee (const goFixedArray<T>& x, const goFixedArray<T>& y);
  * 
  * Solves A*x=b iteratively for x.
  *
- * @note Currently implemented for goSparseMatrix and goVector.
+ * @note Currently implemented for goSparseMatrix and goMath::Vector.
  * 
  * @param A Matrix A
  * @param b Vector b
@@ -386,10 +387,10 @@ template <class MatrixType, class VectorType>
 goDouble goConjugateGradients (const MatrixType& A, const VectorType& b, VectorType& x, goDouble epsilon = 1e-6);
 
 template <class T>
-bool centerOfMass (const goList<goVector<T> >&, goVector<T>& comRet);
+bool centerOfMass (const goList<goMath::Vector<T> >&, goMath::Vector<T>& comRet);
 
 template <class T>
-bool centerOfMass (const goMatrix<T>& confMatrix, goVector<T>& comRet);
+bool centerOfMass (const goMath::Matrix<T>& confMatrix, goMath::Vector<T>& comRet);
 
 template <class pointT>
 bool centerOfMass (const goList<pointT>&, pointT& comRet);
@@ -398,21 +399,21 @@ template <class pointT>
 bool centerOfMass (typename goList<pointT>::ConstElement* begin, goIndex_t pointCount, pointT& comRet);
 
 template <class T>
-bool translate (goMatrix<T>& confMatrix, const goVector<T>& trans);
+bool translate (goMath::Matrix<T>& confMatrix, const goMath::Vector<T>& trans);
 
 
 template <class T>
-bool affineMatch (const goMatrix<T>& X1, const goMatrix<T>& X2, goMatrix<T>& A, goVector<T>& t);
+bool affineMatch (const goMath::Matrix<T>& X1, const goMath::Matrix<T>& X2, goMath::Matrix<T>& A, goMath::Vector<T>& t);
 
 template <class T>
 bool affineMatch(
-        const goMatrix<T>& q,
-        const goMatrix<T>& s,
+        const goMath::Matrix<T>& q,
+        const goMath::Matrix<T>& s,
         goDouble beta,
-        const goMatrix<T>& q2,
-        const goMatrix<T>& s2,
-        goMatrix<T>& A,
-        goVector<T>& t);
+        const goMath::Matrix<T>& q2,
+        const goMath::Matrix<T>& s2,
+        goMath::Matrix<T>& A,
+        goMath::Vector<T>& t);
 
 /** 
  * @brief Mean calculation.
@@ -488,7 +489,7 @@ T fastVariance (const vectorT& v, goSize_t sz, T mean)
 }
 
 template <class T>
-void covariance (const goMatrix<T>& points, const goVector<T>& mean, goMatrix<T>& ret);
+void covariance (const goMath::Matrix<T>& points, const goMath::Vector<T>& mean, goMath::Matrix<T>& ret);
 
 template <class T>
 void sin (goFixedArray<T>& a);
@@ -536,7 +537,7 @@ void diff (const vectorT& v, vectorT& ret, goSize_t sz, bool periodic = false)
 
 #if 0
 template <class T>
-void invert (const goVector<T>& f, goVector<T>& fInvRet)
+void invert (const goMath::Vector<T>& f, goMath::Vector<T>& fInvRet)
 {
     goIndex_t sz = f.getSize();
     if (fInvRet.getSize() != sz)
@@ -612,52 +613,52 @@ template <class vectorT, class T>
 T integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t sz);
 
 template <class T>
-T integrate (const goVector<T>& v);
+T integrate (const goMath::Vector<T>& v);
 template <class T>
-T integrateSum (const goVector<T>& v);
+T integrateSum (const goMath::Vector<T>& v);
 
 template <class T>
-T integrateSimpson (const goVector<T>& v);
+T integrateSimpson (const goMath::Vector<T>& v);
 
 template <class T>
-bool euclideanToBarycentric (const goMatrix<T>& simplex, const goVector<T>& point, goVector<T>& ret);
+bool euclideanToBarycentric (const goMath::Matrix<T>& simplex, const goMath::Vector<T>& point, goMath::Vector<T>& ret);
 
 template <class T>
-void barycentricToEuclidean (const goMatrix<T>& simplex, const goVector<T>& barycentric, goVector<T>& ret);
+void barycentricToEuclidean (const goMath::Matrix<T>& simplex, const goMath::Vector<T>& barycentric, goMath::Vector<T>& ret);
 
 template <class T>
-bool planeLineCut (const goVector<T>& planeNormal, const goVector<T>& planePoint, 
-                   const goVector<T>& lineDirection, const goVector<T>& linePoint,
-                   goVector<T>& ret);
+bool planeLineCut (const goMath::Vector<T>& planeNormal, const goMath::Vector<T>& planePoint, 
+                   const goMath::Vector<T>& lineDirection, const goMath::Vector<T>& linePoint,
+                   goMath::Vector<T>& ret);
 
 template <class vectorT, class T>
 bool getRoots (const vectorT& fX, 
                const vectorT& fY,
                vectorT&       retX,
-               goVector<goIndex_t>* retRootIndex = 0);
+               goMath::Vector<goIndex_t>* retRootIndex = 0);
 
 template <class T>
-bool pairwiseDistances (const goMatrix<T>& X, int dimension, goMatrix<T>& ret);
+bool pairwiseDistances (const goMath::Matrix<T>& X, int dimension, goMath::Matrix<T>& ret);
 template <class T>
-bool pdist (const goMatrix<T>& X, int dimension, goMatrix<T>& ret)
+bool pdist (const goMath::Matrix<T>& X, int dimension, goMath::Matrix<T>& ret)
 {
     return goMath::pairwiseDistances<T> (X, dimension, ret);
 };
 
 template <class T>
 bool sphereToEuclidean (T phi, T theta, T radius,
-                        goVector<T>* positionRet, goVector<T>* upRet);
+                        goMath::Vector<T>* positionRet, goMath::Vector<T>* upRet);
 
 template <class T>
-bool euclideanToSphere (const goVector<T>& x, T& phiRet, T& thetaRet, T& radiusRet);
+bool euclideanToSphere (const goMath::Vector<T>& x, T& phiRet, T& thetaRet, T& radiusRet);
 
 template <class T>
-bool euclideanToSphere (const goVector<T>& x, goVector<T>& phitheta, T* radiusRet = 0);
+bool euclideanToSphere (const goMath::Vector<T>& x, goMath::Vector<T>& phitheta, T* radiusRet = 0);
 
 template <class T>
-bool sampleSphere (T dist, T radius, goList<goVector<T> >& positionRet, goList<goVector<T> >& upRet);
+bool sampleSphere (T dist, T radius, goList<goMath::Vector<T> >& positionRet, goList<goMath::Vector<T> >& upRet);
 template <class T>
-bool sampleSphere (T dist, T radius, goMatrix<T>& sphereRet);
+bool sampleSphere (T dist, T radius, goMath::Matrix<T>& sphereRet);
 
 /*! @} */
 };

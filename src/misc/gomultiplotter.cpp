@@ -23,7 +23,7 @@ class goMultiPlotterPrivate
         bool              autoPosition;
         bool              barycentric;
         bool              singlePlot;    // If false, "set multiplot" is set even if there is only one plot, so single plotting is disabled.
-        goMatrixd         barycentricTriangle;
+        goMath::Matrixd         barycentricTriangle;
         goString          cmdFilename;
         goList<goSinglePlot> plots;
         goList<goFloat>   extentRow;
@@ -156,8 +156,8 @@ void goMultiPlotter::addPlotBarycentric (goSinglePlot& p, goDouble u, goDouble v
         return;
     }
 
-    goVectord bary (3);
-    goVectord pos (2);
+    goMath::Vectord bary (3);
+    goMath::Vectord pos (2);
     bary[0] = u; bary[1] = v; bary[2] = w;
     goMath::barycentricToEuclidean (myPrivate->barycentricTriangle, bary, pos);
 
@@ -263,9 +263,9 @@ bool goMultiPlotter::getAutoPosition () const
     return myPrivate->autoPosition;
 }
 
-void goMultiPlotter::setBarycentric (const goMatrixf& triangle)
+void goMultiPlotter::setBarycentric (const goMath::Matrixf& triangle)
 {
-    goVectord row;
+    goMath::Vectord row;
 
     myPrivate->barycentricTriangle.resize (2,3);
 
@@ -285,9 +285,9 @@ void goMultiPlotter::setBarycentric (const goMatrixf& triangle)
     myPrivate->barycentric = true;
 }
 
-void goMultiPlotter::setBarycentric (const goMatrixd& triangle)
+void goMultiPlotter::setBarycentric (const goMath::Matrixd& triangle)
 {
-    goVectord row;
+    goMath::Vectord row;
 
     myPrivate->barycentricTriangle.resize (2,3);
 

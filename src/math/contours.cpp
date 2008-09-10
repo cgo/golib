@@ -386,7 +386,7 @@ namespace goMath
             {
             };
 
-            goList<goMatrixd> contours;
+            goList<goMath::Matrixd> contours;
     };
 
 };
@@ -508,8 +508,8 @@ void goMath::Contours::calculate (const goSignal3DBase<void>& image, goDouble le
             {
                 goList<goDouble>::Element* elX = path_x.getFrontElement();
                 goList<goDouble>::Element* elY = path_y.getFrontElement();
-                myPrivate->contours.append (goMatrixd(0,0));
-                goMatrixd& M = myPrivate->contours.getTail();
+                myPrivate->contours.append (goMath::Matrixd(0,0));
+                goMath::Matrixd& M = myPrivate->contours.getTail();
                 goSize_t i = 0;
                 goSize_t sz = path_x.getSize();
                 M.resize (sz, 2);
@@ -529,7 +529,7 @@ void goMath::Contours::calculate (const goSignal3DBase<void>& image, goDouble le
     }
 }
 
-goList<goMatrixd>& goMath::Contours::getContours ()
+goList<goMath::Matrixd>& goMath::Contours::getContours ()
 {
     return myPrivate->contours;
 }

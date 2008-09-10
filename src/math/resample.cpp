@@ -2,7 +2,7 @@
 #include <golog.h>
 
 template <class T>
-bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t resamplePointCount)
+bool goResampleLinear (const goMath::Matrix<T>& source, goMath::Matrix<T>& target, goSize_t resamplePointCount)
 {
     goSize_t pointCount = source.getRows();
     if (pointCount < 2)
@@ -21,8 +21,8 @@ bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t 
     {
         accumLength[0] = 0.0;
         goIndex_t i;
-        goVector<T> row1;
-        goVector<T> row2;
+        goMath::Vector<T> row1;
+        goMath::Vector<T> row2;
         for (i = 0; i < pointCount - 1; ++i)
         {
             source.refRow (i, row);
@@ -39,9 +39,9 @@ bool goResampleLinear (const goMatrix<T>& source, goMatrix<T>& target, goSize_t 
     goDouble t = 0.0f;
     goIndex_t i = 0;
     goIndex_t j = 0;
-    goVector<T> row1;
-    goVector<T> row2;
-    goVector<T> targetRow;
+    goMath::Vector<T> row1;
+    goMath::Vector<T> row2;
+    goMath::Vector<T> targetRow;
     for (i = 0; i < resamplePointCount; ++i)
     {
         assert (j >= 0 && j < pointCount - 1);

@@ -33,8 +33,8 @@ namespace goMath
 
    <p>Typical usage looks like:
    <pre>
-	goMatrix<double> A(n,n);
-	goMatrix<double> L;
+	goMath::Matrix<double> A(n,n);
+	goMath::Matrix<double> L;
 
 	 ... 
 
@@ -59,14 +59,14 @@ class Cholesky
 {
     public:
         Cholesky ();
-        Cholesky (const goMatrix<Real> &A);
-        const goMatrix<Real>& getL   () const;
+        Cholesky (const goMath::Matrix<Real> &A);
+        const goMath::Matrix<Real>& getL   () const;
         bool  solve  (const goArray<Real> &B, goArray<Real>& xRet);
-        bool  solve  (const goMatrix<Real> &B, goMatrix<Real>& XRet);
+        bool  solve  (const goMath::Matrix<Real> &B, goMath::Matrix<Real>& XRet);
         int            is_spd () const;
 
     protected:
-        goMatrix<Real> L_;		// lower triangular factor
+        goMath::Matrix<Real> L_;		// lower triangular factor
         int isspd;				// 1 if matrix to be factored was SPD
 
 };

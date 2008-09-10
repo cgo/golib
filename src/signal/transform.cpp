@@ -338,24 +338,24 @@ void goMath::paste2D (
     goDouble source_height = source.getSizeY();
     // goDouble centre[] = {(float)width * 0.5, (float)height * 0.5};
     goDouble source_centre[] = {(float)source_width * 0.5, (float)source_height * 0.5};
-    goVectord sc (source_centre, 2, 1);
-    goMatrixd R (rot_mat, 2, 2);
+    goMath::Vectord sc (source_centre, 2, 1);
+    goMath::Matrixd R (rot_mat, 2, 2);
     goDouble x0_[] = {0.0, 0.0};
     goDouble x1_[] = {source_width-1, 0.0};
     goDouble y0_[] = {0.0, 0.0};
     goDouble y1_[] = {0.0, source_height-1};
     goDouble corners_[] = {0.0, source_width-1, 0.0, 0.0,
                           0.0, 0.0           , 0.0, source_height-1};
-    goMatrixd corners (corners_, 2, 4);
+    goMath::Matrixd corners (corners_, 2, 4);
     for (goSize_t i = 0; i < 4; ++i)
     {
-        goVectord temp(0);
+        goMath::Vectord temp(0);
         corners.refRow (i, temp);
         temp -= sc;
     }
     
-    goMatrixd trans_corners = R * corners * scale;
-    goVectord X(0), Y(0);
+    goMath::Matrixd trans_corners = R * corners * scale;
+    goMath::Vectord X(0), Y(0);
     trans_corners.refRow (0, X);
     trans_corners.refRow (1, Y);
     goDouble max_x = goMath::max(X);

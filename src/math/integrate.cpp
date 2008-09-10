@@ -41,7 +41,7 @@ T goMath::integrate (const vectorT& x, const vectorT& y, vectorT& ret, goSize_t 
  * @return Integral approximation.
  */
 template <class T>
-T goMath::integrate (const goVector<T>& v)
+T goMath::integrate (const goMath::Vector<T>& v)
 {
     goSize_t sz = v.getSize();
     goSize_t szm1 = sz-1;
@@ -71,7 +71,7 @@ T goMath::integrate (const goVector<T>& v)
  * @return Integral approximation.
  */
 template <class T>
-T goMath::integrateSimpson (const goVector<T>& v)
+T goMath::integrateSimpson (const goMath::Vector<T>& v)
 {
     goSize_t sz = v.getSize();
     goSize_t szm1 = sz-1;
@@ -90,7 +90,7 @@ T goMath::integrateSimpson (const goVector<T>& v)
 }
 
 template <class T>
-T goMath::integrateSum (const goVector<T>& v)
+T goMath::integrateSum (const goMath::Vector<T>& v)
 {
     return v.sum ();
 }
@@ -101,9 +101,9 @@ template goFloat goMath::integrate<goFixedArray<goFloat>,goFloat> (const goFixed
 template goDouble goMath::integrate<goFixedArray<goDouble>,goDouble> (const goFixedArray<goDouble>&,const goFixedArray<goDouble>&,goFixedArray<goDouble>&,goSize_t);
 template goFloat goMath::integrate<goFixedArray<goFloat>,goFloat> (const goFixedArray<goFloat>&,const goFixedArray<goFloat>&,goFixedArray<goFloat>&,goSize_t);
 
-template goFloat goMath::integrate<goFloat> (const goVector<goFloat>&);
-template goDouble goMath::integrate<goDouble> (const goVector<goDouble>&);
-template goFloat goMath::integrateSimpson<goFloat> (const goVector<goFloat>&);
-template goDouble goMath::integrateSimpson<goDouble> (const goVector<goDouble>&);
-template goFloat goMath::integrateSum<goFloat> (const goVector<goFloat>&);
-template goDouble goMath::integrateSum<goDouble> (const goVector<goDouble>&);
+template goFloat goMath::integrate<goFloat> (const goMath::Vector<goFloat>&);
+template goDouble goMath::integrate<goDouble> (const goMath::Vector<goDouble>&);
+template goFloat goMath::integrateSimpson<goFloat> (const goMath::Vector<goFloat>&);
+template goDouble goMath::integrateSimpson<goDouble> (const goMath::Vector<goDouble>&);
+template goFloat goMath::integrateSum<goFloat> (const goMath::Vector<goFloat>&);
+template goDouble goMath::integrateSum<goDouble> (const goMath::Vector<goDouble>&);

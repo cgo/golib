@@ -11,7 +11,7 @@
 #include <golu.h>
 #include <iostream>
 
-/* Use goMatrix instead. */
+/* Use goMath::Matrix instead. */
 
 /* \addtogroup math
  * @{
@@ -21,18 +21,18 @@
  * @todo Either throw this class away or rework it a bit.
  */
 template <class T>
-class go44Matrix : public goMatrix<T> 
+class go44Matrix : public goMath::Matrix<T> 
 {
 public:
   go44Matrix ()
-      : goMatrix<T> (4,4)
+      : goMath::Matrix<T> (4,4)
   {
   };
   go44Matrix (T i11, T i12, T i13, T i14,
               T i21, T i22, T i23, T i24,
               T i31, T i32, T i33, T i34,
               T i41, T i42, T i43, T i44)
-      : goMatrix<T> (4,4)
+      : goMath::Matrix<T> (4,4)
   {
       T* matrix = this->getData ();
       matrix[0] = i11;
@@ -56,7 +56,7 @@ public:
   {
       *this = other;
   };
-  go44Matrix (const goMatrix<T>& other)
+  go44Matrix (const goMath::Matrix<T>& other)
   {
       if (other.getRows() == 4 && other.getColumns() == 4)
       {
@@ -308,7 +308,7 @@ bool
 go44Matrix<T>::invert ()
 {
     //= FIXME: This is a quick hack.
-    goMatrix<T> M (4,4);
+    goMath::Matrix<T> M (4,4);
     for (goIndex_t i = 0; i < 4; ++i)
     {
         for (goIndex_t j = 0; j < 4; ++j)
@@ -316,9 +316,9 @@ go44Matrix<T>::invert ()
             M(i,j) = (*this)(i,j);
         }
     }
-    goMatrix<T> B (4,4);
+    goMath::Matrix<T> B (4,4);
     B.setIdentity ();
-    goMatrix<T> X (4,4);
+    goMath::Matrix<T> X (4,4);
     goMath::LU<T> lu (M);
     if (!lu.solve (B,X))
     {

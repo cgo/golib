@@ -15,7 +15,7 @@ class goPointCloudPrivate
         goPointCloudPrivate();
         ~goPointCloudPrivate();
 
-        goList<goVector<T> > points;
+        goList<goMath::Vector<T> > points;
         goSize_t             dim;
 };
 
@@ -54,7 +54,7 @@ goPointCloud<T>::goPointCloud (const goPointCloud<T>& other)
 }
 
 template <class T>
-goPointCloud<T>::goPointCloud (const goList<goVector<T> >& pl)
+goPointCloud<T>::goPointCloud (const goList<goMath::Vector<T> >& pl)
     : goObjectBase (),
       myPrivate (0)
 {
@@ -64,15 +64,15 @@ goPointCloud<T>::goPointCloud (const goList<goVector<T> >& pl)
 }
 
 template <class T>
-goPointCloud<T>::goPointCloud (const goMatrix<T>& confMatrix)
+goPointCloud<T>::goPointCloud (const goMath::Matrix<T>& confMatrix)
     : goObjectBase (),
       myPrivate (0)
 {
     myPrivate = new goPointCloudPrivate<T>;
     assert (myPrivate);
-    goList<goVector<T> >& points = this->getPoints();
+    goList<goMath::Vector<T> >& points = this->getPoints();
     goSize_t sz = confMatrix.getRows();
-    const goVector<T> ref;
+    const goMath::Vector<T> ref;
     for (goSize_t i = 0; i < sz; ++i)
     {
         confMatrix.refRow (i, ref);
@@ -127,15 +127,15 @@ goIndex_t goPointCloud<T>::getPointCount () const
 * @return Reference to the list of pointT objects constituting the point cloud.
 **/
 template <class T>
-goList<goVector<T> >& goPointCloud<T>::getPoints ()
+goList<goMath::Vector<T> >& goPointCloud<T>::getPoints ()
 {
     return myPrivate->points;
 }
 
 template <class T>
-void goPointCloud<T>::affineTransform (const goMatrix<T>& m)
+void goPointCloud<T>::affineTransform (const goMath::Matrix<T>& m)
 {
-    typename goList<goVector<T> >::Element* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::Element* el = this->getPoints().getFrontElement();
     goSize_t sz = this->getPoints().getSize();
     goSize_t i;
     if (el)
@@ -144,7 +144,7 @@ void goPointCloud<T>::affineTransform (const goMatrix<T>& m)
     }
     for (i = 0; i < sz; ++i)
     {
-        goVector<T> temp (this->getDim() + 1);
+        goMath::Vector<T> temp (this->getDim() + 1);
         el->elem.copy (temp, 0, 0);
         // temp = el->elem;
         temp[temp.getSize()-1] = 1.0;
@@ -161,7 +161,7 @@ void goPointCloud<T>::affineTransform (const goMatrix<T>& m)
 }
 
 template <class T>
-bool goPointCloud<T>::readASCII (const char* filename, goSize_t dimension, goList<goVector<T> >& pointList)
+bool goPointCloud<T>::readASCII (const char* filename, goSize_t dimension, goList<goMath::Vector<T> >& pointList)
 {
     FILE* f = ::fopen (filename, "r");
     if (!f)
@@ -186,7 +186,7 @@ bool goPointCloud<T>::readASCII (const char* filename, goSize_t dimension, goLis
             }
             //= Expecting numbers
             goList<goString>::Element* el = words.getFrontElement();
-            goVector<T> v (dimension);
+            goMath::Vector<T> v (dimension);
             goSize_t i = 0;
             while (el && i < dimension)
             {
@@ -207,7 +207,7 @@ bool goPointCloud<T>::readASCII (const char* filename, goSize_t dimension, goLis
 * @return Reference to the list of goPointf objects constituting the point cloud.
 **/
 template <class T>
-const goList<goVector<T> >& goPointCloud<T>::getPoints () const
+const goList<goMath::Vector<T> >& goPointCloud<T>::getPoints () const
 {
     return myPrivate->points;
 }
@@ -220,11 +220,11 @@ const goList<goVector<T> >& goPointCloud<T>::getPoints () const
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goPointCloud<T>::setPoints (const goMatrix<T>& m)
+bool goPointCloud<T>::setPoints (const goMath::Matrix<T>& m)
 {
     myPrivate->points.erase ();
     goSize_t sz = m.getRows ();
-    const goVector<T> ref;
+    const goMath::Vector<T> ref;
     for (goSize_t i = 0; i < sz; ++i)
     {
         m.refRow (i, ref);
@@ -243,7 +243,7 @@ bool goPointCloud<T>::setPoints (const goMatrix<T>& m)
 * @param points  List of points. This list will be deep-copied into the internal list.
 **/
 template <class T>
-bool goPointCloud<T>::setPoints (const goList<goVector<T> >& points)
+bool goPointCloud<T>::setPoints (const goList<goMath::Vector<T> >& points)
 {
     myPrivate->points = points;
     if (!points.isEmpty())
@@ -260,7 +260,7 @@ bool goPointCloud<T>::setPoints (const goList<goVector<T> >& points)
  * @param p Point to be added.
  */
 template <class T>
-void goPointCloud<T>::addPoint (const goVector<T>& p)
+void goPointCloud<T>::addPoint (const goMath::Vector<T>& p)
 {
     assert (p.getSize() == this->getDim());
     myPrivate->points.append(p);
@@ -288,7 +288,7 @@ goSize_t goPointCloud<T>::getDim () const
 * @return True if successful, false otherwise.
 **/
 template <class T>
-bool goPointCloud<T>::getCenterOfMass (goVector<T>& comRet) const
+bool goPointCloud<T>::getCenterOfMass (goMath::Vector<T>& comRet) const
 {
     if (myPrivate->points.isEmpty())
         return false;
@@ -299,9 +299,9 @@ bool goPointCloud<T>::getCenterOfMass (goVector<T>& comRet) const
 //    goDouble y = 0.0;
 //    goDouble z = 0.0;
 //    goDouble w = 0.0;
-    goVector<T> temp (this->getDim());
+    goMath::Vector<T> temp (this->getDim());
     temp.fill (0.0);
-    typename goList<goVector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
     assert(el);
     goIndex_t i = 0;
     while (el && i < pointCount)
@@ -325,14 +325,14 @@ bool goPointCloud<T>::getCenterOfMass (goVector<T>& comRet) const
 }
 
 template <class T>
-bool goPointCloud<T>::getCenterOfMass (const goFixedArray<goVector<T> >& points, goVector<T>& comRet)
+bool goPointCloud<T>::getCenterOfMass (const goFixedArray<goMath::Vector<T> >& points, goMath::Vector<T>& comRet)
 {
     if (points.getSize() < 1)
         return false;
 
     goIndex_t pointCount = static_cast<goIndex_t>(points.getSize());
     goDouble factor = 1.0 / static_cast<goDouble>(pointCount);
-    goVector<T> temp (points[0].getSize());
+    goMath::Vector<T> temp (points[0].getSize());
     temp.fill (T(0));
     goIndex_t i = 0;
     while (i < pointCount)
@@ -356,13 +356,13 @@ bool goPointCloud<T>::getCenterOfMass (const goFixedArray<goVector<T> >& points,
 * @return True if successful, false otherwise.
 **/
 template <class T>
-bool goPointCloud<T>::translate (const goVector<T>& d)
+bool goPointCloud<T>::translate (const goMath::Vector<T>& d)
 {
     if (myPrivate->points.isEmpty())
         return true;
     
     goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
-    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
+    typename goList<goMath::Vector<T> >::Element* el = myPrivate->points.getFrontElement();
     goIndex_t i = 0;
     while (el && i < pointCount)
     {
@@ -387,7 +387,7 @@ bool goPointCloud<T>::scale (T s)
         return true;
     
     goIndex_t pointCount = static_cast<goIndex_t>(myPrivate->points.getSize());
-    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
+    typename goList<goMath::Vector<T> >::Element* el = myPrivate->points.getFrontElement();
     goIndex_t i = 0;
     while (el && i < pointCount)
     {
@@ -407,7 +407,7 @@ bool goPointCloud<T>::scale (T s)
  * @param cmRet Configuration matrix. Resized if necessary.
  */
 template <class T>
-void goPointCloud<T>::getConfigurationMatrix (goMatrix<T>& cmRet) const
+void goPointCloud<T>::getConfigurationMatrix (goMath::Matrix<T>& cmRet) const
 {
     goSize_t k = this->getPointCount();
     goSize_t n = this->getDim();
@@ -416,7 +416,7 @@ void goPointCloud<T>::getConfigurationMatrix (goMatrix<T>& cmRet) const
         cmRet.resize (k, n);
     }
     goSize_t i = 0, j = 0;
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     while (el && i < k)
     {
         for (j = 0; j < n; ++j)
@@ -438,7 +438,7 @@ void goPointCloud<T>::getConfigurationMatrix (goMatrix<T>& cmRet) const
  * @param cvRet Configuration vector. Resized if necessary.
  */
 template <class T>
-void goPointCloud<T>::getConfigurationVector (goVector<T>& cvRet) const
+void goPointCloud<T>::getConfigurationVector (goMath::Vector<T>& cvRet) const
 {
     goSize_t k = this->getPointCount();
     goSize_t n = this->getDim();
@@ -447,7 +447,7 @@ void goPointCloud<T>::getConfigurationVector (goVector<T>& cvRet) const
         cvRet.resize (k * n);
     }
     goSize_t i = 0;
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     while (el && i < k * n)
     {
         goSize_t j;
@@ -475,7 +475,7 @@ bool goPointCloud<pointT>::transform (const go44Matrixf& m)
     if (myPrivate->points.isEmpty())
         return true;
     
-    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
+    typename goList<goMath::Vector<T> >::Element* el = myPrivate->points.getFrontElement();
     assert (el);
     while (true)
     {
@@ -501,7 +501,7 @@ bool goPointCloud<pointT>::transform (const go44Matrixf& m)
  * @return True if successful, false otherwise.
  **/
 template <class T>
-bool goPointCloud<T>::getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const goArray<goFloat>* weights) const
+bool goPointCloud<T>::getPrincipalAxes2D (goMath::Vectorf& a1, goMath::Vectorf& a2, const goArray<goFloat>* weights) const
 {
     //= Moment-of-inertia tensor
     goDouble I_00 = 0.0;
@@ -511,7 +511,7 @@ bool goPointCloud<T>::getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const go
     a1.setSize (2);
     a2.setSize (2);
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     if (!el)
         return false;
 
@@ -602,9 +602,9 @@ bool goPointCloud<T>::getPrincipalAxes2D (goVectorf& a1, goVectorf& a2, const go
 }
 
 template <class T>
-bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
+bool goPointCloud<T>::getPrincipalAxes (goMath::Matrix<T>& axes) const
 {
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     if (!el)
         return false;
 
@@ -614,14 +614,14 @@ bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
     {
         goIndex_t i = 0;
         goIndex_t size = this->getPointCount ();
-        goVector<T> mean;
+        goMath::Vector<T> mean;
         this->getCenterOfMass (mean);
-        goMatrix<T> cov (axes.getRows() < axes.getColumns());
+        goMath::Matrix<T> cov (axes.getRows() < axes.getColumns());
         cov.fill (T(0));
         while (el && i < size)
         {
-            goVector<T> temp = el->elem - mean;
-            goVectorOuter<T> (1.0f, temp, temp, cov);
+            goMath::Vector<T> temp = el->elem - mean;
+            goMath::vectorOuter<T> (1.0f, temp, temp, cov);
             el = el->next;
             ++i;
         }
@@ -634,7 +634,7 @@ bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
         goSize_t N = axes.getRows ();
         for (goSize_t j = 0; j < N; ++j)
         {
-            goVector<T> r;
+            goMath::Vector<T> r;
             axes.refRow (j, r);
             T norm = r.norm2 ();
             if (norm > 1e-4)
@@ -647,7 +647,7 @@ bool goPointCloud<T>::getPrincipalAxes (goMatrix<T>& axes) const
 }
 
 template <class T>
-bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goVector<T> >& points, goMatrix<T>& axes)
+bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goMath::Vector<T> >& points, goMath::Matrix<T>& axes)
 {
     if (points.getSize() < 3)
     {
@@ -660,14 +660,14 @@ bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goVector<T> >& points
     {
         goIndex_t i = 0;
         goIndex_t size = points.getSize();
-        goVector<T> mean;
+        goMath::Vector<T> mean;
         goPointCloud<T>::getCenterOfMass (points, mean);
-        goMatrix<T> cov (axes.getRows() < axes.getColumns());
+        goMath::Matrix<T> cov (axes.getRows() < axes.getColumns());
         cov.fill (T(0));
         while (i < size)
         {
-            goVector<T> temp = points[i] - mean;
-            goVectorOuter<T> (1.0f, temp, temp, cov);
+            goMath::Vector<T> temp = points[i] - mean;
+            goMath::vectorOuter<T> (1.0f, temp, temp, cov);
             ++i;
         }
         cov *= 1.0 / totalWeight;
@@ -679,7 +679,7 @@ bool goPointCloud<T>::getPrincipalAxes (const goFixedArray<goVector<T> >& points
         goSize_t N = axes.getRows ();
         for (goSize_t j = 0; j < N; ++j)
         {
-            goVector<T> r;
+            goMath::Vector<T> r;
             axes.refRow (j, r);
             T norm = r.norm2 ();
             if (norm > 1e-4)
@@ -703,9 +703,9 @@ bool goPointCloud<T>::unitScale (goFloat f)
     {
         return false;
     }
-    typename goList<goVector<T> >::Element* el = myPrivate->points.getFrontElement();
-    goVector<T> max = el->elem;
-    goVector<T> min = el->elem;
+    typename goList<goMath::Vector<T> >::Element* el = myPrivate->points.getFrontElement();
+    goMath::Vector<T> max = el->elem;
+    goMath::Vector<T> min = el->elem;
     const goSize_t N = max.getSize ();
     goSize_t i;
     goSize_t j = 0;
@@ -726,8 +726,8 @@ bool goPointCloud<T>::unitScale (goFloat f)
         el = el->next;
         ++j;
     }
-    goVector<T> trans (min);
-    goVector<T> factorv (this->getDim());
+    goMath::Vector<T> trans (min);
+    goMath::Vector<T> factorv (this->getDim());
     factorv.fill (f);
     for (i = 0; i < N; ++i)
     {
@@ -784,7 +784,7 @@ bool goPointCloud<T>::writeObjectFile (FILE* f) const
 //    const char cnull = 0;
 //    fwrite (&cnull, sizeof(char), 1, f);
 //    fwrite (&s, sizeof(goIndex_t), 1, f);
-    typename goList<goVector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = myPrivate->points.getFrontElement();
     goSize_t j = 0;
     goSize_t pointCount = this->getPointCount ();
     const goSize_t N = (el ? el->elem.getSize() : 0);
@@ -854,7 +854,7 @@ bool goPointCloud<T>::readObjectFile (FILE* f)
     }
     s = line.toInt ();
     myPrivate->points.erase();
-    goVector<T> p (N);
+    goMath::Vector<T> p (N);
     goSize_t count = 0;
     goSize_t i;
     goSize_t j;

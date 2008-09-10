@@ -18,9 +18,9 @@
  * @author Christian Gosch
  */
 template <class T>
-bool goMath::pairwiseDistances (const goMatrix<T>& X, int dimension, goMatrix<T>& ret)
+bool goMath::pairwiseDistances (const goMath::Matrix<T>& X, int dimension, goMath::Matrix<T>& ret)
 {
-    goVector<T> ref1, ref2;
+    goMath::Vector<T> ref1, ref2;
     if (dimension == 0)  // rows contain points
     {
         goSize_t N = X.getRows();
@@ -68,5 +68,5 @@ bool goMath::pairwiseDistances (const goMatrix<T>& X, int dimension, goMatrix<T>
 }
 
 
-template bool goMath::pairwiseDistances <goFloat> (const goMatrix<goFloat>&, int, goMatrix<goFloat>&);
-template bool goMath::pairwiseDistances <goDouble> (const goMatrix<goDouble>&, int, goMatrix<goDouble>&);
+template bool goMath::pairwiseDistances <goFloat> (const goMath::Matrix<goFloat>&, int, goMath::Matrix<goFloat>&);
+template bool goMath::pairwiseDistances <goDouble> (const goMath::Matrix<goDouble>&, int, goMath::Matrix<goDouble>&);

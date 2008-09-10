@@ -45,18 +45,18 @@ class LU
 
 
    /* Array for internal storage of decomposition.  */
-   goMatrix<Real>  LU_;
+   goMath::Matrix<Real>  LU_;
    int m, n, pivsign; 
-   goVector<int> piv;
+   goMath::Vector<int> piv;
 
 
-   void permute_copy(const goMatrix<Real> &A, 
-   			const goVector<int> &piv, int j0, int j1, goMatrix<Real>& retValue)
+   void permute_copy(const goMath::Matrix<Real> &A, 
+   			const goMath::Vector<int> &piv, int j0, int j1, goMath::Matrix<Real>& retValue)
 	{
 		int piv_length = piv.getSize();
 
         retValue.resize (piv_length, j1-j0+1);
-		// goMatrix<Real> X(piv_length, j1-j0+1);
+		// goMath::Matrix<Real> X(piv_length, j1-j0+1);
 
          for (int i = 0; i < piv_length; i++) 
             for (int j = j0; j <= j1; j++) 
@@ -64,8 +64,8 @@ class LU
 		// return X;
 	}
 
-   void permute_copy(const goVector<Real> &A, 
-   		const goVector<int> &piv, goVector<Real>& retValue)
+   void permute_copy(const goMath::Vector<Real> &A, 
+   		const goMath::Vector<int> &piv, goMath::Vector<Real>& retValue)
 	{
 		int piv_length = piv.getSize();
 		if (piv_length != (int)A.getSize())
@@ -73,7 +73,7 @@ class LU
 
         if ((int)retValue.getSize() != piv_length)
             retValue.resize (piv_length);
-		// goVector<Real> x(piv_length);
+		// goMath::Vector<Real> x(piv_length);
 
          for (int i = 0; i < piv_length; i++) 
                retValue[i] = A[piv[i]];
@@ -89,9 +89,9 @@ class LU
    @return     LU Decomposition object to access L, U and piv.
    */
 
-    //goLU (const goMatrix<Real> &A) : LU_(A.copy()), m(A.dim1()), n(A.dim2()), 
+    //goLU (const goMath::Matrix<Real> &A) : LU_(A.copy()), m(A.dim1()), n(A.dim2()), 
 	//	piv(A.dim1())
-    LU (const goMatrix<Real> &A) : LU_(A), m(A.dim1()), n(A.dim2()), 
+    LU (const goMath::Matrix<Real> &A) : LU_(A), m(A.dim1()), n(A.dim2()), 
 		piv(A.dim1())
 	
 	{
@@ -106,7 +106,7 @@ class LU
          piv[i] = i;
       }
       pivsign = 1;
-      goVector<Real> LUcolj(m);
+      goMath::Vector<Real> LUcolj(m);
 
       // Outer loop.
 
@@ -119,7 +119,7 @@ class LU
 
          // Apply previous transformations.
          for (i = 0; i < m; i++) {
-            goVector<Real> LUrowi;
+            goMath::Vector<Real> LUrowi;
             LU_.refRow(i, LUrowi);
 
             // Most of the time is spent in the following dot product.
@@ -181,8 +181,8 @@ class LU
    @return     L
    */
 
-   goMatrix<Real> getL () {
-      goMatrix<Real> L_(m,n);
+   goMath::Matrix<Real> getL () {
+      goMath::Matrix<Real> L_(m,n);
       for (int i = 0; i < m; i++) {
          for (int j = 0; j < n; j++) {
             if (i > j) {
@@ -201,8 +201,8 @@ class LU
    @return     U portion of LU factorization.
    */
 
-   goMatrix<Real> getU () {
-   	  goMatrix<Real> U_(n,n);
+   goMath::Matrix<Real> getU () {
+   	  goMath::Matrix<Real> U_(n,n);
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
             if (i <= j) {
@@ -219,7 +219,7 @@ class LU
    @return     piv
    */
 
-   goVector<int> getPivot () {
+   goMath::Vector<int> getPivot () {
       return piv;
    }
 
@@ -245,7 +245,7 @@ class LU
    					0x0 (null) array.
    */
 
-   bool solve (const goMatrix<Real> &B, goMatrix<Real>& retValue) 
+   bool solve (const goMath::Matrix<Real> &B, goMath::Matrix<Real>& retValue) 
    {
 
 	  /* Dimensions: A is mxn, X is nxk, B is mxk */
@@ -288,12 +288,12 @@ class LU
    /** Solve A*x = b, where x and b are vectors of length equal	
    		to the number of rows in A.
 
-   @param  b   a vector (goVector> of length equal to the first dimension
+   @param  b   a vector (goMath::Vector> of length equal to the first dimension
    						of A.
-   @return x a vector (goVector> so that L*U*x = b(piv), if B is nonconformant,
+   @return x a vector (goMath::Vector> so that L*U*x = b(piv), if B is nonconformant,
    					returns 0x0 (null) array.
    */
-   bool solve (const goVector<Real> &b, goVector<Real>& retValue) 
+   bool solve (const goMath::Vector<Real> &b, goMath::Vector<Real>& retValue) 
    {
 
 	  /* Dimensions: A is mxn, X is nxk, B is mxk */

@@ -3,13 +3,13 @@
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
 
-CXX		= g++-3.3
+#CXX		= g++-3.3
 CXXARGS		= -c   -D HAVE_CONFIG_H -g
 
-LD		= g++-3.3
+#LD		= g++-3.3
 LDARGS		=  
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
+LIBS		=  -L$(GOPATH)/../experimental/lib -lGobase -lGodata -lGomath # -lGomatlab
 
 INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/../include -I$(MATLAB)/extern/include
 TARGET		= matrix

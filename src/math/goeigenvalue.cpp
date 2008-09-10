@@ -15,9 +15,9 @@ extern "C" int ch_(integer *nm, integer *n, real *ar, real *ai, real *w,
  *
  * @return Number of correct eigenvalues and eigenvectors the function was able to compute.
  **/
-goSize_t goMath::ComplexEigenvaluesHermite (const goMatrix<goComplexf>&          m, 
-                                          goVectorf&                           eigenvaluesRet, 
-                                          goFixedArray< goVector<goComplexf> >* eigenvectorsRet)
+goSize_t goMath::complexEigenvaluesHermite (const goMath::Matrix<goComplexf>&          m, 
+                                          Vector<goFloat>&                           eigenvaluesRet, 
+                                          goFixedArray< Vector<goComplexf> >* eigenvectorsRet)
 {
     if (m.getColumns() != m.getRows())
         return 0;

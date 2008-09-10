@@ -24,7 +24,7 @@ class goQuaternion
 
 	void operator= (const goQuaternion<T>& other);
 
-    void setRotation (T angle, const goVector<T>& axis);
+    void setRotation (T angle, const goMath::Vector<T>& axis);
     void setRotation (T angle, const go3Vector<T>& axis);
     T getRotationAngle () const;
     void getRotationMatrix (T* matrix44) const;

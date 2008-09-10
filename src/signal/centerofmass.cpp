@@ -3,7 +3,7 @@
 #include <gosignal3dgenericiterator.h>
 
 template <class T>
-static inline bool _signalCOM2 (const goSignal3DBase<void>& sig, goVectord& comRet)
+static inline bool _signalCOM2 (const goSignal3DBase<void>& sig, goMath::Vectord& comRet)
 {
     if (comRet.getSize() != 3)
     {
@@ -12,7 +12,7 @@ static inline bool _signalCOM2 (const goSignal3DBase<void>& sig, goVectord& comR
     comRet.fill (0.0);
     goSignal3DGenericConstIterator it(&sig);
     goDouble xyz_[] = {0.0, 0.0, 0.0};
-    goVectord xyz (xyz_, 3, 1);
+    goMath::Vectord xyz (xyz_, 3, 1);
     goDouble total = 0.0;
     goDouble temp = 0.0;
     while (!it.endZ())
@@ -50,7 +50,7 @@ static inline bool _signalCOM2 (const goSignal3DBase<void>& sig, goVectord& comR
  * 
  * @return True if successful, false otherwise.
  */
-bool goSignalCOM (const goSignal3DBase<void>& sig, goVectord& comRet)
+bool goSignalCOM (const goSignal3DBase<void>& sig, goMath::Vectord& comRet)
 {
     switch (sig.getDataType().getID())
     {

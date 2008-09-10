@@ -64,16 +64,16 @@ goFilter1D : public goObjectBase
 	    goFilter1D ();
         goFilter1D (const goArray<goFloat>& mask, goIndex_t center = 0, bool normalize = true);
         goFilter1D (const goFloat* mask, goIndex_t length, goIndex_t center = 0, bool normalize = true);
-        goFilter1D (const goVector<goFloat>& mask, goIndex_t center = 0, bool normalize = true);
+        goFilter1D (const goMath::Vector<goFloat>& mask, goIndex_t center = 0, bool normalize = true);
         virtual ~goFilter1D ();
     
         bool setMask   (const goArray<goFloat>& mask);
-        bool setMask   (const goVector<goFloat>& mask);
+        bool setMask   (const goMath::Vector<goFloat>& mask);
         bool setMask   (const goFloat* mask, goIndex_t length);
         bool setCenter (goIndex_t c);
         bool filter    (goSignal3DBase<void>& sig);
-        bool filter    (goMatrixf& m, int direction = 0);
-        bool filter    (goMatrixd& m, int direction = 0);
+        bool filter    (goMath::Matrixf& m, int direction = 0);
+        bool filter    (goMath::Matrixd& m, int direction = 0);
         bool normalize (goDouble constant = 1.0);
         
 	private:

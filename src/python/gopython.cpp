@@ -188,20 +188,20 @@ void goPython::set (const char* name, goSignal3DBase<void>* o, bool own_it)
  * @return The pointer to the object, or 0 if something failed.
  */
 # if 0
-goVectorf* goPython::getVectorf (const char* name, bool own_it)
+goMath::Vectorf* goPython::getVectorf (const char* name, bool own_it)
 {
-    const char* type_str = "goVectorf *";
-    return getSwigPointer<goVectorf> (name, own_it, type_str, this);
+    const char* type_str = "goMath::Vectorf *";
+    return getSwigPointer<goMath::Vectorf> (name, own_it, type_str, this);
 #if 0
     PyObject* o = this->getObject (name);
     if (!o)
         return 0;
 
-    swig_type_info *info = SWIG_TypeQuery ("goVectorf *");
+    swig_type_info *info = SWIG_TypeQuery ("goMath::Vectorf *");
     if (!info)
         return 0;
 
-    goVectorf* ptr = 0;
+    goMath::Vectorf* ptr = 0;
     int own;
     int flags = 0;
     if (own_it)
@@ -215,20 +215,20 @@ goVectorf* goPython::getVectorf (const char* name, bool own_it)
 }
 #endif
 
-GOPYTHON_GETSET_DEFINITION (goVectorf, goVectorf, Vectorf);
-GOPYTHON_GETSET_DEFINITION (goVectord, goVectord, Vectord);
-GOPYTHON_GETSET_DEFINITION (goMatrixf, goMatrixf, Matrixf);
-GOPYTHON_GETSET_DEFINITION (goMatrixd, goMatrixd, Matrixd);
-GOPYTHON_GETSET_DEFINITION (goMatrix<goIndex_t>, goMatrixi, Matrixi);
+GOPYTHON_GETSET_DEFINITION (goMath::Vectorf, goMath::Vectorf, Vectorf);
+GOPYTHON_GETSET_DEFINITION (goMath::Vectord, goMath::Vectord, Vectord);
+GOPYTHON_GETSET_DEFINITION (goMath::Matrixf, goMath::Matrixf, Matrixf);
+GOPYTHON_GETSET_DEFINITION (goMath::Matrixd, goMath::Matrixd, Matrixd);
+GOPYTHON_GETSET_DEFINITION (goMath::Matrix<goIndex_t>, goMath::Matrixi, Matrixi);
 GOPYTHON_GETSET_DEFINITION (goSignal3DBase<void>, goSignal3DBase < void >, Signal3DBase);
 GOPYTHON_GETSET_DEFINITION (goSignal3D<void>, goSignal3D < void >, Signal3D);
 GOPYTHON_GETSET_DEFINITION (goString, goString, String);
 
 
-//goVectord* goPython::getVectord (const char* name, bool own_it)
+//goMath::Vectord* goPython::getVectord (const char* name, bool own_it)
 //{
-//    const char* type_str = "goVectord *";
-//    return getSwigPointer<goVectord> (name, own_it, type_str, this);
+//    const char* type_str = "goMath::Vectord *";
+//    return getSwigPointer<goMath::Vectord> (name, own_it, type_str, this);
 //}
 
 /** 

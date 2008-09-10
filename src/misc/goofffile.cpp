@@ -44,7 +44,7 @@ class goMeshEdge
 #endif
 
 template <class T>
-bool goFixMeshDirection (goFixedArray<goVector<T> >& vertices, goFixedArray<goVector<int> >& faces)
+bool goFixMeshDirection (goFixedArray<goMath::Vector<T> >& vertices, goFixedArray<goMath::Vector<int> >& faces)
 {
     goSize_t sz = faces.getSize();
     if (sz == 0)
@@ -73,7 +73,7 @@ bool goFixMeshDirection (goFixedArray<goVector<T> >& vertices, goFixedArray<goVe
         for (goSize_t i = 1; i < sz; ++i)
         {
             //= Ist eine Kante schon in der Tabelle?
-            goVector<int>& face = faces[i];
+            goMath::Vector<int>& face = faces[i];
             goSize_t sz_f = face.getSize();
             for (goSize_t j = 0; j < sz_f; ++j)
             {
@@ -141,8 +141,8 @@ class goOFFFilePrivate
     {};
         ~goOFFFilePrivate () {};
 
-        goFixedArray<goVectorf>      vertices;
-        goFixedArray<goVector<int> > faces;
+        goFixedArray<goMath::Vectorf>      vertices;
+        goFixedArray<goMath::Vector<int> > faces;
 
         bool cFlag;
         bool nFlag;
@@ -152,8 +152,8 @@ class goOFFFilePrivate
         int nFaces;
         int nEdges;
 
-        goVectorf min;
-        goVectorf max;
+        goMath::Vectorf min;
+        goMath::Vectorf max;
 };
 
 goOFFFile::goOFFFile ()
@@ -334,13 +334,13 @@ bool goOFFFile::read (const char* filename)
 
 bool goOFFFile::removeDoubles ()
 {
-    goFixedArray<goVector<int> >& faces = myPrivate->faces;
-    goList<goVector<int> > newFaces;
+    goFixedArray<goMath::Vector<int> >& faces = myPrivate->faces;
+    goList<goMath::Vector<int> > newFaces;
 
     goSize_t sz = faces.getSize();
     for (goSize_t i = 0; i < sz; ++i)
     {
-        goVector<int>& v = faces[i];
+        goMath::Vector<int>& v = faces[i];
         goSize_t n = v.getSize ();
         bool bad_face = false;
         for (goSize_t j = 0; j < n - 1 && !bad_face; ++j)
@@ -359,7 +359,7 @@ bool goOFFFile::removeDoubles ()
             newFaces.append (v);
     }
     faces.setSize (newFaces.getSize());
-    goList<goVector<int> >::Element* el = newFaces.getFrontElement ();
+    goList<goMath::Vector<int> >::Element* el = newFaces.getFrontElement ();
     sz = faces.getSize ();
     goSize_t i = 0;
     while (el && i < sz)
@@ -374,10 +374,10 @@ bool goOFFFile::removeDoubles ()
 
 bool goOFFFile::align ()
 {
-    goMatrixf M;
+    goMath::Matrixf M;
     goPointCloudf::getPrincipalAxes (myPrivate->vertices, M);
     goSize_t sz = myPrivate->vertices.getSize ();
-    goVectorf mean;
+    goMath::Vectorf mean;
     goPointCloudf::getCenterOfMass (myPrivate->vertices, mean);
     for (goSize_t i = 0; i < sz; ++i)
     {
@@ -386,32 +386,32 @@ bool goOFFFile::align ()
     return true;
 }
 
-const goVectorf& goOFFFile::getMin () const
+const goMath::Vectorf& goOFFFile::getMin () const
 {
     return myPrivate->min;
 }
 
-const goVectorf& goOFFFile::getMax () const
+const goMath::Vectorf& goOFFFile::getMax () const
 {
     return myPrivate->max;
 }
 
-goFixedArray<goVectorf>& goOFFFile::getVertices ()
+goFixedArray<goMath::Vectorf>& goOFFFile::getVertices ()
 {
     return myPrivate->vertices;
 }
 
-goFixedArray<goVector<int> >& goOFFFile::getFaces ()
+goFixedArray<goMath::Vector<int> >& goOFFFile::getFaces ()
 {
     return myPrivate->faces;
 }
 
-const goFixedArray<goVectorf>& goOFFFile::getVertices () const
+const goFixedArray<goMath::Vectorf>& goOFFFile::getVertices () const
 {
     return myPrivate->vertices;
 }
 
-const goFixedArray<goVector<int> >& goOFFFile::getFaces () const
+const goFixedArray<goMath::Vector<int> >& goOFFFile::getFaces () const
 {
     return myPrivate->faces;
 }
@@ -424,14 +424,14 @@ const goFixedArray<goVector<int> >& goOFFFile::getFaces () const
  */
 void goOFFFile::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
 {
-    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    const goFixedArray<goMath::Vector<int> >& faces = this->getFaces();
     int N = this->getVertices().getSize();
     ret.setSize (0);
     ret.setSize (N);
     int Nfaces = faces.getSize();
     for (int fi = 0; fi < Nfaces; ++fi)
     {
-        const goVector<int>& v = faces[fi];
+        const goMath::Vector<int>& v = faces[fi];
         int Nv = v.getSize();
         for (int j = 0; j < Nv; ++j)
         {
@@ -466,14 +466,14 @@ void goOFFFile::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
  */
 void goOFFFile::getAdjacentFaces (goFixedArray<goList<int> >& ret) const
 {
-    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    const goFixedArray<goMath::Vector<int> >& faces = this->getFaces();
     int N = this->getVertices().getSize();
     ret.setSize (0);
     ret.setSize (N);
     int Nfaces = faces.getSize();
     for (int fi = 0; fi < Nfaces; ++fi)
     {
-        const goVector<int>& v = faces[fi];
+        const goMath::Vector<int>& v = faces[fi];
         int Nv = v.getSize();
         for (goSize_t i = 0; i < Nv; ++i)
         {
@@ -497,7 +497,7 @@ static bool contains (const goFixedArray<T>& a, T v)
     return false;
 }
 template <class T>
-static bool contains (const goVector<T>& a, T v)
+static bool contains (const goMath::Vector<T>& a, T v)
 {
     goSize_t sz = a.getSize();
     for (goSize_t i = 0; i < sz; ++i)
@@ -513,10 +513,10 @@ static bool contains (const goVector<T>& a, T v)
  * 
  * @param normals Normals for each vertex.
  */
-void goOFFFile::calculateNormals (goMatrixf& normals) const
+void goOFFFile::calculateNormals (goMath::Matrixf& normals) const
 {
-    const goFixedArray<goVectorf>& vertices = this->getVertices();
-    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    const goFixedArray<goMath::Vectorf>& vertices = this->getVertices();
+    const goFixedArray<goMath::Vector<int> >& faces = this->getFaces();
 
     const goSize_t N = vertices.getSize();
     if (N <= 0)
@@ -524,10 +524,10 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
     const goSize_t dim = vertices[0].getSize();
     const goSize_t N_faces = faces.getSize();
 
-    goMatrixf face_normals (N_faces, dim);
+    goMath::Matrixf face_normals (N_faces, dim);
     this->calculateFaceNormals (face_normals);
     goFloat _normal[3];
-    goVectorf normal (_normal, 3, 1);
+    goMath::Vectorf normal (_normal, 3, 1);
 
     goFixedArray<goList<int> > adj;
     this->getAdjacencyLists (adj);
@@ -584,7 +584,7 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
 #if 0
     {
         goFloat _temp_vec[3];
-        goVectorf temp_vec (_temp_vec, 3, 1);
+        goMath::Vectorf temp_vec (_temp_vec, 3, 1);
         temp_vec.fill (0.0f);
         goFloat temp_count = 0.0f;
         for (goSize_t i = 0; i < N; ++i)
@@ -678,7 +678,7 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
 #if 1
     normals.resize (N, dim);
     normals.fill (0.0f);
-    goVectorf fn_row (0);
+    goMath::Vectorf fn_row (0);
     for (goSize_t i = 0; i < N; ++i)
     {
         normals.refRow (i, normal);
@@ -732,7 +732,7 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
             goList<int>::Element* el = adjFaces[i].getFrontElement();
             while (el)
             {
-                goVectorf temp (0);
+                goMath::Vectorf temp (0);
                 printf ("face %d: ", el->elem);
                 face_normals.refRow (el->elem, temp);
                 for (goSize_t j = 0; j < temp.getSize(); ++j)
@@ -752,10 +752,10 @@ void goOFFFile::calculateNormals (goMatrixf& normals) const
  * 
  * @param face_normals Contains the face normals, on return.
  */
-void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const
+void goOFFFile::calculateFaceNormals (goMath::Matrixf& face_normals) const
 {
-    const goFixedArray<goVectorf>& vertices = this->getVertices();
-    const goFixedArray<goVector<int> >& faces = this->getFaces();
+    const goFixedArray<goMath::Vectorf>& vertices = this->getVertices();
+    const goFixedArray<goMath::Vector<int> >& faces = this->getFaces();
 
     const goSize_t N = vertices.getSize();
     if (N <= 0)
@@ -764,7 +764,7 @@ void goOFFFile::calculateFaceNormals (goMatrixf& face_normals) const
     const goSize_t N_faces = faces.getSize();
 
     face_normals.resize (N_faces, dim);
-    goVectorf normal;
+    goMath::Vectorf normal;
     for (goSize_t i = 0; i < N_faces; ++i)
     {
         face_normals.refRow (i, normal);

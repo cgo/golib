@@ -37,7 +37,7 @@
  * <code>set (const char* name, TYPE *o, bool own_it);</code> <br>
  * <code>TYPE* getNAME (const char* name, bool own_it);</code> <br>
  * Examples are 
- * <code> goVectorf* getVectorf (...) </code>
+ * <code> goMath::Vectorf* getVectorf (...) </code>
  * <code> goSignal3D<void>* getSignal3D (...) </code>
  *
  * All set/get function pairs for swig wrapped objects are created with 
@@ -161,11 +161,11 @@ namespace goPython
     type_spec* get##spec (const char* name, bool own_it = false); \
         void set (const char* name, type_spec *o, bool own_it = false);
     
-        GOPYTHON_GETSET_DECLARATION(goVectorf, Vectorf);
-        GOPYTHON_GETSET_DECLARATION(goVectord, Vectord);
-        GOPYTHON_GETSET_DECLARATION(goMatrixf, Matrixf);
-        GOPYTHON_GETSET_DECLARATION(goMatrixd, Matrixd);
-        GOPYTHON_GETSET_DECLARATION(goMatrix<goIndex_t>, Matrixi);
+        GOPYTHON_GETSET_DECLARATION(goMath::Vectorf, Vectorf);
+        GOPYTHON_GETSET_DECLARATION(goMath::Vectord, Vectord);
+        GOPYTHON_GETSET_DECLARATION(goMath::Matrixf, Matrixf);
+        GOPYTHON_GETSET_DECLARATION(goMath::Matrixd, Matrixd);
+        GOPYTHON_GETSET_DECLARATION(goMath::Matrix<goIndex_t>, Matrixi);
         GOPYTHON_GETSET_DECLARATION(goSignal3DBase<void>, Signal3DBase);
         GOPYTHON_GETSET_DECLARATION(goSignal3D<void>, Signal3D);
         GOPYTHON_GETSET_DECLARATION(goString, String);

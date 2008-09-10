@@ -1,9 +1,9 @@
 #include <gomath.h>
 
 template <class T>
-bool goMath::planeLineCut (const goVector<T>& planeNormal, const goVector<T>& planePoint, 
-                   const goVector<T>& lineDirection, const goVector<T>& linePoint,
-                   goVector<T>& ret)
+bool goMath::planeLineCut (const goMath::Vector<T>& planeNormal, const goMath::Vector<T>& planePoint, 
+                   const goMath::Vector<T>& lineDirection, const goMath::Vector<T>& linePoint,
+                   goMath::Vector<T>& ret)
 {
     goDouble A = planeNormal * planePoint - planeNormal * linePoint;
     goDouble B = planeNormal * lineDirection;
@@ -19,10 +19,10 @@ bool goMath::planeLineCut (const goVector<T>& planeNormal, const goVector<T>& pl
 }
 
 template
-bool goMath::planeLineCut<goFloat> (const goVector<goFloat>& , const goVector<goFloat>& , 
-                   const goVector<goFloat>& , const goVector<goFloat>& ,
-                   goVector<goFloat>& ret);
+bool goMath::planeLineCut<goFloat> (const goMath::Vector<goFloat>& , const goMath::Vector<goFloat>& , 
+                   const goMath::Vector<goFloat>& , const goMath::Vector<goFloat>& ,
+                   goMath::Vector<goFloat>& ret);
 template
-bool goMath::planeLineCut<goDouble> (const goVector<goDouble>& , const goVector<goDouble>& , 
-                   const goVector<goDouble>& , const goVector<goDouble>& ,
-                   goVector<goDouble>& ret);
+bool goMath::planeLineCut<goDouble> (const goMath::Vector<goDouble>& , const goMath::Vector<goDouble>& , 
+                   const goMath::Vector<goDouble>& , const goMath::Vector<goDouble>& ,
+                   goMath::Vector<goDouble>& ret);

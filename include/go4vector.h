@@ -16,11 +16,11 @@
 //= New version of go4Vector -- remplase old when this is done.
 #if 1
 template <class T>
-class go4Vector : public goVector<T>
+class go4Vector : public goMath::Vector<T>
 {
     public:
         go4Vector (T x_ = (T)0, T y_ = (T)0, T z_ = (T)0, T t_ = (T)0) 
-            : goVector<T>(4) 
+            : goMath::Vector<T>(4) 
         {
             (*this)[0] = x_;
             (*this)[1] = y_;
@@ -29,14 +29,14 @@ class go4Vector : public goVector<T>
         };
         template <class To>
         go4Vector (const go4Vector<To>& other)
-            : goVector<T>(4)
+            : goMath::Vector<T>(4)
         {
             *this = other;
         };
 
         template <class To>
-        go4Vector (const goVector<To>& other)
-            : goVector<T>(4)
+        go4Vector (const goMath::Vector<To>& other)
+            : goMath::Vector<T>(4)
         {
             if (other.getSize() == 4)
             {
@@ -44,7 +44,7 @@ class go4Vector : public goVector<T>
             }
             else
             {
-                goLog::warning ("go4Vector::go4Vector(other): Tried to initialise with goVector of size != 4");
+                goLog::warning ("go4Vector::go4Vector(other): Tried to initialise with goMath::Vector of size != 4");
             }
         };
         virtual ~go4Vector () {};
@@ -134,7 +134,7 @@ class go4Vector : public goVector<T>
  */
 /**
  * @brief 4-dimensional vector.
- * @todo make this a descendant of goVector, fix size to 4, provide
+ * @todo make this a descendant of goMath::Vector, fix size to 4, provide
  *  x,y,z,t/w as references.
  **/
 #if 0

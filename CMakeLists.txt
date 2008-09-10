@@ -5,7 +5,7 @@ INCLUDE             (CheckFunctionExists)
 # Apparently buggy:
 # INCLUDE             (FindThreads)
 
-SET (HAVE_MATLAB_GEQ_2007A FALSE CACHE BOOL "Have Matlab >= 2007a? Also see BUILD_WITH_GCC_3_3")
+SET (HAVE_MATLAB_GEQ_2007A TRUE CACHE BOOL "Have Matlab >= 2007a? Also see BUILD_WITH_GCC_3_3")
 SET (BUILD_WITH_GCC_3_3 FALSE CACHE BOOL "Enable/disable gcc-3.3 (for matlab < 2007a)")
 SET (BUILD_WITH_GCC_3_4 FALSE CACHE BOOL "Enable/disable gcc-3.4 (for matlab >= 2006b)")
 # SET (BUILD_GUILE_MODULE FALSE CACHE BOOL "Enable/disable building the guile module")
@@ -17,6 +17,7 @@ SET (BUILD_MATLAB_MEX FALSE CACHE BOOL "Enable/disable building the matlab mex m
 SET (BUILD_GUI_MODULE FALSE CACHE BOOL "Enable/disable building the GUI module (Gogui)")
 SET (BUILD_GUI_MODULE_OPENGL FALSE CACHE BOOL "Enable/disable building the OpenGL widget (needs Gogl)")
 SET (BUILD_GL_MODULE FALSE CACHE BOOL "Enable/disable building the OpenGL module (Gogl)")
+SET (LINK_GFORTRAN TRUE CACHE BOOL "Link gfortran library (for atlas 3.6)")
 
 IF (HAVE_MATLAB_GEQ_2007A)
     ADD_DEFINITIONS (-DHAVE_MATLAB_GEQ_2007A)
@@ -259,6 +260,16 @@ CHECK_LIBRARY_EXISTS (socket connect "" HAVE_LIBSOCKET)
 IF (${HAVE_LIBSOCKET} MATCHES 1)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lsocket")
 ENDIF (${HAVE_LIBSOCKET} MATCHES 1)
+
+IF (LINK_GFORTRAN)
+    #    FIND_LIBRARY (GFORTRAN NAMES gfortran PATHS /usr/lib /usr/local/lib)
+    #IF (GFORTRAN)
+    #    SET (EXTRA_LIBS "${EXTRA_LIBS} ${GFORTRAN}")
+    #ELSE (GFORTRAN)
+    #    MESSAGE ("*** LINK_GFORTRAN selected, but gfortran library not found! ***")
+    #ENDIF (GFORTRAN)
+    SET (EXTRA_LIBS "${EXTRA_LIBS} -lgfortran")
+ENDIF (LINK_GFORTRAN)
 
 SET (EXTRA_INCLUDE_PATH "")
 

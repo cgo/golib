@@ -14,20 +14,20 @@ namespace goMath {
  * Contains NRC code. No public use.
  */
 template<class T>
-void LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d);
+void LUDecomp(goMath::Matrix<T>& a, goArray<int>& indx, double *d);
 
 /*
  * Contains NRC code. No public use.
  */
 template<class T>
-void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b);
+void LUBackSubst(goMath::Matrix<T>& a, goArray<int>& indx, goArray<T>& b);
 
 /*
  * Contains NRC code. No public use.
  * Inverts matrix a using LUDecomp and LUBackSubst (LU decomposition and backsubstitution).
  */
 template<class T>
-void matrixInversion(goMatrix<T>& a);
+void matrixInversion(goMath::Matrix<T>& a);
 
 };
 

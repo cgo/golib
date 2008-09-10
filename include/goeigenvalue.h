@@ -15,7 +15,7 @@ namespace goMath
  * \addtogroup math
  * @{
  */
-    goSize_t ComplexEigenvaluesHermite (const goMatrix<goComplexf>& m, goVectorf& eigenvaluesRet, goFixedArray< goVector<goComplexf> >* eigenvectorsRet = 0);
+    goSize_t complexEigenvaluesHermite (const goMath::Matrix<goComplexf>& m, goMath::Vectorf& eigenvaluesRet, goFixedArray< goMath::Vector<goComplexf> >* eigenvectorsRet = 0);
     
 /*!
  * \internal
@@ -24,7 +24,7 @@ namespace goMath
     This is taken directly from the JAMA library
     from NIST (http://math.nist.gov/tnt/).
     The class was renamed to fit the local conventions
-    and uses goMatrix and goArray classes
+    and uses goMath::Matrix and goArray classes
     instead of the TNT::Array{1,2}D classes.
     
     Computes eigenvalues and eigenvectors of a real (non-complex)
@@ -87,16 +87,16 @@ class Eigenvalue
 
    /** Arrays for internal storage of eigenvalues. */
 
-   goVector<Real> d;         /* real part */
-   goVector<Real> e;         /* img part */
+   goMath::Vector<Real> d;         /* real part */
+   goMath::Vector<Real> e;         /* img part */
 
    /** Array for internal storage of eigenvectors. */
-    goMatrix<Real> V;
+    goMath::Matrix<Real> V;
 
    /** Array for internal storage of nonsymmetric Hessenberg form.
    @serial internal storage of nonsymmetric Hessenberg form.
    */
-   goMatrix<Real> H;
+   goMath::Matrix<Real> H;
    
 
    /** Working storage for nonsymmetric algorithm.
@@ -907,7 +907,7 @@ public:
    @param A    Square real (non-complex) matrix
    */
 
-   Eigenvalue(const goMatrix<Real> &A) {
+   Eigenvalue(const goMath::Matrix<Real> &A) {
       n = A.dim2();
       V.resize(n,n);
       d.resize(n);
@@ -956,23 +956,23 @@ public:
    @return     V
    */
 
-   void getV (goMatrix<Real> &V_) {
+   void getV (goMath::Matrix<Real> &V_) {
       V_ = V;
       return;
    }
 
-   const goMatrix<Real>& getV () const { return this->V; };
-   goMatrix<Real>&       getV () { return this->V; };
+   const goMath::Matrix<Real>& getV () const { return this->V; };
+   goMath::Matrix<Real>&       getV () { return this->V; };
 
-   goVector<Real>&       getRealEigenvalues () { return this->d; };
-   const goVector<Real>& getRealEigenvalues () const { return this->d; };
-   goVector<Real>&       getImagEigenvalues () { return this->e; };
-   const goVector<Real>& getImagEigenvalues () const { return this->e; };
+   goMath::Vector<Real>&       getRealEigenvalues () { return this->d; };
+   const goMath::Vector<Real>& getRealEigenvalues () const { return this->d; };
+   goMath::Vector<Real>&       getImagEigenvalues () { return this->e; };
+   const goMath::Vector<Real>& getImagEigenvalues () const { return this->e; };
 
    /** Return the real parts of the eigenvalues
    @return     real(diag(D))
    */
-   void getRealEigenvalues (goVector<Real> &d_) {
+   void getRealEigenvalues (goMath::Vector<Real> &d_) {
       d_ = d;
       return ;
    }
@@ -982,7 +982,7 @@ public:
 
    @pararm e_: new matrix with imaginary parts of the eigenvalues.
    */
-   void getImagEigenvalues (goVector<Real> &e_) {
+   void getImagEigenvalues (goMath::Vector<Real> &e_) {
       e_ = e;
       return;
    }
@@ -1021,8 +1021,8 @@ public:
 	eigenvalue matrix.
 	
 */
-   void getD (goMatrix<Real> &D) {
-      D = goMatrix<Real>(n,n);
+   void getD (goMath::Matrix<Real> &D) {
+      D = goMath::Matrix<Real>(n,n);
       for (int i = 0; i < n; i++) {
          for (int j = 0; j < n; j++) {
             D(i,j) = Real(0.0);

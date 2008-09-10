@@ -385,7 +385,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             goIndex_t mu_index = parentIndex;
             if (mu_index < 0)
                 mu_index = 0;
-            goVector<Tfloat>& mu = fgn->adj[mu_index]->getOutMsg (fgn);
+            goMath::Vector<Tfloat>& mu = fgn->adj[mu_index]->getOutMsg (fgn);
             if (mu.getSize() != this->getValueCount())
                 mu.resize (this->getValueCount());
 
@@ -411,7 +411,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
          */
         inline bool factorSend (goFGNode<T,Tfloat>* fgn, goSize_t parentIndex)
         {
-            goVector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
+            goMath::Vector<Tfloat>& mu = fgn->adj[parentIndex]->getOutMsg (fgn);
             if (mu.getSize() != this->getValueCount())
                 mu.resize (this->getValueCount());
 
@@ -432,11 +432,11 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
                 //= Sum over all other variables connected to this 
                 //= factor except for the parent.
                 goSize_t x_index = parentIndex;
-                goVector<T> X (fgn->adj.getSize());
+                goMath::Vector<T> X (fgn->adj.getSize());
                 //= Dynamic cast funktioniert in manchen Faellen nicht (??) -- daher mit Gewalt.
                 goFGNodeFactor<T,Tfloat>* factornode = (goFGNodeFactor<T,Tfloat>*)fgn;
                 assert (factornode);
-                goFunctorBase1< Tfloat, const goVector<T>& >* f = factornode->getFunctor();
+                goFunctorBase1< Tfloat, const goMath::Vector<T>& >* f = factornode->getFunctor();
                 for (goSize_t x = 0; x < this->getValueCount(); ++x)
                 {
                     X.fill (T(0));
@@ -455,7 +455,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
                 if (this->getDirection() == goMessagePassing<T,Tfloat>::FORWARD)
                 {
                     //= This must be a leaf node. Send f(x).
-                    goVector<T> X(1);
+                    goMath::Vector<T> X(1);
                     //= Dynamic cast funktioniert in manchen Faellen nicht (??) -- daher mit Gewalt.
                     goFGNodeFactor<T,Tfloat>* f = (goFGNodeFactor<T,Tfloat>*)fgn;
                     for (goSize_t i = 0; i < this->getValueCount(); ++i)
@@ -487,7 +487,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
          * @return The sum/product value.
          */
         inline Tfloat sumproduct (goFGNodeFactor<T,Tfloat>* factorNode,
-                goFunctorBase1 <Tfloat, const goVector<T>& >* f, goVector<T>& X, goSize_t i, goSize_t fixed_index)
+                goFunctorBase1 <Tfloat, const goMath::Vector<T>& >* f, goMath::Vector<T>& X, goSize_t i, goSize_t fixed_index)
         {
             goSize_t vc = this->getValueCount();
             if (i >= X.getSize())
@@ -500,7 +500,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
                    {
                        continue;
                    }
-                   goVector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
+                   goMath::Vector<Tfloat>& inMsg = factorNode->adj[j]->getInMsg(factorNode);
                    if (inMsg.getSize() != vc)
                    {
                        goLog::warning ("goSumProduct::sumproduct(): inMsg size mismatch, continuing -- loopy graph?");
@@ -628,7 +628,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
         bool marginal (
                 goFGNodeVariable<T,Tfloat>* variable, 
                 goSize_t                    valueCount, 
-                goVector<Tfloat>&           marginalRet)
+                goMath::Vector<Tfloat>&           marginalRet)
         {
             goSize_t adjCount = variable->adj.getSize();
             if (marginalRet.getSize() != valueCount)
@@ -646,7 +646,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
         
         Tfloat norm (goFactorGraph<T,Tfloat>& fg, goSize_t valueCount)
         {
-            goVector<Tfloat> marginal (valueCount);
+            goMath::Vector<Tfloat> marginal (valueCount);
             this->marginal (fg.myVariables[0].get(), valueCount, marginal);
             return marginal.sum ();
         };

@@ -24,7 +24,7 @@
  * @return True if successful, false otherwise (also check log).
  */
 template <class T>
-bool goMath::euclideanToBarycentric (const goMatrix<T>& simplex, const goVector<T>& point, goVector<T>& ret)
+bool goMath::euclideanToBarycentric (const goMath::Matrix<T>& simplex, const Vector<T>& point, Vector<T>& ret)
 {
     if (simplex.getRows() != simplex.getColumns() - 1)
     {
@@ -36,35 +36,35 @@ bool goMath::euclideanToBarycentric (const goMatrix<T>& simplex, const goVector<
         goLog::warning ("goMath::euclideanToBarycentric(): point dimensions mismatch.");
         return false;
     }
-    goMatrix<T> simplex_ (simplex.getRows() + 1, simplex.getColumns());
+    goMath::Matrix<T> simplex_ (simplex.getRows() + 1, simplex.getColumns());
     simplex.copy (0, 0, simplex.getRows()-1, simplex.getColumns()-1, simplex_);
-    goVector<T> ref;
+    Vector<T> ref;
     simplex_.refRow (simplex_.getRows()-1, ref);
     ref.fill (T(1));
 
-    goVector<T> point_ (point.getSize() + 1);
+    Vector<T> point_ (point.getSize() + 1);
     point.copy (point_);
     point_[point_.getSize()-1] = T(1);
 
     simplex_.invert ();
     
-    goMatrixVectorMult<T> (T(1), simplex_, false, point_, T(0), ret);
+    goMath::matrixVectorMult<T> (T(1), simplex_, false, point_, T(0), ret);
     return true;
 }
 /** @} */
 
 template <class T>
-void goMath::barycentricToEuclidean (const goMatrix<T>& simplex, const goVector<T>& barycentric, goVector<T>& ret)
+void goMath::barycentricToEuclidean (const goMath::Matrix<T>& simplex, const Vector<T>& barycentric, Vector<T>& ret)
 {
-    goMatrixVectorMult<T> (T(1), simplex, false, barycentric, T(0), ret);
+    goMath::matrixVectorMult<T> (T(1), simplex, false, barycentric, T(0), ret);
 }
 
 template 
-bool goMath::euclideanToBarycentric<goFloat> (const goMatrix<goFloat>&, const goVector<goFloat>&, goVector<goFloat>&);
+bool goMath::euclideanToBarycentric<goFloat> (const goMath::Matrix<goFloat>&, const Vector<goFloat>&, Vector<goFloat>&);
 template 
-bool goMath::euclideanToBarycentric<goDouble> (const goMatrix<goDouble>&, const goVector<goDouble>&, goVector<goDouble>&);
+bool goMath::euclideanToBarycentric<goDouble> (const goMath::Matrix<goDouble>&, const Vector<goDouble>&, Vector<goDouble>&);
 
 template 
-void goMath::barycentricToEuclidean<goFloat> (const goMatrix<goFloat>&, const goVector<goFloat>&, goVector<goFloat>&);
+void goMath::barycentricToEuclidean<goFloat> (const goMath::Matrix<goFloat>&, const Vector<goFloat>&, Vector<goFloat>&);
 template 
-void goMath::barycentricToEuclidean<goDouble> (const goMatrix<goDouble>&, const goVector<goDouble>&, goVector<goDouble>&);
+void goMath::barycentricToEuclidean<goDouble> (const goMath::Matrix<goDouble>&, const Vector<goDouble>&, Vector<goDouble>&);

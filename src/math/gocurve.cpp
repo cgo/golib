@@ -49,7 +49,7 @@ goCurve<T>::goCurve (const goCurve<T>& other)
 }
 
 template<class T>
-goCurve<T>::goCurve (const goList<goVector<T> >& pl)
+goCurve<T>::goCurve (const goList<goMath::Vector<T> >& pl)
     : goPointCloud<T> (pl),
       myPrivate (0)
 {
@@ -58,7 +58,7 @@ goCurve<T>::goCurve (const goList<goVector<T> >& pl)
 }
 
 template<class T>
-goCurve<T>::goCurve (const goMatrix<T>& confMatrix)
+goCurve<T>::goCurve (const goMath::Matrix<T>& confMatrix)
     : goPointCloud<T> (confMatrix),
       myPrivate (0)
 {
@@ -99,7 +99,7 @@ goCurve<T>::~goCurve ()
  * @return True if successful, false otherwise (check logfile).
  */
 template <class T>
-bool goCurve<T>::sample (goDouble position, goVector<T>& ret) const
+bool goCurve<T>::sample (goDouble position, goMath::Vector<T>& ret) const
 {
     if (this->getPoints().getSize() < 2)
     {
@@ -107,13 +107,13 @@ bool goCurve<T>::sample (goDouble position, goVector<T>& ret) const
     }
     goDouble pos1 = 0.0;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     goSize_t sz = this->getPoints().getSize ();
     goSize_t i = 0;
     goDouble lastLength = 0.0;
     while (i < (sz - 1) && el && position > pos1)
     {
-        goVector<T> temp = el->elem;
+        goMath::Vector<T> temp = el->elem;
         temp -= el->next->elem;
         lastLength = temp.norm2();
         pos1 += lastLength;
@@ -158,22 +158,21 @@ bool goCurve<T>::sample (goDouble position, goVector<T>& ret) const
  */
 template <class T>
 bool goCurve<T>::resample (goDouble start, goDouble end, 
-                           goSize_t samples, goList<goVector<T> >& ret) const
+                           goSize_t samples, goList<goMath::Vector<T> >& ret) const
 {
     if (this->getPoints().getSize() < 2)
     {
         return false;
     }
     goDouble pos1 = 0.0;
-    goDouble pos2 = 0.0;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     goSize_t sz = this->getPoints().getSize ();
     goSize_t i = 0;
     goDouble lastLength = 0.0;
     while (i < (sz - 1) && el && start > pos1)
     {
-        goVector<T> temp = el->elem;
+        goMath::Vector<T> temp = el->elem;
         temp -= el->next->elem;
         lastLength = temp.norm2();
         pos1 += lastLength;
@@ -194,11 +193,11 @@ bool goCurve<T>::resample (goDouble start, goDouble end,
     // pos1 -= lastLength;
     //= Copy points including start and end points into temporary and
     //= then resample those (this is more readable and less error prone).
-    goList<goVector<T> > tempPoints;
+    goList<goMath::Vector<T> > tempPoints;
     //= First point:
     if (start > 0.0)
     {
-        goVector<T> p = el->prev->elem + 
+        goMath::Vector<T> p = el->prev->elem + 
             (el->elem - el->prev->elem) * (start - pos1 + lastLength) * (1.0 / lastLength);
         tempPoints.append (p);
     }
@@ -206,7 +205,7 @@ bool goCurve<T>::resample (goDouble start, goDouble end,
     while (el && pos1 < end && i < sz)
     {
         tempPoints.append (el->elem);
-        goVector<T> temp = el->elem;
+        goMath::Vector<T> temp = el->elem;
         temp -= el->next->elem;
         lastLength = temp.norm2();
         pos1 += lastLength;
@@ -220,7 +219,7 @@ bool goCurve<T>::resample (goDouble start, goDouble end,
     
     //= Append last point.
     {
-        goVector<T> p = el->prev->elem + 
+        goMath::Vector<T> p = el->prev->elem + 
             (el->elem - el->prev->elem) * (end - pos1 + lastLength) * (1.0 / lastLength);
         tempPoints.append (p);
     }
@@ -245,7 +244,7 @@ bool goCurve<pointT>::operator!= (const goCurve<pointT>& other) const
 #endif
 
 template <class T>
-bool goCurve<T>::setPoints (const goMatrix<T>& m)
+bool goCurve<T>::setPoints (const goMath::Matrix<T>& m)
 {
     return goPointCloud<T>::setPoints (m);
 }
@@ -253,7 +252,7 @@ bool goCurve<T>::setPoints (const goMatrix<T>& m)
 /**
  */
 template <class T>
-bool goCurve<T>::setPoints (const goList<goVector<T> >& l)
+bool goCurve<T>::setPoints (const goList<goMath::Vector<T> >& l)
 {
     return goPointCloud<T>::setPoints(l);
 }
@@ -270,12 +269,12 @@ bool goCurve<T>::setPoints (const goList<goVector<T> >& l)
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goCurve<T>::setPoints (typename goList<goVector<T> >::ConstElement* sourceBegin, 
+bool goCurve<T>::setPoints (typename goList<goMath::Vector<T> >::ConstElement* sourceBegin, 
                             goIndex_t                         sourcePointCount, 
                             goIndex_t                         destPointCount,
                             bool                              closed)
 {
-    goList<goVector<T> >& points = this->getPoints();
+    goList<goMath::Vector<T> >& points = this->getPoints();
     points.erase();
     bool result = goCurve<T>::resample(sourceBegin, sourcePointCount, destPointCount, points, closed);
     if (!result)
@@ -299,12 +298,12 @@ bool goCurve<T>::setPoints (typename goList<goVector<T> >::ConstElement* sourceB
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goCurve<T>::setPoints (typename goList<goVector<T> >::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed)
+bool goCurve<T>::setPoints (typename goList<goMath::Vector<T> >::ConstElement* sourceBegin, goIndex_t sourcePointCount, bool closed)
 {
-    goList<goVector<T> >& points = this->getPoints();
+    goList<goMath::Vector<T> >& points = this->getPoints();
     points.erase();
     goIndex_t i;
-    typename goList<goVector<T> >::ConstElement* el = sourceBegin;
+    typename goList<goMath::Vector<T> >::ConstElement* el = sourceBegin;
     for (i = 0; i < sourcePointCount && el; ++i)
     {
         points.append(el->elem);
@@ -342,8 +341,8 @@ goDouble goCurve<T>::euclideanDistance (const goCurve<T>& other, bool forward) c
     assert (other.getPointCount() == this->getPointCount());
   
     //= Calculate square sum of point distances.
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
-    typename goList<goVector<T> >::ConstElement* otherEl = 0;
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* otherEl = 0;
     if (forward)
     {
         otherEl = other.getPoints().getFrontElement();
@@ -395,7 +394,7 @@ bool goCurve<T>::resampleNUBS (goIndex_t pointCount, goCurve<T>& ret) const
         return false;
 
     goNUBS nubs (this);
-    goList<goVector<T> > newPoints;
+    goList<goMath::Vector<T> > newPoints;
     goFloat t = 0.0f;
     goFloat step = nubs.getCurveLength() / (float)(pointCount-1);
     goIndex_t i;
@@ -417,7 +416,7 @@ bool goCurve<T>::resampleNUBS (goIndex_t pointCount, goCurve<T>& ret) const
 #endif
 
 template<class T>
-bool goCurve<T>::resample (goIndex_t pointCount, goList<goVector<T> >& ret) const
+bool goCurve<T>::resample (goIndex_t pointCount, goList<goMath::Vector<T> >& ret) const
 {
     goIndex_t np = this->getPoints().getSize();
     bool ok = goCurve<T>::resample (this->getPoints().getFrontElement(), np, pointCount, ret, this->getPoints().isClosed());
@@ -448,7 +447,7 @@ bool goCurve<T>::resample (goIndex_t pointCount, goCurve<T>& ret) const
  */
 #if 0
 template<class T>
-bool goCurve<T>::resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, typename goList<goVector<T> >::ConstElement* end, goIndex_t pointCount, goList<goVector<T> >& ret)
+bool goCurve<T>::resampleNUBS (typename goList<goMath::Vector<T> >::ConstElement* begin, typename goList<goMath::Vector<T> >::ConstElement* end, goIndex_t pointCount, goList<goMath::Vector<T> >& ret)
 {
     goNUBS nubs;
     if (!nubs.setControlPoints(begin,end))
@@ -469,7 +468,7 @@ bool goCurve<T>::resampleNUBS (typename goList<goVector<T> >::ConstElement* begi
 #endif
 
 template<class T>
-bool goCurve<T>::resample (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve)
+bool goCurve<T>::resample (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret, bool closedCurve)
 {
     return goCurve<T>::resampleLinear (begin,pointCount,resamplePointCount,ret,closedCurve);
 }
@@ -488,7 +487,7 @@ bool goCurve<T>::resample (typename goList<goVector<T> >::ConstElement* begin, g
  */
 #if 0
 template<class pointT>
-bool goCurve<pointT>::resampleNUBS (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret)
+bool goCurve<pointT>::resampleNUBS (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret)
 {
     goNUBS nubs;
     if (!nubs.setControlPoints(begin,pointCount))
@@ -521,7 +520,7 @@ bool goCurve<pointT>::resampleNUBS (typename goList<goVector<T> >::ConstElement*
  * @return True if successful, false otherwise.
  */
 template<class T>
-bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goVector<T> >& ret, bool closedCurve)
+bool goCurve<T>::resampleLinear (typename goList<goMath::Vector<T> >::ConstElement* begin, goIndex_t pointCount, goIndex_t resamplePointCount, goList<goMath::Vector<T> >& ret, bool closedCurve)
 {
     if (pointCount < 2)
     {
@@ -545,11 +544,11 @@ bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* be
     
     {
         accumLength[0] = 0.0;
-        typename goList<goVector<T> >::ConstElement* el = begin;
+        typename goList<goMath::Vector<T> >::ConstElement* el = begin;
         goIndex_t i;
         for (i = 1; i < pointCount; ++i, el = el->next)
         {
-            goVector<T> p = el->elem - el->next->elem;
+            goMath::Vector<T> p = el->elem - el->next->elem;
             curveLength += p.abs();
             accumLength[i] = curveLength;
         }
@@ -567,12 +566,12 @@ bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* be
     goDouble t = 0.0f;
     goIndex_t i = 0;
     goIndex_t j = 0;
-    typename goList<goVector<T> >::ConstElement* el = begin;
+    typename goList<goMath::Vector<T> >::ConstElement* el = begin;
     for (i = 0; i < resamplePointCount; ++i)
     {
         assert (el && el->next);
         assert (j >= 0 && j < pointCount - 1);
-        goVector<T> p;
+        goMath::Vector<T> p;
         goDouble e = (t - accumLength[j]) / (accumLength[j+1] - accumLength[j]);
         p = el->next->elem * e + el->elem * (1-e);
         ret.append (p);
@@ -618,7 +617,7 @@ bool goCurve<T>::resampleLinear (typename goList<goVector<T> >::ConstElement* be
 * @return True if successful, false otherwise. Check log.
 */
 template <class T>
-bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
+bool goCurve<T>::readASCII (FILE* f, goList<goMath::Vector<T> >& ret)
 {
     if (!f)
     {
@@ -700,7 +699,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
     unsigned int pointCount = 0;
     fscanf(f,"%d\n",&pointCount);
     unsigned int i;
-    goVector<T> p(dim);
+    goMath::Vector<T> p(dim);
     float x = 0.0f;
     // assert (p.getSize() >= 2);
     for (i = 0; i < pointCount; ++i)
@@ -745,7 +744,7 @@ bool goCurve<T>::readASCII (FILE* f, goList<goVector<T> >& ret)
  * @return 
  */
 template <class T>
-bool goCurve<T>::writeASCII (FILE* f, const goList<goVector<T> >& pointList)
+bool goCurve<T>::writeASCII (FILE* f, const goList<goMath::Vector<T> >& pointList)
 {
     if (pointList.getSize() < 1)
     {
@@ -788,7 +787,7 @@ bool goCurve<T>::writeASCII (FILE* f, const goList<goVector<T> >& pointList)
     {
         return false;
     }
-    typename goList<goVector<T> >::ConstElement* el = pointList.getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = pointList.getFrontElement();
     goSize_t i;
     for (i = 0; i < pointCount; ++i, el = el->next)
     {
@@ -843,7 +842,7 @@ bool goCurve<T>::readASCIISimple (const char* filename, goSize_t dimension, bool
  * @return Total number of removed entries.
  */
 template <class T>
-goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
+goSize_t goCurve<T>::removeDuplicates (goList<goMath::Vector<T> >& pl)
 {
     goSize_t removed = 0;
     goSize_t removed_total = 0;
@@ -852,7 +851,7 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
         goSize_t i = 0;
         removed = 0;
         goSize_t sz = pl.getSize();
-        typename goList<goVector<T> >::Element* el = pl.getFrontElement();
+        typename goList<goMath::Vector<T> >::Element* el = pl.getFrontElement();
         if (!pl.isClosed())
         {
             --sz;
@@ -884,7 +883,7 @@ goSize_t goCurve<T>::removeDuplicates (goList<goVector<T> >& pl)
  * @return Number of removed points.
  */
 template <class T>
-goSize_t goCurve<T>::removeCloseDuplicates (goList<goVector<T> >& pl, goDouble epsilon)
+goSize_t goCurve<T>::removeCloseDuplicates (goList<goMath::Vector<T> >& pl, goDouble epsilon)
 {
     goSize_t removed = 0;
     goSize_t removed_total = 0;
@@ -893,7 +892,7 @@ goSize_t goCurve<T>::removeCloseDuplicates (goList<goVector<T> >& pl, goDouble e
         goSize_t i = 0;
         removed = 0;
         goSize_t sz = pl.getSize();
-        typename goList<goVector<T> >::Element* el = pl.getFrontElement();
+        typename goList<goMath::Vector<T> >::Element* el = pl.getFrontElement();
         if (!pl.isClosed())
         {
             --sz;
@@ -928,15 +927,15 @@ goSize_t goCurve<T>::removeCloseDuplicates (goList<goVector<T> >& pl, goDouble e
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goCurve<T>::filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goVector<T> >& pointList, goSize_t count)
+bool goCurve<T>::filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goMath::Vector<T> >& pointList, goSize_t count)
 {
     if (pointList.isEmpty())
         return true;
 
-    goMatrix<T> M (pointList.getFront().getSize(), pointList.getSize());
-    typename goList<goVector<T> >::Element* el = pointList.getFrontElement();
+    goMath::Matrix<T> M (pointList.getFront().getSize(), pointList.getSize());
+    typename goList<goMath::Vector<T> >::Element* el = pointList.getFrontElement();
     goSize_t sz = pointList.getSize();
-    goVector<T> column;
+    goMath::Vector<T> column;
     for (goSize_t i = 0; i < sz; ++i)
     {
         M.refColumn (i, column);
@@ -1018,10 +1017,10 @@ bool goCurve<T>::getGradNorm (goArray<goFloat>& diffNorm) const
     if (this->getPoints().isEmpty())
         return false;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     
-    const goVector<T>* p1 = 0;
-    const goVector<T>* p2 = 0;
+    const goMath::Vector<T>* p1 = 0;
+    const goMath::Vector<T>* p2 = 0;
 //    goFloat temp1 = 0.0f;
 //    goFloat temp2 = 0.0f;
     diffNorm.resize (this->getPoints().getSize());
@@ -1047,19 +1046,19 @@ bool goCurve<T>::getGradNorm (goArray<goFloat>& diffNorm) const
 }
 
 template<class T>
-bool goCurve<T>::getGrad (goList<goVector<T> >& diff) const
+bool goCurve<T>::getGrad (goList<goMath::Vector<T> >& diff) const
 {
     if (this->getPoints().isEmpty())
         return false;
     
     diff.erase();
-    goVector<T> d(this->getDim());
+    goMath::Vector<T> d(this->getDim());
     d.fill (T(0));
     
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
-    const goVector<T>* p1 = 0;
-    const goVector<T>* p2 = 0;
+    const goMath::Vector<T>* p1 = 0;
+    const goMath::Vector<T>* p2 = 0;
     goSize_t pointCount = this->getPointCount ();
     goSize_t j = 0;
     while (el && j < pointCount)
@@ -1085,11 +1084,11 @@ bool goCurve<T>::getCurvNorm (goArray<goFloat>& curvNorm) const
     if (this->getPoints().isEmpty())
         return false;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     
-    const goVector<T>* p1 = 0;
-    const goVector<T>* p  = 0;
-    const goVector<T>* p2 = 0;
+    const goMath::Vector<T>* p1 = 0;
+    const goMath::Vector<T>* p  = 0;
+    const goMath::Vector<T>* p2 = 0;
     goFloat temp1 = 0.0f;
     goFloat temp2 = 0.0f;
     curvNorm.resize (this->getPoints().getSize());
@@ -1129,12 +1128,12 @@ bool goCurve<T>::getCurvNorm (goArray<goFloat>& curvNorm) const
  **/
 #if 0
 template<class T>
-bool goCurve<T>::getAngleFunction (goArray<goFloat>& angles, const goVector<T>& axis) const
+bool goCurve<T>::getAngleFunction (goArray<goFloat>& angles, const goMath::Vector<T>& axis) const
 {
     if (this->getPoints().isEmpty())
         return false;
     angles.resize (this->getPoints().getSize());
-    goVector<T> a = axis;
+    goMath::Vector<T> a = axis;
     goFloat a_abs = a.abs();
     if (a_abs == 0.0f)
     {
@@ -1157,7 +1156,7 @@ bool goCurve<T>::getAngleFunction (goArray<goFloat>& angles, const goVector<T>& 
 
     goIndex_t i;
     goIndex_t size = angles.getSize();
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
     const pointT* p1 = 0;
     const pointT* p2 = 0;
@@ -1193,9 +1192,9 @@ bool goCurve<T>::getAngleFunction (goArray<goFloat>& angles, const goVector<T>& 
 #endif
 
 template <class T>
-static goDouble getTurn (const goVector<T>& p1, const goVector<T>& p2, const goVector<T>& p3)
+static goDouble getTurn (const goMath::Vector<T>& p1, const goMath::Vector<T>& p2, const goMath::Vector<T>& p3)
 {
-    goVector<T> base = p3 - p1;
+    goMath::Vector<T> base = p3 - p1;
     goDouble f = base.abs();
     if (f == 0.0)
     {
@@ -1203,8 +1202,8 @@ static goDouble getTurn (const goVector<T>& p1, const goVector<T>& p2, const goV
         return 0.0;  //= This should not happen. It would mean p3 == p1.
     }
     base *= 1.0 / f;
-    goVector<T> s1 = p2 - p1;
-    goVector<T> s2 = p3 - p2;
+    goMath::Vector<T> s1 = p2 - p1;
+    goMath::Vector<T> s2 = p3 - p2;
     goDouble l1 = s1.abs();
     goDouble l2 = s2.abs();
     assert (l1 != 0.0 && l2 != 0.0);
@@ -1264,14 +1263,14 @@ static goDouble getTurn (const goVector<T>& p1, const goVector<T>& p2, const goV
 * @return True if successful, false otherwise.
 **/
 template <class T>
-bool goCurve<T>::getTurningFunction (goVector<T>& ret) const
+bool goCurve<T>::getTurningFunction (goMath::Vector<T>& ret) const
 {
     goIndex_t sz = this->getPoints().getSize();
 
     if (sz <= 0)
         return false;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     goIndex_t i = 0;
 
     if (!this->getPoints().isClosed())
@@ -1309,12 +1308,12 @@ goDouble goCurve<T>::getLength () const
     if (this->getPoints().isEmpty())
         return 0.0;
 
-    typename goList<goVector<T> >::ConstElement* el = this->getPoints().getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = this->getPoints().getFrontElement();
     assert (el);
     goIndex_t count = this->getPoints().getSize();
     goDouble length = 0.0;
-    goVector<T> lastPoint = el->elem;
-    goVector<T> d;
+    goMath::Vector<T> lastPoint = el->elem;
+    goMath::Vector<T> d;
     while (count > 0 && el)
     {
         d = el->elem - lastPoint;
@@ -1332,17 +1331,17 @@ goDouble goCurve<T>::getLength () const
 }
 
 template< class T>
-goDouble goCurve<T>::getLength (const goList<goVector<T> >& pl) 
+goDouble goCurve<T>::getLength (const goList<goMath::Vector<T> >& pl) 
 {
     if (pl.isEmpty())
         return 0.0;
 
-    typename goList<goVector<T> >::ConstElement* el = pl.getFrontElement();
+    typename goList<goMath::Vector<T> >::ConstElement* el = pl.getFrontElement();
     assert (el);
     goIndex_t count = pl.getSize();
     goDouble length = 0.0;
-    goVector<T> lastPoint = el->elem;
-    goVector<T> d;
+    goMath::Vector<T> lastPoint = el->elem;
+    goMath::Vector<T> d;
     while (count > 0 && el)
     {
         d = el->elem - lastPoint;

@@ -756,7 +756,7 @@ goFileIO::writeImage (const char*, const goSignal3DBase<void>*) throw (goFileIOE
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, FILE* f) 
+bool goFileIO::writeBinaryMatrix (const goMath::Matrix<T>& M, FILE* f) 
 {
     goSize_t N = M.getColumns();
     goFloat Nf = static_cast<goFloat>(N);
@@ -780,7 +780,7 @@ bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, FILE* f)
 }
 
 template <class T>
-bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, const char* filename) 
+bool goFileIO::writeBinaryMatrix (const goMath::Matrix<T>& M, const char* filename) 
 {
     FILE* f = fopen (filename, "wb");
     if (!f)
@@ -796,8 +796,8 @@ bool goFileIO::writeBinaryMatrix (const goMatrix<T>& M, const char* filename)
     return ok;
 }
 
-template bool goFileIO::writeBinaryMatrix<goFloat> (const goMatrix<goFloat>&, const char*);
-template bool goFileIO::writeBinaryMatrix<goDouble> (const goMatrix<goDouble>&, const char*);
+template bool goFileIO::writeBinaryMatrix<goFloat> (const goMath::Matrix<goFloat>&, const char*);
+template bool goFileIO::writeBinaryMatrix<goDouble> (const goMath::Matrix<goDouble>&, const char*);
 
 /** 
  * @brief Creates a temporary file.

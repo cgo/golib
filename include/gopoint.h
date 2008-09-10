@@ -37,7 +37,7 @@ class goPoint : public go4Vector<T>
         {
         };
         template <class To>
-        goPoint (const goVector<To>& other)
+        goPoint (const goMath::Vector<To>& other)
             : go4Vector<T> (other), value (T(0))
         {
         };
@@ -60,7 +60,7 @@ class goPoint : public go4Vector<T>
             return *this;
         };
         template <class To>
-        goPoint<T>& operator= (const goVector<To>& other)
+        goPoint<T>& operator= (const goMath::Vector<To>& other)
         {
             go4Vector<T>::operator= (other);
             return *this;

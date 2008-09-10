@@ -7,7 +7,7 @@ goMath::AffineTransform<T>::AffineTransform ()
 }
 
 template <class T>
-goMath::AffineTransform<T>::AffineTransform (const goMatrix<T>& A_, const goVector<T>& t_)
+goMath::AffineTransform<T>::AffineTransform (const goMath::Matrix<T>& A_, const Vector<T>& t_)
     : A(A_), t(t_)
 {
 }
@@ -18,17 +18,17 @@ goMath::AffineTransform<T>::~AffineTransform ()
 }
 
 template <class T>
-void goMath::AffineTransform<T>::apply (goVector<T>& v)
+void goMath::AffineTransform<T>::apply (Vector<T>& v)
 {
     v = (A * v) + t;
 }
 
 template <class T>
-void goMath::AffineTransform<T>::apply (const goMatrix<T>& confMatrix, goMatrix<T>& ret)
+void goMath::AffineTransform<T>::apply (const goMath::Matrix<T>& confMatrix, goMath::Matrix<T>& ret)
 {
-    goMatrixMult<T> (T(1), confMatrix, false, this->A, true, T(0), ret);
+    goMath::matrixMult<T> (T(1), confMatrix, false, this->A, true, T(0), ret);
     goSize_t sz = ret.getRows();
-    goVector<T> ref;
+    Vector<T> ref;
     for (goSize_t i = 0; i < sz; ++i)
     {
         ret.refRow (i, ref);

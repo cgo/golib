@@ -21,7 +21,7 @@ template <class vectorT, class T>
 bool goMath::getRoots (const vectorT& fX, 
                        const vectorT& fY,
                        vectorT&       retX,
-                       goVector<goIndex_t>* retIndex)
+                       Vector<goIndex_t>* retIndex)
 {
     assert (fX.getSize() == fY.getSize());
 
@@ -57,4 +57,4 @@ bool goMath::getRoots (const vectorT& fX,
     return true;
 }
 
-template bool goMath::getRoots<goVectord, goDouble> (const goVectord&, const goVectord&, goVectord&, goVector<goIndex_t>*);
+template bool goMath::getRoots<goMath::Vector<goDouble>, goDouble> (const goVectord&, const goVectord&, goVectord&, Vector<goIndex_t>*);

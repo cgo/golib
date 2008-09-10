@@ -10,7 +10,7 @@ template <class T> class goTriangleMeshPrivate
         goTriangleMeshPrivate () {};
         ~goTriangleMeshPrivate () {};
 
-        goList<goVector<T> > vertexList;
+        goList<goMath::Vector<T> > vertexList;
         goList<goTriangle<T> > triangleList;
 };
 
@@ -37,7 +37,7 @@ bool goTriangleMesh::subdivideTriangle (goTriangle<T>* tri_)
 {
     goTriangle<T>& tri = *tri_;
     
-    goVector<T> *p0,*p1,*p2;
+    goMath::Vector<T> *p0,*p1,*p2;
     myPrivate->vertexList.append ((*tri[1] + *tri[2]) * 0.5);
     p0 = &vertexList.getTail();
     myPrivate->vertexList.append ((*tri[0] + *tri[2]) * 0.5);
@@ -59,7 +59,7 @@ bool goTriangleMesh::subdivideTriangle (goTriangle<T>* tri_)
 
 //= Subdivide "green" pair of triangles
 template <class T>
-bool goTriangleMesh::subdivideGreenPair (goTriangle* tri1_, goTriangle* tri2_, goVector<T>* greenVertex)
+bool goTriangleMesh::subdivideGreenPair (goTriangle* tri1_, goTriangle* tri2_, goMath::Vector<T>* greenVertex)
 {
 }
 

@@ -33,6 +33,12 @@
  * \addtogroup signal
  * @{
  */
+namespace goSignal 
+{
+    template <class T>
+        bool binaryImage (const goMath::Matrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
+};
+
 bool     goNormalizeSignal    (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);
 bool     goNormalizeSignal    (goSignal3DBase<void>* sig);
 bool     goFindZeroCrossings  (const goSignal3DBase<void>* sig, goArray<goPointf>& pointsRet);
@@ -47,10 +53,10 @@ void     goSignalInfoText     (const goSignal3DBase<void>& sig, goString& strRet
 goDouble goSignalMean         (const goSignal3DBase<void>& sig);
 void     goSignalMeanVariance (const goSignal3DBase<void>& sig, goDouble& mean, goDouble& variance);
 void     goSignalFlipY        (const goSignal3DBase<void>& sig, goSignal3DBase<void>& target);
-bool     goSignalCOM          (const goSignal3DBase<void>& sig, goVectord& comRet);
-bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
-bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goAutoPtr<goFunctorBase1<bool, goDouble> > f, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
-bool     goSignalMinMaxCoordHigher  (const goSignal3DBase<void>& sig, goDouble thresh, goVector<goSize_t>& minRet, goVector<goSize_t>& maxRet);
+bool     goSignalCOM          (const goSignal3DBase<void>& sig, goMath::Vectord& comRet);
+bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet);
+bool     goSignalMinMaxCoord  (const goSignal3DBase<void>& sig, goAutoPtr<goFunctorBase1<bool, goDouble> > f, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet);
+bool     goSignalMinMaxCoordHigher  (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet);
 bool     goSignalCrop         (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goDouble thresh);
 bool     goSignalCrop         (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goAutoPtr<goFunctorBase1<bool, goDouble> > f);
 bool     goSignalCropHigher   (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goDouble thresh);

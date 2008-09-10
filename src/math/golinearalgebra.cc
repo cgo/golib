@@ -16,7 +16,7 @@
 namespace goMath {
 template<class T>
 void
-LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
+LUDecomp(goMath::Matrix<T>& a, goArray<int>& indx, double *d)
 {
 	if (a.getRows() != a.getColumns())
 	{
@@ -78,7 +78,7 @@ LUDecomp(goMatrix<T>& a, goArray<int>& indx, double *d)
 }
 
 template<class T>
-void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b)
+void LUBackSubst(goMath::Matrix<T>& a, goArray<int>& indx, goArray<T>& b)
 {
 	int i,ii=-1,ip,j;
 	double sum;
@@ -101,7 +101,7 @@ void LUBackSubst(goMatrix<T>& a, goArray<int>& indx, goArray<T>& b)
 }
 
 template<class T>
-void matrixInversion(goMatrix<T>& a)
+void matrixInversion(goMath::Matrix<T>& a)
 {
 	if (a.getColumns() != a.getRows())
 	{
@@ -109,7 +109,7 @@ void matrixInversion(goMatrix<T>& a)
 		return;
 	}
 	int n = a.getColumns();
-	goMatrix<T> y(n,n);
+	goMath::Matrix<T> y(n,n);
 	double d;
 	goArray<int> index(n);
 	goArray<T>   column(n);
@@ -126,12 +126,12 @@ void matrixInversion(goMatrix<T>& a)
 	}
 	a = y;
 }
-template void LUDecomp(goMatrix<double>&,goArray<int>&,double*);
-template void LUBackSubst(goMatrix<double>&,goArray<int>&,goArray<double>&);
-template void matrixInversion(goMatrix<double>&);
-template void LUDecomp(goMatrix<float>&,goArray<int>&,double*);
-template void LUBackSubst(goMatrix<float>&,goArray<int>&,goArray<float>&);
-template void matrixInversion(goMatrix<float>&);
+template void LUDecomp(goMath::Matrix<double>&,goArray<int>&,double*);
+template void LUBackSubst(goMath::Matrix<double>&,goArray<int>&,goArray<double>&);
+template void matrixInversion(goMath::Matrix<double>&);
+template void LUDecomp(goMath::Matrix<float>&,goArray<int>&,double*);
+template void LUBackSubst(goMath::Matrix<float>&,goArray<int>&,goArray<float>&);
+template void matrixInversion(goMath::Matrix<float>&);
 };
 
 #undef TINY

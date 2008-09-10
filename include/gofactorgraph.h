@@ -76,14 +76,14 @@ class goFGNodeFactor : public goFGNode<T,Tfloat>
         {
             this->setType (goFGNode<T,Tfloat>::FACTOR);
             this->dummyFunctor = 
-                    goMemberFunction<goFGNodeFactor<T,Tfloat>,Tfloat,const goVector<T>& > (this, &goFGNodeFactor<T,Tfloat>::dummyFactor);
+                    goMemberFunction<goFGNodeFactor<T,Tfloat>,Tfloat,const goMath::Vector<T>& > (this, &goFGNodeFactor<T,Tfloat>::dummyFactor);
             this->functor = &*dummyFunctor;
         };
         virtual ~goFGNodeFactor ()
         {
         };
 
-        inline Tfloat operator () (const goVector<T>& X)
+        inline Tfloat operator () (const goMath::Vector<T>& X)
         {
             return (*this->functor) (X);
         };
@@ -91,7 +91,7 @@ class goFGNodeFactor : public goFGNode<T,Tfloat>
         inline Tfloat operator () () const
         {
             goSize_t sz = this->adj.getSize();
-            goVector<T> X (sz);
+            goMath::Vector<T> X (sz);
             for (goSize_t i = 0; i < sz; ++i)
             {
                 assert (this->adj[i]);
@@ -100,31 +100,31 @@ class goFGNodeFactor : public goFGNode<T,Tfloat>
             return (*this->functor) (X);
         };
 
-        Tfloat dummyFactor (const goVector<T>& X)
+        Tfloat dummyFactor (const goMath::Vector<T>& X)
         {
             return 1.0;
         };
 
-        inline goFunctorBase1< Tfloat, const goVector<T>& >* getFunctor ()
+        inline goFunctorBase1< Tfloat, const goMath::Vector<T>& >* getFunctor ()
         {
             return &*this->functor;
         };
 
-        inline void setFunctor (goFunctorBase1< Tfloat, const goVector<T>& >* f)
+        inline void setFunctor (goFunctorBase1< Tfloat, const goMath::Vector<T>& >* f)
         {
             this->functor = f;
         };
 
-        inline goMatrix<T>& getMaxX ()
+        inline goMath::Matrix<T>& getMaxX ()
         {
             return maxX;
         };
         
     private:
-        goFunctorBase1< Tfloat, const goVector<T>& >*            functor;
-        goAutoPtr <goFunctorBase1< Tfloat, const goVector<T>&> > dummyFunctor;
+        goFunctorBase1< Tfloat, const goMath::Vector<T>& >*            functor;
+        goAutoPtr <goFunctorBase1< Tfloat, const goMath::Vector<T>&> > dummyFunctor;
         //= For max-sum: keep the variable values that lead to the max message (f->x) in the forward pass.
-        goMatrix<T> maxX; //= TODO: implement max-sum filling this in the forward step and using it to set the
+        goMath::Matrix<T> maxX; //= TODO: implement max-sum filling this in the forward step and using it to set the
                           //= variable values in the backtracking step.
 
 };
@@ -153,7 +153,7 @@ template <class T, class Tfloat>
 class goFGEdge : public goGraphEdge < goFGNode<T,Tfloat> >
 {
     public:
-        typedef goVector<Tfloat> MessageType;
+        typedef goMath::Vector<Tfloat> MessageType;
     
     public:
         goFGEdge (goFGNode<T,Tfloat>* n1 = 0, goFGNode<T,Tfloat>* n2 = 0) 
@@ -286,7 +286,7 @@ class goFactorGraph
             }
         };
 
-        goDouble operator () (const goVector<T>& X, FactorType ft = EXP) 
+        goDouble operator () (const goMath::Vector<T>& X, FactorType ft = EXP) 
         {
             assert (X.getSize() == myVariables.getSize());
             goSize_t sz = X.getSize();

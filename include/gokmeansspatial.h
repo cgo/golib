@@ -15,14 +15,14 @@ class goKMeansSpatial : public goKMeans<elementT>
         goKMeansSpatial();
         virtual ~goKMeansSpatial();
         
-        bool             initialisePositions (const goFixedArray<goVectord>& initMeanPos);
+        bool             initialisePositions (const goFixedArray<goMath::Vectord>& initMeanPos);
         virtual goSize_t assignment ();
         virtual bool     update     ();
 
         //= For each element, add a position too.
-        bool addPosition (const goVectord& p);
+        bool addPosition (const goMath::Vectord& p);
         
-        const goList<goVectord>& getPositions () const;
+        const goList<goMath::Vectord>& getPositions () const;
 
     private:
         goKMeansSpatialPrivate* myPrivate;
