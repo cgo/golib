@@ -1,5 +1,5 @@
 # INCLUDE (FindSWIG)
-PROJECT             (golib_python)
+#PROJECT             (golib_python)
 
 SET (TARGET _golib.so)
 
@@ -12,14 +12,16 @@ FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
                         ARGS -I../include -python -fcompact -addextern -c++ golib.i )
-FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
+#FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 #SET                 (GOMATLAB_LIB "-lGomatlab")
-LINK_LIBRARIES      (${GOLIB})
+#LINK_LIBRARIES      (${GOLIB})
 #INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../include /usr/include/python2.4)
 INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../include ${PYTHON_INCLUDE})
 #ADD_DEFINITIONS     ()
 ADD_LIBRARY         (_golib MODULE golib_wrap.cxx golibpython.cpp)
 SET_TARGET_PROPERTIES (_golib PROPERTIES PREFIX "")
+ADD_DEPENDENCIES (_golib Go)
+TARGET_LINK_LIBRARIES (_golib Go)
 #INSTALL_TARGETS     (/lib _golib)
 
 IF (BUILD_WITH_GCC_3_3)

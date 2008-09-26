@@ -1352,10 +1352,10 @@
 %template(goMatrixf)       goMatrix<goFloat>;
 %template(goMatrixd)       goMatrix<goDouble>;
 %template(goMatrixi)       goMatrix<goIndex_t>;
-%template(goMatrixMultf)   goMatrixMult<goFloat>;
-%template(goMatrixMultd)   goMatrixMult<goDouble>;
-%template(goMatrixVectorMultf)   goMatrixVectorMult<goFloat>;
-%template(goMatrixVectorMultd)   goMatrixVectorMult<goDouble>;
+%template(goMatrixMultf)   goMath::matrixMult<goFloat>;
+%template(goMatrixMultd)   goMath::matrixMult<goDouble>;
+%template(goMatrixVectorMultf)   goMath::matrixVectorMult<goFloat>;
+%template(goMatrixVectorMultd)   goMath::matrixVectorMult<goDouble>;
 
 %template(goHistogramf)    goHistogram<goFloat>;
 %template(goHistogramd)    goHistogram<goDouble>;
@@ -1424,8 +1424,8 @@
 %template(goIntegrateSimpsonf)    goMath::integrateSimpson<goFloat>;
 %template(goIntegrateSimpsond)    goMath::integrateSimpson<goDouble>;
 
-%template(goBinaryImagef)   goMath::binaryImage<goFloat>;
-%template(goBinaryImaged)   goMath::binaryImage<goDouble>;
+%template(goBinaryImagef)   goSignal::binaryImage<goFloat>;
+%template(goBinaryImaged)   goSignal::binaryImage<goDouble>;
 
 %template(goPlotf)         goPlot::plot<goFloat>;
 %template(goPlotd)         goPlot::plot<goDouble>;

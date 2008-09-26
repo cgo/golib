@@ -4,6 +4,9 @@
 #include <GL/gl.h>
 #include <gosignal3d.h>
 #include <govector.h>
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
 
 namespace goGL
 {

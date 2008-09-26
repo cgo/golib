@@ -600,4 +600,9 @@ namespace goMath {
     /** @} */
 };
 
+#ifndef goMatrix
+# define goMatrix goMath::Matrix
+#endif
+typedef goMatrix<goFloat> goMatrixf;
+typedef goMatrix<goDouble> goMatrixd;
 #endif /* __GOMATRIX_H */

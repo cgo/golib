@@ -6,6 +6,10 @@
 #endif
 #include <go4vector.h>
 
+/** 
+ * @brief Deprecate this, do not use!
+ * @deprecated
+ */
 template <class T>
 class goPoint : public go4Vector<T>
 {

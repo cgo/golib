@@ -1,6 +1,5 @@
 INCLUDE (UsePkgConfig)
 INCLUDE (FindOpenGL)
-PROJECT             (Gogl)
 SET                 (TARGETNAME Gogl)
 SET                 (SOURCES 
                              src/texture.cpp
@@ -32,7 +31,7 @@ SET                 (SOURCES
 SET (EXTRA_LIBS ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
-                     ${Gogl_SOURCE_DIR}/include
+                     ${CMAKE_CURRENT_SOURCE_DIR}/include
                      ${GOPATH}/include
                      ${OPENGL_INCLUDE_DIR})
                      
@@ -51,9 +50,10 @@ IF(UNIX)
 ENDIF(UNIX)
 
 IF (BUILD_PYTHON_MODULE)
-    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/python)
+    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/gl/python)
 ENDIF (BUILD_PYTHON_MODULE)
 
 ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
-TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+ADD_DEPENDENCIES (${TARGETNAME} Go)
+TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT} Go)
 INSTALL_TARGETS     (/lib ${TARGETNAME})

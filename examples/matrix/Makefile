@@ -9,9 +9,9 @@ CXXARGS		= -c   -D HAVE_CONFIG_H -g
 #LD		= g++-3.3
 LDARGS		=  
 
-LIBS		=  -L$(GOPATH)/../experimental/lib -lGobase -lGodata -lGomath # -lGomatlab
+LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/../include -I$(MATLAB)/extern/include
+INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
 TARGET		= matrix
 
 %.o: %.cxx

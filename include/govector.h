@@ -669,5 +669,8 @@ typedef goMath::Vector<goFloat>  goVectorf;
 typedef goMath::Vector<goDouble> goVectord;
 typedef goMath::Vector<goInt32>  goVectori;
 
+#ifndef goVector
+# define goVector goMath::Vector
+#endif
 
 #endif
