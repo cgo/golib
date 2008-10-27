@@ -1,0 +1,6 @@
+WARNING: goGUI::Draw::image(): image must currently be rgb.
+WARNING: goGUI::Draw::image(): image must currently be rgb.
+goFileIO::readImage(): Bytes per pixel: 3
+goNormalizeSignal(): min = 0.000000, max = 786.437561
+goFileIO::readImage(): Bytes per pixel: 3
+goNormalizeSignal(): min = 0.000000, max = 987.000488
