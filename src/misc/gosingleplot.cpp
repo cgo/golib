@@ -109,6 +109,74 @@ class goPlotElementSignalImage : public goPlotElement
         goSignal3D<void> mySignal;
 };
 
+//class goPlotElementSignalSurface : public goPlotElementSignalImage
+//{
+//    public:
+//        goPlotElementSignalSurface (const goSignal3DBase<void>& M) : goPlotElementSignalImage (M)
+//        { 
+//            this->setPlotCommand ("splot");
+//            this->setPlotOptions ("with lines");
+//            this->setFilename ("-");
+//        };
+//        virtual ~goPlotElementSignalSurface () {};
+//};
+
+template <class T>
+static void signalSurfaceData (const goSignal3DBase<void>& M, goString& ret)
+{
+    goSignal3DGenericConstIterator it (&M);
+
+    goSize_t i = 0;
+    while (!it.endY())
+    {
+        it.resetX();
+        goSize_t j = 0;
+        while (!it.endX())
+        {
+            ret += (int)j; ret += " "; ret += (int)i; ret += " "; ret += (float)*(T*)*it; ret += "\n";
+            ++j;
+            it.incrementX();
+        }
+        ret += "\n";
+        ++i;
+        it.incrementY();
+    }
+}
+
+/*
+ * @brief 
+ * @todo Mehrkanaldaten
+ */
+class goPlotElementSignalSurface : public goPlotElement
+{
+    public:
+        goPlotElementSignalSurface (const goSignal3DBase<void>& M) : goPlotElement ("plot", "-", "with lines"), mySignal () 
+        { 
+            mySignal.setDataType (M.getDataType().getID());
+            mySignal.make (M.getSize(), M.getBlockSize(), M.getBorderSize(), M.getChannelCount());
+            goCopySignal (&M, &mySignal);
+        };
+        virtual ~goPlotElementSignalSurface () {};
+
+        virtual void data (goString& ret) const
+        {
+            switch (mySignal.getDataType().getID())
+            {
+                case GO_INT8: signalSurfaceData<goInt8> (mySignal, ret); break;
+                case GO_UINT8: signalSurfaceData<goUInt8> (mySignal, ret); break;
+                case GO_INT16: signalSurfaceData<goInt16> (mySignal, ret); break;
+                case GO_UINT16: signalSurfaceData<goUInt16> (mySignal, ret); break;
+                case GO_INT32: signalSurfaceData<goInt32> (mySignal, ret); break;
+                case GO_UINT32: signalSurfaceData<goUInt32> (mySignal, ret); break;
+                case GO_FLOAT: signalSurfaceData<goFloat> (mySignal, ret); break;
+                case GO_DOUBLE: signalSurfaceData<goDouble> (mySignal, ret); break;
+                default: goLog::warning ("goPlotElementSignalSurface::data(): type error."); break;
+            }
+        };
+
+        goSignal3D<void> mySignal;
+};
+
 template <class T>
 class goPlotElementMatrixImage : public goPlotElement
 {
@@ -754,7 +822,7 @@ bool goSinglePlot::add3D (const goSignal3DBase<void>* image, const char* title, 
         myPrivate->plotType = goPlot::Surface;
     }
 
-    myPrivate->plotImages.append (image);
+    // myPrivate->plotImages.append (image);
     goString temp = "";
     if (!plotOptions)
     {
@@ -767,7 +835,21 @@ bool goSinglePlot::add3D (const goSignal3DBase<void>* image, const char* title, 
     temp += " title \""; temp += title; temp += "\"";
     myPrivate->plotCommands.append(temp);
 
-    goLog::warning ("goSinglePlot::add3D(goSignal3DBase): no new version for signals yet! Will not be added to plot list using new plot objects.");
+    // goLog::warning ("goSinglePlot::add3D(goSignal3DBase): no new version for signals yet! Will not be added to plot list using new plot objects.");
+    //= New
+    goAutoPtr<goPlotElement> aptr = goAutoPtr<goPlotElement> (new goPlotElementSignalSurface(*image));
+    if (plotOptions)
+        aptr->setPlotOptions (plotOptions);
+    if (title)
+    {
+        goString newpo = aptr->plotOptions();
+        newpo += " title \"";
+        newpo += title;
+        newpo += "\"";
+        aptr->setPlotOptions (newpo);
+    }
+    myPrivate->plotElements.append (aptr);
+    return true;
 //    myPrivate->titles.append(goString(title));
 //    if (!plotOptions)
 //    {
