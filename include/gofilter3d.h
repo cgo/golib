@@ -73,7 +73,7 @@ goFilter3D : public goObjectBase
         goIndex_t                 getMaskCenterZ () const;
                                                 
         const goSignal3D<void>&   getMask () const;
-        bool                      filter  (goSignal3DBase<T_IN>&  inSignal,
+        bool                      filter  (const goSignal3DBase<T_IN>&  inSignal,
                                            goSignal3DBase<T_OUT>& outSignal);
 
 	private:

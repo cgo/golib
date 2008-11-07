@@ -233,6 +233,8 @@ void goGL::MeshObject::getAdjacencyLists (goFixedArray<goList<int> >& ret) const
             int neigh2 = (j - 1);
             if (neigh2 < 0)
                 neigh2 += Nv;
+            neigh1 = v[neigh1];
+            neigh2 = v[neigh2];
             if (!ret[v[j]].contains(neigh1)) 
             {
                 ret[v[j]].append(neigh1);

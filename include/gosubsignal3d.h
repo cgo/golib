@@ -12,9 +12,6 @@
  * @todo Implement GO_PARENT_BORDER as copying jumps and diffs on the border from
  * the parent. Currently, CONSTANT_BORDER is default.
  *
- * @todo Diese Klasse ist ein Aergernis. Stabiler machen.
- * @bug Diese Klasse ist ein Aergernis. Stabiler machen.
- * 
  * Enables access to sub signals of a given <CODE>goSignal3DBase</CODE>.
  * Being derived from it, <CODE>goSubSignal3D</CODE> can do anything a 
  * <CODE>goSignal3D</CODE> can.
@@ -39,6 +36,13 @@ goSubSignal3D : public goSignal3DBase<T>
                        goSize_t           sizeX,
                        goSize_t           sizeY,
                        goSize_t           sizeZ);
+        goSubSignal3D (goSignal3DBase<T>* p, 
+                       goSize_t           sizeX,
+                       goSize_t           sizeY,
+                       goSize_t           sizeZ,
+                       goIndex_t          posX,
+                       goIndex_t          posY,
+                       goIndex_t          posZ);
         goSubSignal3D (goSignal3DBase<T>* p, const goSize3D& size);
         virtual ~goSubSignal3D();
 

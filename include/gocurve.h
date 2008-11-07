@@ -79,6 +79,7 @@ class goCurve : public goPointCloud<T>
         static bool     filter (const goFloat* mask, goSize_t size, goSize_t center, goList<goMath::Vector<T> >& pl, goSize_t count = 1);
 
         bool readASCII  (FILE* f);
+        bool readASCII  (const char* filename);
         bool writeASCII (FILE* f) const;
         bool writeASCII (const char* filename) const;
 

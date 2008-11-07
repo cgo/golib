@@ -68,6 +68,22 @@ namespace goPython
         PyObject* run (const goString& cmd);
         bool runFile (const char* filename);
 
+        /** 
+         * @brief Convert object to vector.
+         * 
+         * Converts a list object with numeric values to
+         * a goVector object.
+         * Since typechecks are performed and numerical python objects must
+         * be converted, this function must be considered slow.
+         *
+         * @param obj Python list object.
+         * @param ret Target vector. Will be resized.
+         * 
+         * @return True if successful, false otherwise.
+         */
+        template <class T>
+            bool convert (PyObject* obj, goVector<T>& ret);
+        
         PyObject* getObject (const char* name);
 
         void getAllSwigTypes (goList<goString>& ret);

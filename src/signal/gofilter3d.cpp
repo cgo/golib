@@ -177,13 +177,13 @@ goFilter3D<T_IN, T_OUT>::getMask () const
 }
 
 template <class in_T, class out_T, class mask_T>
-static bool filterFunction2 (goSignal3DBase<void>& inSignal, goSignal3DBase<void>& outSignal, const goSignal3DBase<void>& mask, goIndex_t myMaskCenterX, goIndex_t  myMaskCenterY, goIndex_t myMaskCenterZ)
+static bool filterFunction2 (const goSignal3DBase<void>& inSignal, goSignal3DBase<void>& outSignal, const goSignal3DBase<void>& mask, goIndex_t myMaskCenterX, goIndex_t  myMaskCenterY, goIndex_t myMaskCenterZ)
 {
     assert (inSignal.getSizeX() == outSignal.getSizeX() &&
             inSignal.getSizeY() == outSignal.getSizeY() &&
             inSignal.getSizeZ() == outSignal.getSizeZ());
     
-    goSubSignal3D<void> inCoeff (&inSignal, 
+    goSubSignal3D<void> inCoeff (const_cast<goSignal3DBase<void>*> (&inSignal), 
                                  mask.getSizeX(),
                                  mask.getSizeY(),
                                  mask.getSizeZ());
@@ -226,7 +226,7 @@ static bool filterFunction2 (goSignal3DBase<void>& inSignal, goSignal3DBase<void
 }
 
 template <class in_T, class mask_T>
-static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>& outSignal, const goSignal3DBase<void>& mask, goIndex_t myMaskCenterX, goIndex_t  myMaskCenterY, goIndex_t myMaskCenterZ)
+static bool filterFunction (const goSignal3DBase<void>& inSignal, goSignal3DBase<void>& outSignal, const goSignal3DBase<void>& mask, goIndex_t myMaskCenterX, goIndex_t  myMaskCenterY, goIndex_t myMaskCenterZ)
 {
     switch (outSignal.getDataType().getID())
     {
@@ -296,7 +296,7 @@ static bool filterFunction (goSignal3DBase<void>& inSignal, goSignal3DBase<void>
  * @return True if successful, false otherwise.
  **/
 template<> bool
-goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
+goFilter3D<void, void>::filter (const goSignal3DBase<void>& inSignal,
                                 goSignal3DBase<void>& outSignal)
 {
     assert (inSignal.getSizeX() == outSignal.getSizeX() &&
@@ -334,14 +334,14 @@ goFilter3D<void, void>::filter (goSignal3DBase<void>& inSignal,
 #if 1
 template <class T_IN, class T_OUT>
 bool
-goFilter3D<T_IN, T_OUT>::filter (goSignal3DBase<T_IN>&  inSignal,
+goFilter3D<T_IN, T_OUT>::filter (const goSignal3DBase<T_IN>&  inSignal,
                                  goSignal3DBase<T_OUT>& outSignal)
 {
     assert (inSignal.getSizeX() == outSignal.getSizeX() &&
             inSignal.getSizeY() == outSignal.getSizeY() &&
             inSignal.getSizeZ() == outSignal.getSizeZ());
     
-    goSubSignal3D<T_IN> inCoeff (&inSignal, 
+    goSubSignal3D<T_IN> inCoeff (const_cast <goSignal3DBase<T_IN>*> (&inSignal), 
                                  myMask.getSizeX(),
                                  myMask.getSizeY(),
                                  myMask.getSizeZ());

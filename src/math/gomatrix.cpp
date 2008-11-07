@@ -1103,12 +1103,12 @@ bool goMath::Matrix<T>::readASCII (FILE* f)
         return false;
     }
 
-    if (s != "goMath::Matrix")
+    if (s != "goMath::Matrix" && s != "goMatrix")
     {
         ::rewind (f);
         if (!this->readASCIISimple (f))
         {
-            goString msg = "goMath::Matrix::readASCII: expected goMath::Matrix, got ";
+            goString msg = "goMath::Matrix::readASCII: expected goMath::Matrix or goMatrix, got ";
             msg += s.toCharPtr ();
             msg += " and readASCIISimple also failed.";
             goLog::warning (msg);
@@ -1567,3 +1567,9 @@ template class goMath::Matrix<goIndex_t>;
 template class goMath::Matrix<goSize_t>;
 // template class goMath::Matrix<goInt32>;
 template class goMath::Matrix<goComplexf>;
+
+template class goMath::Matrix<goInt8>;
+template class goMath::Matrix<goUInt8>;
+template class goMath::Matrix<goInt16>;
+template class goMath::Matrix<goUInt16>;
+template class goMath::Matrix<goUInt32>;

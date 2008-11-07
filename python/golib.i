@@ -6,6 +6,7 @@
 %feature("autodoc","1");
 
 %include "typemaps.i"
+%include "std_list.i"
 
 // Exceptions
 %exception goFileIO::readImage {

@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -O2
+CXXARGS		= -c   -D HAVE_CONFIG_H -g
 
 LD		= g++
 LDARGS		=  
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo 
+LIBS		=  -L$(GOPATH)/../lib -lGo -lGopython
 
-INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I/usr/include/python2.4
+INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I/usr/include/python2.5
 
 TARGET		= test
 

@@ -16,6 +16,25 @@ goSignal3DRef::goSignal3DRef (void* data_ptr,
     this->ref (data_ptr, data_type, size, blockSize, borderSize, channelCount);
 }
 
+/** 
+ * @brief Construct reference using data linearly stored in memory.
+ * 
+ * @param data_ptr   Pointer to linearly stored data, first x direction, then y, then z.
+ * @param data_type  Data type.
+ * @param sx         X size
+ * @param sy         Y size (default: 1)
+ * @param sz         Z size (default: 1)
+ * @param channelCount  Channel count (default: 1)
+ */
+goSignal3DRef::goSignal3DRef (void* data_ptr,
+                       goTypeEnum data_type,
+                       goSize_t sx, goSize_t sy, goSize_t sz,
+                       goSize_t channelCount )
+{
+    goSize3D s (sx, sy, sz);
+    this->ref (data_ptr, data_type, s, s, goSize3D (0, 0, 0), channelCount);
+}
+
 goSignal3DRef::~goSignal3DRef ()
 {
 }

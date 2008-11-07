@@ -35,6 +35,9 @@ namespace goGUI
             ImageViewPrivate() : curves(), image(0) 
             {
                 image.set (new goSignal3D<void>);
+                image->setDataType (GO_UINT8);
+                image->make (1,1,1,1,1,1,0,0,0,1);
+                image->fill (0.0f);
             };
             ~ImageViewPrivate () {};
 

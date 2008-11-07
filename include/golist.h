@@ -6,6 +6,7 @@
 #ifndef GOEXCEPTION_H
 # include <goexception.h>
 #endif
+#include <list>
 
 /** @addtogroup data
  * @{ */
@@ -96,6 +97,13 @@ class goList {
   {
       *this = other;
   };
+
+  goList (const std::list<T>& l)
+      : size (0), front (0), tail (0), position (0), dummy ()
+  {
+      *this = l;
+  };
+
   virtual ~goList ()
   {
       position = front;
@@ -125,6 +133,20 @@ class goList {
           return const_iterator (0); 
       else
           return const_iterator (this->getTailElement());
+  };
+
+  operator std::list<T> () 
+  {
+      std::list<T> ret;
+      goSize_t sz = this->getSize ();
+      ConstElement* el = this->getFrontElement ();
+      for (goSize_t i = 0; i < sz && el; ++i)
+      {
+          ret.push_back (el->elem);
+          el = el->next;
+      }
+
+      return ret;
   };
 
   Element*      getFrontElement ()
@@ -855,6 +877,32 @@ class goList {
           this->close();
       }
       else
+      {
+          this->open (this->getFrontElement());
+      }
+      return *this;
+  };
+
+  goList<T>&        operator= (const std::list<T>& other)
+  {
+      this->erase ();
+      this->open ();
+      if (other.empty())
+          return *this;
+
+      typename std::list<T>::const_iterator it = other.begin ();
+      typename std::list<T>::const_iterator end = other.end ();
+      goIndex_t sz = other.size();
+      goIndex_t i = 0;
+
+      while (i < sz && it != end)
+      {
+          this->append (*it);
+          ++it;
+          ++i;
+      }
+
+      if (this->isClosed())
       {
           this->open (this->getFrontElement());
       }

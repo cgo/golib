@@ -104,6 +104,7 @@ SET (SOURCES ${SOURCES}
 
 ## goMath
 SET (SOURCES ${SOURCES}
+ src/math/goreparam.cpp
  src/math/covariance.cpp
  src/math/gomanifold.cpp
  src/math/lapack.cpp
@@ -127,7 +128,7 @@ SET (SOURCES ${SOURCES}
  src/math/gomatrix.cpp 
  src/math/gocomplex.cc 
  src/math/goposition.cc 
- # src/math/goquaternion.cc 
+ src/math/goquaternion.cc 
  # src/math/golinearalgebra.cc 
  # src/math/gopdf.cpp 
  src/math/gogausspdf.cpp 
@@ -219,6 +220,7 @@ SET (SOURCES ${SOURCES}
 ## goSignal
 SET (SOURCES ${SOURCES}
     ## goSignal namespace hinzufuegen:
+    src/signal/sobel2d.cpp
     src/signal/minmax.cpp
     src/signal/crop.cpp
     src/signal/gosignaloperation.cpp

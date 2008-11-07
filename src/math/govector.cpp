@@ -352,9 +352,9 @@ bool goMath::Vector<T>::readASCII (FILE* file)
 
     goString line = "";
     goFileIO::readASCIILine (file, line);
-    if (line != "goMath::Vector")
+    if (line != "goMath::Vector" && line != "goVector")
     {
-        goString s = "goMath::Vector::readASCII(): expected goMath::Vector, got ";
+        goString s = "goMath::Vector::readASCII(): expected goMath::Vector or goVector, got ";
         s += line;
         goLog::warning (s);
         return false;
@@ -815,3 +815,9 @@ template class goMath::Vector<goComplexf>;
 // template class goMath::Vector<goComplexd>;
 template class goMath::Vector<goIndex_t>;
 template class goMath::Vector<goSize_t>;
+template class goMath::Vector<goInt8>;
+template class goMath::Vector<goUInt8>;
+template class goMath::Vector<goInt16>;
+template class goMath::Vector<goUInt16>;
+// template class goMath::Vector<goInt32>;
+template class goMath::Vector<goUInt32>;

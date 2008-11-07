@@ -37,6 +37,7 @@ namespace goSignal
 {
     template <class T>
         bool binaryImage (const goMath::Matrix<T>& boundary, goSignal3D<void>& ret, goSize_t width, goSize_t height);
+    bool sobel2D (const goSignal3DBase<void>& input, goSignal3DBase<void>& output);
 };
 
 bool     goNormalizeSignal    (const goSignal3DBase<void>* sig, goSignal3D<void>* targetSig);

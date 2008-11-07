@@ -1011,6 +1011,18 @@ bool goCurve<T>::readASCII (FILE* f)
     return ok;
 }
 
+template <class T>
+bool goCurve<T>::readASCII (const char *fname)
+{
+    FILE* f = ::fopen (fname, "r");
+    if (!f)
+        return false;
+
+    bool ok = this->readASCII (f);
+    ::fclose (f);
+    return ok;
+}
+
 template<class T>
 bool goCurve<T>::getGradNorm (goArray<goFloat>& diffNorm) const
 {

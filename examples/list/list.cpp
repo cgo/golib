@@ -2,6 +2,8 @@
 #include <govector.h>
 #include <gosort.h>
 
+#include <list>
+
 int main ()
 {
     goList<int> li;
@@ -10,6 +12,33 @@ int main ()
     li.append (0);
     li.append (5);
     li.append (4);
+
+    {
+        std::list<int> std_li;
+        std_li.push_back (1);
+        std_li.push_back (2);
+        std_li.push_back (3);
+        goList<int> li (std_li);
+
+        goList<int>::iterator it = li.begin ();
+        goList<int>::iterator itend = li.end ();
+        while (it != itend)
+        {
+            printf ("%d ", *it);
+            ++it;
+        }
+        printf ("\n");
+    }
+    {
+        std::list<int> l = li;
+        std::list<int>::iterator it = l.begin ();
+        while (it != l.end ())
+        {
+            printf ("%d ", *it);
+            ++it;
+        }
+        exit (1);
+    }
 
     goList<int>::iterator a = li.begin ();
     goList<int>::iterator b (li.getTailElement());

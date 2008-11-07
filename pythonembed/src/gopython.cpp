@@ -109,6 +109,38 @@ bool goPython::runFile (const char* filename)
     return false;
 }
 
+template <class T>
+bool goPython::convert (PyObject* obj, goVector<T>& ret)
+{
+    if (PyList_Check (obj))
+    {
+        // Get size without error checking
+        goSize_t sz = static_cast<goSize_t> (PyList_GET_SIZE (obj));
+        ret.resize (sz); 
+        PyObject* element = 0;
+        for (goSize_t i = 0; i < sz; ++i)
+        {
+             element = PyList_GET_ITEM (obj, i);
+             if (element)
+             {
+                 if (PyNumber_Check (element))
+                 {
+                     ret[i] = PyFloat_AsDouble (PyNumber_Float (element));
+                 }
+                 else
+                 {
+                     PyErr_SetString (PyExc_TypeError, "Can only put numeric objects into a goFixedArray");
+                     return false;
+                 }
+             }
+        }
+        return true;
+    }
+    return false;
+}
+
+template bool goPython::convert<goFloat> (PyObject*, goVector<goFloat>&);
+
 PyObject* goPython::run (const goString& cmd)
 {
     PyObject* ret = PyRun_String (cmd.toCharPtr(), Py_file_input, goPython::mainNamespace, goPython::mainNamespace);

@@ -357,8 +357,9 @@ void goGUI::OFFView::glDraw ()
     {
         myPrivate->camera.setViewingTransformation();
 
-        const float list_diffuse[] = {0.7f, 0.7f, 0.7f, 0.7f};
-        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
+        const float list_diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        // glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, list_diffuse);
+        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, list_diffuse);
         // glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, list_diffuse);
         //glEnable (GL_LINE_SMOOTH);
         // glEnable (GL_POLYGON_SMOOTH);

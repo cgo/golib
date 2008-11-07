@@ -3,6 +3,7 @@
 
 #include <gomatrix.h>
 #include <gosignal3d.h>
+#include <gtkmm.h>
 
 namespace goGUI
 {
