@@ -10,6 +10,8 @@
 #include <gogl/textureimage.h>
 #include <gofileio.h>
 
+#include <limits>
+
 namespace goGUI
 {
     class SceneControlPrivate

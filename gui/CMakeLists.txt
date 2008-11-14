@@ -1,8 +1,6 @@
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
                              src/videocapturecontrol.cpp
-                             src/scenecontrol.cpp
-                             src/sceneview.cpp
                              src/multivectorinput.cpp
                              src/vectorinput.cpp
                              src/imageview.cpp
@@ -12,6 +10,12 @@ SET                 (SOURCES
                              src/about.cpp
                              src/mainwindow.cpp
                              src/countfilenames.cpp)
+
+IF (BUILD_GUI_MODULE_OPENGL)
+    SET (SOURCES ${SOURCES} 
+          src/scenecontrol.cpp
+          src/sceneview.cpp)
+ENDIF (BUILD_GUI_MODULE_OPENGL)
 
                          #IF (WIN32)
                          #    SET (GTK_DIR CACHE PATH "c:/GTK")

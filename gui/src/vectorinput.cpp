@@ -2,6 +2,8 @@
 #include <gofixedarray.h>
 #include <gomath.h>
 
+#include <limits>
+
 namespace goGUI
 {
     class VectorInputPrivate
