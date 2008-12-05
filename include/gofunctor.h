@@ -446,5 +446,21 @@ goMemberFunction (Tclass* c, typename goFunctor1<Tret, Tclass, Targ1>::function_
     return goAutoPtr<goFunctorBase1<Tret, Targ1> > (static_cast<goFunctorBase1<Tret, Targ1>*> (new goFunctor1<Tret, Tclass, Targ1> (c, f)));
 }
 
+/** 
+ * @brief Create a member function functor object, encapsulated
+ * in a goAutoPtr for automatic deletion.
+ * 
+ * @param c  Pointer to the object.
+ * @param f  Function pointer to a member function.
+ * 
+ * @return goAutoPtr to a goFunctorBase2 object.
+ */
+template <class Tclass, class Tret, class Targ1, class Targ2>
+goAutoPtr<goFunctorBase2<Tret, Targ1, Targ2> >
+goMemberFunction (Tclass* c, typename goFunctor2<Tret, Tclass, Targ1, Targ2>::function_t f)
+{
+    return goAutoPtr<goFunctorBase2<Tret, Targ1, Targ2> > (static_cast<goFunctorBase2<Tret, Targ1, Targ2>*> (new goFunctor2<Tret, Tclass, Targ1, Targ2> (c, f)));
+}
+
 /** @} */
 #endif

@@ -4,6 +4,7 @@
 
 #include <gofileio.h>
 #include <gosignal3d.h>
+#include <gosignal.h>
 #include <gosignalhelper.h>
 #include <gosignalmacros.h>
 
@@ -16,7 +17,9 @@ class ImageViewer : public goGUI::MainWindow
         virtual ~ImageViewer ();
 
         void loadImage ();
+        void loadImageName (const char* fname);
         void sobel ();
+        void canny ();
 
     private:
         goGUI::ImageView view;
@@ -37,6 +40,10 @@ ImageViewer::ImageViewer ()
     {
         Gtk::MenuItem* i = this->addMenuItem (this->getFileMenu (), "Sobel");
         i->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::sobel));
+    }
+    {
+        Gtk::MenuItem* i = this->addMenuItem (this->getFileMenu (), "Canny");
+        i->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::canny));
     }
 
     this->addFileQuit ();
@@ -77,6 +84,27 @@ void ImageViewer::loadImage ()
     }
 }
 
+void ImageViewer::loadImageName (const char* fname)
+{
+    goSignal3D<void> image;
+    try
+    {
+        goFileIO::readImage (fname, &image, true);
+        goSignal3D<void> image2;
+        image2.setDataType (image.getDataType ().getID ());
+        image2.make (image.getSize(), image.getSize(), image.getBorderSize(), 3);
+        goCopySignal (&image, &image2);
+        this->view.setImage (image2);
+        this->view.queue_draw ();
+    }
+    catch (goFileIOException& ex)
+    {
+        Gtk::MessageDialog dlg ("Reading image failed.");
+        dlg.run ();
+        return;
+    }
+}
+
 void ImageViewer::sobel ()
 {
     goAutoPtr<goSignal3D<void> > image = this->view.getImage ();
@@ -110,6 +138,59 @@ void ImageViewer::sobel ()
     this->view.setImage (image2);
     this->view.queue_draw ();
 }
+
+void ImageViewer::canny ()
+{
+    goAutoPtr<goSignal3D<void> > image = this->view.getImage ();
+    
+    if (image.isNull ())
+        return;
+  
+    goSignal3D<void> cimg;
+    cimg.setDataType (GO_UINT8);
+    goSignal::canny (*image, cimg);
+    cimg *= 255.0f;
+
+    goSignal3D<void> image2;
+    image2.make (image);
+    image2.setChannel (0);
+    goCopySignalChannel (&cimg, &image2);
+    image2.setChannel (1);
+    goCopySignalChannel (&cimg, &image2);
+    image2.setChannel (2);
+    goCopySignalChannel (&cimg, &image2);
+    image2.setChannel (0);
+    this->view.setImage (image2);
+    this->view.queue_draw ();
+}
+
+    template <class T>
+    static int _cannyRoundAngle (T angle)
+    {
+        //= Erzwinge Winkel zw. 90 u. -90 Grad
+        if (angle < T(-90))
+        {
+            angle += T(90);
+        }
+        else if (angle > T(90))
+        {
+            angle -= T(90);
+        }
+
+        if (angle < T(67.5) || angle < T(-67.5))
+            return 90;
+
+        if (angle > T(67.5) && angle < T(22.5))
+            return 45;
+
+        if (angle < T(22.5) && angle > T(-22.5))
+            return 0;
+
+        return -45;
+
+        //if (angle < T(-22.5) && angle > T(-67.5))
+        //    return -45;
+    }
 
 int main (int argc, char* argv[])
 {

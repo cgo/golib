@@ -219,8 +219,10 @@ SET (SOURCES ${SOURCES}
 
 ## goSignal
 SET (SOURCES ${SOURCES}
-    ## goSignal namespace hinzufuegen:
+    src/signal/canny.cpp
+    src/signal/defaultsize.cpp
     src/signal/sobel2d.cpp
+    ## goSignal namespace hinzufuegen:
     src/signal/minmax.cpp
     src/signal/crop.cpp
     src/signal/gosignaloperation.cpp
@@ -504,6 +506,7 @@ IF (BUILD_MATLAB_MODULE)
     ELSE(DEFINED ENV{MATLAB})
         MESSAGE ("*** MATLAB environment variable was not declared. ***")
     ENDIF(DEFINED ENV{MATLAB})
+    SET(HAVE_MATLAB 1)
 ENDIF (BUILD_MATLAB_MODULE)
 
 IF (BUILD_GUILE_MODULE)

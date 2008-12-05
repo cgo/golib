@@ -983,3 +983,14 @@ doubleIndexFunction (const void* valueP)
     static goDouble delta = goQuantizationTables::doubleMaxIndex - goQuantizationTables::doubleMinIndex;
     return (goIndex_t)(*(goDouble*)valueP * delta);
 }
+
+template <> goTypeEnum goTypeID<goInt8> () { return GO_INT8; };
+template <> goTypeEnum goTypeID<goUInt8> () { return GO_UINT8; };
+template <> goTypeEnum goTypeID<goInt16> () { return GO_INT16; };
+template <> goTypeEnum goTypeID<goUInt16> () { return GO_UINT16; };
+template <> goTypeEnum goTypeID<goInt32> () { return GO_INT32; };
+template <> goTypeEnum goTypeID<goUInt32> () { return GO_UINT32; };
+template <> goTypeEnum goTypeID<goFloat> () { return GO_FLOAT; };
+template <> goTypeEnum goTypeID<goDouble> () { return GO_DOUBLE; };
+template <> goTypeEnum goTypeID<goComplexf> () { return GO_COMPLEX_SINGLE; };
+template <> goTypeEnum goTypeID<goComplexd> () { return GO_COMPLEX_DOUBLE; };

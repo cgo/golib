@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 namespace goNet {
@@ -77,7 +78,7 @@ goConnection::link (int maxconn) {
       return false;
     }
     remoteSockAddr->sin_family = AF_INET;
-    memcpy ((char*)&remoteSockAddr->sin_addr,(char*)remoteHostEnt->h_addr,remoteHostEnt->h_length);
+    ::memcpy ((char*)&remoteSockAddr->sin_addr,(char*)remoteHostEnt->h_addr,remoteHostEnt->h_length);
     if ( connect (socketDescriptor, (struct sockaddr*)remoteSockAddr, sizeof (*remoteSockAddr)) != 0 ) {
       lastFailed = true;
       std::cout << "goConnection::link(): connect failed \n";

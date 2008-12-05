@@ -32,6 +32,8 @@
 # include <gomessagepassing.h>
 #endif
 
+#include <limits>
+
 /** 
  * \addtogroup gm
  * @{

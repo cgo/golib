@@ -52,6 +52,7 @@
 #cmakedefine HAVE_NASM ${HAVE_NASM}
 
 #cmakedefine HAVE_MATLAB_GEQ_2007A ${HAVE_MATLAB_GEQ_2007A}
+#cmakedefine HAVE_MATLAB ${HAVE_MATLAB}
 
 /* Guile-related */
 #cmakedefine GO_GUILE_MULTITHREAD ${GO_GUILE_MULTITHREAD}

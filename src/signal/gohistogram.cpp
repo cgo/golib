@@ -106,7 +106,7 @@ static bool calculateHistogram (const goSignal3DBase<void>& sig,
     if (_binStep > 0.0)
     {
         GO_SIGNAL3D_EACHELEMENT_GENERIC_CONST (
-                bins[(goIndex_t)((*(const signal_type*)__ptr - minValue) * _binStep)] += 1.0;, sig);
+                bins[(goIndex_t)((*(const signal_type*)__ptr - minValue) * _binStep)] += level_type (1);, sig);
     }
     return true;
 }
@@ -168,6 +168,7 @@ goHistogram<level_type>::calculate (const goSignal3DBase<void>& sig, bool normal
     }
     else
     {
+        goLog::error ("goHistogram::calculate(): user set levels not yet allowed");
         return false;
     }
     myPrivate->minValue = minValue;

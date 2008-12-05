@@ -120,6 +120,9 @@ class goType : public goObjectBase
         goTypePrivate* myPrivate;
 };
 
+template <class T>
+goTypeEnum goTypeID ();
+
 template <class targetT>
 targetT* goCreateQuantizationTable (const goType&     sourceType,
                                     targetT           minTargetValue,

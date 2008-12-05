@@ -3,6 +3,7 @@
 #include <golog.h>
 
 #include <unistd.h>
+#include <string.h>
 
 class goGnuplotPrivate
 {
@@ -80,7 +81,7 @@ bool goGnuplot::call (const char* command)
 {
     ssize_t written = 0;
     ssize_t total = 0;
-    ssize_t totalToWrite = strlen(command) * sizeof(char);
+    ssize_t totalToWrite = ::strlen(command) * sizeof(char);
     while (total < totalToWrite)
     {
         written = write(myPrivate->pipe1[1], command + total, totalToWrite - total);

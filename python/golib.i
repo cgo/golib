@@ -93,6 +93,7 @@
 #include <gostring.h>
 #include <gofileio.h>
 #include <gosignalhelper.h>
+#include <gosignal.h>
 #include <goexception.h>
 // #include <gomatrix.hpp>
 #include <gomatrix.h>
@@ -108,6 +109,7 @@
 #include <gosvd.h>
 #include <goeigenvalue.h>
 #include <goresample.h>
+#include <goreparam.h>
 #include <gorandom.h>
 #include <gognuplot.h>
 #include <gofilter1d.h>
@@ -119,6 +121,7 @@
 
 #include <go3vector.h>
 #include <gotimerobject.h>
+
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
@@ -154,6 +157,7 @@
 %include <godwt3d.h>
 %include <gofileio.h>
 %include <gosignalhelper.h>
+%include <gosignal.h>
 %include <goarray.h>
 %include <gofixedarray.h>
 %include <gomatrix.h>
@@ -169,6 +173,7 @@
 %include <gosvd.h>
 %include <goeigenvalue.h>
 %include <goresample.h>
+%include <goreparam.h>
 %include <gorandom.h>
 %include <gognuplot.h>
 %include <gofilter1d.h>
@@ -1440,6 +1445,9 @@
 
 %template(goUnitSpheref) goMath::UnitSphere<goFloat>;
 %template(goUnitSphered) goMath::UnitSphere<goDouble>;
+
+%template(goReparamf) goMath::Reparam<goFloat>;
+%template(goReparamd) goMath::Reparam<goDouble>;
 
 // Depends on goSignal3DBase, and that appears to have to be %templated before.
 %include <gosignal3dref.h>

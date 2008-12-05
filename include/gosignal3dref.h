@@ -24,7 +24,7 @@ class goSignal3DRef : public goSignal3DBase<void>
                        goSize_t channelCount);
         goSignal3DRef (void* data_ptr,
                        goTypeEnum data_type,
-                       goSize_t sz, goSize_t sy = 1, goSize_t sz = 1,
+                       goSize_t sx, goSize_t sy = 1, goSize_t sz = 1,
                        goSize_t channelCount = 1);
         virtual ~goSignal3DRef ();
         void ref (void* data_ptr, 

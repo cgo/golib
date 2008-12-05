@@ -8,10 +8,10 @@
 
 // Matlab
 #include <engine.h>
+#include <goconfig.h>
 #include <gomatlab.h>
 
 #include <gosignal3dgenericiterator.h>
-#include <goconfig.h>
 
 #ifndef HAVE_MATLAB_GEQ_2007A
 # define mwIndex int

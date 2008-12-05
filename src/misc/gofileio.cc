@@ -798,6 +798,8 @@ bool goFileIO::writeBinaryMatrix (const goMath::Matrix<T>& M, const char* filena
 
 template bool goFileIO::writeBinaryMatrix<goFloat> (const goMath::Matrix<goFloat>&, const char*);
 template bool goFileIO::writeBinaryMatrix<goDouble> (const goMath::Matrix<goDouble>&, const char*);
+template bool goFileIO::writeBinaryMatrix<goFloat> (const goMath::Matrix<goFloat>&, FILE*);
+template bool goFileIO::writeBinaryMatrix<goDouble> (const goMath::Matrix<goDouble>&, FILE*);
 
 /** 
  * @brief Creates a temporary file.

@@ -13,7 +13,7 @@ bool goSignal::sobel2D (const goSignal3DBase<void>& input, goSignal3DBase<void>&
                                          0.0, 0.0, 0.0,
                                          1.0, 2.0, 1.0};
 
-    if (output.getSize () != sz || output.getChannelCount () != 2 || output.getDataType().getID () != GO_FLOAT)
+    if (output.getSize () != sz || output.getChannelCount () < 2 || output.getDataType().getID () != GO_FLOAT)
     {
         goSignal3D<void>* p = reinterpret_cast <goSignal3D<void>*> (&output);
         if (!p)
