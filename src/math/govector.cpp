@@ -2,6 +2,7 @@
 #include <gomatrix.h>
 #include <golog.h>
 #include <gotypes.h>
+#include <goconfig.h>
 #ifndef GOFILEIO_H
 # include <gofileio.h>
 #endif
@@ -813,11 +814,15 @@ template class goMath::Vector<goFloat>;
 template class goMath::Vector<goDouble>;
 template class goMath::Vector<goComplexf>;
 // template class goMath::Vector<goComplexd>;
-template class goMath::Vector<goIndex_t>;
-template class goMath::Vector<goSize_t>;
+// template class goMath::Vector<goIndex_t>;
+// template class goMath::Vector<goSize_t>;
 template class goMath::Vector<goInt8>;
 template class goMath::Vector<goUInt8>;
 template class goMath::Vector<goInt16>;
 template class goMath::Vector<goUInt16>;
-// template class goMath::Vector<goInt32>;
+template class goMath::Vector<goInt32>;
 template class goMath::Vector<goUInt32>;
+#ifdef HAVE_INT64
+template class goMath::Vector<goInt64>;
+template class goMath::Vector<goUInt64>;
+#endif

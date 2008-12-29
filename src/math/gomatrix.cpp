@@ -1563,8 +1563,8 @@ namespace goMath {
 template void  goMath::matrixPower<goFloat> (goMath::Matrix<goFloat>& A, goFloat);
 template class goMath::Matrix<goDouble>;
 template class goMath::Matrix<goFloat>;
-template class goMath::Matrix<goIndex_t>;
-template class goMath::Matrix<goSize_t>;
+// template class goMath::Matrix<goIndex_t>;
+// template class goMath::Matrix<goSize_t>;
 // template class goMath::Matrix<goInt32>;
 template class goMath::Matrix<goComplexf>;
 
@@ -1572,4 +1572,9 @@ template class goMath::Matrix<goInt8>;
 template class goMath::Matrix<goUInt8>;
 template class goMath::Matrix<goInt16>;
 template class goMath::Matrix<goUInt16>;
+template class goMath::Matrix<goInt32>;
 template class goMath::Matrix<goUInt32>;
+#ifdef HAVE_INT64
+template class goMath::Matrix<goInt64>;
+template class goMath::Matrix<goUInt64>;
+#endif
