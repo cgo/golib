@@ -1,19 +1,39 @@
 #include <gofixedarray.h>
 #include <stdio.h>
 
+template<class T>
+void print (goFixedArray<T>& a)
+{
+    for (int i = 0; i < (int)a.getSize(); ++i)
+    {
+        printf ("%d ", a[i]);
+    }
+    printf ("\n");
+    printf ("   Reserved: %d\n   Overhead: %d\n", a.getReserved(), a.getResizeOverhead());
+}
+
 int main ()
 {
-    goFixedArray<goInt32> a (3,2,2);
+    goFixedArray<goInt32> a (3,6,3);
 
     a.fill(1);
-    a(-2) = -2;
-    a(-1) = -1;
-    a(3) = 3;
-    a(4) = 4;
+    a(0) = 1;
+    a(1) = 2;
+    a(2) = 3;
 
-    for (goIndex_t i = 0; i < 3+4; ++i)
+    print (a);
+
+    for (int i = 4; i < 20; ++i)
     {
-        printf ("a(%d) = %d\n", i-2,a(i-2));
+        a.resize (i);
+        a[i-1] = i;
+        print (a);
     }
+    for (int i = a.getSize(); i > 1 ; --i)
+    {
+        a.resize (i);
+        print (a);
+    }
+
     exit(1);
 }

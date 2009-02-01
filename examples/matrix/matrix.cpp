@@ -5,12 +5,12 @@
 #include <govector.h>
 #include <gofixedarray.h>
 #include <gotimerobject.h>
-#undef HAVE_MATLAB
+// #undef HAVE_MATLAB
 #include <gosparsematrix.h>
 
-//#define HAVE_MATLAB
-//#include <engine.h>
-//#include <gomatlab.h>
+#define HAVE_MATLAB
+#include <engine.h>
+#include <gomatlab.h>
 
 int main ()
 {

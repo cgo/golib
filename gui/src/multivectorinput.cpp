@@ -1,4 +1,5 @@
 #include <gogui/multivectorinput.h>
+#include <goexception.h>
 
 namespace goGUI
 {
@@ -82,6 +83,7 @@ goGUI::VectorInput& goGUI::MultiVectorInput::getInput (int index)
     else
     {
         goLog::error ("goGUI::MultiVectorInput::getInput(): index out of range.");
+        throw goMathException (goMathException::OTHER);
     }
 }
 

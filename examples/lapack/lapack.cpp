@@ -30,6 +30,7 @@ int main ()
     goMath::Lapack::getrs (A, false, B, ipiv);
     B.print ();
 
+#if 0
     {
         printf ("Testing gels()\n");
         printf ("A2:\n");
@@ -37,14 +38,14 @@ int main ()
         goVectorf B(3);
         B[0] = 1.0; B[1] = 2.0; B[2] = 3.0;
         printf ("B:\n");
-        B._print ();
+        B.print ();
         //if (!goMath::Lapack::gels (A, false, B))
         //{
         //    printf ("gels() failed.\n");
         //}
         goMath::Lapack::gelss (A, false, B);
         printf ("Solution:\n");
-        B._print ();
+        B.print ();
     }
-
+#endif
 }

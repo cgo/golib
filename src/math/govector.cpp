@@ -20,8 +20,8 @@ goMath::Vector<T>::Vector ()
 }
 
 template <class T>
-goMath::Vector<T>::Vector (goSize_t s, goIndex_t leftBorder, goIndex_t rightBorder) 
-    : goFixedArray<T> (s,leftBorder,rightBorder) 
+goMath::Vector<T>::Vector (goSize_t s, goSize_t reserve, goSize_t resize_overhead)
+    : goFixedArray<T> (s, reserve, resize_overhead) 
 {
     this->fill (T(0));
 }

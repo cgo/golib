@@ -36,7 +36,7 @@ class Vector : public goFixedArray<T>
 {
     public:
         Vector ();
-        Vector (goSize_t s, goIndex_t leftBorder = 0, goIndex_t rightBorder = 0);
+        Vector (goSize_t s, goSize_t reserve = 0, goSize_t resize_overhead = 0);
         Vector (T* ptr, goSize_t size, goIndex_t stride = 1) : goFixedArray<T> (ptr, size, stride) {};
         Vector (const goFixedArray<T>& o);
         // Vector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};
@@ -45,10 +45,11 @@ class Vector : public goFixedArray<T>
 
         Vector<T>& operator= (const goFixedArray<T>& other);
 
-        void resize (goSize_t s)
-        {
-            this->setSize (s,this->getLeftBorder(),this->getRightBorder());
-        }
+        //= resize now done in goFixedArray.
+        //void resize (goSize_t s)
+        //{
+        //    this->setSize (s);
+        //}
 
         void print (const char* formatstring = "%f\n") const;
 

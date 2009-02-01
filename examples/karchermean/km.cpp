@@ -135,7 +135,7 @@ int main ()
 {
     printf ("Karcher mean example using golib.\n(C) Christian Gosch\n");
     printf ("Generates meanrot.gnuplot for use in Gnuplot.\n");
-    // karcher_test_so3 ();
-    karcher_test_linear ();
+    karcher_test_so3 ();
+    // karcher_test_linear ();
     exit (1);
 }

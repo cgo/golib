@@ -14,7 +14,7 @@ int main ()
         v[2] = 3.0;
         //v[3] = 4.0;
         //v[4] = 5.0;
-        v._print();
+        v.print();
 
         float a = 1.1;
         float b = 0.0;
