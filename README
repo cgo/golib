@@ -3,28 +3,20 @@ libGo (golib) README
 
 LICENSE ISSUES
 --------------
-This library comes with the GNU general public license (GPL). 
-That means, as long as
-all derived work is also put under the terms of the GNU general public
-license, you may use this library as you please, as long as you do
-not violate the terms of the GPL.
-The text of the GPL can be found in the file COPYING in this distribution
-or on the web pages of the Free Software Foundation. Make sure
-you read and understand it before using this software.
+Please read the file COPYING.
+The original intention was to use GPL for golib,
+but currently that is NOT used. See COPYING.
 
-COMMERCIAL USE:
-***
-However, if there is demand, I, the author, will make it possible to obtain 
+COMMERCIAL USE
+--------------
+If there is demand, I, the author, will make it possible to obtain 
 a commercial license for golib. Please contact me at golib@goschs.de.
-Note that with the GNU GPL, you are not allowed to use
-this software in closed source, commercial applications.
-***
 
 About
 -----
 libGo is a C++ class library containing all kinds of 
 things that proved useful to me.
-For details, see the source documentation in golib/doc.
+For details, see the HTML source documentation in golib/doc.
 
 Directories
 -----------
@@ -58,6 +50,22 @@ What you need
   http://www.gnu.org/software/guile
 Also see the html documentation as is might be more up to date.
   
+Package Dependencies in Ubuntu
+------------------------------
+This holds possibly for other Debian based
+GNU/Linux distributions.
+Necessary:
+ libatlas-base-dev (lapack, blas, atlas)
+ libf2c2-dev (lapack)
+Recommended:
+ libdevil-dev
+GUI:
+ libgtkmm-2.4-dev
+ libgtkglext1-dev
+GL:
+Python:
+ python-dev
+
 How to build
 ------------
 Set the environment variable GOPATH to the path where golib resides, e.g. in bash

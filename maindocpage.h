@@ -61,41 +61,43 @@
  * - Some <b>matrix and vector classes</b>, and a sparse matrix class 
  *   that acts mainly as a golib-side representation of sparse matrices for the Matlab
  *   interface
- * - Few <b>numerical linear algebra routines</b>, 
- *   like the ones from the free TNT library (incorporated in the code
- *   and marked as such) and the standard conjugate gradients method 
+ * - A few <b>numerical linear algebra routines</b>,
+ *   using BLAS/LAPACK/ATLAS, and
+ *   some parts from the free TNT library (incorporated in the code
+ *   and marked as such). They include the standard conjugate gradients method 
  *   for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
  *   for solving linear systems, Eigenvalues of complex Hermitian matrices (the latter from
  *   SEISPACK).
- * - An interface to <b>gnuplot</b> (goPlotter, goMultiPlotter)
- * - A few networking classes (not well tested)
+ * - An interface to run <b>gnuplot</b> (goPlotter, goMultiPlotter)
+ *   comfortably from C++, e.g. to plot a goVector
  * - A <b>process interface</b> for external program calls (goProcess)
+ * - A few networking classes (not well tested)
  * - ... it's slowly growing as I find use for more stuff :)
  *
- * There are also additional libraries which use golib and are all included 
- * in the distribution:
+ * There are also additional libraries which use golib and are all included:
  * - A <b>matlab interface wrapper</b>  
  *   to use matlab engines from C++ and swap data
- *   between the two (you need matlab for this, of course)
+ *   between golib and matlab (you need matlab for this, of course)
  * - A GUI base library using gtkmm, a (very good) C++ wrapper for gtk+
  *   <ul>
  *   <li>http://www.gtkmm.org</li>
  *   </ul>
  *   You need version 2.4 of gtkmm for the GUI library.
- * - A small OpenGL helper library (quite recent and currently very small).
+ * - A small OpenGL helper library.
  *   You need OpenGL libraries to use this.
+ * - A library helping to use embedded Python with the Swig-generated
+ *   wrappers for golib classes (good for application scripting)
  * 
  * All additional libraries can be selected to be built from the ccmake
- * interface. However, build and install golib itself first, without
- * selecting additional libraries (since they rely on finding golib).
- * See the building instructions further below.
+ * interface. 
  *
  * \par 
  * <strong>Important notice:</strong> All of this was made because I had
  * a use for it. If you want to make your own contributions, please see further 
  * below! <br>
- * It may well be the case that classes contained in the library are not well tested
- * or have never been in actual use. I can not guarantee perfect suitability for
+ * golib does contain some deprecated classes and functions, which will be
+ * removed in the future.
+ * I can not guarantee perfect suitability for
  * any purpose. However, the signal related stuff seems to work quite fine (and surely
  * still has bugs). Also, the classes in src/data seem to work ok (the basic 
  * arrays, fixed arrays, strings, lists, hashtables and goSignal3DBase-based classes 
@@ -104,44 +106,33 @@
  * similar).
  * \subsection intro3 Scripting using SWiG
  * \subsubsection intro31 Python
- * I have recently tried Python and it fits quite well into
+ * I have tried Python for scripting and prototyping and it fits quite well into
  * my programming habits and environment. Therefore,
  * I will continue work on the Python interface for golib and
  * neglect other interpreted languages.
- * The Python module can be selected in the ccmake interface,
- * but should only be built when libGo has been built and installed.
- * The matlab module also provides for a Python interface,
- * which will automatically be built if you select to build the Python and
+ * The Python module can be selected in the ccmake interface.
+ * The matlab and OpenGL modules also provide for a Python interface,
+ * which will automatically be built if you additionally select to build the Python and
  * the Matlab interface in cmake/ccmake.
  * You should also select the install directory for your Python modules
  * in cmake/ccmake (the directory where the environment variable 
  * PYTHONPATH points to).
  * You do need SWiG >= 1.3.29 and Python >= 2.4 for this. It might work
  * with different versions, but was tried only with these.
- * 
- * \subsubsection intro32 Guile Scheme (not recommended, discontinued)
- * If you have GNU Guile >= 1.6.7, you can use Guile's implementation of the Scheme
- * programming language to write scripts that use the functionality of golib.
- * In the directory <code>swig</code>, you will find code and a CMakeLists.txt
- * to create a Guile module using SWiG (so you need SWiG >= 1.3.25 too).
- * If you want to use the Guile module, install the created .so library
- * to a location included in the LD_LIBRARY_PATH environment variable and
- * copy the created .scm files to a path that can be found by Guile
- * (e.g., a path contained in the GUILE_LOAD_PATH environment variable).
- * Also, if the file common.scm, which comes from SWiG, is not available on your system,
- * copy it to the same location as the other .scm files (it resides in golib's swig directory).
- * Note that golib's Guile Scheme support is highly experimental and subject to changes.<br>
  * <ul>
  *   <li>http://www.swig.org</li>
- *   <li>http://www.gnu.org/software/guile</li>
+ *   <li>http://www.python.org</li>
  * </ul>
+ * 
+ * \subsubsection intro32 Guile Scheme (not recommended, discontinued)
+ * Work on the scheme module is discontinued.
  * 
  * \section howto How to build and use
  *	\subsection pre Prerequisites
  *	 You will definitely need:
  *	 - A recent cmake: http://www.cmake.org
  *	 - GNU compiler collection (gcc) with C++ -- other compilers may work but were not tested.
- *	 - ATLAS generated CBLAS library: http://math-atlas.sourceforge.net/  for some matrix and vector operations<br>
+ *	 - ATLAS generated CBLAS library: http://math-atlas.sourceforge.net/  for some matrix and vector operations
  *	 - ATLAS's LAPACK C implementation.
  *	 - An f2c translated or compatible 
  *	   LAPACK, like the reference implementation from www.netlib.org.
@@ -159,22 +150,37 @@
  *	 Completely optional:
  *	 - SWiG: http://www.swig.org
  *	 - Python 2.4: http://www.python.org
- *	 - Guile: http://www.gnu.org/software/guile<br>
- *	 These are both needed for the respective modules for golib.
+ *	 These are both needed for the Python modules for golib.
  *
- *	 You will always need the pthread library to compile goLib. It is
- *	 available in many modern Unix environments.
+ *	 You will always need the pthread library. It is
+ *	 available in many modern Unix environments. golib has in an early version
+ *	 also been compiled on Windows, and there are Windows implementations
+ *	 for the multithreading classes too. However, many other things will probably
+ *	 not compile anymore in Windows.
  *	 Depending on the version you are compiling, libSDL might also
- *	 be necessary. You can get it at http://www.libsdl.org.
- *	 In order to use the goFileIO::readImage() and goFileIO::writeImage() methods,
- *	 you need libIL which you can get at http://openil.sourceforge.net <br>
- *	 I recently switched from GNU Autotools to CMake, which can be obtained from 
- *	 http://www.cmake.org <br>
- *	 I have not yet decided if I cease using Autotools completely or support both.
- *	 Probably I will drop Autotools in favour of CMake.<br>
- *	 In order to use the guile scripting support (which is experimental,
- *	 see below), you need swig (http://www.swig.org) and libguile
- *	 (http://www.gnu.org/software/guile).
+ *	 be necessary (only for golib 0.2). You can get it at http://www.libsdl.org.
+ *
+ *  \subsection ubuntu Package Dependencies in Ubuntu
+    This holds also possibly for other Debian based
+    GNU/Linux distributions.
+    <ul>
+     <li>Necessary:</li>
+     <ul>
+      <li>libatlas-base-dev (lapack, blas, atlas)</li>
+      <li>libf2c2-dev (lapack)</li>
+     </ul>
+     <li>Recommended:</li>
+       <ul><li>libdevil-dev</li></ul>
+     <li>GUI:</li>
+      <ul>
+       <li>libgtkmm-2.4-dev</li>
+       <li>libgtkglext1-dev</li>
+       </ul>
+     <li>GL:</li>
+     <li>Python:</li>
+        <ul><li>python-dev</li></ul>
+    </ul>
+ *
  *
  * 	\subsection env Environment variables
  * 	You need to set:
@@ -213,17 +219,9 @@
  *      <li>mkdir build</li>
  *      <li>cd build</li>
  *      <li>cmake ..  or  ccmake ..</li>
- *      <li>  --> select no additional modules
+ *      <li>  --> select whichever modules you need, and configure/generate
  *      <li>make</li>
  *      <li>make install</li>
- *      <li>If you like to build some additional modules, do<br>
- *          ccmake<br>
- *            --> select additional modules, like the Matlab module, GTKMM GUI module,
- *            Python module, etc., and do<br>
- *           make<br>
- *           make install<br>
- *          again. <b>This will be changed. The modules will get their own make files, so that
- *          they will be decoupled from the main library.</b>
  *    </ul>
  * 
  *	\subsection examples Examples
@@ -238,28 +236,15 @@
  * 	 to compile the examples. Be sure to have the environment variables
  *	 mentioned above set correctly.
  *
- * \section da  ---Diplomarbeit---
- * Version 0.2.1 of this library contains the source code for my Diplomarbeit 
- * (final thesis in Germany). 
- * Everything in the namespace Vol is only for the Diplomarbeit, which has
- * been in cooperation with Siemens Medical Solutions, Erlangen, Germany.
- * <strong> 
- * 	 According to the cooperation agreement,
- *   this code is NOT free and NOT intended for the open public. 
- * </strong>
- * If you received this code by accident, please be so kind to delete
- * it and get a different version of the library. You are not allowed to
- * use it without written consent of all copyright holders.
- *
  * \section state State of development
- * Most of this, except for the src/data tree, is work in progress.
+ * Development has started some time in 1996/97.
+ * Some of this is work in progress.
  * The current version number is <strong>0.5</strong>.
  * Some significant changes are imminent.
- * There are currently non-free parts in it which are unlikely to
- * be released to open public any time soon (if you should receive them,
- * you must delete them).
  * Some of the basic features are not very well documented, but I will fix that
- * in the future. I plan to write some introductory documentation
+ * in the future. Particularly, "how-to-use" sections are missing in the documentation,
+ * even though many classes are straight forward to use.
+ * I plan to write some introductory documentation
  * which explains some concepts.<br>
  * You should also be aware that this library was created over a long time
  * in small parts, some of which I used more than others. The parts I
@@ -271,19 +256,11 @@
  * do not hesitate to send me an email to <code>golib __at__ goschs __ de</code>.
  *
  * \section download How to get the source
- * You should be able to download the source at <a href="http://www.goschs.de">www.goschs.de</a> in the [projects] section. 
  * <b>A current version is not available online. If you are really interested in
  *    trying the library, please drop me a line.</b>
  * 
- * 
  * \section warranty Warranty
- * This is very simple. There is no warranty at all, since this software is provided
- * free of charge.
- * 
- * \section contributions Contributions
- * If you would like to make contributions to goLib, you are more
- * than welcome to! Please send suggestions or source (or both ;-) ) to
- * <code>christian __at__ goschs __ de</code>.
+ * No warranty at all.
  */
 
  /**
