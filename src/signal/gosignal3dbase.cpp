@@ -1103,6 +1103,11 @@ goSignal3DBase<T>::fill (const T* value)
     GO_SIGNAL3D_EACHELEMENT(*__ptr = *value, (*this), T);
 }
 
+/** 
+ * @brief Fill the currently selected channel with a given value.
+ * 
+ * @param value Pointer to the value (must be of correct type).
+ */
 template<> void
 goSignal3DBase<void>::fill (const void* value)
 {

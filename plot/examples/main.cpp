@@ -1,9 +1,15 @@
 #include <gtkmm.h>
 #include <goplot/cairoplot.h>
 #include <goplot/object2dtext.h>
+#include <goplot/object2dimage.h>
 
 #include <gomatrix.h>
 #include <gocurve.h>
+#include <gosignal.h>
+#include <gosignal3d.h>
+#include <gosignal3dref.h>
+#include <gosignal3dgenericiterator.h>
+#include <gofileio.h>
 
 #include <cairo/cairo.h>
 
@@ -156,6 +162,31 @@ int main (int argc, char* argv[])
     // txt->setTransform (NSPACE ::Trafo2D<NSPACE ::real> (1.0, 0.0, 0.0, 1.0, 0.0, 0.0));
     // graph.add (txt);
     // graph.add (NSPACE ::AutoPtr<NSPACE ::Object2D> (txt));
+
+    //= Load image
+    goSignal3D<void> sig;
+    sig.setDataType (GO_UINT8);
+    goFileIO::readImage ("image.png", &sig, true);
+    //= Create an image object for the graph
+    NSPACE ::Object2DImage *img = new NSPACE ::Object2DImage;
+    img->createImage (NSPACE ::Object2DImage::ARGB32, sig.getSizeX (), sig.getSizeY ());
+
+    //= Convert the loaded image from RGB into BGRA in the object2dImage object.
+    {
+        goSize3D sz (img->stride() / 4, img->height(), 1);
+        goSignal3DRef temp (img->data (), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
+        goSignal::RGB2BGRA (sig, temp);
+
+        temp.setChannel (3);
+        goFillSignal (&temp, 255);
+        temp.setChannel (0);
+    }
+    //= Set transform and add image to graph. Note the data are not residing in sig, but in img (they got copied).
+    NSPACE ::Trafo2D<NSPACE ::real> t (1.0/ float (sig.getSizeX()), 0.0, 0.0, -1.0 / float (sig.getSizeY()), 0.0, 1.0);
+    img->setTransform (t);
+    sig.destroy ();
+    graph.add (NSPACE ::AutoPtr<NSPACE ::Object2D> (img));
+
 
     NSPACE ::CairoPlotWidget cp (&graph);
 

@@ -7,6 +7,7 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#include <gosignalhelper.h>
 
 namespace goSignal
 {
@@ -17,6 +18,10 @@ namespace goSignal
     const goSize3D& defaultBlockSize2D ();
 
     bool canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret);
+
+    bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount);
+
+    bool RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target);
 };
 
 #endif

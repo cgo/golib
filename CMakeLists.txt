@@ -219,6 +219,7 @@ SET (SOURCES ${SOURCES}
 
 ## goSignal
 SET (SOURCES ${SOURCES}
+    src/signal/convert.cpp
     src/signal/canny.cpp
     src/signal/defaultsize.cpp
     src/signal/sobel2d.cpp
