@@ -1,10 +1,11 @@
 #ifndef PLOT_H
 #define PLOT_H
 
-#define NSPACE go
+#define NSPACE goPlot
 
 #include <math.h>
 #include <cairo.h>
+#include <pango/pangocairo.h>
 
 namespace NSPACE
 {

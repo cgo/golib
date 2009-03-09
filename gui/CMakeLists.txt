@@ -1,5 +1,6 @@
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
+                             src/plotview.cpp
                              src/videocapturecontrol.cpp
                              src/multivectorinput.cpp
                              src/vectorinput.cpp
@@ -128,7 +129,8 @@ INSTALL_TARGETS     (/lib ${TARGETNAME})
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${CMAKE_CURRENT_SOURCE_DIR}/include
-                     ${GOPATH}/include)
+                     ${GOPATH}/include
+                     ${GOPATH}/plot/include)
 
 #IF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
 #    SET (CMAKE_CXX_COMPILER g++-3.3)

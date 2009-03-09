@@ -19,6 +19,8 @@
 # include <gognuplot.h>
 #endif
 
+#include <goplot/plot.h>
+
 class goPlotterPrivate;
 
 class goSinglePlotPrivate;
@@ -495,6 +497,57 @@ namespace goPlot
         static bool gnuplot (const goFixedArray<goFloat>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
         static bool gnuplot (const goFixedArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
 #endif
+
+
+        /** 
+         * @brief For use in the goPlot library (uses the same namespace).
+         *
+         * Points stored in a goMath::Matrix<T> object, one point per row.
+         */
+        template <class T>
+            class Points2DMatrix : public goPlot ::Points2D <T>
+        {
+            public:
+                Points2DMatrix () 
+                    : goPlot ::Points2D <T> (),
+                    myMatrix (0, 0)
+            {
+            }
+
+                virtual ~Points2DMatrix ()
+                {
+                }
+
+                Points2DMatrix (const goMatrix<T>& M)
+                    : goPlot ::Points2D<T> (),
+                    myMatrix (M)
+            {
+            }
+
+                Points2DMatrix& operator= (const goMatrix<T>& o)
+                {
+                    myMatrix = o;
+                    return *this;
+                }
+
+                virtual T x (int i) const { return myMatrix (i, 0); }
+                virtual T y (int i) const { return myMatrix (i, 1); }
+
+                virtual void set (int i, T x, T y) 
+                {
+                    myMatrix (i, 0) = x;
+                    myMatrix (i, 1) = y;
+                }
+                //= Return number of points
+                virtual size_t size () const
+                {
+                    return myMatrix.getRows ();
+                }
+
+            private:
+                goMatrix<T> myMatrix;
+        };
+
 }
 
 #endif

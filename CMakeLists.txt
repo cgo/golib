@@ -2,6 +2,7 @@ INCLUDE             (CheckLibraryExists)
 INCLUDE             (CheckTypeSize)
 INCLUDE             (CheckIncludeFile)
 INCLUDE             (CheckFunctionExists)
+INCLUDE             (FindPkgConfig)
 # Apparently buggy:
 # INCLUDE             (FindThreads)
 
@@ -417,8 +418,18 @@ IF (BUILD_PYTHON_EMBED)
     ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/pythonembed)
 ENDIF (BUILD_PYTHON_EMBED)
 
+## Cairo and Pango (for use of the goPlot library)
+pkg_search_module (CAIRO REQUIRED cairo)
+pkg_search_module (PANGO REQUIRED pango)
+
+SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${CAIRO_INCLUDE_DIRS})
+SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PANGO_INCLUDE_DIRS})
+LINK_LIBRARIES (${CAIRO_LDFLAGS})
+LINK_LIBRARIES (${PANGO_LDFLAGS})
+
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
+                     ${GOPATH}/plot/include
                      ${GOPATH}/extra/include
                      $ENV{HOME}/include) # Only in windows!
                         

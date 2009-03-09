@@ -280,3 +280,5 @@ goGnuplot& goPlot::Plot::getGnuplot ()
 {
     return myPrivate->gp;
 }
+
+

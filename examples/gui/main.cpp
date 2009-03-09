@@ -4,24 +4,53 @@
 #include <gothreadobject.h>
 #include <gofileio.h>
 #include <gosignalhelper.h>
+#include <gomatrix.h>
+
+#include <goplot.h>
+#include <gogui/plotview.h>
+#include <goplot/graph.h>
 
 class MyWindow : public goGUI::MainWindow
 {
+    public:
+        typedef goPlot::Object2DPoints<goPlot::Points2DMatrix<goFloat>, goFloat> PointsObject;
     public:
         MyWindow () : goGUI::MainWindow ()
         {
             Gtk::Menu* menu = this->getFileMenu();
             Gtk::MenuItem* item = this->addMenuItem (menu, "Draw test");
             item->signal_activate().connect (sigc::mem_fun (*this, &MyWindow::fileAbout));
-            Gtk::Curve* da = Gtk::manage (new Gtk::Curve);
-            this->getPaned().pack1 (*da, Gtk::EXPAND);
+            // Gtk::Curve* da = Gtk::manage (new Gtk::Curve);
+            // this->getPaned().pack1 (*da, Gtk::EXPAND);
+            goGUI::PlotView *pv = Gtk::manage (new goGUI::PlotView);
+            this->getPaned().pack1 (*pv, Gtk::EXPAND);
+
+            goAutoPtr<goPlot::Graph> graph = new goPlot::Graph;
+
+            PointsObject* po = new PointsObject;
+            goMatrixf M;
+            M.readASCII ("curve.txt");
+            po->points() = M;
+            goVectorf v1,v2;
+            M.refColumn (0, v1);
+            M.refColumn (1, v2);
+            graph->axis (0)->setLower (goMath::min(v1));
+            graph->axis (0)->setUpper (goMath::max(v1));
+            graph->axis (1)->setLower (goMath::min(v2));
+            graph->axis (1)->setUpper (goMath::max(v2));
+            graph->axis (0)->setTics (20);
+            graph->axis (1)->setTics (20);
+
+            graph->add (goPlot::AutoPtr<PointsObject> (po));
+
+            pv->setGraph (graph);
+            
             this->show_all_children ();
-            da->reset ();
-        };
+        }
 
         virtual ~MyWindow ()
         {
-        };
+        }
 
         virtual void fileAbout ()
         {
@@ -41,7 +70,7 @@ class MyWindow : public goGUI::MainWindow
             goCopySignal (&image, &image2);
 
             draw.image (image2);
-        };
+        }
 
 };
 
