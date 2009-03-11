@@ -15,11 +15,15 @@
 #ifndef GOVECTOR_H
 # include <govector.h>
 #endif
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
 #ifndef GOGNUPLOT_H
 # include <gognuplot.h>
 #endif
 
-#include <goplot/plot.h>
+// #include <goplot/plot.h>
+#include <goplot/goplot.h>
 
 class goPlotterPrivate;
 
@@ -533,6 +537,8 @@ namespace goPlot
                 virtual T x (int i) const { return myMatrix (i, 0); }
                 virtual T y (int i) const { return myMatrix (i, 1); }
 
+                goMatrix<T>& matrix () { return myMatrix; }
+
                 virtual void set (int i, T x, T y) 
                 {
                     myMatrix (i, 0) = x;
@@ -547,6 +553,76 @@ namespace goPlot
             private:
                 goMatrix<T> myMatrix;
         };
+
+        /** 
+         * @brief Create a goPlot::Object2DPoints for use in the goPlot library.
+         * 
+         * Support function for using the goPlot library.
+         *
+         * @param curve 2D Points, one per row. N times 2 matrix.
+         * 
+         * @return A goPlot::AutoPtr to a goPlot::Object2D that can be given directly
+         *   to a goPlot::Graph using goPlot::Graph::add().
+         */
+        template <class T>
+            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goMatrix<T>& curve)
+        {
+            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            assert (!points.isNull ());
+            points->points() = curve;
+
+            return points;
+        }
+
+        /** 
+         * @brief Create a goPlot::Object2DPoints for use in the goPlot library.
+         * 
+         * Support function for using the goPlot library.
+         *
+         * @param x x coordinates
+         * @param y y coordinates (must be of same size as x)
+         * 
+         * @return A goPlot::AutoPtr to a goPlot::Object2D that can be given directly
+         *   to a goPlot::Graph using goPlot::Graph::add().
+         */
+        template <class T>
+            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& x, const goVector<T>& y)
+        {
+            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            assert (!points.isNull ());
+            assert (x.getSize() == y.getSize());
+            points->points().matrix().resize (x.getSize(), 2);
+            points->points().matrix().setColumn (0, x);
+            points->points().matrix().setColumn (1, y);
+
+            return points;
+        }
+
+        /** 
+         * @brief Create a goPlot::Object2DPoints for use in the goPlot library.
+         * 
+         * Support function for using the goPlot library.
+         *
+         * x coordinates will be filled with [0,...,y.getSize() - 1].
+         *
+         * @param y y coordinates 
+         * 
+         * @return A goPlot::AutoPtr to a goPlot::Object2D that can be given directly
+         *   to a goPlot::Graph using goPlot::Graph::add().
+         */
+        template <class T>
+            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& y)
+        {
+            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            assert (!points.isNull ());
+            points->points().matrix().resize (y.getSize(), 2);
+            goVector<T> x (0);
+            points->points().matrix().refColumn (0, x);
+            x.fillRange (0.0, 1.0, y.getSize());
+            points->points().matrix().setColumn (1, y);
+
+            return points;
+        }
 
 }
 

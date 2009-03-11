@@ -27,10 +27,10 @@ class MyWindow : public goGUI::MainWindow
 
             goAutoPtr<goPlot::Graph> graph = new goPlot::Graph;
 
-            PointsObject* po = new PointsObject;
+            //PointsObject* po = new PointsObject;
             goMatrixf M;
             M.readASCII ("curve.txt");
-            po->points() = M;
+            // po->points() = M;
             goVectorf v1,v2;
             M.refColumn (0, v1);
             M.refColumn (1, v2);
@@ -41,9 +41,30 @@ class MyWindow : public goGUI::MainWindow
             graph->axis (0)->setTics (20);
             graph->axis (1)->setTics (20);
 
-            graph->add (goPlot::AutoPtr<PointsObject> (po));
+            //graph->add (goPlot::AutoPtr<PointsObject> (po));
+            //graph->add (po);
+            graph->add (goPlot::object2D (M));
 
-            pv->setGraph (graph);
+            goAutoPtr<goPlot::Graph> graph2 = new goPlot::Graph;
+            goVectorf y (100);
+            goVectorf x (100);
+            for (int i = 0; i < y.getSize(); ++i)
+            {
+                x[i] = 2.0 * M_PI * float(i) / float(y.getSize() - 1);
+                y[i] = ::sin (x[i]);
+            }
+            goPlot::AutoPtr<goPlot::Object2DPoints<goPlot::Points2DMatrix<goFloat>, goFloat> > obj = goPlot::object2D (x,y);
+            obj->lineTraits ().setColour (goPlot::RGBA (1.0, 0.0, 0.0, 1.0));
+
+            graph2->add (obj);
+            graph2->axis (1)->setLower (goMath::min(y));
+            graph2->axis (1)->setUpper (goMath::max(y));
+            graph2->axis (0)->setLower (goMath::min(x));
+            graph2->axis (0)->setUpper (goMath::max(x));
+            graph2->axis (0)->setTics (20);
+            graph2->axis (1)->setTics (20);
+
+            pv->setGraph (graph2);
             
             this->show_all_children ();
         }

@@ -1024,6 +1024,21 @@ bool goPlot::gnuplotList (const goList< arrayT >* arrayListX,
     return _gnuplot_list <arrayT> (arrayListX, arrayListY, cmdFileNameRet, dataFileNameRet, title, waitfor, plotCommands, prefixCommands, postfixCommands, shellPostfix);
 }
 
+
+//= Support functions for the goPlot library (not gnuplot)
+
+//= In the header file.
+//template <class T>
+//goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > goPlot::object2D (const goMatrix<T>& curve)
+//{
+//    AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+//    assert (!points.isNull ());
+//    points->points() = curve;
+//
+//    return points;
+//}
+
+
 #define GOPLOT_INSTANTIATE(TYPE) \
 template bool goPlot::gnuplot< TYPE > (const TYPE& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor);
 

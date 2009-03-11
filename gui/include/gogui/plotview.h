@@ -9,12 +9,20 @@
 
 namespace goGUI
 {
+    /** 
+     * @brief Plots a goPlot::Graph object.
+     */
     class PlotView : public Gtk::DrawingArea
     {
         public:
             PlotView ();
             virtual ~PlotView ();
 
+            /** 
+             * @brief Set the graph.
+             * 
+             * @param g goAutoPtr to a goPlot::Graph object.
+             */
             void setGraph (goAutoPtr<goPlot::Graph> g);
 
         protected:
