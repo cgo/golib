@@ -12,6 +12,8 @@ SET                 (SOURCES
                              src/mainwindow.cpp
                              src/countfilenames.cpp)
 
+SET (GOGUI_USE_CAIRO TRUE CACHE BOOL "Use Cairo in the GUI")
+
 IF (BUILD_GUI_MODULE_OPENGL)
     SET (SOURCES ${SOURCES} 
           src/scenecontrol.cpp

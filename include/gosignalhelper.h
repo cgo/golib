@@ -46,8 +46,8 @@ bool     goFindZeroCrossings  (const goSignal3DBase<void>* sig, goArray<goPointf
 bool     goConvertSignal      (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
 bool     goCopySignal         (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
 bool     goCopySignalChannel  (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
-template <class T> bool goCopySignalArray (const goSignal3DBase<void>* sig, T* targetArray);
-template <class T> bool goCopySignalArray (const T* array, goSignal3DBase<void>* targetSig);
+template <class T> bool goCopySignalArray (const goSignal3DBase<void>* sig, T* targetArray, int* strides = 0);
+template <class T> bool goCopySignalArray (const T* array, goSignal3DBase<void>* targetSig, int* strides = 0);
 bool     goFillSignal         (goSignal3DBase<void>* sig, goFloat value);
 bool     goRGBAtoScalar       (const goSignal3DBase<void>* sig, goSignal3DBase<void>* targetSig);
 void     goSignalInfoText     (const goSignal3DBase<void>& sig, goString& strRet, bool html = false);

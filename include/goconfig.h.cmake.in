@@ -11,6 +11,7 @@
 #define SIZEOF_DOUBLE ${SIZEOF_DOUBLE}
 
 #cmakedefine HAVE_INT64 ${HAVE_INT64}
+#cmakedefine GOGUI_USE_CAIRO ${GOGUI_USE_CAIRO}
 
 /* header files */
 #cmakedefine HAVE_IEEE754_H ${HAVE_IEEE754_H}
@@ -42,6 +43,8 @@
 #cmakedefine HAVE_LIBIL ${HAVE_LIBIL}
 #cmakedefine HAVE_LIBILU ${HAVE_LIBILU}
 #cmakedefine HAVE_LIBILUT ${HAVE_LIBILUT}
+#cmakedefine HAVE_CAIRO ${HAVE_CAIRO}
+#cmakedefine HAVE_PANGO ${HAVE_PANGO}
 
 #ifdef HAVE_LIBQT
 #define USE_QT

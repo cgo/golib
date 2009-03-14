@@ -105,3 +105,77 @@ bool goSignal::RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& tar
 
     return true;
 }
+
+bool goSignal::toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha)
+{
+    if (target.getChannelCount() != 4)
+    {
+        goLog::error ("goSignal::toBGRA(): target must have 4 channel.");
+        return false;
+    }
+
+    ptrdiff_t target_chanBGR[] = {2, 1, 0};
+    ptrdiff_t target_chanBGRA[] = {2, 1, 0, 3};
+    ptrdiff_t source_chanRGB[] = {0, 1, 2};
+    ptrdiff_t source_chanRGBA[] = {0, 1, 2, 3};
+    ptrdiff_t source_chanI[] = {0, 0, 0};
+
+    ptrdiff_t *source_chan = 0;
+    ptrdiff_t *target_chan = 0;
+    int chan_count = 3;
+    switch (source.getChannelCount())
+    {
+        case 4:
+            {
+                source_chan = source_chanRGBA;
+                target_chan = target_chanBGRA;
+                chan_count = 4;
+            } break;
+        case 3:
+            {
+                source_chan = source_chanRGB;
+                target_chan = target_chanBGR;
+                chan_count = 3;
+            } break;
+        case 1:
+            {
+                source_chan = source_chanI;
+                target_chan = target_chanBGR;
+                chan_count = 3;
+            } break;
+        default:
+            goLog::error ("goSignal::toBGRA(): unknown source channel count");
+            break;
+    }
+
+    bool ok = convert (source, target, source_chan, target_chan, chan_count);
+    if (!ok)
+        return false;
+
+    goFloat temp = alpha;
+    if (temp == -1.0)
+    {
+        temp = target.getDataType().getMaximum ();
+    }
+
+    target.setChannel (3);
+    goFillSignal (&target, temp);
+    target.setChannel (0);
+
+    return true;
+}
+
+goAutoPtr<goSignal3D<void> > goSignal::toBGRA (goSignal3DBase<void>& source, goFloat alpha)
+{
+    goAutoPtr<goSignal3D<void> > ret = new goSignal3D<void>;
+    ret->setDataType (GO_UINT8);
+    ret->make (source.getSize(), source.getBlockSize(), source.getBorderSize(), 4);
+
+    bool ok = goSignal::toBGRA (source, *ret, alpha);
+    if (!ok)
+    {
+        ret.reset ();
+    }
+
+    return ret;
+}

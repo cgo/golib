@@ -7,11 +7,11 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g
 
 LD		= g++
-LDARGS		=  
+LDARGS		= $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGopython
+LIBS		=  -lGo -lGopython
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I/usr/include/python2.5
 

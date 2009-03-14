@@ -1,4 +1,5 @@
-INCLUDE (UsePkgConfig)
+# INCLUDE (UsePkgConfig)
+# INCLUDE (FindPkgConfig)
 PROJECT             (Gopython)
 SET                 (TARGETNAME Gopython)
 SET                 (SOURCES src/gopython.cpp)
@@ -29,5 +30,6 @@ IF(UNIX)
 ENDIF(UNIX)
 
 ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
+#STRING (STRIP ${EXTRA_LIBS} EXTRA_LIBS)
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 INSTALL_TARGETS     (/lib ${TARGETNAME})

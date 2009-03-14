@@ -412,7 +412,7 @@ namespace NSPACE
              */
             void setTics (real start, real step, real end) 
             {
-                if (start > end)
+                if (start > end || step == real(0))
                     return;
 
                 myTics.resize (0);

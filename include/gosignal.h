@@ -7,7 +7,12 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
-#include <gosignalhelper.h>
+#ifndef GOSIGNALHELPER_H
+# include <gosignalhelper.h>
+#endif
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 namespace goSignal
 {
@@ -22,6 +27,8 @@ namespace goSignal
     bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount);
 
     bool RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target);
+    bool toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha = -1.0);
+    goAutoPtr<goSignal3D<void> > toBGRA (goSignal3DBase<void>& source, goFloat alpha = -1.0);
 };
 
 #endif

@@ -108,7 +108,6 @@ template <class T> class goFixedArray
             {
                 if (myArray)
                 {
-                    goSize_t end = mySize;
                     for (goSize_t i = 0; i < mySize; ++i)
                     {
                         (*this)(i) = other (i);

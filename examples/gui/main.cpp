@@ -4,6 +4,7 @@
 #include <gothreadobject.h>
 #include <gofileio.h>
 #include <gosignalhelper.h>
+#include <gosignal.h>
 #include <gomatrix.h>
 
 #include <goplot.h>
@@ -65,6 +66,27 @@ class MyWindow : public goGUI::MainWindow
             graph2->axis (1)->setTics (20);
 
             pv->setGraph (graph2);
+
+            {
+                goSignal3D<void> i;
+                // goFileIO::readImage ("zebrabw.pgm", &i, true);
+                try
+                {
+                    goFileIO::readImage ("image.png", &i, true);
+                    goString str;
+                    goSignalInfoText (i, str);
+                    printf ("%s\n", str.toCharPtr ());
+                    goPlot::AutoPtr<goPlot::Object2DImage> obj = goPlot::object2DImage (*goSignal::toBGRA (i, 128));
+                    // goPlot::AutoPtr<goPlot::Object2DImage> obj = goPlot::object2DImage (i);
+                    goPlot::Trafo2D<goPlot::real> t (1.3 / float(i.getSizeX()), 0, 0, -1.0 / float(i.getSizeY()), 0.5, 0.5);
+                    obj->setTransform (t);
+                    graph2->add (obj);
+                }
+                catch (goException& ex)
+                {
+                    printf ("Could not load the test image, not displaying an image.\n");
+                }
+            }
             
             this->show_all_children ();
         }
