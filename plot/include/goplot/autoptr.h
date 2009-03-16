@@ -306,7 +306,7 @@ namespace NSPACE
                 bool isNull () const
                 {
                     if (!this->myRRefPtr)
-                        return false;
+                        return true;
 
                     return (this->myRRefPtr->myPtr == 0);
                     // return ((const T*)(*this) == 0);

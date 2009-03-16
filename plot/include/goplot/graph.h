@@ -88,6 +88,9 @@ namespace NSPACE
                 //= FIXME === Pointers are copied, not objects. Is that wanted?
                 myObjects = other.myObjects;
 
+                //= Also use the same transformation
+                this->setTransform (other.transform ());
+
                 return *this;
             }
 
@@ -230,6 +233,13 @@ namespace NSPACE
                 }
             }
 
+            void applyAxesTransform (cairo_t* c)
+            {
+                cairo_matrix_t M;
+                cairo_matrix_init (&M, 1.0 / myAxes[0]->length (), 0, 0, 1.0 / myAxes[1]->length (), -myAxes[0]->lower() / myAxes[0]->length(), -myAxes[1]->lower() / myAxes[1]->length());
+                cairo_transform (c, &M);
+            }
+
             /** 
              * @brief Draws axes (according to their visibilities) and all objects.
              */
@@ -242,7 +252,7 @@ namespace NSPACE
                 cairo_save (cr);
 
                 this->applyTransform (cr);
-
+                
                 //= Draw axes
                 for (int i = 0; i < int (myAxes.size ()); ++i)
                 {
@@ -250,9 +260,8 @@ namespace NSPACE
                     myAxes[i]->draw ();
                 }
 
-                cairo_matrix_t M;
-                cairo_matrix_init (&M, 1.0 / myAxes[0]->length (), 0, 0, 1.0 / myAxes[1]->length (), -myAxes[0]->lower() / myAxes[0]->length(), -myAxes[1]->lower() / myAxes[1]->length());
-                cairo_transform (cr, &M);
+                this->applyAxesTransform (cr);
+
                 //cairo_matrix_t Mo;
                 //cairo_get_matrix (cr, &Mo);
                 //cairo_matrix_multiply (&Mo, &Mo, &M);
@@ -300,6 +309,9 @@ namespace NSPACE
 
                 cairo_restore (cr);
             }
+
+        protected:
+            std::list<AutoPtr<Object2D> > objects2D () { return myObjects; }
 
         private:
             std::vector<AutoPtr<GraphAxis> > myAxes;

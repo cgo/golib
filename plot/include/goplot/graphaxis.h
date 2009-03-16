@@ -559,6 +559,12 @@ namespace NSPACE
                 if (!cr)
                     return;
 
+                if ((this->configuration () & TICS_TEXT) == 0)
+                {
+                    x1 = y1 = x2 = y2 = 0.0;
+                    return;
+                }
+
                 cairo_save (cr);
 
                 this->applyTransform (cr);

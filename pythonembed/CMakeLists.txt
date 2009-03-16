@@ -10,7 +10,13 @@ EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysc
 SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
 EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
 
-SET (EXTRA_LIBS ${EXTRA_LIBS} ${PYTHON_LDFLAGS})
+IF (EXTRA_LIBS)
+   SET (EXTRA_LIBS ${EXTRA_LIBS} ${PYTHON_LDFLAGS})
+ELSE (EXTRA_LIBS)
+   SET (EXTRA_LIBS ${PYTHON_LDFLAGS})
+ENDIF (EXTRA_LIBS)
+
+MESSAGE ("PYTHON_LDFLAGS: ${PYTHON_LDFLAGS}")
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include)

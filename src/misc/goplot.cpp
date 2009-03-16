@@ -1038,6 +1038,47 @@ bool goPlot::gnuplotList (const goList< arrayT >* arrayListX,
 //    return points;
 //}
 
+/** 
+ * @brief Create a goPlot::AutoPtr<goPlot::Object2DImage> for use with the goPlot library.
+ * 
+ * The given 2D image \c img is copied into a \c goPlot::Object2DImage.
+ * If \c img has 3 or 4 channels, they are interpreted as RGB / RGBA
+ * and converted to ARGB32 for display.
+ * 1-channel images are converted to A8 format, which is only an alpha.
+ * It may be a good idea to change this.
+ *
+ * @todo Convert 1-channel images also to ARGB32
+ *
+ * @param img The 2D source image.
+ * 
+ * @return The goPlot::AutoPtr to the image object.
+ */
+goPlot::AutoPtr<goPlot::Object2DImage> goPlot::object2DImage (const goSignal3DBase<void>& img)
+{
+    int format = goPlot::Object2DImage::ARGB32;
+
+    switch (img.getChannelCount ())
+    {
+        case 4:
+        case 3: format = goPlot::Object2DImage::ARGB32;
+                printf ("Format: ARGB32\n");
+                break;
+        case 1: format = goPlot::Object2DImage::A8;
+                printf ("Format: A8\n");
+                break;
+        default: goLog::error ("goPlot::object2DImage(): unknown channel count.");
+                 break;
+    }
+
+    goPlot::AutoPtr<goPlot::Object2DImage> ret = new goPlot::Object2DImage;
+
+    ret->createImage (format, img.getSizeX(), img.getSizeY());
+
+    int strides[] = {1, ret->stride(), ret->stride() * ret->height()}; 
+    goCopySignalArray<unsigned char> (&img, ret->data (), strides);
+
+    return ret;
+}
 
 #define GOPLOT_INSTANTIATE(TYPE) \
 template bool goPlot::gnuplot< TYPE > (const TYPE& a, const char* title, const char* plotCommands, const char* prefixCommands, const char* shellPostfix, goString* cmdFileNameRet, goString* dataFileNameRet, bool waitfor);

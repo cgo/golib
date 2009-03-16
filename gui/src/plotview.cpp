@@ -13,6 +13,8 @@ goGUI::PlotView::~PlotView ()
 void goGUI::PlotView::setGraph (goAutoPtr<goPlot::Graph> g)
 {
     myGraph = g;
+
+    // printf ("PlotView::setGraph(): graph trafo: %f %f %f %f\n", myGraph->transform().xx, myGraph->transform().xy, myGraph->transform().yx, myGraph->transform().yy);
 }
 
 bool goGUI::PlotView::on_expose_event (GdkEventExpose* event)

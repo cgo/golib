@@ -409,16 +409,6 @@ ENDIF (LINK_GFORTRAN)
 
 SET (EXTRA_INCLUDE_PATH "")
 
-IF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
-    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
-    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
-    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
-ENDIF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
-
-IF (BUILD_PYTHON_EMBED)
-    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/pythonembed)
-ENDIF (BUILD_PYTHON_EMBED)
-
 ## Cairo and Pango (for use of the goPlot library)
 pkg_search_module (CAIRO REQUIRED cairo)
 pkg_search_module (PANGO REQUIRED pango)
@@ -516,6 +506,15 @@ INSTALL_TARGETS     (/lib ${TARGETNAME})
 #    SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS ${PYTHON_LDFLAGS})
 #ENDIF (BUILD_PYTHON_EMBED)
 
+IF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
+    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
+    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
+    EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
+ENDIF (BUILD_PYTHON_EMBED OR BUILD_PYTHON_MODULE)
+
+IF (BUILD_PYTHON_EMBED)
+    ADD_SUBDIRECTORY (${PROJECT_SOURCE_DIR}/pythonembed)
+ENDIF (BUILD_PYTHON_EMBED)
 
 # If the the environment variable MATLAB is set, assume the matlab module
 # should be built. This creates the build directory, but it is not

@@ -631,33 +631,7 @@ namespace goPlot
             return points;
         }
 
-        goPlot::AutoPtr<goPlot::Object2DImage> object2DImage (const goSignal3DBase<void>& img)
-        {
-            int format = goPlot::Object2DImage::ARGB32;
-
-            switch (img.getChannelCount ())
-            {
-                case 4:
-                case 3: format = goPlot::Object2DImage::ARGB32;
-                        printf ("Format: ARGB32\n");
-                        break;
-                case 1: format = goPlot::Object2DImage::A8;
-                        printf ("Format: A8\n");
-                        break;
-                default: goLog::error ("goPlot::object2DImage(): unknown channel count.");
-                         break;
-            }
-
-            goPlot::AutoPtr<goPlot::Object2DImage> ret = new goPlot::Object2DImage;
-
-            ret->createImage (format, img.getSizeX(), img.getSizeY());
-
-            int strides[] = {1, ret->stride(), ret->stride() * ret->height()}; 
-            goCopySignalArray<unsigned char> (&img, ret->data (), strides);
-
-            return ret;
-        }
-
+        goPlot::AutoPtr<goPlot::Object2DImage> object2DImage (const goSignal3DBase<void>& img);
 }
 
 #endif

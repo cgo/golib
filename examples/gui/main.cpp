@@ -10,6 +10,7 @@
 #include <goplot.h>
 #include <gogui/plotview.h>
 #include <goplot/graph.h>
+#include <goplot/layout.h>
 
 class MyWindow : public goGUI::MainWindow
 {
@@ -47,6 +48,7 @@ class MyWindow : public goGUI::MainWindow
             graph->add (goPlot::object2D (M));
 
             goAutoPtr<goPlot::Graph> graph2 = new goPlot::Graph;
+            // graph2->setTransform (goPlot::Trafo2D<goPlot::real> (0.1, 0.0, 0.0, 0.1, 0.1, 0.1));
             goVectorf y (100);
             goVectorf x (100);
             for (int i = 0; i < y.getSize(); ++i)
@@ -56,6 +58,17 @@ class MyWindow : public goGUI::MainWindow
             }
             goPlot::AutoPtr<goPlot::Object2DPoints<goPlot::Points2DMatrix<goFloat>, goFloat> > obj = goPlot::object2D (x,y);
             obj->lineTraits ().setColour (goPlot::RGBA (1.0, 0.0, 0.0, 1.0));
+            obj->lineTraits ().setWidth (2.0);
+
+            //goPlot::Layout* layout = new goPlot::Layout;
+            //layout->setSize (2,2);
+            //graph2.getRRefPtr()->incRef ();
+            //graph.getRRefPtr()->incRef ();
+            //layout->setGraph (&*graph2, 0, 0);
+            //layout->setGraph (&*graph, 1, 1, 1, 1);
+
+            //goAutoPtr<goPlot::Graph> lg = new goPlot::Graph;
+            //lg->add (layout);
 
             graph2->add (obj);
             graph2->axis (1)->setLower (goMath::min(y));
@@ -64,8 +77,16 @@ class MyWindow : public goGUI::MainWindow
             graph2->axis (0)->setUpper (goMath::max(x));
             graph2->axis (0)->setTics (20);
             graph2->axis (1)->setTics (20);
+            graph2->axis (0)->enableTics (false);
+            graph2->axis (1)->enableTics (false);
+            graph2->axis (0)->enableTicsText (false);
+            graph2->axis (1)->enableTicsText (false);
+            graph2->axis (2)->setVisible (true);
+            graph2->axis (3)->setVisible (true);
 
+            //layout->updateLayout ();
             pv->setGraph (graph2);
+            //pv->setGraph (lg);
 
             {
                 goSignal3D<void> i;
