@@ -881,7 +881,7 @@ bool goSinglePlot::addImage (const goMath::Matrixf& m, const char* title, const 
     {
         temp = plotOptions;
     }
-    if (title != "")
+    if (goString(title) != "")
     {
         temp += " title \""; temp += title; temp += "\"";
     }
@@ -927,7 +927,7 @@ bool goSinglePlot::addImage (const goMath::Matrixd& m, const char* title, const 
     {
         temp = plotOptions;
     }
-    if (title != "")
+    if (goString(title) != "")
     {
         temp += " title \""; temp += title; temp += "\"";
     }
@@ -1023,7 +1023,7 @@ bool goSinglePlot::addSphere (const char* plotOptions, goFloat radius, bool auto
     goString cmd = "cos(u)*cos(v)"; cmd += tr;
     cmd += ",cos(u)*sin(v)"; cmd += tr;
     cmd += ",sin(u)"; cmd += tr; cmd += " ";
-    if (plotOptions && plotOptions != "")
+    if (plotOptions && goString(plotOptions) != "")
     {
         cmd += plotOptions;
     }
@@ -1068,7 +1068,7 @@ bool goSinglePlot::addCurve (const goMath::Vectord& x, const goMath::Vectord& y,
     {
         temp = plotOptions;
     }
-    if (title != "")
+    if (goString(title) != "")
     {
         temp += " title \""; temp += title; temp += "\"";
     }
@@ -1141,7 +1141,7 @@ bool goSinglePlot::addCurve (const goMath::Vectorf& x, const goMath::Vectorf& y,
     {
         temp = plotOptions;
     }
-    if (title != "")
+    if (goString(title) != "")
     {
         temp += " title \""; temp += title; temp += "\"";
     }

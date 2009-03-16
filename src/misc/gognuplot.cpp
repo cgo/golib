@@ -23,7 +23,7 @@ class goGnuplotPrivate
         int pipe2[2];
 };
 
-goGnuplot::goGnuplot() : goObjectBase(), myPrivate(0)
+goGnuplot::goGnuplot (const char* program_name) : goObjectBase(), myPrivate(0)
 {
     myPrivate = new goGnuplotPrivate;
 
@@ -48,7 +48,14 @@ goGnuplot::goGnuplot() : goObjectBase(), myPrivate(0)
     // cl[2] = "\"gnuplot\"";
     // myPrivate->process.run ("bash",cl);
     goFixedArray<goString> cl (0);
-    myPrivate->process.run("gnuplot", cl);
+    if (!program_name)
+    {
+        myPrivate->process.run("gnuplot", cl);
+    }
+    else
+    {
+        myPrivate->process.run(program_name, cl);
+    }
 
     //=
     //= Close the old read/write ends which are now stdin/stdout of the child process.

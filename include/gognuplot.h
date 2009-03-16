@@ -18,7 +18,7 @@ class goGnuplotPrivate;
 class goGnuplot : public goObjectBase
 {
     public:
-        goGnuplot ();
+        goGnuplot (const char* program_name = 0);
         virtual ~goGnuplot ();
 
         bool call (const goString& command);

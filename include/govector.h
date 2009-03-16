@@ -36,7 +36,7 @@ class Vector : public goFixedArray<T>
 {
     public:
         Vector ();
-        Vector (goSize_t s, goSize_t reserve = 0, goSize_t resize_overhead = 0);
+        explicit Vector (goSize_t s, goSize_t reserve = 0, goSize_t resize_overhead = 0);
         Vector (T* ptr, goSize_t size, goIndex_t stride = 1) : goFixedArray<T> (ptr, size, stride) {};
         Vector (const goFixedArray<T>& o);
         // Vector (const goFixedArray<T>& o) : goFixedArray<T> (o) {};

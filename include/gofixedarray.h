@@ -45,7 +45,7 @@ template <class T> class goFixedArray
          * @param reserve Reserved memory in number of elements (default 0)
          * @param resize_overhead Resize overhead in number of elements (default 0)
          */
-        goFixedArray (goSize_t size = 1, goSize_t reserve = 0, goSize_t resize_overhead = 0)
+        explicit goFixedArray (goSize_t size = 1, goSize_t reserve = 0, goSize_t resize_overhead = 0) 
             : myArray (0), 
               mySize (0), 
               myReserved (0),
