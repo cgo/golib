@@ -12,6 +12,10 @@ extern "C"
  #include <clapack.h>
 }
 
+//= gets defined in f2c.h and messes up std::max and goMath::max
+#undef max
+#undef min
+
 //=
 //= These are from the clapack.h header file from netlib's clapack (not ATLAS),
 //= which you can find at http://www.netlib.org/clapack/clapack.h
@@ -38,9 +42,16 @@ extern "C" {
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, doublereal *
 	s, doublereal *rcond, integer *rank, doublereal *work, integer *lwork,
 	 integer *info);
+
+/* Subroutine */ int sposv_(char *uplo, integer *n, integer *nrhs, real *a, 
+	integer *lda, real *b, integer *ldb, integer *info);
+/* Subroutine */ int dposv_(char *uplo, integer *n, integer *nrhs, doublereal *a, 
+	integer *lda, doublereal *b, integer *ldb, integer *info);
 }
 
 namespace goMath { namespace Lapack {
+
+    void logError (integer info, const char* where = 0);
 
     template <class matrix_type, class pivot_vector>
         bool getrf (matrix_type& A, pivot_vector& ipiv);
@@ -56,6 +67,13 @@ namespace goMath { namespace Lapack {
     // FIXME
     template <class matrix_type, class vector_type>
         bool gelss (matrix_type& A, bool transA, vector_type& b, vector_type* singularValues = 0);
+    
+    template <class matrix_type, class vector_type>
+        bool posv (matrix_type& A, vector_type& b);
+
+    template <class matrix_type>
+        bool posv (matrix_type& A, matrix_type& b);
+
 
     template <class T>
     class TypeDriver
@@ -70,6 +88,8 @@ namespace goMath { namespace Lapack {
             static bool gelss (integer *m, integer *n, integer *nrhs, T *a, 
                     integer *lda, T *b, integer *ldb, T *s, T *rcond, integer *
                     rank, T *work, integer *lwork, integer *info);
+            static bool posv (char *uplo, integer *n, integer *nrhs, T *a,
+                    integer *lda, T *b, integer *ldb, integer *info);
     };
 
 }; };
@@ -241,5 +261,65 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
             &lda, b.getPtr(), &ldb, singularValues ? singularValues->getPtr() : temp_sv.getPtr(), 
             &rcond, &rank, WORK.getPtr(), &LWORK, &info);
 }
+
+/** 
+ * @brief Lapack *posv procedure for solving symmetric linear systems.
+ *
+ * @param A Symmetric matrix, no special storage, must be upper right.
+ * @param b Right hand side vector. Contains the solution if the method returns true.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class matrix_type, class vector_type>
+bool goMath::Lapack::posv (matrix_type& A, vector_type& b)
+{
+
+    //= Translated by f2c, so this uses Fortran storage (column-first). Therefore, when
+    //= saying UPLO = 'L', i.e. lower triangular, the storage must be in 'U' in the row-major
+    //= storage scheme. I.e., A is used transposed, but since it is symmetric it does not matter.
+    //= A is assumed to contain the data in the upper triangle (in row major, C-like storage).
+    char uplo = 'L';
+    integer n = b.getSize ();
+    integer nrhs = 1;
+    integer ldb = n;
+    integer lda = A.getLeadingDimension ();
+    integer info = 0;
+
+    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
+                    &lda, b.getPtr (), &ldb, &info);
+}
+
+/** 
+ * @brief Lapack *posv procedure for solving symmetric linear systems.
+ *
+ * @param A Symmetric matrix, no special storage, must be upper right.
+ * @param b Contains the right hand side vectors <b>in its rows</b>. This is due
+ * to the actual lapack routine using column major storage and we use the more C-like row major.
+ * Contains the solutions if the method returns true. The solutions are contained <b>in the rows</b>,
+ * again because of the underlying routine using column major storage.
+ * 
+ * @return True if successful, false otherwise.
+ */
+template <class matrix_type>
+bool goMath::Lapack::posv (matrix_type& A, matrix_type& b)
+{
+
+    //= Translated by f2c, so this uses Fortran storage (column-first). Therefore, when
+    //= saying UPLO = 'L', i.e. lower triangular, the storage must be in 'U' in the row-major
+    //= storage scheme. I.e., A is used transposed, but since it is symmetric it does not matter.
+    //= A is assumed to contain the data in the upper triangle (in row major, C-like storage).
+    char uplo = 'L';
+
+    //= cols and rows are swapped here, since the type driver uses LAPACK's columns first storage
+    integer n = b.getColumns ();
+    integer nrhs = b.getRows ();
+    integer ldb = b.getLeadingDimension ();
+    integer lda = A.getLeadingDimension ();
+    integer info = 0;
+
+    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
+                    &lda, b.getPtr (), &ldb, &info);
+}
+
 /** @} */
 #endif

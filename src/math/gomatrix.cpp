@@ -110,6 +110,10 @@ bool goMath::Matrix<T>::resize (goSize_t rows, goSize_t cols)
     {
         this->matrix = new T[rows * cols];
     }
+    else
+    {
+        this->matrix = 0;
+    }
     this->rows = rows;
     this->columns = cols;
     if (goMath::Matrix<T>::rowMajor)
@@ -357,13 +361,14 @@ void goMath::Matrix<T>::shiftColumns (goIndex_t offset, goMath::Matrix<T>& ret) 
  * @param endRow 
  * @param endCol 
  * @param target 
+ * @param trans    Transpose while copying (target = transpose(this))
  * 
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMath::Matrix<T>& target) const
+bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goMath::Matrix<T>& target, bool trans) const
 {
-    return this->copy (startRow, startCol, endRow, endCol, 0, 0, target);
+    return this->copy (startRow, startCol, endRow, endCol, 0, 0, target, trans);
 }
 
 /** 
@@ -379,25 +384,58 @@ bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t end
  * @param endCol   End column in this matrix (inclusive)
  * @param target_row Starting row in target
  * @param target_col Starting column in target
- * @param target     Target matrix.
- * 
+ * @param target     Target matrix
+ * @param trans    Transpose while copying (target = transpose(this))
+ *
  * @return True if successful, false otherwise.
  */
 template <class T>
-bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMath::Matrix<T>& target) const
+bool goMath::Matrix<T>::copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, goMath::Matrix<T>& target, bool trans) const
 {
     goSize_t num_rows = endRow - startRow + 1;
     goSize_t num_cols = endCol - startCol + 1;
-    if (target.getRows() - target_row < num_rows || target.getColumns() - target_col < num_cols)
+
+    if (!trans)
     {
-        goLog::warning ("goMath::Matrix::copy(): target too small. Not copying.");
-        return false;
+        if (target.getRows() - target_row < num_rows || target.getColumns() - target_col < num_cols)
+        {
+            goLog::warning ("goMath::Matrix::copy(): target too small. Not copying.");
+            return false;
+        }
+
+        goMath::Matrix<T> refM(0,0);
+        this->ref (startRow, startCol, num_rows, num_cols, refM);
+        goMath::Matrix<T> refTarget(0,0);
+        target.ref (target_row, target_col, num_rows, num_cols, refTarget);
+        refTarget = refM;
     }
-    goMath::Matrix<T> refM(0,0);
-    this->ref (startRow, startCol, num_rows, num_cols, refM);
-    goMath::Matrix<T> refTarget(0,0);
-    target.ref (target_row, target_col, num_rows, num_cols, refTarget);
-    refTarget = refM;
+    else
+        //= Copy transposed directly
+    {
+        if (target.getRows() - target_row < num_cols || target.getColumns() - target_col < num_rows)
+        {
+            goLog::warning ("goMath::Matrix::copy(): target too small. Not copying.");
+            return false;
+        }
+        
+        ptrdiff_t ld_source = this->getLeadingDimension ();
+        ptrdiff_t ld_target = target.getLeadingDimension ();
+        const T* source_p = this->getPtr() + startRow * ld_source + startCol;
+        T* target_p = target.getPtr() + target_row * ld_target + target_col;
+        for (goSize_t i = 0; i < num_cols; ++i)
+        {
+            const T* source_p_col = source_p;
+            T* target_p_row = target_p;
+            for (goSize_t j = 0; j < num_rows; ++j)
+            {
+                *target_p_row = *source_p_col;
+                ++target_p_row;
+                source_p_col += ld_source;
+            }
+            ++source_p;
+            target_p += ld_target;
+        }
+    }
 
     return true;
 }

@@ -584,6 +584,8 @@ goSize_t goSinglePlot::getColumn () const
 /** 
  * @brief Add 3D plot given by x,y,z coordinates.
  * 
+ * @note In the gnuplot prefix, add "set dgrid3d" to see a 3d grid.
+ *
  * @param x x coordinates
  * @param y y coordinates
  * @param lineLength Length of the grid in x-direction (number of elements in one line)
@@ -638,6 +640,20 @@ bool goSinglePlot::add3D (const goMath::Vectord& x, const goMath::Vectord& y,
     return true;
 }
 
+/** 
+ * @brief Add 3D plot given by x,y,z coordinates.
+ * 
+ * @note In the gnuplot prefix, add "set dgrid3d" to see a 3d grid.
+ *
+ * @param x x coordinates
+ * @param y y coordinates
+ * @param lineLength Length of the grid in x-direction (number of elements in one line)
+ * @param values z values
+ * @param title Title
+ * @param plotOptions plot options as in the other add* functions.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goSinglePlot::add3D (const goMath::Vectorf& x, const goMath::Vectorf& y,
                           goIndex_t lineLength,
                           const goMath::Vectorf& values, 

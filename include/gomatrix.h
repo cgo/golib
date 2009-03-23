@@ -71,7 +71,7 @@ namespace goMath {
                     bool resize (const Matrix<To>& o)
                     {
                         return this->resize (o.getRows(),o.getColumns());
-                    };
+                    }
 
                 void transpose ();
                 void getTranspose (Matrix<T>& trans) const;
@@ -97,21 +97,21 @@ namespace goMath {
                  * @brief Get data pointer.
                  * @return Pointer to the matrix array.
                  */
-                inline T*       getData   () { return this->matrix; };
+                inline T*       getData   () { return this->matrix; }
                 /** 
                  * @brief Get data pointer.
                  * @return Const pointer to the matrix array.
                  */
-                inline const T* getData   () const { return this->matrix; };
+                inline const T* getData   () const { return this->matrix; }
 
                 /** 
                  * @brief Get data pointer. Same as getData().
                  */
-                inline T*       getPtr    () { return this->matrix; };
+                inline T*       getPtr    () { return this->matrix; }
                 /** 
                  * @brief Get data pointer. Same as getData().
                  */
-                inline const T* getPtr    () const { return this->matrix; };
+                inline const T* getPtr    () const { return this->matrix; }
 
                 /** 
                  * @brief Get number of columns.
@@ -121,7 +121,7 @@ namespace goMath {
                 inline goSize_t   getColumns () const 
                 { 
                     return this->columns;
-                };
+                }
                 /** 
                  * @brief Get number of rows.
                  * 
@@ -130,7 +130,7 @@ namespace goMath {
                 inline goSize_t   getRows () const 
                 { 
                     return this->rows;
-                };
+                }
 
                 /** 
                  * @brief Get the leading dimension.
@@ -149,16 +149,16 @@ namespace goMath {
                 inline goSize_t getLeadingDimension () const
                 {
                     return this->leadingDimension;
-                };
+                }
 
                 T sum () const;
                 void sum (int dimension, Matrix<T>& ret) const;
                 void sum (int dimension, goMath::Vector<T>& ret) const;
 
                 // TNT compatibility methods BEGIN
-                inline int        dim1 () const { return this->getRows(); };
-                inline int        dim2 () const { return this->getColumns(); };
-                inline const Matrix<T>& copy () const { return *this;};  // NOTE: Makes a deep copy here
+                inline int        dim1 () const { return this->getRows(); }
+                inline int        dim2 () const { return this->getColumns(); }
+                inline const Matrix<T>& copy () const { return *this;}  // NOTE: Makes a deep copy here
                 // and a reference in TNT
                 // TNT compatibility methods END  
 
@@ -181,10 +181,10 @@ namespace goMath {
                         goSize_t num_rows, goSize_t num_cols, Matrix<T>& refMatrix)
                 {
                     refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
-                };
+                }
 
-                bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, Matrix<T>& target) const;
-                bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, Matrix<T>& target) const;
+                bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, Matrix<T>& target, bool trans = false) const;
+                bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, Matrix<T>& target, bool trans = false) const;
                 bool copy (Matrix<T>& target) const;
 
                 /** 
@@ -206,7 +206,7 @@ namespace goMath {
                         goSize_t num_rows, goSize_t num_cols, const Matrix<T>& refMatrix) const
                 {
                     const_cast<Matrix<T>&>(refMatrix).setData (const_cast<T*>(&(*this)(startRow,startColumn)), num_rows, num_cols, this->getLeadingDimension());
-                };
+                }
 
                 /** 
                  * @brief Makes a vector reference a row from this matrix.
@@ -219,7 +219,7 @@ namespace goMath {
                 inline void              refRow    (goSize_t row, goMath::Vector<T>& v)
                 {
                     v.setData (&(*this)(row,0), this->getColumns(), 1);
-                };
+                }
                 /** 
                  * @brief Reference to a sub row.
                  * 
@@ -231,7 +231,7 @@ namespace goMath {
                 inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, goMath::Vector<T>& v)
                 {
                     v.setData (&(*this)(row,column), length, 1);
-                };
+                }
 
                 inline void setRow (goSize_t row, const goMath::Vector<T>& v)
                 {
@@ -241,7 +241,7 @@ namespace goMath {
                     {
                         (*this)(row, i) = v[i];
                     }
-                };
+                }
 
                 inline void setColumn (goSize_t col, const goMath::Vector<T>& v)
                 {
@@ -251,7 +251,7 @@ namespace goMath {
                     {
                         (*this)(i, col) = v[i];
                     }
-                };
+                }
 
                 /** 
                  * @brief Const reference to row.
@@ -267,7 +267,7 @@ namespace goMath {
                 inline void              refRow    (goSize_t row, const goMath::Vector<T>& v) const
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,0)), this->getColumns(), 1);
-                };
+                }
                 /** 
                  * @brief Reference to a sub row.
                  * 
@@ -279,7 +279,7 @@ namespace goMath {
                 inline void              refRow    (goSize_t row, goSize_t column, goSize_t length, const goMath::Vector<T>& v) const
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, 1);
-                };
+                }
 
                 /** 
                  * @brief Makes a vector reference a column from this matrix.
@@ -292,7 +292,7 @@ namespace goMath {
                 inline void              refColumn (goSize_t column, goMath::Vector<T>& v)
                 {
                     v.setData (&(*this)(0,column), this->getRows(), this->getLeadingDimension());
-                };
+                }
                 /** 
                  * @brief Reference to a sub column.
                  * 
@@ -304,7 +304,7 @@ namespace goMath {
                 inline void              refColumn (goSize_t row, goSize_t column, goSize_t length, goMath::Vector<T>& v)
                 {
                     v.setData (&(*this)(row,column), length, this->getLeadingDimension());
-                };
+                }
 
                 /** 
                  * @brief Const reference to column.
@@ -320,7 +320,7 @@ namespace goMath {
                 inline void              refColumn    (goSize_t column, const goMath::Vector<T>& v) const
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(0,column)), this->getRows(), this->getLeadingDimension());
-                };
+                }
                 /** 
                  * @brief Reference to a sub column.
                  * 
@@ -332,7 +332,7 @@ namespace goMath {
                 inline void              refColumn    (goSize_t row, goSize_t column, goSize_t length, const goMath::Vector<T>& v) const
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, this->getLeadingDimension());
-                };
+                }
 
                 /** 
                  * @brief Copies a row to vector vRet.
@@ -355,7 +355,7 @@ namespace goMath {
                         {
                             vRet[i] = (*this)(row, i);
                         }
-                    };
+                    }
 
                 /** 
                  * @brief Copied a column to vector vRet.
@@ -378,7 +378,7 @@ namespace goMath {
                         {
                             vRet[i] = (*this)(i, col);
                         }
-                    };
+                    }
 
                 void swapRows (goIndex_t i1, goIndex_t i2)
                 {
@@ -393,7 +393,7 @@ namespace goMath {
                         ref1[i] = ref2[i];
                         ref2[i] = temp;
                     }
-                };
+                }
 
                 void swapColumns (goIndex_t i1, goIndex_t i2)
                 {
@@ -408,27 +408,27 @@ namespace goMath {
                         ref1[i] = ref2[i];
                         ref2[i] = temp;
                     }
-                };
+                }
 
                 inline T&                operator() (goIndex_t i, goIndex_t j)
                 {
                     assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
                     assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
                     return this->matrix[i * this->leadingDimension + j];
-                };
+                }
                 inline const T&          operator() (goIndex_t i, goIndex_t j) const
                 {
                     assert (i >= 0 && i < static_cast<goIndex_t>(this->rows));
                     assert (j >= 0 && j < static_cast<goIndex_t>(this->columns));
                     return this->matrix[i * this->leadingDimension + j];
-                };
+                }
 
                 void operator () (goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2, Matrix<T>& target) const;
                 void operator () (const Matrix<T>& source, goIndex_t i1, goIndex_t j1, goIndex_t i2, goIndex_t j2);
 
                 //= Handle these with care. They use the plain pointer, no leading dimension.
-                inline T&       operator[] (goSize_t index) { return this->matrix[index]; };
-                inline const T& operator[] (goSize_t index) const { return this->matrix[index]; };
+                inline T&       operator[] (goSize_t index) { return this->matrix[index]; }
+                inline const T& operator[] (goSize_t index) const { return this->matrix[index]; }
 
 
                 /** 
@@ -474,14 +474,14 @@ namespace goMath {
                         }
                     }
                     return *this;
-                };
+                }
 
                 inline Matrix<T> operator* (T scalar)
                 {
                     Matrix<T> temp = *this;
                     temp *= scalar;
                     return temp;
-                };
+                }
 
                 /** 
                  * @brief Division by a scalar.
@@ -497,7 +497,7 @@ namespace goMath {
                         *this *= T(1) / scalar;
                     }
                     return *this;
-                };
+                }
 
                 bool multiplyElements (const Matrix<T>& other);
 
@@ -510,7 +510,7 @@ namespace goMath {
                 inline void setUnity()
                 {
                     this->setIdentity();
-                };
+                }
 
                 void setIdentity();
 
@@ -529,7 +529,7 @@ namespace goMath {
                         std::cout << "\n";
                     }
                     std::cout << std::endl;
-                };
+                }
 
                 bool writeASCII (FILE* f) const;
                 bool writeASCII (const char* fname) const;

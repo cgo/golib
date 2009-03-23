@@ -122,5 +122,53 @@ namespace goMath { namespace Lapack {
         return true;
     }
 
+
+    template<> bool TypeDriver<goFloat>::posv (char *uplo, integer *n, integer *nrhs, goFloat *a,
+                    integer *lda, goFloat *b, integer *ldb, integer *info)
+    {
+        printf ("posv with %c %d %d %d %d\n", *uplo, *n, *nrhs, *lda, *ldb);
+        sposv_ (uplo, n, nrhs, a, lda, b, ldb, info);
+        if (*info != 0)
+        {
+            logError (*info, "goMath::Lapack::TypeDriver::sposv()");
+            return false;
+        }
+        return true;
+    }
+
+    template<> bool TypeDriver<goDouble>::posv (char *uplo, integer *n, integer *nrhs, goDouble *a,
+                    integer *lda, goDouble *b, integer *ldb, integer *info)
+    {
+        dposv_ (uplo, n, nrhs, a, lda, b, ldb, info);
+        if (*info != 0)
+        {
+            logError (*info, "goMath::Lapack::TypeDriver::dposv()");
+            return false;
+        }
+        return true;
+    }
+
+    void logError (integer info, const char* where)
+    {
+        if (info < 0)
+        {
+            goString s;
+            if (where)
+                s = where;
+
+            s += ": Illegal value of one or more arguments. No computation performed.";
+            goLog::warning (s.toCharPtr ());
+        }
+        else if (info > 0)
+        {
+            goString s;
+            if (where)
+                s = where;
+
+            s += ": Failure in the course of computation.";
+            goLog::warning (s.toCharPtr ());
+        }
+    }
+
 }; };
 

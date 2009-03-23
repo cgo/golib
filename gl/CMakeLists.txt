@@ -1,4 +1,3 @@
-INCLUDE (UsePkgConfig)
 INCLUDE (FindOpenGL)
 SET                 (TARGETNAME Gogl)
 SET                 (SOURCES 
