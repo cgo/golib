@@ -103,7 +103,11 @@
  */
 /*!
  * \defgroup math Mathematics and numerics
- *  \section math-la Linear Algebra Objects
+ */
+ /*!
+  * \ingroup math
+  * \defgroup mathla Linear Algebra
+ *  \section math-las Linear Algebra Objects
  *  Use goMatrix and goVector for matrix and vector operations.
  *  Others, like go4Vector and such will be deprecated and replaced
  *  solely by the former two classes.
@@ -125,6 +129,11 @@
  *  a freely available implementation of a few linear algebra 
  *  algorithms.
  */
+ /*!
+  * \ingroup math
+  * \defgroup mathopt Optimisation
+  * This module contains optimisation methods for Newton type optimisation.
+  */
 /*!
  * \defgroup misc Miscellaneous and basic classes
  *  \section misc-intro Introduction
