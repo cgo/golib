@@ -49,7 +49,12 @@ extern "C" {
 	integer *lda, doublereal *b, integer *ldb, integer *info);
 }
 
-namespace goMath { namespace Lapack {
+
+    /*! 
+     * \addtogroup mathla
+     * @{
+     */
+    namespace Lapack {
 
     void logError (integer info, const char* where = 0);
 
@@ -92,10 +97,13 @@ namespace goMath { namespace Lapack {
                     integer *lda, T *b, integer *ldb, integer *info);
     };
 
-}; };
+}; 
+/*! @} */
+
+};
 
 /**
- * \addtogroup math
+ * \addtogroup mathla
  * @{
  */
 /** 

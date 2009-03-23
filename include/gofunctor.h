@@ -51,6 +51,7 @@ class goFunctorBase0 : public goFunctorBase <Tret, void, void, void, void ,void,
          * @return Any value.
          */
         virtual Tret operator () () = 0;
+        virtual Tret operator () () const = 0;
 };
 
 template <class Tret, class Targ1>
@@ -72,6 +73,7 @@ class goFunctorBase1 : public goFunctorBase <Tret, Targ1, void, void, void ,void
          * @return Any value.
          */
         virtual Tret operator () (Targ1 p) = 0;
+        virtual Tret operator () (Targ1 p) const = 0;
 };
 
 template <class Tret, class Targ1, class Targ2>
@@ -93,6 +95,7 @@ class goFunctorBase2 : public goFunctorBase <Tret, Targ1, Targ2, void, void ,voi
          * @return Any value.
          */
         virtual Tret operator () (Targ1 p, Targ2 p2) = 0;
+        virtual Tret operator () (Targ1 p, Targ2 p2) const = 0;
 };
 
 template <class Tret>
@@ -127,6 +130,14 @@ class goFunction0 : public goFunctorBase0<Tret>
             //    Tret dummy;
             //    return dummy;
            // }
+        };
+        virtual Tret operator () () const
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)();
+            }
         };
 
     private:
@@ -166,6 +177,20 @@ class goFunctor0 : public goFunctorBase0<Tret>
             //    return dummy;
            // }
         };
+
+        virtual Tret operator () () const
+        {
+            // printf ("Functor called.\n");
+            if (myObject && myFunction)
+            {
+                return (myObject->*myFunction)();
+            }
+            //else
+            //{
+            //    Tret dummy;
+            //    return dummy;
+           // }
+        }
     private:
         Tclass* myObject;
         function_t myFunction;
@@ -202,6 +227,14 @@ class goFunction1 : public goFunctorBase1<Tret, Targ1>
                 return (myFunction)(p);
             }
         };
+        virtual Tret operator () (Targ1 p) const
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)(p);
+            }
+        };
 
     private:
         function_t myFunction;
@@ -221,8 +254,8 @@ class goFunctor1 : public goFunctorBase1<Tret, Targ1>
         goFunctor1 (Tclass* object, function_t function)
             : goFunctorBase1<Tret, Targ1>(), myObject (object), myFunction (function)
         {
-        };
-        virtual ~goFunctor1 () {};
+        }
+        virtual ~goFunctor1 () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -232,6 +265,19 @@ class goFunctor1 : public goFunctorBase1<Tret, Targ1>
          * @return Whatever the set function returns.
          */
         virtual Tret operator () (Targ1 p)
+        {
+            // printf ("Functor called.\n");
+            if (myObject && myFunction)
+            {
+                return (myObject->*myFunction)(p);
+            }
+            else
+            {
+                Tret dummy;
+                return dummy;
+            }
+        };
+        virtual Tret operator () (Targ1 p) const
         {
             // printf ("Functor called.\n");
             if (myObject && myFunction)
@@ -281,6 +327,14 @@ class goFunction2 : public goFunctorBase2<Tret, Targ1, Targ2>
                 return (myFunction)(p, p2);
             }
         };
+        virtual Tret operator () (Targ1 p, Targ2 p2) const
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                return (myFunction)(p, p2);
+            }
+        };
 
     private:
         function_t myFunction;
@@ -310,6 +364,14 @@ class goFunctor2 : public goFunctorBase2<Tret, Targ1, Targ2>
          * @return Whatever the set function returns.
          */
         virtual Tret operator () (Targ1 p, Targ2 p2)
+        {
+            // printf ("Functor called.\n");
+            if (myObject && myFunction)
+            {
+                return (myObject->*myFunction)(p, p2);
+            }
+        };
+        virtual Tret operator () (Targ1 p, Targ2 p2) const
         {
             // printf ("Functor called.\n");
             if (myObject && myFunction)

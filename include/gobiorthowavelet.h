@@ -13,6 +13,10 @@
 
 class goBiorthoWaveletPrivate;
 
+/*!
+ * \addtogroup math
+ * @{
+ */
 class goBiorthoWavelet : public goObjectBase
 {
     public:
@@ -25,5 +29,5 @@ class goBiorthoWavelet : public goObjectBase
     private:
         goBiorthoWaveletPrivate* myPrivate;
 };
-
+/*! @} */
 #endif

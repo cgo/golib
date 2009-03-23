@@ -8,6 +8,13 @@
 #endif
 template <class elementT> class goKMeansPrivate;
 
+/*!
+ * \addtogroup learning
+ * @{
+ */
+/** 
+ * @brief K-means clustering
+ */
 template <class elementT>
 class goKMeans : public goObjectBase
 {
@@ -35,5 +42,7 @@ class goKMeans : public goObjectBase
     private:
         goKMeansPrivate<elementT>* myPrivate;
 };
-
+/*!
+ * @} 
+ */
 #endif

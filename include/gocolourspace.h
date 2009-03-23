@@ -16,6 +16,11 @@
 //= stores YUV data.
 //= goYUV420P_RGB() is actually doing the job.
 
+/*!
+ * \addtogroup signal
+ * \addtogroup video
+ * @{
+ */
 static inline goFloat goYUV422_Red (goUInt8 yuv)
 {
     // Y + 1.14 * V
@@ -49,6 +54,7 @@ static inline goFloat goYUV422_Blue (goUInt8 y, goUInt8 u, goUInt8 v)
     return (static_cast<float>(y) - 
             2.032 * static_cast<float>(u)) / 255.0;
 }
+/*! @} */
 
 /** 
  * \addtogroup video

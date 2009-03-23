@@ -16,7 +16,7 @@
 // template <class T> class goMath::Vector;
 
 namespace goMath {
-    /** \addtogroup math 
+    /** \addtogroup mathla
      * @{ */
 
     /*!

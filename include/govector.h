@@ -17,7 +17,7 @@ namespace goMath {
     template <class T> class Matrix;
 
 /**
- * @addtogroup math
+ * @addtogroup mathla
  * @{
  */
 /** 
@@ -34,6 +34,8 @@ namespace goMath {
 template<class T>
 class Vector : public goFixedArray<T>
 {
+    public:
+        typedef T value_type;
     public:
         Vector ();
         explicit Vector (goSize_t s, goSize_t reserve = 0, goSize_t resize_overhead = 0);

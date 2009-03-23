@@ -13,7 +13,7 @@ namespace goMath
  */
 
 /* 
- * \addtogroup math
+ * \addtogroup mathla
  * @{
  */
 /*

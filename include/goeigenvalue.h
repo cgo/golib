@@ -12,7 +12,7 @@ namespace goMath
 {
 
 /** 
- * \addtogroup math
+ * \addtogroup mathla
  * @{
  */
     goSize_t complexEigenvaluesHermite (const goMath::Matrix<goComplexf>& m, goMath::Vectorf& eigenvaluesRet, goFixedArray< goMath::Vector<goComplexf> >* eigenvectorsRet = 0);
