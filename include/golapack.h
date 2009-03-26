@@ -50,6 +50,8 @@ extern "C" {
 }
 
 
+namespace goMath {
+
     /*! 
      * \addtogroup mathla
      * @{
@@ -99,7 +101,6 @@ extern "C" {
 
 }; 
 /*! @} */
-
 };
 
 /**
