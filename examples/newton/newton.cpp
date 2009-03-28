@@ -3,7 +3,10 @@
 #include <govector.h>
 #include <gomatrix.h>
 #include <gonewton.h>
+#include <goopt.h>
+#include <gobarrieropt.h>
 #include <goplot.h>
+#include <gofunctor.h>
 
 typedef goFloat REAL;
 typedef goVector<REAL> vector_type;
@@ -14,11 +17,11 @@ REAL ff (const vector_type& x)
     return ( (x * x) ) * 0.5 + 4;
 }
 
-    class Function : public goMath::NewtonOptFunction <matrix_type, vector_type>
+    class Function : public goMath::OptFunction <matrix_type, vector_type>
     {
         public:
             Function () 
-                : goMath::NewtonOptFunction <matrix_type, vector_type> () { };
+                : goMath::OptFunction <matrix_type, vector_type> () { };
             ~Function () { };
 
             virtual REAL operator () (const vector_type& x) const
@@ -28,11 +31,11 @@ REAL ff (const vector_type& x)
             }
     };
 
-    class Function2D : public goMath::NewtonOptFunction <matrix_type, vector_type>
+    class Function2D : public goMath::OptFunction <matrix_type, vector_type>
     {
         public:
             Function2D ()
-                : goMath::NewtonOptFunction <matrix_type, vector_type> (),
+                : goMath::OptFunction <matrix_type, vector_type> (),
                   A (2, 2),
                   c (2)
                 { 
@@ -53,8 +56,44 @@ REAL ff (const vector_type& x)
             vector_type c;
     };
 
+//= Inequality constraints
+REAL f1 (const vector_type& x)
+{
+    // |x| >= 1
+    return REAL(1) - ::sqrt (x * x);
+}
+
 int main ()
 {
+
+    //= Do log barrier interior point
+    {
+        goAutoPtr<Function2D> f (new Function2D);
+        goAutoPtr<goMath::OptProblem <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> > problem (new goMath::OptProblem <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> (f));
+        problem->addIneqCon (new goMath::OptFunctor<matrix_type, vector_type> (goFunction <REAL, const vector_type&> (f1)));
+
+        {
+            matrix_type* A = new matrix_type;
+            A->resize (1, 2);
+            REAL A_[] = { 1.0, 1.0 };
+            *A = matrix_type (A_, 1, 2);
+            vector_type* b = new vector_type (1);
+            (*b)[0] = 1.0;
+
+            problem->setEqCon (A, b);
+        }
+
+        goMath::BarrierOpt <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> bo (problem);
+
+        vector_type x (2);
+        x[0] = 10.0;
+        x[1] = 10.0;
+
+        bo.solveDirect (x);
+
+        exit (1);
+    }
+
 //= Do 2D Newton
     {
         Function2D f;
@@ -141,8 +180,8 @@ int main ()
 //= Do 1D Newton, and try the functor interface.
     // Function f;
     // goMath::NewtonOpt <Function, REAL> newton (f);
-    goMath::NewtonOptFunctor <matrix_type, vector_type> f (new goFunction1 <REAL, const vector_type&> (ff));
-    goMath::NewtonOpt <goMath::NewtonOptFunctor<matrix_type, vector_type>, REAL> newton (f);
+    goMath::OptFunctor <matrix_type, vector_type> f (new goFunction1 <REAL, const vector_type&> (ff));
+    goMath::NewtonOpt <goMath::OptFunctor<matrix_type, vector_type>, REAL> newton (f);
 
     vector_type g;
     vector_type x (1);

@@ -14,6 +14,8 @@
 # include <gofunctor.h>
 #endif
 
+#include <vector>
+
 namespace goMath
 {
 /** \addtogroup mathopt
@@ -194,14 +196,14 @@ namespace goMath
             };
 
 
-        template <class callable_, class matrix_type, class vector_type>
+        template <class matrix_type, class vector_type>
             class OptProblem
             {
                 public:
-                    typedef callable_::value_type value_type;
+                    typedef typename matrix_type::value_type value_type;
                     
                 public:
-                    OptProblem (goAutoPtr<callable_> f)
+                    OptProblem (goAutoPtr<OptFunction> f)
                         : myF (f),
                           myIneqCon (),
                           myEqCon_A (0),
@@ -224,12 +226,12 @@ namespace goMath
                         myEqCon_b = b;
                     }
 
-                    goAutoPtr<callable_>& f ()
+                    goAutoPtr<OptFunction>& f ()
                     {
                         return myF;
                     }
 
-                    goAutoPtr<callable_>& ineq (goSize_t i)
+                    goAutoPtr<OptFunction>& ineq (goSize_t i)
                     {
                         return myIneqCon[i];
                     }
@@ -250,8 +252,8 @@ namespace goMath
                     }
 
                 private:
-                    goAutoPtr<callable_>                myF;
-                    std::vector<goAutoPtr<callable_> >  myIneqCon;
+                    goAutoPtr<OptFunction>           myF;
+                    std::vector<goAutoPtr<OptFunction> >  myIneqCon;
                     goAutoPtr<matrix_type>  myEqCon_A;
                     goAutoPtr<vector_type>  myEqCon_b;
             };
