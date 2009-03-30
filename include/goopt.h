@@ -40,7 +40,7 @@ namespace goMath
                 virtual ~OptFunction () 
                 { }
 
-                virtual value_type operator () (const vector_type& x) const = 0; 
+                virtual value_type operator () (const vector_type& x) = 0; 
 
                 /** 
                  * @brief Calculate the gradient of f at x.
@@ -186,7 +186,7 @@ namespace goMath
                     * 
                     * @return f(x), the value of the functor at x
                     */
-                    virtual typename parent::value_type operator () (const vector_type& x) const
+                    virtual typename parent::value_type operator () (const vector_type& x) 
                     {
                         return (*myF) (x);
                     }
@@ -201,9 +201,10 @@ namespace goMath
             {
                 public:
                     typedef typename matrix_type::value_type value_type;
+                    typedef OptFunction <matrix_type, vector_type> function_type;
                     
                 public:
-                    OptProblem (goAutoPtr<OptFunction> f)
+                    OptProblem (goAutoPtr<function_type> f)
                         : myF (f),
                           myIneqCon (),
                           myEqCon_A (0),
@@ -215,7 +216,7 @@ namespace goMath
                     {
                     }
 
-                    void addIneqCon (goAutoPtr<callable_> f)
+                    void addIneqCon (goAutoPtr<function_type> f)
                     {
                         myIneqCon.push_back (f);
                     }
@@ -226,12 +227,12 @@ namespace goMath
                         myEqCon_b = b;
                     }
 
-                    goAutoPtr<OptFunction>& f ()
+                    goAutoPtr<function_type> f ()
                     {
                         return myF;
                     }
 
-                    goAutoPtr<OptFunction>& ineq (goSize_t i)
+                    goAutoPtr<function_type> ineq (goSize_t i)
                     {
                         return myIneqCon[i];
                     }
@@ -241,19 +242,19 @@ namespace goMath
                         return myIneqCon.size ();
                     }
 
-                    goAutoPtr<matrix_type>& eqA ()
+                    goAutoPtr<matrix_type> eqA ()
                     {
                         return myEqCon_A;
                     }
 
-                    goAutoPtr<matrix_type>& eqB ()
+                    goAutoPtr<matrix_type> eqB ()
                     {
                         return myEqCon_b;
                     }
 
                 private:
-                    goAutoPtr<OptFunction>           myF;
-                    std::vector<goAutoPtr<OptFunction> >  myIneqCon;
+                    goAutoPtr<function_type>           myF;
+                    std::vector<goAutoPtr<function_type> >  myIneqCon;
                     goAutoPtr<matrix_type>  myEqCon_A;
                     goAutoPtr<vector_type>  myEqCon_b;
             };

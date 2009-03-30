@@ -14,11 +14,12 @@ namespace goMath
    //= OptFunction (callable_) auf.
    //= Die Auessere Schleife laeuft in BarrierOpt.    
 
-   template <class callable_, class matrix_type, class vector_type>
+   template <class matrix_type, class vector_type>
         class BarrierOptFunction : public OptFunction <matrix_type, vector_type>
    {
        public:
            typedef typename OptFunction<matrix_type,vector_type>::value_type value_type;
+           typedef OptFunction<matrix_type,vector_type> function_type;
 
        public:
            BarrierOptFunction (double eps = 0.01)
@@ -44,14 +45,14 @@ namespace goMath
                return my_t;
            }
 
-           void setProblem (goAutoPtr<OptProblem <callable_, matrix_type, vector_type> > f)
+           void setProblem (goAutoPtr<OptProblem <matrix_type, vector_type> > f)
            {
                myProblem = f;
            }
 
-           virtual value_type operator () (const vector_type& x) const
+           virtual value_type operator () (const vector_type& x) 
            {
-               return (*myProblem->f())(x);
+               return (*(myProblem->f()))(x);
            }
 
            virtual void grad (vector_type& x, vector_type& ret)
@@ -157,29 +158,29 @@ namespace goMath
                //= FIXME if this gets used, add hessian and grad of myProblem->f().
            }
 
-           goAutoPtr<OptProblem<callable_, matrix_type, vector_type> >  problem ()
+           goAutoPtr<OptProblem<matrix_type, vector_type> >  problem ()
            {
                return myProblem;
            }
 
        private:
-           goAutoPtr<OptProblem<callable_, matrix_type, vector_type> > myProblem;
+           goAutoPtr<OptProblem<matrix_type, vector_type> > myProblem;
            vector_type myBufferGrad;
            matrix_type myBufferHess;
 
            value_type my_t;
    };
 
-    template <class callable_, class matrix_type, class vector_type>
+    template <class matrix_type, class vector_type>
         class BarrierOpt
         {
             public:
                 typedef typename matrix_type::value_type value_type;
-                typedef BarrierOptFunction<callable_, matrix_type, vector_type> opt_function_type;
+                typedef BarrierOptFunction<matrix_type, vector_type> opt_function_type;
 
             public:
-                BarrierOpt (goAutoPtr<OptProblem<callable_, matrix_type, vector_type> > prob)
-                    : myFunction (new BarrierOptFunction<callable_, matrix_type, vector_type>)
+                BarrierOpt (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
+                    : myFunction (new BarrierOptFunction<matrix_type, vector_type>)
                 {
                     myFunction->setProblem (prob);
                 }
@@ -190,13 +191,23 @@ namespace goMath
 
                 void solveDirect (vector_type& x)
                 {
-                    NewtonOptEq <opt_function_type, value_type> newton (*myFunction->problem()->f(), *myFunction->problem()->eqA(), *myFunction->problem()->eqB());
+                    NewtonOptEq <value_type> newton (myFunction->problem()->f(), myFunction->problem()->eqA(), myFunction->problem()->eqB());
 
                     myFunction->setT (value_type (1));
-                    newton.solveDirect (x);
-                    printf ("Function value %f\n", (*myFunction)(x));
-                    printf ("At point ");
-                    x.print ();
+                    for (goSize_t n = 0; n < 10; ++n)
+                    {
+                        newton.solveDirect (x);
+                        printf ("Function value %f\n", (*myFunction)(x));
+                        printf ("At point:\n");
+                        x.print ();
+
+                        goSize_t cnt = myFunction->problem()->ineqCount ();
+                        for (goSize_t i = 0; i < cnt; ++i)
+                        {
+                            printf ("Inequality %d: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
+                        }
+                        myFunction->setT (myFunction->t() * 2.0);
+                    }
                 }
 
             private:

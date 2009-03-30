@@ -44,12 +44,14 @@ namespace goMath
      * The function to be minimised will be of type \c callable_.
      * @param type_ A floating point type (float or double).
      */
-    template <class callable_, class type_>
+    template <class type_>
     class NewtonOpt
     {
         public:
             typedef goMath::Vector<type_> vector_type;
             typedef goMath::Matrix<type_> matrix_type;
+
+            typedef goMath::OptFunction<matrix_type, vector_type> function_type;
 
         public:
             /** 
@@ -60,7 +62,7 @@ namespace goMath
              *
              * @param f Function object that is to be minimised.
              */
-            NewtonOpt (callable_& f)
+            NewtonOpt (goAutoPtr<function_type> f)
                 : myF (f),
                   myHessian (0, 0)
             { }
@@ -71,7 +73,7 @@ namespace goMath
              * 
              * @param f Function object that is to be minimised.
              */
-            void setF (callable_& f)
+            void setF (goAutoPtr<function_type> f)
             {
                 myF = f;
             }
@@ -99,7 +101,7 @@ namespace goMath
                 while (stopping > epsilon)
                 {
                     this->step (x, dx);
-                    printf ("f == %f\n", myF(x));
+                    printf ("f == %f\n", (*myF)(x));
                     x -= dx;
                     stopping = dx * dx;
                 }
@@ -123,7 +125,7 @@ namespace goMath
             {
                 vector_type g (x.getSize());
 
-                this->myF.grad (x, g);
+                this->myF->grad (x, g);
                 return x * g;
             }
 
@@ -145,8 +147,8 @@ namespace goMath
                     ret.setSize (sz);
                 }
 
-                this->myF.hessian (x, myHessian);
-                this->myF.grad (x, ret);
+                this->myF->hessian (x, myHessian);
+                this->myF->grad (x, ret);
                 if (!goMath::Lapack::posv (myHessian, ret))
                 {
                     printf ("******************* posv FAILED! ********************\n");
@@ -155,7 +157,7 @@ namespace goMath
 
         protected:
             // double myEpsilon;
-            callable_ myF;
+            goAutoPtr<function_type> myF;
 
             matrix_type myHessian; //= For step calculation -- call cleanup to free memory.
     };
@@ -176,12 +178,14 @@ namespace goMath
      * \f[ \left(\begin{array}{c c} H(F) & A^\top \\ A & 0 \end{array}\right) \cdot \left( \begin{array}{c} \Delta x \\w \end{array} \right) = \left( \begin{array}{c} \nabla F(x) \\A \, x - b \end{array} \right) \f]
      * with H(F) the Hessian matrix of F.
      */
-    template <class callable_, class type_>
-    class NewtonOptEq : public NewtonOpt <callable_, type_>
+    template <class type_>
+    class NewtonOptEq : public NewtonOpt <type_>
     {
         public:
             typedef goMath::Vector<type_> vector_type;
             typedef goMath::Matrix<type_> matrix_type;
+
+            typedef goMath::OptFunction<matrix_type, vector_type> function_type;
 
         public:
             /** 
@@ -195,8 +199,8 @@ namespace goMath
              * @param b  Right hand side vector b
              * @param eps Epsilon, see NewtonOpt
              */
-            NewtonOptEq (callable_& f, goAutoPtr<matrix_type> A = 0, goAutoPtr<vector_type> b = 0)
-                : NewtonOpt <callable_, type_> (f),
+            NewtonOptEq (goAutoPtr<function_type> f, goAutoPtr<matrix_type> A = 0, goAutoPtr<vector_type> b = 0)
+                : NewtonOpt <type_> (f),
                   myA (A),
                   myB (b),
                   myKKT_A (0, 0),
@@ -238,7 +242,7 @@ namespace goMath
                     return;
                 }
                 this->initKKT (x.getSize());
-                NewtonOpt<callable_, type_>::solveDirect (x);
+                NewtonOpt<type_>::solveDirect (x);
             }
 
             /** 
@@ -246,7 +250,7 @@ namespace goMath
              */
             virtual void cleanup ()
             {
-                NewtonOpt<callable_, type_>::cleanup ();
+                NewtonOpt<type_>::cleanup ();
                 myKKT_A.resize (0, 0);
                 myKKT_b.setSize (0);
             }
@@ -315,7 +319,9 @@ namespace goMath
                     //myKKT_b.fill (0.0);
                     vector_type temp;
                     myKKT_b.ref (temp, sz, myA->getRows());
-                    
+                   
+                    // temp.fill (0.0);
+
                     temp = *myB;
                     goMath::matrixVectorMult (type_(1), *myA, false, x, type_(-1), temp);
                     // temp = *myA * x - *myB;
@@ -328,8 +334,8 @@ namespace goMath
                 //= Will hold grad F -- the rest is for Ax - b
                 myKKT_b.ref (g, 0, sz); 
 
-                this->myF.hessian (x, this->myHessian);
-                this->myF.grad (x, g);
+                this->myF->hessian (x, this->myHessian);
+                this->myF->grad (x, g);
 
                 //myKKT_A.print ();
                 //myKKT_b.print ();

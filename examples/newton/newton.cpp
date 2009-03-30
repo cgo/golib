@@ -22,9 +22,9 @@ REAL ff (const vector_type& x)
         public:
             Function () 
                 : goMath::OptFunction <matrix_type, vector_type> () { };
-            ~Function () { };
+            virtual ~Function () { };
 
-            virtual REAL operator () (const vector_type& x) const
+            virtual REAL operator () (const vector_type& x)
             {
                 // return ((x * x) * (x * x)) * 0.5 + x * x;
                 return ( (x * x) ) * 0.5 + 4;
@@ -45,9 +45,9 @@ REAL ff (const vector_type& x)
                     c[0] = 1;
                     c[1] = 1;
                 }
-            ~Function2D () { }
+            virtual ~Function2D () { }
             
-            virtual REAL operator () (const vector_type& x) const
+            virtual REAL operator () (const vector_type& x)
             {
                 return x * (A * x) + c * x;
             }
@@ -67,9 +67,10 @@ int main ()
 {
 
     //= Do log barrier interior point
+#if 1
     {
         goAutoPtr<Function2D> f (new Function2D);
-        goAutoPtr<goMath::OptProblem <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> > problem (new goMath::OptProblem <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> (f));
+        goAutoPtr<goMath::OptProblem <matrix_type, vector_type> > problem (new goMath::OptProblem <matrix_type, vector_type> (f));
         problem->addIneqCon (new goMath::OptFunctor<matrix_type, vector_type> (goFunction <REAL, const vector_type&> (f1)));
 
         {
@@ -83,7 +84,7 @@ int main ()
             problem->setEqCon (A, b);
         }
 
-        goMath::BarrierOpt <goMath::OptFunction<matrix_type, vector_type>, matrix_type, vector_type> bo (problem);
+        goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
         vector_type x (2);
         x[0] = 10.0;
@@ -93,11 +94,12 @@ int main ()
 
         exit (1);
     }
+#endif
 
 //= Do 2D Newton
     {
-        Function2D f;
-        goMath::NewtonOpt <Function2D, REAL> newton (f);
+        goAutoPtr<Function2D> f = new Function2D;
+        goMath::NewtonOpt <REAL> newton (f);
 
         vector_type x (2);
         x[0] = 10.0;
@@ -117,10 +119,10 @@ int main ()
             for (int j = 0; j < N; ++j)
             {
                 xx[1] = x1 + ( x2 - x1 ) * j / float (N - 1);
-                M (i, j) = f (xx);
+                M (i, j) = (*f) (xx);
                 points (i * N + j, 0) = xx[0];
                 points (i * N + j, 1) = xx[1];
-                points (i * N + j, 2) = f (xx);
+                points (i * N + j, 2) = (*f) (xx);
             }
         }
 
@@ -151,7 +153,7 @@ int main ()
             x[1] = 10.5;
             printf ("Ax - b = ");
             (*A * x - *b).print ();
-            goMath::NewtonOptEq <Function2D, REAL> newton (f, A, b);
+            goMath::NewtonOptEq <REAL> newton (f, A, b);
             // newton.setEq (A, b);
             newton.solveDirect (x);
 
@@ -162,7 +164,7 @@ int main ()
             x.print ();
 
             vector_type point (3);
-            point[0] = x[0]; point[1] = x[1]; point[2] = f (x);
+            point[0] = x[0]; point[1] = x[1]; point[2] = (*f) (x);
             sp.addPoint (point, "", "w p ps 4 lw 3");
         }
         goMultiPlotter mp (1,1);
@@ -180,19 +182,19 @@ int main ()
 //= Do 1D Newton, and try the functor interface.
     // Function f;
     // goMath::NewtonOpt <Function, REAL> newton (f);
-    goMath::OptFunctor <matrix_type, vector_type> f (new goFunction1 <REAL, const vector_type&> (ff));
-    goMath::NewtonOpt <goMath::OptFunctor<matrix_type, vector_type>, REAL> newton (f);
+    goMath::OptFunctor <matrix_type, vector_type>* f = new goMath::OptFunctor <matrix_type, vector_type> (new goFunction1 <REAL, const vector_type&> (ff));
+    goMath::NewtonOpt <REAL> newton (f);
 
     vector_type g;
     vector_type x (1);
     x[0] = 30;
-    f.grad (x, g);
+    f->grad (x, g);
     
     std::cout << "grad (" << x[0] << "): ";
     g.print ();
 
     matrix_type H;
-    f.hessian (x, H);
+    f->hessian (x, H);
     std::cout << "Hessian:";
     H.print ();
 
@@ -207,6 +209,7 @@ int main ()
    // }
 
 
+#if 0
     {
         goSize_t sz = 100;
         REAL x0 = -1;
@@ -221,10 +224,10 @@ int main ()
         for (goSize_t i = 0; i < sz; ++i)
         {
             x[0] = X[i];
-            fx[i] = f(x);
-            f.grad (x, g);
+            fx[i] = (*f)(x);
+            f->grad (x, g);
             dfx[i] = g[0];
-            f.hessian (x, H);
+            f->hessian (x, H);
             ddfx[i] = H (0, 0);
         }
         goGnuplot gp ("/usr/bin/gnuplot");
@@ -236,6 +239,7 @@ int main ()
         mp.addPlot (P,0);
         mp.saveGnuplot ("gnuplot.txt");
     }
+#endif
 
     return 1;
 }
