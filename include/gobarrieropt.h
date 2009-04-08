@@ -166,7 +166,7 @@ namespace goMath
                return myProblem;
            }
 
-       private:
+       protected:
            goAutoPtr<OptProblem<matrix_type, vector_type> > myProblem;
            vector_type myBufferGrad;
            matrix_type myBufferHess;
@@ -180,14 +180,13 @@ namespace goMath
        class BarrierOptFunctionPhase1 : public BarrierOptFunction<matrix_type, vector_type>
    {
        public:
-           typedef OptFunction<matrix_type, vector_type> parent;
+           typedef BarrierOptFunction<matrix_type, vector_type> parent;
            typedef matrix_type::value_type value_type;
 
            BarrierOptFunctionPhase1 (goAutoPtr<parent> p, double eps = 0.01)
-               : OptFunction <matrix_type, vector_type> (eps),
+               : BarrierOptFunction <matrix_type, vector_type> (eps),
                  myOriginalFunction (p),
                  myVector (0),
-                 myS (s)
            {
            }
 
@@ -204,38 +203,108 @@ namespace goMath
            //= Last entry of x is s
            virtual void grad (vector_type& x_s, vector_type& ret)
            {
-               const goSize_t M = myProblem->ineqCount ();
+               const goSize_t M = this->myProblem->ineqCount ();
 
-               if (ret.getSize() != x_s.getSize())
+               goSize_t x_s_sz = x_s.getSize ();
+
+               if (ret.getSize() != x_s_sz)
                {
-                   ret.setSize (x_s.getSize());
+                   ret.setSize (x_s_sz);
                }
 
                ret.fill (value_type (0));
 
-               value_type s = x_s [x_s.getSize()];
+               value_type s = x_s [x_s_sz - 1];
 
                vector_type x (0);
-               x_s.ref (x, 0, x_s.getSize() - 1);
+               x_s.ref (x, 0, x_s_sz - 1);
 
                value_type fi_x = value_type (0);
+
+               vector_type bufferGrad_x (0);
+               if (this->myBufferGrad.getSize() != x_s_sz)
+               {
+                   this->myBufferGrad.setSize (x_s_sz);
+               }
+               this->myBufferGrad.ref (bufferGrad_x, 0, x_s_sz - 1);
+
+               this->myBufferGrad [x_s_sz - 1] = 1;
+
                for (goSize_t i = 0; i < M; ++i)
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
                    //= 1 / f_i(x)
-                   fi_x = value_type(1) / ((*myProblem->ineq(i))(x) + s);
-                   myProblem->ineq(i)->grad (x, myBufferGrad);
+                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) + s);
+                   this->myProblem->ineq(i)->grad (x, bufferGrad_x);
                    goMath::vectorAdd (-fi_x, myBufferGrad, ret);
                }
 
-               myProblem->f()->grad (x, myBufferGrad);
-               goMath::vectorAdd (my_t, myBufferGrad, ret);
+               //= f(x,s) = s, d/d(x,s) f(x,s) = (0,...,0,1)^T
+               // this->myProblem->f()->grad (x, bufferGrad_x);
+               // goMath::vectorAdd (this->my_t, myBufferGrad, ret);
+               ret [x_s_sz - 1] += this->my_t * 1.0;
+           }
+
+           virtual void hessian (vector_type& x_s, matrix_type& ret)
+           {
+               const goSize_t M = this->myProblem->ineqCount ();
+               const goSize_t N = x_s.getSize ();
+
+               if (this->myBufferGrad.getSize() != N)
+               {
+                   this->myBufferGrad.setSize (N);
+               }
+
+               if (ret.getColumns() != N || ret.getRows() != N)
+               {
+                   ret.resize (N, N);
+               }
+
+               myBufferGrad.fill (value_type (0));
+               ret.fill (value_type (0));
+
+               vector_type x (0);
+               x_s.ref (x, 0, N - 1);
+
+               value_type s = x_s [N - 1];
+
+               vector_type bufferGrad_x (0);
+               this->myBufferGrad.ref (bufferGrad_x, 0, N - 1);
+               // myBufferGrad.fill (value_type(0));
+
+               this->myBufferGrad [N - 1] = 1;
+
+               matrix_type bufferHess_x (0, 0);
+               this->myBufferHess.ref (0, 0, N - 1, N - 1, bufferHess_x);
+
+               //= Boyd eq. (11.14)
+
+               value_type fi_x = value_type (0);
+
+               for (goSize_t i = 0; i < M; ++i)
+               {
+                   //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
+                   //= 1 / f_i(x)
+                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) + s);
+                   this->myProblem->ineq(i)->grad (x, bufferGrad_x);
+
+                   //= sum 1/f_i(x)^2 nabla f_i(x) (nabla f_i(x))^\top
+                   goMath::vectorOuter<value_type> (fi_x * fi_x, myBufferGrad, myBufferGrad, ret);
+
+                   myProblem->ineq(i)->hessian (x, bufferHess_x);
+                   myBufferHess *= -fi_x;
+                   ret += myBufferHess;
+               }
+
+               //= f(x,s) = s, Hess(f) = 0
+               // myProblem->f()->hessian (x, myBufferHess);
+               // myBufferHess *= my_t;
+               // ret += myBufferHess;
            }
 
        private:
            goAutoPtr<parent> myOriginalFunction;
            const vector_type myVector;
-           value_type myS;
    };
    #endif
 
@@ -317,6 +386,14 @@ namespace goMath
 
                 virtual ~BarrierOpt ()
                 {
+                }
+
+                void phase1 (vector_type& x_s)
+                {
+                    goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
+                    NewtonOptEq <value_type> newton (bop1, myFunction->problem()->eqA(), myFunction->problem()->eqB());
+
+                    newton.solveLineSearch (x_s);
                 }
 
                 void solve (vector_type& x)
