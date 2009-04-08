@@ -64,7 +64,8 @@ namespace goMath
              */
             NewtonOpt (goAutoPtr<function_type> f)
                 : myF (f),
-                  myHessian (0, 0)
+                  myHessian (0, 0),
+                  myLineSearch (1, 0.2, 0.5)
             { }
             virtual ~NewtonOpt () { }
 
@@ -108,6 +109,36 @@ namespace goMath
 
                 this->cleanup ();
             }
+
+            virtual void solveLineSearch (vector_type& x)
+            {
+                const type_ epsilon = type_ (1e-5);
+                type_ stopping = type_ (1);
+
+                vector_type dx (x.getSize ());
+
+                type_ t = type_ (1);
+                type_ fx = type_ (0);
+                vector_type nabla_fx;
+                
+                while (stopping > epsilon && t > 1e-5)
+                {
+                    this->step (x, dx);
+                    
+                    fx = (*myF)(x);
+                    myF->grad (x, nabla_fx);
+                    t = this->myLineSearch (*myF, fx, nabla_fx, x, dx);
+                    printf ("t == %.20f\n", t);
+
+                    printf ("f == %f\n", fx);
+                    stopping = dx * dx;
+                    dx *= t;
+                    x -= dx;
+                }
+
+                this->cleanup ();
+            }
+
 
              /* @brief Calculates the Newton decrement at x.
               *
@@ -160,6 +191,8 @@ namespace goMath
             goAutoPtr<function_type> myF;
 
             matrix_type myHessian; //= For step calculation -- call cleanup to free memory.
+
+            LineSearch<function_type, vector_type> myLineSearch;
     };
 
     /** 
@@ -243,6 +276,17 @@ namespace goMath
                 }
                 this->initKKT (x.getSize());
                 NewtonOpt<type_>::solveDirect (x);
+            }
+
+            virtual void solveLineSearch (vector_type& x)
+            {
+                if (this->myA.isNull () || this->myB.isNull())
+                {
+                    goLog::warning ("NewtonOptEq::solveDirect(): A or b is null. Not solving.");
+                    return;
+                }
+                this->initKKT (x.getSize());
+                NewtonOpt<type_>::solveLineSearch (x);
             }
 
             /** 

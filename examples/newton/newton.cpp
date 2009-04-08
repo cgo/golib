@@ -86,11 +86,13 @@ int main ()
 
         goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
+        bo.function()->setT (0.01);
+
         vector_type x (2);
         x[0] = 10.0;
         x[1] = 10.0;
 
-        bo.solveDirect (x);
+        bo.solve (x);
 
         exit (1);
     }

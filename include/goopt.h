@@ -21,6 +21,88 @@ namespace goMath
 /** \addtogroup mathopt
  * @{
  */
+
+    
+     /** 
+     * @brief Backtracking line search.
+     * 
+     * Searches for a sufficient decrease of f(x) in direction -dx, by repeating
+     * \f[ t = \beta \, t \f]
+     * until
+     * \f[ f(x - t \, \Delta x) > f(x) - \alpha \, t \, \nabla f(x)^\top \Delta x \f]
+     * with
+     * \f[ \alpha \in (0, 0.5), \, \beta \in (0,1) \, . \f]
+     *
+     * @par References
+     * Boyd, S. & Vandenberghe, L.: 
+     * Convex Optimization. Cambridge University Press, 2004
+     *
+     * @note \f$x - t \, \Delta x\f$ must be in the domain of \c f,
+     * so in some cases it may be necessary to choose \c t accordingly
+     * when calling this function.
+     *
+     * @param callable_ Some callable object, i.e. allowing 
+     *  <code>vector_type::value_type callable_::operator() (const vector_type&)</code>
+     * @param vector_type A vector type, e.g. goMath::Vector<>
+     *
+     * @param f Function to evaluate
+     * @param f_x Value at point \c x
+     * @param nabla_f_x Value of the gradient of \c f at \c x
+     * @param x Point at which to evaluate
+     * @param dx Direction in which to evaluate
+     * @param t Starting parameter \c t, defaults to 1
+     * @param alpha Parameter \c alpha, defaults to 0.2
+     * @param beta Parameter \c beta, defaults to 0.8
+     * 
+     * @return The value of \c t so that f(x+t*dt) is sufficiently decreasing.
+     */
+    template <class callable_, class vector_type>
+    typename vector_type::value_type backtrackingLineSearch (callable_& f,
+                                  typename vector_type::value_type f_x,
+                                  const vector_type& nabla_f_x,
+                                  const vector_type& x, 
+                                  const vector_type& dx, 
+                                  typename vector_type::value_type t = 1, 
+                                  typename vector_type::value_type alpha = 0.2, 
+                                  typename vector_type::value_type beta = 0.8)
+    {
+        typename vector_type::value_type Nfx_times_dx = nabla_f_x * dx;
+        while ( f (x - dx * t) > f_x - Nfx_times_dx * alpha * t)
+        {
+            t = beta * t;
+        }
+
+        return t;
+    }
+
+    template <class callable_, class vector_type>
+    class LineSearch
+    {
+        public:
+            LineSearch (typename vector_type::value_type t = 1, typename vector_type::value_type alpha = 0.2, typename vector_type::value_type beta = 0.5)
+                : myT (t), myAlpha (alpha), myBeta (beta)
+            { 
+            }
+
+            virtual ~LineSearch ()
+            {
+            }
+
+            typename vector_type::value_type operator() (callable_& f,
+                                                typename vector_type::value_type f_x,
+                                                const vector_type& nabla_f_x,
+                                                const vector_type& x, 
+                                                const vector_type& dx)
+            {
+                return backtrackingLineSearch<callable_, vector_type> (f, f_x, nabla_f_x, x, dx, myT, myAlpha, myBeta);
+            }
+
+        protected:
+            typename vector_type::value_type myT;
+            typename vector_type::value_type myAlpha;
+            typename vector_type::value_type myBeta;
+    };
+
      /** 
      * @brief Function interface for Newton type optimisation.
      *

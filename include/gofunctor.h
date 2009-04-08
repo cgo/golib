@@ -108,7 +108,7 @@ class goFunction0 : public goFunctorBase0<Tret>
         goFunction0 (function_t function)
             : goFunctorBase0<Tret>(), myFunction (function)
         {
-        };
+        }
         virtual ~goFunction0 () {};
 
         /** 
@@ -130,7 +130,7 @@ class goFunction0 : public goFunctorBase0<Tret>
             //    Tret dummy;
             //    return dummy;
            // }
-        };
+        }
         virtual Tret operator () () const
         {
             // printf ("Functor called.\n");
@@ -138,11 +138,12 @@ class goFunction0 : public goFunctorBase0<Tret>
             {
                 return (myFunction)();
             }
-        };
+        }
 
     private:
         function_t myFunction;
 };
+
 
 template <class Tret, class Tclass>
 class goFunctor0 : public goFunctorBase0<Tret>
