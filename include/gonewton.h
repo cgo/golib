@@ -390,6 +390,8 @@ namespace goMath
                 if (!goMath::Lapack::getrf (myKKT_A, piv))
                 {
                     printf ("****************** getrf failed! ******************\n");
+                    printf ("myKKT_A:\n");
+                    myKKT_A.print ();
                 }
                 matrix_type B (myKKT_b.getPtr(), 1, myKKT_b.getSize());
                 if (!goMath::Lapack::getrs (myKKT_A, false, B, piv))

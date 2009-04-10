@@ -399,7 +399,7 @@ class Vector : public goFixedArray<T>
                 ithis += skip + 1;
             }
             return true;
-        };
+        }
 
         template <class To>
         bool copy (To* target, goIndex_t startIndex = 0, goIndex_t skip = 0, goIndex_t lastIndex = -1) const

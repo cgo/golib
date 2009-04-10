@@ -84,13 +84,25 @@ int main ()
             problem->setEqCon (A, b);
         }
 
+        vector_type x (2);
+        x[0] = 10.0;
+        x[1] = 10.0;
+
+        vector_type x_s (x.getSize() + 1);
+        x.copy (x_s, 0, 0, x.getSize() - 1);
+        x_s [x_s.getSize() - 1] = 1;
+
+        printf ("x_s size: %d\n", x_s.getSize());
+
+        goMath::BarrierOptPhase1 <matrix_type, vector_type> phase1 (problem);
+        phase1.solve (x_s);
+        printf ("x_s after phase1:\n");
+        x_s.print ();
+
         goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
         bo.function()->setT (0.01);
 
-        vector_type x (2);
-        x[0] = 10.0;
-        x[1] = 10.0;
 
         bo.solve (x);
 

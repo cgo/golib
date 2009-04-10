@@ -7,6 +7,12 @@
 #ifndef GONEWTON_H
 # include <gonewton.h>
 #endif
+#ifndef GOMATH_H
+# include <gomath.h>
+#endif
+#ifndef GOLAPACK_H
+# include <golapack.h>
+#endif
 
 namespace goMath
 {
@@ -45,14 +51,48 @@ namespace goMath
                return my_t;
            }
 
-           void setProblem (goAutoPtr<OptProblem <matrix_type, vector_type> > f)
+
+           /** 
+           * @brief Barrier function \f$ \Phi \f$
+           * 
+           * Calculates the barrier function
+           * \f[ \Phi(x) = -\sum_{i=1}^{m} \log (-f_i(x)) \f]
+           * for all inequality constraints \f$ f_i(x) \leq 0 \f$ which obviously must be met
+           * \b strictly.
+           *
+           * @param x Point at which to calculate \f$ \Phi(x) \f$.
+           */
+           virtual value_type barrier (const vector_type& x)
            {
-               myProblem = f;
+               value_type sumLog = value_type (0);
+               goSize_t M = myProblem->ineqCount ();
+
+               for (goSize_t i = 0; i < M; ++i)
+               {
+                   sumLog -= ::log (-myProblem->ineq(i)->operator() (x));
+               }
+
+               return sumLog;
            }
 
+           void setProblem (goAutoPtr<OptProblem <matrix_type, vector_type> > p)
+           {
+               myProblem = p;
+           }
+
+           /** 
+           * @brief Calculate \f$ t \cdot f(x) + \Phi(x) \f$
+           * 
+           * @see barrier()
+           *
+           * \f$ f(x) \f$ is the original function to be minimised, \f$ \Phi(x) \f$ is the
+           * log barrier.
+           *
+           * @return \f$ t \cdot f(x) + \Phi(x) \f$
+           */
            virtual value_type operator () (const vector_type& x) 
            {
-               return (*(myProblem->f()))(x);
+               return this->my_t * (*(myProblem->f()))(x) + this->barrier (x);
            }
 
            virtual void grad (vector_type& x, vector_type& ret)
@@ -181,12 +221,11 @@ namespace goMath
    {
        public:
            typedef BarrierOptFunction<matrix_type, vector_type> parent;
-           typedef matrix_type::value_type value_type;
+           typedef typename matrix_type::value_type value_type;
 
-           BarrierOptFunctionPhase1 (goAutoPtr<parent> p, double eps = 0.01)
+           BarrierOptFunctionPhase1 (double eps = 0.01)
                : BarrierOptFunction <matrix_type, vector_type> (eps),
-                 myOriginalFunction (p),
-                 myVector (0),
+                 myVector (0)
            {
            }
 
@@ -194,13 +233,61 @@ namespace goMath
            {
            }
 
-           virtual value_type operator () (const vector_type& x)
+           /** 
+           * @brief Barrier function \f$ \Phi \f$
+           * 
+           * Calculates the barrier function
+           * \f[ \Phi(x,s) = -\sum_{i=1}^{m} \log (-f_i(x) + s) \f]
+           * for all inequality constraints \f$ f_i(x) \leq 0 \f$ which obviously must be met
+           * \b strictly.
+           *
+           * @param x_s Point at which to calculate \f$ \Phi(x,s) \f$.
+           * The last entry of vector \c x_s is \c s.
+           */
+           virtual value_type barrier (const vector_type& x_s)
            {
-               const_cast<vector_type*> (&myVector) -> setData (const_cast<valut_type*> (x.getPtr()), x.getSize() - 1, x.getStride ());
-               return (*myOriginalFunction) (myVector) - x[x.getSize() - 1];
+               value_type sumLog = value_type (0);
+               goSize_t M = this->myProblem->ineqCount ();
+
+               goSize_t N = x_s.getSize ();
+
+               value_type s = x_s [N - 1];
+               const vector_type x (0);
+               //= Rather ugly but we need this to let x_s be const (as it should be)
+               (const_cast<vector_type*> (&x))->setData (const_cast<value_type*> (x_s.getPtr()), N - 1, x_s.getStride());
+
+               for (goSize_t i = 0; i < M; ++i)
+               {
+                   sumLog -= ::log (-(this->myProblem->ineq(i)->operator() (x) - s));
+               }
+
+               return sumLog;
            }
 
-           //= Last entry of x is s
+
+           /** 
+           * @brief Calculate \f$ t \cdot f(x) + \Phi(x) \f$
+           * 
+           * @see barrier()
+           *
+           * \f$ f(x) \f$ is the original function to be minimised, \f$ \Phi(x) \f$ is the
+           * log barrier.
+           *
+           * @return \f$ t \cdot f(x) + \Phi(x) \f$
+           */
+           //virtual value_type operator () (const vector_type& x) 
+           //{
+           //    return this->my_t * (*(myProblem->f()))(x) + this->barrier (x);
+           //}
+
+           virtual value_type operator () (const vector_type& x_s)
+           {
+               // const_cast<vector_type*> (&myVector) -> setData (const_cast<value_type*> (x.getPtr()), x.getSize() - 1, x.getStride ());
+               //= s + log barrier
+               return this->t() * x_s[x_s.getSize() - 1] + this->barrier (x_s);
+           }
+
+           //= Last entry of x_s is s
            virtual void grad (vector_type& x_s, vector_type& ret)
            {
                const goSize_t M = this->myProblem->ineqCount ();
@@ -228,15 +315,15 @@ namespace goMath
                }
                this->myBufferGrad.ref (bufferGrad_x, 0, x_s_sz - 1);
 
-               this->myBufferGrad [x_s_sz - 1] = 1;
+               this->myBufferGrad [x_s_sz - 1] = -1;
 
                for (goSize_t i = 0; i < M; ++i)
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
                    //= 1 / f_i(x)
-                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) + s);
+                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) - s);
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
-                   goMath::vectorAdd (-fi_x, myBufferGrad, ret);
+                   goMath::vectorAdd (-fi_x, this->myBufferGrad, ret);
                }
 
                //= f(x,s) = s, d/d(x,s) f(x,s) = (0,...,0,1)^T
@@ -260,7 +347,17 @@ namespace goMath
                    ret.resize (N, N);
                }
 
-               myBufferGrad.fill (value_type (0));
+               if (this->myBufferHess.getRows () != N || this->myBufferHess.getColumns() != N)
+               {
+                   this->myBufferHess.resize (N, N);
+                   vector_type v (0);
+                   this->myBufferHess.refRow (N - 1, v);
+                   v.fill (0.0);
+                   this->myBufferHess.refColumn (N - 1, v);
+                   v.fill (0.0);
+               }
+
+               this->myBufferGrad.fill (value_type (0));
                ret.fill (value_type (0));
 
                vector_type x (0);
@@ -272,7 +369,7 @@ namespace goMath
                this->myBufferGrad.ref (bufferGrad_x, 0, N - 1);
                // myBufferGrad.fill (value_type(0));
 
-               this->myBufferGrad [N - 1] = 1;
+               this->myBufferGrad [N - 1] = -1;
 
                matrix_type bufferHess_x (0, 0);
                this->myBufferHess.ref (0, 0, N - 1, N - 1, bufferHess_x);
@@ -285,15 +382,15 @@ namespace goMath
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
                    //= 1 / f_i(x)
-                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) + s);
+                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) - s);
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
 
                    //= sum 1/f_i(x)^2 nabla f_i(x) (nabla f_i(x))^\top
-                   goMath::vectorOuter<value_type> (fi_x * fi_x, myBufferGrad, myBufferGrad, ret);
+                   goMath::vectorOuter<value_type> (fi_x * fi_x, this->myBufferGrad, this->myBufferGrad, ret);
 
-                   myProblem->ineq(i)->hessian (x, bufferHess_x);
-                   myBufferHess *= -fi_x;
-                   ret += myBufferHess;
+                   this->myProblem->ineq(i)->hessian (x, bufferHess_x);
+                   this->myBufferHess *= -fi_x;
+                   ret += this->myBufferHess;
                }
 
                //= f(x,s) = s, Hess(f) = 0
@@ -303,7 +400,6 @@ namespace goMath
            }
 
        private:
-           goAutoPtr<parent> myOriginalFunction;
            const vector_type myVector;
    };
    #endif
@@ -370,16 +466,16 @@ namespace goMath
        };
 #endif
 
-    template <class matrix_type, class vector_type>
+    template <class matrix_type, class vector_type, class opt_function_type = BarrierOptFunction<matrix_type, vector_type> >
         class BarrierOpt
         {
             public:
                 typedef typename matrix_type::value_type value_type;
-                typedef BarrierOptFunction<matrix_type, vector_type> opt_function_type;
+                // typedef BarrierOptFunction<matrix_type, vector_type> opt_function_type;
 
             public:
                 BarrierOpt (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
-                    : myFunction (new BarrierOptFunction<matrix_type, vector_type>)
+                    : myFunction (new opt_function_type)
                 {
                     myFunction->setProblem (prob);
                 }
@@ -388,20 +484,17 @@ namespace goMath
                 {
                 }
 
-                void phase1 (vector_type& x_s)
-                {
-                    goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
-                    NewtonOptEq <value_type> newton (bop1, myFunction->problem()->eqA(), myFunction->problem()->eqB());
-
-                    newton.solveLineSearch (x_s);
-                }
-
+                /** 
+                * @brief Solve using the log barrier interior point method.
+                * 
+                * @param x Start point, must be \b strictly \b feasible. Contains the solution on return.
+                */
                 void solve (vector_type& x)
                 {
-                    NewtonOptEq <value_type> newton (myFunction->problem()->f(), myFunction->problem()->eqA(), myFunction->problem()->eqB());
+                    NewtonOptEq <value_type> newton (myFunction, myFunction->problem()->eqA(), myFunction->problem()->eqB());
 
-                    myFunction->setT (value_type (1));
-                    for (goSize_t n = 0; n < 3; ++n)
+                    myFunction->setT (value_type (0.01));
+                    for (goSize_t n = 0; n < 10; ++n)
                     {
                         newton.solveLineSearch (x);
                         printf ("Function value %f\n", (*myFunction)(x));
@@ -409,10 +502,12 @@ namespace goMath
                         x.print ();
 
                         goSize_t cnt = myFunction->problem()->ineqCount ();
+                        
                         for (goSize_t i = 0; i < cnt; ++i)
                         {
                             printf ("Inequality %d: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
                         }
+
                         myFunction->setT (myFunction->t() * 2.0);
                     }
                 }
@@ -425,6 +520,115 @@ namespace goMath
             private:
                 goAutoPtr<opt_function_type> myFunction;
         };
+
+
+    template <class matrix_type, class vector_type, class opt_function_type = BarrierOptFunctionPhase1<matrix_type, vector_type> >
+        class BarrierOptPhase1
+        {
+            public:
+                typedef typename matrix_type::value_type value_type;
+
+            public:
+                BarrierOptPhase1 (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
+                    : myFunction (new opt_function_type)
+                {
+                    myFunction->setProblem (prob);
+                }
+
+                virtual ~BarrierOptPhase1 ()
+                {
+                }
+                
+                void solve (vector_type& x_s)
+                {
+                    goSize_t N = x_s.getSize ();
+
+                    //=
+                    //= Find an x fulfilling AA x = bb
+                    //=
+                    goSize_t m = myFunction->problem()->eqA()->getRows ();
+                    goSize_t n = myFunction->problem()->eqA()->getColumns ();
+                    if (m != myFunction->problem()->eqB()->getSize())
+                    {
+                        goString s = "BarrierOptPhase1::solve(): eqB has wrong element count. Throwing exception.";
+                        s += "\n  element count: ";
+                        s += (int)myFunction->problem()->eqB()->getSize();
+                        goLog::warning (s.toCharPtr());
+                        throw goException();
+                    }
+                    goAutoPtr<matrix_type> A (new matrix_type (m, n + 1));
+                    goAutoPtr<vector_type> b (new vector_type (m));
+
+                    vector_type v (0);
+                    A->refColumn (n, v);
+                    v.fill (0.0);
+
+                    matrix_type AA (0, 0);
+                    A->ref (0, 0, m, n, AA);
+                    AA = *myFunction->problem()->eqA();
+
+                    myFunction->problem()->eqB()->copy (*b);
+                    
+                    vector_type x (0);
+                    x_s.ref (x, 0, N - 1);
+                    b->copy (x);
+
+                    printf ("x size: %d\n", x.getSize ());
+
+                    //= Solve AA x = b
+                    matrix_type AAA (AA);
+                    goVector<int> piv;
+//                    if (!goMath::Lapack::getrf (AAA, piv) ||
+//                        !goMath::Lapack::getrs (AAA, false, x, piv))
+                    if (!goMath::Lapack::gels (AAA, false, x))
+                    {
+                        goLog::warning ("BarrierOptPhase1::solve(): gels failed. Throwing exception.");
+                        throw goException ();
+                    }
+
+                    printf ("feasible x:\n");
+                    x.print ();
+                    
+                    //=
+                    //= Find initial s so that all inequalities are met
+                    //=
+                    value_type s = value_type (0);
+                    goSize_t M = myFunction->problem()->ineqCount ();
+                    for (goSize_t i = 0; i < M; ++i)
+                    {
+                        s = goMath::max<value_type> (s, (*myFunction->problem()->ineq (i)) (x));
+                    }
+                    s *= 1.1; //= inequalities must be strictly fulfilled --- therefore, add 10%
+
+                    x_s [N - 1] = s;
+
+                    printf ("x_s:\n");
+                    x_s.print ();
+
+                    printf ("A, b:\n");
+                    A->print ();
+                    b->print ();
+
+                    //=
+                    //= Create exactly the same problem like the original, just change the equality constraints A, b so that they fit
+                    //= x_s.
+                    //=
+                    goAutoPtr<OptProblem <matrix_type, vector_type> > phase1Problem = new OptProblem <matrix_type, vector_type> (*myFunction->problem());
+                    phase1Problem->setEqCon (A, b);
+
+                    //= Solve the problem min s  s.t. f_i <= s and A x = b with the barrier method
+                    // goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
+                    BarrierOpt <matrix_type, vector_type, opt_function_type> bo (phase1Problem);  // myFunction->problem());
+                    bo.solve (x_s);
+
+                    printf ("phase 1 x_s:\n");
+                    x_s.print ();
+                }
+
+            private:
+                goAutoPtr<opt_function_type> myFunction;
+        };
+
 };
 
 #endif

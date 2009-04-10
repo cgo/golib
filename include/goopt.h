@@ -329,7 +329,7 @@ namespace goMath
                         return myEqCon_A;
                     }
 
-                    goAutoPtr<matrix_type> eqB ()
+                    goAutoPtr<vector_type> eqB ()
                     {
                         return myEqCon_b;
                     }

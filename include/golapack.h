@@ -66,6 +66,8 @@ namespace goMath {
     template <class matrix_type, class pivot_vector>
         bool getrs (const matrix_type& A, bool transA, matrix_type& B, const pivot_vector& ipiv);
     template <class matrix_type, class pivot_vector>
+        bool getrs (const matrix_type& A, bool transA, goMath::Vector<typename matrix_type::value_type>& B, const pivot_vector& ipiv);
+    template <class matrix_type, class pivot_vector>
         bool getri (matrix_type& A, const pivot_vector& ipiv);
 
     template <class matrix_type, class vector_type>
@@ -163,6 +165,19 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, matrix_type& B, c
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
     return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
+}
+
+template <class matrix_type, class pivot_vector>
+bool goMath::Lapack::getrs (const matrix_type& A, bool transA, goMath::Vector<typename matrix_type::value_type>& b, const pivot_vector& ipiv)
+{
+    int N = transA ? A.getRows() : A.getColumns();
+    //= For ATLAS, B is always just a concatenation of columns -- that is why
+    //= the solution vectors must be in the ROWS of B, since we are working
+    //= with row-major order, as usual in C. 
+    int NRHS = 1; // B.getRows();
+    // int M = transA ? A.getColumns() : A.getRows();
+    // int N = transA ? A.getRows() : A.getColumns();
+    return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), b.getPtr(), b.getSize ());
 }
 
 /** 
