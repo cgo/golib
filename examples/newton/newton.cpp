@@ -8,7 +8,7 @@
 #include <goplot.h>
 #include <gofunctor.h>
 
-typedef goFloat REAL;
+typedef goDouble REAL;
 typedef goVector<REAL> vector_type;
 typedef goMatrix<REAL> matrix_type;
 
@@ -56,11 +56,12 @@ REAL ff (const vector_type& x)
             vector_type c;
     };
 
+
 //= Inequality constraints
 REAL f1 (const vector_type& x)
 {
     // |x| >= 1
-    return REAL(1) - ::sqrt (x * x);
+    return REAL(1.5) - ::sqrt (x * x);
 }
 
 int main ()
@@ -70,9 +71,9 @@ int main ()
 #if 1
     {
         goAutoPtr<Function2D> f (new Function2D);
+
         goAutoPtr<goMath::OptProblem <matrix_type, vector_type> > problem (new goMath::OptProblem <matrix_type, vector_type> (f));
         problem->addIneqCon (new goMath::OptFunctor<matrix_type, vector_type> (goFunction <REAL, const vector_type&> (f1)));
-
         {
             matrix_type* A = new matrix_type;
             A->resize (1, 2);
@@ -101,12 +102,52 @@ int main ()
 
         goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
-        bo.function()->setT (0.01);
+        // x[0] = x_s[0]; x[1] = x_s[1];
 
-
+        //= Solve with the old (Ax=b infeasible, but inequality feasible) x:
         bo.solve (x);
 
-        exit (1);
+        {
+            goSize_t N = 40;
+            REAL from_[] = {-2, -2};
+            REAL to_[] = {2, 2};
+            goVector<REAL> from (from_, 2, 1);
+            goVector<REAL> to (to_, 2, 1);
+
+            goVector<REAL> point (2);
+
+            goMatrix<REAL> points (N * N, 3);
+            for (goSize_t i = 0; i < N; ++i)
+            {
+                point[0] = from[0] + (to[0] - from[0]) / float(N - 1) * float(i);
+                for (goSize_t j = 0; j < N; ++j)
+                {
+                    point[1] = from[1] + (to[1] - from[1]) / float(N - 1) * float(j);
+                    points (i * N + j, 0) = point[0];
+                    points (i * N + j, 1) = point[1];
+                    points (i * N + j, 2) = (*f) (point);
+                }
+            }
+
+            goMultiPlotter mp (1,1);
+            goSinglePlot p;
+           
+            goVector<REAL> xx, yy, zz;
+            points.refColumn (0, xx);
+            points.refColumn (1, yy);
+            points.refColumn (2, zz);
+
+            p.add3D (xx, yy, N, zz, "");
+            vector_type pp (3);
+            pp[0] = x[0]; pp[1] = x[1]; pp[2] = (*f)(x);
+            p.addPoint (pp, "", "w p ps 4 lw 2");
+            mp.addPlot (p, 0);
+            mp.setPrefix ("set dgrid3d 40,40\n");
+            mp.setPauseFlag (true);
+            mp.plot ();
+        }
+
+        // exit (1);
     }
 #endif
 
@@ -150,7 +191,7 @@ int main ()
             points.refColumn (0, x);
             points.refColumn (1, y);
             points.refColumn (2, v);
-            sp.add3D (x, y, N, v, "");
+            sp.add3D (x, y, N, v, "", "w pm3d");
         }
 
 

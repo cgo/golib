@@ -14,6 +14,14 @@
 # include <golapack.h>
 #endif
 
+#include <limits>
+
+//= For FE tra (debugging)
+extern "C" {
+ #include <fenv.h>
+ #include <signal.h>
+}
+
 namespace goMath
 {
    //= Idee: BarrierOpt -> ruft NewtonOptEq mit BarrierOptFunction als 
@@ -67,9 +75,21 @@ namespace goMath
                value_type sumLog = value_type (0);
                goSize_t M = myProblem->ineqCount ();
 
+               value_type op = value_type (0); 
+
                for (goSize_t i = 0; i < M; ++i)
                {
-                   sumLog -= ::log (-myProblem->ineq(i)->operator() (x));
+                   op = -myProblem->ineq(i)->operator() (x);
+                   printf ("BarrierOptFunction::barrier(): -f_%ld(x) = %f\n", i, op);
+                   if (op > value_type (0))
+                   {
+                       sumLog -= ::log (op);
+                   }
+                   else
+                   {
+                       //= Return "something large"
+                       return std::numeric_limits<value_type>::max () * value_type (0.5);
+                   }
                }
 
                return sumLog;
@@ -256,9 +276,22 @@ namespace goMath
                //= Rather ugly but we need this to let x_s be const (as it should be)
                (const_cast<vector_type*> (&x))->setData (const_cast<value_type*> (x_s.getPtr()), N - 1, x_s.getStride());
 
+               value_type op = value_type (0);
+
                for (goSize_t i = 0; i < M; ++i)
                {
-                   sumLog -= ::log (-(this->myProblem->ineq(i)->operator() (x) - s));
+                   op = -(this->myProblem->ineq(i)->operator() (x) - s);
+                   printf ("BarrierOptFunctionPhase1::barrier(): -f_%d(x) + s == %f\n", i, op);
+                   if (op > value_type (0))
+                   {
+                       sumLog -= ::log (op);
+                   }
+                   else
+                   {
+                       //= "Something large"
+                       // sumLog += std::numeric_limits<value_type>::max () / float (M + 1);
+                       return std::numeric_limits<value_type>::max () * value_type (0.5);
+                   }
                }
 
                return sumLog;
@@ -316,7 +349,6 @@ namespace goMath
                this->myBufferGrad.ref (bufferGrad_x, 0, x_s_sz - 1);
 
                this->myBufferGrad [x_s_sz - 1] = -1;
-
                for (goSize_t i = 0; i < M; ++i)
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
@@ -330,6 +362,9 @@ namespace goMath
                // this->myProblem->f()->grad (x, bufferGrad_x);
                // goMath::vectorAdd (this->my_t, myBufferGrad, ret);
                ret [x_s_sz - 1] += this->my_t * 1.0;
+
+               printf ("BarrierOptFunctionPhase1::grad: \n");
+               ret.print ();
            }
 
            virtual void hessian (vector_type& x_s, matrix_type& ret)
@@ -374,7 +409,9 @@ namespace goMath
                matrix_type bufferHess_x (0, 0);
                this->myBufferHess.ref (0, 0, N - 1, N - 1, bufferHess_x);
 
+               //=
                //= Boyd eq. (11.14)
+               //=
 
                value_type fi_x = value_type (0);
 
@@ -404,67 +441,6 @@ namespace goMath
    };
    #endif
 
-   #if 0
-   template <class matrix_type, class vector_type>
-       class BarrierOptPhase1
-       {
-           public:
-               typedef typename matrix_type::value_type value_type;
-
-               BarrierOptPhase1 ()
-                   : myS (0),
-                     myOriginalProblem (0)
-               {
-               }
-
-               virtual ~BarrierOptPhase1 ()
-               {
-               }
-
-               void phase1Basic (vector_type& x)
-               {
-                   goSize_t cnt = myOriginalProblem->problem()->ineqCount ();
-                   value_type s = value_type (0);
-
-                   //= Solve Ax = b to find a feasible x_0
-                   {
-                       goMath::Vector<int> pivot;
-                       matrix_type M (*myFunction->problem()->eqA());
-                       goMath::Lapack::getrf (M, pivot);
-                       x = *myFunction->problem()->eqB ();
-                       matrix_type B (x.getPtr(), 1, xgetSize ());
-                       goMath::Lapack::getrs (M, false, B);
-                   }
-
-                   //= Make the modified inequality conditions f_i(x) < s feasible by choosing s.
-                   for (goSize_t i = 0; i < cnt; ++i)
-                   {
-                       s = goMath::max (s, (*myFunction->problem()->ineq (i)) (x));
-                   }
-
-                   myS = s * value_type (1.2);
-
-                   //= Create problem with modified inequality constraints
-                   //= FIXME: MAke a whole new problem -- min_{x,s} s wrt f_i(x) <= s, Ax = b.
-                   goAutoPtr<OptProblem<matrix_type, vector_type> > newProblem = new OptProblem<matrix_type,vector_type> ( FIXME )
-                   newProblem->setEqCon (myOriginalProblem->eqA(), myOriginalProblem->eqB());
-
-                   for (goSize_t i = 0; i < cnt; ++i)
-                   {
-                        newProblem->addIneqCon (new OptFunctionAdd<matrix_type,vector_type> (myOriginalProblem->ineq (i)));
-                   }
-               }
-
-               value_type f (const vector_type&)
-               {
-                   
-               }
-
-           private:
-               value_type myS;
-               goAutoPtr<OptProblem<matrix_type, vector_type> > myOriginalProblem;
-       };
-#endif
 
     template <class matrix_type, class vector_type, class opt_function_type = BarrierOptFunction<matrix_type, vector_type> >
         class BarrierOpt
@@ -487,28 +463,38 @@ namespace goMath
                 /** 
                 * @brief Solve using the log barrier interior point method.
                 * 
+                * @todo Document choice of t0, mu, epsilon
+                *
                 * @param x Start point, must be \b strictly \b feasible. Contains the solution on return.
                 */
-                void solve (vector_type& x)
+                void solve (vector_type& x, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
                     NewtonOptEq <value_type> newton (myFunction, myFunction->problem()->eqA(), myFunction->problem()->eqB());
 
-                    myFunction->setT (value_type (0.01));
-                    for (goSize_t n = 0; n < 10; ++n)
+                    myFunction->setT (t0);
+                    
+                    goSize_t m = myFunction->problem()->ineqCount ();
+                        
+                    while (true)
                     {
                         newton.solveLineSearch (x);
-                        printf ("Function value %f\n", (*myFunction)(x));
+                        printf ("t * f(x) + Barrier Function value %f\n", (*myFunction)(x));
                         printf ("At point:\n");
                         x.print ();
 
-                        goSize_t cnt = myFunction->problem()->ineqCount ();
-                        
-                        for (goSize_t i = 0; i < cnt; ++i)
+                        for (goSize_t i = 0; i < m; ++i)
                         {
-                            printf ("Inequality %d: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
+                            printf ("Inequality %ld: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
+                        }
+                
+                        printf ("BarrierOpt: t = %f\n", myFunction->t());
+
+                        if (float(m) / myFunction->t() < epsilon)
+                        {
+                            break;
                         }
 
-                        myFunction->setT (myFunction->t() * 2.0);
+                        myFunction->setT (myFunction->t() * mu);
                     }
                 }
 
@@ -521,6 +507,16 @@ namespace goMath
                 goAutoPtr<opt_function_type> myFunction;
         };
 
+static void fpTraps ()
+    {
+        ::feclearexcept (FE_ALL_EXCEPT);
+        ::fedisableexcept (FE_ALL_EXCEPT);
+        ::feenableexcept (FE_DIVBYZERO | FE_INVALID);
+        // ::feenableexcept (FE_DIVBYZERO | FE_UNDERFLOW | FE_INVALID);
+        //::feenableexcept (FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW | FE_INVALID);
+        // ::fedisableexcept (FE_INEXACT);   // raised e.g. by sqrt(2)
+        // signal (SIGFPE, (sighandler_t)fpe_handler);
+    }
 
     template <class matrix_type, class vector_type, class opt_function_type = BarrierOptFunctionPhase1<matrix_type, vector_type> >
         class BarrierOptPhase1
@@ -542,6 +538,8 @@ namespace goMath
                 void solve (vector_type& x_s)
                 {
                     goSize_t N = x_s.getSize ();
+
+                    fpTraps ();
 
                     //=
                     //= Find an x fulfilling AA x = bb
@@ -576,14 +574,15 @@ namespace goMath
                     printf ("x size: %d\n", x.getSize ());
 
                     //= Solve AA x = b
-                    matrix_type AAA (AA);
-                    goVector<int> piv;
-//                    if (!goMath::Lapack::getrf (AAA, piv) ||
-//                        !goMath::Lapack::getrs (AAA, false, x, piv))
-                    if (!goMath::Lapack::gels (AAA, false, x))
                     {
-                        goLog::warning ("BarrierOptPhase1::solve(): gels failed. Throwing exception.");
-                        throw goException ();
+                        matrix_type AAA (AA);
+                        goVector<int> piv;
+
+                        if (!goMath::Lapack::gels (AAA, false, x))
+                        {
+                            goLog::warning ("BarrierOptPhase1::solve(): gels failed. Throwing exception.");
+                            throw goException ();
+                        }
                     }
 
                     printf ("feasible x:\n");
