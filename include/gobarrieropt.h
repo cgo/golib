@@ -385,6 +385,9 @@ namespace goMath
                if (this->myBufferHess.getRows () != N || this->myBufferHess.getColumns() != N)
                {
                    this->myBufferHess.resize (N, N);
+               }
+
+               {
                    vector_type v (0);
                    this->myBufferHess.refRow (N - 1, v);
                    v.fill (0.0);
@@ -422,6 +425,8 @@ namespace goMath
                    fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) - s);
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
 
+                   printf ("myBufferGrad:\n");
+                   this->myBufferGrad.print ();
                    //= sum 1/f_i(x)^2 nabla f_i(x) (nabla f_i(x))^\top
                    goMath::vectorOuter<value_type> (fi_x * fi_x, this->myBufferGrad, this->myBufferGrad, ret);
 
@@ -434,6 +439,8 @@ namespace goMath
                // myProblem->f()->hessian (x, myBufferHess);
                // myBufferHess *= my_t;
                // ret += myBufferHess;
+               printf ("BarrierOptFunctionPhase1::hessian: \n");
+               ret.print ();
            }
 
        private:
@@ -451,13 +458,36 @@ namespace goMath
 
             public:
                 BarrierOpt (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
-                    : myFunction (new opt_function_type)
+                    : myFunction (new opt_function_type),
+                      myInfeasible (true)
                 {
                     myFunction->setProblem (prob);
                 }
 
                 virtual ~BarrierOpt ()
                 {
+                }
+
+                /*! @brief Set the infeasible start point flag.
+                 *
+                 * @param i If true, the initial point is assumed to fulfill the inequality constraints,
+                 * but not necessarily the equality constraints.
+                 */
+                void setInfeasible (bool i)
+                {
+                    myInfeasible = i;
+                }
+
+                /*! @brief Get the infeasible start point flag.
+                 *
+                 * @see setInfeasible()
+                 *
+                 * @return If true, the initial point must only fulfill the inequality constraints,
+                 * but not necessarily the equality constraints.
+                 */
+                bool infeasible () const
+                {
+                    return myInfeasible;
                 }
 
                 /** 
@@ -470,6 +500,8 @@ namespace goMath
                 void solve (vector_type& x, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
                     NewtonOptEq <value_type> newton (myFunction, myFunction->problem()->eqA(), myFunction->problem()->eqB());
+
+                    newton.setInfeasible (this->myInfeasible);
 
                     myFunction->setT (t0);
                     
@@ -505,6 +537,7 @@ namespace goMath
 
             private:
                 goAutoPtr<opt_function_type> myFunction;
+                bool                         myInfeasible;
         };
 
 static void fpTraps ()
@@ -535,7 +568,7 @@ static void fpTraps ()
                 {
                 }
                 
-                void solve (vector_type& x_s)
+                void solve (vector_type& x_s, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
                     goSize_t N = x_s.getSize ();
 
@@ -618,7 +651,8 @@ static void fpTraps ()
                     //= Solve the problem min s  s.t. f_i <= s and A x = b with the barrier method
                     // goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
                     BarrierOpt <matrix_type, vector_type, opt_function_type> bo (phase1Problem);  // myFunction->problem());
-                    bo.solve (x_s);
+                    bo.setInfeasible (false);
+                    bo.solve (x_s, epsilon, mu, t0);
 
                     printf ("phase 1 x_s:\n");
                     x_s.print ();

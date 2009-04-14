@@ -238,7 +238,8 @@ namespace goMath
                   myB (b),
                   myKKT_A (0, 0),
                   myKKT_x (0),
-                  myKKT_b (0)
+                  myKKT_b (0),
+                  myInfeasible (true)
             {
             }
 
@@ -364,11 +365,16 @@ namespace goMath
                     vector_type temp;
                     myKKT_b.ref (temp, sz, myA->getRows());
                    
-                    // temp.fill (0.0);
-
-                    temp = *myB;
-                    goMath::matrixVectorMult (type_(1), *myA, false, x, type_(-1), temp);
-                    // temp = *myA * x - *myB;
+                    if (this->myInfeasible)
+                    {
+                        temp = *myB;
+                        goMath::matrixVectorMult (type_(1), *myA, false, x, type_(-1), temp);
+                        // temp = *myA * x - *myB;
+                    }
+                    else
+                    {
+                        temp.fill (0.0);
+                    }
                 }
                 
                 //= Upper left: Hessian (F)
@@ -381,11 +387,16 @@ namespace goMath
                 this->myF->hessian (x, this->myHessian);
                 this->myF->grad (x, g);
 
+                printf ("NewtonOptEq::step(): KKT_A:\n");
+                this->myKKT_A.print ();
+                printf ("NewtonOptEq::step(): KKT_b:\n");
+                this->myKKT_b.print ();
+
                 //myKKT_A.print ();
                 //myKKT_b.print ();
 
                 //= Solve myKKT_A * [delta_x w]' = myKKT_b
-#if 0
+#if 1
                 goVector<int> piv;
                 if (!goMath::Lapack::getrf (myKKT_A, piv))
                 {
@@ -399,18 +410,41 @@ namespace goMath
                     printf ("******************* getrs FAILED! ********************\n");
                 }
 #endif
-                if (!goMath::Lapack::gels (myKKT_A, false, myKKT_b))
-                {
-                    printf ("********************* gels FAILED! ********************\n");
-                }
+//                if (!goMath::Lapack::gels (myKKT_A, false, myKKT_b))
+//                {
+//                    printf ("********************* gels FAILED! ********************\n");
+//                }
                 //if (!goMath::Lapack::posv (myKKT_A, myKKT_b))
                 //{
                 //    printf ("******************* posv FAILED! ********************\n");
                 //}
 
                 ret = g;
+
+                printf ("NewtonOptEq::step(): \n");
+                ret.print ();
             }
            
+            /*! @brief Set infeasibile start point flag.
+             *
+             * @param i If true, the initial point is assumed infeasible.
+             */
+            void setInfeasible (bool i)
+            {
+                myInfeasible = i;
+            }
+
+            /*! @brief Returns the infeasibile start point flag.
+             *
+             * @see setInfeasible()
+             *
+             * If true, the initial point may be infeasible.
+             */
+            bool infeasible () const
+            {
+                return myInfeasible;
+            }
+
         protected:
             goAutoPtr<matrix_type> myA;  //= Linear equality constraints: Ax = b
             goAutoPtr<vector_type> myB;
@@ -418,6 +452,8 @@ namespace goMath
             matrix_type myKKT_A; //= KKT system: _A * _x = _b
             vector_type myKKT_x;
             vector_type myKKT_b;
+
+            bool myInfeasible;  //= If true, the initial point is assumed infeasible.
     };
 /** @} */
 
