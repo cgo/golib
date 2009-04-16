@@ -299,7 +299,7 @@ namespace goMath
 
 
            /** 
-           * @brief Calculate \f$ t \cdot f(x) + \Phi(x) \f$
+           * @brief Calculate \f$ t \cdot s + \Phi(x) \f$
            * 
            * @see barrier()
            *
@@ -308,11 +308,6 @@ namespace goMath
            *
            * @return \f$ t \cdot f(x) + \Phi(x) \f$
            */
-           //virtual value_type operator () (const vector_type& x) 
-           //{
-           //    return this->my_t * (*(myProblem->f()))(x) + this->barrier (x);
-           //}
-
            virtual value_type operator () (const vector_type& x_s)
            {
                // const_cast<vector_type*> (&myVector) -> setData (const_cast<value_type*> (x.getPtr()), x.getSize() - 1, x.getStride ());
@@ -499,6 +494,17 @@ namespace goMath
                 */
                 void solve (vector_type& x, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
+                    //NewtonOpt <value_type> *newton = 0;
+                    ////if (myFunction->problem()->eqA().isNull() && myFunction->problem()->eqB().isNull())
+                    //{
+                    //    newton = new NewtonOpt <value_type> (myFunction);
+                    //}
+                    //else
+                    //{
+                    //    newton = new NewtonOptEq <value_type> (myFunction, myFunction->problem()->eqA(), myFunction->problem()->eqB());
+                    //    ((NewtonOptEq<value_type>*)newton)->setInfeasible (this->myInfeasible);
+                    //}
+
                     NewtonOptEq <value_type> newton (myFunction, myFunction->problem()->eqA(), myFunction->problem()->eqB());
 
                     newton.setInfeasible (this->myInfeasible);
@@ -609,7 +615,6 @@ static void fpTraps ()
                     //= Solve AA x = b
                     {
                         matrix_type AAA (AA);
-                        goVector<int> piv;
 
                         if (!goMath::Lapack::gels (AAA, false, x))
                         {

@@ -396,7 +396,7 @@ namespace goMath
                 //myKKT_b.print ();
 
                 //= Solve myKKT_A * [delta_x w]' = myKKT_b
-#if 1
+#if 0
                 goVector<int> piv;
                 if (!goMath::Lapack::getrf (myKKT_A, piv))
                 {
@@ -410,10 +410,10 @@ namespace goMath
                     printf ("******************* getrs FAILED! ********************\n");
                 }
 #endif
-//                if (!goMath::Lapack::gels (myKKT_A, false, myKKT_b))
-//                {
-//                    printf ("********************* gels FAILED! ********************\n");
-//                }
+                if (!goMath::Lapack::gels (myKKT_A, false, myKKT_b))
+                {
+                    printf ("********************* gels FAILED! ********************\n");
+                }
                 //if (!goMath::Lapack::posv (myKKT_A, myKKT_b))
                 //{
                 //    printf ("******************* posv FAILED! ********************\n");

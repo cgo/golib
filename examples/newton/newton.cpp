@@ -60,8 +60,10 @@ REAL ff (const vector_type& x)
 //= Inequality constraints
 REAL f1 (const vector_type& x)
 {
+    REAL A_[] = {1, 0, 0, 1};
+    goMatrix<REAL> A (A_, 2, 2);
     // |x| >= 1
-    return REAL(1) - (x * x);
+    return REAL(1) - ((A * x) * x);
 }
 
 int main ()
@@ -96,16 +98,16 @@ int main ()
         printf ("x_s size: %d\n", x_s.getSize());
 
         goMath::BarrierOptPhase1 <matrix_type, vector_type> phase1 (problem);
-        //phase1.solve (x_s, 0.01, 2, 0.0001);
-        //printf ("x_s after phase1:\n");
-        //x_s.print ();
+        phase1.solve (x_s, 0.01, 2, 0.0001);
+        printf ("x_s after phase1:\n");
+        x_s.print ();
 
         goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
         // x[0] = x_s[0]; x[1] = x_s[1];
 
         //= Solve with the old (Ax=b infeasible, but inequality feasible) x:
-        bo.solve (x, 0.01, 2, 0.0001);
+        //bo.solve (x, 0.01, 2, 0.0001);
 
         {
             goSize_t N = 40;
