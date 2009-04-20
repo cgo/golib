@@ -93,6 +93,11 @@ int main ()
 
         vector_type x_s (x.getSize() + 1);
         x.copy (x_s, 0, 0, x.getSize() - 1);
+        //= Experiment
+        {
+            x_s[0] = 0.4;
+            x_s[1] = 1.0 - x_s[0];
+        }
         x_s [x_s.getSize() - 1] = 1;
 
         printf ("x_s size: %d\n", x_s.getSize());

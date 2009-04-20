@@ -58,3 +58,10 @@ int VCGui::redrawImage ()
     myPrivate->imageView.queue_draw ();
     return 0;
 }
+
+int main (int argc, char* argv[])
+{
+    Gtk::Main m (argc, argv);
+    VCGui gui;
+    m.run (gui);
+}

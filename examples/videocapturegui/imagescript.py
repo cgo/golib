@@ -3,7 +3,7 @@ import array
 #golib.goSignalInfoText (the_image, s)
 #print (s.toCharPtr())
 
-if False:
+if True:
     mask = golib.goVectorf ()
     # mask.setArray ([1,4,6,4,1])
     mask.setArray ([1,2,1])

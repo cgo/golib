@@ -348,9 +348,9 @@ namespace goMath
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
                    //= 1 / f_i(x)
-                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) - s);
+                   fi_x = value_type(1) / (s - (*this->myProblem->ineq(i))(x));
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
-                   goMath::vectorAdd (-fi_x, this->myBufferGrad, ret);
+                   goMath::vectorAdd (fi_x, this->myBufferGrad, ret);
                }
 
                //= f(x,s) = s, d/d(x,s) f(x,s) = (0,...,0,1)^T
@@ -402,7 +402,7 @@ namespace goMath
                this->myBufferGrad.ref (bufferGrad_x, 0, N - 1);
                // myBufferGrad.fill (value_type(0));
 
-               this->myBufferGrad [N - 1] = -1;
+               this->myBufferGrad [N - 1] = value_type (0);
 
                matrix_type bufferHess_x (0, 0);
                this->myBufferHess.ref (0, 0, N - 1, N - 1, bufferHess_x);
@@ -413,12 +413,20 @@ namespace goMath
 
                value_type fi_x = value_type (0);
 
+               vector_type ret_last_row (0), ret_last_col (0);
+               ret.refRow (N - 1, 0, N - 1, ret_last_row); //= Only the x part, size N-1
+               ret.refColumn (0, N - 1, N - 1, ret_last_col); //= Only the x part, size N-1
+
                for (goSize_t i = 0; i < M; ++i)
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
                    //= 1 / f_i(x)
-                   fi_x = value_type(1) / ((*this->myProblem->ineq(i))(x) - s);
+                   fi_x = value_type(1) / (s - (*this->myProblem->ineq(i))(x));
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
+
+                   goMath::vectorAdd (-fi_x * fi_x, bufferGrad_x, ret_last_row);
+                   goMath::vectorAdd (-fi_x * fi_x, bufferGrad_x, ret_last_col);
+                   ret (N - 1, N - 1) += fi_x * fi_x;
 
                    printf ("myBufferGrad:\n");
                    this->myBufferGrad.print ();
@@ -426,7 +434,7 @@ namespace goMath
                    goMath::vectorOuter<value_type> (fi_x * fi_x, this->myBufferGrad, this->myBufferGrad, ret);
 
                    this->myProblem->ineq(i)->hessian (x, bufferHess_x);
-                   this->myBufferHess *= -fi_x;
+                   this->myBufferHess *= fi_x;
                    ret += this->myBufferHess;
                }
 
@@ -608,12 +616,12 @@ static void fpTraps ()
                     
                     vector_type x (0);
                     x_s.ref (x, 0, N - 1);
-                    b->copy (x);
-
                     printf ("x size: %d\n", x.getSize ());
 
                     //= Solve AA x = b
+                    if (false)
                     {
+                        b->copy (x);
                         matrix_type AAA (AA);
 
                         if (!goMath::Lapack::gels (AAA, false, x))
