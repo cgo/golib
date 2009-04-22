@@ -643,7 +643,7 @@ static void fpTraps ()
                     {
                         s = goMath::max<value_type> (s, (*myFunction->problem()->ineq (i)) (x));
                     }
-                    s *= 1.1; //= inequalities must be strictly fulfilled --- therefore, add 10%
+                    s *= 1.5; //= inequalities must be strictly fulfilled --- therefore, add 10%
 
                     x_s [N - 1] = s;
 
@@ -654,11 +654,14 @@ static void fpTraps ()
                     A->print ();
                     b->print ();
 
+                    // asm ("int $3"); // Breakpoint
+
                     //=
                     //= Create exactly the same problem like the original, just change the equality constraints A, b so that they fit
                     //= x_s.
                     //=
-                    goAutoPtr<OptProblem <matrix_type, vector_type> > phase1Problem = new OptProblem <matrix_type, vector_type> (*myFunction->problem());
+                    goAutoPtr<OptProblem <matrix_type, vector_type> > phase1Problem = 
+                        new OptProblem <matrix_type, vector_type> (*myFunction->problem());
                     phase1Problem->setEqCon (A, b);
 
                     //= Solve the problem min s  s.t. f_i <= s and A x = b with the barrier method

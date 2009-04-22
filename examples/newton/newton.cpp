@@ -42,8 +42,8 @@ REAL ff (const vector_type& x)
                     REAL A_[] = {2, 0,
                                  0, 1};
                     this->A = matrix_type (A_, 2, 2);
-                    c[0] = 1;
-                    c[1] = 1;
+                    c[0] = 0;
+                    c[1] = 0;
                 }
             virtual ~Function2D () { }
             
@@ -88,7 +88,7 @@ int main ()
         }
 
         vector_type x (2);
-        x[0] = 10.0;
+        x[0] = 1.0;
         x[1] = 10.0;
 
         vector_type x_s (x.getSize() + 1);
@@ -103,7 +103,7 @@ int main ()
         printf ("x_s size: %d\n", x_s.getSize());
 
         goMath::BarrierOptPhase1 <matrix_type, vector_type> phase1 (problem);
-        phase1.solve (x_s, 0.01, 2, 0.0001);
+        phase1.solve (x_s, 0.01, 2, 1);
         printf ("x_s after phase1:\n");
         x_s.print ();
 
@@ -112,7 +112,7 @@ int main ()
         // x[0] = x_s[0]; x[1] = x_s[1];
 
         //= Solve with the old (Ax=b infeasible, but inequality feasible) x:
-        //bo.solve (x, 0.01, 2, 0.0001);
+        bo.solve (x, 0.01, 2, 0.0001);
 
         {
             goSize_t N = 40;
@@ -148,8 +148,10 @@ int main ()
             vector_type pp (3);
             pp[0] = x[0]; pp[1] = x[1]; pp[2] = (*f)(x);
             p.addPoint (pp, "", "w p ps 4 lw 2");
+            mp.setPrefix ("set dgrid3d 40,40; set xrange [-2:2]; set yrange [-2:2]; set cntrparam levels discrete 1; set contour surface\n");
+            p.add3D ("x + y");
             mp.addPlot (p, 0);
-            mp.setPrefix ("set dgrid3d 40,40\n");
+            // mp.setPrefix ("set dgrid3d 40,40\n");
             mp.setPauseFlag (true);
             mp.plot ();
         }
@@ -230,7 +232,7 @@ int main ()
             sp.addPoint (point, "", "w p ps 4 lw 3");
         }
         goMultiPlotter mp (1,1);
-        mp.setPrefix ("set dgrid3d; set xrange [-2:2]; set yrange [-2:2]; set cntrparam levels discrete 1; set contour\n");
+        mp.setPrefix ("set dgrid3d; set xrange [-2:2]; set yrange [-2:2]; set cntrparam levels discrete 1; set contour surface\n");
         sp.add3D ("x + y");
         mp.addPlot (sp, 0);
         mp.saveGnuplot ("2d");

@@ -10,6 +10,15 @@ Dedicated to the memory of William Schelter.
 The function bug_report() provides bug reporting information.
    [wxMaxima: comment end   ] */
 
+/* [wxMaxima: comment start ]
+wxMaxima 0.8.1 http://wxmaxima.sourceforge.net
+Maxima 5.17.0 http://maxima.sourceforge.net
+Using Lisp CLISP 2.44.1 (2008-02-23)
+Distributed under the GNU Public License. See the file COPYING.
+Dedicated to the memory of William Schelter.
+The function bug_report() provides bug reporting information.
+   [wxMaxima: comment end   ] */
+
 /* [wxMaxima: input   start ] */
 g[i](x,s):=f[i](x) - s$
 f0(x,s):=t*s - sum(log (-g[i](x,s)),i,1,n)$
@@ -22,6 +31,16 @@ diff(diff(f0(x,s),x,1),s,1);
 
 /* [wxMaxima: input   start ] */
 plot2d(-log(-x),[x,-3,0]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+h(x,y):=(2*x*x+y*y)*0.5 + x + y$
+plot3d (h(x,y),[x,-2,2],[y,-2,2]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+h(1,0);
+h(0,1);
 /* [wxMaxima: input   end   ] */
 
 /* Maxima can't load/batch files which end with a comment! */
