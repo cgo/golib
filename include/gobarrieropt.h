@@ -528,10 +528,10 @@ namespace goMath
                         printf ("At point:\n");
                         x.print ();
 
-                        for (goSize_t i = 0; i < m; ++i)
-                        {
-                            printf ("Inequality %ld: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
-                        }
+                        //for (goSize_t i = 0; i < m; ++i)
+                        //{
+                        //    printf ("Inequality %ld: %f\n", i, (*myFunction->problem()->ineq (i)) (x));
+                        //}
                 
                         printf ("BarrierOpt: t = %f\n", myFunction->t());
 

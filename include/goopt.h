@@ -54,7 +54,7 @@ namespace goMath
      * @param alpha Parameter \c alpha, defaults to 0.2
      * @param beta Parameter \c beta, defaults to 0.8
      * 
-     * @return The value of \c t so that f(x+t*dt) is sufficiently decreasing.
+     * @return The value of \c t so that f(x - t*dt) is sufficiently decreasing.
      */
     template <class callable_, class vector_type>
     typename vector_type::value_type backtrackingLineSearch (callable_& f,
@@ -67,12 +67,20 @@ namespace goMath
                                   typename vector_type::value_type beta = 0.8)
     {
         typename vector_type::value_type Nfx_times_dx = nabla_f_x * dx;
-        while ( f (x - dx * t) > f_x - Nfx_times_dx * alpha * t)
+
+        typename vector_type::value_type fx2 = f (x - dx * t);
+
+        while ( t > 1e-6 && 
+                fx2 > f_x - Nfx_times_dx * alpha * t )
         {
             t = beta * t;
-        }
+            fx2 = f (x - dx * t);
+        } 
 
-        return t;
+        if (fx2 <= f_x - Nfx_times_dx * alpha * t)
+            return t;
+        else
+            return typename vector_type::value_type (0.0);
     }
 
     template <class callable_, class vector_type>

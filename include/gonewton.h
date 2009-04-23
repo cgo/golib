@@ -121,7 +121,7 @@ namespace goMath
                 type_ fx = type_ (0);
                 vector_type nabla_fx;
                 
-                while (stopping > epsilon && t > 1e-5)
+                while (stopping > epsilon && t > 1e-6)
                 {
                     this->step (x, dx);
                     
