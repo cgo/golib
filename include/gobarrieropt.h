@@ -358,6 +358,9 @@ namespace goMath
                // goMath::vectorAdd (this->my_t, myBufferGrad, ret);
                ret [x_s_sz - 1] += this->my_t * 1.0;
 
+               //= FIXME: W H Y ?
+               // ret *= -1.0;
+
                printf ("BarrierOptFunctionPhase1::grad: \n");
                ret.print ();
            }
@@ -428,12 +431,14 @@ namespace goMath
                    goMath::vectorAdd (-fi_x * fi_x, bufferGrad_x, ret_last_col);
                    ret (N - 1, N - 1) += fi_x * fi_x;
 
-                   printf ("myBufferGrad:\n");
-                   this->myBufferGrad.print ();
+                   //printf ("myBufferGrad:\n");
+                   //this->myBufferGrad.print ();
                    //= sum 1/f_i(x)^2 nabla f_i(x) (nabla f_i(x))^\top
                    goMath::vectorOuter<value_type> (fi_x * fi_x, this->myBufferGrad, this->myBufferGrad, ret);
 
                    this->myProblem->ineq(i)->hessian (x, bufferHess_x);
+                   //printf ("myBufferHess:\n");
+                   //this->myBufferHess.print ();
                    this->myBufferHess *= fi_x;
                    ret += this->myBufferHess;
                }
@@ -462,7 +467,8 @@ namespace goMath
             public:
                 BarrierOpt (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
                     : myFunction (new opt_function_type),
-                      myInfeasible (true)
+                      myInfeasible (true),
+                      myExtraStopCondition (0)
                 {
                     myFunction->setProblem (prob);
                 }
@@ -491,6 +497,11 @@ namespace goMath
                 bool infeasible () const
                 {
                     return myInfeasible;
+                }
+
+                void setExtraStopCondition (goAutoPtr<goFunctorBase0<bool> > f)
+                {
+                    myExtraStopCondition = f;
                 }
 
                 /** 
@@ -535,6 +546,12 @@ namespace goMath
                 
                         printf ("BarrierOpt: t = %f\n", myFunction->t());
 
+                        //= Check the extra stop condition, if any
+                        if (!myExtraStopCondition.isNull() && (*myExtraStopCondition)())
+                        {
+                            break;
+                        }
+
                         if (float(m) / myFunction->t() < epsilon)
                         {
                             break;
@@ -550,8 +567,9 @@ namespace goMath
                 }
 
             private:
-                goAutoPtr<opt_function_type> myFunction;
-                bool                         myInfeasible;
+                goAutoPtr<opt_function_type>      myFunction;
+                bool                              myInfeasible;
+                goAutoPtr<goFunctorBase0<bool> >  myExtraStopCondition;
         };
 
 static void fpTraps ()
@@ -573,7 +591,8 @@ static void fpTraps ()
 
             public:
                 BarrierOptPhase1 (goAutoPtr<OptProblem<matrix_type, vector_type> > prob)
-                    : myFunction (new opt_function_type)
+                    : myFunction (new opt_function_type),
+                      my_s (0)
                 {
                     myFunction->setProblem (prob);
                 }
@@ -581,7 +600,13 @@ static void fpTraps ()
                 virtual ~BarrierOptPhase1 ()
                 {
                 }
-                
+               
+                bool stopCondition ()
+                {
+                    printf ("Stop condition check: %f\n", *my_s);
+                    return *my_s < value_type (0);
+                }
+
                 void solve (vector_type& x_s, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
                     goSize_t N = x_s.getSize ();
@@ -637,7 +662,7 @@ static void fpTraps ()
                     //=
                     //= Find initial s so that all inequalities are met
                     //=
-                    value_type s = value_type (0);
+                    value_type s = value_type (-10);
                     goSize_t M = myFunction->problem()->ineqCount ();
                     for (goSize_t i = 0; i < M; ++i)
                     {
@@ -668,6 +693,8 @@ static void fpTraps ()
                     // goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
                     BarrierOpt <matrix_type, vector_type, opt_function_type> bo (phase1Problem);  // myFunction->problem());
                     bo.setInfeasible (false);
+                    my_s = &x_s[x_s.getSize() - 1];
+                    bo.setExtraStopCondition (goMemberFunction <BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>, bool> (this, &BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>::stopCondition));
                     bo.solve (x_s, epsilon, mu, t0);
 
                     printf ("phase 1 x_s:\n");
@@ -676,6 +703,8 @@ static void fpTraps ()
 
             private:
                 goAutoPtr<opt_function_type> myFunction;
+
+                value_type *my_s;  //= Used in the extra stop condition
         };
 
 };

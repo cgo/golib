@@ -95,7 +95,7 @@ int main ()
         x.copy (x_s, 0, 0, x.getSize() - 1);
         //= Experiment
         {
-            x_s[0] = 2.1;
+            x_s[0] = 0.6;
             x_s[1] = 1.0 - x_s[0];
         }
         x_s [x_s.getSize() - 1] = 1;
@@ -103,7 +103,7 @@ int main ()
         printf ("x_s size: %d\n", x_s.getSize());
 
         goMath::BarrierOptPhase1 <matrix_type, vector_type> phase1 (problem);
-        phase1.solve (x_s, 0.01, 2, 1);
+        phase1.solve (x_s, 0.01, 2, 0.001);
         printf ("x_s after phase1:\n");
         x_s.print ();
 
