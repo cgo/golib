@@ -2,10 +2,10 @@
 #define GOMATRIX_H
 
 #include <gotypes.h>
-#include <gosignal3dbase.h>
-#include <gosignal3d.h>
-#include <gosubsignal3d.h>
-#include <gosignalmacros.h>
+//#include <gosignal3dbase.h>
+//#include <gosignal3d.h>
+//#include <gosubsignal3d.h>
+//#include <gosignalmacros.h>
 #ifndef GOMATH_H
 # include <gomath.h>
 #endif
@@ -18,6 +18,9 @@
 namespace goMath {
     /** \addtogroup mathla
      * @{ */
+
+    template <class T> class VectorIterator;
+    template <class T> class ConstVectorIterator;
 
     /*!
      * \brief Matrix class.
@@ -37,6 +40,9 @@ namespace goMath {
             public:
                 static const bool rowMajor;
                 typedef T value_type;
+                typedef VectorIterator<T>      vector_iterator;
+                typedef ConstVectorIterator<T> const_vector_iterator;
+
                 /*!
                  * @param y Number of rows.
                  * @param x Number of columns.
@@ -61,6 +67,15 @@ namespace goMath {
                 Matrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
 
                 virtual ~Matrix ();
+
+                vector_iterator       rowBegin ();
+                vector_iterator       rowEnd ();
+                const_vector_iterator rowBegin () const;
+                const_vector_iterator rowEnd () const;
+                vector_iterator       colBegin ();
+                vector_iterator       colEnd ();
+                const_vector_iterator colBegin () const;
+                const_vector_iterator colEnd () const;
 
                 bool setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0);
                 bool setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0) const;
@@ -544,6 +559,216 @@ namespace goMath {
                 goSize_t           columns;
                 goSize_t           leadingDimension;
         };
+
+  
+    /** 
+     * @brief Vector iterator for multi-dimensional array data.
+     *
+     * This class is used as goMath::Matrix::vector_iterator.
+     * It can be used to iterate over a number of vectors stored e.g.
+     * in a matrix.
+     *
+     * @param T Data type of the data.
+     */
+    template <class T>
+        class VectorIterator
+        {
+            public:
+                /** 
+                 * @brief Construct an iterator over data starting at \c ptr,
+                 * of length \c len, using \c stride to get from one element to the next,
+                 * and \c increment to get from one vector to the next.
+                 * 
+                 * @param ptr Start pointer.
+                 * @param len Length of a vector.
+                 * @param stride Stride within the vector (number of elements to add to the pointer 
+                 * in order to get to the next element).
+                 * @param increment Increment to get from one vector to the next, in elements.
+                 */
+                VectorIterator (T* ptr, goSize_t len, goPtrdiff_t stride, goPtrdiff_t increment)
+                    : myRef (ptr, len, stride),
+                      myLen (len),
+                      myIncrement (increment)
+                {
+                }
+
+                /** 
+                 * @brief Copy constructor.
+                 *
+                 * @param other Iterator to be copied.
+                 */
+                VectorIterator (const VectorIterator<T>& other)
+                    : myRef (0),
+                      myLen (0),
+                      myIncrement (0)
+                {
+                    *this = other;
+                }
+
+                /** 
+                 * @brief Copy operator.
+                 * 
+                 * @param other Iterator to be copied.
+                 * 
+                 * @return this.
+                 */
+                VectorIterator<T>& operator= (const VectorIterator<T>& other)
+                {
+                    printf ("VectIt operator=\n");
+                    (*const_cast<VectorIterator<T>*>(&other))->ref (myRef);
+                    myLen = other.len ();
+                    myIncrement = other.increment ();
+                    return *this;
+                }
+
+                /** 
+                 * @brief Length of a vector.
+                 * 
+                 * @return Length of a vector.
+                 */
+                goSize_t len () const { return myLen; }
+                /** 
+                 * @brief Increment to add to a pointer to get to the next vector.
+                 * 
+                 * @return Increment to add to a pointer to get to the next vector, in elements.
+                 */
+                goPtrdiff_t increment () const { return myIncrement; }
+
+                /** 
+                 * @brief Increment the iterator (move to the next vector).
+                 * 
+                 * @return this.
+                 */
+                VectorIterator<T>& operator++ ()
+                {
+                    myRef.setPtr (myRef.getPtr() + myIncrement);
+                    return *this;
+                }
+
+                /** 
+                 * @brief Decrement the iterator (move to the previous vector).
+                 * 
+                 * @return this.
+                 */
+                VectorIterator<T>& operator-- ()
+                {
+                    myRef.setPtr (myRef.getPtr() - myIncrement);
+                    return *this;
+                }
+
+                /** 
+                 * @brief Dereference operator.
+                 * 
+                 * @return The current vector.
+                 */
+                Vector<T>& operator* () { return myRef; }
+                /** 
+                 * @brief Pointer operator.
+                 * 
+                 * @return Pointer to the current vector.
+                 */
+                Vector<T>* operator-> () { return &myRef; }
+                const Vector<T>& operator* () const { return myRef; }
+                const Vector<T>* operator-> () const { return &myRef; }
+
+                /** 
+                 * @brief Compares the actual pointers.
+                 * 
+                 * @param other Iterator to compare with.
+                 * 
+                 * @return True if the pointers are equal, false otherwise.
+                 */
+                bool operator== (const VectorIterator<T>& other)
+                {
+                    return other->getPtr() == myRef.getPtr();
+                }
+
+                /** 
+                 * @brief Compares the actual pointers.
+                 * 
+                 * @param other Iterator to compare with.
+                 * 
+                 * @return True if the pointers are unequal, false otherwise.
+                 */
+                bool operator!= (const VectorIterator<T>& other)
+                {
+                    return other->getPtr() != myRef.getPtr();
+                }
+
+            private:
+                Vector<T>   myRef;
+                goSize_t    myLen;
+                goPtrdiff_t myIncrement;
+        };
+
+    /** 
+     * @brief Cons iterator over vectors.
+     * @see VectorIterator
+     */
+    template <class T>
+        class ConstVectorIterator
+        {
+            public:
+                ConstVectorIterator (const T* ptr, goSize_t len, goPtrdiff_t stride, goPtrdiff_t increment)
+                    : myRef (const_cast<T*> (ptr), len, stride),
+                      myLen (len),
+                      myIncrement (increment)
+                {
+                }
+
+                ConstVectorIterator (const ConstVectorIterator<T>& other)
+                    : myRef (0),
+                      myLen (0),
+                      myIncrement (0)
+                {
+                    *this = other;
+                }
+
+                ConstVectorIterator<T>& operator= (const ConstVectorIterator<T>& other)
+                {
+                    //= This language can be so ugly ...
+                    const_cast<Vector<T>*> (const_cast<ConstVectorIterator<T>*>(&other)->operator->())->ref (myRef);
+                    myLen = other.len ();
+                    myIncrement = other.increment ();
+                    return *this;
+                }
+
+                goSize_t len () const { return myLen; }
+                goPtrdiff_t increment () const { return myIncrement; }
+
+                ConstVectorIterator<T>& operator++ ()
+                {
+                    myRef.setPtr (myRef.getPtr() + myIncrement);
+                    return *this;
+                }
+
+                ConstVectorIterator<T>& operator-- ()
+                {
+                    myRef.setPtr (myRef.getPtr() - myIncrement);
+                    return *this;
+                }
+
+                const Vector<T>& operator* () { return myRef; }
+                const Vector<T>* operator-> () { return &myRef; }
+                const Vector<T>& operator* () const { return myRef; }
+                const Vector<T>* operator-> () const { return &myRef; }
+
+                bool operator== (const ConstVectorIterator<T>& other)
+                {
+                    return other->getPtr() == myRef.getPtr();
+                }
+
+                bool operator!= (const ConstVectorIterator<T>& other)
+                {
+                    return other->getPtr() != myRef.getPtr();
+                }
+
+            private:
+                Vector<T>   myRef;
+                goSize_t    myLen;
+                goPtrdiff_t myIncrement;
+        };
+
 
     /** 
      * @brief Calculate \f$C = \alpha \cdot A \cdot B + \beta \cdot C \f$.

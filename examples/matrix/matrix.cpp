@@ -15,6 +15,13 @@
 int main ()
 {
     {
+        goMath::Matrix<float> M (10, 2);
+        goMath::MatrixVectorIterateRow<float> iter (M);
+        printf ("Blah.\n");
+        exit (1);
+    }
+
+    {
         goMath::Matrixf M1 (5,5);
         M1.setIdentity();
         for (goSize_t i = 0; i < 5*5; ++i)

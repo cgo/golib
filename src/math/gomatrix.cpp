@@ -89,6 +89,84 @@ goMath::Matrix<T>::~Matrix ()
 }
 
 /** 
+ * @brief Get an iterator to the first row.
+ * 
+ * @return Vector iterator to the first row.
+ */
+template <class T>
+typename goMath::Matrix<T>::vector_iterator       goMath::Matrix<T>::rowBegin () { return vector_iterator (this->getPtr(), this->getColumns(), 1, this->getLeadingDimension()); }
+
+/** 
+ * @brief Get an iterator to the first row.
+ * 
+ * @return Vector iterator to the first row.
+ */
+template <class T>
+typename goMath::Matrix<T>::const_vector_iterator       goMath::Matrix<T>::rowBegin () const { return const_vector_iterator (this->getPtr(), this->getColumns(), 1, this->getLeadingDimension()); }
+
+/** 
+ * @brief Get an iterator pointing after the last row.
+ * 
+ * @return Iterator pointing after the last row.
+ */
+template <class T>
+typename goMath::Matrix<T>::vector_iterator       goMath::Matrix<T>::rowEnd () { return vector_iterator (this->getPtr() + this->getLeadingDimension() * this->getRows(), this->getColumns(), 1, this->getLeadingDimension()); }
+
+/** 
+ * @brief Get an iterator pointing after the last row.
+ * 
+ * @return Iterator pointing after the last row.
+ */
+template <class T>
+typename goMath::Matrix<T>::const_vector_iterator       goMath::Matrix<T>::rowEnd () const { return const_vector_iterator (this->getPtr() + this->getLeadingDimension() * this->getRows(), this->getColumns(), 1, this->getLeadingDimension()); }
+
+/** 
+ * @brief Get an iterator to the first column.
+ * 
+ * @return Vector iterator to the first column.
+ */
+template <class T>
+typename goMath::Matrix<T>::vector_iterator       goMath::Matrix<T>::colBegin () { return vector_iterator (this->getPtr(), this->getRows(), this->getLeadingDimension(), 1); }
+
+/** 
+ * @brief Get an iterator to the first column.
+ * 
+ * @return Vector iterator to the first column.
+ */
+template <class T>
+typename goMath::Matrix<T>::const_vector_iterator       goMath::Matrix<T>::colBegin () const { return const_vector_iterator (this->getPtr(), this->getRows(), this->getLeadingDimension(), 1); }
+
+/** 
+ * @brief Get an iterator pointing after the last column.
+ * 
+ * @return Iterator pointing after the last column.
+ */
+template <class T>
+typename goMath::Matrix<T>::vector_iterator       goMath::Matrix<T>::colEnd () { return vector_iterator (this->getPtr() + this->getColumns(), this->getRows(), this->getLeadingDimension(), 1); }
+
+/** 
+ * @brief Get an iterator pointing after the last column.
+ * 
+ * @return Iterator pointing after the last column.
+ */
+template <class T>
+typename goMath::Matrix<T>::const_vector_iterator       goMath::Matrix<T>::colEnd () const { return const_vector_iterator (this->getPtr() + this->getColumns(), this->getRows(), this->getLeadingDimension(), 1); }
+#if 0
+template <class T>
+typename goMath::Matrix<T>::const_row_iterator goMath::Matrix<T>::rowBegin () const { return const_row_iterator (*this, 0); }
+template <class T>
+typename goMath::Matrix<T>::const_row_iterator goMath::Matrix<T>::rowEnd () const { return const_row_iterator (*this, this->getRows()); } 
+template <class T>
+typename goMath::Matrix<T>::col_iterator       goMath::Matrix<T>::colBegin () { return col_iterator (*this, 0); }
+template <class T>
+typename goMath::Matrix<T>::col_iterator       goMath::Matrix<T>::colEnd () { return col_iterator (*this, this->getColumns()); }
+template <class T>
+typename goMath::Matrix<T>::const_col_iterator goMath::Matrix<T>::colBegin () const { return const_col_iterator (*this, 0); }
+template <class T>
+typename goMath::Matrix<T>::const_col_iterator goMath::Matrix<T>::colEnd () const { return const_col_iterator (*this, this->getColumns()); }
+#endif
+
+/** 
  * @brief Resize (re-allocate) the matrix.
  * 
  * Memory is newly allocated, so all former data is lost.

@@ -133,6 +133,12 @@ template <class T> class goFixedArray
             this->myReserved = size;
         }
 
+        //= Set the pointer directly (used by Matrix-->Vector iterators)
+        void setPtr (T* ptr)
+        {
+            this->myArray = ptr;
+        }
+
         void ref (goFixedArray<T>& target, goSize_t startIndex = 0, goSize_t size = 0)
         {
             if (size == 0)

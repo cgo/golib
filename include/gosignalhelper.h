@@ -16,6 +16,9 @@
 #ifndef GOSIGNAL3D_H
 # include <gosignal3d.h>
 #endif
+#ifndef GOSUBSIGNAL3D_H
+# include <gosubsignal3d.h>
+#endif
 #ifndef GOPOINT_H
 # include <gopoint.h>
 #endif

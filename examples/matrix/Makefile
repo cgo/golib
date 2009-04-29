@@ -4,10 +4,10 @@
 # you might want to have added.
 
 #CXX		= g++-3.3
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
 
 #LD		= g++-3.3
-LDARGS		=  
+LDARGS		=  $(LDFLAGS)
 
 LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
 

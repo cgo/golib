@@ -19,6 +19,9 @@
 #ifndef GOMATRIX_H
 # include <gomatrix.h>
 #endif
+#ifndef GOSIGNAL3D_H
+# include <gosignal3d.h>
+#endif
 
 /**
  * @addtogroup pythonembed
