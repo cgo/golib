@@ -95,8 +95,10 @@ int main ()
         x.copy (x_s, 0, 0, x.getSize() - 1);
         //= Experiment
         {
-            x_s[0] = 0.6;
+            x_s[0] = 0.4;
             x_s[1] = 1.0 - x_s[0];
+            //x_s[0] = 0.1;
+            //x_s[1] = 0.5;
         }
         x_s [x_s.getSize() - 1] = 1;
 
@@ -107,11 +109,11 @@ int main ()
         printf ("x_s after phase1:\n");
         x_s.print ();
 
-        exit (1);
+        // exit (1);
 
         goMath::BarrierOpt <matrix_type, vector_type> bo (problem);
 
-        // x[0] = x_s[0]; x[1] = x_s[1];
+        x[0] = x_s[0]; x[1] = x_s[1];
 
         //= Solve with the old (Ax=b infeasible, but inequality feasible) x:
         bo.solve (x, 0.01, 2, 0.0001);

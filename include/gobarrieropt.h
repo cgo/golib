@@ -281,7 +281,7 @@ namespace goMath
                for (goSize_t i = 0; i < M; ++i)
                {
                    op = -(this->myProblem->ineq(i)->operator() (x) - s);
-                   printf ("BarrierOptFunctionPhase1::barrier(): -f_%d(x) + s == %f\n", i, op);
+                   // printf ("BarrierOptFunctionPhase1::barrier(): -f_%d(x) + s == %f\n", i, op);
                    if (op > value_type (0))
                    {
                        sumLog -= ::log (op);
@@ -350,6 +350,7 @@ namespace goMath
                    //= 1 / f_i(x)
                    fi_x = value_type(1) / (s - (*this->myProblem->ineq(i))(x));
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
+                   bufferGrad_x *= -1.0; // FIXME  --- WHY IS THIS???
                    goMath::vectorAdd (fi_x, this->myBufferGrad, ret);
                }
 
@@ -609,15 +610,15 @@ static void fpTraps ()
 
                 void solve (vector_type& x_s, value_type epsilon = 0.01, value_type mu = 2, value_type t0 = 1)
                 {
-                    goSize_t N = x_s.getSize ();
+                    const goSize_t N = x_s.getSize ();
 
                     fpTraps ();
 
                     //=
                     //= Find an x fulfilling AA x = bb
                     //=
-                    goSize_t m = myFunction->problem()->eqA()->getRows ();
-                    goSize_t n = myFunction->problem()->eqA()->getColumns ();
+                    const goSize_t m = myFunction->problem()->eqA()->getRows ();
+                    const goSize_t n = myFunction->problem()->eqA()->getColumns ();
                     if (m != myFunction->problem()->eqB()->getSize())
                     {
                         goString s = "BarrierOptPhase1::solve(): eqB has wrong element count. Throwing exception.";
@@ -694,7 +695,7 @@ static void fpTraps ()
                     BarrierOpt <matrix_type, vector_type, opt_function_type> bo (phase1Problem);  // myFunction->problem());
                     bo.setInfeasible (false);
                     my_s = &x_s[x_s.getSize() - 1];
-                    bo.setExtraStopCondition (goMemberFunction <BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>, bool> (this, &BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>::stopCondition));
+                    // bo.setExtraStopCondition (goMemberFunction <BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>, bool> (this, &BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>::stopCondition));
                     bo.solve (x_s, epsilon, mu, t0);
 
                     printf ("phase 1 x_s:\n");

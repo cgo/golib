@@ -36,8 +36,12 @@
  * \addtogroup gm
  * @{
  */
+
 /** 
  * @brief The sum-product algorithm.
+ *
+ * @param T Type of the node values, currently must be integer
+ * @param Tfloat Floating point type, typically goFloat or goDouble
  *
  * \par References:
     \verbatim
@@ -45,6 +49,7 @@
      Pattern Recognition and Machine Learning 
      Springer, 2006 
     \endverbatim
+ *
  * \example sumproduct/sp.cpp
  * @author Christian Gosch
  */
@@ -651,7 +656,6 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return marginal.sum ();
         };
 };
-
 /** @} */
 
 #endif
