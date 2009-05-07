@@ -693,7 +693,7 @@ static void fpTraps ()
                     //= Solve the problem min s  s.t. f_i <= s and A x = b with the barrier method
                     // goAutoPtr<BarrierOptFunctionPhase1 <vector_type, matrix_type> > bop1 = new  BarrierOptFunctionPhase1 <vector_type, matrix_type> (myFunction);
                     BarrierOpt <matrix_type, vector_type, opt_function_type> bo (phase1Problem);  // myFunction->problem());
-                    bo.setInfeasible (false);
+                    // bo.setInfeasible (false);
                     my_s = &x_s[x_s.getSize() - 1];
                     // bo.setExtraStopCondition (goMemberFunction <BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>, bool> (this, &BarrierOptPhase1 <matrix_type, vector_type, opt_function_type>::stopCondition));
                     bo.solve (x_s, epsilon, mu, t0);
