@@ -1,32 +1,5 @@
 /* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
-/* [ Created with wxMaxima version 0.8.1 ] */
-
-/* [wxMaxima: comment start ]
-wxMaxima 0.8.1 http://wxmaxima.sourceforge.net
-Maxima 5.17.0 http://maxima.sourceforge.net
-Using Lisp CLISP 2.44.1 (2008-02-23)
-Distributed under the GNU Public License. See the file COPYING.
-Dedicated to the memory of William Schelter.
-The function bug_report() provides bug reporting information.
-   [wxMaxima: comment end   ] */
-
-/* [wxMaxima: comment start ]
-wxMaxima 0.8.1 http://wxmaxima.sourceforge.net
-Maxima 5.17.0 http://maxima.sourceforge.net
-Using Lisp CLISP 2.44.1 (2008-02-23)
-Distributed under the GNU Public License. See the file COPYING.
-Dedicated to the memory of William Schelter.
-The function bug_report() provides bug reporting information.
-   [wxMaxima: comment end   ] */
-
-/* [wxMaxima: comment start ]
-wxMaxima 0.8.1 http://wxmaxima.sourceforge.net
-Maxima 5.17.0 http://maxima.sourceforge.net
-Using Lisp CLISP 2.44.1 (2008-02-23)
-Distributed under the GNU Public License. See the file COPYING.
-Dedicated to the memory of William Schelter.
-The function bug_report() provides bug reporting information.
-   [wxMaxima: comment end   ] */
+/* [ Created with wxMaxima version 0.8.2 ] */
 
 /* [wxMaxima: input   start ] */
 g[i](x,s):=f[i](x) - s$

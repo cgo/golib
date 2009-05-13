@@ -298,12 +298,23 @@ namespace goMath
                         : myF (f),
                           myIneqCon (),
                           myEqCon_A (0),
-                          myEqCon_b (0)
+                          myEqCon_b (0),
+                          myNonNegativity (false)
                     {
                     }
 
                     virtual ~OptProblem ()
                     {
+                    }
+
+                    void setNonNegativity (bool val = true)
+                    {
+                        myNonNegativity = val;
+                    }
+
+                    bool nonNegativity () const
+                    {
+                        return myNonNegativity;
                     }
 
                     void addIneqCon (goAutoPtr<function_type> f)
@@ -347,6 +358,8 @@ namespace goMath
                     std::vector<goAutoPtr<function_type> >  myIneqCon;
                     goAutoPtr<matrix_type>  myEqCon_A;
                     goAutoPtr<vector_type>  myEqCon_b;
+
+                    bool myNonNegativity; // If true, the solution x must be non-negative.
             };
 /** @} */
 };

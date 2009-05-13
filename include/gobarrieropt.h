@@ -28,6 +28,21 @@ namespace goMath
    //= OptFunction (callable_) auf.
    //= Die Auessere Schleife laeuft in BarrierOpt.    
 
+    //= FIXME: NonNegativity flag in OptProblem benutzen, um log barrier
+    //=        so zu erweitern, dass x_i >= 0 erzwungen wird.
+
+    /** 
+     * @brief An OptFunction that is used in BarrierOpt.
+     *
+     * This class provides gradient and Hessian methods for calculating
+     * the gradient and Hessian of an optimisation problem
+     * set with \c setProblem() by augmenting the gradient and Hessian
+     * of the original objective function by the ones induced by the log barrier
+     * function.
+     *
+     * The gradient is calculated as ... FIXME
+     * 
+     */
    template <class matrix_type, class vector_type>
         class BarrierOptFunction : public OptFunction <matrix_type, vector_type>
    {
@@ -92,6 +107,23 @@ namespace goMath
                    }
                }
 
+               if (myProblem->nonNegativity ())
+               {
+                   const goSize_t N = x.getSize ();
+                   for (goSize_t i = 0; i < N; ++i)
+                   {
+                       if (x[i] > value_type(0))
+                       {
+                           sumLog -= ::log (x[i]);
+                       }
+                       else
+                       {
+                           //= Return "something large"
+                           return std::numeric_limits<value_type>::max () * value_type (0.5);
+                       }
+                   }
+               }
+
                return sumLog;
            }
 
@@ -127,6 +159,7 @@ namespace goMath
 
                ret.fill (value_type (0));
 
+
                value_type fi_x = value_type (0);
                for (goSize_t i = 0; i < M; ++i)
                {
@@ -135,6 +168,14 @@ namespace goMath
                    fi_x = value_type(1) / (*myProblem->ineq(i))(x);
                    myProblem->ineq(i)->grad (x, myBufferGrad);
                    goMath::vectorAdd (-fi_x, myBufferGrad, ret);
+               }
+
+               if (myProblem->nonNegativity ())
+               {
+                   for (goSize_t i = 0; i < N; ++i)
+                   {
+                       ret[i] -= (x[i] != 0.0) ? (1.0 / x[i]) : 0.0;
+                   }
                }
 
                myProblem->f()->grad (x, myBufferGrad);
@@ -177,6 +218,17 @@ namespace goMath
                    myBufferHess *= -fi_x;
                    ret += myBufferHess;
                }
+
+               //= FIXME: This can be done more efficiently.
+               if (myProblem->nonNegativity ())
+               {
+                   for (goSize_t i = 0; i < N; ++i)
+                   {
+                       value_type f = (x[i] != 0.0) ? (1.0 / (x[i] * x[i])) : 0.0;
+                       ret (i,i) += f;
+                   }
+               }
+
                myProblem->f()->hessian (x, myBufferHess);
                myBufferHess *= my_t;
                ret += myBufferHess;
@@ -532,6 +584,10 @@ namespace goMath
                     myFunction->setT (t0);
                     
                     goSize_t m = myFunction->problem()->ineqCount ();
+                    if (myFunction->problem()->nonNegativity ())
+                    {
+                        m += x.getSize ();
+                    }
                         
                     while (true)
                     {
