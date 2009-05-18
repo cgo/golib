@@ -7,26 +7,49 @@ namespace goSignal
     template <class T>
     static int _cannyRoundAngle (T angle)
     {
+        static const float range_1 = M_PI * 0.5 + M_PI * 0.125;
+        static const float range_2 = M_PI * 0.5 - M_PI * 0.125;
+        static const float range_3 = M_PI * 0.25 - M_PI * 0.125;
+        static const float range_4 = -M_PI * 0.125;
+        static const float range_5 = -M_PI * 0.25 - M_PI * 0.125;
+        static const float range_6 = -M_PI * 0.5 - M_PI * 0.125;
+
         //= Erzwinge Winkel zw. 90 u. -90 Grad
-        if (angle < T(-90))
+        if (angle > T(range_1))
         {
-            angle += T(90);
+            angle -= T(M_PI);
         }
-        else if (angle > T(90))
+        else if (angle < T(range_5))
         {
-            angle -= T(90);
+            angle += T(M_PI);
         }
 
-        if (angle < T(67.5) || angle < T(-67.5))
+        if (angle <= range_1 && angle > range_2)
             return 90;
 
-        if (angle > T(67.5) && angle < T(22.5))
+        if (angle <= range_2 && angle > range_3)
             return 45;
 
-        if (angle < T(22.5) && angle > T(-22.5))
+        if (angle <= range_3 && angle > range_4)
             return 0;
 
-        return -45;
+        if (angle <= range_4 && angle > range_5)
+            return -45;
+
+        //= This should not happen.
+        assert (false == true);
+        return 0;
+
+//        if (angle < T(67.5) || angle < T(-67.5))
+//            return 90;
+//
+//        if (angle > T(67.5) && angle < T(22.5))
+//            return 45;
+//
+//        if (angle < T(22.5) && angle > T(-22.5))
+//            return 0;
+//
+//        return -45;
 
         //if (angle < T(-22.5) && angle > T(-67.5))
         //    return -45;
@@ -45,7 +68,7 @@ namespace goSignal
             i.resetX ();
             r.resetX ();
             s.resetX ();
-            while (!io.endX())
+            while (!i.endX())
             {
                 sobelT x, y, a;
                 x = *(imageT*)i.rightUp() - *(imageT*)i.leftUp() +
@@ -86,12 +109,14 @@ namespace goSignal
                     default: goLog::error ("goSignal::canny (): angle error."); return;
                 }
 
-                sobelT a = *(sobelT*)*s;
-                if (a < a1 || a <= a2)
-                    *(retT*)*r = retT(0);
-                else
-                    *(retT*)*r = retT(1);
-
+                if (angle == 90)
+                {
+                    sobelT a = *((sobelT*)*s + 2);
+                    if (a < a1 || a <= a2)
+                        *(retT*)*r = retT(0);
+                    else
+                        *(retT*)*r = retT(1);
+                }
                 s.incrementX ();
                 r.incrementX ();
             }
