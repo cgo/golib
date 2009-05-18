@@ -73,11 +73,13 @@ static inline goFloat goYUV422_Blue (goUInt8 y, goUInt8 u, goUInt8 v)
  * @param width  Width of the image
  * @param height Height of the image
  * @param ret    The goSignal3D<void> containing the RGB image after 
+ * @param rgb_offsets Contains 3 integers each denoting the channel number in \c ret of
+ *                    r, g, and b channels respectively.
  * the function returned. If it is not of appropriate size/type, nothing will be converted.
  *
  * @author Christian Gosch
  */
-static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3DBase<void>& ret)
+static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3DBase<void>& ret, const int* rgb_offsets)
 {
     if (ret.getSizeX() != width || ret.getSizeY() != height || ret.getChannelCount() < 3 || ret.getDataType().getID() != GO_UINT8)
     {
@@ -96,6 +98,10 @@ static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t he
     goUInt8* cr_py = cb_py + (cr_width * cr_height);
 
     goIndex_t y = 0;
+
+    int r_chan = rgb_offsets[0];
+    int g_chan = rgb_offsets[1];
+    int b_chan = rgb_offsets[2];
     //= Note: FIXME This does not really upsample the downsampled 
     //=       U/V (Cr/Cb) values but just uses the left neighbour for
     //=       non-existent samples.
@@ -117,11 +123,11 @@ static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t he
             R = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,R),255.0f);
             G = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,G),255.0f);
             B = goMath::min<goFloat>(goMath::max<goFloat>(0.0f,B),255.0f);
-            *(goUInt8*)*it = static_cast<goUInt8>(R);
+            *((goUInt8*)*it + r_chan) = static_cast<goUInt8>(R);
             //= G = 1.164x(Y-16) - 0.813×(Cr-128) - 0.392×(Cb-128)
-            *((goUInt8*)*it + 1) = static_cast<goUInt8>(G);
+            *((goUInt8*)*it + g_chan) = static_cast<goUInt8>(G);
             //= B = 1.164×(Y-16) + 2.017×(Cb-128)
-            *((goUInt8*)*it + 2) = static_cast<goUInt8>(B);
+            *((goUInt8*)*it + b_chan) = static_cast<goUInt8>(B);
             cr_p += x;
             cb_p += x;
             x = x ^ 1;
@@ -151,17 +157,19 @@ static inline bool goYUV420P_RGB_base (goUInt8* yuv, goSize_t width, goSize_t he
  * @param ret    The goSignal3D<void> containing the RGB image after 
  * the function returned. If it is not of appropriate size/type, it will be 
  * reallocated.
+ * @param rgb_channels Contains 3 integers each denoting the channel number in \c ret of
+ *                    r, g, and b channels respectively.
  *
  * @author Christian Gosch
  */
-static inline bool goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3D<void>& ret)
+static inline bool goYUV420P_RGB (goUInt8* yuv, goSize_t width, goSize_t height, goSignal3D<void>& ret, const int* rgb_channels)
 {
     if (ret.getSizeX() != width || ret.getSizeY() != height || ret.getChannelCount() < 3 || ret.getDataType().getID() != GO_UINT8)
     {
         ret.setDataType(GO_UINT8);
         ret.make (goSize3D(width,height,1),goSize3D(32,32,1),goSize3D(8,8,0),3);
     }
-    return goYUV420P_RGB_base (yuv, width, height, ret);
+    return goYUV420P_RGB_base (yuv, width, height, ret, rgb_channels);
 }
 /*! @} */
 #endif

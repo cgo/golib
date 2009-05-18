@@ -29,10 +29,11 @@ ImageViewer::ImageViewer ()
     : goGUI::MainWindow (),
       view ()
 {
-    Gtk::ScrolledWindow *sw = Gtk::manage (new Gtk::ScrolledWindow);
-    sw->add (this->view);
-    this->view.show ();
-    this->getPaned().add1 (*sw);
+    //Gtk::ScrolledWindow *sw = Gtk::manage (new Gtk::ScrolledWindow);
+    //sw->add (this->view);
+    //this->view.show ();
+    //this->getPaned().add1 (*sw);
+    this->getPaned().add1 (this->view);
 
     Gtk::MenuItem* loadItem = this->addMenuItem (this->getFileMenu (), "Load image");
     loadItem->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::loadImage));
@@ -107,7 +108,7 @@ void ImageViewer::loadImageName (const char* fname)
 
 void ImageViewer::sobel ()
 {
-    goAutoPtr<goSignal3D<void> > image = this->view.getImage ();
+    goAutoPtr<goSignal3DBase<void> > image = this->view.getImage ();
     
     if (image.isNull ())
         return;
@@ -115,7 +116,18 @@ void ImageViewer::sobel ()
     goSignal3D<void> sob, abs_sob;
     sob.setDataType (GO_FLOAT);
 
-    goSignal::sobel2D (*image, sob);
+    if (image->getChannelCount() == 1)
+    {
+        goSignal::sobel2D (*image, sob);
+    }
+    else
+    {
+        goSignal3D<void> temp;
+        temp.setDataType (GO_UINT8);
+        temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
+        goRGBAtoScalar (image, &temp);
+        goSignal::sobel2D (temp, sob);
+    }
     abs_sob.setDataType (sob.getDataType ().getID ());
     abs_sob.make (sob.getSize(), sob.getSize(), sob.getBorderSize(), 1);
 
@@ -141,14 +153,25 @@ void ImageViewer::sobel ()
 
 void ImageViewer::canny ()
 {
-    goAutoPtr<goSignal3D<void> > image = this->view.getImage ();
+    goAutoPtr<goSignal3DBase<void> > image = this->view.getImage ();
     
     if (image.isNull ())
         return;
   
     goSignal3D<void> cimg;
     cimg.setDataType (GO_UINT8);
-    goSignal::canny (*image, cimg);
+    if (image->getChannelCount() == 1)
+    {
+        goSignal::canny (*image, cimg);
+    }
+    else
+    {
+        goSignal3D<void> temp;
+        temp.setDataType (GO_UINT8);
+        temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
+        goRGBAtoScalar (image, &temp);
+        goSignal::canny (temp, cimg);
+    }
     cimg *= 255.0f;
 
     goSignal3D<void> image2;

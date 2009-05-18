@@ -66,6 +66,7 @@ namespace goGUI
                 vc.close ();
             };
 
+            //= Deprecated. Does not get used anymore.
             void channelSwap ()
             {
                 if (target.isNull())
@@ -89,7 +90,7 @@ namespace goGUI
             };
 
             goVideoCapture vc;
-            goAutoPtr<goSignal3D<void> > target;
+            goAutoPtr<goSignal3DBase<void> > target;
 
             Gtk::Button      captureButton;
             Gtk::CheckButton contCapture;
@@ -157,6 +158,11 @@ goGUI::VideoCaptureControl::~VideoCaptureControl ()
     }
 }
 
+goVideoCapture& goGUI::VideoCaptureControl::getVideoCapture ()
+{
+    return myPrivate->vc;
+}
+
 //bool goGUI::VideoCaptureControl::capture (goSignal3D<void>& target)
 //{
 //    return myPrivate->vc.grab (target);
@@ -166,11 +172,19 @@ void goGUI::VideoCaptureControl::capture ()
 {
     if (!myPrivate->target.isNull())
     {
-        myPrivate->vc.grab (*myPrivate->target);
+        const int rgb_channels[] = {0, 1, 2};
+        const int bgr_channels[] = {2, 1, 0};
         if (myPrivate->swapRGB.get_active())
         {
-            myPrivate->channelSwap ();
+            myPrivate->vc.grab (*myPrivate->target, bgr_channels);
         }
+        else
+        {
+            myPrivate->vc.grab (*myPrivate->target, rgb_channels);
+        }
+        //{
+        //    myPrivate->channelSwap ();
+        //}
         myPrivate->capturedCaller ();
     }
 }
@@ -181,7 +195,8 @@ void goGUI::VideoCaptureControl::contCaptureToggle ()
     {
         struct timespec t_req, t_remain;
         t_req.tv_sec = 0;
-        t_req.tv_nsec = 10000000;
+        // t_req.tv_nsec = 10000000;
+        t_req.tv_nsec = 10000;
 
         while (myPrivate->contCapture.get_active())
         {
@@ -204,7 +219,7 @@ void goGUI::VideoCaptureControl::swapRGBToggle ()
     }
 }
 
-void goGUI::VideoCaptureControl::setTarget (goAutoPtr<goSignal3D<void> > target)
+void goGUI::VideoCaptureControl::setTarget (goAutoPtr<goSignal3DBase<void> > target)
 {
     myPrivate->target = target;
 }

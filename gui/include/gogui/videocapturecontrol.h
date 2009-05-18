@@ -5,6 +5,7 @@
 #include <goautoptr.h>
 #include <gofunctor.h>
 #include <gosignal3d.h>
+#include <govideocapture.h>
 
 namespace goGUI
 {
@@ -19,11 +20,13 @@ namespace goGUI
 
             // bool capture (goSignal3D<void>& target);
             void capture ();
-            void setTarget (goAutoPtr<goSignal3D<void> > target);
+            void setTarget (goAutoPtr<goSignal3DBase<void> > target);
             void contCaptureToggle ();
             void swapRGBToggle ();
 
             goCaller0<int>& capturedCaller ();
+
+            goVideoCapture& getVideoCapture ();
 
             void setWhiteness ();
             void setBrightness ();

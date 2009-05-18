@@ -6,6 +6,9 @@
 #include <gofixedarray.h>
 #include <gocolourspace.h>
 
+#include <gosignal3dref.h>
+#include <gosignal.h>
+
 #include <fcntl.h>
 #include <unistd.h>
 #if HAVE_SYS_STAT_H
@@ -314,10 +317,11 @@ bool goVideoCapture::grab (void* target, goSize_t sz)
  * if necessary.
  * 
  * @param target Target containing the image if return value is true.
+ * @param rgb_channels Contains 3 integers, each denoting the channel number in target for r, g, and b respectively.
  * 
  * @return True if successful, false otherwise.
  */
-bool goVideoCapture::grab (goSignal3D<void>& target)
+bool goVideoCapture::grab (goSignal3D<void>& target, const int* rgb_channels)
 {
     if (target.getSizeX() != this->getCaptureWidth() || target.getSizeY() != this->getCaptureHeight() || target.getSizeX() != target.getBlockSizeX() || target.getSizeY() != target.getBlockSizeY() || target.getChannelCount() != 3 || target.getDataType().getID() != GO_UINT8)
     {
@@ -328,7 +332,7 @@ bool goVideoCapture::grab (goSignal3D<void>& target)
         target.make (sz, sz, border, 3);
     }
 
-    return this->grab (*static_cast<goSignal3DBase<void>*> (&target));
+    return this->grab (*static_cast<goSignal3DBase<void>*> (&target), rgb_channels);
 }
 
 /** 
@@ -336,10 +340,11 @@ bool goVideoCapture::grab (goSignal3D<void>& target)
  * 
  * @param target Target. Must currently be linear in memory (block size == signal size), of type GO_UINT8 and
  * must have 3 channels if the colour mode is RGB24.
+ * @param rgb_channels Contains 3 integers, each denoting the channel number in target for r, g, and b respectively.
  * 
  * @return True if successful, false otherwise.
  */
-bool goVideoCapture::grab (goSignal3DBase<void>& target)
+bool goVideoCapture::grab (goSignal3DBase<void>& target, const int* rgb_channels)
 {
 #if HAVE_LINUX_VIDEODEV_H
     switch (myPrivate->colourMode)
@@ -353,14 +358,26 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
                     goLog::warning ("grab RGB24 : Unsupported target. Data type must be uint8 and block size must equal size.",this);
                     return false;
                 }
-                if (target.getChannelCount() != 3)
+                if (target.getChannelCount() >= 3)
                 {
-                    goLog::warning ("grab(): channel count must be 3 for rgb grabbing.",this);
-                    return false;
+                    // return this->grab (target.getPtr(), target.getSizeX() * target.getSizeY() * target.getChannelCount());
+                    if (myPrivate->grabBuffer.getSize() != myPrivate->captureWidth * myPrivate->captureHeight * 3)
+                    {
+                        myPrivate->grabBuffer.setSize (myPrivate->captureWidth * myPrivate->captureHeight * 3);
+                    }
+                    if (!this->grab (myPrivate->grabBuffer.getPtr(), myPrivate->grabBuffer.getSize()))
+                    {
+                        return false;
+                    }
+                    goSize3D sz (myPrivate->captureWidth, myPrivate->captureHeight, 1);
+                    goSignal3DRef ref (myPrivate->grabBuffer.getPtr(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 3);
+                    const int source_chan [] = {0, 1, 2};
+                    goSignal::convert (ref, target, source_chan, rgb_channels, 3);
                 }
                 else
                 {
-                    return this->grab (target.getPtr(), target.getSizeX() * target.getSizeY() * target.getChannelCount());
+                    goLog::warning ("grab(): channel count must be 3 for rgb grabbing.",this);
+                    return false;
                 }
             }
             break;
@@ -375,7 +392,8 @@ bool goVideoCapture::grab (goSignal3DBase<void>& target)
                 {
                     return false;
                 }
-                goYUV420P_RGB_base (myPrivate->grabBuffer.getPtr(), myPrivate->captureWidth, myPrivate->captureHeight, target);
+                // const int rgb_channels[] = {0, 1, 2};
+                goYUV420P_RGB_base (myPrivate->grabBuffer.getPtr(), myPrivate->captureWidth, myPrivate->captureHeight, target, rgb_channels);
                 return true;
             }
             break;

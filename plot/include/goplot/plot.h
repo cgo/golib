@@ -7,9 +7,12 @@
 #include <cairo.h>
 #include <pango/pangocairo.h>
 
-namespace NSPACE
+namespace goPlot
 {
 
+    /** @addtogroup cairoplot
+     * @{
+     */
     typedef double real;
 
     //= Surface --> Graphs --> draw2d
@@ -119,7 +122,7 @@ namespace NSPACE
             RGBA (double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0)
                 : r (r), g (g), b (b), a (a)
             {
-            };
+            }
 
             double r, g, b, a;
     };
@@ -137,12 +140,12 @@ namespace NSPACE
             Trafo2D (Real xx = 1.0, Real yx = 0.0, Real xy = 0.0, Real yy = 1.0, Real x0 = 0.0, Real y0 = 0.0)
                 : xx (xx), xy (xy), yx (yx), yy (yy), x0 (x0), y0 (y0)
             {
-            };
+            }
 
             Trafo2D (const Trafo2D<Real>& t)
             {
                 *this = t;
-            };
+            }
             Trafo2D<Real>& operator= (const Trafo2D<Real>& t)
             {
                 xx = t.xx;
@@ -153,7 +156,7 @@ namespace NSPACE
                 y0 = t.y0;
 
                 return *this;
-            };
+            }
 
             virtual ~Trafo2D () { };
 
@@ -260,7 +263,7 @@ namespace NSPACE
                 g_free (families); // FIXME: Stimmt das so?
             }
     };
-
+    /** @} */
 };
 #endif
 

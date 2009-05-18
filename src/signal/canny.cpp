@@ -11,6 +11,58 @@ namespace goSignal
     template <class T>
     static int _cannyRoundAngle (T angle)
     {
+        static const float range_1 = M_PI * 0.5 + M_PI * 0.125;
+        static const float range_2 = M_PI * 0.5 - M_PI * 0.125;
+        static const float range_3 = M_PI * 0.25 - M_PI * 0.125;
+        static const float range_4 = -M_PI * 0.125;
+        static const float range_5 = -M_PI * 0.25 - M_PI * 0.125;
+        // static const float range_6 = -M_PI * 0.5 - M_PI * 0.125;
+
+        //= Erzwinge Winkel zw. 90 u. -90 Grad
+        if (angle > T(range_1))
+        {
+            angle -= T(M_PI);
+        }
+        else if (angle <= T(range_5))
+        {
+            angle += T(M_PI);
+        }
+
+        if (angle <= range_1 && angle > range_2)
+            return 90;
+
+        if (angle <= range_2 && angle > range_3)
+            return 45;
+
+        if (angle <= range_3 && angle > range_4)
+            return 0;
+
+        if (angle <= range_4 && angle > range_5)
+            return -45;
+
+        //= This should not happen.
+        assert (false == true);
+        return 90;
+
+//        if (angle < T(67.5) || angle < T(-67.5))
+//            return 90;
+//
+//        if (angle > T(67.5) && angle < T(22.5))
+//            return 45;
+//
+//        if (angle < T(22.5) && angle > T(-22.5))
+//            return 0;
+//
+//        return -45;
+
+        //if (angle < T(-22.5) && angle > T(-67.5))
+        //    return -45;
+    }
+
+#if 0
+    template <class T>
+    static int _cannyRoundAngle (T angle)
+    {
         //= Erzwinge Winkel zw. 90 u. -90 Grad
         if (angle < T(-90))
         {
@@ -39,6 +91,7 @@ namespace goSignal
         //if (angle < T(-22.5) && angle > T(-67.5))
         //    return -45;
     }
+#endif
 
     //= currently unused.
     template <class imageT, class retT, class sobelT>
@@ -87,36 +140,44 @@ namespace goSignal
         //= Non-maximum suppression
         goSignal3DGenericIterator r (&ret);
         goSignal3DGenericIterator s (&sobel);
-        goFloat f = 180.0f / M_PI;
+        // goFloat f = 180.0f / M_PI;
         while (!s.endY ())
         {
             s.resetX ();
             r.resetX ();
             while (!s.endX ())
             {
-                int angle = _cannyRoundAngle (f * ::atan2 (*((sobelT*)*s + 1), *(sobelT*)*s));
+                int angle = _cannyRoundAngle (::atan2 (*((sobelT*)*s + 1), *(sobelT*)*s));
                 sobelT a1 = sobelT(0), a2 = sobelT(0);
                 sobelT a = *((sobelT*)*s + 2);
                 switch (angle)
                 {
-                    case 90: a1 = *((sobelT*)s.leftX() + 2); a2 = *((sobelT*)s.rightX() + 2); break;
-                    case 45: a1 = *((sobelT*)s.leftDown() + 2); a2 = *((sobelT*)s.rightUp() + 2); break;
-                    case 0: a1 = *((sobelT*)s.rightY() + 2); a2 = *((sobelT*)s.leftY() + 2); break;
-                    case -45: a1 = *((sobelT*)s.leftUp() + 2); a2 = *((sobelT*)s.rightDown() + 2); break;
+                    case 0: a1 = *((sobelT*)s.leftX() + 2); a2 = *((sobelT*)s.rightX() + 2); break;
+                    case -45: a1 = *((sobelT*)s.leftDown() + 2); a2 = *((sobelT*)s.rightUp() + 2); break;
+                    case 90: a1 = *((sobelT*)s.rightY() + 2); a2 = *((sobelT*)s.leftY() + 2); break;
+                    case 45: a1 = *((sobelT*)s.leftUp() + 2); a2 = *((sobelT*)s.rightDown() + 2); break;
                     default: goLog::error ("goSignal::canny (): angle error."); a1 = 0; a2 = 0; a = 0; break;
                 }
 
-                if (a > a1 && a > a2)
-                    *(retT*)*r = retT(1);
-                else
-                    *(retT*)*r = retT(0);
-
+                //if (angle == 45)
+                {
+                    if (a > a1 && a > a2)
+                        *(retT*)*r = retT(1);
+                    else
+                        *(retT*)*r = retT(0);
+                }
+                //else
+                //{
+                //    *(retT*)*r = retT(0);
+                //}
                 s.incrementX ();
                 r.incrementX ();
             }
             s.incrementY ();
             r.incrementY ();
         }
+
+        //= FIXME: Hysteresis
     }
 
     template <class imageT, class sobelT>

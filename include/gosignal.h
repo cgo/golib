@@ -24,7 +24,7 @@ namespace goSignal
 
     bool canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret);
 
-    bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount);
+    bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount);
 
     bool RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target);
     bool toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha = -1.0);

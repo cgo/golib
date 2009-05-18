@@ -58,8 +58,8 @@ class goVideoCapture : public goObjectBase
         enum ColourMode getColourMode () const;
         bool open              ();
         void close             ();
-        bool grab              (goSignal3DBase<void>& signal);
-        bool grab              (goSignal3D<void>& signal);
+        bool grab              (goSignal3DBase<void>& signal, const int* rgb_channels);
+        bool grab              (goSignal3D<void>& signal, const int* rgb_channels);
         bool grab              (void* buffer, goSize_t size);
 
         bool checkCapture      () const;

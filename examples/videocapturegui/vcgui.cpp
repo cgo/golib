@@ -33,8 +33,15 @@ VCGui::VCGui ()
     myPrivate->imageContainer.add (myPrivate->imageView);
     this->getPaned().add1 (myPrivate->imageContainer);
 
+    int w = myPrivate->vccontrol.getVideoCapture().getCaptureWidth ();
+    int h = myPrivate->vccontrol.getVideoCapture().getCaptureHeight ();
+
+    myPrivate->imageView.setImage (w, h, goPlot::Object2DImage::RGB24);
+
     myPrivate->vccontrol.setTarget (myPrivate->imageView.getImage());
     myPrivate->vccontrol.capturedCaller().connect (goMemberFunction<VCGui, int> (this, &VCGui::redrawImage));
+
+    printf ("myPrivate->imageView.getImage() size: %d %d\n", myPrivate->imageView.getImage()->getSizeX(), myPrivate->imageView.getImage()->getSizeY());
 
     this->show_all ();
 
@@ -54,7 +61,8 @@ VCGui::~VCGui ()
 
 int VCGui::redrawImage ()
 {
-    goPython::runFile ("imagescript.py");
+    // goPython::runFile ("imagescript.py");
+    // myPrivate->imageView.setImage (myPrivate->imageView.getImage());
     myPrivate->imageView.queue_draw ();
     return 0;
 }

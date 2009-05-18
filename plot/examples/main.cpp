@@ -3,6 +3,8 @@
 #include <goplot/object2dtext.h>
 #include <goplot/object2dimage.h>
 
+#include <gogui/cairoplot.h>
+
 #include <gomatrix.h>
 #include <gocurve.h>
 #include <gosignal.h>
@@ -100,10 +102,10 @@ int main (int argc, char* argv[])
     const int N = 100;
     //= Gets deleted by the destructor of Graph. Not good.
     typedef NSPACE ::Object2DPoints <Points, Real> Points_t;
-    NSPACE ::AutoPtr<NSPACE ::Object2D> points = new NSPACE ::Object2DPoints <Points, Real> (N);
-    NSPACE ::AutoPtr<NSPACE ::Object2D> points2 = new NSPACE ::Object2DPoints <Points, Real> (N);
+    goAutoPtr<NSPACE ::Object2D> points = new goPlot::Object2DPoints <Points, Real> (N);
+    goAutoPtr<NSPACE ::Object2D> points2 = new goPlot::Object2DPoints <Points, Real> (N);
 
-    NSPACE ::AutoPtr<NSPACE ::Object2D> mypoints = new NSPACE ::Object2DPoints <MyPoints2D<goFloat>, goFloat>;
+    goAutoPtr<NSPACE ::Object2D> mypoints = new NSPACE ::Object2DPoints <MyPoints2D<goFloat>, goFloat>;
     goMatrix<goFloat> M;
     goCurve<goFloat> c;
     c.readASCII ("/home/christian/Work/shapes/mpeg7-ce1-b/shapes/bat-17.gif.txt");
@@ -152,7 +154,7 @@ int main (int argc, char* argv[])
     graph2->axis(1)->setUpper (maxy);
     graph2->axis(0)->setTics (10);
     graph2->axis(1)->setTics (10);
-    NSPACE ::AutoPtr<NSPACE ::Object2D> graph2p (graph2);
+    goAutoPtr<NSPACE ::Object2D> graph2p (graph2);
     NSPACE ::Trafo2D<NSPACE ::real> trafo2 (M_PI, 0.0, 0.0, 1.0, M_PI, -0.5);
     graph2p->setTransform (trafo2);
     // graph.add (graph2p);
@@ -185,10 +187,10 @@ int main (int argc, char* argv[])
     NSPACE ::Trafo2D<NSPACE ::real> t (1.0/ float (sig.getSizeX()), 0.0, 0.0, -1.0 / float (sig.getSizeY()), 0.0, 1.0);
     img->setTransform (t);
     sig.destroy ();
-    graph.add (NSPACE ::AutoPtr<NSPACE ::Object2D> (img));
+    graph.add (goAutoPtr<NSPACE ::Object2D> (img));
 
 
-    NSPACE ::CairoPlotWidget cp (&graph);
+    goGUI::CairoPlotWidget cp (&graph);
 
 #ifndef CAIRO_HAS_PS_SURFACE
     printf ("Cairo does not have PS!\n");

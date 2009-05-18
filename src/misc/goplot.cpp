@@ -1039,7 +1039,7 @@ bool goPlot::gnuplotList (const goList< arrayT >* arrayListX,
 //}
 
 /** 
- * @brief Create a goPlot::AutoPtr<goPlot::Object2DImage> for use with the goPlot library.
+ * @brief Create a goAutoPtr<goPlot::Object2DImage> for use with the goPlot library.
  * 
  * The given 2D image \c img is copied into a \c goPlot::Object2DImage.
  * If \c img has 3 or 4 channels, they are interpreted as RGB / RGBA
@@ -1051,9 +1051,9 @@ bool goPlot::gnuplotList (const goList< arrayT >* arrayListX,
  *
  * @param img The 2D source image.
  * 
- * @return The goPlot::AutoPtr to the image object.
+ * @return The goAutoPtr to the image object.
  */
-goPlot::AutoPtr<goPlot::Object2DImage> goPlot::object2DImage (const goSignal3DBase<void>& img)
+goAutoPtr<goPlot::Object2DImage> goPlot::object2DImage (const goSignal3DBase<void>& img)
 {
     int format = goPlot::Object2DImage::ARGB32;
 
@@ -1070,7 +1070,7 @@ goPlot::AutoPtr<goPlot::Object2DImage> goPlot::object2DImage (const goSignal3DBa
                  break;
     }
 
-    goPlot::AutoPtr<goPlot::Object2DImage> ret = new goPlot::Object2DImage;
+    goAutoPtr<goPlot::Object2DImage> ret = new goPlot::Object2DImage;
 
     ret->createImage (format, img.getSizeX(), img.getSizeY());
 

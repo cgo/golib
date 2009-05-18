@@ -4,11 +4,14 @@
 #include <goplot/plot.h>
 #include <cairo/cairo.h>
 
-namespace NSPACE
+namespace goPlot
 {
 
     //= Cairo 2D drawing object
     //= Points must be derived from Points2D.
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Points object. Draws lines connecting the given 2D points.
      * @param Points Class derived from Points2D.
@@ -73,6 +76,7 @@ namespace NSPACE
             Points         myPoints;
             LineTraits     myLineTraits;
     };
+    /** @} */
 };
 
 #endif

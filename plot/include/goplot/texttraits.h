@@ -6,8 +6,11 @@
 
 #include <pango/pangocairo.h>
 
-namespace NSPACE
+namespace goPlot
 {
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Text properties.
      * Contains colour and font.
@@ -141,5 +144,6 @@ namespace NSPACE
             PangoLayout *myLayout;
             // PangoFontDescription *myFontDesc;
     };
+    /** @} */
 };
 #endif

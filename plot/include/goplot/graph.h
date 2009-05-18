@@ -1,6 +1,8 @@
 #ifndef GOPLOT_GRAPH_H
 #define GOPLOT_GRAPH_H
 
+#include <goautoptr.h>
+
 #include <goplot/plot.h>
 #include <goplot/graphaxis.h>
 #include <goplot/autoptr.h>
@@ -11,8 +13,11 @@
 
 #include <assert.h>
 
-namespace NSPACE
+namespace goPlot
 {
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Graph. Contains multiple Object2D and some axes to be drawn.
      * Can also contain other Graphs.
@@ -50,7 +55,7 @@ namespace NSPACE
 
                 for (int i = 0; i < axes; ++i)
                 {
-                    myAxes.push_back (AutoPtr<GraphAxis> (new GraphAxis));
+                    myAxes.push_back (goAutoPtr<GraphAxis> (new GraphAxis));
                     myAxes[i]->setIndex (i);
                     //if (axes <= 4)
                     //    myAxes[i]->configure (configs[i]);
@@ -82,7 +87,7 @@ namespace NSPACE
                 myAxes.reserve (other.myAxes.size ());
                 for ( size_t i = 0; i < other.myAxes.size (); ++i)
                 {
-                    myAxes.push_back (AutoPtr<GraphAxis> (new GraphAxis (*other.axis(i))));
+                    myAxes.push_back (goAutoPtr<GraphAxis> (new GraphAxis (*other.axis(i))));
                 }
 
                 //= FIXME === Pointers are copied, not objects. Is that wanted?
@@ -134,7 +139,7 @@ namespace NSPACE
             }
 
             int              dim () const { return myDim; }
-            AutoPtr<GraphAxis>  axis (int i) 
+            goAutoPtr<GraphAxis>  axis (int i) 
             { 
                 if (i >= 0 && i < int (this->myAxes.size ()))
                     return myAxes[i];
@@ -142,7 +147,7 @@ namespace NSPACE
                 throw std::exception (); // ("Graph::axis(): Index out of range");
             }
 
-            const AutoPtr<GraphAxis> axis (int i) const 
+            const goAutoPtr<GraphAxis> axis (int i) const 
             { 
                 if (i >= 0 && i < this->dim ())
                     return myAxes[i];
@@ -153,9 +158,9 @@ namespace NSPACE
             /** 
              * @brief Adds a Object2D to this graph.
              * 
-             * @param o The object pointer (managed by a AutoPtr)
+             * @param o The object pointer (managed by a goAutoPtr)
              */
-            void add (AutoPtr<Object2D> o)
+            void add (goAutoPtr<Object2D> o)
             {
                 if (!o.isNull ())
                     o->setContext (this->context ());
@@ -208,7 +213,7 @@ namespace NSPACE
                     throw std::exception ();
 
                 txt->setPosition (x, y, rel_x, rel_y);
-                this->add (AutoPtr<Object2D> (txt));
+                this->add (goAutoPtr<Object2D> (txt));
                 return *txt;
             }
 
@@ -227,7 +232,7 @@ namespace NSPACE
                     assert (!myAxes[i].isNull ());
                     myAxes[i]->setContext (c);
                 }
-                for (std::list<AutoPtr<Object2D> >::iterator it = myObjects.begin (); it != myObjects.end (); ++it)
+                for (std::list<goAutoPtr<Object2D> >::iterator it = myObjects.begin (); it != myObjects.end (); ++it)
                 {
                     (*it)->setContext (c);
                 }
@@ -267,7 +272,7 @@ namespace NSPACE
                 //cairo_matrix_multiply (&Mo, &Mo, &M);
                 //cairo_set_matrix (cr, &Mo);
                 //= Draw other objects
-                for (std::list<AutoPtr<Object2D> >::iterator it = myObjects.begin (); it != myObjects.end (); ++it)
+                for (std::list<goAutoPtr<Object2D> >::iterator it = myObjects.begin (); it != myObjects.end (); ++it)
                 {
                     (*it)->draw ();
                 }
@@ -311,14 +316,15 @@ namespace NSPACE
             }
 
         protected:
-            std::list<AutoPtr<Object2D> > objects2D () { return myObjects; }
+            std::list<goAutoPtr<Object2D> > objects2D () { return myObjects; }
 
         private:
-            std::vector<AutoPtr<GraphAxis> > myAxes;
-            std::list<AutoPtr<Object2D> >    myObjects;
+            std::vector<goAutoPtr<GraphAxis> > myAxes;
+            std::list<goAutoPtr<Object2D> >    myObjects;
             int                              myDim;
             std::string                      myTitle;
     };
+    /** @} */
 };
 
 #endif

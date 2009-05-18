@@ -6,6 +6,10 @@
 namespace NSPACE
 {
 
+
+
+   //= Own version
+#if 0
     class RRefPtrException : public std::exception
     {
         public:
@@ -376,5 +380,7 @@ namespace NSPACE
                 RRefPtr<void>* myRRefPtr;
         };
 
+#endif
 };
+
 #endif

@@ -5,7 +5,7 @@
 
 #include <goplot/plot.h>
 
-namespace NSPACE
+namespace goPlot
 {
     class Tic : public Object2D
     {

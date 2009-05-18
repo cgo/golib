@@ -3,7 +3,7 @@
 #include <golog.h>
 
 template <class S, class T>
-static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount)
+static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
     source.setChannel (0);
     target.setChannel (0);
@@ -21,8 +21,8 @@ static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
             t.resetX ();
             while (!s.endX ())
             {
-                ptrdiff_t *sc = source_chan;
-                ptrdiff_t *tc = target_chan;
+                const int *sc = source_chan;
+                const int *tc = target_chan;
                 for (i = 0; i < channelCount; ++i, ++sc, ++tc)
                 {
                     *((T*)*t + *tc) = *((S*)*s + *sc);
@@ -43,7 +43,7 @@ static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
 
 
 template <class S>
-static bool _convert1 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount)
+static bool _convert1 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
     switch (target.getDataType().getID())
     {
@@ -60,7 +60,7 @@ static bool _convert1 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
 }
 
 
-bool goSignal::convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, ptrdiff_t* source_chan, ptrdiff_t* target_chan, int channelCount)
+bool goSignal::convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
     if (source.getSizeX() > target.getSizeX() ||
         source.getSizeY() > target.getSizeY() ||
@@ -92,8 +92,8 @@ bool goSignal::RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& tar
     if (source.getChannelCount () < 3)
         return false;
 
-    ptrdiff_t target_chan[] = {2, 1, 0};
-    ptrdiff_t source_chan[] = {0, 1, 2};
+    int target_chan[] = {2, 1, 0};
+    int source_chan[] = {0, 1, 2};
 
     bool ok = convert (source, target, source_chan, target_chan, 3);
     if (!ok)
@@ -114,14 +114,14 @@ bool goSignal::toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
         return false;
     }
 
-    ptrdiff_t target_chanBGR[] = {2, 1, 0};
-    ptrdiff_t target_chanBGRA[] = {2, 1, 0, 3};
-    ptrdiff_t source_chanRGB[] = {0, 1, 2};
-    ptrdiff_t source_chanRGBA[] = {0, 1, 2, 3};
-    ptrdiff_t source_chanI[] = {0, 0, 0};
+    int target_chanBGR[] = {2, 1, 0};
+    int target_chanBGRA[] = {2, 1, 0, 3};
+    int source_chanRGB[] = {0, 1, 2};
+    int source_chanRGBA[] = {0, 1, 2, 3};
+    int source_chanI[] = {0, 0, 0};
 
-    ptrdiff_t *source_chan = 0;
-    ptrdiff_t *target_chan = 0;
+    int *source_chan = 0;
+    int *target_chan = 0;
     int chan_count = 3;
     switch (source.getChannelCount())
     {

@@ -8,7 +8,7 @@ LDARGS		=  $(LDFLAGS) `pkg-config --libs gtkmm-2.4` -lGo # -lgoplot
 
 LIBS		=  
 
-INCLUDE		=  $(CPPFLAGS) -I../include `pkg-config --cflags gtkmm-2.4`
+INCLUDE		=  $(CPPFLAGS) -I../include `pkg-config --cflags gtkmm-2.4` -I../../gui/include
 
 TARGET		= main
 

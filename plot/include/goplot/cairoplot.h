@@ -7,10 +7,13 @@
 #include <goplot/graph.h>
 // #include <goplot/graphaxis.h>
 
-namespace NSPACE
+namespace goPlot
 {
     // template <class Points, class Real>
-    
+
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Plots a graph with cairo.
      */
@@ -25,7 +28,7 @@ namespace NSPACE
                     return;
                 }
                 // d->get_size (w, h);
-                printf ("W, H = %d, %d\n", w, h);
+                // printf ("W, H = %d, %d\n", w, h);
                 cairo_save (context);
                 cairo_matrix_t m;
                 // cairo_matrix_init (&m, float(w) / g.axis(0)->length(), 0, 0, -float(h) / g.axis(1)->length(), 0, float(h) / g.axis(1)->length());
@@ -59,6 +62,8 @@ namespace NSPACE
             cairo_t* context;
     };
 
+    //= Moved to goGUI
+#if 0
     // template <class Points, class Real>
     /** 
      * @brief Gtkmm widget for plotting. Testing only.
@@ -106,6 +111,10 @@ namespace NSPACE
 #endif
             };
     };
+#endif
+
+    /** @} */
+
 };
 
 #endif

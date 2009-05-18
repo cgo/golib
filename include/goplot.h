@@ -22,6 +22,10 @@
 # include <gognuplot.h>
 #endif
 
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
+
 // #include <goplot/plot.h>
 #include <goplot/goplot.h>
 
@@ -67,6 +71,9 @@ class goPlotterLabel
         goString options;
 };
 
+/** @addtogroup gnuplot
+ * @{
+ */
 /** 
  * @brief Single plot class used for goMultiPlotter.
  */
@@ -247,7 +254,11 @@ class goMultiPlotter : public goObjectBase
     private:
         goMultiPlotterPrivate* myPrivate;
 };
+    /** @} */
 
+/** 
+ * @deprecate
+ */
 class goPlotter : public goObjectBase
 {
     public:
@@ -320,6 +331,9 @@ class goPlotter : public goObjectBase
 namespace goPlot
 {
 
+/** @addtogroup gnuplot
+ * @{
+ */
     typedef enum
     {
         Normal,
@@ -341,6 +355,11 @@ namespace goPlot
 
     class PlotPrivate;
 
+    /** 
+     * @brief Convenience interface to goMultiPlotter and goSinglePlot
+     *
+     * This just makes using goMultiPlotter and goSinglePlot a little simpler for some cases.
+     */
     class Plot : public goObjectBase
     {
         public:
@@ -509,9 +528,13 @@ namespace goPlot
         static bool gnuplot (const goFixedArray<goDouble>&, const char* title = 0, const char* gnuplotCommands = 0, goString* cmdFileNameRet = 0, goString* dataFileNameRet = 0, bool waitfor = false);
 #endif
 
+    /** @} */
 
+/** @addtogroup cairoplot
+ * @{
+ */
         /** 
-         * @brief For use in the goPlot library (uses the same namespace).
+         * @brief For use in the cairo plotting environment (uses the same namespace).
          *
          * Points stored in a goMath::Matrix<T> object, one point per row.
          */
@@ -568,13 +591,13 @@ namespace goPlot
          *
          * @param curve 2D Points, one per row. N times 2 matrix.
          * 
-         * @return A goPlot::AutoPtr to a goPlot::Object2D that can be given directly
+         * @return A goAutoPtr to a goPlot::Object2D that can be given directly
          *   to a goPlot::Graph using goPlot::Graph::add().
          */
         template <class T>
-            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goMatrix<T>& curve)
+            goAutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goMatrix<T>& curve)
         {
-            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            goAutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
             assert (!points.isNull ());
             points->points() = curve;
 
@@ -589,13 +612,13 @@ namespace goPlot
          * @param x x coordinates
          * @param y y coordinates (must be of same size as x)
          * 
-         * @return A goPlot::AutoPtr to a goPlot::Object2D that can be given directly
+         * @return A goAutoPtr to a goPlot::Object2D that can be given directly
          *   to a goPlot::Graph using goPlot::Graph::add().
          */
         template <class T>
-            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& x, const goVector<T>& y)
+            goAutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& x, const goVector<T>& y)
         {
-            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            goAutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
             assert (!points.isNull ());
             assert (x.getSize() == y.getSize());
             points->points().matrix().resize (x.getSize(), 2);
@@ -618,9 +641,9 @@ namespace goPlot
          *   to a goPlot::Graph using goPlot::Graph::add().
          */
         template <class T>
-            goPlot::AutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& y)
+            goAutoPtr<goPlot::Object2DPoints<Points2DMatrix<T>,T > > object2D (const goVector<T>& y)
         {
-            AutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
+            goAutoPtr<Object2DPoints<Points2DMatrix<T>,T> > points = new Object2DPoints<Points2DMatrix<T>,T>;
             assert (!points.isNull ());
             points->points().matrix().resize (y.getSize(), 2);
             goVector<T> x (0);
@@ -631,7 +654,8 @@ namespace goPlot
             return points;
         }
 
-        goPlot::AutoPtr<goPlot::Object2DImage> object2DImage (const goSignal3DBase<void>& img);
+        goAutoPtr<goPlot::Object2DImage> object2DImage (const goSignal3DBase<void>& img);
+    /** @} */
 }
 
 #endif

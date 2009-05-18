@@ -6,11 +6,15 @@
 
 #include <exception>
 
-namespace NSPACE
+namespace goPlot
 {
 
     //= Cairo 2D drawing object
     //= Points must be derived from Points2D.
+
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Image object.
      * @note Set the transform with \c setTransform() sensibly, so the dimensions fit in the
@@ -32,7 +36,8 @@ namespace NSPACE
             Object2DImage ()
                 : Object2D (), 
                   myCairoFormat (CAIRO_FORMAT_ARGB32),
-                  mySurface (0)
+                  mySurface (0),
+                  myData (0)
             {
             }
 
@@ -74,6 +79,19 @@ namespace NSPACE
                 mySurface = cairo_image_surface_create_for_data (image, myCairoFormat, width, height, stride);
             }
 
+            int format () const
+            {
+                switch (myCairoFormat)
+                {
+                    case CAIRO_FORMAT_ARGB32: return ARGB32; break;
+                    case CAIRO_FORMAT_RGB24: return RGB24; break;
+                    case CAIRO_FORMAT_A8: return A8; break;
+                    case CAIRO_FORMAT_A1: return A1; break;
+                    default: goLog::error ("Object2DImage: unknown cairo format.");
+                             return -1; break;
+                }
+            }
+
             /** 
              * @brief Creates an image of (width x height)
              * @note The allocated data has stride \c stride().
@@ -104,9 +122,10 @@ namespace NSPACE
 
                 int stride = cairo_format_stride_for_width (myCairoFormat, width);
                 
-                unsigned char* data = static_cast<unsigned char*> (::malloc (stride * height));
-
-                mySurface = cairo_image_surface_create_for_data (data, myCairoFormat, width, height, stride);
+                // unsigned char* data = static_cast<unsigned char*> (::malloc (stride * height));
+                // mySurface = cairo_image_surface_create_for_data (data, myCairoFormat, width, height, stride);
+                myData = new unsigned char [stride * height];
+                mySurface = cairo_image_surface_create_for_data (myData, myCairoFormat, width, height, stride);
             }
 
             /** 
@@ -160,7 +179,7 @@ namespace NSPACE
 
                 this->applyTransform (cr);
 
-                printf ("Drawing Object2DImage\n");
+                // printf ("Drawing Object2DImage\n");
 
                 cairo_set_source_surface (cr, mySurface, 0, 0);
                 cairo_identity_matrix (cr);
@@ -175,7 +194,10 @@ namespace NSPACE
         private:
              cairo_format_t myCairoFormat;
              cairo_surface_t *mySurface;
+             goAutoPtr <unsigned char> myData; //= If data is allocated internally for an image, it is stored here.
     };
+
+    /** @} */
 };
 
 #endif

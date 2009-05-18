@@ -7,8 +7,11 @@
 
 // #include <pango/pangocairo.h>
 
-namespace NSPACE
+namespace goPlot
 {
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief 2D text drawing class. Uses pango with cairo.
      *
@@ -184,6 +187,7 @@ namespace NSPACE
             real        myRelDx;
             real        myRelDy;
     };
+    /** @} */
 };
 
 #endif

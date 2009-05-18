@@ -134,6 +134,27 @@
   * \defgroup mathopt Optimisation
   * This module contains optimisation methods for Newton type optimisation.
   */
+ /*!
+  * \defgroup plot Plotting
+  * This module contains some functions and classes that help plotting
+  * from C++ or languages for which golib has been wrapped.
+  * There is currently support for using gnuplot under Linux or compatible systems
+  * and for using Cairo for plotting.
+  */
+ /*!
+  * \ingroup plot
+  * \defgroup cairoplot Plotting with Cairo
+  * These are the functions and classes related to plotting with Cairo.
+  */
+ /*!
+  * \ingroup plot
+  * \defgroup gnuplot Plotting with Gnuplot
+  * These are the functions and classes related to plotting with gnuplot.
+  * You will generally want to use only
+  * - goMultiPlotter together with a bunch of
+  * - goSinglePlot
+  * - or goPlot::Plot as a simpler interface for a few things.
+  */
 /*!
  * \defgroup misc Miscellaneous and basic classes
  *  \section misc-intro Introduction

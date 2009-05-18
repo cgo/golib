@@ -8,10 +8,13 @@
 #include <vector>
 #include <algorithm>
 
-namespace NSPACE
+namespace goPlot
 {
     // template <class Points, class Real> class Object2DPoints;
 
+    /** @addtogroup cairoplot
+     * @{
+     */
     /** 
      * @brief Axis.
      */
@@ -677,5 +680,7 @@ namespace NSPACE
             real              myPosY;
             int               myConf;
     };
+
+    /** @} */
 };
 #endif
