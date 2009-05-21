@@ -52,8 +52,8 @@ int main ()
     goAutoPtr<vector> y = new vector (2*N);
     for (int i = 0; i < N; ++it, ++i)
     {
-        (*it)[0] = 0.3 * goRandom() + 0.2;
-        (*it)[1] = 0.3 * goRandom() + 0.0;
+        (*it)[0] = 0.5 * goRandom() + 0.5;
+        (*it)[1] = 0.5 * goRandom() + 0.9;
         (*y)[i] = 1.0;
     }
     for (int i = 0; i < N; ++it, ++i)
@@ -82,6 +82,8 @@ int main ()
         }
     }
 
+    points *= 10.0;
+
     goAutoPtr<OptProblem<Matrix<goFloat>, Vector<goFloat> > > prob = new OptProblem<Matrix<goFloat>, Vector<goFloat> > (new SVMDual (xx, y));
 
     goAutoPtr<matrix> A = new matrix (1, y->getSize());
@@ -103,7 +105,7 @@ int main ()
 
     double epsilon = 0.001;
     BarrierOpt<Matrix<goFloat>, Vector<goFloat> > bo (prob);
-    bo.solve (alpha, epsilon);
+    bo.solve (alpha, epsilon, 1.5, 1.0);
 
     alpha.print ();
 

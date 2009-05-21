@@ -68,7 +68,31 @@ REAL f1 (const vector_type& x)
 
 int main ()
 {
+    //= Plot f1
+    {
+        goSize_t N = 10;
+        
+        goMatrixd points (N * N, 3);
+        double x1 = -1, x2 = 1;
+        double y1 = -1, y2 = 1;
+        for (goSize_t i = 0; i < N; ++i)
+        {
+            for (goSize_t j = 0; j < N; ++j)
+            {
+                goVectord x (2);
+                x[0] = x1 + (x2 - x1) * (float)i / (float)(N - 1);
+                x[1] = y1 + (y2 - y1) * (float)j / (float)(N - 1);
+                points (i * N + j, 0) = x[0];
+                points (i * N + j, 1) = x[1];
+                points (i * N + j, 2) = f1 (x);
+            }
+        }
 
+        goPlot::Plot p;
+        p.setPrefix ("set dgrid3d; set isosamples 30,30; set contour; set cntrparam levels discrete 0;\n");
+        p.plot (points, "");
+        p.plotPause ();
+    }
     //= Do log barrier interior point
 #if 1
     {

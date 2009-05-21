@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -O2
+CXXARGS		= -c   -D HAVE_CONFIG_H -O2 $(CPPFLAGS)
 
 LD		= g++
-LDARGS		=  
+LDARGS		= $(LDFLAGS) 
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L/space/gosch/lib -lGo -lGomatlab
+LIBS		=  -lGo -lGomatlab
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
 

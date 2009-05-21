@@ -396,6 +396,7 @@ namespace goMath
                this->myBufferGrad.ref (bufferGrad_x, 0, x_s_sz - 1);
 
                this->myBufferGrad [x_s_sz - 1] = -1;
+               //= sum ( grad f_i(x) / (s - f_i(x)) )
                for (goSize_t i = 0; i < M; ++i)
                {
                    //== nabla phi(x) = sum_{i=1}^{M} 1/-f_i(x) \, nabla f_i(x)
@@ -404,15 +405,16 @@ namespace goMath
                    this->myProblem->ineq(i)->grad (x, bufferGrad_x);
                    bufferGrad_x *= -1.0; // FIXME  --- WHY IS THIS???
                    goMath::vectorAdd (fi_x, this->myBufferGrad, ret);
+                   //printf ("Added to grad:\n");
+                   //this->myBufferGrad.print ();
+                   //char c;
+                   //std::cin >> c;
                }
 
                //= f(x,s) = s, d/d(x,s) f(x,s) = (0,...,0,1)^T
                // this->myProblem->f()->grad (x, bufferGrad_x);
                // goMath::vectorAdd (this->my_t, myBufferGrad, ret);
                ret [x_s_sz - 1] += this->my_t * 1.0;
-
-               //= FIXME: W H Y ?
-               // ret *= -1.0;
 
                printf ("BarrierOptFunctionPhase1::grad: \n");
                ret.print ();

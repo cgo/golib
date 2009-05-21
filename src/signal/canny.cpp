@@ -11,33 +11,33 @@ namespace goSignal
     template <class T>
     static int _cannyRoundAngle (T angle)
     {
-        static const float range_1 = M_PI * 0.5 + M_PI * 0.125;
-        static const float range_2 = M_PI * 0.5 - M_PI * 0.125;
-        static const float range_3 = M_PI * 0.25 - M_PI * 0.125;
-        static const float range_4 = -M_PI * 0.125;
-        static const float range_5 = -M_PI * 0.25 - M_PI * 0.125;
+        static const float range_1 = -M_PI * 0.125;
+        static const float range_2 = M_PI * 0.125;
+        static const float range_3 = M_PI * 0.25 + M_PI * 0.125;
+        static const float range_4 = M_PI * 0.5 + M_PI * 0.125;
+        static const float range_5 = M_PI * 0.75 + M_PI * 0.125;
         // static const float range_6 = -M_PI * 0.5 - M_PI * 0.125;
 
         //= Erzwinge Winkel zw. 90 u. -90 Grad
-        if (angle > T(range_1))
-        {
-            angle -= T(M_PI);
-        }
-        else if (angle <= T(range_5))
+        if (angle < T(range_1))
         {
             angle += T(M_PI);
         }
+        else if (angle >= T(range_5))
+        {
+            angle -= T(M_PI);
+        }
 
-        if (angle <= range_1 && angle > range_2)
-            return 90;
-
-        if (angle <= range_2 && angle > range_3)
-            return 45;
-
-        if (angle <= range_3 && angle > range_4)
+        if (angle >= range_1 && angle < range_2)
             return 0;
 
-        if (angle <= range_4 && angle > range_5)
+        if (angle >= range_2 && angle < range_3)
+            return 45;
+
+        if (angle >= range_3 && angle < range_4)
+            return 90;
+
+        if (angle >= range_4 && angle < range_5)
             return -45;
 
         //= This should not happen.
@@ -108,22 +108,41 @@ namespace goSignal
                 while (!i.endX())
                 {
                     sobelT x, y, a;
-                    x = *(imageT*)i.rightUp() - *(imageT*)i.leftUp() +
-                        imageT(2) * (*(imageT*)i.rightX() - *(imageT*)i.leftX()) +
-                        *(imageT*)i.rightDown() - *(imageT*)i.leftDown();
-                    y = *(imageT*)i.rightDown() - *(imageT*)i.rightUp() +
-                        imageT(2) * (*(imageT*)i.rightY() - *(imageT*)i.leftY()) +
-                        *(imageT*)i.leftDown() - *(imageT*)i.leftUp();
-                    a = ::sqrt (x*x + y*y);
+                    x = float(*(imageT*)i.rightUp()) - float(*(imageT*)i.leftUp()) +
+                        2.0 * (float(*(imageT*)i.rightX()) - float(*(imageT*)i.leftX())) +
+                        float(*(imageT*)i.rightDown()) - float(*(imageT*)i.leftDown());
+                    y = float(*(imageT*)i.rightDown()) - float(*(imageT*)i.rightUp()) +
+                        2.0 * (float(*(imageT*)i.rightY()) - float(*(imageT*)i.leftY())) +
+                        float(*(imageT*)i.leftDown()) - float(*(imageT*)i.leftUp());
+                    //x = -x;
+                    //y = -y;
+                    a = ::sqrt(x*x + y*y);
                     *(sobelT*)*s = x;
                     *((sobelT*)*s + 1) = y;
-                    *((sobelT*)*s + 2) = a;
+                    *((sobelT*)*s + 2) = a; // a;
                     i.incrementX ();
                     s.incrementX ();
                 }
                 i.incrementY ();
                 s.incrementY ();
             }
+
+#if 0
+            sobel.setChannel (2);
+            printf ("sobel min, max: %f, %f\n", sobel.getMinimum (), sobel.getMaximum ());
+            sobel *= 255.0 / sobel.getMaximum();
+            sobel.setChannel (0);
+
+            int source_chan[ret.getChannelCount()];
+            int target_chan[ret.getChannelCount()];
+            for (goSize_t i = 0; i < ret.getChannelCount(); ++i)
+            {
+                source_chan[i] = 2;
+                target_chan[i] = i;
+            }
+            goSignal::convert (sobel, ret, source_chan, target_chan, ret.getChannelCount());
+            return;
+#endif
         }
 
 //        {
@@ -140,6 +159,12 @@ namespace goSignal
         //= Non-maximum suppression
         goSignal3DGenericIterator r (&ret);
         goSignal3DGenericIterator s (&sobel);
+
+        //goDouble minSobel, maxSobel;
+        //sobel.setChannel (2);
+        //sobel.getMinMax (minSobel, maxSobel);
+        //sobel.setChannel (0);
+
         // goFloat f = 180.0f / M_PI;
         while (!s.endY ())
         {
@@ -159,12 +184,18 @@ namespace goSignal
                     default: goLog::error ("goSignal::canny (): angle error."); a1 = 0; a2 = 0; a = 0; break;
                 }
 
-                //if (angle == 45)
+                //if (angle == -45)
                 {
                     if (a > a1 && a > a2)
-                        *(retT*)*r = retT(1);
+                    {
+                        *((sobelT*)*s + 2) = a;
+                        //*(retT*)*r = retT ((a - minSobel) / (maxSobel - minSobel) * 255.0f);
+                    }
                     else
-                        *(retT*)*r = retT(0);
+                    {
+                        //*(retT*)*r = retT(0);
+                        *((sobelT*)*s + 2) = 0;
+                    }
                 }
                 //else
                 //{
@@ -176,6 +207,14 @@ namespace goSignal
             s.incrementY ();
             r.incrementY ();
         }
+
+        goDouble minSobel, maxSobel;
+        sobel.setChannel (2);
+        sobel.getMinMax (minSobel, maxSobel);
+        sobel -= minSobel;
+        sobel *= 255.0f / (maxSobel - minSobel);
+        goCopySignalChannel (&sobel, &ret);
+        sobel.setChannel (0);
 
         //= FIXME: Hysteresis
     }

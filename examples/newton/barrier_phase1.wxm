@@ -4,11 +4,14 @@
 /* [wxMaxima: input   start ] */
 g[i](x,s):=f[i](x) - s$
 f0(x,s):=t*s - sum(log (-g[i](x,s)),i,1,n);
+print("Gradient:")$
 diff(f0(x,s),x,1);
 diff(f0(x,s),s,1);
+print("Hessian:")$
 diff(f0(x,s),x,2);
 diff(f0(x,s),s,2);
 diff(diff(f0(x,s),x,1),s,1);
+diff(diff(f0(x,s),s,1),x,1);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */

@@ -221,6 +221,7 @@ SET (SOURCES ${SOURCES}
 
 ## goSignal
 SET (SOURCES ${SOURCES}
+    src/signal/smooth.cpp
     src/signal/convert.cpp
     src/signal/canny.cpp
     src/signal/defaultsize.cpp

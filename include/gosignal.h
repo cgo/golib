@@ -23,6 +23,7 @@ namespace goSignal
     const goSize3D& defaultBlockSize2D ();
 
     bool canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret);
+    bool smooth (goSignal3DBase<void>& sig, goSize_t width = 3);
 
     bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount);
 

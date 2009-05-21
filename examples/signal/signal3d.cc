@@ -145,6 +145,26 @@ void printWithPointers (goSignal3D<void>& signal)
 
 int main (void)
 {
+    //= Check direct neighbour access functions for 2D:
+    {
+        goSignal3D<void> sig;
+        sig.setDataType (GO_UINT8);
+        sig.make (goSize3D (10, 10, 1), goSize3D (2, 2, 1), goSize3D (4, 4, 0), 1);
+        int i = 0;
+        GO_SIGNAL3D_EACHELEMENT_GENERIC (*(goUInt8*)__ptr = i; ++i;, sig);
+        printGenericSignal <goUInt8> (sig);
+
+        goSignal3DGenericIterator it (&sig);
+
+        it.setPosition (4, 5, 0);
+
+        printf ("%d %d %d\n", *(goUInt8*)it.leftUp(), *(goUInt8*)it.leftY(), *(goUInt8*)it.rightUp());
+        printf ("%d %d %d\n", *(goUInt8*)it.leftX(), *(goUInt8*)*it, *(goUInt8*)it.rightX());
+        printf ("%d %d %d\n", *(goUInt8*)it.leftDown(), *(goUInt8*)it.rightY(), *(goUInt8*)it.rightDown());
+
+        exit (1);
+    }
+
     //= Performance test
     {
         goSignal3D<void> sig;

@@ -157,11 +157,15 @@ void ImageViewer::canny ()
     
     if (image.isNull ())
         return;
-  
+
+    // this->queue_draw ();
+    // return;
+
     goSignal3D<void> cimg;
     cimg.setDataType (GO_UINT8);
     if (image->getChannelCount() == 1)
     {
+        goSignal::smooth (*image);
         goSignal::canny (*image, cimg);
     }
     else
@@ -170,9 +174,10 @@ void ImageViewer::canny ()
         temp.setDataType (GO_UINT8);
         temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
         goRGBAtoScalar (image, &temp);
+        goSignal::smooth (temp);
         goSignal::canny (temp, cimg);
     }
-    cimg *= 255.0f;
+    // cimg *= 255.0f;
 
     goSignal3D<void> image2;
     image2.make (image);
