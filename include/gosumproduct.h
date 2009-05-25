@@ -36,9 +36,10 @@
  * \addtogroup gm
  * @{
  */
-
 /** 
  * @brief The sum-product algorithm.
+ *
+ * @see goMaxSum
  *
  * @param T Type of the node values, currently must be integer
  * @param Tfloat Floating point type, typically goFloat or goDouble
@@ -656,6 +657,7 @@ class goSumProduct : public goMessagePassing <T,Tfloat>
             return marginal.sum ();
         };
 };
+
 /** @} */
 
 #endif

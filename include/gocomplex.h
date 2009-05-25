@@ -15,15 +15,17 @@ template <class T>
 class goComplex 
 {
     public:
-        goComplex  () : real (T(0)), ima (T(0)) {};
-        goComplex  (T r, T i = T(0)) : real (r), ima (i) {};
-        goComplex  (const goComplex<T>& other) { *this = other; };
-        virtual ~goComplex () {};
+        goComplex  () : real (T(0)), ima (T(0)) {}
+        goComplex  (T r, T i = T(0)) : real (r), ima (i) {}
+        goComplex  (const goComplex<T>& other) { *this = other; }
+        virtual ~goComplex () {}
 
         inline T&	re () { return real; }
         inline T&	im () { return ima; }
         inline const T&	re () const { return real; }
         inline const T&	im () const { return ima; }
+
+        operator T () { return this->abs(); }
 
         goComplex<T>	operator*  (const goComplex<T>& other) const
         {
@@ -33,7 +35,7 @@ class goComplex
             retval.im() = (real * other.im()) + (ima * other.re());
 
             return retval;
-        };
+        }
 
         goComplex<T>&	operator*= (const goComplex<T>& other) 
         {
@@ -47,7 +49,7 @@ class goComplex
             ima  = tmpima;
             return *this;
 
-        };
+        }
 
         goComplex<T>	operator+  (const goComplex<T>& other) const
         {
@@ -57,14 +59,14 @@ class goComplex
             retval.im() = ima  + other.im();
 
             return retval;
-        };
+        }
 
         goComplex<T>&	operator+= (const goComplex<T>& other)
         {
             real += other.re();
             ima  += other.im();
             return *this;
-        };
+        }
 
         goComplex<T>	operator-  (const goComplex<T>& other) const
         {
@@ -74,7 +76,7 @@ class goComplex
             retval.im() = ima  - other.im();
 
             return retval;
-        };
+        }
 
         goComplex<T>&	operator-= (const goComplex<T>& other)
         {
@@ -82,7 +84,7 @@ class goComplex
             ima  -= other.im();
 
             return *this;
-        };
+        }
 
         goComplex<T>	operator/  (const goComplex<T>& other) const
         {
@@ -94,7 +96,7 @@ class goComplex
             retval.im() = ( (other.re() * ima) - (real * other.im()) ) / tmp;
 
             return retval;
-        };
+        }
 
         goComplex<T>&	operator/= (const goComplex<T>& other)
         {
@@ -109,14 +111,14 @@ class goComplex
             real = tmpreal;
             ima  = tmpima;
             return *this;
-        };
+        }
 
         goComplex<T>&	operator=  (const goComplex<T>& other)
         {
             real = other.re();
             ima  = other.im();
             return *this;
-        };
+        }
 
         bool		operator== (const goComplex<T>& other) const
         {
@@ -125,7 +127,7 @@ class goComplex
                 return true;
             }
             return false;
-        };
+        }
 
         bool		operator!= (const goComplex<T>& other) const
         {
@@ -134,7 +136,7 @@ class goComplex
                 return true;
             }
             return false;
-        };
+        }
 
         bool		operator>  (const goComplex<T>& other) const
         {
@@ -142,7 +144,7 @@ class goComplex
                 return true;
             }
             return false;
-        };
+        }
 
         bool		operator<  (const goComplex<T>& other) const
         {
@@ -150,18 +152,18 @@ class goComplex
                 return true;
             }
             return false;
-        };
+        }
 
         /// make conjugate complex number
         void	conjugate ()
         {
             ima = -ima;
-        };
+        }
 
         goComplex<T> conj () const
         {
             return goComplex<T>(this->re(),-this->im());
-        };
+        }
 
         /**
          * Calculate the argument (phase angle) of the complex number.
@@ -192,7 +194,7 @@ class goComplex
                 argValue = (T)(M_PI_2);
             }
             return argValue;
-        };
+        }
 
         /**
          * Calculate the absolute value of the complex number.
@@ -201,7 +203,7 @@ class goComplex
         goDouble  abs () const
         {
             return sqrt ( (double) (ima*ima + real*real) );
-        };
+        }
 
     protected:
         T real;

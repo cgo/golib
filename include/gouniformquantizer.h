@@ -16,6 +16,9 @@ template <class _input_type,class _output_type> class goUniformQuantizerPrivate;
 /**
  * @brief Uniform quantizer.
  *
+ * @todo Check the example quantizer.cpp. The last value may not be reached (maybe a rounding problem)
+ * and that may also result in the problems with histogram equalisation that have been observed.
+ *
  * @param _input_type   Input data type.
  * @param _output_type  Output data type.
  *

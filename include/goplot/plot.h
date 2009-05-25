@@ -128,7 +128,19 @@ namespace goPlot
     };
 
     /** 
-     * @brief Simple transformation representation (2x2 matrix and translation vector).
+     * @brief Simple affine transformation representation (2x2 matrix and translation vector).
+     *
+     * Represents an affine transformation, essentially
+     * in the same way Cairo does.
+     *
+     * The transformations consists of a 2x2 matrix M
+       @verbatim
+         xx xy
+         yx yy
+       @endverbatim
+       and a translation vector <code> T = (x0,y0) </code>.
+       The transformation applied to a point z then results in
+       <code> M * z + T </code>.
      */
     template <class Real> class Trafo2D
     {

@@ -139,6 +139,9 @@ goSignal3DBase : public goObjectBase
         // there is no good reason to use another type. Void rules.
         bool setDataType (goTypeEnum t);
 
+        goDouble getValue (goIndex_t x, goIndex_t y = 0, goIndex_t z = 0, goSize_t channel = 0) const;
+        void     setValue (goDouble value, goIndex_t x, goIndex_t y = 0, goIndex_t z = 0, goSize_t channel = 0);
+
               T* getPtr ();
         const T* getPtr () const;
 

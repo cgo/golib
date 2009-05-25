@@ -144,6 +144,109 @@ goSignal3DBase<T>::initializeDataType ()
     return false;
 }
 
+#define GET_PTR(type) (*(const type*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[channel]))
+template <>
+goDouble
+goSignal3DBase<void>::getValue (goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel) const
+{
+    switch (this->getDataType().getID())
+    {
+        case GO_UINT8:  return static_cast<goDouble> (GET_PTR(goUInt8)); break;
+        case GO_INT8:   return static_cast<goDouble> (GET_PTR(goInt8)); break;
+        case GO_UINT16: return static_cast<goDouble> (GET_PTR(goUInt16)); break;
+        case GO_INT16:  return static_cast<goDouble> (GET_PTR(goInt16)); break;
+        case GO_UINT32: return static_cast<goDouble> (GET_PTR(goUInt32)); break;
+        case GO_INT32:  return static_cast<goDouble> (GET_PTR(goInt32)); break;
+        case GO_FLOAT:  return static_cast<goDouble> (GET_PTR(goFloat)); break;
+        case GO_DOUBLE: return static_cast<goDouble> (GET_PTR(goDouble)); break;
+        default: goLog::error ("goSignal3DBase::getValue(): unsupported data type."); 
+                 return 0.0; 
+                 break;
+    }
+}
+#undef GET_PTR
+
+template <>
+goDouble
+goSignal3DBase<void*>::getValue (goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel) const
+{
+    goLog::error ("goSignal3DBase::getValue() does not work for void* type.");
+    return 0.0;
+}
+
+/** 
+ * @brief Convenience function to get a value.
+ *
+ * @note This is slow.
+ *
+ * Get a value at a specific position conveniently and type independent.
+ * While this is ok for a single value, it is slow for use in a loop.
+ * Use the goSignal3DGenericIterator family of classes for fast iteration over signals.
+ * 
+ * @param x X coordinate 
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param channel Channel number
+ *
+ * @return The value at the given position.
+ */
+template <class T>
+goDouble
+goSignal3DBase<T>::getValue (goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel) const
+{
+    return static_cast<goDouble> (*(const T*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[channel]));
+}
+
+#define GET_PTR(type) (*(type*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[channel]))
+template <>
+void
+goSignal3DBase<void>::setValue (goDouble value, goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel)
+{
+    switch (this->getDataType().getID())
+    {
+        case GO_UINT8:  GET_PTR(goUInt8)  = static_cast<goUInt8> (value);   break;
+        case GO_INT8:   GET_PTR(goInt8)   = static_cast<goInt8> (value);    break;
+        case GO_UINT16: GET_PTR(goUInt16) = static_cast<goUInt16> (value);  break;
+        case GO_INT16:  GET_PTR(goInt16)  = static_cast<goInt16> (value);   break;
+        case GO_UINT32: GET_PTR(goUInt32) = static_cast<goUInt32> (value);  break;
+        case GO_INT32:  GET_PTR(goInt32)  = static_cast<goInt32> (value);   break;
+        case GO_FLOAT:  GET_PTR(goFloat)  = static_cast<goFloat> (value);   break;
+        case GO_DOUBLE: GET_PTR(goDouble) = static_cast<goDouble> (value);  break;
+        default: goLog::error ("goSignal3DBase::setValue(): unsupported data type."); 
+                 break;
+    }
+}
+#undef GET_PTR
+
+template <>
+void
+goSignal3DBase<void*>::setValue (goDouble value, goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel)
+{
+    goLog::error ("goSignal3DBase::setValue() does not work for void* type.");
+}
+
+/** 
+ * @brief Convenience function to set a value.
+ *
+ * @note This is slow.
+ *
+ * Set a value at a specific position conveniently and type independent.
+ * While this is ok for a single value, it is slow for use in a loop.
+ * Use the goSignal3DGenericIterator family of classes for fast iteration over signals.
+ * 
+ * @param value Value. Will be cast to the appropriate data type.
+ * @param x X coordinate 
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param channel Channel number
+ */
+template <class T>
+void
+goSignal3DBase<T>::setValue (goDouble value, goIndex_t x, goIndex_t y, goIndex_t z, goSize_t channel)
+{
+    *(T*) ((goUInt8*)ptr + myZJump[z] + myYJump[y] + myXJump[x] + myChannelOffset[channel]) = static_cast<T> (value);
+}
+
 template<> void*
 goSignal3DBase<void>::getPtr (goIndex_t x, goIndex_t y, goIndex_t z)
 {

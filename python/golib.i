@@ -1125,6 +1125,20 @@
     };
 }
 
+%extend goSignal3DBase<void>
+{
+    %pythoncode
+    {
+        def __setitem__ (self, pos, val):
+            """pos is a sequence of 4 integers containing (x, y, z, channel) indices."""
+            self.setValue (val, pos[0], pos[1], pos[2], pos[3])
+
+        def __getitem__ (self, pos):
+            """pos is a sequence of 4 integers containing (x, y, z, channel) indices."""
+            return self.getValue (pos[0], pos[1], pos[2], pos[3])
+    }
+}
+
 %apply float *OUTPUT {float *phiRet, float *thetaRet, float *radiusRet};
 %inline %{
     // Namespaces are not used, but maybe they will in a future swig?

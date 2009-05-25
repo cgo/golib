@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
 
 LD		= g++
-LDARGS		=  
+LDARGS		= $(LDFLAGS)
 
 GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  -lGo
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		= `pkg-config --cflags-only-I cairo` `pkg-config --cflags-only-I pango`
 
 TARGET		= quantizer
 
