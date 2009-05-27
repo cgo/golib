@@ -179,7 +179,7 @@ namespace goPlot
                                 this->setPosition (0.5, 0.0); 
                             else
                                 this->setPosition (1.0, 0.0); 
-                            Trafo2D<real> M (0.0, 1.0, -1.0, 0.0, myPosX, myPosY);
+                            Trafo2DT<real> M (0.0, 1.0, -1.0, 0.0, myPosX, myPosY);
                             this->setTransform (M);
                         } break;
                     case BOTTOM: 
@@ -188,7 +188,7 @@ namespace goPlot
                                 this->setPosition (0.0, 0.5); 
                             else
                                 this->setPosition (0.0, 0.0); 
-                            Trafo2D<real> M (1.0, 0.0, 0.0, 1.0, myPosX, myPosY);
+                            Trafo2DT<real> M (1.0, 0.0, 0.0, 1.0, myPosX, myPosY);
                             this->setTransform (M);
                         } break;
                     case LEFT: 
@@ -197,7 +197,7 @@ namespace goPlot
                                 this->setPosition (0.5, 0.0);
                             else
                                 this->setPosition (0.0, 0.0);
-                            Trafo2D<real> M (0.0, 1.0, 1.0, 0.0, myPosX, myPosY);
+                            Trafo2DT<real> M (0.0, 1.0, 1.0, 0.0, myPosX, myPosY);
                             this->setTransform (M);
                         } break;
                     case TOP: 
@@ -206,7 +206,7 @@ namespace goPlot
                                 this->setPosition (0.0, 0.5);
                             else
                                 this->setPosition (0.0, 1.0);
-                            Trafo2D<real> M (1.0, 0.0, 0.0, -1.0, myPosX, myPosY);
+                            Trafo2DT<real> M (1.0, 0.0, 0.0, -1.0, myPosX, myPosY);
                             this->setTransform (M);
                         } break;
                 }

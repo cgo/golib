@@ -142,23 +142,23 @@ namespace goPlot
        The transformation applied to a point z then results in
        <code> M * z + T </code>.
      */
-    template <class Real> class Trafo2D
+    template <class Real> class Trafo2DT
     {
         public:
             //= Matrix:
             //=   xx xy
             //=   yx yy
             //= Plus a translation (x0, y0)^T
-            Trafo2D (Real xx = 1.0, Real yx = 0.0, Real xy = 0.0, Real yy = 1.0, Real x0 = 0.0, Real y0 = 0.0)
+            Trafo2DT (Real xx = 1.0, Real yx = 0.0, Real xy = 0.0, Real yy = 1.0, Real x0 = 0.0, Real y0 = 0.0)
                 : xx (xx), xy (xy), yx (yx), yy (yy), x0 (x0), y0 (y0)
             {
             }
 
-            Trafo2D (const Trafo2D<Real>& t)
+            Trafo2DT (const Trafo2DT<Real>& t)
             {
                 *this = t;
             }
-            Trafo2D<Real>& operator= (const Trafo2D<Real>& t)
+            Trafo2DT<Real>& operator= (const Trafo2DT<Real>& t)
             {
                 xx = t.xx;
                 xy = t.xy;
@@ -170,7 +170,7 @@ namespace goPlot
                 return *this;
             }
 
-            virtual ~Trafo2D () { };
+            virtual ~Trafo2DT () { };
 
             void print () const
             {
@@ -184,8 +184,30 @@ namespace goPlot
                 cairo_transform (cr, &M);
             }
 
+            /** 
+             * @brief this = this * M2;
+             * 
+             * @param M2 
+             */
+            void operator*= (const Trafo2DT<Real>& M2)
+            {
+                const Trafo2DT<Real>& M1 = *this;
+                
+                Trafo2DT<Real> temp;
+                temp.xx = M1.xy*M2.yx+M1.xx*M2.xx;
+                temp.xy = M1.xy*M2.yy+M1.xx*M2.xy;
+                temp.yx = M1.yy*M2.yx+M1.yx*M2.xx;
+                temp.yy = M1.yy*M2.yy+M1.yx*M2.xy;
+                temp.x0 = M1.xy*M2.y0+M1.xx*M2.x0+M1.x0;
+                temp.y0 = M1.yy*M2.y0+M1.yx*M2.x0+M1.y0;
+
+                *this = temp;
+            }
+
             Real xx, xy, yx, yy, x0, y0;
     };
+
+    typedef Trafo2DT<real> Trafo2D;
 
     /** 
      * @brief Base class for all 2D drawable objects.
@@ -198,9 +220,9 @@ namespace goPlot
             virtual void draw () = 0;
             virtual void setContext (cairo_t* c) { myContext = c; }
 
-            // Trafo2D<real>& transform () { return myTransform; };
-            const Trafo2D<real>& transform () const { return myTransform; };
-            void setTransform (const Trafo2D<real>& T) { myTransform = T; };
+            // Trafo2DT<real>& transform () { return myTransform; };
+            const Trafo2DT<real>& transform () const { return myTransform; };
+            void setTransform (const Trafo2DT<real>& T) { myTransform = T; };
 
             cairo_t* context () { return myContext; }
             const cairo_t* context () const { return myContext; }
@@ -224,7 +246,7 @@ namespace goPlot
             { };
 
         private:
-            Trafo2D<real> myTransform;
+            Trafo2DT<real> myTransform;
             cairo_t       *myContext;
     };
     

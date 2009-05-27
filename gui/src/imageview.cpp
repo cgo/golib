@@ -64,12 +64,20 @@ namespace goGUI
                 graph.set (0);
                 graph.set (new goPlot::Graph);
 
-                this->graph->axis(0)->setVisible (false);
-                this->graph->axis(1)->setVisible (false);
+                graph->disableAxes ();
+                graph->flipY ();
+
+                const goPlot::Trafo2D& t = graph->transform ();
+                printf ("%.3f %.3f\n%.3f %.3f\n", t.xx, t.xy, t.yx, t.yy);
+                printf ("%.3f, %.3f\n", t.x0, t.y0);
+
+                // this->graph->axis(0)->setVisible (false);
+                // this->graph->axis(1)->setVisible (false);
 
                 // this->makeImages ();
             }
 
+#if 0
             /* 
              * @brief Make a cairo image of given proportions.
              * 
@@ -144,7 +152,7 @@ namespace goGUI
                 //= Set the transform so that y-axes is flipped (Graph coordinate system starts at lower left
                 //=  corner by default).
                 // img->setTransform (goPlot::Trafo2D<goPlot::real> (1.0, 0.0, 0.0, -1.0, 0.0, img->height ()));
-                this->graph->setTransform (goPlot::Trafo2D<goPlot::real> (1.0, 0.0, 0.0, -1.0, 0.0, 1.0));
+                this->graph->setTransform (goPlot::Trafo2D (1.0, 0.0, 0.0, -1.0, 0.0, 1.0));
 
                 //= Cairo's format is different --- copy the data into a new buffer.
 
@@ -167,7 +175,7 @@ namespace goGUI
                 {
                     case 4: format = goPlot::Object2DImage::ARGB32; break;
                     case 3: format = goPlot::Object2DImage::RGB24; break;
-                    case 1: format = goPlot::Object2DImage::A8; break;
+                    case 1: format = goPlot::Object2DImage::RGB24; break;
                     default:
                         goLog::warning ("ImageView::setImage: channel count not supported."); return false; break;
                 }
@@ -189,7 +197,12 @@ namespace goGUI
                         break;
                     case 1:
                         {
-                            goCopySignalArray (&image, img->data());
+                            goSize3D sz (w, h, 1);
+                            goSignal3DRef imgref (img->data(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
+                            int source_i [] = {0, 0, 0};
+                            int target_i [] = {1, 2, 3};
+                            goSignal::convert (*const_cast<goSignal3DBase<void>*>(&image), imgref, source_i, target_i, 3);
+                            // goCopySignalArray (&image, img->data());
                         }
                         break;
                     default:
@@ -198,6 +211,7 @@ namespace goGUI
 
                 return true;
             }
+#endif
 
             // goList<goMatrixd>          curves;
             // goList<ImageViewCurveAttr> curveAttributes;  //= These are not used yet. Add them.
@@ -293,7 +307,9 @@ namespace goGUI
     {
         myPrivate->graph = 0;
         myPrivate->makeGraph ();
-        myPrivate->makeImage (w, h, format);
+        // myPrivate->makeImage (w, h, format);
+        myPrivate->imageObjects.clear ();
+        myPrivate->imageObjects.push_back (myPrivate->graph->makeImage (w, h, format));
         myPrivate->graph->setDimensions (0, w, 0, h);
     }
 
@@ -314,17 +330,21 @@ namespace goGUI
         // myPrivate->image = image;
 
         myPrivate->makeGraph ();
-        if (!myPrivate->setImage (image))
-        {
-            goLog::warning ("ImageView::setImage(): Could not set image to myPrivate object");
-            return;
-        }
 
         if (myPrivate->graph.isNull())
         {
             goLog::error ("ImageView::setImage(): graph is null.");
             return;
         }
+
+        myPrivate->imageObjects.clear ();
+        myPrivate->imageObjects.push_back (myPrivate->graph->addImage (image));
+
+        //if (!myPrivate->setImage (image))
+        //{
+        //    goLog::warning ("ImageView::setImage(): Could not set image to myPrivate object");
+        //    return;
+        //}
 
         myPrivate->graph->setDimensions (0, image.getSizeX(), 0, image.getSizeY());
         // myPrivate->graph->setDimensions (0, 1.0, 0, 1.0);

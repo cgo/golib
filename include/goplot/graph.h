@@ -6,12 +6,26 @@
 #include <goplot/plot.h>
 #include <goplot/graphaxis.h>
 #include <goplot/autoptr.h>
+#include <goplot/object2dimage.h>
 
 #include <exception>
 #include <list>
 #include <vector>
 
 #include <assert.h>
+
+#ifndef GOSIGNAL_H
+# include <gosignal.h>
+#endif
+#ifndef GOSIGNAL3DREF_H
+# include <gosignal3dref.h>
+#endif
+#ifndef GOSIGNAL3DBASE_H
+# include <gosignal3dbase.h>
+#endif
+#ifndef GOAUTOPTR_H
+# include <goautoptr.h>
+#endif
 
 namespace goPlot
 {
@@ -102,6 +116,129 @@ namespace goPlot
             virtual ~Graph ()
             {
             }
+
+            /** 
+             * @brief Disables all axes.
+             *
+             * This can e.g. be used if you want to use this graph as an image display.
+             */
+            void disableAxes ()
+            {
+                const goSize_t N = this->myAxes.size();
+                for (goSize_t i = 0; i < N; ++i)
+                {
+                    this->axis(i)->setVisible (false);
+                }
+            }
+
+            /** 
+             * @brief Multiply the current transformation so that
+             * the Y axis is mirrored.
+             *
+             * Useful if displaying an image which starts in the upper left corner.
+             */
+            void flipY ()
+            {
+                Trafo2D t = this->transform();
+                t *= Trafo2D (1, 0, 0, -1, 0, 1);
+                this->setTransform (t);
+            }
+
+            /** 
+             * @brief Removes all objects.
+             */
+            void clear ()
+            {
+                this->objects2D ().clear ();
+            }
+
+            //=
+            //= Convenience functions for adding new objects.
+            //=
+
+            goAutoPtr<Object2DImage> makeImage (int width, int height, int format = goPlot::Object2DImage::RGB24)
+            {
+                int channels = 0;
+                switch (format)
+                {
+                    case goPlot::Object2DImage::ARGB32:
+                        channels = 4; printf ("ARGB32\n"); break;
+                            //= RGB24 is stored in 32 bits too, but the first 8 bits are ignored.
+                    case goPlot::Object2DImage::RGB24:
+                        channels = 4; printf ("RGB24\n"); break;
+                    case goPlot::Object2DImage::A8:
+                        channels = 1; printf ("A8\n"); break;
+                    default: goLog::warning ("Graph: image format not supported."); return 0; break;
+                }
+
+                goAutoPtr<goPlot::Object2DImage> img = 0;
+                img = new goPlot::Object2DImage;
+                img->createImage (format, width, height);
+
+                //= Set the transform so that y-axes is flipped (Graph coordinate system starts at lower left
+                //=  corner by default).
+                // img->setTransform (goPlot::Trafo2DT<goPlot::real> (1.0, 0.0, 0.0, -1.0, 0.0, img->height ()));
+                // this->graph->setTransform (goPlot::Trafo2DT<goPlot::real> (1.0, 0.0, 0.0, -1.0, 0.0, 1.0));
+
+                this->add (img);
+                return img;
+            }
+
+            goAutoPtr<Object2DImage> addImage (const goSignal3DBase<void>& image)
+            {
+                int format = 0;
+                switch (image.getChannelCount())
+                {
+                    case 4: format = goPlot::Object2DImage::ARGB32; break;
+                    case 3: format = goPlot::Object2DImage::RGB24; break;
+                    case 1: format = goPlot::Object2DImage::RGB24; break;
+                    default:
+                        goLog::warning ("Graph::addImage: channel count not supported."); return false; break;
+                }
+
+                int w = image.getSizeX();
+                int h = image.getSizeY();
+
+                goAutoPtr<goPlot::Object2DImage> img = this->makeImage (w, h, format);
+
+                if (img.isNull())
+                {
+                    goLog::error ("Graph::addImage(): img is null.");
+                    return 0;
+                }
+
+                switch (image.getChannelCount())
+                {
+                    case 4:
+                    case 3:
+                        {
+                            goSize3D sz (w, h, 1);
+                            goSignal3DRef imgref (img->data(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
+                            goSignal::RGB2BGRA (*const_cast<goSignal3DBase<void>*> (&image), imgref);
+                        }
+                        break;
+                    case 1:
+                        {
+                            goSize3D sz (w, h, 1);
+                            goSignal3DRef imgref (img->data(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
+                            int source_i [] = {0, 0, 0};
+                            int target_i [] = {0, 1, 2};
+                            goSignal::convert (*const_cast<goSignal3DBase<void>*>(&image), imgref, source_i, target_i, 3);
+                        }
+                        break;
+                    default:
+                        goLog::warning ("Graph::addImage: channel count not supported."); 
+                        this->objects2D().pop_back (); // remove the object added by makeImage()
+                        return 0; 
+                        break;
+                }
+
+                return img;
+            }
+
+            //=
+            //= End convenience functions.
+            //================================================================================
 
             void setDimensions (real xmin, real xmax, real ymin, real ymax)
             {

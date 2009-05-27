@@ -69,11 +69,22 @@ void ImageViewer::loadImage ()
         try
         {
             goFileIO::readImage (fname.toCharPtr (), &image, true);
-            goSignal3D<void> image2;
-            image2.setDataType (image.getDataType ().getID ());
-            image2.make (image.getSize(), image.getSize(), image.getBorderSize(), 3);
-            goCopySignal (&image, &image2);
-            this->view.setImage (image2);
+//            goSignal3D<void> image2;
+//            image2.setDataType (image.getDataType ().getID ());
+//            image2.make (image.getSize(), image.getSize(), image.getBorderSize(), 3);
+//            switch (image.getChannelCount())
+//            {
+//                case 1: 
+//                    {
+//                        const int s_i[] = {0, 0, 0};
+//                        const int t_i[] = 
+//                    }
+//                goCopySignal (&image, &image2);
+//            }
+//            this->view.setImage (image2);
+            
+            //= Let imageview worry about the image format.            
+            this->view.setImage (image);
             this->view.queue_draw ();
         }
         catch (goFileIOException& ex)
