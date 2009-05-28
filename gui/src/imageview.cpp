@@ -52,6 +52,8 @@ namespace goGUI
             //img->fill (255.0f);
 
             graph.set (new goPlot::Graph);
+            graph->disableAxes ();
+            graph->flipY ();
         }
 
             ~ImageViewPrivate () {}
@@ -61,15 +63,12 @@ namespace goGUI
              */
             void makeGraph ()
             {
-                graph.set (0);
-                graph.set (new goPlot::Graph);
+                //graph.set (0);
+                //graph.set (new goPlot::Graph);
 
-                graph->disableAxes ();
-                graph->flipY ();
-
-                const goPlot::Trafo2D& t = graph->transform ();
-                printf ("%.3f %.3f\n%.3f %.3f\n", t.xx, t.xy, t.yx, t.yy);
-                printf ("%.3f, %.3f\n", t.x0, t.y0);
+                //const goPlot::Trafo2D& t = graph->transform ();
+                //printf ("%.3f %.3f\n%.3f %.3f\n", t.xx, t.xy, t.yx, t.yy);
+                //printf ("%.3f, %.3f\n", t.x0, t.y0);
 
                 // this->graph->axis(0)->setVisible (false);
                 // this->graph->axis(1)->setVisible (false);
@@ -305,12 +304,20 @@ namespace goGUI
      */
     void goGUI::ImageView::setImage  (int w, int h, int format)
     {
-        myPrivate->graph = 0;
-        myPrivate->makeGraph ();
+        //myPrivate->graph = 0;
+        //myPrivate->makeGraph ();
+        myPrivate->graph->remove (myPrivate->imageObjects.front());
         // myPrivate->makeImage (w, h, format);
         myPrivate->imageObjects.clear ();
-        myPrivate->imageObjects.push_back (myPrivate->graph->makeImage (w, h, format));
-        myPrivate->graph->setDimensions (0, w, 0, h);
+
+        goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->makeImage (w, h, format);
+        myPrivate->imageObjects.push_back (o);
+        goPlot::Trafo2D t = o->transform ();
+        t *= goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
+        o->setTransform (t);
+
+        // myPrivate->graph->setDimensions (0, w, 0, h);
+        myPrivate->graph->setDimensions (0, 1, 0, 1);
     }
 
     /** 
@@ -326,10 +333,11 @@ namespace goGUI
      */
     void goGUI::ImageView::setImage (const goSignal3DBase<void>& image)
     {
-        myPrivate->graph = 0;
+        // myPrivate->graph = 0;
         // myPrivate->image = image;
 
-        myPrivate->makeGraph ();
+        // myPrivate->makeGraph ();
+        myPrivate->graph->remove (myPrivate->imageObjects.front());
 
         if (myPrivate->graph.isNull())
         {
@@ -338,7 +346,11 @@ namespace goGUI
         }
 
         myPrivate->imageObjects.clear ();
-        myPrivate->imageObjects.push_back (myPrivate->graph->addImage (image));
+        goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->addImage (image);
+        myPrivate->imageObjects.push_back (o);
+        goPlot::Trafo2D t = o->transform ();
+        t *= goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
+        o->setTransform (t);
 
         //if (!myPrivate->setImage (image))
         //{
@@ -346,8 +358,8 @@ namespace goGUI
         //    return;
         //}
 
-        myPrivate->graph->setDimensions (0, image.getSizeX(), 0, image.getSizeY());
-        // myPrivate->graph->setDimensions (0, 1.0, 0, 1.0);
+        // myPrivate->graph->setDimensions (0, image.getSizeX(), 0, image.getSizeY());
+        myPrivate->graph->setDimensions (0, 1.0, 0, 1.0);
 
         {
             //= This call fixes the minimum size of the image widget to its original size
@@ -398,6 +410,11 @@ namespace goGUI
         goSize3D sz (img->stride() / chan, img->height(), 1);
 
         return new goSignal3DRef (img->data(), GO_UINT8, sz, sz, goSize3D (8, 8, 0), chan); 
+    }
+
+    goAutoPtr<goPlot::Graph> goGUI::ImageView::graph ()
+    {
+        return myPrivate->graph;
     }
 
 #if 0

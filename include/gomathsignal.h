@@ -50,7 +50,7 @@ void paste2D (const goSignal3DBase<void>& source,
         goDouble angle,
         goDouble t_x,
         goDouble t_y,
-        goSignal3D<void>& target,
+        goSignal3DBase<void>& target,
         goFloat bgColour);
 /* 
  * @brief Divergence of a 2D vector field.

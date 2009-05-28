@@ -18,7 +18,7 @@ namespace goPlot
     /** 
      * @brief Axis.
      */
-    class GraphAxis : public Object2DPoints <Points2DSimple <real>, real>
+    class GraphAxis : public Object2DPoints
     {
         public:
             enum Conf
@@ -52,7 +52,7 @@ namespace goPlot
              * @param u Upper end of range
              */
             GraphAxis (int index = 0, double l = 0.0, double u = 1.0)
-                : Object2DPoints <Points2DSimple <real>, real> (2),
+                : Object2DPoints (2),
                   myLower (l), 
                   myUpper (u),
                   myIndex (index),
@@ -270,7 +270,7 @@ namespace goPlot
                 this->points().set (0, 0.0, 0.0);
                 this->points().set (1, 1.0, 0.0);
 
-                Object2DPoints <Points2DSimple <real>, real>::draw ();
+                Object2DPoints::draw ();
 
                 if ( (this->configuration () & TICS) != 0)
                 {

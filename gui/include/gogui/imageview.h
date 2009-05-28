@@ -43,6 +43,9 @@ namespace goGUI
             // goAutoPtr<goSignal3DBase<void> > getImage  ();
             goAutoPtr<goPlot::Object2DImage> getImageObject (); 
             goAutoPtr<goSignal3DBase<void> > getImage ();
+
+            goAutoPtr<goPlot::Graph> graph ();
+
 #if 0
             void              drawCurve (const goMatrixd& c);
             void              drawCurves ();

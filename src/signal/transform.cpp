@@ -319,7 +319,7 @@ void goMath::paste2D (
         goDouble angle,
         goDouble t_x,
         goDouble t_y,
-        goSignal3D<void>& target,
+        goSignal3DBase<void>& target,
         goFloat bgColour)
 {
     if (source.getDataType().getID() != target.getDataType().getID())

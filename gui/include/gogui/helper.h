@@ -20,6 +20,9 @@ namespace goGUI
     bool getFilenames (goFixedArray<goString>& filenames, const goString& start = "", const goString& title = "");
 
     void about (const goString& text, char* logo[]);
+
+    void warning (const char* text);
+
 /** 
  * @}
  */

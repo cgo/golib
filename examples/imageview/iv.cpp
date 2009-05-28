@@ -18,6 +18,7 @@ class ImageViewer : public goGUI::MainWindow
 
         void loadImage ();
         void loadImageName (const char* fname);
+        void loadCurve ();
         void sobel ();
         void canny ();
 
@@ -37,6 +38,9 @@ ImageViewer::ImageViewer ()
 
     Gtk::MenuItem* loadItem = this->addMenuItem (this->getFileMenu (), "Load image");
     loadItem->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::loadImage));
+
+    Gtk::MenuItem* loadItem2 = this->addMenuItem (this->getFileMenu (), "Load curve");
+    loadItem2->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::loadCurve));
    
     {
         Gtk::MenuItem* i = this->addMenuItem (this->getFileMenu (), "Sobel");
@@ -56,6 +60,58 @@ ImageViewer::ImageViewer ()
 
 ImageViewer::~ImageViewer ()
 {
+}
+
+void ImageViewer::loadCurve ()
+{
+    goString fname = "";
+    static goString start = "./";
+    if (goGUI::getFilenameOpen (fname, start, "Load Curve from Matrix File"))
+    {
+        fname.getPathName (start);
+        goMatrixd curve;
+        
+        if (!curve.readASCII (fname.toCharPtr ()))
+        {
+            goGUI::warning ("Could not load curve matrix.");
+            return;
+        }
+
+        
+        goVectord x (0), y (0);
+        curve.refColumn (0, x);
+        curve.refColumn (1, y);
+
+        goVectord mean;
+        goMath::centerOfMass (curve, mean);
+        goMath::translate (curve, mean * -1.0);
+
+        goFloat x0 = goMath::min (x);
+        goFloat x1 = goMath::max (x);
+        goFloat y0 = goMath::min (y);
+        goFloat y1 = goMath::max (y);
+
+        curve.print ();
+
+        goAutoPtr<goPlot::Object2DPoints> o = this->view.graph()->addCurve (curve);
+        goPlot::Trafo2D t = o->transform ();
+        t *= goPlot::Trafo2D (1.0 / (x1-x0), 0.0, 0.0, 1.0 / (y1-y0), -x0 / (x1-x0), -y0 / (y1-y0));
+        o->setTransform (t);
+        this->view.graph()->axis(0)->setLower (0.0);
+        this->view.graph()->axis(0)->setUpper (1.0);
+        this->view.graph()->axis(1)->setLower (0.0);
+        this->view.graph()->axis(1)->setUpper (1.0);
+
+        o->lineTraits().setWidth (3.0);
+        o->lineTraits().setColour (goPlot::RGBA (1.0, 0.0, 0.0, 0.5));
+
+//        this->view.graph()->axis(0)->setVisible (true);
+//        this->view.graph()->axis(0)->setTics (10);
+//        this->view.graph()->axis(1)->setVisible (true);
+//        this->view.graph()->axis(1)->setTics (10);
+//
+        this->view.queue_draw ();
+    }
 }
 
 void ImageViewer::loadImage ()

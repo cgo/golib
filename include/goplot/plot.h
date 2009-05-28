@@ -7,6 +7,10 @@
 #include <cairo.h>
 #include <pango/pangocairo.h>
 
+#ifndef GOMATRIX_H
+# include <gomatrix.h>
+#endif
+
 namespace goPlot
 {
 
@@ -24,11 +28,12 @@ namespace goPlot
      * @param Real Real type (float or double)
      */
     template <class Real>
-        class Points2D
+        class Points2DT
         {
             public:
-                Points2D () { };
-                virtual ~Points2D () { };
+                Points2DT () { };
+                explicit Points2DT (int N) { };
+                virtual ~Points2DT () { };
                
                 //! Reimplement these.
                 //! Return i'th point x value
@@ -41,32 +46,34 @@ namespace goPlot
                 virtual size_t size () const { return 0; };
         };
 
+    typedef Points2DT<goDouble> Points2D;
+
     /** 
      * @brief Simple 2D points provider. Just stores the points in a C array.
      */
     template <class Real>
-        class Points2DSimple : public Points2D <Real>
+        class Points2DSimple : public Points2DT<Real>
     {
         public:
             Points2DSimple (int count = 1)
-                : Points2D<Real> (), myPoints (0), mySize (0), myDelete (true)
+                : Points2DT<Real> (), myPoints (0), mySize (0), myDelete (true)
             {
                 myPoints = new Real[count * 2];
                 mySize = count;
             };
 
             Points2DSimple (Real* ptr, size_t size)
-                : Points2D<Real> (), myPoints (ptr), mySize (size), myDelete (false)
+                : Points2DT<Real> (), myPoints (ptr), mySize (size), myDelete (false)
             {
             };
 
-            template <class T> Points2DSimple (const Points2D<T>& other)
-                : Points2D<Real> (), myPoints (0), mySize (0), myDelete (true)
+            template <class T> Points2DSimple (const Points2DT<T>& other)
+                : Points2DT<Real> (), myPoints (0), mySize (0), myDelete (true)
             {
                 *this = other;
             };
 
-            template <class T> Points2DSimple<Real>& operator= (const Points2D<T>& other)
+            template <class T> Points2DSimple<Real>& operator= (const Points2DT<T>& other)
             {
                 if (myPoints && myDelete)
                 {
@@ -112,6 +119,69 @@ namespace goPlot
             size_t mySize;
             bool   myDelete;
     };
+
+    /** 
+     * @brief Points2D class for accessing points in a goMath::Matrix.
+     *
+     * The matrix is stored in a goAutoPtr, so you can use a matrix object in some application code
+     * and do changes to the same object used in the plotting code.
+     *
+     * An initial matrix object is created in any case, so there should always be a valid matrix
+     * associated with a Points2DMatrix object.
+     */
+    template <class T>
+        class Points2DMatrix : public Points2D
+        {
+            public:
+                Points2DMatrix (int N = 1) : 
+                    Points2D (),
+                    M (new goMath::Matrix<T> (N,2)) { }
+
+                /** 
+                 * @brief Constructor.
+                 * 
+                 * @param m Matrix auto pointer. If the pointer is null, a new matrix is created
+                 * instead with size 1.
+                 */
+                Points2DMatrix (goAutoPtr<goMath::Matrix<T> > m)
+                    : Points2D (),
+                      M (m)
+                {
+                    if (m.isNull())
+                        M = new goMath::Matrix<T> (1,2);
+                }
+
+                /** 
+                 * @brief Constructor.
+                 * 
+                 * Copies the points in m.
+                 * 
+                 * @param m Configuration matrix, one point per row.
+                 */
+                Points2DMatrix (const goMath::Matrix<T>& m)
+                    : Points2D (),
+                      M (new goMatrix<T> (m))
+                {
+                }
+
+                virtual ~Points2DMatrix () { }
+
+                goMatrix<T>&       matrix () { return *M; }
+                const goMatrix<T>& matrix () const { return *M; }
+                
+                //! Reimplement these.
+                //! Return i'th point x value
+                virtual goDouble x (int i) const { return (*M)(i, 0); }
+                //! Return i'th point x value
+                virtual goDouble y (int i) const { return (*M) (i, 1); }
+                //! Set point number i
+                virtual void set (int i, goDouble x, goDouble y) { (*M) (i, 0) = x; (*M) (i, 1) = y; }
+                //! Return number of points
+                virtual size_t size () const { return const_cast<Points2DMatrix<T>*>(this)->M->getRows (); } // sorry :)
+            
+            private:
+                goAutoPtr<goMath::Matrix<T> > M;
+        };
 
     /** 
      * @brief Colour class with alpha channel.

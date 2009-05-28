@@ -11,6 +11,7 @@
 #include <exception>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 #include <assert.h>
 
@@ -152,9 +153,21 @@ namespace goPlot
                 this->objects2D ().clear ();
             }
 
+            //================================================================================
             //=
             //= Convenience functions for adding new objects.
             //=
+
+            goAutoPtr<Object2DPoints> addCurve (const goMatrixd& c)
+            {
+                goAutoPtr<goPlot::Object2DPoints> points = new goPlot::Object2DPoints;
+                Points2DMatrix<goDouble> *M = new Points2DMatrix<goDouble> (c);
+                points->setPoints (M);
+
+                this->add (points);
+
+                return points;
+            }
 
             goAutoPtr<Object2DImage> makeImage (int width, int height, int format = goPlot::Object2DImage::RGB24)
             {
@@ -303,6 +316,24 @@ namespace goPlot
                     o->setContext (this->context ());
 
                 myObjects.push_back (o);
+            }
+
+            /** 
+            * @brief Removes all occurrences of \c o in this graph.
+            * 
+            * @param o Object pointer to remove.
+            */
+            void remove (goAutoPtr<Object2D> o)
+            {
+                std::list<goAutoPtr<Object2D> >::iterator first = myObjects.begin ();
+                std::list<goAutoPtr<Object2D> >::iterator last  = myObjects.end ();
+                std::list<goAutoPtr<Object2D> >::iterator it;
+                while ((it = std::find (first, last, o)) != last)
+                {
+                    myObjects.erase (it);
+                    first = myObjects.begin();
+                    last = myObjects.end();
+                }
             }
 
             /** 
