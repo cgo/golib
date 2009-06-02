@@ -1,11 +1,11 @@
 #ifndef GOPLOT_CAIROPLOT_H
 #define GOPLOT_CAIROPLOT_H
 
-#include <gtkmm.h>
 #include <goplot/plot.h>
-//#include <goplot/object2dpoints.h>
 #include <goplot/graph.h>
-// #include <goplot/graphaxis.h>
+#ifndef GOSTRING_H
+# include <gostring.h>
+#endif
 
 namespace goPlot
 {
@@ -61,6 +61,15 @@ namespace goPlot
         private:
             cairo_t* context;
     };
+
+    //= Helper functions for quickly plotting stuff
+    goAutoPtr<goPlot::Graph> plot (const goMatrixf& curve, goAutoPtr<goPlot::Graph> g = 0);
+    goAutoPtr<goPlot::Graph> plot (const goVectorf& x, const goVectorf& y, goAutoPtr<goPlot::Graph> g = 0);
+    goAutoPtr<goPlot::Graph> plot (const goMatrixd& curve, goAutoPtr<goPlot::Graph> g = 0);
+    goAutoPtr<goPlot::Graph> plot (const goVectord& x, const goVectord& y, goAutoPtr<goPlot::Graph> g = 0);
+
+    bool plot (goAutoPtr<goPlot::Graph> g, const goString& filename, int w = 600, int h = 400);
+    void plot (goAutoPtr<goPlot::Graph> g, cairo_t* context, int w = 600, int h = 400);
 
     //= Moved to goGUI
 #if 0

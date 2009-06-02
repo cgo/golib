@@ -255,6 +255,17 @@ SET (SOURCES ${SOURCES}
  src/math/gobiorthowavelet.cpp
  src/math/vectormult.cpp)
 
+# Cairo plotting
+SET (SOURCES ${SOURCES}
+       src/plot/cairoplot.cpp
+       src/plot/graph.cpp
+       src/plot/object2dtext.cpp
+       src/plot/object2dimage.cpp
+       src/plot/object2dpoints.cpp
+       src/plot/texttraits.cpp
+       src/plot/plot.cpp
+       src/plot/graphaxis.cpp)
+
 IF (NOT WIN32)
     SET (SOURCES ${SOURCES}
   src/misc/plot.cpp

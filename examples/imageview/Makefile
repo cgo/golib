@@ -15,7 +15,7 @@ LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
 
 LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui -lGogl -lpython2.5
 
-INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include -I$(GOPATH)/plot/include
+INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
 
 TARGET		= imageviewer
 

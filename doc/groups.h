@@ -144,7 +144,20 @@
  /*!
   * \ingroup plot
   * \defgroup cairoplot Plotting with Cairo
+  * @see goGUI::plot, goGUI::PlotView, goGUI::ImageView
+  *
   * These are the functions and classes related to plotting with Cairo.
+  * The main structure to look at is goPlot::Graph. A Graph is created and Object2D type objects
+  * can be added to it, each one having their own affine transformation, goPlot::Trafo2D.
+  * To draw a curve, e.g. use Object2DPoints and a Points2D derived class like Points2DMatrix, 
+  * for text labels use Object2DText, for images Object2DImage, and so on.
+  * Graph also contains convenience functions to add some objects.
+  * You can also use the goPlot::plot functions provided for convenience,
+  * which also automatically set the dimensions of the graph.
+  * The standard transformation for a graph is identity. Plotting starts at the
+  * lower left corner, so if you draw images, you may want to flip the y axis.
+  *
+  * This module is still quite new and growing, so more objects and functions may be added.
   */
  /*!
   * \ingroup plot

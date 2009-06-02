@@ -1,5 +1,6 @@
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
+                             src/cairoplot.cpp
                              src/warning.cpp
                              src/plotview.cpp
                              src/videocapturecontrol.cpp

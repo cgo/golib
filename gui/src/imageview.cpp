@@ -43,7 +43,7 @@ namespace goGUI
         public:
             ImageViewPrivate() 
                 : imageObjects (),
-                graph (0)
+                graph (new goPlot::Graph)
         {
             //goSignal3D<void> *img = new goSignal3D<void>;
             //image.set (img);
@@ -51,8 +51,7 @@ namespace goGUI
             //img->make (128,128,1,128,128,1,0,0,0,3);
             //img->fill (255.0f);
 
-            graph.set (new goPlot::Graph);
-            graph->disableAxes ();
+            // graph->disableAxes ();
             graph->flipY ();
         }
 
@@ -306,7 +305,8 @@ namespace goGUI
     {
         //myPrivate->graph = 0;
         //myPrivate->makeGraph ();
-        myPrivate->graph->remove (myPrivate->imageObjects.front());
+        if (!myPrivate->imageObjects.empty ())
+            myPrivate->graph->remove (myPrivate->imageObjects.front());
         // myPrivate->makeImage (w, h, format);
         myPrivate->imageObjects.clear ();
 
@@ -317,7 +317,8 @@ namespace goGUI
         o->setTransform (t);
 
         // myPrivate->graph->setDimensions (0, w, 0, h);
-        myPrivate->graph->setDimensions (0, 1, 0, 1);
+        //= FIXME: This tends to crash in a pango function.
+        // myPrivate->graph->setDimensions (0.0, 1.0, 0.0, 1.0);
     }
 
     /** 
@@ -337,13 +338,17 @@ namespace goGUI
         // myPrivate->image = image;
 
         // myPrivate->makeGraph ();
-        myPrivate->graph->remove (myPrivate->imageObjects.front());
+        if (!myPrivate->imageObjects.empty ())
+            myPrivate->graph->remove (myPrivate->imageObjects.front());
 
         if (myPrivate->graph.isNull())
         {
             goLog::error ("ImageView::setImage(): graph is null.");
             return;
         }
+
+        //= FIXME: This tends to crash in a pango function.
+        // myPrivate->graph->setDimensions (0.0, 1.0, 0.0, 1.0);
 
         myPrivate->imageObjects.clear ();
         goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->addImage (image);
@@ -359,7 +364,6 @@ namespace goGUI
         //}
 
         // myPrivate->graph->setDimensions (0, image.getSizeX(), 0, image.getSizeY());
-        myPrivate->graph->setDimensions (0, 1.0, 0, 1.0);
 
         {
             //= This call fixes the minimum size of the image widget to its original size
@@ -385,12 +389,14 @@ namespace goGUI
             return myPrivate->imageObjects.front ();
     }
 
-    /*
+    /**
      * @brief Creates an object that references the data in the Object2DImage directly.
      *
      * The data in the object is organised linearly, rows first.
      * If the internal image format is ARGB32 or RGB24, the number of channels is 4.
      * Otherwise, the number of channels is 1. The data type is always GO_UINT8.
+     *
+     * The returned object should be a goSignal3DRef and has border size (8,8,0) set.
      *
      * @return Pointer to the reference.
      */
@@ -412,6 +418,11 @@ namespace goGUI
         return new goSignal3DRef (img->data(), GO_UINT8, sz, sz, goSize3D (8, 8, 0), chan); 
     }
 
+    /** 
+     * @brief Get the Graph object used to draw the image.
+     * 
+     * @return 
+     */
     goAutoPtr<goPlot::Graph> goGUI::ImageView::graph ()
     {
         return myPrivate->graph;

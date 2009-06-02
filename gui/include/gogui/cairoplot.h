@@ -2,6 +2,7 @@
 #define GOGUI_CAIROPLOT_H
 
 #include <goplot/cairoplot.h>
+#include <gtkmm.h>
 
 namespace goGUI 
 {
@@ -52,6 +53,9 @@ namespace goGUI
 #endif
             };
     };
+
+    //= Helper functions for quickly plotting stuff -- use e.g. with goPlot::plot functions in goplot/cairoplot.h
+    void plot (goAutoPtr<goPlot::Graph> g);
 };
 
 #endif

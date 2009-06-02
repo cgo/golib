@@ -232,6 +232,8 @@ void ImageViewer::canny ()
     cimg.setDataType (GO_UINT8);
     if (image->getChannelCount() == 1)
     {
+        image->setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
+        image->applyBorderFlags (GO_X|GO_Y);
         goSignal::smooth (*image);
         goSignal::canny (*image, cimg);
     }
@@ -239,6 +241,7 @@ void ImageViewer::canny ()
     {
         goSignal3D<void> temp;
         temp.setDataType (GO_UINT8);
+        temp.setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
         temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
         goRGBAtoScalar (image, &temp);
         goSignal::smooth (temp);
@@ -259,33 +262,6 @@ void ImageViewer::canny ()
     this->view.queue_draw ();
 }
 
-    template <class T>
-    static int _cannyRoundAngle (T angle)
-    {
-        //= Erzwinge Winkel zw. 90 u. -90 Grad
-        if (angle < T(-90))
-        {
-            angle += T(90);
-        }
-        else if (angle > T(90))
-        {
-            angle -= T(90);
-        }
-
-        if (angle < T(67.5) || angle < T(-67.5))
-            return 90;
-
-        if (angle > T(67.5) && angle < T(22.5))
-            return 45;
-
-        if (angle < T(22.5) && angle > T(-22.5))
-            return 0;
-
-        return -45;
-
-        //if (angle < T(-22.5) && angle > T(-67.5))
-        //    return -45;
-    }
 
 int main (int argc, char* argv[])
 {

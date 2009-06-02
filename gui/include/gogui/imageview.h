@@ -19,6 +19,9 @@ namespace goGUI
     /** 
      * @brief Image display widget.
      *
+     * @bug Check imageview.cpp for FIXME --- a setDimensions call to goPlot::Graph 
+     * crashes somewhere in pango. The call is commented out for now.
+     *
      * ImageView uses a goPlot::Graph to display objects with Cairo.
      * For an image set with \c setImage(), a buffer will be created, so the image data, if any,
      * will be copied. A wrapping goSignal3DBase referencing that buffer can be retrieved
