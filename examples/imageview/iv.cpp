@@ -234,7 +234,7 @@ void ImageViewer::canny ()
     {
         image->setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
         image->applyBorderFlags (GO_X|GO_Y);
-        goSignal::smooth (*image);
+        // goSignal::smooth (*image);
         goSignal::canny (*image, cimg);
     }
     else

@@ -6,6 +6,8 @@
 #include <gosubsignal3d.h>
 #include <goplot.h>
 
+#include <queue>
+
 namespace goSignal
 {
     template <class T>
@@ -166,6 +168,10 @@ namespace goSignal
         //sobel.setChannel (0);
 
         // goFloat f = 180.0f / M_PI;
+        goIndex_t index = 0;
+        std::queue<goIndex_t> Q;
+        goFloat thresh1 = 150.0f;
+        goFloat thresh2 = 100.0f;
         while (!s.endY ())
         {
             s.resetX ();
@@ -188,13 +194,23 @@ namespace goSignal
                 {
                     if (a > a1 && a > a2)
                     {
-                        *((sobelT*)*s + 2) = a;
+                        // *((sobelT*)*s + 2) = a;
+                        if (a >= thresh1)
+                        {
+                            Q.push (index);
+                            *(retT*)*r = retT (255);
+                        }
+                        else
+                        {
+                            *(retT*)*r = retT (0);
+                        }
                         //*(retT*)*r = retT ((a - minSobel) / (maxSobel - minSobel) * 255.0f);
                     }
                     else
                     {
                         //*(retT*)*r = retT(0);
                         *((sobelT*)*s + 2) = 0;
+                        *(retT*)*r = retT (0);
                     }
                 }
                 //else
@@ -203,20 +219,50 @@ namespace goSignal
                 //}
                 s.incrementX ();
                 r.incrementX ();
+                ++index;
             }
             s.incrementY ();
             r.incrementY ();
         }
 
-        goDouble minSobel, maxSobel;
-        sobel.setChannel (2);
-        sobel.getMinMax (minSobel, maxSobel);
-        sobel -= minSobel;
-        sobel *= 255.0f / (maxSobel - minSobel);
-        goCopySignalChannel (&sobel, &ret);
-        sobel.setChannel (0);
+        //= Copy the result scaled to [0,255] into ret
+//        goDouble minSobel, maxSobel;
+//        sobel.setChannel (2);
+//        sobel.getMinMax (minSobel, maxSobel);
+//        sobel -= minSobel;
+//        sobel *= 255.0f / (maxSobel - minSobel);
+//        goCopySignalChannel (&sobel, &ret);
+//        sobel.setChannel (0);
 
-        //= FIXME: Hysteresis
+        //= FIXME: Hysteresis. May be done faster; this is for good readability.
+        goIndex_t Nx = static_cast<goIndex_t> (sobel.getSizeX ());
+        goIndex_t Ny = static_cast<goIndex_t> (sobel.getSizeY ());
+        while (!Q.empty ())
+        {
+            goIndex_t i = Q.front ();
+            Q.pop ();
+
+            goIndex_t y = i / Nx;
+            goIndex_t x = i - y * Nx;
+            for (goIndex_t k = -1; k < 2; ++k)
+            {
+                for (goIndex_t l = -1; l < 2; ++l)
+                {
+                    if (l == 0 && k == 0)
+                        continue;
+
+                    if (x + k < 0 || y + l < 0 || x + k >= Nx || y + l >= Ny)
+                        continue;
+
+                    if (sobel.getValue (x + k, y + l, 0, 2) >= thresh2 && ret.getValue (x + k, y + l) <= 0)
+                    {
+                        Q.push (x + k + (y + l) * Nx);
+                        sobel.setValue (thresh1, x + k, y + l, 0, 2);
+                        ret.setValue (255.0, x + k, y + l);
+                    }
+                }
+            }
+        }
     }
 
     template <class imageT, class sobelT>
@@ -272,6 +318,7 @@ bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& r
 
     goAutoPtr<goSignal3D<void> > sobel = new goSignal3D<void>;
     sobel->setDataType (GO_FLOAT);
+    sobel->setBorderFlags (GO_X | GO_Y, GO_CONSTANT_BORDER);
     sobel->make (image.getSize(), image.getSize(), goSize3D (8, 8, 1), 3);
             // goSignal::defaultBlockSize2D(), goSize3D (8, 8, 1), 3);
 
