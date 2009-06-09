@@ -18,7 +18,6 @@ namespace goSignal
         static const float range_3 = M_PI * 0.25 + M_PI * 0.125;
         static const float range_4 = M_PI * 0.5 + M_PI * 0.125;
         static const float range_5 = M_PI * 0.75 + M_PI * 0.125;
-        // static const float range_6 = -M_PI * 0.5 - M_PI * 0.125;
 
         //= Erzwinge Winkel zw. 90 u. -90 Grad
         if (angle < T(range_1))
@@ -46,58 +45,11 @@ namespace goSignal
         assert (false == true);
         return 90;
 
-//        if (angle < T(67.5) || angle < T(-67.5))
-//            return 90;
-//
-//        if (angle > T(67.5) && angle < T(22.5))
-//            return 45;
-//
-//        if (angle < T(22.5) && angle > T(-22.5))
-//            return 0;
-//
-//        return -45;
-
-        //if (angle < T(-22.5) && angle > T(-67.5))
-        //    return -45;
     }
 
-#if 0
-    template <class T>
-    static int _cannyRoundAngle (T angle)
-    {
-        //= Erzwinge Winkel zw. 90 u. -90 Grad
-        if (angle < T(-90))
-        {
-            angle += T(180);
-        }
-        else if (angle > T(90))
-        {
-            angle -= T(180);
-        }
-
-        if (angle > T(67.5) || angle < T(-67.5))
-            //return -1;
-            return 45;
-
-        if (angle < T(67.5) && angle > T(22.5))
-            //return -1;
-            return -45;
-
-        if (angle < T(22.5) && angle > T(-22.5))
-            //return -1;
-            return 90;
-
-        // return -1;
-        return 0;
-
-        //if (angle < T(-22.5) && angle > T(-67.5))
-        //    return -45;
-    }
-#endif
-
-    //= currently unused.
+    //= 
     template <class imageT, class retT, class sobelT>
-    static void _canny2 (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goSignal3DBase<void>& sobel)
+    static void _canny2 (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goSignal3DBase<void>& sobel, goDouble thresh1, goDouble thresh2)
     {
         {
             goSignal3DGenericConstIterator i (&image);
@@ -129,6 +81,7 @@ namespace goSignal
                 s.incrementY ();
             }
 
+//= Debug: Return sobel filter output.
 #if 0
             sobel.setChannel (2);
             printf ("sobel min, max: %f, %f\n", sobel.getMinimum (), sobel.getMaximum ());
@@ -167,11 +120,10 @@ namespace goSignal
         //sobel.getMinMax (minSobel, maxSobel);
         //sobel.setChannel (0);
 
-        // goFloat f = 180.0f / M_PI;
         goIndex_t index = 0;
         std::queue<goIndex_t> Q;
-        goFloat thresh1 = 150.0f;
-        goFloat thresh2 = 100.0f;
+        // goFloat thresh1 = 80.0f;
+        // goFloat thresh2 = 40.0f;
         while (!s.endY ())
         {
             s.resetX ();
@@ -183,6 +135,7 @@ namespace goSignal
                 sobelT a = *((sobelT*)*s + 2);
                 switch (angle)
                 {
+                    //= 0 -45 90 45
                     case 0: a1 = *((sobelT*)s.leftX() + 2); a2 = *((sobelT*)s.rightX() + 2); break;
                     case -45: a1 = *((sobelT*)s.leftDown() + 2); a2 = *((sobelT*)s.rightUp() + 2); break;
                     case 90: a1 = *((sobelT*)s.rightY() + 2); a2 = *((sobelT*)s.leftY() + 2); break;
@@ -190,33 +143,27 @@ namespace goSignal
                     default: goLog::error ("goSignal::canny (): angle error."); a1 = 0; a2 = 0; a = 0; break;
                 }
 
-                //if (angle == -45)
                 {
                     if (a > a1 && a > a2)
                     {
-                        // *((sobelT*)*s + 2) = a;
                         if (a >= thresh1)
                         {
                             Q.push (index);
+                            *((sobelT*)*s) = a;      //= Misuse the first channel as storage for non-maximum suppression result.
                             *(retT*)*r = retT (255);
                         }
                         else
                         {
                             *(retT*)*r = retT (0);
+                            *((sobelT*)*s) = a;
                         }
-                        //*(retT*)*r = retT ((a - minSobel) / (maxSobel - minSobel) * 255.0f);
                     }
                     else
                     {
-                        //*(retT*)*r = retT(0);
-                        *((sobelT*)*s + 2) = 0;
+                        *((sobelT*)*s) = 0;
                         *(retT*)*r = retT (0);
                     }
                 }
-                //else
-                //{
-                //    *(retT*)*r = retT(0);
-                //}
                 s.incrementX ();
                 r.incrementX ();
                 ++index;
@@ -244,6 +191,7 @@ namespace goSignal
 
             goIndex_t y = i / Nx;
             goIndex_t x = i - y * Nx;
+            // goIndex_t x = i % Nx;
             for (goIndex_t k = -1; k < 2; ++k)
             {
                 for (goIndex_t l = -1; l < 2; ++l)
@@ -254,10 +202,10 @@ namespace goSignal
                     if (x + k < 0 || y + l < 0 || x + k >= Nx || y + l >= Ny)
                         continue;
 
-                    if (sobel.getValue (x + k, y + l, 0, 2) >= thresh2 && ret.getValue (x + k, y + l) <= 0)
+                    if (ret.getValue (x + k, y + l) <= 0 && sobel.getValue (x + k, y + l, 0, 0) >= thresh2)
                     {
                         Q.push (x + k + (y + l) * Nx);
-                        sobel.setValue (thresh1, x + k, y + l, 0, 2);
+                        // sobel.setValue (thresh1, x + k, y + l, 0, 0);
                         ret.setValue (255.0, x + k, y + l);
                     }
                 }
@@ -266,24 +214,48 @@ namespace goSignal
     }
 
     template <class imageT, class sobelT>
-    static void _canny1 (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goSignal3DBase<void>& sobel)
+    static void _canny1 (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goSignal3DBase<void>& sobel, goDouble thresh1, goDouble thresh2)
     {
         switch (ret.getDataType().getID ())
         {
-            case GO_INT8:   _canny2 <imageT, goInt8, sobelT> (image, ret, sobel); break;
-            case GO_UINT8:  _canny2 <imageT, goUInt8, sobelT> (image, ret, sobel); break;
-            case GO_INT16:  _canny2 <imageT, goInt16, sobelT> (image, ret, sobel); break;
-            case GO_UINT16: _canny2 <imageT, goUInt16, sobelT> (image, ret, sobel); break;
-            case GO_INT32:  _canny2 <imageT, goInt32, sobelT> (image, ret, sobel); break;
-            case GO_UINT32: _canny2 <imageT, goUInt32, sobelT> (image, ret, sobel); break;
-            case GO_FLOAT:  _canny2 <imageT, goFloat, sobelT> (image, ret, sobel); break;
-            case GO_DOUBLE: _canny2 <imageT, goDouble, sobelT> (image, ret, sobel); break;
+            case GO_INT8:   _canny2 <imageT, goInt8, sobelT> (image, ret, sobel,   thresh1,  thresh2); break;
+            case GO_UINT8:  _canny2 <imageT, goUInt8, sobelT> (image, ret, sobel,  thresh1,  thresh2); break;
+            case GO_INT16:  _canny2 <imageT, goInt16, sobelT> (image, ret, sobel,  thresh1,  thresh2); break;
+            case GO_UINT16: _canny2 <imageT, goUInt16, sobelT> (image, ret, sobel, thresh1,  thresh2); break;
+            case GO_INT32:  _canny2 <imageT, goInt32, sobelT> (image, ret, sobel,  thresh1,  thresh2); break;
+            case GO_UINT32: _canny2 <imageT, goUInt32, sobelT> (image, ret, sobel, thresh1,  thresh2); break;
+            case GO_FLOAT:  _canny2 <imageT, goFloat, sobelT> (image, ret, sobel,  thresh1,  thresh2); break;
+            case GO_DOUBLE: _canny2 <imageT, goDouble, sobelT> (image, ret, sobel, thresh1,  thresh2); break;
             default: goLog::error ("goSignal::_canny1 (): wrong data type of ret.");
         }
     }
 };
 
-bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret)
+/** 
+ * @addtogroup signal
+ * @brief Canny edge detector for 2D images.
+ *
+ * Compute the edge map after Canny.
+ * The detector consists of 3 steps:
+ * First, a Sobel operator is run on the image to find
+ * gradient directions and magnitudes. If the image is a colour image (in RGB(A)), it will be
+ * converted to a scalar gray value image first.
+ * Second, non-maximum suppression is used to thin out the result of the Sobel operator.
+ * Third, a hysteresis thresholding is used to reduce the edge map to prominent edgels.
+ * Here, \c thresh1 is the high threshold, and \c thresh2 is the low threshold.
+ * That means that first, only the responses higher than \c thresh1 are marked as edgels, and then
+ * neighbouring responses higher than \c thresh2 are added successively.
+ *
+ * @param image Image
+ * @param ret Return value, contains the edge map on successful return. Must be properly sized
+ * or must be a goSignal3D<void>. If in the latter case it is not of matching size, it will be
+ * resized and the type will be set to GO_UINT8.
+ * @param thresh1 High threshold for hysteresis (default 80.0)
+ * @param thresh2 Low threshold for hysteresis (default 40.0)
+ * 
+ * @return True is successful, false otherwise.
+ */
+bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goDouble thresh1, goDouble thresh2)
 {
     if (ret.getSize() != image.getSize())
     {
@@ -295,7 +267,7 @@ bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& r
         }
 
         ret_p->setDataType (GO_UINT8);
-        ret_p->make (image.getSize(), image.getSize(), goSize3D (8, 8, 1), 1);
+        ret_p->make (image.getSize(), image.getSize(), goSize3D (8, 8, 0), 1);
                 // goSignal::defaultBlockSize2D(), goSize3D (8, 8, 1), 1);
     }
 
@@ -319,31 +291,21 @@ bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& r
     goAutoPtr<goSignal3D<void> > sobel = new goSignal3D<void>;
     sobel->setDataType (GO_FLOAT);
     sobel->setBorderFlags (GO_X | GO_Y, GO_CONSTANT_BORDER);
-    sobel->make (image.getSize(), image.getSize(), goSize3D (8, 8, 1), 3);
+    sobel->make (image.getSize(), image.getSize(), goSize3D (8, 8, 0), 3);
             // goSignal::defaultBlockSize2D(), goSize3D (8, 8, 1), 3);
 
     switch (image_p->getDataType().getID())
     {
-        case GO_INT8: _canny1 <goInt8, goFloat> (*image_p, ret, *sobel); break;
-        case GO_UINT8: _canny1 <goUInt8, goFloat> (*image_p, ret, *sobel); break;
-        case GO_INT16: _canny1 <goInt16, goFloat> (*image_p, ret, *sobel); break;
-        case GO_UINT16: _canny1 <goUInt16, goFloat> (*image_p, ret, *sobel); break;
-        case GO_INT32: _canny1 <goInt32, goFloat> (*image_p, ret, *sobel); break;
-        case GO_UINT32: _canny1 <goUInt32, goFloat> (*image_p, ret, *sobel); break;
-        case GO_FLOAT: _canny1 <goFloat, goFloat> (*image_p, ret, *sobel); break;
-        case GO_DOUBLE: _canny1 <goDouble, goFloat> (*image_p, ret, *sobel); break;
+        case GO_INT8: _canny1 <goInt8, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_UINT8: _canny1 <goUInt8, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_INT16: _canny1 <goInt16, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_UINT16: _canny1 <goUInt16, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_INT32: _canny1 <goInt32, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_UINT32: _canny1 <goUInt32, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_FLOAT: _canny1 <goFloat, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
+        case GO_DOUBLE: _canny1 <goDouble, goFloat> (*image_p, ret, *sobel, thresh1, thresh2); break;
         default: return false; break;
     }
 
-#if 0
-    goAutoPtr<goSignal3D<void> > sobel = new goSignal3D<void>;
-    sobel->setDataType (GO_FLOAT);
-
-    if (!goSignal::sobel2D (*image_p, *sobel))
-    {
-        goLog::error ("goSignal::canny (): sobel2D failed.");
-        return false;
-    }
-#endif
     return true;    
 }

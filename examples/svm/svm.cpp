@@ -100,6 +100,7 @@ int main ()
 //    BarrierOptPhase1<matrix, vector> phase1 (prob);
 //    phase1.solve (alpha_s);
 
+//    vector alpha (0); alpha_s.ref (alpha, 0, 2*N);
     vector alpha (2*N);
     alpha.fill (1.0);
 

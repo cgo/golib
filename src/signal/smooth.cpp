@@ -14,7 +14,6 @@ bool goSignal::smooth (goSignal3DBase<void>& sig, goSize_t width)
         *mp = 1.0f;
 
     goFilter1D filter (mask, width, width >> 1, true);
-    int rotations = 0;
     if (sig.getSizeX() > 1 && sig.getBorderX() >= width)
     {
         filter.filter (sig);
@@ -22,24 +21,17 @@ bool goSignal::smooth (goSignal3DBase<void>& sig, goSize_t width)
     if (sig.getSizeY() > 1 && sig.getBorderY() >= width)
     {
         sig.rotateAxes ();
-        ++rotations;
+        sig.rotateAxes ();
         filter.filter (sig);
+        sig.rotateAxes ();
     }
     if (sig.getSizeZ() > 1 && sig.getBorderZ() >= width)
     {
         sig.rotateAxes ();
-        ++rotations;
         filter.filter (sig);
+        sig.rotateAxes ();
+        sig.rotateAxes ();
     }
-
-    //= Rotate axes back to original setting.
-    if (rotations > 0)
-    {
-        for (int total = rotations; total < 3; ++total)
-        {
-            sig.rotateAxes();
-        }
-    } 
 
     return true;
 }

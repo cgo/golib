@@ -39,6 +39,7 @@ void Control::warning (const char* text)
 #elif defined HAVE_GTK_2_4
     Gtk::MessageDialog msg (text, false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_OK);
 #endif
+    msg.run ();
 }
 
 void Control::message (const char* text)
@@ -48,7 +49,7 @@ void Control::message (const char* text)
 #elif defined HAVE_GTK_2_4
     Gtk::MessageDialog msg (text, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
 #endif
-    msg.run();
+    msg.run ();
 }
 
 void Control::print (const char* text)

@@ -62,8 +62,8 @@ REAL f1 (const vector_type& x)
 {
     REAL A_[] = {1, 0, 0, 1};
     goMatrix<REAL> A (A_, 2, 2);
-    // |x| >= 1
-    return REAL(1) - ((A * x) * x);
+    // |x| <= 1
+    return ((A * x) * x) - REAL(1);
 }
 
 int main ()
@@ -124,7 +124,7 @@ int main ()
             x_s[0] = 0.5;
             x_s[1] = 0.501;
         }
-        x_s [x_s.getSize() - 1] = 1;
+        x_s [x_s.getSize() - 1] = 2;
 
         printf ("x_s size: %d\n", x_s.getSize());
 

@@ -1,6 +1,8 @@
 #include <gogui/imageview.h>
 #include <gogui/mainwindow.h>
 #include <gogui/helper.h>
+#include <gogui/cannycontrol.h>
+#include <gogui/controldialog.h>
 
 #include <gofileio.h>
 #include <gosignal3d.h>
@@ -22,19 +24,30 @@ class ImageViewer : public goGUI::MainWindow
         void sobel ();
         void canny ();
 
+        goCaller1<int, goAutoPtr<goSignal3DBase<void> > >& imageCaller () { return myImageCaller; }
+        goCaller1<int, goAutoPtr<goSignal3DBase<void> > >& edgeMapCaller () { return myEdgeMapCaller; }
+
     private:
         goGUI::ImageView view;
+        goGUI::CannyControl cannyControl;
+
+        goCaller1<int, goAutoPtr<goSignal3DBase<void> > > myImageCaller;   //= called when the image is set
+        goCaller1<int, goAutoPtr<goSignal3DBase<void> > > myEdgeMapCaller; //= called when the target (edge map) is set
 };
 
 ImageViewer::ImageViewer ()
     : goGUI::MainWindow (),
-      view ()
+      view (),
+      cannyControl (),
+      myImageCaller (),
+      myEdgeMapCaller ()
 {
     //Gtk::ScrolledWindow *sw = Gtk::manage (new Gtk::ScrolledWindow);
     //sw->add (this->view);
     //this->view.show ();
     //this->getPaned().add1 (*sw);
     this->getPaned().add1 (this->view);
+    this->addControl (this->cannyControl);
 
     Gtk::MenuItem* loadItem = this->addMenuItem (this->getFileMenu (), "Load image");
     loadItem->signal_activate().connect (sigc::mem_fun (this, &ImageViewer::loadImage));
@@ -142,6 +155,7 @@ void ImageViewer::loadImage ()
             //= Let imageview worry about the image format.            
             this->view.setImage (image);
             this->view.queue_draw ();
+            // this->control.setImage (image);
         }
         catch (goFileIOException& ex)
         {
@@ -228,38 +242,55 @@ void ImageViewer::canny ()
     // this->queue_draw ();
     // return;
 
-    goSignal3D<void> cimg;
-    cimg.setDataType (GO_UINT8);
+    int result = Gtk::RESPONSE_CANCEL;
+    goAutoPtr<goSignal3D<void> > cimg = new goSignal3D<void>;
+    cimg->setDataType (GO_UINT8);
     if (image->getChannelCount() == 1)
     {
         image->setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
         image->applyBorderFlags (GO_X|GO_Y);
         // goSignal::smooth (*image);
-        goSignal::canny (*image, cimg);
+        goGUI::CannyControl ctrl;
+        goGUI::ControlDialog dlg (ctrl);
+        ctrl.setImage (image);
+        ctrl.setEdgeMap (cimg);
+        result = dlg.run ();
+        // goSignal::canny (*image, cimg);
     }
     else
     {
-        goSignal3D<void> temp;
-        temp.setDataType (GO_UINT8);
-        temp.setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
-        temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
-        goRGBAtoScalar (image, &temp);
-        goSignal::smooth (temp);
-        goSignal::canny (temp, cimg);
+        goAutoPtr<goSignal3D<void> > temp = new goSignal3D<void>;
+        temp->setDataType (GO_UINT8);
+        temp->setBorderFlags (GO_X|GO_Y, GO_CONSTANT_BORDER);
+        // temp.make (image->getSize(), image->getBlockSize(), image->getBorderSize(), 1);
+        temp->make (image->getSize(), image->getBlockSize(), goSize3D (3, 3, 0), 1);
+        goRGBAtoScalar (image, temp);
+        goSignal::smooth (*temp);
+        //cimg.make (&temp);
+        //goCopySignal (&temp, &cimg);
+        goGUI::CannyControl ctrl;
+        goGUI::ControlDialog dlg (ctrl);
+        ctrl.setImage (temp);
+        ctrl.setEdgeMap (cimg);
+        result = dlg.run ();
+        // goSignal::canny (temp, cimg, 80.0, 40.0);
     }
     // cimg *= 255.0f;
 
-    goSignal3D<void> image2;
-    image2.make (image);
-    image2.setChannel (0);
-    goCopySignalChannel (&cimg, &image2);
-    image2.setChannel (1);
-    goCopySignalChannel (&cimg, &image2);
-    image2.setChannel (2);
-    goCopySignalChannel (&cimg, &image2);
-    image2.setChannel (0);
-    this->view.setImage (image2);
-    this->view.queue_draw ();
+    if (result != Gtk::RESPONSE_CANCEL)
+    {
+        goSignal3D<void> image2;
+        image2.make (image);
+        image2.setChannel (0);
+        goCopySignalChannel (cimg, &image2);
+        image2.setChannel (1);
+        goCopySignalChannel (cimg, &image2);
+        image2.setChannel (2);
+        goCopySignalChannel (cimg, &image2);
+        image2.setChannel (0);
+        this->view.setImage (image2);
+        this->view.queue_draw ();
+    }
 }
 
 

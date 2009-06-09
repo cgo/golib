@@ -9,6 +9,7 @@
  * @addtogroup misc
  * @{
  */
+#if 0
 /** 
  * @brief Virtual base class for functors with 1 argument.
  */
@@ -386,6 +387,10 @@ class goFunctor2 : public goFunctorBase2<Tret, Targ1, Targ2>
         function_t myFunction;
 };
 
+#endif
+
+#include "gofunctor2.h"
+
 /** 
  * @brief Broadcasting caller class,
  * like signals in the "signal/slot" paradigm.
@@ -395,6 +400,9 @@ class goFunctor2 : public goFunctorBase2<Tret, Targ1, Targ2>
 template <class Tret>
 class goCaller0
 {
+    public:
+        typedef goList< goAutoPtr<goFunctorBase0<Tret> > > FunctorList;
+
     public:
         goCaller0 ()
             : fList () {};
@@ -409,6 +417,18 @@ class goCaller0
             this->fList.append (f);
         };
 
+        void disconnect (goAutoPtr<goFunctorBase0<Tret> > f)
+        {
+            typename FunctorList::Element* e = fList.find (f);
+            if (e)
+                fList.remove (e);
+        }
+
+        void clear ()
+        {
+            fList.clear ();
+        }
+
         virtual Tret operator () ()
         {
             typename goList< goAutoPtr<goFunctorBase0<Tret> > >::Element* el = this->fList.getFrontElement ();
@@ -422,18 +442,19 @@ class goCaller0
         };
 
     private:
-        goList< goAutoPtr<goFunctorBase0<Tret> > > fList;
+        FunctorList fList;
 };
 
 /** 
  * @brief Broadcasting caller class,
  * like signals in the "signal/slot" paradigm.
- * @todo Fix the goList issue. golist.hpp must be included at the
- * end of one source file that uses this class.
  */
 template <class Tret, class Targ1>
 class goCaller1
 {
+    public:
+        typedef goList< goAutoPtr<goFunctorBase1<Tret,Targ1> > > FunctorList;
+
     public:
         goCaller1 ()
             : fList () {};
@@ -446,7 +467,20 @@ class goCaller1
         void connect (goAutoPtr<goFunctorBase1<Tret, Targ1> > f)
         {
             this->fList.append (f);
-        };
+        }
+
+        void disconnect (goAutoPtr<goFunctorBase1<Tret, Targ1> > f)
+        {
+            typename FunctorList::Element* e = fList.find (f);
+            if (e)
+                fList.remove (e);
+        }
+
+        void clear ()
+        {
+            fList.clear ();
+        }
+
 
         virtual Tret operator () (Targ1 a1)
         {
@@ -458,10 +492,10 @@ class goCaller1
                 el = el->next;
             }
             return ret;
-        };
+        }
 
     private:
-        goList< goAutoPtr<goFunctorBase1<Tret,Targ1> > > fList;
+        FunctorList fList;
 };
 
 
