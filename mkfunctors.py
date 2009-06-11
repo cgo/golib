@@ -1,4 +1,14 @@
-import string
+#!/usr/bin/python
+
+import string, sys
+
+"""
+Helper program to create functor implementations up to a given max. number of arguments.
+Versions for void and non-void are made, as well as matching helpers (goFunction() and goMemberFunction())
+and goCaller classes.
+Part of golib
+(C) Copyright 2009 by Christian Gosch
+"""
 
 def make_base (max_args):
     args_string = "class Tret"
@@ -45,17 +55,17 @@ class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}>
 """
     template_string = """
 ${template_statement_function}
-class goFunction${postfix}${functionpostfix} : public goFunctorBase${postfix}${template_suffix}
+class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_function}>
 {
     public:
-        typedef ${ret} (*function_t)(${args_names});
+        typedef Tret (*function_t)(${args_names});
 
     public:
-        goFunction${postfix}${functionpostfix} (function_t function)
-            : goFunctorBase${postfix}${template_suffix} (), myFunction (function)
+        goFunction${postfix} (function_t function)
+            : goFunctorBase${postfix}<${template_args_function}> (), myFunction (function)
         {
         }
-        virtual ~goFunction${postfix}${functionpostfix} () {};
+        virtual ~goFunction${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -64,23 +74,18 @@ class goFunction${postfix}${functionpostfix} : public goFunctorBase${postfix}${t
          *
          * @return Whatever the set function returns.
          */
-        virtual ${ret} operator () (${args_names})
+        virtual Tret operator () (${args_names})
         {
             if (myFunction)
             {
-                ${return_statement} (myFunction)(${names});
+                return (myFunction)(${names});
             }
-            //else
-            //{
-            //    Tret dummy;
-            //    return dummy;
-           // }
         }
-        virtual ${ret} operator () (${args_names}) const
+        virtual Tret operator () (${args_names}) const
         {
             if (myFunction)
             {
-                ${return_statement} (myFunction)(${names});
+                return (myFunction)(${names});
             }
         }
 
@@ -89,17 +94,17 @@ class goFunction${postfix}${functionpostfix} : public goFunctorBase${postfix}${t
 };
 
 ${template_statement_function_void}
-class goFunction${postfix} : public goFunctorBase${postfix}${template_suffix_void}
+class goFunction${postfix}<${template_args_function_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
 {
     public:
         typedef void (*function_t)(${args_names});
 
     public:
         goFunction${postfix} (function_t function)
-            : goFunctorBase${postfix}${template_suffix_void} (), myFunction (function)
+            : goFunctorBase${postfix}<${template_args_function_void}> (), myFunction (function)
         {
         }
-        virtual ~goFunction${postfix} () {};
+        virtual ~goFunction${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -128,17 +133,17 @@ class goFunction${postfix} : public goFunctorBase${postfix}${template_suffix_voi
 };
 
 ${template_statement_functor}
-class goFunctor${postfix}${functorpostfix} : public goFunctorBase${postfix}${template_suffix}
+class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_function}>
 {
     public:
-        typedef ${ret} (Tclass::*function_t)(${args_names});
+        typedef Tret (Tclass::*function_t)(${args_names});
 
     public:
-        goFunctor${postfix}${functorpostfix} (Tclass* object, function_t function)
-            : goFunctorBase${postfix}${template_suffix} (), myObject (object), myFunction (function)
+        goFunctor${postfix} (Tclass* object, function_t function)
+            : goFunctorBase${postfix}<${template_args_function}> (), myObject (object), myFunction (function)
         {
         }
-        virtual ~goFunctor${postfix}${functorpostfix} () {};
+        virtual ~goFunctor${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -147,23 +152,58 @@ class goFunctor${postfix}${functorpostfix} : public goFunctorBase${postfix}${tem
          *
          * @return Whatever the set function returns.
          */
-        virtual ${ret} operator () (${args_names})
+        virtual Tret operator () (${args_names})
         {
             if (myObject && myFunction)
             {
-                ${return_statement} (myObject->*myFunction)(${names});
+                return (myObject->*myFunction)(${names});
             }
-            //else
-            //{
-            //    Tret dummy;
-            //    return dummy;
-           // }
         }
-        virtual ${ret} operator () (${args_names}) const
+        virtual Tret operator () (${args_names}) const
         {
             if (myObject && myFunction)
             {
-                ${return_statement} (myObject->*myFunction)(${names});
+                return (myObject->*myFunction)(${names});
+            }
+        }
+
+    private:
+        Tclass* myObject;
+        function_t myFunction;
+};
+
+${template_statement_functor_void}
+class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
+{
+    public:
+        typedef void (Tclass::*function_t)(${args_names});
+
+    public:
+        goFunctor${postfix} (Tclass* object, function_t function)
+            : goFunctorBase${postfix}<${template_args_function_void}> (), myObject (object), myFunction (function)
+        {
+        }
+        virtual ~goFunctor${postfix} () {}
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual void operator () (${args_names})
+        {
+            if (myObject && myFunction)
+            {
+                (myObject->*myFunction)(${names});
+            }
+        }
+        virtual void operator () (${args_names}) const
+        {
+            if (myObject && myFunction)
+            {
+                (myObject->*myFunction)(${names});
             }
         }
 
@@ -184,7 +224,8 @@ ${template_statement_functorbase}
 class goCaller${postfix}
 {
     public:
-        typedef goList< goAutoPtr<goFunctorBase${postfix}${template_suffix} > > FunctorList;
+        typedef goFunctorBase${postfix}<${template_args_function}> FunctorBase;
+        typedef goList< goAutoPtr< FunctorBase > > FunctorList;
 
     public:
         goCaller${postfix} ()
@@ -194,12 +235,12 @@ class goCaller${postfix}
         //= Take very much care here that
         //= 1. This class gets notified if functors are destroyed.
         //= 2. Everything is thread safe.
-        void connect (goAutoPtr<goFunctorBase${postfix}${template_suffix} > f)
+        void connect (goAutoPtr< FunctorBase > f)
         {
             this->fList.append (f);
         }
 
-        void disconnect (goAutoPtr<goFunctorBase${postfix}${template_suffix} > f)
+        void disconnect (goAutoPtr< FunctorBase > f)
         {
             typename FunctorList::Element* e = fList.find (f);
             if (e)
@@ -240,11 +281,10 @@ class goCaller${postfix}
  * @return goAutoPtr to a goFunctorBase${postfix} object.
  */
 ${template_statement_function}
-goAutoPtr<goFunctorBase${postfix}${template_suffix} >
-goFunction (${function_typename_statement} goFunction${postfix}${functionpostfix}${template_suffix_function}::function_t f)
+goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
+goFunction (${function_typename_statement} goFunction${postfix}<${template_args_function}>::function_t f)
 {
-    return goAutoPtr<goFunctorBase${postfix}${template_suffix} > (new goFunction${postfix}${functionpostfix}${template_suffix_function} (f));
-     // (static_cast<goFunctorBase${postfix}${template_suffix}*> (new goFunction${postfix}${template_suffix_function} (f)));
+    return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (new goFunction${postfix}<${template_args_function}> (f));
 }
 
 /** 
@@ -258,20 +298,16 @@ goFunction (${function_typename_statement} goFunction${postfix}${functionpostfix
  */
 ${template_statement_functor}
 // template <class Tclass, class Tret, class Targ1>
-goAutoPtr<goFunctorBase${postfix}${template_suffix} >
-goMemberFunction (Tclass* c, typename goFunctor${postfix}${functorpostfix}<${template_args_functor}>::function_t f)
+goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
+goMemberFunction (Tclass* c, typename goFunctor${postfix}<${template_args_functor}>::function_t f)
 {
-    return goAutoPtr<goFunctorBase${postfix}${template_suffix} > (static_cast<goFunctorBase${postfix}${template_suffix}*> (new goFunctor${postfix}${functorpostfix}<${template_args_functor}> (c, f)));
+    return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (static_cast<goFunctorBase${postfix}<${template_args_function}>*> (new goFunctor${postfix}<${template_args_functor}> (c, f)));
 }
 """
 
     args_string = ""
     args_names_string = ""
     names_string = ""
-#    if ret == "void":
-#        void_ret = True
-#    else:
-#        void_ret = False
 
     args_string2 = ""
 
@@ -294,48 +330,41 @@ goMemberFunction (Tclass* c, typename goFunctor${postfix}${functorpostfix}<${tem
         template_args_base += ", void"
     template_statement_functorbase += ">"
     
-    if (void_ret):
-        template_statement_functor = "template <class Tclass"
-        template_args_functor = "Tclass"
-    else:
-        template_statement_functor = "template <class Tret, class Tclass"
-        template_args_functor = "Tret, Tclass"
-    if (void_ret and num_args <= 0):
-        template_statement_function = ""
-        template_suffix_function = ""
-        template_suffix = "<void>"
-    else:
-        template_statement_function = "template <"
-        template_suffix = "<"
-        template_suffix_function = "<"
-        if (void_ret):
-            template_suffix += "void"
-        else:
-            template_suffix += "Tret"
-        if num_args > 0:
-            template_suffix += ", "
-        if (not void_ret):
-            template_statement_function += "class Tret"
-            template_suffix_function += "Tret"
-            if num_args > 0:
-                template_statement_function += ", "
-                template_suffix_function += ", "
-        if num_args > 0:
-            template_statement_function += "class Targ0"
-            template_statement_functor += ", class Targ0"
-            template_args_functor += ", Targ0"
-            template_suffix += "Targ0"
-            template_suffix_function += "Targ0"
-            for i in xrange (1, num_args):
-                template_statement_function += ", class Targ" + str(i)
-                template_statement_functor += ", class Targ" + str(i)
-                template_args_functor += ", Targ" + str(i)
-                template_suffix += ", Targ" + str(i)
-                template_suffix_function += ", Targ" + str(i)
-        template_statement_function += ">"
-        template_suffix += ">"
-        template_suffix_function += ">"
-    template_statement_functor += ">"    
+    template_statement_functor = "template <class Tret, class Tclass"
+    template_args_functor = "Tret, Tclass"
+    template_statement_functor_void = "template <class Tclass"
+    template_args_functor_void = "void, Tclass"
+
+    template_statement_function = "template <class Tret"
+    template_statement_function_void = "template <"
+    template_args_function_void = "void"
+    template_args_function = "Tret"
+
+
+    if num_args > 0:
+        template_statement_function += ", class Targ0"
+        template_statement_function_void += "class Targ0"
+        template_statement_functor += ", class Targ0"
+        template_statement_functor_void += ", class Targ0"
+        template_args_functor += ", Targ0"
+        template_args_functor_void += ", Targ0"
+        template_args_function += ", Targ0"
+        template_args_function_void += ", Targ0"
+        for i in xrange (1, num_args):
+            s = ", class Targ" + str(i)
+            template_statement_function += s
+            template_statement_function_void += s
+            template_statement_functor += s
+            template_statement_functor_void += s
+            template_args_functor += ", Targ" + str(i)
+            template_args_functor_void += ", Targ" + str(i)
+            template_args_function += ", Targ" + str(i)
+            template_args_function_void += ", Targ" + str(i)
+
+    template_statement_function += ">"
+    template_statement_function_void += ">"
+    template_statement_functor += ">"
+    template_statement_functor_void += ">"
 
     if (base):
         s = string.Template (template_base_string)
@@ -345,32 +374,22 @@ goMemberFunction (Tclass* c, typename goFunctor${postfix}${functorpostfix}<${tem
     d = {"names": names, 
          "args_names": args_names, 
          "template_args_base": template_args_base,
-         "template_suffix": template_suffix,
-         "template_suffix_function": template_suffix_function,
          "template_statement_functorbase": template_statement_functorbase,
          "template_statement_functor": template_statement_functor,
+         "template_statement_functor_void": template_statement_functor_void,
          "template_args_functor": template_args_functor,
+         "template_args_functor_void": template_args_functor_void,
+         "template_args_function": template_args_function,
+         "template_args_function_void": template_args_function_void,
          "template_statement_function": template_statement_function,
+         "template_statement_function_void": template_statement_function_void,
          "function_typename_statement": "typename",
-         "ret": "Tret",
-         "return_statement": "return",
-         "postfix": str(num_args),
-         "functionpostfix": "",
-         "functorpostfix" : ""}
-
-    if template_suffix_function == "":
-        d["function_typename_statement"] = ""
+         "postfix": str(num_args)}
 
     if make_callers:
         caller_result = string.Template (caller_template).substitute (d)
     else:
         caller_result = ""
-
-    if (void_ret):
-        d["ret"] = "void"
-        d["return_statement"] = ""
-        d["functionpostfix"] = "Void"
-        d["functorpostfix"] = "Void"
 
     if make_helper:
         helper_result = string.Template (helper_template).substitute (d)
@@ -379,14 +398,20 @@ goMemberFunction (Tclass* c, typename goFunctor${postfix}${functorpostfix}<${tem
 
     return s.substitute (d) + caller_result + helper_result
 
-s = make_base (10)
-# Make the bases (void_ret does not matter):
-for i in xrange (3):
-    s += make_functors (i,10,void_ret = True, base = True)
+if len(argv) < 2:
+    print ("""
+Make any amount of functor classes and helper functions, as well as goCaller classes.
+Usage: %s <max. number of arguments>" % argv[0])
+""")
+    sys.exit ()
+
+N = int (argv[1])
+
+s = make_base (N)
+# Make the bases 
+for i in xrange (N):
+    s += make_functors (i,N, base = True)
 # Make voids:
-for i in xrange (3):
-    s += make_functors (i,10,void_ret = True, base = False, make_helper = True)
-# Make non-voids:
-for i in xrange (3):
-    s += make_functors (i,10,void_ret = False, base = False, make_callers = True, make_helper = True)
+for i in xrange (N):
+    s += make_functors (i,N, base = False, make_helper = True, make_callers = True)
 print s 
