@@ -398,14 +398,14 @@ goMemberFunction (Tclass* c, typename goFunctor${postfix}<${template_args_functo
 
     return s.substitute (d) + caller_result + helper_result
 
-if len(argv) < 2:
+if len(sys.argv) < 2:
     print ("""
 Make any amount of functor classes and helper functions, as well as goCaller classes.
-Usage: %s <max. number of arguments>" % argv[0])
-""")
+Usage: %s <max. number of arguments>
+""" % sys.argv[0])
     sys.exit ()
 
-N = int (argv[1])
+N = int (sys.argv[1])
 
 s = make_base (N)
 # Make the bases 
