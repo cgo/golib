@@ -223,7 +223,7 @@ goGUI::SceneControl::SceneControl ()
         //= THIS CRASHES ONLY AT UNI -- SOMETHING WRONG WITH GTKMM/SIGC ????
         // myPrivate->glanimation.signalWaypointSelected().connect (sigc::mem_fun (*this, &SceneControl::transformToSelectedWaypoint));
         //= Workaround for the crash mentioned above.
-        myPrivate->glanimation.waypointSelectedCaller().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::transformToSelectedWaypoint));
+        myPrivate->glanimation.waypointSelectedCaller().connect (goMemberFunction<int, SceneControl> (this, &SceneControl::transformToSelectedWaypoint));
         // myPrivate->view.signalChanged().connect (sigc::mem_fun (*this, &SceneControl::editWaypoint));
     }
 
@@ -234,7 +234,7 @@ goGUI::SceneControl::SceneControl ()
     {
         myPrivate->objectPropButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::objectProperties));
         // myPrivate->objectInput.signalDrawableObjectInputChanged().connect (sigc::mem_fun (*this, &SceneControl::objectPropChanged));
-        myPrivate->objectInput.callerDrawableObjectInputChanged().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::objectPropChanged));
+        myPrivate->objectInput.callerDrawableObjectInputChanged().connect (goMemberFunction<int, SceneControl> (this, &SceneControl::objectPropChanged));
         myPrivate->loadOFFButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadOFF));
         myPrivate->deleteObjectButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::deleteObject));
         myPrivate->loadImageButton.signal_clicked().connect (sigc::mem_fun (*this, &SceneControl::loadImage));
@@ -258,7 +258,7 @@ goGUI::SceneControl::SceneControl ()
 
         //= BUG IN UNIVERSITY COMPUTER'S SIGC/GTKMM???
         // myPrivate->glanimation.signalPositionChanged().connect (sigc::mem_fun (*this, &SceneControl::animationPositionChanged));
-        myPrivate->glanimation.positionChangedCaller().connect (goMemberFunction<SceneControl,int> (this, &SceneControl::animationPositionChanged));
+        myPrivate->glanimation.positionChangedCaller().connect (goMemberFunction<int, SceneControl> (this, &SceneControl::animationPositionChanged));
     }
 
     myPrivate->viewWindow.add (myPrivate->view);

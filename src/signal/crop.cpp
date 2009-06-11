@@ -248,7 +248,7 @@ bool goSignalCropHigher (goSignal3DBase<void>& sig, goSubSignal3D<void>& target,
     goMath::Vector<goSize_t> max (_max, 3, 1);
 
     _lower_or_equal leq (thresh);
-    return goSignalCrop (sig, target, goMemberFunction<_lower_or_equal, bool, goDouble> (&leq, &_lower_or_equal::eval));
+    return goSignalCrop (sig, target, goMemberFunction<bool, _lower_or_equal, goDouble> (&leq, &_lower_or_equal::eval));
 }
 
 /** 
@@ -310,5 +310,5 @@ bool goSignalCrop (goSignal3DBase<void>& sig, goSubSignal3D<void>& target, goAut
 bool goSignalMinMaxCoordHigher (const goSignal3DBase<void>& sig, goDouble thresh, goMath::Vector<goSize_t>& minRet, goMath::Vector<goSize_t>& maxRet)
 {
     _lower_or_equal leq (thresh);
-    return goSignalMinMaxCoord (sig, goMemberFunction<_lower_or_equal, bool, goDouble> (&leq, &_lower_or_equal::eval), minRet, maxRet);
+    return goSignalMinMaxCoord (sig, goMemberFunction<bool, _lower_or_equal, goDouble> (&leq, &_lower_or_equal::eval), minRet, maxRet);
 }

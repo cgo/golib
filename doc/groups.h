@@ -194,7 +194,110 @@
  *     can be read and written by the installed libdevil.
  *     There are also functions for reading and writing
  *     ASCII strings from and to files. See goFileIO for details.
- *   
+ */
+ /*!
+  *
+  * \ingroup misc
+  * \defgroup functors Functor objects
+  * Functors are used to encapsulate functions and member functions.
+  * There are a number of classes provided for different numbers of arguments.
+  * Functions and member functions are somewhat unified in that they both are goFunctorBase type objects,
+  * so e.g. for callbacks you can use either a function or a member function; they use the same interface.
+  * It is usually recommended to use the goFunction and goMemberFunction helper functions, which create
+  * goAutoPtr objects pointing to functor objects.
+  * To use a simple callback mechanism, you can utilise the goCaller classes, which provide an easy to use
+  * interface to connect to functors. If you then invoke a goCaller, all connected functors will be called.
+  * 
+  * \par Usage example
+  * \code
+void f1 ()
+{
+    printf ("f1\n");
+}
+
+int f2 ()
+{
+    printf ("f2\n");
+    return 2;
+}
+
+void f3 (int i)
+{
+    printf ("f3: %d\n", i);
+}
+
+void s1 (int i, const goString& s)
+{
+    printf ("s1: %s, %d\n", s.toCharPtr(), i);
+}
+
+class MyClass
+{
+    public: 
+        MyClass (int a = 5)
+            : n (a)
+        {
+        }
+
+        void action ()
+        {
+            printf ("MyClass n = %d\n", n);
+        }
+
+        void action2 (int i, const goString& s)
+        {
+            printf ("MyClass action2: %s, %d\n", s.toCharPtr(), i);
+        }
+
+    private:
+        int n;
+};
+
+// ....
+// Somewhere in the code:
+    {
+        goFunction0<void> ff1 (f1);
+        goFunction0<int> ff2 (f2);
+
+        goFunction1<void, int> ff3 (f3);
+
+        ff1 ();
+        ff2 ();
+        ff3 (4);
+    }
+
+// Or use the convenience functions:
+    {
+        goAutoPtr<goFunctorBase0<void> > ff1 = goFunction<void> (f1);
+
+        goAutoPtr<goFunctorBase0<int> > ff2 = goFunction<int> (f2);
+        goAutoPtr<goFunctorBase1<void, int> > ff3 = goFunction<void, int> (f3);
+
+        MyClass c (10);
+        goAutoPtr<goFunctorBase0<void> > ff4 = goMemberFunction <void, MyClass> (&c, &MyClass::action);
+
+        (*ff1)();
+        printf (" -- return value: %d\n", (*ff2)());
+        (*ff3)(3);
+
+        (*ff4)();
+
+        //= Try the caller
+        goCaller0 <void> caller;
+        caller.connect (ff1);
+        caller.connect (ff4);
+
+        caller (); //= Calls ff1 and ff4
+
+        goCaller2 <void, int, const goString&> caller2;
+        caller2.connect (goFunction<void, int, const goString&> (s1));
+        caller2.connect (goMemberFunction<void, MyClass, int, const goString&> (&c, &MyClass::action2));
+
+        caller2 (42, goString("Hello, World!")); //= Calls s1 and c.action2
+    }
+  * \endcode
+  */
+ /*!
  * \defgroup system System
  * \defgroup net Network classes
  * \defgroup thread Multithreading classes

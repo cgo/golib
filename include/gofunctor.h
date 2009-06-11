@@ -5,10 +5,9 @@
 #include <golist.h>
 #include <golog.h>
 
-/**
- * @addtogroup misc
- * @{
- */
+#include "gofunctor2.h"
+
+
 #if 0
 /** 
  * @brief Virtual base class for functors with 1 argument.
@@ -145,6 +144,50 @@ class goFunction0 : public goFunctorBase0<Tret>
         function_t myFunction;
 };
 
+template<> class goFunction0<void> : public goFunctorBase0<void>
+{
+    public:
+        typedef void (*function_t)();
+
+    public:
+        goFunction0 (function_t function)
+            : goFunctorBase0<void>(), myFunction (function)
+        {
+        }
+        virtual ~goFunction0 () {};
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual void operator () ()
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                (myFunction)();
+            }
+            //else
+            //{
+            //    Tret dummy;
+            //    return dummy;
+           // }
+        }
+        virtual void operator () () const
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                (myFunction)();
+            }
+        }
+
+    private:
+        function_t myFunction;
+};
 
 template <class Tret, class Tclass>
 class goFunctor0 : public goFunctorBase0<Tret>
@@ -237,6 +280,47 @@ class goFunction1 : public goFunctorBase1<Tret, Targ1>
                 return (myFunction)(p);
             }
         };
+
+    private:
+        function_t myFunction;
+};
+
+template <class Targ1>
+class goFunction1<void, Targ1> : public goFunctorBase1<void, Targ1>
+{
+    public:
+        typedef void (*function_t)(Targ1);
+
+    public:
+        goFunction1 (function_t function)
+            : goFunctorBase1<void, Targ1>(), myFunction (function)
+        {
+        }
+        virtual ~goFunction1 () {}
+
+        /** 
+         * @brief Calls the function set to this functor.
+         *
+         * @param p Whatever parameter the represented function takes.
+         *
+         * @return Whatever the set function returns.
+         */
+        virtual void operator () (Targ1 p)
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                (myFunction)(p);
+            }
+        }
+        virtual void operator () (Targ1 p) const
+        {
+            // printf ("Functor called.\n");
+            if (myFunction)
+            {
+                (myFunction)(p);
+            }
+        }
 
     private:
         function_t myFunction;
@@ -389,8 +473,7 @@ class goFunctor2 : public goFunctorBase2<Tret, Targ1, Targ2>
 
 #endif
 
-#include "gofunctor2.h"
-
+#if 0
 /** 
  * @brief Broadcasting caller class,
  * like signals in the "signal/slot" paradigm.
@@ -559,5 +642,6 @@ goMemberFunction (Tclass* c, typename goFunctor2<Tret, Tclass, Targ1, Targ2>::fu
     return goAutoPtr<goFunctorBase2<Tret, Targ1, Targ2> > (static_cast<goFunctorBase2<Tret, Targ1, Targ2>*> (new goFunctor2<Tret, Tclass, Targ1, Targ2> (c, f)));
 }
 
-/** @} */
+#endif
+
 #endif

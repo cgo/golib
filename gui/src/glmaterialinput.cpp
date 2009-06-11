@@ -72,7 +72,8 @@ void goGUI::GLMaterialInput::get (goGL::Material& m)
 int goGUI::GLMaterialInput::inputChangedSlotMaterial ()
 {
     this->get (myPrivate->material);
-    return myPrivate->callerChangedMaterial ();
+    myPrivate->callerChangedMaterial ();
+    return 0;
 }
 
 goCaller0<int>& goGUI::GLMaterialInput::callerChangedMaterial ()

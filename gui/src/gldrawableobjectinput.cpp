@@ -149,7 +149,8 @@ int goGUI::GLDrawableObjectInput::inputChangedSlotDrawableObject ()
     if (!myPrivate->object.isNull())
         this->getDrawable (*myPrivate->object);
 
-    return myPrivate->callerChanged ();
+    myPrivate->callerChanged ();
+    return 0;
 }
 
 void goGUI::GLDrawableObjectInput::inputChangedShadeModel ()

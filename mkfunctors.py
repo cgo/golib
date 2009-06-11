@@ -31,6 +31,9 @@ class goFunctorBase
 def make_functors (num_args, max_args, void_ret = False, base = False, make_callers = False, make_helper = False):
 
     template_base_string = """
+/** 
+* @brief Base for functor objects with ${postfix} arguments.
+*/
 ${template_statement_functorbase}
 class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}> 
 {
@@ -54,10 +57,18 @@ class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}>
 };
 """
     template_string = """
+/** 
+* @brief Function representation (not member function) for functions with ${postfix} arguments.
+* 
+* The first template argument is the return type, the others are argument types.
+*/
 ${template_statement_function}
 class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_function}>
 {
     public:
+        /** 
+        * @brief Function type represented by this class.
+        */
         typedef Tret (*function_t)(${args_names});
 
     public:
@@ -93,10 +104,16 @@ class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_func
         function_t myFunction;
 };
 
+/** 
+* @brief Specialisation for void functions.
+*/
 ${template_statement_function_void}
 class goFunction${postfix}<${template_args_function_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
 {
     public:
+        /** 
+        * @brief Function type represented by this class.
+        */
         typedef void (*function_t)(${args_names});
 
     public:
@@ -132,10 +149,19 @@ class goFunction${postfix}<${template_args_function_void}> : public goFunctorBas
         function_t myFunction;
 };
 
+/** 
+* @brief Member function representation for class members with ${postfix} arguments.
+* 
+* The first template argument is the return type, the second is the class type,
+* the others are member function argument types.
+*/
 ${template_statement_functor}
 class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_function}>
 {
     public:
+        /** 
+        * @brief Function type represented by this class.
+        */
         typedef Tret (Tclass::*function_t)(${args_names});
 
     public:
@@ -172,10 +198,16 @@ class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_funct
         function_t myFunction;
 };
 
+/** 
+* @brief Specialisation for void member functions.
+*/
 ${template_statement_functor_void}
 class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
 {
     public:
+        /** 
+        * @brief Function type represented by this class.
+        */
         typedef void (Tclass::*function_t)(${args_names});
 
     public:
@@ -224,6 +256,9 @@ ${template_statement_functorbase}
 class goCaller${postfix}
 {
     public:
+        /** 
+        * @brief Function type represented by this class.
+        */
         typedef goFunctorBase${postfix}<${template_args_function}> FunctorBase;
         typedef goList< goAutoPtr< FunctorBase > > FunctorList;
 
@@ -407,11 +442,21 @@ Usage: %s <max. number of arguments>
 
 N = int (sys.argv[1])
 
-s = make_base (N)
+s = """
+//= Automatically created by mkfunctors.py.
+//= Part of golib, (C) copyright 2009 by Christian Gosch
+/*! @addtogroup functors
+ * @{
+ */
+"""
+s += make_base (N)
 # Make the bases 
 for i in xrange (N):
     s += make_functors (i,N, base = True)
 # Make voids:
 for i in xrange (N):
     s += make_functors (i,N, base = False, make_helper = True, make_callers = True)
+
+s += """
+/*! @} */"""
 print s 

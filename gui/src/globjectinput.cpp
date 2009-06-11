@@ -65,7 +65,8 @@ int goGUI::GLObjectInput::inputChangedSlotObject ()
     if (!myPrivate->object.isNull())
         this->get (*myPrivate->object);
     // myPrivate->objectInputChangedSignal ();
-    return myPrivate->objectInputChangedCaller ();
+    myPrivate->objectInputChangedCaller ();
+    return 0;
 }
 
 //sigc::signal<void>& goGUI::GLObjectInput::signalObjectInputChanged ()
