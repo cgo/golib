@@ -37,7 +37,8 @@ goSignal3DBase<T>::goSignal3DBase ()
     myDataType    (GO_UINT8),
     myChannelCount (1),
     myChannel     (0),
-    myBorderFlags (3)
+    myBorderFlags (3),
+    myChangedCaller ()
 {
     myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
@@ -76,7 +77,8 @@ goSignal3DBase<T>::goSignal3DBase (goSignal3DBase<T>& other)
     myDataType   (GO_UINT8),
     myChannelCount (1),
     myChannel     (0),
-    myBorderFlags (3)
+    myBorderFlags (3),
+    myChangedCaller ()
 {
     myBorderFlags.fill (GO_PERIODIC_BORDER);
     this->initializeDataType ();
@@ -847,7 +849,14 @@ template<class T>
 void
 goSignal3DBase<T>::setChanged ()
 {
+    this->myChangedCaller ();
     this->sendObjectMessage (GO_OBJECTMESSAGE_CHANGED);
+}
+
+template <class T>
+goCaller0<void>& goSignal3DBase<T>::getChangedCaller ()
+{
+    return this->myChangedCaller;
 }
 
 template<> goSize_t

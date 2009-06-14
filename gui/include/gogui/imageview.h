@@ -6,6 +6,9 @@
 #include <gosignal3d.h>
 #include <golist.h>
 #include <goautoptr.h>
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 #include <goplot.h>
 
@@ -37,6 +40,17 @@ namespace goGUI
     class ImageView : public Gtk::DrawingArea
     {
         public:
+            enum 
+            {
+                /// Value for changedCaller
+                IMAGE_SET,
+                /// Value for changedCaller
+                IMAGE_REMOVED,
+                /// Value for changedCaller
+                CURRENT_IMAGE_CHANGED
+            };
+                
+        public:
             ImageView ();
             virtual ~ImageView ();
 
@@ -47,12 +61,14 @@ namespace goGUI
             // goAutoPtr<goSignal3DBase<void> > getImage  ();
             goAutoPtr<goPlot::Object2DImage> getImageObject (goIndex_t index = -1); 
             goAutoPtr<goSignal3DBase<void> > getImage (goIndex_t index = -1);
+            goIndex_t         getImageCount () const;
 
             goAutoPtr<goPlot::Graph> graph ();
 
-            void setCurrentImage (goIndex_t i);
+            void      setCurrentImage (goIndex_t i);
             goIndex_t currentImageIndex () const;
 
+            goCaller1<void, int>& changedCaller ();
 #if 0
             void              drawCurve (const goMatrixd& c);
             void              drawCurves ();

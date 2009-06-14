@@ -42,8 +42,8 @@ namespace goGUI
     class ImageViewPrivate
     {
         public:
-            typedef std::list<goAutoPtr<goPlot::Object2DImage> > ImageObjectList;
-            typedef std::list<goAutoPtr<goSignal3DRef> >         ImageList;
+            typedef std::vector<goAutoPtr<goPlot::Object2DImage> > ImageObjectList;
+            typedef std::vector<goAutoPtr<goSignal3DRef> >         ImageList;
 
         public:
             ImageViewPrivate() 
@@ -51,7 +51,8 @@ namespace goGUI
                   images (),
                   graph (new goPlot::Graph),
                   currentImageIndex (0),
-                  currentImage (0)
+                  currentImage (0),
+                  changedCaller ()
         {
             graph->flipY ();
         }
@@ -74,6 +75,8 @@ namespace goGUI
             goAutoPtr<goPlot::Graph>                     graph;
             goIndex_t                                    currentImageIndex;
             goAutoPtr<goSignal3DBase<void> >             currentImage;
+
+            goCaller1<void, int>                         changedCaller; //= Called whenever something changes.
     };
 
     goGUI::ImageView::ImageView ()
@@ -181,18 +184,10 @@ namespace goGUI
 
         if (index >= 0 && index < goIndex_t(myPrivate->imageObjects.size ()))
         {
-            goIndex_t i = 0;
-
-            while (i < index && it != myPrivate->imageObjects.end () && itim != myPrivate->images.end ())
-            {
-                ++i; ++it; ++itim;
-            }
-
-            if (it != myPrivate->imageObjects.end () && i == index && itim != myPrivate->images.end ())
-            {
-                o = *it;
-                im = *itim;
-            }
+            o = myPrivate->imageObjects[index];
+            im = myPrivate->images[index];
+            it = myPrivate->imageObjects.begin() + index;
+            itim = myPrivate->images.begin() + index;
         }
 
         if (o.isNull() || im.isNull () || w != o->width () || h != o->height () || format != o->format ())
@@ -230,6 +225,8 @@ namespace goGUI
         // t *= goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
         t = goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
         o->setTransform (t);
+
+        myPrivate->changedCaller (IMAGE_SET);
 
         // myPrivate->graph->setDimensions (0, w, 0, h);
         //= FIXME: This tends to crash in a pango function.
@@ -271,18 +268,10 @@ namespace goGUI
 
         if (index >= 0 && index < goIndex_t(myPrivate->imageObjects.size ()))
         {
-            goIndex_t i = 0;
-
-            while (i < index && it != myPrivate->imageObjects.end () && itim != myPrivate->images.end ())
-            {
-                ++i; ++it; ++itim;
-            }
-
-            if (it != myPrivate->imageObjects.end () && i == index && itim != myPrivate->images.end ())
-            {
-                o = *it;
-                im = *itim;
-            }
+            o = myPrivate->imageObjects[index];
+            im = myPrivate->images[index];
+            it = myPrivate->imageObjects.begin() + index;
+            itim = myPrivate->images.begin() + index;
         }
 
         myPrivate->graph->remove (o);  // Remove the current image representation before making a new one
@@ -323,6 +312,8 @@ namespace goGUI
         //t *= goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
         t = goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
         o->setTransform (t);
+
+        myPrivate->changedCaller (IMAGE_SET);
 
         {
             //= This call fixes the minimum size of the image widget to its original size
@@ -409,6 +400,11 @@ namespace goGUI
         return 0;
     }
 
+    goIndex_t goGUI::ImageView::getImageCount () const
+    {
+        return static_cast<goIndex_t> (myPrivate->images.size ());
+    }
+
     /**
      * @brief Creates an object that references the data in the Object2DImage directly.
      *
@@ -460,11 +456,18 @@ namespace goGUI
             else
                 (*it)->setVisible (false);
         }
+
+        myPrivate->changedCaller (CURRENT_IMAGE_CHANGED);
     }
 
     goIndex_t goGUI::ImageView::currentImageIndex () const
     {
         return myPrivate->currentImageIndex;
+    }
+
+    goCaller1<void, int>& goGUI::ImageView::changedCaller ()
+    {
+        return myPrivate->changedCaller;
     }
 
 #if 0

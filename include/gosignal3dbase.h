@@ -36,6 +36,9 @@
 #ifndef GOFIXEDARRAY_H
 # include <gofixedarray.h>
 #endif
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 /*!
  * @addtogroup signal
@@ -109,7 +112,8 @@ goSignal3DBase : public goObjectBase
         // From goObjectInfo
         virtual goSize_t memoryUsage() const;
 
-        void          setChanged  ();
+        void             setChanged  ();
+        goCaller0<void>& getChangedCaller ();
         
         void          setPtr      (T *p); 
         const goType& getDataType () const;
@@ -372,6 +376,8 @@ goSignal3DBase : public goObjectBase
 
     private:
         goSignal3DBase<T>& operator= (goSignal3DBase<T>&);
+
+        goCaller0<void> myChangedCaller;  //= called by setChanged()
 };
 
 #define SIGNAL3D_bilinear(__A, __B, __C, __D, __px, __py, __target) {  \
