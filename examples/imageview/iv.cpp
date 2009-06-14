@@ -153,7 +153,8 @@ void ImageViewer::loadImage ()
 //            this->view.setImage (image2);
             
             //= Let imageview worry about the image format.            
-            this->view.setImage (image);
+            this->view.setImage (image, 0);
+            this->view.setCurrentImage (0);
             this->view.queue_draw ();
             // this->control.setImage (image);
         }
@@ -237,7 +238,10 @@ void ImageViewer::canny ()
     goAutoPtr<goSignal3DBase<void> > image = this->view.getImage ();
     
     if (image.isNull ())
+    {
+        goGUI::warning ("image is null");
         return;
+    }
 
     // this->queue_draw ();
     // return;
@@ -288,7 +292,7 @@ void ImageViewer::canny ()
         image2.setChannel (2);
         goCopySignalChannel (cimg, &image2);
         image2.setChannel (0);
-        this->view.setImage (image2);
+        this->view.setImage (image2, this->view.currentImageIndex ());
         this->view.queue_draw ();
     }
 }

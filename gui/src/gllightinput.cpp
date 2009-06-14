@@ -34,7 +34,7 @@ goGUI::GLLightInput::GLLightInput ()
     this->set (myPrivate->light);
 
     // this->signalChanged().connect (sigc::mem_fun (*this, &GLLightInput::inputChangedSlotLight));
-    this->callerChanged().connect (goMemberFunction<GLLightInput,int> (this, &GLLightInput::inputChangedSlotLight));
+    this->callerChanged().connect (goMemberFunction<int, GLLightInput> (this, &GLLightInput::inputChangedSlotLight));
     this->show_all ();
 }
 

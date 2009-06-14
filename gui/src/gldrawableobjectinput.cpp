@@ -51,9 +51,9 @@ goGUI::GLDrawableObjectInput::GLDrawableObjectInput ()
     }
     myPrivate->materialInput.set (myPrivate->material);
     // this->signalObjectInputChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
-    this->callerObjectInputChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    this->callerObjectInputChanged().connect (goMemberFunction<int, GLDrawableObjectInput> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
     // myPrivate->materialInput.signalChanged().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
-    myPrivate->materialInput.callerChanged().connect (goMemberFunction<GLDrawableObjectInput,int> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
+    myPrivate->materialInput.callerChanged().connect (goMemberFunction<int, GLDrawableObjectInput> (this, &GLDrawableObjectInput::inputChangedSlotDrawableObject));
     myPrivate->shadeModelConnection = myPrivate->shadeModelInput.signal_changed().connect (sigc::mem_fun (*this, &GLDrawableObjectInput::inputChangedShadeModel));
 }
 

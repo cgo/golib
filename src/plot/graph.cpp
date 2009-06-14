@@ -509,7 +509,8 @@ namespace goPlot
         //= Draw other objects
         for (std::list<goAutoPtr<Object2D> >::iterator it = myObjects.begin (); it != myObjects.end (); ++it)
         {
-            (*it)->draw ();
+            if ((*it)->visible ())
+                (*it)->draw ();
         }
         cairo_restore (cr);
     }

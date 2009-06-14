@@ -16,6 +16,7 @@ namespace goGUI
 /** @addtogroup gui
  * @{
  */
+
     /** 
      * @brief Image display widget.
      *
@@ -41,13 +42,16 @@ namespace goGUI
 
             void draw ();
 
-            void              setImage  (const goSignal3DBase<void>& image);
-            void              setImage  (int w, int h, int format = goPlot::Object2DImage::RGB24);
+            void              setImage  (const goSignal3DBase<void>& image, goIndex_t index = -1);
+            void              setImage  (int w, int h, int format = goPlot::Object2DImage::RGB24, goIndex_t index = -1);
             // goAutoPtr<goSignal3DBase<void> > getImage  ();
-            goAutoPtr<goPlot::Object2DImage> getImageObject (); 
-            goAutoPtr<goSignal3DBase<void> > getImage ();
+            goAutoPtr<goPlot::Object2DImage> getImageObject (goIndex_t index = -1); 
+            goAutoPtr<goSignal3DBase<void> > getImage (goIndex_t index = -1);
 
             goAutoPtr<goPlot::Graph> graph ();
+
+            void setCurrentImage (goIndex_t i);
+            goIndex_t currentImageIndex () const;
 
 #if 0
             void              drawCurve (const goMatrixd& c);
@@ -60,6 +64,8 @@ namespace goGUI
 #endif
         protected:
             virtual bool on_expose_event (GdkEventExpose* event);
+
+            goAutoPtr<goSignal3DBase<void> > imageRef (goAutoPtr<goPlot::Object2DImage> img);
 
         private:
             ImageView (const ImageView&);

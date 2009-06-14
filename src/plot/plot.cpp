@@ -103,9 +103,18 @@ namespace goPlot
     }
 
     Object2D::Object2D () 
-        : myTransform (), myContext (0)
+        : myTransform (), myContext (0), myVisible (true)
     { }
 
+    bool Object2D::visible () const
+    {
+        return myVisible;
+    }
+
+    void Object2D::setVisible (bool t)
+    {
+        myVisible = t;
+    }
 
     LineTraits::LineTraits () 
         : myWidth (1.0), 

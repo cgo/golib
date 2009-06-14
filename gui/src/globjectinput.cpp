@@ -37,7 +37,7 @@ goGUI::GLObjectInput::GLObjectInput ()
     this->show_all ();
 
     // myPrivate->objectVectorInput.signalChanged().connect (sigc::mem_fun (*this, &GLObjectInput::inputChangedSlotObject));
-    myPrivate->objectVectorInput.callerChanged().connect (goMemberFunction<GLObjectInput,int> (this, &GLObjectInput::inputChangedSlotObject));
+    myPrivate->objectVectorInput.callerChanged().connect (goMemberFunction<int, GLObjectInput> (this, &GLObjectInput::inputChangedSlotObject));
 }
 
 goGUI::GLObjectInput::~GLObjectInput ()

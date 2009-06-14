@@ -66,7 +66,7 @@ goGUI::OFFViewControl::OFFViewControl ()
         this->signal_hide().connect (sigc::mem_fun (*this, &OFFViewControl::onHide));
         this->signal_show().connect (sigc::mem_fun (*this, &OFFViewControl::onShow));
         //myPrivate->viewConnection = myPrivate->view.signalRotated().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::OFFViewRotated));
-        myPrivate->view.callerRotated().connect (goMemberFunction<OFFViewControl,int> (this, &goGUI::OFFViewControl::OFFViewRotated));
+        myPrivate->view.callerRotated().connect (goMemberFunction<int, OFFViewControl> (this, &goGUI::OFFViewControl::OFFViewRotated));
     }
 
     myPrivate->tips.enable ();
@@ -95,7 +95,7 @@ goGUI::OFFViewControl::OFFViewControl ()
     myPrivate->lightDialog.hide ();
 
     // myPrivate->lightInput.signalChanged().connect (sigc::mem_fun (*this, &OFFViewControl::lightChangedSlot));
-    myPrivate->lightInput.callerChanged().connect (goMemberFunction<OFFViewControl,int> (this, &OFFViewControl::lightChangedSlot));
+    myPrivate->lightInput.callerChanged().connect (goMemberFunction<int, OFFViewControl> (this, &OFFViewControl::lightChangedSlot));
 
     //myPrivate->phi.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));
     //myPrivate->theta.signal_value_changed().connect (sigc::mem_fun (*this, &goGUI::OFFViewControl::angleChanged));

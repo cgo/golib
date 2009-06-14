@@ -38,20 +38,21 @@ namespace goGUI
     };
 #endif
 
+
     class ImageViewPrivate
     {
         public:
+            typedef std::list<goAutoPtr<goPlot::Object2DImage> > ImageObjectList;
+            typedef std::list<goAutoPtr<goSignal3DRef> >         ImageList;
+
+        public:
             ImageViewPrivate() 
                 : imageObjects (),
-                graph (new goPlot::Graph)
+                  images (),
+                  graph (new goPlot::Graph),
+                  currentImageIndex (0),
+                  currentImage (0)
         {
-            //goSignal3D<void> *img = new goSignal3D<void>;
-            //image.set (img);
-            //img->setDataType (GO_UINT8);
-            //img->make (128,128,1,128,128,1,0,0,0,3);
-            //img->fill (255.0f);
-
-            // graph->disableAxes ();
             graph->flipY ();
         }
 
@@ -59,163 +60,20 @@ namespace goGUI
 
             /*
              * @brief Create a fresh goPlot::Graph to draw things in.
+             * @deprecate
              */
             void makeGraph ()
             {
-                //graph.set (0);
-                //graph.set (new goPlot::Graph);
-
-                //const goPlot::Trafo2D& t = graph->transform ();
-                //printf ("%.3f %.3f\n%.3f %.3f\n", t.xx, t.xy, t.yx, t.yy);
-                //printf ("%.3f, %.3f\n", t.x0, t.y0);
-
-                // this->graph->axis(0)->setVisible (false);
-                // this->graph->axis(1)->setVisible (false);
-
-                // this->makeImages ();
             }
-
-#if 0
-            /* 
-             * @brief Make a cairo image of given proportions.
-             * 
-             * If an image already exists and fits the specifications, that
-             * image (front of imageObjects) will be returned.
-             *
-             * @param width Width
-             * @param height  Height
-             * @param format Format as in goPlot::Object2DImage
-             * 
-             * @return Pointer to the new object
-             */
-            goAutoPtr<goPlot::Object2DImage> makeImage (int width, int height, int format = goPlot::Object2DImage::RGB24)
-            {
-                //if (this->image.isNull() || this->graph.isNull())
-                //{
-                //    return;
-                //}
-
-                //if (this->image->getBlockSize() != this->image->getSize())
-                //{
-                //    goLog::warning ("ImageView: currently no tiled images are supported.");
-                //    return;
-                //}
-
-                //if (this->image->getDataType().getID() != GO_UINT8)
-                //{
-                //    goLog::warning ("ImageView: currently only uint8 image data is allowed.");
-                //    return;
-                //}
-
-                //int format = 0;
-                int channels = 0;
-                switch (format)
-                {
-                    case goPlot::Object2DImage::ARGB32:
-                        channels = 4; printf ("ARGB32\n"); break;
-                            //= RGB24 is stored in 32 bits too, but the first 8 bits are ignored.
-                    case goPlot::Object2DImage::RGB24:
-                        channels = 4; printf ("RGB24\n"); break;
-                    case goPlot::Object2DImage::A8:
-                        channels = 1; printf ("A8\n"); break;
-                    default: goLog::warning ("ImageView: image format not supported."); return 0; break;
-                }
-
-                goAutoPtr<goPlot::Object2DImage> img = 0;
-
-                int w = width;
-                int h = height;
-
-                if (imageObjects.empty())
-                {
-                    img = new goPlot::Object2DImage;
-                    img->createImage (format, w, h);
-                    imageObjects.push_back (img);
-                }
-                else
-                {
-                    goAutoPtr<goPlot::Object2DImage> i = imageObjects.front();
-                    if (i->format() != format || i->width() != w || i->height() != h)
-                    {
-                        imageObjects.clear ();
-                        img = new goPlot::Object2DImage;
-                        img->createImage (format, w, h);
-                        imageObjects.push_back (img);
-                    }
-                    else
-                    {
-                        img = i;
-                    }
-                }
-                //= Set the transform so that y-axes is flipped (Graph coordinate system starts at lower left
-                //=  corner by default).
-                // img->setTransform (goPlot::Trafo2D<goPlot::real> (1.0, 0.0, 0.0, -1.0, 0.0, img->height ()));
-                this->graph->setTransform (goPlot::Trafo2D (1.0, 0.0, 0.0, -1.0, 0.0, 1.0));
-
-                //= Cairo's format is different --- copy the data into a new buffer.
-
-                // goCopySignalArray (this->image, img->data() + ptrOffset, strides);
-                // img->setImage (static_cast<unsigned char*>(this->image->getPtr()), format, this->image->getSizeX(), this->image->getSizeY(), this->image->getSizeX() * this->image->getChannelCount());
-
-                this->graph->add (img);
-                return img;
-            }
-
-            /*
-             * @brief Creates a new cairo image and copies the content of image to it.
-             * 
-             * @param image The image.
-             */
-            bool setImage (const goSignal3DBase<void>& image)
-            {
-                int format = 0;
-                switch (image.getChannelCount())
-                {
-                    case 4: format = goPlot::Object2DImage::ARGB32; break;
-                    case 3: format = goPlot::Object2DImage::RGB24; break;
-                    case 1: format = goPlot::Object2DImage::RGB24; break;
-                    default:
-                        goLog::warning ("ImageView::setImage: channel count not supported."); return false; break;
-                }
-
-                int w = image.getSizeX();
-                int h = image.getSizeY();
-
-                goAutoPtr<goPlot::Object2DImage> img = this->makeImage (w, h, format);
-
-                switch (image.getChannelCount())
-                {
-                    case 4:
-                    case 3:
-                        {
-                            goSize3D sz (w, h, 1);
-                            goSignal3DRef imgref (img->data(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
-                            goSignal::RGB2BGRA (*const_cast<goSignal3DBase<void>*> (&image), imgref);
-                        }
-                        break;
-                    case 1:
-                        {
-                            goSize3D sz (w, h, 1);
-                            goSignal3DRef imgref (img->data(), GO_UINT8, sz, sz, goSize3D (0, 0, 0), 4);
-                            int source_i [] = {0, 0, 0};
-                            int target_i [] = {1, 2, 3};
-                            goSignal::convert (*const_cast<goSignal3DBase<void>*>(&image), imgref, source_i, target_i, 3);
-                            // goCopySignalArray (&image, img->data());
-                        }
-                        break;
-                    default:
-                        goLog::warning ("ImageView::makeImages: channel count not supported."); return false; break;
-                }
-
-                return true;
-            }
-#endif
 
             // goList<goMatrixd>          curves;
             // goList<ImageViewCurveAttr> curveAttributes;  //= These are not used yet. Add them.
             // goAutoPtr<goSignal3DBase<void> >     image;
-            std::list<goAutoPtr<goPlot::Object2DImage> > imageObjects;
-            goAutoPtr<goPlot::Graph>             graph;
+            ImageObjectList imageObjects;
+            ImageList       images;
+            goAutoPtr<goPlot::Graph>                     graph;
+            goIndex_t                                    currentImageIndex;
+            goAutoPtr<goSignal3DBase<void> >             currentImage;
     };
 
     goGUI::ImageView::ImageView ()
@@ -290,6 +148,8 @@ namespace goGUI
     }
 #endif
 
+
+
     /** 
      * @brief Sets the image dimensions and format. A cairo image is created.
      *
@@ -300,20 +160,75 @@ namespace goGUI
      * @param w Width
      * @param h Height
      * @param format Format, such as goPlot::Object2DImage::RGB24.
+     * @param index Index of the image (default -1). If index < 0, a new image is made.
      */
-    void goGUI::ImageView::setImage  (int w, int h, int format)
+    void goGUI::ImageView::setImage  (int w, int h, int format, goIndex_t index)
     {
-        //myPrivate->graph = 0;
-        //myPrivate->makeGraph ();
-        if (!myPrivate->imageObjects.empty ())
-            myPrivate->graph->remove (myPrivate->imageObjects.front());
-        // myPrivate->makeImage (w, h, format);
-        myPrivate->imageObjects.clear ();
+//        if (!myPrivate->imageObjects.empty ())
+//            myPrivate->graph->remove (myPrivate->imageObjects.front());
+//        myPrivate->imageObjects.clear ();
+        
+        goAutoPtr<goPlot::Object2DImage> o = 0;
+        goAutoPtr<goSignal3DRef>        im = 0;
+        
+        ImageViewPrivate::ImageObjectList::iterator it = myPrivate->imageObjects.begin ();
+        ImageViewPrivate::ImageList::iterator itim = myPrivate->images.begin ();
 
-        goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->makeImage (w, h, format);
-        myPrivate->imageObjects.push_back (o);
+//        if (index < 0)
+//        {
+//            index = myPrivate->currentImageIndex;
+//        }
+
+        if (index >= 0 && index < goIndex_t(myPrivate->imageObjects.size ()))
+        {
+            goIndex_t i = 0;
+
+            while (i < index && it != myPrivate->imageObjects.end () && itim != myPrivate->images.end ())
+            {
+                ++i; ++it; ++itim;
+            }
+
+            if (it != myPrivate->imageObjects.end () && i == index && itim != myPrivate->images.end ())
+            {
+                o = *it;
+                im = *itim;
+            }
+        }
+
+        if (o.isNull() || im.isNull () || w != o->width () || h != o->height () || format != o->format ())
+        {
+            myPrivate->graph->remove (o);  // Remove the current image representation before making a new one
+            o = myPrivate->graph->makeImage (w, h, format);
+            im = this->imageRef (o);
+        }
+
+        if (myPrivate->imageObjects.empty () || index < 0)
+        {
+            //= Currently no image: push back the object
+            myPrivate->imageObjects.push_back (o);
+            myPrivate->images.push_back (im);
+        }
+        else
+        {
+            *it = o;
+            *itim = im;
+        }
+
+        if (index == myPrivate->currentImageIndex)
+        {
+            o->setVisible (true);
+        }
+        else
+        {
+            o->setVisible (false);
+        }
+
+        assert (!o.isNull());
+        assert (!im.isNull());
+
         goPlot::Trafo2D t = o->transform ();
-        t *= goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
+        // t *= goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
+        t = goPlot::Trafo2D (1.0 / float (w), 0.0, 0.0, 1.0 / float (h), 0.0, 0.0);
         o->setTransform (t);
 
         // myPrivate->graph->setDimensions (0, w, 0, h);
@@ -332,14 +247,10 @@ namespace goGUI
      * @param image Image to draw. The image gets copied, but gets copied into a uint8 type array.
      * That means if the data range is out of the 8 bit range, it will get clamped.
      */
-    void goGUI::ImageView::setImage (const goSignal3DBase<void>& image)
+    void goGUI::ImageView::setImage (const goSignal3DBase<void>& image, goIndex_t index)
     {
-        // myPrivate->graph = 0;
-        // myPrivate->image = image;
-
-        // myPrivate->makeGraph ();
-        if (!myPrivate->imageObjects.empty ())
-            myPrivate->graph->remove (myPrivate->imageObjects.front());
+//        if (!myPrivate->imageObjects.empty ())
+//            myPrivate->graph->remove (myPrivate->imageObjects.front());
 
         if (myPrivate->graph.isNull())
         {
@@ -347,23 +258,71 @@ namespace goGUI
             return;
         }
 
+        goAutoPtr<goPlot::Object2DImage> o = 0;
+        goAutoPtr<goSignal3DRef>        im = 0;
+        
+        ImageViewPrivate::ImageObjectList::iterator it = myPrivate->imageObjects.begin ();
+        ImageViewPrivate::ImageList::iterator itim = myPrivate->images.begin ();
+
+//        if (index < 0)
+//        {
+//            index = myPrivate->currentImageIndex;
+//        }
+
+        if (index >= 0 && index < goIndex_t(myPrivate->imageObjects.size ()))
+        {
+            goIndex_t i = 0;
+
+            while (i < index && it != myPrivate->imageObjects.end () && itim != myPrivate->images.end ())
+            {
+                ++i; ++it; ++itim;
+            }
+
+            if (it != myPrivate->imageObjects.end () && i == index && itim != myPrivate->images.end ())
+            {
+                o = *it;
+                im = *itim;
+            }
+        }
+
+        myPrivate->graph->remove (o);  // Remove the current image representation before making a new one
+        o = myPrivate->graph->addImage (image);
+        im = this->imageRef (o);
+
+        if (myPrivate->imageObjects.empty () || index < 0)
+        {
+            //= Currently no image: push back the object
+            myPrivate->imageObjects.push_back (o);
+            myPrivate->images.push_back (im);
+        }
+        else
+        {
+            *it = o;
+            *itim = im;
+        }
+
+        if (index == myPrivate->currentImageIndex)
+        {
+            o->setVisible (true);
+        }
+        else
+        {
+            o->setVisible (false);
+        }
+
+        assert (!o.isNull());
+        assert (!im.isNull());
+
         //= FIXME: This tends to crash in a pango function.
         // myPrivate->graph->setDimensions (0.0, 1.0, 0.0, 1.0);
 
-        myPrivate->imageObjects.clear ();
-        goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->addImage (image);
-        myPrivate->imageObjects.push_back (o);
+        // myPrivate->imageObjects.clear ();
+        // goAutoPtr<goPlot::Object2DImage> o = myPrivate->graph->addImage (image);
+        // myPrivate->imageObjects.push_back (o);
         goPlot::Trafo2D t = o->transform ();
-        t *= goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
+        //t *= goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
+        t = goPlot::Trafo2D (1.0 / float (image.getSizeX()), 0.0, 0.0, 1.0 / float (image.getSizeY()), 0.0, 0.0);
         o->setTransform (t);
-
-        //if (!myPrivate->setImage (image))
-        //{
-        //    goLog::warning ("ImageView::setImage(): Could not set image to myPrivate object");
-        //    return;
-        //}
-
-        // myPrivate->graph->setDimensions (0, image.getSizeX(), 0, image.getSizeY());
 
         {
             //= This call fixes the minimum size of the image widget to its original size
@@ -381,12 +340,73 @@ namespace goGUI
      *
      * @return Reference to the stored image object.
      */
-    goAutoPtr<goPlot::Object2DImage> goGUI::ImageView::getImageObject ()
+    goAutoPtr<goPlot::Object2DImage> goGUI::ImageView::getImageObject (goIndex_t index)
     {
         if (myPrivate->imageObjects.empty())
             return 0;
-        else
-            return myPrivate->imageObjects.front ();
+
+        if (index < 0)
+        {
+            index = myPrivate->currentImageIndex;
+        }
+
+        ImageViewPrivate::ImageObjectList::iterator it = myPrivate->imageObjects.begin ();
+
+        if (index >= 0 && index < goIndex_t(myPrivate->imageObjects.size ()))
+        {
+            goIndex_t i = 0;
+
+            while (i < index && it != myPrivate->imageObjects.end ())
+            {
+                ++i;
+                ++it;
+            }
+
+            if (it != myPrivate->imageObjects.end () && i == index)
+            {
+                return *it;
+            }
+        }
+
+        return 0;
+    }
+
+    /** 
+     * @brief Get the image from this object.
+     * 
+     * @see getImageObject()
+     *
+     * @return Reference to the stored image object.
+     */
+    goAutoPtr<goSignal3DBase<void> > goGUI::ImageView::getImage (goIndex_t index)
+    {
+        if (myPrivate->images.empty())
+            return 0;
+
+        if (index < 0)
+        {
+            index = myPrivate->currentImageIndex;
+        }
+
+        ImageViewPrivate::ImageList::iterator it = myPrivate->images.begin ();
+
+        if (index >= 0 && index < goIndex_t(myPrivate->images.size ()))
+        {
+            goIndex_t i = 0;
+
+            while (i < index && it != myPrivate->images.end ())
+            {
+                ++i;
+                ++it;
+            }
+
+            if (it != myPrivate->images.end () && i == index)
+            {
+                return *it;
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -400,12 +420,12 @@ namespace goGUI
      *
      * @return Pointer to the reference.
      */
-    goAutoPtr<goSignal3DBase<void> > goGUI::ImageView::getImage ()
+    goAutoPtr<goSignal3DBase<void> > goGUI::ImageView::imageRef (goAutoPtr<goPlot::Object2DImage> img)
     {
-        if (myPrivate->imageObjects.empty())
-            return 0;
-
-        goAutoPtr<goPlot::Object2DImage> img = myPrivate->imageObjects.front ();
+//        if (myPrivate->imageObjects.empty())
+//            return 0;
+//
+//        goAutoPtr<goPlot::Object2DImage> img = myPrivate->imageObjects.front ();
         int chan = 0;
         switch (img->format())
         {
@@ -426,6 +446,25 @@ namespace goGUI
     goAutoPtr<goPlot::Graph> goGUI::ImageView::graph ()
     {
         return myPrivate->graph;
+    }
+
+    void goGUI::ImageView::setCurrentImage (goIndex_t i)
+    {
+        myPrivate->currentImageIndex = i;
+        ImageViewPrivate::ImageObjectList::iterator it = myPrivate->imageObjects.begin ();
+        goIndex_t in = 0;
+        for (; it != myPrivate->imageObjects.end (); ++it, ++in)
+        {
+            if (in == i)
+                (*it)->setVisible (true);
+            else
+                (*it)->setVisible (false);
+        }
+    }
+
+    goIndex_t goGUI::ImageView::currentImageIndex () const
+    {
+        return myPrivate->currentImageIndex;
     }
 
 #if 0

@@ -256,6 +256,9 @@ namespace goPlot
             cairo_t* context ();
             const cairo_t* context () const;
 
+            bool visible () const;
+            void setVisible (bool t);
+
             void applyTransform (cairo_t* cr); 
 
         protected:
@@ -264,6 +267,7 @@ namespace goPlot
         private:
             Trafo2DT<real> myTransform;
             cairo_t       *myContext;
+            bool           myVisible;
     };
     
     /** 
