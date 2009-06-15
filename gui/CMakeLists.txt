@@ -2,6 +2,7 @@ SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
     src/imagecontrol.cpp
     src/controldialog.cpp
+    src/controlsbox.cpp
     src/cannycontrol.cpp
                              src/cairoplot.cpp
                              src/warning.cpp

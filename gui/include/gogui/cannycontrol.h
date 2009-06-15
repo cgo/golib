@@ -10,6 +10,9 @@
 #ifndef GOSIGNAL3DBASE_H
 # include <gosignal3dbase.h>
 #endif
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 namespace goGUI
 {
@@ -23,8 +26,10 @@ namespace goGUI
 
             void run ();
 
-            int setImage (goAutoPtr<goSignal3DBase<void> > im);
-            int setEdgeMap (goAutoPtr<goSignal3DBase<void> > em);
+            void setImage   (goAutoPtr<goSignal3DBase<void> > im);
+            void setEdgeMap (goAutoPtr<goSignal3DBase<void> > em);
+
+            goCaller1<void, goAutoPtr<goSignal3DBase<void> > >& getImageCreationCaller ();
 
         private:
             CannyControlPrivate* myPrivate;

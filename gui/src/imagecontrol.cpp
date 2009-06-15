@@ -37,7 +37,8 @@ namespace goGUI
                   imageView (0),
                   myColumns (),
                   myRefTreeStore (),
-                  myTreeView ()
+                  myTreeView (),
+                  myImageChangedCaller ()
             {
                 myRefTreeStore = Gtk::TreeStore::create (myColumns);
                 myTreeView.set_model (myRefTreeStore);
@@ -55,6 +56,7 @@ namespace goGUI
             ImageModelColumns               myColumns;
             Glib::RefPtr<Gtk::TreeStore>    myRefTreeStore;
             Gtk::TreeView                   myTreeView;
+            goCaller1 <void, goAutoPtr<goSignal3DBase<void> > > myImageChangedCaller;
     };
 
 
@@ -65,11 +67,20 @@ goGUI::ImageControl::ImageControl ()
       myPrivate (0)
 {
     myPrivate = new ImageControlPrivate;
-    myPrivate->imageList.signal_columns_changed ().connect (sigc::mem_fun (*this, &ImageControl::selectionChanged));
+    // myPrivate->imageList.signal_columns_changed ().connect (sigc::mem_fun (*this, &ImageControl::selectionChanged));
 
     myPrivate->myTreeView.signal_row_activated ().connect (sigc::mem_fun (*this, &ImageControl::treeRowActivated));
 
     this->add (myPrivate->myTreeView);
+}
+
+goGUI::ImageControl::~ImageControl ()
+{
+    if (myPrivate)
+    {
+        delete myPrivate;
+        myPrivate = 0;
+    }
 }
 
 void goGUI::ImageControl::loadImage ()
@@ -115,7 +126,8 @@ void goGUI::ImageControl::addImage (goAutoPtr<goSignal3DBase<void> > img)
     //= Let imageview worry about the image format.
     myPrivate->imageView->setImage (*img, -1);
     myPrivate->imageView->setCurrentImage (myPrivate->imageView->getImageCount() - 1);
-
+    myPrivate->imageView->getImage (myPrivate->imageView->getImageCount() - 1)->setObjectName (img->getObjectName());
+    this->imageViewChanged (ImageView::IMAGE_SET); //= Force rebuilding the treeview to get the object name right.
 }
 
 void goGUI::ImageControl::setImageView (ImageView* iv)
@@ -133,8 +145,24 @@ void goGUI::ImageControl::setImageView (ImageView* iv)
     }
 }
 
+/** 
+ * @brief Slot that gets called whenever the image view changes.
+ * 
+ * If the current image has changed, the caller returned by getImageChangedCaller() gets called
+ * with the new current image as argument.
+ * In the other cases, the treeview showing the images gets rebuilt.
+ *
+ * @param code One og ImageView::CURRENT_IMAGE_CHANGED, ImageView::IMAGE_SET, ImageView::IMAGE_REMOVED.
+ */
 void goGUI::ImageControl::imageViewChanged (int code)
 {
+    if (code == ImageView::CURRENT_IMAGE_CHANGED)
+    {
+        goAutoPtr<goSignal3DBase<void> > img = myPrivate->imageView->getImage (myPrivate->imageView->currentImageIndex());
+        myPrivate->myImageChangedCaller (img);
+        return;
+    }
+
     if (code == ImageView::IMAGE_SET || code == ImageView::IMAGE_REMOVED)
     {
         myPrivate->myRefTreeStore->clear ();
@@ -186,12 +214,25 @@ void goGUI::ImageControl::treeRowActivated (const Gtk::TreeModel::Path& path, Gt
     }
 }
 
-void goGUI::ImageControl::selectionChanged ()
+/** 
+ * @brief This goCaller is called whenever the current image changes.
+ * 
+ * The parameter of the caller is a pointer to the current image.
+ *
+ * @return The respective goCaller.
+ */
+goCaller1 <void, goAutoPtr<goSignal3DBase<void> > >& 
+goGUI::ImageControl::getImageChangedCaller ()
 {
-    Gtk::ListViewText::SelectionList l = myPrivate->imageList.get_selected ();
-    if (myPrivate->imageView && l.size() > 0)
-    {
-        myPrivate->imageView->setCurrentImage (l[0]);
-        myPrivate->imageView->queue_draw ();
-    }
+    return myPrivate->myImageChangedCaller;
 }
+
+//void goGUI::ImageControl::selectionChanged ()
+//{
+//    Gtk::ListViewText::SelectionList l = myPrivate->imageList.get_selected ();
+//    if (myPrivate->imageView && l.size() > 0)
+//    {
+//        myPrivate->imageView->setCurrentImage (l[0]);
+//        myPrivate->imageView->queue_draw ();
+//    }
+//}

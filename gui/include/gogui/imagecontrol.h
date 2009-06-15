@@ -3,6 +3,9 @@
 
 #include <gogui/control.h>
 #include <gogui/imageview.h>
+#ifndef GOFUNCTOR_H
+# include <gofunctor.h>
+#endif
 
 namespace goGUI
 {
@@ -12,6 +15,7 @@ namespace goGUI
     {
         public:
             ImageControl ();
+            virtual ~ImageControl ();
 
             void loadImage ();
             void addImage (goAutoPtr<goSignal3DBase<void> > img);
@@ -19,7 +23,9 @@ namespace goGUI
             void setImageView (ImageView* iv);
 
             void imageViewChanged (int); //= "Slot" connected to ImageView::changedCaller()
-            void selectionChanged (); //= Slot for the Gtk widget
+            //void selectionChanged (); //= Slot for the Gtk widget
+
+            goCaller1 <void, goAutoPtr<goSignal3DBase<void> > >& getImageChangedCaller ();   //= Called when the current image changes
 
         protected:
             void treeRowActivated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* col);

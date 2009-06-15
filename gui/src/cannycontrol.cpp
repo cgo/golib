@@ -15,7 +15,8 @@ namespace goGUI
                   button_run ("Run"),
                   table (),
                   edgeMap (0),
-                  image (0)
+                  image (0),
+                  imageCreationCaller ()
             {
                 spin_thresh1.set_digits (2);
                 spin_thresh2.set_digits (2);
@@ -43,6 +44,7 @@ namespace goGUI
 
             goAutoPtr<goSignal3DBase<void> > edgeMap;
             goAutoPtr<goSignal3DBase<void> > image;
+            goCaller1<void, goAutoPtr<goSignal3DBase<void> > > imageCreationCaller;
     };
 };
 
@@ -67,27 +69,41 @@ goGUI::CannyControl::~CannyControl ()
 
 void goGUI::CannyControl::run ()
 {
-    if (myPrivate->edgeMap.isNull() || myPrivate->image.isNull())
+    if (myPrivate->image.isNull())
     {
-        this->warning ("Edge map or image is NULL.\nNot running.");
+        this->warning ("Image is NULL.\nNot running.");
         return;
+    }
+
+    if (myPrivate->edgeMap.isNull())
+    {
+        goSignal3D<void>* s = new goSignal3D<void>;
+        myPrivate->edgeMap = s;
+        s->setDataType (GO_UINT8);
+        s->make (myPrivate->image->getSize(), myPrivate->image->getBlockSize(), goSize3D (8, 8, 0), 1);
+        s->setObjectName ("Canny edge map");
     }
 
     if (!goSignal::canny (*myPrivate->image, *myPrivate->edgeMap, myPrivate->spin_thresh1.get_value(), myPrivate->spin_thresh2.get_value()))
     {
         this->warning ("Canny failed.");
+        return;
     }
+
+    myPrivate->imageCreationCaller (myPrivate->edgeMap);
 }
 
-int goGUI::CannyControl::setImage (goAutoPtr<goSignal3DBase<void> > im)
+void goGUI::CannyControl::setImage (goAutoPtr<goSignal3DBase<void> > im)
 {
     myPrivate->image = im;
-    return 0;
 }
 
-int goGUI::CannyControl::setEdgeMap (goAutoPtr<goSignal3DBase<void> > em)
+void goGUI::CannyControl::setEdgeMap (goAutoPtr<goSignal3DBase<void> > em)
 {
     myPrivate->edgeMap = em;
-    return 0;
 }
 
+goCaller1<void, goAutoPtr<goSignal3DBase<void> > >& goGUI::CannyControl::getImageCreationCaller ()
+{
+    return myPrivate->imageCreationCaller;
+}

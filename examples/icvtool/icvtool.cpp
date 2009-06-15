@@ -4,6 +4,7 @@
 #include <gogui/helper.h>
 #include <gogui/cannycontrol.h>
 #include <gogui/controldialog.h>
+#include <gogui/controlsbox.h>
 
 #include <gofileio.h>
 #include <gosignal3d.h>
@@ -22,15 +23,26 @@ class ICVTool : public goGUI::MainWindow
     private:
         goGUI::ImageView    myImageView;
         goGUI::ImageControl myImageControl;
+
+        goGUI::ControlsBox  myControlsBox;
+        goGUI::CannyControl myCannyControl;
 };
 
 ICVTool::ICVTool ()
     : goGUI::MainWindow (),
       myImageView (),
-      myImageControl ()
+      myImageControl (),
+      myControlsBox ("Image Operations"),
+      myCannyControl ()
 {
     this->getPaned().add1 (this->myImageView);
     this->addControl (this->myImageControl);
+    this->addControl (this->myControlsBox);
+
+    this->myControlsBox.addControl (this->myCannyControl);
+    this->myCannyControl.getImageCreationCaller().connect (goMemberFunction<void, goGUI::ImageControl, goAutoPtr<goSignal3DBase<void> > > (&myImageControl, &goGUI::ImageControl::addImage));
+    this->myImageControl.getImageChangedCaller().connect (goMemberFunction<void, goGUI::CannyControl, goAutoPtr<goSignal3DBase<void> > > (&myCannyControl, &goGUI::CannyControl::setImage));
+
     this->myImageControl.setImageView (&this->myImageView);
 
     Gtk::MenuItem* loadItem = this->addMenuItem (this->getFileMenu (), "Load image");
