@@ -76,7 +76,7 @@ class goFGNodeFactor : public goFGNode<T,Tfloat>
         {
             this->setType (goFGNode<T,Tfloat>::FACTOR);
             this->dummyFunctor = 
-                    goMemberFunction<goFGNodeFactor<T,Tfloat>,Tfloat,const goMath::Vector<T>& > (this, &goFGNodeFactor<T,Tfloat>::dummyFactor);
+                    goMemberFunction<Tfloat,goFGNodeFactor<T,Tfloat>,const goMath::Vector<T>& > (this, &goFGNodeFactor<T,Tfloat>::dummyFactor);
             this->functor = &*dummyFunctor;
         };
         virtual ~goFGNodeFactor ()
