@@ -523,7 +523,7 @@ class goCaller0
  */
 template <class Tret>
 goAutoPtr<goFunctorBase0<Tret > >
-goFunction (typename goFunction0<Tret>::function_t f)
+goFunction (Tret (*f)())
 {
     return goAutoPtr<goFunctorBase0<Tret> > (new goFunction0<Tret> (f));
 }
@@ -540,7 +540,7 @@ goFunction (typename goFunction0<Tret>::function_t f)
 template <class Tret, class Tclass>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase0<Tret > >
-goMemberFunction (Tclass* c, typename goFunctor0<Tret, Tclass>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)())
 {
     return goAutoPtr<goFunctorBase0<Tret> > (static_cast<goFunctorBase0<Tret>*> (new goFunctor0<Tret, Tclass> (c, f)));
 }
@@ -801,7 +801,7 @@ class goCaller1
  */
 template <class Tret, class Targ0>
 goAutoPtr<goFunctorBase1<Tret, Targ0 > >
-goFunction (typename goFunction1<Tret, Targ0>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0))
 {
     return goAutoPtr<goFunctorBase1<Tret, Targ0> > (new goFunction1<Tret, Targ0> (f));
 }
@@ -818,7 +818,7 @@ goFunction (typename goFunction1<Tret, Targ0>::function_t f)
 template <class Tret, class Tclass, class Targ0>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase1<Tret, Targ0 > >
-goMemberFunction (Tclass* c, typename goFunctor1<Tret, Tclass, Targ0>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0))
 {
     return goAutoPtr<goFunctorBase1<Tret, Targ0> > (static_cast<goFunctorBase1<Tret, Targ0>*> (new goFunctor1<Tret, Tclass, Targ0> (c, f)));
 }
@@ -1079,7 +1079,7 @@ class goCaller2
  */
 template <class Tret, class Targ0, class Targ1>
 goAutoPtr<goFunctorBase2<Tret, Targ0, Targ1 > >
-goFunction (typename goFunction2<Tret, Targ0, Targ1>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1))
 {
     return goAutoPtr<goFunctorBase2<Tret, Targ0, Targ1> > (new goFunction2<Tret, Targ0, Targ1> (f));
 }
@@ -1096,7 +1096,7 @@ goFunction (typename goFunction2<Tret, Targ0, Targ1>::function_t f)
 template <class Tret, class Tclass, class Targ0, class Targ1>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase2<Tret, Targ0, Targ1 > >
-goMemberFunction (Tclass* c, typename goFunctor2<Tret, Tclass, Targ0, Targ1>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1))
 {
     return goAutoPtr<goFunctorBase2<Tret, Targ0, Targ1> > (static_cast<goFunctorBase2<Tret, Targ0, Targ1>*> (new goFunctor2<Tret, Tclass, Targ0, Targ1> (c, f)));
 }
@@ -1357,7 +1357,7 @@ class goCaller3
  */
 template <class Tret, class Targ0, class Targ1, class Targ2>
 goAutoPtr<goFunctorBase3<Tret, Targ0, Targ1, Targ2 > >
-goFunction (typename goFunction3<Tret, Targ0, Targ1, Targ2>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2))
 {
     return goAutoPtr<goFunctorBase3<Tret, Targ0, Targ1, Targ2> > (new goFunction3<Tret, Targ0, Targ1, Targ2> (f));
 }
@@ -1374,7 +1374,7 @@ goFunction (typename goFunction3<Tret, Targ0, Targ1, Targ2>::function_t f)
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase3<Tret, Targ0, Targ1, Targ2 > >
-goMemberFunction (Tclass* c, typename goFunctor3<Tret, Tclass, Targ0, Targ1, Targ2>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2))
 {
     return goAutoPtr<goFunctorBase3<Tret, Targ0, Targ1, Targ2> > (static_cast<goFunctorBase3<Tret, Targ0, Targ1, Targ2>*> (new goFunctor3<Tret, Tclass, Targ0, Targ1, Targ2> (c, f)));
 }
@@ -1635,7 +1635,7 @@ class goCaller4
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3>
 goAutoPtr<goFunctorBase4<Tret, Targ0, Targ1, Targ2, Targ3 > >
-goFunction (typename goFunction4<Tret, Targ0, Targ1, Targ2, Targ3>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3))
 {
     return goAutoPtr<goFunctorBase4<Tret, Targ0, Targ1, Targ2, Targ3> > (new goFunction4<Tret, Targ0, Targ1, Targ2, Targ3> (f));
 }
@@ -1652,7 +1652,7 @@ goFunction (typename goFunction4<Tret, Targ0, Targ1, Targ2, Targ3>::function_t f
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase4<Tret, Targ0, Targ1, Targ2, Targ3 > >
-goMemberFunction (Tclass* c, typename goFunctor4<Tret, Tclass, Targ0, Targ1, Targ2, Targ3>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3))
 {
     return goAutoPtr<goFunctorBase4<Tret, Targ0, Targ1, Targ2, Targ3> > (static_cast<goFunctorBase4<Tret, Targ0, Targ1, Targ2, Targ3>*> (new goFunctor4<Tret, Tclass, Targ0, Targ1, Targ2, Targ3> (c, f)));
 }
@@ -1913,7 +1913,7 @@ class goCaller5
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4>
 goAutoPtr<goFunctorBase5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4 > >
-goFunction (typename goFunction5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4))
 {
     return goAutoPtr<goFunctorBase5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4> > (new goFunction5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4> (f));
 }
@@ -1930,7 +1930,7 @@ goFunction (typename goFunction5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4>::funct
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4 > >
-goMemberFunction (Tclass* c, typename goFunctor5<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4))
 {
     return goAutoPtr<goFunctorBase5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4> > (static_cast<goFunctorBase5<Tret, Targ0, Targ1, Targ2, Targ3, Targ4>*> (new goFunctor5<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4> (c, f)));
 }
@@ -2191,7 +2191,7 @@ class goCaller6
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5>
 goAutoPtr<goFunctorBase6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5 > >
-goFunction (typename goFunction6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5))
 {
     return goAutoPtr<goFunctorBase6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5> > (new goFunction6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5> (f));
 }
@@ -2208,7 +2208,7 @@ goFunction (typename goFunction6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5>
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5 > >
-goMemberFunction (Tclass* c, typename goFunctor6<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5))
 {
     return goAutoPtr<goFunctorBase6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5> > (static_cast<goFunctorBase6<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5>*> (new goFunctor6<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5> (c, f)));
 }
@@ -2469,7 +2469,7 @@ class goCaller7
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6>
 goAutoPtr<goFunctorBase7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6 > >
-goFunction (typename goFunction7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6))
 {
     return goAutoPtr<goFunctorBase7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6> > (new goFunction7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6> (f));
 }
@@ -2486,7 +2486,7 @@ goFunction (typename goFunction7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5,
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6 > >
-goMemberFunction (Tclass* c, typename goFunctor7<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6))
 {
     return goAutoPtr<goFunctorBase7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6> > (static_cast<goFunctorBase7<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6>*> (new goFunctor7<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6> (c, f)));
 }
@@ -2747,7 +2747,7 @@ class goCaller8
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6, class Targ7>
 goAutoPtr<goFunctorBase8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7 > >
-goFunction (typename goFunction8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6, Targ7 arg7))
 {
     return goAutoPtr<goFunctorBase8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7> > (new goFunction8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7> (f));
 }
@@ -2764,7 +2764,7 @@ goFunction (typename goFunction8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5,
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6, class Targ7>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7 > >
-goMemberFunction (Tclass* c, typename goFunctor8<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6, Targ7 arg7))
 {
     return goAutoPtr<goFunctorBase8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7> > (static_cast<goFunctorBase8<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7>*> (new goFunctor8<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7> (c, f)));
 }
@@ -3025,7 +3025,7 @@ class goCaller9
  */
 template <class Tret, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6, class Targ7, class Targ8>
 goAutoPtr<goFunctorBase9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8 > >
-goFunction (typename goFunction9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8>::function_t f)
+goFunction (Tret (*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6, Targ7 arg7, Targ8 arg8))
 {
     return goAutoPtr<goFunctorBase9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8> > (new goFunction9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8> (f));
 }
@@ -3042,7 +3042,7 @@ goFunction (typename goFunction9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5,
 template <class Tret, class Tclass, class Targ0, class Targ1, class Targ2, class Targ3, class Targ4, class Targ5, class Targ6, class Targ7, class Targ8>
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8 > >
-goMemberFunction (Tclass* c, typename goFunctor9<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(Targ0 arg0, Targ1 arg1, Targ2 arg2, Targ3 arg3, Targ4 arg4, Targ5 arg5, Targ6 arg6, Targ7 arg7, Targ8 arg8))
 {
     return goAutoPtr<goFunctorBase9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8> > (static_cast<goFunctorBase9<Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8>*> (new goFunctor9<Tret, Tclass, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8> (c, f)));
 }

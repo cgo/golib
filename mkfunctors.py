@@ -317,7 +317,7 @@ class goCaller${postfix}
  */
 ${template_statement_function}
 goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
-goFunction (${function_typename_statement} goFunction${postfix}<${template_args_function}>::function_t f)
+goFunction (Tret (*f)(${args_names}))
 {
     return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (new goFunction${postfix}<${template_args_function}> (f));
 }
@@ -334,7 +334,7 @@ goFunction (${function_typename_statement} goFunction${postfix}<${template_args_
 ${template_statement_functor}
 // template <class Tclass, class Tret, class Targ1>
 goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
-goMemberFunction (Tclass* c, typename goFunctor${postfix}<${template_args_functor}>::function_t f)
+goMemberFunction (Tclass* c, Tret (Tclass::*f)(${args_names}))
 {
     return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (static_cast<goFunctorBase${postfix}<${template_args_function}>*> (new goFunctor${postfix}<${template_args_functor}> (c, f)));
 }
