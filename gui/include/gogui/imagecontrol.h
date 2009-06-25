@@ -29,6 +29,8 @@ namespace goGUI
 
         protected:
             void treeRowActivated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* col);
+            void treeViewButtonPressed (GdkEventButton*);
+            void treeDeleteImage ();
 
         private:
             ImageControlPrivate* myPrivate;

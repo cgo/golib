@@ -632,6 +632,20 @@ goString::operator+= (double i) {
     return (*this);
 }
 
+goString goString::operator+ (const goString& o) const
+{
+    goString ret = *this;
+    ret += o;
+    return ret;
+}
+
+goString goString::operator+ (const char* s) const
+{
+    goString ret = *this;
+    ret += s;
+    return ret;
+}
+
 bool
 operator== (const goString& str,const char* s) {
   goIndex_t i = 0;

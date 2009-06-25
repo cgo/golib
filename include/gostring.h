@@ -95,12 +95,19 @@ public:
   goString&   operator+= (float f);
   ///
   goString&   operator+= (double f);
+  ///
+  goString    operator+ (const goString& o) const;
+  ///
+  goString    operator+ (const char* s) const;
 
   // ONLY USE THIS IF YOU KNOW EXACTLY WHAT YOU ARE DOING. 
   // ALWAYS AVOID USING THIS METHOD IF THERE'S A WAY TO DO IT IN A CLEAN WAY!
   char*		  getPtr () { return thisString.getPtr(); }
   const char* getPtr () const { return thisString.getPtr(); }
-  
+ 
+  operator char* () { return thisString.getPtr(); }
+  operator const char* () const { return thisString.getPtr(); }
+
   // goString&	  operator+= (const goString& s);
   // bool		  operator== (const char* s);
   friend bool	  operator== (const goString& str,const char* s);

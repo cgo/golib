@@ -81,8 +81,8 @@ void goGUI::CannyControl::run ()
         myPrivate->edgeMap = s;
         s->setDataType (GO_UINT8);
         s->make (myPrivate->image->getSize(), myPrivate->image->getBlockSize(), goSize3D (8, 8, 0), 1);
-        s->setObjectName ("Canny edge map");
     }
+    myPrivate->edgeMap->setObjectName (myPrivate->image->getObjectName() + " Canny edge map");
 
     if (!goSignal::canny (*myPrivate->image, *myPrivate->edgeMap, myPrivate->spin_thresh1.get_value(), myPrivate->spin_thresh2.get_value()))
     {
@@ -90,6 +90,8 @@ void goGUI::CannyControl::run ()
         return;
     }
 
+    //= FIXME Note that egde map is only _newly_ created if it was null before --- it is the same goSignal3D
+    //=       otherwise.
     myPrivate->imageCreationCaller (myPrivate->edgeMap);
 }
 
