@@ -78,17 +78,17 @@ namespace goPlot
             //= Convenience functions for adding new objects.
             //=
 
-            goAutoPtr<Object2DPoints> addCurve (const goMatrixd& c);
+            goAutoPtr<goPlot::Object2DPoints> addCurve (const goMatrixd& c);
 
-            goAutoPtr<Object2DImage> makeImage (int width, int height, int format = goPlot::Object2DImage::RGB24);
+            goAutoPtr<goPlot::Object2DImage> makeImage (int width, int height, int format = goPlot::Object2DImage::RGB24);
 
-            goAutoPtr<Object2DImage> addImage (const goSignal3DBase<void>& image);
+            goAutoPtr<goPlot::Object2DImage> addImage (const goSignal3DBase<void>& image);
 
             //=
             //= End convenience functions.
             //================================================================================
 
-            void setDimensions (real xmin, real xmax, real ymin, real ymax);
+            void setDimensions (goPlot::real xmin, goPlot::real xmax, goPlot::real ymin, goPlot::real ymax);
 
 
             /** 
@@ -102,23 +102,23 @@ namespace goPlot
             void setTicsFont (const char* f);
 
             int              dim () const;
-            goAutoPtr<GraphAxis>  axis (int i);
+            goAutoPtr<goPlot::GraphAxis>  axis (int i);
 
-            const goAutoPtr<GraphAxis> axis (int i) const;
+            const goAutoPtr<goPlot::GraphAxis> axis (int i) const;
 
             /** 
              * @brief Adds a Object2D to this graph.
              * 
              * @param o The object pointer (managed by a goAutoPtr)
              */
-            void add (goAutoPtr<Object2D> o);
+            void add (goAutoPtr<goPlot::Object2D> o);
 
             /** 
             * @brief Removes all occurrences of \c o in this graph.
             * 
             * @param o Object pointer to remove.
             */
-            void remove (goAutoPtr<Object2D> o);
+            void remove (goAutoPtr<goPlot::Object2D> o);
 
             /** 
              * @brief Sets the title of the graph.
@@ -154,7 +154,7 @@ namespace goPlot
              *
              * @return Reference to the new Object2DText
              */
-            Object2DText& addLabel (double x, double y, const char* label, double rel_x = 0.0, double rel_y = 0.0);
+            goPlot::Object2DText& addLabel (double x, double y, const char* label, double rel_x = 0.0, double rel_y = 0.0);
 
             /** 
              * @brief Sets the context and hands it on to all axes and drawable objects.
@@ -173,11 +173,11 @@ namespace goPlot
             void getBorderHint (double w, double h, double& x1, double& y1, double& x2, double& y2);
 
         protected:
-            std::list<goAutoPtr<Object2D> > objects2D () { return myObjects; }
+            std::list<goAutoPtr<goPlot::Object2D> > objects2D () { return myObjects; }
 
         private:
-            std::vector<goAutoPtr<GraphAxis> > myAxes;
-            std::list<goAutoPtr<Object2D> >    myObjects;
+            std::vector<goAutoPtr<goPlot::GraphAxis> > myAxes;
+            std::list<goAutoPtr<goPlot::Object2D> >    myObjects;
             int                              myDim;
             std::string                      myTitle;
     };

@@ -26,26 +26,26 @@ namespace goPlot
             Object2DText ();
             Object2DText (const char* c);
 
-            Object2DText (const Object2DText& other);
+            Object2DText (const goPlot::Object2DText& other);
 
             virtual ~Object2DText ();
             
             operator const char* () const;
-            Object2DText& operator= (const char* t);
-            Object2DText& operator= (const Object2DText& other);
+            goPlot::Object2DText& operator= (const char* t);
+            goPlot::Object2DText& operator= (const goPlot::Object2DText& other);
 
             std::string& string (); 
             const std::string& string () const;
 
-            TextTraits& traits ();
-            const TextTraits& traits () const;
+            goPlot::TextTraits& traits ();
+            const goPlot::TextTraits& traits () const;
 
-            real x () const;
-            real y () const;
-            real relDx () const;
-            real relDy () const;
+            goPlot::real x () const;
+            goPlot::real y () const;
+            goPlot::real relDx () const;
+            goPlot::real relDy () const;
 
-            void setPosition (real x, real y, real rel_dx = 0.0, real rel_dy = 0.0);
+            void setPosition (goPlot::real x, goPlot::real y, goPlot::real rel_dx = 0.0, goPlot::real rel_dy = 0.0);
 
             virtual void setContext (cairo_t *context);
 

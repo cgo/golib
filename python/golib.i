@@ -122,6 +122,15 @@
 #include <go3vector.h>
 #include <gotimerobject.h>
 
+#include <goplot/graph.h>
+#include <goplot/cairoplot.h>
+#include <goplot/goplot.h>
+#include <goplot/plot.h>
+#include <goplot/graphaxis.h>
+#include <goplot/object2dimage.h>
+#include <goplot/object2dtext.h>
+#include <goplot/object2dpoints.h>
+#include <goplot/texttraits.h>
 %}
 
 %ignore goSignal3DBase<void>::shiftLeftDiff (int,int);
@@ -185,6 +194,21 @@
 
 %include <go3vector.h>
 %include <gotimerobject.h>
+
+%include <goplot/graph.h>
+%include <goplot/cairoplot.h>
+%include <goplot/goplot.h>
+%include <goplot/object2dimage.h>
+%include <goplot/object2dtext.h>
+
+%inline %{
+    void gplot (goPlot::Graph* g, const char* filename, int w = 640, int h = 480)
+    {
+        goAutoPtr<goPlot::Graph> ap = g;
+        ap.getRRefPtr ()->incRef (); // Make sure it is not deleted
+        goPlot::plot (ap, goString (filename), w, h);
+    }
+%}
 
 %extend goOFFFile 
 {
@@ -1326,6 +1350,7 @@
 
 // Auto pointers
 %template(goAutoPtrSignal3D) goAutoPtr<goSignal3D<void> >;
+%template(goAutoPtrGraph) goAutoPtr<goPlot::Graph>;
 
 // Templates
 
