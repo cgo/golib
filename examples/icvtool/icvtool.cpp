@@ -40,8 +40,8 @@ ICVTool::ICVTool ()
     this->addControl (this->myControlsBox);
 
     this->myControlsBox.addControl (this->myCannyControl);
-    this->myCannyControl.getImageCreationCaller().connect (goMemberFunction<void, goGUI::ImageControl, goAutoPtr<goSignal3DBase<void> > > (&myImageControl, &goGUI::ImageControl::addImage));
-    this->myImageControl.getImageChangedCaller().connect (goMemberFunction<void, goGUI::CannyControl, goAutoPtr<goSignal3DBase<void> > > (&myCannyControl, &goGUI::CannyControl::setImage));
+    this->myCannyControl.getImageCreationCaller().connect (goMemberFunction (&myImageControl, &goGUI::ImageControl::addImage));
+    this->myImageControl.getImageChangedCaller().connect (goMemberFunction (&myCannyControl, &goGUI::CannyControl::setImage));
 
     this->myImageControl.setImageView (&this->myImageView);
 
