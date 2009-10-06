@@ -61,6 +61,8 @@ namespace goGUI
             // goAutoPtr<goSignal3DBase<void> > getImage  ();
             goAutoPtr<goPlot::Object2DImage> getImageObject (goIndex_t index = -1); 
             goAutoPtr<goSignal3DBase<void> > getImage (goIndex_t index = -1);
+            void                             removeImage (goIndex_t index = -1);
+            void                             reorderImages (const std::vector<int>& order);
             goIndex_t         getImageCount () const;
 
             goAutoPtr<goPlot::Graph> graph ();

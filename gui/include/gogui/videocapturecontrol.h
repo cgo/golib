@@ -12,6 +12,14 @@ namespace goGUI
 
     class VideoCaptureControlPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Control for video capturing.
+     *
+     * Provides its own goVideoCapture (see getVideoCapture).
+     */
     class VideoCaptureControl : public Control
     {
         public:
@@ -21,10 +29,11 @@ namespace goGUI
             // bool capture (goSignal3D<void>& target);
             void capture ();
             void setTarget (goAutoPtr<goSignal3DBase<void> > target);
+            goAutoPtr<goSignal3DBase<void> >  getTarget ();
             void contCaptureToggle ();
             void swapRGBToggle ();
 
-            goCaller0<int>& capturedCaller ();
+            goCaller0<void>& capturedCaller ();
 
             goVideoCapture& getVideoCapture ();
 
@@ -37,6 +46,7 @@ namespace goGUI
         private:
             VideoCaptureControlPrivate* myPrivate;
     };
+/** \} */
 };
 
 #endif

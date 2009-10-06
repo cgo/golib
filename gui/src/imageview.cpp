@@ -9,6 +9,8 @@
 #include <gosignal3dref.h>
 
 #include <list>
+#include <vector>
+#include <algorithm>
 
 namespace goGUI
 {
@@ -398,6 +400,58 @@ namespace goGUI
         }
 
         return 0;
+    }
+
+    void goGUI::ImageView::removeImage (goIndex_t index)
+    {
+        if (myPrivate->images.empty())
+            return;
+
+        if (index < 0)
+        {
+            index = myPrivate->currentImageIndex;
+        }
+
+        if (index >= 0 && index < goIndex_t(myPrivate->images.size ()))
+        {
+            myPrivate->graph->remove (myPrivate->imageObjects [index]);
+            ImageViewPrivate::ImageList::iterator im_it = myPrivate->images.begin ();
+            ImageViewPrivate::ImageObjectList::iterator io_it = myPrivate->imageObjects.begin ();
+
+            for (goIndex_t i = 0; i < index; ++i)
+            {
+                ++im_it;
+                ++io_it;
+            }
+
+            myPrivate->images.erase (im_it);
+            myPrivate->imageObjects.erase (io_it);
+            myPrivate->changedCaller (IMAGE_REMOVED);
+        }
+    }
+
+    void goGUI::ImageView::reorderImages (const std::vector<int>& order)
+    {
+        if (order.size () != myPrivate->images.size ())
+        {
+            return;
+        }
+
+        const size_t N = order.size ();
+        ImageViewPrivate::ImageList newImages (N);
+        ImageViewPrivate::ImageObjectList newImageObjects (N);
+        
+        ImageViewPrivate::ImageList& images = myPrivate->images;
+        ImageViewPrivate::ImageObjectList& imageObjects = myPrivate->imageObjects;
+
+        for (size_t i = 0; i < N; ++i)
+        {
+            newImages [i] = images [order[i]];
+            newImageObjects [i] = imageObjects [order[i]];
+        }
+
+        images = newImages;
+        imageObjects = newImageObjects;
     }
 
     goIndex_t goGUI::ImageView::getImageCount () const

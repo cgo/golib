@@ -11,6 +11,17 @@ namespace goGUI
 {
     class ImageControlPrivate;
 
+/** @addtogroup gui
+ * @{
+ */
+    /** 
+     * @brief Control widget for images in an ImageView.
+     *
+     * This control is used with an ImageView object.
+     * It displays a Gtk::TreeView showing the images in the ImageView
+     * and lets the user do things like deleting images and re-ordering
+     * them by drag and drop.
+     */
     class ImageControl : public Control
     {
         public:
@@ -24,6 +35,7 @@ namespace goGUI
 
             void imageViewChanged (int); //= "Slot" connected to ImageView::changedCaller()
             //void selectionChanged (); //= Slot for the Gtk widget
+            void treeViewDragEnd (const Glib::RefPtr<Gdk::DragContext>& context);
 
             goCaller1 <void, goAutoPtr<goSignal3DBase<void> > >& getImageChangedCaller ();   //= Called when the current image changes
 
@@ -35,6 +47,7 @@ namespace goGUI
         private:
             ImageControlPrivate* myPrivate;
     };
+/** \} */
 };
 
 #endif

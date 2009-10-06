@@ -14,6 +14,10 @@
 # include <goautoptr.h>
 #endif
 
+/** 
+ * @addtogroup signal
+ * @{
+ */
 namespace goSignal
 {
     extern const goSize3D _defaultBlockSize3D;
@@ -25,11 +29,12 @@ namespace goSignal
     bool canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goDouble thresh1 = 80.0, goDouble thresh2 = 40.0);
     bool smooth (goSignal3DBase<void>& sig, goSize_t width = 3);
 
-    bool convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount);
+    bool convert (const goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount);
 
     bool RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target);
     bool toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha = -1.0);
     goAutoPtr<goSignal3D<void> > toBGRA (goSignal3DBase<void>& source, goFloat alpha = -1.0);
 };
+/** @} */
 
 #endif

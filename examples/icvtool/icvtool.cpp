@@ -5,14 +5,18 @@
 #include <gogui/cannycontrol.h>
 #include <gogui/controldialog.h>
 #include <gogui/controlsbox.h>
+#include <gogui/videocapturecontrol.h>
 
 #include <gofileio.h>
 #include <gosignal3d.h>
 #include <gosignal.h>
 #include <gosignalhelper.h>
 #include <gosignalmacros.h>
+#include <gofunctor.h>
 
 #include <gtkmm.h>
+
+#include "gaussimagecontrol.h"
 
 class ICVTool : public goGUI::MainWindow
 {
@@ -20,24 +24,34 @@ class ICVTool : public goGUI::MainWindow
         ICVTool ();
         virtual ~ICVTool ();
 
+        void imageCaptured ();
+        void gaussImageUpdate ();
+
     private:
-        goGUI::ImageView    myImageView;
-        goGUI::ImageControl myImageControl;
+        goGUI::ImageView           myImageView;
+        goGUI::ImageControl        myImageControl;
+        goGUI::VideoCaptureControl myVCControl;
 
         goGUI::ControlsBox  myControlsBox;
         goGUI::CannyControl myCannyControl;
+
+        GaussImageControl myGaussImageControl;
 };
 
 ICVTool::ICVTool ()
     : goGUI::MainWindow (),
       myImageView (),
+      myVCControl (),
       myImageControl (),
       myControlsBox ("Image Operations"),
-      myCannyControl ()
+      myCannyControl (),
+      myGaussImageControl ()
 {
     this->getPaned().add1 (this->myImageView);
     this->addControl (this->myImageControl);
     this->addControl (this->myControlsBox);
+    this->addControl (this->myVCControl);
+    this->addControl (this->myGaussImageControl);
 
     this->myControlsBox.addControl (this->myCannyControl);
     this->myCannyControl.getImageCreationCaller().connect (goMemberFunction (&myImageControl, &goGUI::ImageControl::addImage));
@@ -50,11 +64,31 @@ ICVTool::ICVTool ()
 
     this->addFileQuit ();
     this->show_all_children ();
+
+
+    //= Set the image for the video capture
+    myImageView.setImage (640, 480);
+    this->myVCControl.setTarget (myImageView.getImage (0)); //= FIXME: This means the image may not change.
+                                                            //= Also it needs to be changed when the user changes the resolution
+                                                            //= or something similar.
+    this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::imageCaptured));
+    this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::gaussImageUpdate));
     //this->getPaned().get_child1()->hide ();
+}
+
+//= Make this an extra class.
+void ICVTool::gaussImageUpdate ()
+{
+    myGaussImageControl.update (this->myVCControl.getTarget ());
 }
 
 ICVTool::~ICVTool ()
 {
+}
+
+void ICVTool::imageCaptured ()
+{
+    this->queue_draw ();
 }
 
 #if 0

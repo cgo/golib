@@ -13,7 +13,7 @@ class goGaussImage
         goGaussImage ();
         virtual ~goGaussImage ();
 
-        void update (const goSignal3DBase<void>& u);
+        void update (const goSignal3DBase<void>& u, int k = -1);
         void reset  ();
         const goSignal3DBase<void>& getMean () const;
         const goSignal3DBase<void>& getVariance () const;

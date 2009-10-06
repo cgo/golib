@@ -1,6 +1,8 @@
 #include <gogui/videocapturecontrol.h>
 #include <govideocapture.h>
 #include <gosignalmacros.h>
+#include <gotimerobject.h>
+#include <gomath.h>
 
 namespace goGUI
 {
@@ -18,13 +20,19 @@ namespace goGUI
                   hueScale (),
                   colourScale (),
                   contrastScale (),
-                  whitenessScale ()
+                  whitenessScale (),
+                  fpsButton ()
             {
                 vc.setDevice ("/dev/video0");
                 vc.open ();
                 vc.getSettings ();
                 vc.setCaptureSize (640, 480);
                 vc.setSettings ();
+
+                fpsButton.set_digits (0);
+                fpsButton.set_range (1.0, 10000000.0);
+                fpsButton.set_increments (1, 5);
+                fpsButton.set_value (10);
 
                 //printf ("Settings:");
                 //printf ("%f, %f, %f, %f\n", vc.getBrightness(), vc.getColour(), vc.getHue(), vc.getContrast());
@@ -96,13 +104,15 @@ namespace goGUI
             Gtk::CheckButton contCapture;
             Gtk::CheckButton swapRGB;
 
-            goCaller0<int> capturedCaller;
+            goCaller0<void>  capturedCaller;
 
             Gtk::HScale      brightnessScale;
             Gtk::HScale      hueScale;
             Gtk::HScale      colourScale;
             Gtk::HScale      contrastScale;
             Gtk::HScale      whitenessScale;
+
+            Gtk::SpinButton  fpsButton;
     };
 };
 
@@ -117,7 +127,8 @@ goGUI::VideoCaptureControl::VideoCaptureControl ()
         Gtk::Table* table = Gtk::manage (new Gtk::Table);
         table->attach (myPrivate->captureButton, 0, 2, 0, 1);
         table->attach (myPrivate->contCapture, 0, 1, 1, 2);
-        table->attach (myPrivate->swapRGB, 1, 2, 1, 2);
+        table->attach (myPrivate->fpsButton, 1, 2, 1, 2);
+        table->attach (myPrivate->swapRGB, 0, 1, 2, 3);
         mainBox->pack_start (*table);
         table->show_all ();
     }
@@ -158,6 +169,11 @@ goGUI::VideoCaptureControl::~VideoCaptureControl ()
     }
 }
 
+/** 
+ * @brief Get the goVideoCapture object.
+ * 
+ * @return Reference to the goVideoCapture object.
+ */
 goVideoCapture& goGUI::VideoCaptureControl::getVideoCapture ()
 {
     return myPrivate->vc;
@@ -168,6 +184,11 @@ goVideoCapture& goGUI::VideoCaptureControl::getVideoCapture ()
 //    return myPrivate->vc.grab (target);
 //}
 
+/** 
+ * @brief Capture a frame.
+ *
+ * capturedCaller() is called after the frame has been captured.
+ */
 void goGUI::VideoCaptureControl::capture ()
 {
     if (!myPrivate->target.isNull())
@@ -189,6 +210,13 @@ void goGUI::VideoCaptureControl::capture ()
     }
 }
 
+/** 
+ * @brief Toggle continuous capture.
+ *
+ * During continuous capture, Gtk::Main::iteration() is called 
+ * <b>after each capture</b>. Then the loop waits for a set time
+ * and repeats.
+ */
 void goGUI::VideoCaptureControl::contCaptureToggle ()
 {
     if (myPrivate->contCapture.get_active())
@@ -196,11 +224,19 @@ void goGUI::VideoCaptureControl::contCaptureToggle ()
         struct timespec t_req, t_remain;
         t_req.tv_sec = 0;
         // t_req.tv_nsec = 10000000;
+            
         t_req.tv_nsec = 10000;
+
+        goTimerObject timer;
 
         while (myPrivate->contCapture.get_active())
         {
+            int fps = myPrivate->fpsButton.get_value_as_int ();
+            timer.startTimer ();
             this->capture ();
+            timer.stopTimer ();
+            long int nsec = 1000000000 / fps - (long int) (timer.getTimerSeconds() * 1e9);
+            t_req.tv_nsec = goMath::max<long int> (0, nsec);
             while (Gtk::Main::events_pending())
             {
                 Gtk::Main::iteration ();
@@ -219,12 +255,32 @@ void goGUI::VideoCaptureControl::swapRGBToggle ()
     }
 }
 
+/** 
+ * @brief Set the target goSignal3DBase to hold the image data.
+ * 
+ * @param target Pointer to the target. Must be 3-channel GO_UINT8 data.
+ */
 void goGUI::VideoCaptureControl::setTarget (goAutoPtr<goSignal3DBase<void> > target)
 {
     myPrivate->target = target;
 }
 
-goCaller0<int>& goGUI::VideoCaptureControl::capturedCaller ()
+/** 
+ * @brief Get the pointer to the target image.
+ * 
+ * @return An autoptr to the target image. Note is can be Null if no target has been set.
+ */
+goAutoPtr<goSignal3DBase<void> >  goGUI::VideoCaptureControl::getTarget ()
+{
+    return myPrivate->target;
+}
+
+/** 
+ * @brief This caller gets called every time capture() has successfully been called.
+ * 
+ * @return The caller.
+ */
+goCaller0<void>& goGUI::VideoCaptureControl::capturedCaller ()
 {
     return myPrivate->capturedCaller;
 }

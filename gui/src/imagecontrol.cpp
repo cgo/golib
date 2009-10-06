@@ -14,8 +14,8 @@ namespace goGUI
                 add (myColName);
             }
 
-            Gtk::TreeModelColumn <goIndex_t>     myColNumber;
-            Gtk::TreeModelColumn <Glib::ustring> myColName;
+            Gtk::TreeModelColumn <goIndex_t>     myColNumber;   //= Index of the row is stored here
+            Gtk::TreeModelColumn <Glib::ustring> myColName;     //= Textual description (ObjectName)
     };
 
     class ImageModelInfoColumns : public Gtk::TreeModelColumnRecord
@@ -76,6 +76,11 @@ goGUI::ImageControl::ImageControl ()
     myPrivate->myTreeView.signal_row_activated ().connect (sigc::mem_fun (*this, &ImageControl::treeRowActivated));
     myPrivate->myTreeView.signal_button_press_event ().connect_notify (sigc::mem_fun (*this, &ImageControl::treeViewButtonPressed));
 
+    //= Drag and drop
+    {
+        myPrivate->myTreeView.signal_drag_end ().connect (sigc::mem_fun (*this, &ImageControl::treeViewDragEnd));
+    }
+
     //= Context menu in treeview
     {
         Gtk::Menu::MenuList& menulist = myPrivate->myTreeContextMenu.items ();
@@ -112,30 +117,105 @@ void goGUI::ImageControl::treeViewButtonPressed (GdkEventButton* event)
     // return return_value;
 }
 
+//===============================
+//= Put all selected Gtk::TreeModel::iterator objects into a vector.
+class SelectedTreeModelIterators
+{
+    public:
+        SelectedTreeModelIterators (Glib::RefPtr<Gtk::TreeSelection> selection)
+            : myIterators ()
+        {
+            selection->selected_foreach_iter (sigc::mem_fun (*this, &SelectedTreeModelIterators::selected_row_callback));
+        }
+
+        void selected_row_callback (const Gtk::TreeModel::iterator& iter)
+        {
+            myIterators.push_back (iter);
+        }
+
+        std::vector<Gtk::TreeModel::iterator> myIterators;
+};
+
+//= Put the numbers on myColNumber in a vector (myIndex)
+class TreeModelEnumerate
+{
+    public:
+        TreeModelEnumerate (Glib::RefPtr<Gtk::TreeModel> model, goGUI::ImageControlPrivate* p)
+            : myIndex (), myPrivate (p)
+        {
+            model->foreach_iter (sigc::mem_fun (*this, &TreeModelEnumerate::row_callback));
+        }
+
+        bool row_callback (const Gtk::TreeModel::iterator& iter)
+        {
+            Gtk::TreeModel::Row row = *iter;
+            myIndex.push_back ((*row) [myPrivate->myColumns.myColNumber]);
+            return false; //= Returning true stops the tree walk
+        }
+
+        std::vector<int> myIndex;
+        goGUI::ImageControlPrivate* myPrivate;
+};
+
+//= Renumber all rows from 0 to N-1
+class TreeModelRenumber
+{
+    public:
+        TreeModelRenumber (Glib::RefPtr<Gtk::TreeModel> model, goGUI::ImageControlPrivate* p)
+            : myI (0), myPrivate (p)
+        {
+            model->foreach_iter (sigc::mem_fun (*this, &TreeModelRenumber::row_callback));
+        }
+
+        bool row_callback (const Gtk::TreeModel::iterator& iter)
+        {
+            Gtk::TreeModel::Row row = *iter;
+            (*row) [myPrivate->myColumns.myColNumber] = myI;
+            ++myI;
+            return false; //= Returning true stops the tree walk
+        }
+
+        int myI;
+        goGUI::ImageControlPrivate* myPrivate;
+};
+//==============================
+
+/** 
+ * @brief Delete the current selection of images
+ */
 void goGUI::ImageControl::treeDeleteImage ()
 {
     Glib::RefPtr<Gtk::TreeSelection> selection = myPrivate->myTreeView.get_selection ();
     Gtk::TreeSelection::ListHandle_Path::iterator it = selection->get_selected_rows ().begin ();
 
-    std::vector<Gtk::TreeModel::iterator> rm_iters;
-    for (; it != selection->get_selected_rows ().end (); ++it)
-    {
-        Gtk::TreeModel::iterator iter = myPrivate->myRefStore->get_iter (*it);
-        Gtk::TreeModel::Row row = *iter;
-        goIndex_t i = row[myPrivate->myColumns.myColNumber];
-        rm_iters.push_back (iter);
-        // myPrivate->myRefStore->erase (iter);
-    }
+//    std::vector<Gtk::TreeModel::iterator> rm_iters;
+//    for (; it != selection->get_selected_rows ().end (); ++it)
+//    {
+//        Gtk::TreeModel::iterator iter = myPrivate->myRefStore->get_iter (*it);
+//        Gtk::TreeModel::Row row = *iter;
+//        goIndex_t i = row[myPrivate->myColumns.myColNumber];
+//        rm_iters.push_back (iter);
+//        // myPrivate->myRefStore->erase (iter);
+//    }
 
-    for (size_t i = 0; i < rm_iters.size (); ++i)
+    SelectedTreeModelIterators sel_iters (myPrivate->myTreeView.get_selection ());
+
+    for (size_t i = 0; i < sel_iters.myIterators.size (); ++i)
     {
-        myPrivate->myRefStore->erase (rm_iters[i]);
+        Gtk::TreeModel::Row row = *sel_iters.myIterators [i];
+        myPrivate->imageView->removeImage (row [myPrivate->myColumns.myColNumber]);
+        myPrivate->myRefStore->erase (sel_iters.myIterators [i]);
         //= FIXME: Also remove from imageview!
     }
 
-    printf ("Delete image!\n");
+    TreeModelRenumber renumber (myPrivate->myRefStore, myPrivate);
+
+    myPrivate->imageView->queue_draw ();
 }
 
+/** 
+ * @brief Pop up a file open dialog and load an image.
+ */
 void goGUI::ImageControl::loadImage ()
 {
     if (!myPrivate->imageView)
@@ -171,6 +251,16 @@ void goGUI::ImageControl::loadImage ()
     }
 }
 
+/** 
+ * @brief Add the image given as goAutoPtr
+ * 
+ * The image is just added to the ImageView, and is being deep copied.
+ * The goAutoPtr is currently not copied.
+ * The image is also automatically converted by ImageView to be displayable --- this means
+ * the original data format is probably not retained in the copied version of the image.
+ *
+ * @param img Image to add.
+ */
 void goGUI::ImageControl::addImage (goAutoPtr<goSignal3DBase<void> > img)
 {
     if (!myPrivate->imageView)
@@ -185,6 +275,11 @@ void goGUI::ImageControl::addImage (goAutoPtr<goSignal3DBase<void> > img)
     this->imageViewChanged (ImageView::IMAGE_SET); //= Force rebuilding the treeview to get the object name right.
 }
 
+/** 
+ * @brief Set the ImageView object.
+ * 
+ * @param iv The ImageView object to be used with this ImageControl.
+ */
 void goGUI::ImageControl::setImageView (ImageView* iv)
 {
     if (myPrivate->imageView)
@@ -207,7 +302,7 @@ void goGUI::ImageControl::setImageView (ImageView* iv)
  * with the new current image as argument.
  * In the other cases, the treeview showing the images gets rebuilt.
  *
- * @param code One og ImageView::CURRENT_IMAGE_CHANGED, ImageView::IMAGE_SET, ImageView::IMAGE_REMOVED.
+ * @param code One of ImageView::CURRENT_IMAGE_CHANGED, ImageView::IMAGE_SET, ImageView::IMAGE_REMOVED.
  */
 void goGUI::ImageControl::imageViewChanged (int code)
 {
@@ -247,6 +342,27 @@ void goGUI::ImageControl::imageViewChanged (int code)
             }
         }
     }
+}
+
+//========================================
+//=======================================
+
+void goGUI::ImageControl::treeViewDragEnd (const Glib::RefPtr<Gdk::DragContext>& context)
+{
+    printf ("Drag end!\n");
+
+    TreeModelEnumerate enumerate (myPrivate->myRefStore, myPrivate);
+    for (std::vector<int>::iterator it = enumerate.myIndex.begin(); it != enumerate.myIndex.end(); ++it)
+    {
+        printf ("%d\n", *it);
+    }
+
+    if (myPrivate->imageView)
+    {
+        myPrivate->imageView->reorderImages (enumerate.myIndex);
+    }
+    
+    TreeModelRenumber renumber (myPrivate->myRefStore, myPrivate);
 }
 
 void goGUI::ImageControl::treeRowActivated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* col)

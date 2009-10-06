@@ -126,30 +126,38 @@ static void update_mu_sigma_squared (goFloat k, goSignal3DBase<void>& sigma2, go
     }
 }
 
-void goGaussImage::update (const goSignal3DBase<void>& u)
+/** 
+ * @brief Update the Gaussian for each pixel.
+ * 
+ * @param u The new data
+ * @param k The number of frames in the sliding window -- k <= 0 means "infinite"
+ */
+void goGaussImage::update (const goSignal3DBase<void>& u, int k)
 {
     goSignal3D<void>& mu = myPrivate->mu;
     goSignal3D<void>& sigma2 = myPrivate->sigma2;
     goSignal3D<void>& mean_squared = myPrivate->mean_squared;
     if (mu.getSize() != u.getSize())
     {
-        mu.make (&u);
-        sigma2.make (&u);
-        mean_squared.make (&u);
+        //= Allocate the buffers linearly
+        goSize3D borders (8, 8, 0);
+        mu.make (u.getSize(), u.getSize(), borders, u.getChannelCount());
+        sigma2.make (&mu);
+        mean_squared.make (&mu);
         this->reset ();
     }
 
-    goFloat k = static_cast<goFloat>(myPrivate->counter);
+    goFloat _k = k <= 0 ? static_cast<goFloat>(myPrivate->counter) : k;
     switch (u.getDataType().getID())
     {
-        case GO_UINT8:  update_mu_sigma_squared<goUInt8>  (k, sigma2, mean_squared, mu, u); break;
-        case GO_INT8:   update_mu_sigma_squared<goInt8>   (k, sigma2, mean_squared, mu, u); break;
-        case GO_UINT16: update_mu_sigma_squared<goUInt16> (k, sigma2, mean_squared, mu, u); break;
-        case GO_INT16:  update_mu_sigma_squared<goInt16>  (k, sigma2, mean_squared, mu, u); break;
-        case GO_UINT32: update_mu_sigma_squared<goUInt32> (k, sigma2, mean_squared, mu, u); break;
-        case GO_INT32:  update_mu_sigma_squared<goInt32>  (k, sigma2, mean_squared, mu, u); break;
-        case GO_FLOAT:  update_mu_sigma_squared<goFloat>  (k, sigma2, mean_squared, mu, u); break;
-        case GO_DOUBLE: update_mu_sigma_squared<goDouble> (k, sigma2, mean_squared, mu, u); break;
+        case GO_UINT8:  update_mu_sigma_squared<goUInt8>  (_k, sigma2, mean_squared, mu, u); break;
+        case GO_INT8:   update_mu_sigma_squared<goInt8>   (_k, sigma2, mean_squared, mu, u); break;
+        case GO_UINT16: update_mu_sigma_squared<goUInt16> (_k, sigma2, mean_squared, mu, u); break;
+        case GO_INT16:  update_mu_sigma_squared<goInt16>  (_k, sigma2, mean_squared, mu, u); break;
+        case GO_UINT32: update_mu_sigma_squared<goUInt32> (_k, sigma2, mean_squared, mu, u); break;
+        case GO_INT32:  update_mu_sigma_squared<goInt32>  (_k, sigma2, mean_squared, mu, u); break;
+        case GO_FLOAT:  update_mu_sigma_squared<goFloat>  (_k, sigma2, mean_squared, mu, u); break;
+        case GO_DOUBLE: update_mu_sigma_squared<goDouble> (_k, sigma2, mean_squared, mu, u); break;
         default: goLog::warning ("goGaussImage::update(): unsupported type."); 
                  return; break;
     }
@@ -164,11 +172,27 @@ void goGaussImage::reset ()
     myPrivate->counter = 0;
 }
 
+/** 
+ * @brief Get the mean.
+ *
+ * The mean is stored in linearly allocated memory and of type goFloat.
+ * So getMean().getPtr() gives a pointer to the linearly stored values.
+ * 
+ * @return The mean values for each data element (pixel).
+ */
 const goSignal3DBase<void>& goGaussImage::getMean () const
 {
     return myPrivate->mu;
 }
 
+/** 
+ * @brief Get the variance.
+ *
+ * The variance is stored in linearly allocated memory and of type goFloat.
+ * So getVariance().getPtr() gives a pointer to the linearly stored values.
+ * 
+ * @return The variance values for each data element (pixel).
+ */
 const goSignal3DBase<void>& goGaussImage::getVariance () const
 {
     return myPrivate->sigma2;

@@ -2,7 +2,7 @@ include (FindPkgConfig)
 include (CheckLibraryExists)
 
 set (TARGET icvtool)
-set (SOURCES icvtool.cpp)
+set (SOURCES icvtool.cpp gaussimagecontrol.cpp)
 
 ## Cairo and Pango (for use of the goPlot library)
 pkg_search_module (CAIRO REQUIRED cairo)

@@ -3,12 +3,15 @@
 #include <golog.h>
 
 template <class S, class T>
-static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
+static bool _convert2 (const goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
-    source.setChannel (0);
+    int s_chan = source.getChannel ();
+
+    const_cast<goSignal3DBase<void>*> (&source)->setChannel (0);
     target.setChannel (0);
 
-    goSignal3DGenericIterator s (&source), t (&target);
+    goSignal3DGenericConstIterator s (&source);
+    goSignal3DGenericIterator t (&target);
     int i = 0;
 
     while (!s.endZ ())
@@ -25,7 +28,7 @@ static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
                 const int *tc = target_chan;
                 for (i = 0; i < channelCount; ++i, ++sc, ++tc)
                 {
-                    *((T*)*t + *tc) = *((S*)*s + *sc);
+                    *((T*)*t + *tc) = *((const S*)*s + *sc);
                 }
 
                 s.incrementX ();
@@ -38,12 +41,14 @@ static bool _convert2 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
         t.incrementZ ();
     }
 
+    const_cast<goSignal3DBase<void>*> (&source)->setChannel (s_chan);
+
     return true;
 }
 
 
 template <class S>
-static bool _convert1 (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
+static bool _convert1 (const goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
     switch (target.getDataType().getID())
     {
@@ -60,7 +65,27 @@ static bool _convert1 (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
 }
 
 
-bool goSignal::convert (goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
+/** 
+ * @addtogroup signal
+ * @{
+ */
+/**
+ * @brief Convert a goSignal3DBase to another.
+ * 
+ * Copies the content of \c source to \c target, converting from the source data type to the target
+ * data type. The source and target channels can be mapped to one another freely.
+ * 
+ * \c Target must be at least of the same size as \c source in all dimensions.
+ *
+ * @param source Source signal
+ * @param target Target signal
+ * @param source_chan Array denoting the source channels, e.g. <code> const int s_chan[] = {0, 1, 2} <\code>; must contain \c channelCount elements
+ * @param target_chan Array denoting the target channels; must contain \c channelCount elements
+ * @param channelCount Number of channels to be copied (e.g. number of elements in source_chan and target_chan)
+ * 
+ * @return True if successful, false otherwise.
+ */
+bool goSignal::convert (const goSignal3DBase<void>& source, goSignal3DBase<void>& target, const int* source_chan, const int* target_chan, int channelCount)
 {
     if (source.getSizeX() > target.getSizeX() ||
         source.getSizeY() > target.getSizeY() ||
@@ -85,6 +110,16 @@ bool goSignal::convert (goSignal3DBase<void>& source, goSignal3DBase<void>& targ
     return false;
 }
 
+/** 
+ * @brief Convert RGB to BGRA data
+ * 
+ * Uses goSignal::convert() to convert from RGB \c source to BGRA \c target.
+ *
+ * @param source Source signal
+ * @param target Target signal
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goSignal::RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target)
 {
     if (target.getChannelCount() != 4)
@@ -106,6 +141,20 @@ bool goSignal::RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& tar
     return true;
 }
 
+/** 
+ * @brief Convenience function, converts a source to a BGRA target.
+ *
+ * @see goSignal::convert()
+ *
+ * @param source Source signal. Must be 4 channel (RGBA), 3 channel (RGB) or 1 channel (intensity) data.
+ * @param target Target signal. Must be 4 channel, and at least of the size of \c source in each dimension.
+ * @param alpha Optional alpha value, to be filled in when the source does not have an alpha channel.
+ * If alpha < 0, the maximal value for the target data type will be filled in as alpha value if
+ * \c source does not provide an alpha channel. If alpha >= 0, the alpha channel is filled with \c alpha
+ * regardless of whether \c source provides an alpha channel.
+ * 
+ * @return True if successful, false otherwise.
+ */
 bool goSignal::toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha)
 {
     if (target.getChannelCount() != 4)
@@ -152,19 +201,36 @@ bool goSignal::toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& targe
     if (!ok)
         return false;
 
-    goFloat temp = alpha;
-    if (temp == -1.0)
+    if (chan_count < 4 || alpha >= 0.0)
     {
-        temp = target.getDataType().getMaximum ();
-    }
+        goFloat temp = alpha;
+        if (temp == -1.0)
+        {
+            temp = target.getDataType().getMaximum ();
+        }
 
-    target.setChannel (3);
-    goFillSignal (&target, temp);
-    target.setChannel (0);
+        target.setChannel (3);
+        goFillSignal (&target, temp);
+        target.setChannel (0);
+    }
 
     return true;
 }
 
+/** 
+ * @brief Convenience function, converts a source to RGBA.
+ * 
+ * @see goSignal::toBGRA()
+ *
+ * This function works like the other toBGRA() function, except that it returns a goAutoPtr to
+ * a newly allocated goSignal3D<void>.
+ *
+ * @param source Source signal
+ * @param alpha Optional alpha value
+ * 
+ * @return goAutoPtr to a new goSignal3D<void> of type goUInt8.
+ * If something goes wrong, this is a Null pointer.
+ */
 goAutoPtr<goSignal3D<void> > goSignal::toBGRA (goSignal3DBase<void>& source, goFloat alpha)
 {
     goAutoPtr<goSignal3D<void> > ret = new goSignal3D<void>;
@@ -179,3 +245,4 @@ goAutoPtr<goSignal3D<void> > goSignal::toBGRA (goSignal3DBase<void>& source, goF
 
     return ret;
 }
+/** @} */
