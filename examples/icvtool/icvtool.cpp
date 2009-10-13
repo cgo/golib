@@ -79,7 +79,35 @@ ICVTool::ICVTool ()
 //= Make this an extra class.
 void ICVTool::gaussImageUpdate ()
 {
-    myGaussImageControl.update (this->myVCControl.getTarget ());
+    static goSignal3D<void> mono_image;
+
+    static int counter = 0;
+    static const int update_max = 50;
+
+    goAutoPtr<goSignal3DBase<void> >  image = this->myVCControl.getTarget ();
+
+    if (image->getChannelCount () != 1 && (mono_image.getSize() != image->getSize()))
+    {
+        mono_image.setDataType (image->getDataType().getID());
+        mono_image.make (image->getSize(), image->getSize(), goSize3D (8, 8, 0), 1);
+    }
+    
+    if (image->getChannelCount () != 1)
+    {
+        goRGBAtoScalar (image, &mono_image);
+        image = &mono_image;
+        image.getRRefPtr()->incRef (); //= Prevent the autoptr from deleting its contents.
+    }
+
+//    if (counter < update_max)
+    {
+        myGaussImageControl.update (image);
+//        ++counter;
+    }
+//    else
+    {
+        myGaussImageControl.difference (image);
+    }
 }
 
 ICVTool::~ICVTool ()

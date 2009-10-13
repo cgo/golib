@@ -29,6 +29,9 @@ namespace goGUI
             void setVector (const goVectorf& v);
             void setVector (const goVectord& v);
 
+            void setDigits (int d);
+            void setRange (double low, double high, double step = 0.1, double large_step = 1.0);
+
             void valueChangedSlot ();
 
             void connectAll ();

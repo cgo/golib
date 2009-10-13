@@ -15,6 +15,7 @@ class GaussImageControl : public goGUI::Control
         virtual ~GaussImageControl ();
 
         void update (goAutoPtr<goSignal3DBase<void> >  image);
+        void difference (goAutoPtr<goSignal3DBase<void> >  image);
 
     private:
         GaussImageControlPrivate *myPrivate;
