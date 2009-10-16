@@ -491,7 +491,7 @@ namespace goGUI
     /** 
      * @brief Get the Graph object used to draw the image.
      * 
-     * @return 
+     * @return goAutoPtr to the goPlot::Graph object.
      */
     goAutoPtr<goPlot::Graph> goGUI::ImageView::graph ()
     {

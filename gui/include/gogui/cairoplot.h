@@ -4,6 +4,11 @@
 #include <goplot/cairoplot.h>
 #include <gtkmm.h>
 
+/**
+ * @addtogroup gui
+ *
+ * @{
+ */
 namespace goGUI 
 {
     // template <class Points, class Real>
@@ -57,5 +62,6 @@ namespace goGUI
     //= Helper functions for quickly plotting stuff -- use e.g. with goPlot::plot functions in goplot/cairoplot.h
     void plot (goAutoPtr<goPlot::Graph> g);
 };
+/** @} */
 
 #endif

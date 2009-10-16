@@ -1,0 +1,30 @@
+%        File: notes.tex
+%     Created: Fri Oct 16 10:00 PM 2009 C
+% Last Change: Fri Oct 16 10:00 PM 2009 C
+%
+\documentclass[a4paper,openbib,11pt]{article}
+\usepackage{psfig,epsfig,amssymb}
+\author{Christian Gosch}
+\title{Concepts, Ideas for golib}
+\begin{document}
+\bibliographystyle{abbrv}
+\maketitle
+
+\section{icvtool}
+\subsection{ROI selection}
+\begin{itemize}
+    \item goGUI::ImageView: pointer to goPlot::Graph, holds image object pointers internally
+    \item Similarly, make class for drawing / creating other objects; like rectangles
+        and associate with the same Graph (autopointer); also hold list of drawn objects
+        internally
+    \item e.g.~goGUI::ROISelection, maintain ROI information, draw ROI, load/store ROI
+\end{itemize}
+\subsection{Feature Extraction and Learning}
+\begin{itemize}
+    \item Use ROI selection; extract features for each ROI; learn to recognise objects
+\end{itemize}
+
+% \bibliography{../bibliography.bib}
+\end{document}
+
+

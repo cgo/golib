@@ -349,13 +349,13 @@ void goGUI::ImageControl::imageViewChanged (int code)
 
 void goGUI::ImageControl::treeViewDragEnd (const Glib::RefPtr<Gdk::DragContext>& context)
 {
-    printf ("Drag end!\n");
+//    printf ("Drag end!\n");
 
     TreeModelEnumerate enumerate (myPrivate->myRefStore, myPrivate);
-    for (std::vector<int>::iterator it = enumerate.myIndex.begin(); it != enumerate.myIndex.end(); ++it)
-    {
-        printf ("%d\n", *it);
-    }
+//    for (std::vector<int>::iterator it = enumerate.myIndex.begin(); it != enumerate.myIndex.end(); ++it)
+//    {
+//        printf ("%d\n", *it);
+//    }
 
     if (myPrivate->imageView)
     {
