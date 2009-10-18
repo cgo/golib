@@ -1,5 +1,6 @@
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
+    src/interactivedraw.cpp
     src/textoutput.cpp
     src/imagecontrol.cpp
     src/controldialog.cpp

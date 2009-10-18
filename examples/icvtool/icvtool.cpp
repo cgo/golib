@@ -7,6 +7,8 @@
 #include <gogui/controlsbox.h>
 #include <gogui/videocapturecontrol.h>
 
+#include <gogui/interactivedraw.h>
+
 #include <gofileio.h>
 #include <gosignal3d.h>
 #include <gosignal.h>
@@ -36,6 +38,8 @@ class ICVTool : public goGUI::MainWindow
         goGUI::CannyControl myCannyControl;
 
         GaussImageControl myGaussImageControl;
+
+        goGUI::InteractiveDraw myInteractiveDraw;
 };
 
 ICVTool::ICVTool ()
@@ -45,7 +49,8 @@ ICVTool::ICVTool ()
       myImageControl (),
       myControlsBox ("Image Operations"),
       myCannyControl (),
-      myGaussImageControl ()
+      myGaussImageControl (),
+      myInteractiveDraw ()
 {
     this->getPaned().add1 (this->myImageView);
     this->addControl (this->myImageControl);
@@ -74,6 +79,8 @@ ICVTool::ICVTool ()
     this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::imageCaptured));
     this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::gaussImageUpdate));
     //this->getPaned().get_child1()->hide ();
+    
+    this->myInteractiveDraw.setDrawWidget (&this->myImageView);
 }
 
 //= Make this an extra class.
