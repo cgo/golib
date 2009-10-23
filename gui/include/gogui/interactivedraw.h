@@ -3,6 +3,9 @@
 
 #include <gtkmm.h>
 
+#include <goautoptr.h>
+#include <goplot/goplot.h>
+
 namespace goGUI
 {
     class InteractiveDrawPrivate;
@@ -24,6 +27,7 @@ namespace goGUI
             virtual ~InteractiveDraw ();
 
             void setDrawWidget (Gtk::Widget* widget);
+            void setGraph (goAutoPtr<goPlot::Graph> g);
 
         private:
             InteractiveDrawPrivate* myPrivate;

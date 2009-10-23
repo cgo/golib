@@ -259,6 +259,7 @@ SET (SOURCES ${SOURCES}
 SET (SOURCES ${SOURCES}
        src/plot/cairoplot.cpp
        src/plot/graph.cpp
+       src/plot/object2dbox.cpp
        src/plot/object2dtext.cpp
        src/plot/object2dimage.cpp
        src/plot/object2dpoints.cpp
