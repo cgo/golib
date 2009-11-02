@@ -6,17 +6,17 @@ SET                 (SOURCES src/gopython.cpp)
 
 # SET (PYTHON_VERSION "2.4" CACHE STRING "Python version")
 
-EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
-SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE})
-EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
+#EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEPY')\"" OUTPUT_VARIABLE PYTHON_INCLUDE)
+#SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PYTHON_INCLUDE_PATH})
+#EXEC_PROGRAM (python ARGS "-c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('BLDLIBRARY')\"" OUTPUT_VARIABLE PYTHON_LDFLAGS)
 
 IF (EXTRA_LIBS)
-   SET (EXTRA_LIBS ${EXTRA_LIBS} ${PYTHON_LDFLAGS})
+   SET (EXTRA_LIBS ${EXTRA_LIBS} ${PYTHON_LIBRARIES})
 ELSE (EXTRA_LIBS)
-   SET (EXTRA_LIBS ${PYTHON_LDFLAGS})
+   SET (EXTRA_LIBS ${PYTHON_LIBRARIES})
 ENDIF (EXTRA_LIBS)
 
-MESSAGE ("PYTHON_LDFLAGS: ${PYTHON_LDFLAGS}")
+#MESSAGE ("PYTHON_LDFLAGS: ${PYTHON_LDFLAGS}")
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include)

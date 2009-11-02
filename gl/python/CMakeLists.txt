@@ -2,15 +2,20 @@
 
 SET (TARGET _gogl)
 
-FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
+#FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
 
-EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
-                        ARGS -I../../include -I../include -python -c++ gogl.i)
+add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/gogl_wrap.cxx
+                    COMMAND ${SWIG_EXECUTABLE} 
+                        ARGS -I../include -python -fcompact -addextern -c++ gogl.i
+                        DEPENDS gogl.i
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+#EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
+#                        ARGS -I../../include -I../include -python -c++ gogl.i)
 #FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 #SET                 (GOGL_LIB "-lGogl")
 #LINK_LIBRARIES      (${GOLIB} ${GOGL_LIB})
 #INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include /usr/include/python2.4)
-INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include ${CMAKE_CURRENT_SOURCE_DIR}/../include ${PYTHON_INCLUDE})
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include ${CMAKE_CURRENT_SOURCE_DIR}/../include ${PYTHON_INCLUDE_PATH})
 ADD_LIBRARY         (${TARGET} SHARED gogl_wrap.cxx)
 ADD_DEPENDENCIES    (${TARGET} Go Gogl)
 TARGET_LINK_LIBRARIES (${TARGET} Go Gogl)

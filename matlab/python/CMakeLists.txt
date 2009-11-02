@@ -2,19 +2,24 @@
 
 SET (TARGET _gomatlab)
 
-FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
+#FIND_PROGRAM (SWIG_EXECUTABLE NAMES swig)
 
 
 #EXEC_PROGRAM        (${GUILE_CONFIG} ARGS link OUTPUT_VARIABLE GUILE_LIBS)
 #EXEC_PROGRAM        (${GUILE_CONFIG} ARGS compile OUTPUT_VARIABLE GUILE_CFLAGS)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
-EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
-                        ARGS -I../../include -python -c++ gomatlab.i)
+add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/gomatlab_wrap.cxx
+                    COMMAND ${SWIG_EXECUTABLE} 
+                        ARGS -I../include -python -fcompact -addextern -c++ gomatlab.i
+                        DEPENDS gomatlab.i
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+#EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
+#                        ARGS -I../../include -python -c++ gomatlab.i)
 #FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 #SET                 (GOMATLAB_LIB "-lGomatlab")
 #LINK_LIBRARIES      (${GOLIB} ${GOMATLAB_LIB})
 #INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include /usr/include/python2.4)
-INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include ${PYTHON_INCLUDE})
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR}/../../include ${PYTHON_INCLUDE_PATH})
 #ADD_DEFINITIONS     ()
 #ADD_LIBRARY         (${TARGET} MODULE gomatlab_wrap.cxx)
 ADD_LIBRARY         (${TARGET} SHARED gomatlab_wrap.cxx)
