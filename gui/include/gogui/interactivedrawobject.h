@@ -12,8 +12,8 @@ namespace goGUI
         public:
             virtual void apply () = 0; //= Apply properties of this object to the T type object 
 
-            std::list<goVectord>       getEditPoints () { return myEditPoints; }
-            const std::list<goVectord> getEditPoints () const { return myEditPoints; }
+            std::list<goVectord>&       getEditPoints () { return myEditPoints; }
+            const std::list<goVectord>& getEditPoints () const { return myEditPoints; }
 
         protected:
             InteractiveDrawObject () 
