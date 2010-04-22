@@ -10,23 +10,72 @@ Part of golib
 (C) Copyright 2009 by Christian Gosch
 """
 
+FUNCTORBASE = "FunctorBase"
+FUNCTION    = "Function"
+FUNCTOR     = "Functor"
+CALLER      = "Caller"
+MEMBERFUNCTION = "MemberFunction"
+USE_AUTOPTR = True
+AUTOPTR     = "goAutoPtr"
+
+header = """
+#ifndef GOFUNCTOR_H
+#define GOFUNCTOR_H
+
+#include <list>
+#include <algorithm>
+  /**
+   * \\addtogroup functors
+   * @{
+   */
+"""
+
+docs = """
+/**
+ * \defgroup functors Functors
+ *
+ * \par Summary
+ * This is a collection of templates which provides more or less flexible
+ * functors which can represent either c-style functions or member functions
+ * in a transparent-ish way. This code is generated automatically by a Python script
+ * which is part of golib by Christian Gosch.<br>
+ * There are also \\a {caller}* objects which collect a number of functor objects
+ * and can be used to broadcast a function call to all its functors.
+ *
+ * \par Usage
+ * You can either create one of the \\a {function}* or \\a {functor}* objects by yourself,
+ * or use the convenience functions \\a {function}() and \\a {memberfunction}() to create
+ * new functor objects.
+ * 
+ * \\note The \\a {function}() and \\a {memberfunction}() functions as well as the \\a {caller}*
+ * classes can either be created (by the source code generating script) with or without
+ * the support for automatic pointers (from golib). It is recommended to use automatic pointers,
+ * and \\a {caller}* type objects have not been tested without automatic pointers.
+ */
+""".format (function = FUNCTION, functor = FUNCTOR, memberfunction = MEMBERFUNCTION, caller = CALLER)
+
+footer = """
+  /** @} */
+#endif
+"""
+
 def make_base (max_args):
     args_string = "class Tret"
     for i in xrange (max_args):
         args_string += ", class Targ" + str(i)
     return """
 template <""" + args_string + """>
-class goFunctorBase
-{
+class {0}
+{{
     public:
-        goFunctorBase ()
-        {
-        }
-        virtual ~goFunctorBase ()
-        {
-        }
-};
-"""
+        {0} ()
+        {{        
+        }}
+        virtual ~{0} ()
+        {{
+        }}
+}};
+""".format (FUNCTORBASE)
 
 def make_functors (num_args, max_args, void_ret = False, base = False, make_callers = False, make_helper = False):
 
@@ -35,14 +84,14 @@ def make_functors (num_args, max_args, void_ret = False, base = False, make_call
 * @brief Base for functor objects with ${postfix} arguments.
 */
 ${template_statement_functorbase}
-class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}> 
+class ${functorbase}${postfix} : public ${functorbase} <${template_args_base}> 
 {
     public:
-        goFunctorBase${postfix} ()
-            : goFunctorBase <${template_args_base}> ()
+        ${functorbase}${postfix} ()
+            : ${functorbase} <${template_args_base}> ()
         {
         }
-        virtual ~goFunctorBase${postfix} ()
+        virtual ~${functorbase}${postfix} ()
         {
         }
 
@@ -54,6 +103,8 @@ class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}>
          */
         virtual Tret operator () (${args_names}) = 0;
         virtual Tret operator () (${args_names}) const = 0;
+
+        virtual ${functorbase}${postfix} < ${template_args_function} > * createCopy () const = 0;
 };
 """
     template_string = """
@@ -63,7 +114,7 @@ class goFunctorBase${postfix} : public goFunctorBase <${template_args_base}>
 * The first template argument is the return type, the others are argument types.
 */
 ${template_statement_function}
-class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_function}>
+class ${function}${postfix} : public ${functorbase}${postfix}<${template_args_function}>
 {
     public:
         /** 
@@ -72,11 +123,11 @@ class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_func
         typedef Tret (*function_t)(${args_names});
 
     public:
-        goFunction${postfix} (function_t function)
-            : goFunctorBase${postfix}<${template_args_function}> (), myFunction (function)
+        ${function}${postfix} (function_t function)
+            : ${functorbase}${postfix}<${template_args_function}> (), myFunction (function)
         {
         }
-        virtual ~goFunction${postfix} () {}
+        virtual ~${function}${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -100,6 +151,11 @@ class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_func
             }
         }
 
+        virtual ${functorbase}${postfix} < ${template_args_function} > * createCopy () const
+        {
+          return new ${function}${postfix} < ${template_args_function} > (*this);
+        }
+
     private:
         function_t myFunction;
 };
@@ -108,7 +164,7 @@ class goFunction${postfix} : public goFunctorBase${postfix}<${template_args_func
 * @brief Specialisation for void functions.
 */
 ${template_statement_function_void}
-class goFunction${postfix}<${template_args_function_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
+class ${function}${postfix}<${template_args_function_void}> : public ${functorbase}${postfix}<${template_args_function_void}>
 {
     public:
         /** 
@@ -117,11 +173,11 @@ class goFunction${postfix}<${template_args_function_void}> : public goFunctorBas
         typedef void (*function_t)(${args_names});
 
     public:
-        goFunction${postfix} (function_t function)
-            : goFunctorBase${postfix}<${template_args_function_void}> (), myFunction (function)
+        ${function}${postfix} (function_t function)
+            : ${functorbase}${postfix}<${template_args_function_void}> (), myFunction (function)
         {
         }
-        virtual ~goFunction${postfix} () {}
+        virtual ~${function}${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -143,6 +199,11 @@ class goFunction${postfix}<${template_args_function_void}> : public goFunctorBas
             {
                 (myFunction)(${names});
             }
+        }
+
+        virtual ${functorbase}${postfix} < ${template_args_function_void} > * createCopy () const
+        {
+          return new ${function}${postfix} < ${template_args_function_void} > (*this);
         }
 
     private:
@@ -156,7 +217,7 @@ class goFunction${postfix}<${template_args_function_void}> : public goFunctorBas
 * the others are member function argument types.
 */
 ${template_statement_functor}
-class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_function}>
+class ${functor}${postfix} : public ${functorbase}${postfix}<${template_args_function}>
 {
     public:
         /** 
@@ -165,11 +226,11 @@ class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_funct
         typedef Tret (Tclass::*function_t)(${args_names});
 
     public:
-        goFunctor${postfix} (Tclass* object, function_t function)
-            : goFunctorBase${postfix}<${template_args_function}> (), myObject (object), myFunction (function)
+        ${functor}${postfix} (Tclass* object, function_t function)
+            : ${functorbase}${postfix}<${template_args_function}> (), myObject (object), myFunction (function)
         {
         }
-        virtual ~goFunctor${postfix} () {}
+        virtual ~${functor}${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -193,6 +254,11 @@ class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_funct
             }
         }
 
+        virtual ${functorbase}${postfix} < ${template_args_function} > * createCopy () const
+        {
+          return new ${functor}${postfix} < ${template_args_functor} > (*this);
+        }
+
     private:
         Tclass* myObject;
         function_t myFunction;
@@ -202,7 +268,7 @@ class goFunctor${postfix} : public goFunctorBase${postfix}<${template_args_funct
 * @brief Specialisation for void member functions.
 */
 ${template_statement_functor_void}
-class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase${postfix}<${template_args_function_void}>
+class ${functor}${postfix}<${template_args_functor_void}> : public ${functorbase}${postfix}<${template_args_function_void}>
 {
     public:
         /** 
@@ -211,11 +277,11 @@ class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase$
         typedef void (Tclass::*function_t)(${args_names});
 
     public:
-        goFunctor${postfix} (Tclass* object, function_t function)
-            : goFunctorBase${postfix}<${template_args_function_void}> (), myObject (object), myFunction (function)
+        ${functor}${postfix} (Tclass* object, function_t function)
+            : ${functorbase}${postfix}<${template_args_function_void}> (), myObject (object), myFunction (function)
         {
         }
-        virtual ~goFunctor${postfix} () {}
+        virtual ~${functor}${postfix} () {}
 
         /** 
          * @brief Calls the function set to this functor.
@@ -239,6 +305,11 @@ class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase$
             }
         }
 
+        virtual ${functorbase}${postfix} < ${template_args_function_void} > * createCopy () const
+        {
+          return new ${functor}${postfix} < ${template_args_functor_void} > (*this);
+        }
+
     private:
         Tclass* myObject;
         function_t myFunction;
@@ -249,37 +320,35 @@ class goFunctor${postfix}<${template_args_functor_void}> : public goFunctorBase$
 /** 
  * @brief Broadcasting caller class,
  * like signals in the "signal/slot" paradigm.
- * @todo Fix the goList issue. golist.hpp must be included at the
- * end of one source file that uses this class.
  */
 ${template_statement_functorbase}
-class goCaller${postfix}
+class ${caller}${postfix}
 {
     public:
         /** 
         * @brief Function type represented by this class.
         */
-        typedef goFunctorBase${postfix}<${template_args_function}> FunctorBase;
-        typedef goList< goAutoPtr< FunctorBase > > FunctorList;
+        typedef ${functorbase}${postfix}<${template_args_function}> FunctorBase;
+        typedef std::list< ${autoptrstart} FunctorBase ${autoptrend} > FunctorList;
 
     public:
-        goCaller${postfix} ()
+        ${caller}${postfix} ()
             : fList () {}
-        virtual ~goCaller${postfix} () {fList.erase ();}
+        virtual ~${caller}${postfix} () {fList.erase ();}
 
         //= Take very much care here that
         //= 1. This class gets notified if functors are destroyed.
         //= 2. Everything is thread safe.
-        void connect (goAutoPtr< FunctorBase > f)
+        void connect (${autoptrstart} FunctorBase ${autoptrend} f)
         {
-            this->fList.append (f);
+            this->fList.push_back (f);
         }
 
-        void disconnect (goAutoPtr< FunctorBase > f)
+        void disconnect (${autoptrstart} FunctorBase ${autoptrend} f)
         {
-            typename FunctorList::Element* e = fList.find (f);
-            if (e)
-                fList.remove (e);
+            typename FunctorList::iterator e = std::find (fList.begin(), fList.end(), f);
+            if (e != fList.end ())
+                fList.erase (e);
         }
 
         void clear ()
@@ -287,18 +356,13 @@ class goCaller${postfix}
             fList.clear ();
         }
 
-        // virtual Tret operator () (${args_names})
         virtual void operator () (${args_names})
         {
-            typename FunctorList::Element* el = this->fList.getFrontElement ();
-            // Tret ret;
-            while (el)
+            typename FunctorList::iterator el = this->fList.getFrontElement ();
+            for (el = this->fList.begin (); el != this->flist.end (); ++el)
             {
-                // ret = (*el->elem)(${names});
-                (*el->elem)(${names});
-                el = el->next;
+                (*el)(${names});
             }
-            // return ret;
         }
 
     private:
@@ -313,13 +377,13 @@ class goCaller${postfix}
  * 
  * @param f  Function pointer to a function.
  * 
- * @return goAutoPtr to a goFunctorBase${postfix} object.
+ * @return goAutoPtr to a ${functorbase}${postfix} object.
  */
 ${template_statement_function}
-goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
-goFunction (Tret (*f)(${args_names}))
+${autoptrstart} ${functorbase}${postfix}<${template_args_function} > ${autoptrend}
+${function} (Tret (*f)(${args_names}))
 {
-    return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (new goFunction${postfix}<${template_args_function}> (f));
+    return ${autoptrstart} ${functorbase}${postfix}<${template_args_function}> ${autoptrend} (new ${function}${postfix}<${template_args_function}> (f));
 }
 
 /** 
@@ -329,14 +393,45 @@ goFunction (Tret (*f)(${args_names}))
  * @param c  Pointer to the object.
  * @param f  Function pointer to a member function.
  * 
- * @return goAutoPtr to a goFunctorBase${postfix} object.
+ * @return goAutoPtr to a ${functorbase}${postfix} object.
  */
 ${template_statement_functor}
 // template <class Tclass, class Tret, class Targ1>
-goAutoPtr<goFunctorBase${postfix}<${template_args_function} > >
-goMemberFunction (Tclass* c, Tret (Tclass::*f)(${args_names}))
+${autoptrstart} ${functorbase}${postfix}<${template_args_function} > ${autoptrend}
+${memberfunction} (Tclass* c, Tret (Tclass::*f)(${args_names}))
 {
-    return goAutoPtr<goFunctorBase${postfix}<${template_args_function}> > (static_cast<goFunctorBase${postfix}<${template_args_function}>*> (new goFunctor${postfix}<${template_args_functor}> (c, f)));
+    return ${autoptrstart} ${functorbase}${postfix}<${template_args_function}> ${autoptrend} (static_cast<${functorbase}${postfix}<${template_args_function}>*> (new ${functor}${postfix}<${template_args_functor}> (c, f)));
+}
+"""
+
+    helper_template_no_autoptr = """
+/** 
+ * @brief Create a function functor object.
+ * 
+ * @param f  Function pointer to a function.
+ * 
+ * @return Pointer to a ${functorbase}${postfix} object pointer.
+ */
+${template_statement_function}
+${functorbase}${postfix}<${template_args_function} >*
+${function} (Tret (*f)(${args_names}))
+{
+    return new ${function}${postfix}<${template_args_function}> (f);
+}
+
+/** 
+ * @brief Create a member function functor object.
+ * 
+ * @param c  Pointer to the object.
+ * @param f  Function pointer to a member function.
+ * 
+ * @return Pointer to a ${functorbase}${postfix} object.
+ */
+${template_statement_functor}
+${functorbase}${postfix}<${template_args_function} >*
+${memberfunction} (Tclass* c, Tret (Tclass::*f)(${args_names}))
+{
+    return static_cast<${functorbase}${postfix}<${template_args_function}>*> (new ${functor}${postfix}<${template_args_functor}> (c, f));
 }
 """
 
@@ -419,12 +514,22 @@ goMemberFunction (Tclass* c, Tret (Tclass::*f)(${args_names}))
          "template_statement_function": template_statement_function,
          "template_statement_function_void": template_statement_function_void,
          "function_typename_statement": "typename",
-         "postfix": str(num_args)}
+         "postfix": str(num_args),
+         "functorbase": FUNCTORBASE,
+         "function": FUNCTION,
+         "functor": FUNCTOR,
+         "caller": CALLER,
+         "memberfunction": MEMBERFUNCTION,
+         "autoptrstart": AUTOPTR + "< " if USE_AUTOPTR else "",
+         "autoptrend": " >" if USE_AUTOPTR else ""}
 
     if make_callers:
         caller_result = string.Template (caller_template).substitute (d)
     else:
         caller_result = ""
+
+    if not USE_AUTOPTR:
+      helper_template = helper_template_no_autoptr
 
     if make_helper:
         helper_result = string.Template (helper_template).substitute (d)
@@ -435,7 +540,7 @@ goMemberFunction (Tclass* c, Tret (Tclass::*f)(${args_names}))
 
 if len(sys.argv) < 2:
     print ("""
-Make any amount of functor classes and helper functions, as well as goCaller classes.
+Make any amount of functor classes and helper functions, as well as caller classes.
 Usage: %s <max. number of arguments>
 """ % sys.argv[0])
     sys.exit ()
@@ -445,10 +550,8 @@ N = int (sys.argv[1])
 s = """
 //= Automatically created by mkfunctors.py.
 //= Part of golib, (C) copyright 2009 by Christian Gosch
-/*! @addtogroup functors
- * @{
- */
-"""
+""" + docs + header
+
 s += make_base (N)
 # Make the bases 
 for i in xrange (N):
@@ -458,5 +561,5 @@ for i in xrange (N):
     s += make_functors (i,N, base = False, make_helper = True, make_callers = True)
 
 s += """
-/*! @} */"""
+""" + footer
 print s 
