@@ -11,9 +11,9 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
+LIBS		=  -L$(GOPATH)/../lib -lGo # -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  -I$(GOPATH)/include `pkg-config pkg-config --cflags cairomm-1.0` `pkg-config pkg-config --cflags pangocairo`
 
 TARGET		= cubic
 

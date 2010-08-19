@@ -8,7 +8,7 @@ LDARGS		=  $(LDFLAGS)
 
 LIBS		=  -lGo
 
-INCLUDE		=  
+INCLUDE		=  `pkg-config --cflags cairomm-1.0 pangocairo`
 
 TARGET		= km
 

@@ -10,11 +10,11 @@ Part of golib
 (C) Copyright 2009 by Christian Gosch
 """
 
-FUNCTORBASE = "FunctorBase"
-FUNCTION    = "Function"
-FUNCTOR     = "Functor"
-CALLER      = "Caller"
-MEMBERFUNCTION = "MemberFunction"
+FUNCTORBASE = "goFunctorBase"
+FUNCTION    = "goFunction"
+FUNCTOR     = "goFunctor"
+CALLER      = "goCaller"
+MEMBERFUNCTION = "goMemberFunction"
 USE_AUTOPTR = True
 AUTOPTR     = "goAutoPtr"
 
@@ -22,8 +22,11 @@ header = """
 #ifndef GOFUNCTOR_H
 #define GOFUNCTOR_H
 
+#include <goautoptr.h>
 #include <list>
 #include <algorithm>
+#include <assert.h>
+
   /**
    * \\addtogroup functors
    * @{
@@ -138,14 +141,16 @@ class ${function}${postfix} : public ${functorbase}${postfix}<${template_args_fu
          */
         virtual Tret operator () (${args_names})
         {
-            if (myFunction)
+            assert (0 != myFunction);
+            // if (myFunction)
             {
                 return (myFunction)(${names});
             }
         }
         virtual Tret operator () (${args_names}) const
         {
-            if (myFunction)
+            assert (0 != myFunction);
+            // if (myFunction)
             {
                 return (myFunction)(${names});
             }
@@ -188,6 +193,7 @@ class ${function}${postfix}<${template_args_function_void}> : public ${functorba
          */
         virtual void operator () (${args_names})
         {
+            assert (0 != myFunction);
             if (myFunction)
             {
                 (myFunction)(${names});
@@ -195,6 +201,7 @@ class ${function}${postfix}<${template_args_function_void}> : public ${functorba
         }
         virtual void operator () (${args_names}) const
         {
+            assert (0 != myFunction);
             if (myFunction)
             {
                 (myFunction)(${names});
@@ -241,14 +248,16 @@ class ${functor}${postfix} : public ${functorbase}${postfix}<${template_args_fun
          */
         virtual Tret operator () (${args_names})
         {
-            if (myObject && myFunction)
+            assert (myObject && myFunction); 
+            // if (myObject && myFunction)
             {
                 return (myObject->*myFunction)(${names});
             }
         }
         virtual Tret operator () (${args_names}) const
         {
-            if (myObject && myFunction)
+            assert (myObject && myFunction); 
+            // if (myObject && myFunction)
             {
                 return (myObject->*myFunction)(${names});
             }
@@ -292,14 +301,16 @@ class ${functor}${postfix}<${template_args_functor_void}> : public ${functorbase
          */
         virtual void operator () (${args_names})
         {
-            if (myObject && myFunction)
+            assert (myObject && myFunction); 
+            // if (myObject && myFunction)
             {
                 (myObject->*myFunction)(${names});
             }
         }
         virtual void operator () (${args_names}) const
         {
-            if (myObject && myFunction)
+            assert (myObject && myFunction); 
+            // if (myObject && myFunction)
             {
                 (myObject->*myFunction)(${names});
             }
@@ -334,7 +345,7 @@ class ${caller}${postfix}
     public:
         ${caller}${postfix} ()
             : fList () {}
-        virtual ~${caller}${postfix} () {fList.erase ();}
+        virtual ~${caller}${postfix} () {fList.clear ();}
 
         //= Take very much care here that
         //= 1. This class gets notified if functors are destroyed.
@@ -358,10 +369,10 @@ class ${caller}${postfix}
 
         virtual void operator () (${args_names})
         {
-            typename FunctorList::iterator el = this->fList.getFrontElement ();
-            for (el = this->fList.begin (); el != this->flist.end (); ++el)
+            typename FunctorList::iterator el = this->fList.begin ();
+            for (el = this->fList.begin (); el != this->fList.end (); ++el)
             {
-                (*el)(${names});
+                (**el)(${names});
             }
         }
 
