@@ -5,18 +5,17 @@ set (TARGET cairoplot)
 set (SOURCES cairoplot.cpp)
 
 ## Cairo and Pango (for use of the goPlot library)
-pkg_search_module (CAIRO REQUIRED cairo)
-pkg_search_module (PANGO REQUIRED pango)
 pkg_search_module (GTKMM REQUIRED gtkmm-2.4)
+pkg_search_module (GOLIB REQUIRED golib)
 
-find_library (GOLIB NAMES Go PATHS $ENV{HOME}/pgm/lib)
-find_library (GOGUI NAMES Gogui PATHS $ENV{HOME}/pgm/lib)
+# find_library (GOLIB NAMES Go PATHS $ENV{HOME}/Software/lib)
+find_library (GOGUI NAMES Gogui PATHS $ENV{HOME}/Software/lib)
 
-include_directories ($ENV{GOPATH}/include $ENV{GOPATH}/gui/include ${CAIRO_INCLUDE_DIRS} ${PANGO_INCLUDE_DIRS} ${GTKMM_INCLUDE_DIRS})
+include_directories (${GOLIB_INCLUDE_DIRS} ${GTKMM_INCLUDE_DIRS})
 
 add_executable (${TARGET} ${SOURCES})
 target_link_libraries (${TARGET} 
-                       ${GOLIB}
+                       ${GOLIB_LDFLAGS}
                        ${GOGUI})
                        #${CAIRO_LDFLAGS} 
                        #${PANGO_LDFLAGS} 

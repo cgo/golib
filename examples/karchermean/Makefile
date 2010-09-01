@@ -1,12 +1,12 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
 
 CXX		= g++
-CXXARGS		= -c $(CPPFLAGS)  
+CXXARGS		= -c `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		=  $(LDFLAGS)
+LDARGS		=  $(LDFLAGS) 
 
-LIBS		=  -lGo
+LIBS		=  `pkg-config --libs golib`
 
 INCLUDE		=  `pkg-config --cflags cairomm-1.0 pangocairo`
 
