@@ -29,7 +29,7 @@ class Control : public Gtk::Frame
         virtual void print   (const char* text);
 
         //= Signals
-        SigC::Signal1<void,const goString&> signal_print;
+        sigc::signal<void,const goString&> signal_print;
 
     private:
         Control (const Control&);

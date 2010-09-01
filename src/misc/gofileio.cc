@@ -497,7 +497,7 @@ goFileIO::readImage (const char* filename, goSignal3D<void>* sig, bool linear) t
 }
 #else
 bool
-goFileIO::readImage (const char*, goSignal3D<void>*) throw (goFileIOException, goTypeException)
+goFileIO::readImage (const char*, goSignal3D<void>*, bool) throw (goFileIOException, goTypeException)
 {
     goLog::warning("goFileIO::readImage(): HAVE_LIBIL was not defined when building golib -- did you install libIL? (http://openil.sourceforge.net)");
     return false;

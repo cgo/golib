@@ -1,0 +1,10 @@
+includes=@PCINCLUDES@
+libs=@PCLIBS@
+libdir=@PCLIBDIR@
+Name: Golib
+Description: A cool C++ library.
+Version: 0.6
+URL: http://www.goschs.de
+Requires: cairo, pango, pangocairo
+Libs: ${libdir} ${libs}
+Cflags: ${includes}

@@ -9,7 +9,7 @@ CXXARGS		= -c   -D HAVE_CONFIG_H -O2
 LD		= g++
 LDARGS		= $(LDFLAGS)
 
-#GOPATH		= /home/christian/pgm/golib
+GOPATH		= /home/christian/pgm/golib
 
 LIBS		=  -lGo -lGomatlab
 

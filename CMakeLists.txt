@@ -446,6 +446,7 @@ IF (PANGOCAIRO_FOUND)
     SET (HAVE_PANGOCAIRO 1)
 ENDIF (PANGOCAIRO_FOUND)
 
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/plot/include -I${GOPATH}/extra/include -I$ENV{HOME}/include")
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
                      ${GOPATH}/plot/include
@@ -515,6 +516,13 @@ ENDIF (PTHREAD)
 
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
+
+# pkg-config file
+set (PCLIBS "-lGo")
+set (PCLIBDIR "-L${CMAKE_INSTALL_PREFIX}/lib")
+CONFIGURE_FILE (${GOPATH}/golib.pc.cmakeconfig
+                ${GOPATH}/golib.pc
+                @ONLY)
 
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
 STRING (STRIP ${EXTRA_LIBS} EXTRA_LIBS)  ## Remove trailing and leading whitespaces (leads to error in newer cmake)
