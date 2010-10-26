@@ -45,6 +45,7 @@ SET                 (SOURCES
  # src/math/variance.cpp
 
  # src/math/contours.cpp
+ src/misc/goargs.cpp
  src/misc/goofffile.cpp
  # src/misc/plot.cpp
  # src/misc/gognuplot.cpp      # not plotting in windows!
@@ -330,6 +331,14 @@ IF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 
 # SET (CMAKE_REQUIRED_INCLUDES /usr/include /usr/local/include)
+
+find_file (CLAPACK_H clapack.h PATHS /usr/include/atlas /usr/include ${CMAKE_INSTALL_PREFIX}/include)
+if (CLAPACK_H)
+    get_filename_component (tmp ${CLAPACK_H} PATH)
+    message ("Location: ${tmp}")
+    include_directories (${tmp})
+endif (CLAPACK_H)
+
 
 CHECK_INCLUDE_FILE (ieee754.h   HAVE_IEEE754_H)
 CHECK_INCLUDE_FILE (dirent.h    HAVE_DIRENT_H)

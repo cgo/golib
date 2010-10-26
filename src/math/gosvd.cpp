@@ -5,6 +5,8 @@
 # include <golapack.h>
 #endif
 
+#include <golib_clapack.h>
+
 #ifdef min
 # undef min
 #endif

@@ -11,7 +11,7 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
+LIBS		=  -L$(GOPATH)/../lib -lGo #-lGomatlab
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
 

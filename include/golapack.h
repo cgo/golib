@@ -11,6 +11,7 @@
 #undef max
 #undef min
 
+#include <golib_clapack.h>
 
 
 namespace goMath {

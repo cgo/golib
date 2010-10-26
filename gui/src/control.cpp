@@ -54,7 +54,7 @@ void Control::message (const char* text)
 
 void Control::print (const char* text)
 {
-    this->signal_print (goString(text));
+    // this->signal_print (goString(text));
 }
 
 };

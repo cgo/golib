@@ -6,7 +6,7 @@ SET (TARGET _gogl)
 
 add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/gogl_wrap.cxx
                     COMMAND ${SWIG_EXECUTABLE} 
-                        ARGS -I../include -python -fcompact -addextern -c++ gogl.i
+                        ARGS -I../include -I../../include -python -fcompact -addextern -c++ gogl.i
                         DEPENDS gogl.i
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 #EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
