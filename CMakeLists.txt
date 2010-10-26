@@ -334,9 +334,9 @@ ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 
 find_file (CLAPACK_H clapack.h PATHS /usr/include/atlas /usr/include ${CMAKE_INSTALL_PREFIX}/include)
 if (CLAPACK_H)
-    get_filename_component (tmp ${CLAPACK_H} PATH)
-    message ("Location: ${tmp}")
-    include_directories (${tmp})
+    get_filename_component (CLAPACK_INCLUDE_DIR ${CLAPACK_H} PATH)
+    message ("Location: ${CLAPACK_INCLUDE_DIR}")
+    include_directories (${CLAPACK_INCLUDE_DIR})
 endif (CLAPACK_H)
 
 
@@ -527,10 +527,12 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 # pkg-config file
 set (PCLIBS "-lGo")
-set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/plot/include -I${GOPATH}/extra/include -I${GOPATH}/gui/include")
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/plot/include -I${GOPATH}/extra/include -I${GOPATH}/gui/include -I${CLAPACK_INCLUDE_DIR}")
 if (BUILD_GUI_MODULE)
     set (PCLIBS "${PCLIBS} -lGogui")
 endif (BUILD_GUI_MODULE)
+
+set (GOLIB_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
 
 set (PCLIBDIR "-L${CMAKE_INSTALL_PREFIX}/lib")
 CONFIGURE_FILE (${GOPATH}/golib.pc.cmakeconfig
@@ -542,6 +544,7 @@ STRING (STRIP ${EXTRA_LIBS} EXTRA_LIBS)  ## Remove trailing and leading whitespa
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 INSTALL_TARGETS     (/lib ${TARGETNAME})
+INSTALL (FILES ${GOPATH}/golib.pc DESTINATION ${GOLIB_PKG_CONFIG_INSTALL_DIR})
 
 #IF (BUILD_PYTHON_EMBED)
 #    SET_TARGET_PROPERTIES (${TARGETNAME} PROPERTIES LINK_FLAGS ${PYTHON_LDFLAGS})
