@@ -1,0 +1,3 @@
+c2hs -l test.chs
+g++ test.cpp -c -o testc.o
+ghc --make test.hs testc.o -lstdc++
