@@ -1,3 +1,3 @@
 c2hs -l test.chs
-g++ test.cpp -c -o testc.o
-ghc --make test.hs testc.o -lstdc++
+g++ test.cpp -c -o testc.o `pkg-config --cflags golib`
+ghc --make test.hs testc.o -lstdc++ `pkg-config --libs-only-l golib` `pkg-config --libs-only-L golib`
