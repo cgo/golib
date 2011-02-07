@@ -527,7 +527,7 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 # pkg-config file
 set (PCLIBS "-lGo")
-set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/plot/include -I${GOPATH}/extra/include -I${GOPATH}/gui/include -I${CLAPACK_INCLUDE_DIR}")
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${CLAPACK_INCLUDE_DIR}")
 if (BUILD_GUI_MODULE)
     set (PCLIBS "${PCLIBS} -lGogui")
 endif (BUILD_GUI_MODULE)

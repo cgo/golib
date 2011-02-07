@@ -24,7 +24,7 @@ import Foreign.Storable
 
 goMatrixOutMarshal = newForeignPtr goMatrixFinalize
 
-foreign import ccall "test.h &golib_matrix_destroy"
+foreign import ccall "matrix.h &golib_matrix_destroy"
 	goMatrixFinalize :: FunPtr (Ptr GoMatrix -> IO ())
 
 
