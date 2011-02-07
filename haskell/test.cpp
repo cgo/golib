@@ -18,6 +18,8 @@ golib_matrix* golib_matrix_new ()
 
 void golib_matrix_destroy (golib_matrix* m)
 {
+  std::cout << "Deleting a matrix...";
   delete static_cast<goMath::Matrix<double>*>(m->object);
   delete m;
+  std::cout << "done deleting.\n";
 }

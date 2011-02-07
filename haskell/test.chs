@@ -1,6 +1,10 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
+module Golib
+(GoMatrix,
+ matrixNew) where
+
 import C2HS
 import Foreign.C.Types
 import Foreign.Ptr
@@ -15,10 +19,18 @@ import Foreign.Storable
 -- {# fun unsafe test as test {} -> `Int' peekIntConv*  #}
 {# fun unsafe test as test {} -> `Int' #}
 
-{# pointer *golib_matrix as Matrix foreign newtype #}
-{# fun unsafe golib_matrix_new as matrixNew {} -> `Ptr Matrix' id #}
--- {# fun unsafe golib_matrix_new as matrixNew {} -> `Matrix' id #}
+{# pointer *golib_matrix as GoMatrix foreign newtype #}
+{# fun unsafe golib_matrix_new as matrixNew {} -> `ForeignPtr GoMatrix' goMatrixOutMarshal #}
 
-main = do
+goMatrixOutMarshal = newForeignPtr goMatrixFinalize
+
+foreign import ccall "test.h &golib_matrix_destroy"
+	goMatrixFinalize :: FunPtr (Ptr GoMatrix -> IO ())
+
+
+
+-- {# fun unsafe golib_matrix_new as matrixNew {} -> `GoMatrix' id #}
+
+{- main = do
      n <- test
-     putStrLn $ "test () yields " ++ show n
+     putStrLn $ "test () yields " ++ show n -}
