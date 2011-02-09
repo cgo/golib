@@ -81,6 +81,7 @@ namespace goMath {
                 bool setData (const T* data, goSize_t r, goSize_t c, goSize_t leadingDim = 0) const;
 
                 bool resize (goSize_t rows, goSize_t cols);
+		bool reshape (goSize_t rows, goSize_t cols);
 
                 template <class To>
                     bool resize (const Matrix<To>& o)

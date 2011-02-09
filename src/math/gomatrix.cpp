@@ -179,32 +179,70 @@ typename goMath::Matrix<T>::const_col_iterator goMath::Matrix<T>::colEnd () cons
 template <class T>
 bool goMath::Matrix<T>::resize (goSize_t rows, goSize_t cols)
 {
-    if (!this->externalData && this->matrix)
-    {
-        delete[] this->matrix;
-        this->matrix = 0;
-    }
-    if (rows * cols > 0)
-    {
-        this->matrix = new T[rows * cols];
-    }
-    else
-    {
-        this->matrix = 0;
-    }
-    this->rows = rows;
-    this->columns = cols;
-    if (goMath::Matrix<T>::rowMajor)
-    {
-        this->leadingDimension = cols;
-    }
-    else
-    {
-        this->leadingDimension = rows;
-    }
-    this->externalData = false;
-    return true;
+  if (!this->externalData && this->matrix)
+  {
+    delete[] this->matrix;
+    this->matrix = 0;
+  }
+  if (rows * cols == 0)
+  {
+    this->matrix = 0;
+  }
+  else 
+  {
+    this->matrix = new T[rows * cols];
+  }
+
+  this->rows = rows;
+  this->columns = cols;
+  if (goMath::Matrix<T>::rowMajor)
+  {
+    this->leadingDimension = cols;
+  }
+  else
+  {
+    this->leadingDimension = rows;
+  }
+  this->externalData = false;
+  return true;
 }
+
+/** 
+ * @brief Reshape this matrix as long as the new shape results in the same
+ total number of elements.
+
+ If the number rows*cols is the same as this->getRows()*this->getColumns(),
+ the matrix is reshaped; the data are not touched in any way.
+ Nothing is reallocated.
+
+ * @param rows Number of rows of the new shape
+ * @param cols Number of columns of the new shape
+ * 
+ * @return True on success, false otherwise.
+ */
+template <class T>
+bool goMath::Matrix<T>::reshape (goSize_t rows, goSize_t cols)
+{
+  if (rows * cols != this->getRows() * this->getColumns())
+  {
+    return false;
+  }
+
+  this->rows = rows;
+  this->columns = cols;
+  if (goMath::Matrix<T>::rowMajor)
+  {
+    this->leadingDimension = cols;
+  }
+  else
+  {
+    this->leadingDimension = rows;
+  }
+
+  return true;
+}
+
+
 
 /** 
  * @brief Set external data.
@@ -543,16 +581,15 @@ bool goMath::Matrix<T>::copy (goMath::Matrix<T>& target) const
 template <class T>
 void goMath::Matrix<T>::transpose ()
 {
-    if (this->externalData)
-    {
-        goLog::warning ("goMath::Matrix::transpose() called on a matrix with external data. The matrix will not be a reference to the external data any more -- is this what you want?");
-    }
     goMath::Matrix<T> temp;
     this->getTranspose(temp);
-    if (this->externalData)
+
+    if (true != this->reshape (this->getColumns(), this->getRows()))
     {
-        this->resize (0, 0);
+      goLog::error ("Matrix: Reshaping for transpose() did not work.");
+      return;
     }
+
     *this = temp;
 }
 
@@ -993,7 +1030,10 @@ goMath::Matrix<T>& goMath::Matrix<T>::operator= (const goMath::Matrix<T>& other)
 {
     if (this->rows != other.getRows() || this->columns != other.getColumns())
     {
-        this->resize (other.getRows(), other.getColumns());
+      if (true != this->reshape (other.getRows(), other.getColumns()))
+      {
+	this->resize (other.getRows(), other.getColumns());
+      }
     }
     goSize_t C = this->getColumns();
     goSize_t R = this->getRows();
