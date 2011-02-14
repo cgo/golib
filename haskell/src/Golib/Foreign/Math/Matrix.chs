@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module Golib.Foreign.Math.Matrix
-(GoMatrix,
+(GoMatrix(..),
  goMatrixRowCount,
  goMatrixColCount,
  goMatrixGetElem,
@@ -25,13 +25,13 @@ import Foreign.Storable
 {# pointer *golib_matrix as GoMatrix newtype #}
 -- {# fun unsafe golib_matrix_new as matrixNew' {} -> `Ptr GoMatrix' id #}
 
-matrixNew = goMatrixNew >>= newForeignPtr goMatrixFinalize
+matrixNew r c = goMatrixNew r c >>= newForeignPtr goMatrixFinalize
 
 foreign import ccall "matrix.h &golib_matrix_destroy"
 	goMatrixFinalize :: FunPtr (Ptr GoMatrix -> IO ())
 
 foreign import ccall "matrix.h golib_matrix_new"
-	goMatrixNew :: IO (Ptr GoMatrix)
+	goMatrixNew :: CSize -> CSize -> IO (Ptr GoMatrix)
 
 foreign import ccall "matrix.h golib_matrix_row_count"
 	goMatrixRowCount :: Ptr GoMatrix -> IO CSize

@@ -43,7 +43,7 @@ Cabal-version:       >=1.2
 
 Library
   -- Modules exported by the library.
-  Exposed-modules:   Golib, Golib.Foreign.Math.Matrix, Golib.Math.Matrix
+  Exposed-modules:   Golib, Golib.Foreign.Math.Matrix, Golib.Math.Matrix, Golib.Math.MMatrix
   Other-modules: C2HS
   pkgconfig-depends: golib
   include-dirs: .

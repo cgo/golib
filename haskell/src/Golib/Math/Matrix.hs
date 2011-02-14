@@ -2,34 +2,34 @@
 module Golib.Math.Matrix
        (   MatrixClass(..)
          , Dummy (..)
-         , Index  
         ) where
 
 import Golib.Foreign.Math.Matrix
 
-newtype Index = Index Int deriving Show
-
-class MatrixClass a m | m -> a where
-  shape ::  m -> (Index, Index)
-  rowCount :: m -> Index
-  colCount :: m -> Index
-  shape m  = (rowCount m, colCount m)
+class MatrixClass i a mat | mat -> a, mat -> i where
+  shape    :: mat -> (i, i)
+  rowCount :: mat -> i
+  colCount :: mat -> i
+  shape mat = (rowCount mat, colCount mat)
   rowCount = fst . shape
   colCount = snd . shape
   
+--  (!) :: mat -> (i, i) -> a
   -- Scalar mult
-  (*>) :: a -> m -> m
+  (*>) :: a -> mat -> mat
+--  (<*) :: mat -> a -> mat
   -- Matrix mult
-  (<**>) :: m -> m -> m
+  (<**>) :: mat -> mat -> mat
   -- Matrix vector mult
-  -- (<*>) :: (VectorClass v) => m -> v -> v
+  -- (<**) :: (VectorClass v) => m -> v -> v
+  -- (**>) :: (VectorClass v) => v -> m -> v
   
 
 newtype Dummy = Dummy Int deriving Show
 
-instance MatrixClass Double Dummy where
-  shape _ = (Index 3, Index 4)
+instance MatrixClass Int Double Dummy where
+  shape _ = (3, 4)
   s *> m = m
   m1 <**> m2 = m2
   
-  
+

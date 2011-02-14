@@ -12,12 +12,21 @@ template class goMath::Matrix<double>;
 
 typedef goMath::Matrix<double> matrix_t;
 
-golib_matrix* golib_matrix_new ()
+golib_matrix* golib_matrix_new (size_t rows, size_t cols)
 {
-  golib_matrix* ret = new golib_matrix;
-  matrix_t* m = new matrix_t (3,3);
+  matrix_t*	m   = new matrix_t (rows, cols);
+  if (0 == m)
+  {
+    return 0;
+  }
   m->setIdentity ();
-  ret->object = m;
+  golib_matrix* ret = new golib_matrix;
+  if (0 == ret)
+  {
+    delete m;
+    return 0;
+  }
+  ret->object	    = m;
   return ret;
 }
 

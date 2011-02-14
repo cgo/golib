@@ -11,7 +11,7 @@ extern "C"
     void* object;
   } golib_matrix;
 
-  golib_matrix* golib_matrix_new ();
+  golib_matrix* golib_matrix_new (size_t rows, size_t cols);
   void		golib_matrix_destroy (golib_matrix*);
   size_t	golib_matrix_row_count (golib_matrix* m);
   size_t	golib_matrix_col_count (golib_matrix* m);
