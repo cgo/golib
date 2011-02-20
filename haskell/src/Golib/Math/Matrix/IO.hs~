@@ -1,0 +1,7 @@
+module Golib.Math.Matrix.IO
+       (MatrixClass(..),
+        Dummy (..),
+        Matrix,
+        matrix,
+        matrixMapM
+       ) where

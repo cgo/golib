@@ -1,0 +1,11 @@
+module Golib.Math.Matrix.Monadic
+       (matrixMapM) where
+
+-- FIXME: Das soll eine neue Matrix zurueckgeben; 
+-- ich brauche eine ST-Variante der Matrix, so dass ich auftauen, einfrieren
+-- und modifizieren kann.
+matrixMapM :: (Monad m, Integral i, MM.MMatrixClass i a mat m) => (a -> a) -> mat -> m [a]
+matrixMapM f m = 
+  MM.shape m >>= \(r,c) ->
+  mapM (\i -> m MM.! i) [(fromIntegral i,fromIntegral j) | i <- [0..(r-1)], j <- [0..(c-1)]] >>=
+  return . map f

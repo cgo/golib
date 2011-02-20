@@ -1,0 +1,11 @@
+cmake_minimum_required (VERSION 2.8)
+include (FindPkgConfig)
+
+project (hsgolib)
+set (target hsgolib)
+set (sources matrix.cpp)
+pkg_search_module (golib REQUIRED golib)
+include_directories (${golib_INCLUDE_DIRS})
+add_library (${target} STATIC ${sources})
+target_link_libraries (${target} ${golib_LDFLAGS})
+install_targets (/ ${target})

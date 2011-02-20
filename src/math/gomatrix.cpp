@@ -35,12 +35,12 @@ const bool goMath::Matrix<T>::rowMajor = true;
 * @param x Number of columns.
 */
 template <class T>
-goMath::Matrix<T>::Matrix (goSize_t rows, goSize_t cols)
-    : externalData (false), matrix (0), rows (rows), columns (cols), leadingDimension (cols)
+goMath::Matrix<T>::Matrix (goSize_t r, goSize_t c)
+    : externalData (false), matrix (0), rows (0), columns (0), leadingDimension (c)
 {
-    if (rows * cols > 0)
+  if (true != this->resize (r, c))
     {
-        this->matrix = new T[rows * cols];
+      this->resize (0, 0);
     }
 }
 
@@ -190,9 +190,24 @@ bool goMath::Matrix<T>::resize (goSize_t rows, goSize_t cols)
   }
   else 
   {
-    this->matrix = new T[rows * cols];
+    // Check if the target size fits in our memory space at all:
+    int bits = ilogb (rows) + ilogb (cols) + ilogb (sizeof(T));
+    if (bits > (sizeof(std::size_t) << 3))
+      {
+	this->matrix  = 0;
+	this->columns = 0;
+	this->rows    = 0;
+	return false;
+      }
+    this->matrix = new (std::nothrow) T[rows * cols];
+    if (0 == this->matrix)
+      {
+	this->rows	  = 0;
+	this->columns = 0;
+	return false;
+      }
   }
-
+  
   this->rows = rows;
   this->columns = cols;
   if (goMath::Matrix<T>::rowMajor)
