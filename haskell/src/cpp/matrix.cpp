@@ -77,19 +77,51 @@ void golib_matrix_destroy (golib_matrix* m)
 
 size_t golib_matrix_row_count (golib_matrix* m)
 {
-  return static_cast<size_t> (static_cast<matrix_t*>(m->object)->getRows ());
+  return static_cast<size_t> (get_matrix_t(m)->getRows ());
 }
 
 size_t golib_matrix_col_count (golib_matrix* m)
 {
-  return static_cast<size_t> (static_cast<matrix_t*>(m->object)->getColumns ());
+  return static_cast<size_t> (get_matrix_t(m)->getColumns ());
 }
 
 double golib_matrix_get_elem (golib_matrix* m, size_t row, size_t col)
 {
-  matrix_t* mat = static_cast<matrix_t*>(m->object);
-  return (*mat)(row,col);
+  return (*static_cast<const matrix_t*>(get_matrix_t(m))) (row, col);
 }
+
+void golib_matrix_set_elem (golib_matrix* m, size_t row, size_t col, double elem)
+{
+  get_matrix_t(m)->operator() (row, col) = elem;
+}
+
+void golib_matrix_fill (golib_matrix* m, double elem)
+{
+  get_matrix_t(m)->fill (elem);
+}
+
+void golib_matrix_transpose (golib_matrix* m)
+{
+  get_matrix_t(m)->transpose();
+}
+
+int golib_matrix_equals (golib_matrix* a, golib_matrix* b)
+{
+  if (*get_matrix_t(a) == *get_matrix_t(b))
+    {
+      return 1;
+    }
+  else
+    {
+      return 0;
+    }
+}
+
+void golib_matrix_copy (golib_matrix* source, golib_matrix* target)
+{
+  *get_matrix_t(target) = *get_matrix_t(source);
+}
+
 
 void golib_matrix_matrix_mult (double alpha, const golib_matrix* A, int transA,
 			       const golib_matrix* B, int transB, double beta, golib_matrix* C)

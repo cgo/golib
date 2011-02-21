@@ -15,10 +15,8 @@ import Foreign.C.Types
 import Foreign
 import Ix
 
-data Matrix = Matrix GoMatrix
+data Matrix = Matrix IOMatrix
 
-
--- instance Eq GoMatrix where
 
 instance MatrixClass Int Double Matrix where
   rowCount (Matrix gm) = unsafePerformIO . MIO.rowCountIO $ gm
@@ -26,7 +24,11 @@ instance MatrixClass Int Double Matrix where
   (Matrix m) ! (r,c) = unsafePerformIO $ m MIO.! (r,c)
   -- a *> mat = mat
   (Matrix m1) <**> (Matrix m2) = Matrix $ unsafePerformIO $ MIO.matrixMultIO 1 m1 NoTrans m2 NoTrans
-  
+{- NOINLINE (<**>) #-}  
+{- NOINLINE (!) #-}  
+{- NOINLINE rowCount #-}  
+{- NOINLINE colCount #-}  
+
 
 
 {-| Construct a new matrix of given shape. 
@@ -37,7 +39,7 @@ matrix r c = Matrix $ unsafePerformIO matrix'
     r' = fromIntegral r
     c' = fromIntegral c
     matrix' = matrixNew r' c'
-{-# INLINE matrix #-}
+{-# NOINLINE matrix #-}
     
 toList :: (Integral i, Num a, MatrixClass i a mat) => mat -> [a]
 toList mat = let (r,c) = shape mat

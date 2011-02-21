@@ -17,9 +17,17 @@ extern "C"
   size_t	golib_matrix_row_count (golib_matrix* m);
   size_t	golib_matrix_col_count (golib_matrix* m);
   double	golib_matrix_get_elem (golib_matrix* m, size_t row, size_t col);
+  void          golib_matrix_set_elem (golib_matrix* m, size_t row, size_t col, double elem);
+  void          golib_matrix_fill (golib_matrix* m, double elem);
+  void          golib_matrix_transpose (golib_matrix* m);
 
   void          golib_matrix_matrix_mult (double alpha, const golib_matrix* A, int transA,
 					  const golib_matrix* B, int transB, double beta, golib_matrix* C);
+
+  void          golib_matrix_copy (golib_matrix* source, golib_matrix* target);
+  int           golib_matrix_equals (golib_matrix* a, golib_matrix* b);
+
+
 
   // void       golib_matrix_scalar_mult (double s, golib_matrix* m);
 
