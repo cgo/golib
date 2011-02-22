@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module Golib.Foreign.Math.Matrix
-(IOMatrix,
+(Matrix,
  goMatrixRowCount,
  goMatrixColCount,
  goMatrixGetElem,
@@ -13,7 +13,7 @@ module Golib.Foreign.Math.Matrix
  goMatrixCopy,
  goMatrixEquals,
  matrixNew,
- withIOMatrix) where
+ withMatrix) where
 
 import C2HS
 import Foreign.C.Types
@@ -29,8 +29,8 @@ import Foreign.Storable
 -- {# fun unsafe test as test {} -> `Int' peekIntConv*  #}
 {# fun unsafe test as test {} -> `Int' #}
 
-{# pointer *golib_matrix as IOMatrix foreign newtype #}
--- {# fun unsafe golib_matrix_new as matrixNew' {} -> `Ptr IOMatrix' id #}
+{# pointer *golib_matrix as Matrix foreign newtype #}
+-- {# fun unsafe golib_matrix_new as matrixNew' {} -> `Ptr Matrix' id #}
 
 matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
   checkNullPtr mp >>= \n ->
@@ -38,10 +38,10 @@ matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
   then error ("Matrix: allocation error when allocating " ++ show r ++ "," ++
               show c ++ " matrix!")
   else return () >>
-  newForeignPtr goMatrixFinalize mp >>= return . IOMatrix
+  newForeignPtr goMatrixFinalize mp >>= return . Matrix
 -- These are generated automatically by the above c2hs line.
---withIOMatrix :: IOMatrix -> (Ptr IOMatrix -> IO a) -> IO a
---withIOMatrix (IOMatrix m) = withForeignPtr m
+--withMatrix :: Matrix -> (Ptr Matrix -> IO a) -> IO a
+--withMatrix (Matrix m) = withForeignPtr m
 
 checkNullPtr :: Ptr a -> IO Bool
 checkNullPtr p = goCheckNullPtr (castPtr p) >>= \i ->
@@ -54,38 +54,38 @@ foreign import ccall "matrix.h golib_check_null_ptr"
   goCheckNullPtr :: Ptr () -> IO CInt
 
 foreign import ccall "matrix.h &golib_matrix_destroy"
-  goMatrixFinalize :: FunPtr (Ptr IOMatrix -> IO ())
+  goMatrixFinalize :: FunPtr (Ptr Matrix -> IO ())
 
 foreign import ccall "matrix.h golib_matrix_new"
-  goMatrixNew :: CSize -> CSize -> IO (Ptr IOMatrix)
+  goMatrixNew :: CSize -> CSize -> IO (Ptr Matrix)
 
 foreign import ccall "matrix.h golib_matrix_row_count"
-  goMatrixRowCount :: Ptr IOMatrix -> IO CSize
+  goMatrixRowCount :: Ptr Matrix -> IO CSize
 foreign import ccall "matrix.h golib_matrix_col_count"
-  goMatrixColCount :: Ptr IOMatrix -> IO CSize
+  goMatrixColCount :: Ptr Matrix -> IO CSize
 
 foreign import ccall "matrix.h golib_matrix_get_elem"
-  goMatrixGetElem :: Ptr IOMatrix -> CSize -> CSize -> IO CDouble
+  goMatrixGetElem :: Ptr Matrix -> CSize -> CSize -> IO CDouble
 
 foreign import ccall "matrix.h golib_matrix_set_elem"
-  goMatrixSetElem :: Ptr IOMatrix -> CSize -> CSize -> CDouble -> IO ()
+  goMatrixSetElem :: Ptr Matrix -> CSize -> CSize -> CDouble -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_fill"
-  goMatrixFill :: Ptr IOMatrix -> CDouble -> IO ()
+  goMatrixFill :: Ptr Matrix -> CDouble -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_transpose"
-  goMatrixTranspose :: Ptr IOMatrix -> IO ()
+  goMatrixTranspose :: Ptr Matrix -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_matrix_mult"
-  goMatrixMatrixMult :: CDouble -> Ptr IOMatrix -> CInt -> Ptr IOMatrix -> CInt -> CDouble -> Ptr IOMatrix -> IO ()
+  goMatrixMatrixMult :: CDouble -> Ptr Matrix -> CInt -> Ptr Matrix -> CInt -> CDouble -> Ptr Matrix -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_copy"
-  goMatrixCopy :: Ptr IOMatrix -> Ptr IOMatrix -> IO ()
+  goMatrixCopy :: Ptr Matrix -> Ptr Matrix -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_equals"
-  goMatrixEquals :: Ptr IOMatrix -> Ptr IOMatrix -> IO CInt
+  goMatrixEquals :: Ptr Matrix -> Ptr Matrix -> IO CInt
 
--- {# fun unsafe golib_matrix_new as matrixNew {} -> `IOMatrix' id #}
+-- {# fun unsafe golib_matrix_new as matrixNew {} -> `Matrix' id #}
 
 {- main = do
      n <- test
