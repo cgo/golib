@@ -91,10 +91,8 @@ golib_matrix* golib_matrix_new (size_t rows, size_t cols)
 
 void golib_matrix_destroy (golib_matrix* m)
 {
-  std::cout << "Deleting a matrix...";
   delete static_cast<matrix_t*>(m->object);
   delete m;
-  std::cout << "done deleting.\n";
 }
 
 size_t golib_matrix_row_count (golib_matrix* m)

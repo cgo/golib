@@ -8,6 +8,7 @@ module Golib.Math.Matrix
         setElems,
         prettyPrintMatrix,
         invert,
+        pseudoInverse,
         trans,
         module Golib.Math.Matrix.Class,
         module Golib.Math.Matrix.Base,
@@ -101,6 +102,11 @@ invert m = unsafePerformIO $ invertIO m
 trans :: Matrix -> Matrix
 trans m = fromJust . unsafePerformIO $ transposeIO m -- Assuming transposition always works (why shouldn't it?)
 
+
+{-| P^T (P P^T)^(-1)  --  works only for fat matrices (?) -}
+pseudoInverse :: Matrix -> Maybe Matrix
+pseudoInverse m = invert (m <**> mT) >>= \mmT' -> return $ mT <**> mmT'
+  where mT = trans m
 
 prettyPrintMatrix :: Matrix -> [String]
 prettyPrintMatrix m = map ppl $ toLists m
