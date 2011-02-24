@@ -9,6 +9,8 @@ module Golib.Foreign.Math.Matrix
  goMatrixSetElem,
  goMatrixFill,
  goMatrixTranspose,
+ goMatrixTransposeTo,
+ goMatrixInvert,
  goMatrixMatrixMult,
  goMatrixCopy,
  goMatrixEquals,
@@ -68,13 +70,19 @@ foreign import ccall "matrix.h golib_matrix_get_elem"
   goMatrixGetElem :: Ptr Matrix -> CSize -> CSize -> IO CDouble
 
 foreign import ccall "matrix.h golib_matrix_set_elem"
-  goMatrixSetElem :: Ptr Matrix -> CSize -> CSize -> CDouble -> IO ()
+  goMatrixSetElem :: Ptr Matrix -> CSize -> CSize -> CDouble -> IO CInt
 
 foreign import ccall "matrix.h golib_matrix_fill"
   goMatrixFill :: Ptr Matrix -> CDouble -> IO ()
 
 foreign import ccall "matrix.h golib_matrix_transpose"
-  goMatrixTranspose :: Ptr Matrix -> IO ()
+  goMatrixTranspose :: Ptr Matrix -> IO CInt
+
+foreign import ccall "matrix.h golib_matrix_transpose_to"
+  goMatrixTransposeTo :: Ptr Matrix -> Ptr Matrix -> IO CInt
+                        
+foreign import ccall "matrix.h golib_matrix_invert"
+  goMatrixInvert :: Ptr Matrix -> IO CInt
 
 foreign import ccall "matrix.h golib_matrix_matrix_mult"
   goMatrixMatrixMult :: CDouble -> Ptr Matrix -> CInt -> Ptr Matrix -> CInt -> CDouble -> Ptr Matrix -> IO ()

@@ -4,7 +4,6 @@ import Golib.Foreign.Math.Matrix
 import Foreign.C.Types
 
 import Golib.Math.Matrix
-import Golib.Math.Matrix.Monadic
 
 forEachElem :: Matrix -> (CDouble -> IO b) -> IO [b]
 forEachElem m f = do

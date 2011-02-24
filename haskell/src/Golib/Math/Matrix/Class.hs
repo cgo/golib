@@ -38,9 +38,6 @@ toLists mat = let (r,c) = shape mat
               in [[mat ! (i,j) | j <- [0..(c-1)]] | i <- [0..(r-1)]]
 
 
--- fromList :: (Integral i, Num a, MatrixClass i a mat) => i -> i -> [a] -> mat
--- fromList r c l = 
-
 -- FIXME: Das soll eine neue Matrix zurueckgeben; 
 -- ich brauche eine ST-Variante der Matrix, so dass ich auftauen, einfrieren
 -- und modifizieren kann.

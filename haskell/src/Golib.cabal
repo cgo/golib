@@ -46,9 +46,7 @@ Library
   Exposed-modules:   Golib, 
                      Golib.Foreign.Math.Matrix, 
                      Golib.Math.Matrix,
-                     Golib.Math.Matrix.Monadic,
                      Golib.Math.Matrix.Class, 
-                     Golib.Math.Matrix.Class.Monadic,
                      Golib.Math.Matrix.Base
   Other-modules: C2HS
   pkgconfig-depends: golib

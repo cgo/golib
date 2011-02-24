@@ -89,8 +89,8 @@ namespace goMath {
                         return this->resize (o.getRows(),o.getColumns());
                     }
 
-                void transpose ();
-                void getTranspose (Matrix<T>& trans) const;
+                bool transpose ();
+                bool getTranspose (Matrix<T>& trans) const;
                 Matrix<T> getTranspose () const;
 
                 bool invert ();

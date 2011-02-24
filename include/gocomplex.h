@@ -18,7 +18,7 @@ class goComplex
         goComplex  () : real (T(0)), ima (T(0)) {}
         goComplex  (T r, T i = T(0)) : real (r), ima (i) {}
         goComplex  (const goComplex<T>& other) { *this = other; }
-        virtual ~goComplex () {}
+        ~goComplex () {}
 
         inline T&	re () { return real; }
         inline T&	im () { return ima; }

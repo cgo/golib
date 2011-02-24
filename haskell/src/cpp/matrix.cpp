@@ -22,6 +22,16 @@ const matrix_t* get_matrix_t (const golib_matrix* m)
   return static_cast<const matrix_t*> (m->object);
 }
 
+int fromBool (bool b)
+{
+  switch (b)
+  {
+    case true: return 1; break;
+    case false: return 0; break;
+  }
+}
+
+
 int golib_check_null_ptr (void* p)
 {
   if (0 == p)
@@ -32,6 +42,18 @@ int golib_check_null_ptr (void* p)
     {
       return 0;
     }
+}
+
+static inline bool rangeCheck (golib_matrix* m, size_t i, size_t j)
+{
+  if (i < get_matrix_t(m)->getRows() && j < get_matrix_t(m)->getColumns())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 golib_matrix* golib_matrix_new (size_t rows, size_t cols)
@@ -90,9 +112,14 @@ double golib_matrix_get_elem (golib_matrix* m, size_t row, size_t col)
   return (*static_cast<const matrix_t*>(get_matrix_t(m))) (row, col);
 }
 
-void golib_matrix_set_elem (golib_matrix* m, size_t row, size_t col, double elem)
+int golib_matrix_set_elem (golib_matrix* m, size_t row, size_t col, double elem)
 {
+  if (true != rangeCheck (m, row, col))
+  {
+    return fromBool (false);
+  }
   get_matrix_t(m)->operator() (row, col) = elem;
+  return fromBool (true);
 }
 
 void golib_matrix_fill (golib_matrix* m, double elem)
@@ -100,9 +127,19 @@ void golib_matrix_fill (golib_matrix* m, double elem)
   get_matrix_t(m)->fill (elem);
 }
 
-void golib_matrix_transpose (golib_matrix* m)
+int golib_matrix_transpose (golib_matrix* m)
 {
-  get_matrix_t(m)->transpose();
+  return fromBool (get_matrix_t(m)->transpose());
+}
+
+int golib_matrix_transpose_to (golib_matrix* source, golib_matrix* target)
+{
+  return fromBool (get_matrix_t(source)->getTranspose (*get_matrix_t(target)));
+}
+
+int golib_matrix_invert (golib_matrix* m)
+{
+  return fromBool (get_matrix_t(m)->invert ());
 }
 
 int golib_matrix_equals (golib_matrix* a, golib_matrix* b)

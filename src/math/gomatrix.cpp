@@ -345,11 +345,14 @@ bool goMath::Matrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t
  * @param trans Contains the transpose after the method returned.
  */
 template <class T>
-void goMath::Matrix<T>::getTranspose (goMath::Matrix<T>& trans) const
+bool goMath::Matrix<T>::getTranspose (goMath::Matrix<T>& trans) const
 {
     if (trans.getColumns() != this->getRows() || trans.getRows() != this->getColumns())
     {
-        trans.resize (this->getColumns(), this->getRows());
+      if (true != trans.resize (this->getColumns(), this->getRows()))
+        {
+          return false;
+        }
     }
     goSize_t i;
     goSize_t j;
@@ -362,6 +365,7 @@ void goMath::Matrix<T>::getTranspose (goMath::Matrix<T>& trans) const
             trans(j,i) = (*this)(i,j);
         }
     }
+    return true;
 }
 
 template <class T>
@@ -594,15 +598,18 @@ bool goMath::Matrix<T>::copy (goMath::Matrix<T>& target) const
  * For Multiplication with transposition, use goMath::MatrixMult().
  */
 template <class T>
-void goMath::Matrix<T>::transpose ()
+bool goMath::Matrix<T>::transpose ()
 {
-    goMath::Matrix<T> temp;
-    this->getTranspose(temp);
+  goMath::Matrix<T> temp;
+  if (true != this->getTranspose(temp))
+    {
+      return false;
+    }
 
     if (true != this->reshape (this->getColumns(), this->getRows()))
     {
-      goLog::error ("Matrix: Reshaping for transpose() did not work.");
-      return;
+      // goLog::error ("Matrix: Reshaping for transpose() did not work.");
+      return false;
     }
 
     *this = temp;
@@ -1564,14 +1571,14 @@ namespace goMath {
         };
 
     template <>
-        bool Matrix<goFloat>::invert ()
+    bool Matrix<goFloat>::invert ()
         {
             //= Factorise A P = L U
             goSize_t M = this->getColumns();
             if (M != this->getRows())
             {
-                goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
-                return false;
+              // goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
+              return false;
             }
             int* P = new int [M];
             if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
@@ -1597,8 +1604,8 @@ namespace goMath {
             //= Factorise A P = L U
             goSize_t M = this->getColumns();
             if (M != this->getRows())
-            {
-                goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
+              {
+                // goLog::warning ("goMath::Matrix::invert(): tried to invert non-quadratic matrix.");
                 return false;
             }
             int* P = new int [M * M];
