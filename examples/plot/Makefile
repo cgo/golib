@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		=  
+LDARGS		=  `pkg-config --libs golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L/space/gosch/lib -lGo -lGomatlab -L/usr/lib/atlas -llapack -latlas
+LIBS		=  # -L/space/gosch/lib -lGo -lGomatlab -L/usr/lib/atlas -llapack -latlas
 
 INCLUDE		=  -I$(GOPATH)/include
 

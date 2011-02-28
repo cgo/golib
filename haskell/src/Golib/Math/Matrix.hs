@@ -3,15 +3,14 @@ module Golib.Math.Matrix
        (
          -- Pure things
         Matrix,
-        matrix,
         fromList,
         setElems,
         prettyPrintMatrix,
         invert,
         pseudoInverse,
         trans,
-        module Golib.Math.Matrix.Class,
-        module Golib.Math.Matrix.Base,
+        --module Golib.Math.Matrix.Class,
+        module Golib.Math.Base,
         -- IO things
         prettyPrintMatrixIO,
         rowCountIO,
@@ -42,7 +41,7 @@ module Golib.Math.Matrix
 
 import Golib.Foreign.Math.Matrix
 import Golib.Math.Matrix.Class
-import Golib.Math.Matrix.Base
+import Golib.Math.Base
 import Foreign.C.Types
 import Foreign
 import Ix
@@ -54,6 +53,7 @@ import Foreign.Marshal.Utils
 
 
 instance MatrixClass Int Double Matrix where
+  matrix = matrix'
   rowCount gm = unsafePerformIO . rowCountIO $ gm
   colCount gm = unsafePerformIO . colCountIO $ gm
   m ! (r,c) = unsafePerformIO $ getElemIO m (r,c)
@@ -73,13 +73,13 @@ instance Show Matrix where
 
 {-| Construct a new matrix of given shape. 
     r are the number of rows, c the number of columns. -}
-matrix :: (Integral i) => i -> i -> Matrix
-matrix r c = unsafePerformIO matrix'
+matrix' :: (Integral i) => i -> i -> Matrix
+matrix' r c = unsafePerformIO matrix'
   where
     r' = fromIntegral r
     c' = fromIntegral c
     matrix' = matrixNew r' c'
-{-# NOINLINE matrix #-}
+{-# NOINLINE matrix' #-}
 
 
 fromList :: Index -> Index -> [Double] -> Maybe Matrix

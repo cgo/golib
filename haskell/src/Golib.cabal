@@ -45,9 +45,13 @@ Library
   -- Modules exported by the library.
   Exposed-modules:   Golib, 
                      Golib.Foreign.Math.Matrix, 
+                     Golib.Foreign.Math.Vector,
+                     Golib.Foreign.Base,
                      Golib.Math.Matrix,
-                     Golib.Math.Matrix.Class, 
-                     Golib.Math.Matrix.Base
+                     Golib.Math.Matrix.Class,
+                     Golib.Math.Vector, 
+                     Golib.Math.Vector.Class, 
+                     Golib.Math.Base
   Other-modules: C2HS
   pkgconfig-depends: golib
   include-dirs: .

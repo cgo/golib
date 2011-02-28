@@ -3,7 +3,7 @@ include (FindPkgConfig)
 
 project (hsgolib)
 set (target hsgolib)
-set (sources matrix.cpp)
+set (sources matrix.cpp vector.cpp general.cpp)
 pkg_search_module (golib REQUIRED golib)
 include_directories (${golib_INCLUDE_DIRS})
 add_library (${target} SHARED ${sources})

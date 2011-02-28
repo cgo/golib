@@ -39,7 +39,7 @@ VCGui::VCGui ()
     myPrivate->imageView.setImage (w, h, goPlot::Object2DImage::RGB24);
 
     myPrivate->vccontrol.setTarget (myPrivate->imageView.getImage());
-    myPrivate->vccontrol.capturedCaller().connect (goMemberFunction<VCGui, int> (this, &VCGui::redrawImage));
+    myPrivate->vccontrol.capturedCaller().connect (goMemberFunction (this, &VCGui::redrawImage));
 
     printf ("myPrivate->imageView.getImage() size: %d %d\n", myPrivate->imageView.getImage()->getSizeX(), myPrivate->imageView.getImage()->getSizeY());
 

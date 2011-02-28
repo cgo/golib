@@ -137,6 +137,7 @@ template <class T> class goFixedArray
         void setPtr (T* ptr)
         {
             this->myArray = ptr;
+	    this->myExternal = true;
         }
 
         void ref (goFixedArray<T>& target, goSize_t startIndex = 0, goSize_t size = 0)

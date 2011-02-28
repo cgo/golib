@@ -1,8 +1,12 @@
+#ifndef _MATRIX_H_
+#define _MATRIX_H_
+
 #ifdef __cplusplus 
 extern "C"
 {
 #endif
 #include <stdlib.h>
+#include "vector.h"
 
   int test ();
 
@@ -11,7 +15,6 @@ extern "C"
     void* object;
   } golib_matrix;
 
-  int           golib_check_null_ptr (void* p);
   golib_matrix* golib_matrix_new (size_t rows, size_t cols);
   void          golib_matrix_destroy (golib_matrix*);
   size_t        golib_matrix_row_count (golib_matrix* m);
@@ -29,6 +32,7 @@ extern "C"
   void          golib_matrix_copy (golib_matrix* source, golib_matrix* target);
   int           golib_matrix_equals (golib_matrix* a, golib_matrix* b);
 
+  int           golib_matrix_vector_mult (golib_matrix* m, golib_vector* v);
 
 
   // void       golib_matrix_scalar_mult (double s, golib_matrix* m);
@@ -37,3 +41,4 @@ extern "C"
 }
 #endif
 
+#endif /* _MATRIX_H_ */

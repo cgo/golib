@@ -6,16 +6,16 @@ GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
 GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `pkg-config --cflags golib`
 
 LD		= g++
 LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS =  -L$(GOPATH)/../lib -lGo -lGomatlab -lGogui -lGogl -lpython2.5
+LIBS = `pkg-config --libs golib`
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/plot/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
+INCLUDE		=
 
 TARGET		= gui
 

@@ -205,7 +205,7 @@ class Vector : public goFixedArray<T>
         {
             if (other.getSize() != 3 || this->getSize() != 3)
             {
-                goLog::warning ("Vector::cross(): vectors must be size 3.");
+	      // goLog::warning ("Vector::cross(): vectors must be size 3.");
                 return false;
             }
             if (ret.getSize() < 3)
@@ -614,12 +614,12 @@ inline T Vector<T>::operator* (const Vector<T>& other) const
         throw goMathException (goMathException::SIZE_MISMATCH);
     }
 #endif
-    T ret = T(0);
-    goIndex_t max = this->getSize();
-    const T* array = this->getPtr();
-    const T* otherArray = other.getPtr();
-    goIndex_t stride = this->getStride();
-    goIndex_t otherStride = other.getStride();
+    T		ret	    = T(0);
+    goIndex_t	max	    = this->getSize();
+    const T*	array	    = this->getPtr();
+    const T*	otherArray  = other.getPtr();
+    goIndex_t	stride	    = this->getStride();
+    goIndex_t	otherStride = other.getStride();
     for (goIndex_t i = 0; i < max; ++i)
     {
         ret += *array * *otherArray;

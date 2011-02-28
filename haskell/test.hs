@@ -12,6 +12,7 @@ forEachElem m f = do
   es <- sequence [withMatrix m (\m -> goMatrixGetElem m x y) | x <- [0..(rows-1)], y <- [0..(cols-1)]]
   sequence $ map f es
 
+testMult :: Matrix
 testMult = m1 <**> m2 
   where
     m1 = matrix 10 20
@@ -31,12 +32,12 @@ main = do
   
   let e = m2 ! (29,5)
   -- let ee = m2 Matrix.! (5,5)
-  let m = matrix 10 20
+  let m = matrix 10 20 :: Matrix
   let ee = m ! (6,6)
   let ee2 = m ! (6,7)
   putStrLn $ "e = " ++ show e ++ ", ee = " ++ show ee ++ ", ee2 = " ++ show ee2
   
-  let m2 = matrix (2^10) (2^10)
+  let m2 = matrix (2^10) (2^10) :: Matrix
   -- putStrLn $ "element: " ++ show (m2 Matrix.! (2^11,10))
   
   -- Multiplication

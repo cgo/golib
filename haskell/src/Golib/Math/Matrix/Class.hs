@@ -10,6 +10,7 @@ module Golib.Math.Matrix.Class
 import Ix
 
 class MatrixClass i a mat | mat -> a, mat -> i where
+  matrix   :: i -> i -> mat
   shape    :: mat -> (i, i)
   rowCount :: mat -> i
   colCount :: mat -> i

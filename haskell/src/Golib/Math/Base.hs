@@ -1,4 +1,4 @@
-module Golib.Math.Matrix.Base
+module Golib.Math.Base
        (Trans (..),
         Index) where
 

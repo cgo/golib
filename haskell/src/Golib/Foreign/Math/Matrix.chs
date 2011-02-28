@@ -21,7 +21,7 @@ import C2HS
 import Foreign.C.Types
 import Foreign.Ptr
 import Foreign.Storable
-
+import Golib.Foreign.Base
 
 #include "cpp/matrix.h"
 
@@ -45,15 +45,7 @@ matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
 --withMatrix :: Matrix -> (Ptr Matrix -> IO a) -> IO a
 --withMatrix (Matrix m) = withForeignPtr m
 
-checkNullPtr :: Ptr a -> IO Bool
-checkNullPtr p = goCheckNullPtr (castPtr p) >>= \i ->
-  case i of
-    1 -> return True
-    _ -> return False
-
-
-foreign import ccall "matrix.h golib_check_null_ptr"
-  goCheckNullPtr :: Ptr () -> IO CInt
+-- {# fun unsafe golib_matrix_vector_mult {withMatrix* FIXME} #}
 
 foreign import ccall "matrix.h &golib_matrix_destroy"
   goMatrixFinalize :: FunPtr (Ptr Matrix -> IO ())

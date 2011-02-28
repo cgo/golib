@@ -6,16 +6,16 @@ GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
 GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) $(CPPFLAGS) 
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) $(CPPFLAGS) `pkg-config --cflags golib` `python-config --cflags`
 
 LD		= g++
-LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
+LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS) `pkg-config --libs golib` `python-config --libs`
 
 #GOPATH		= /home/christian/pgm/golib
 
 LIBS =  -L$(GOPATH)/../lib -lGo -lGogui -lGogl -lGopython
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/gui/include -I/usr/include/python2.5 -I$(GOPATH)/plot/include
+INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/gui/include -I$(GOPATH)/plot/include
 
 TARGET		= vcgui
 

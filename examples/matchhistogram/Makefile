@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -g `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		=  
+LDARGS		=  `pkg-config --libs golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo 
+LIBS		=  
 
-INCLUDE		=  -I$(GOPATH)/include 
+INCLUDE		=  
 
 TARGET		= match
 

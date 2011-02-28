@@ -1,6 +1,8 @@
 #include <iostream>
 #include <gomatrix.h>
 #include "matrix.h"
+#include "vector.h"
+#include "general.h"
 
 int test ()
 {
@@ -20,28 +22,6 @@ matrix_t* get_matrix_t (golib_matrix* m)
 const matrix_t* get_matrix_t (const golib_matrix* m)
 {
   return static_cast<const matrix_t*> (m->object);
-}
-
-int fromBool (bool b)
-{
-  switch (b)
-  {
-    case true: return 1; break;
-    case false: return 0; break;
-  }
-}
-
-
-int golib_check_null_ptr (void* p)
-{
-  if (0 == p)
-    {
-      return 1;
-    }
-  else
-    {
-      return 0;
-    }
 }
 
 static inline bool rangeCheck (golib_matrix* m, size_t i, size_t j)
@@ -165,4 +145,13 @@ void golib_matrix_matrix_mult (double alpha, const golib_matrix* A, int transA,
   const matrix_t* BB = get_matrix_t (B);
   matrix_t* CC = get_matrix_t (C);
   goMath::matrixMult (alpha, *AA, transA == 1, *BB, transB == 1, beta, *CC);
+}
+
+int golib_matrix_vector_mult (double alpha, const golib_matrix* m, int transA, const golib_vector* v,
+			      double beta, golib_vector* ret)
+{
+  const matrix_t* A = get_matrix_t(m);
+  const vector_t* x = get_const_vector_t(v);
+  bool ok = goMath::matrixVectorMult (alpha, *A, transA == 1, *x, beta, *get_vector_t(ret));
+  return fromBool (ok);
 }

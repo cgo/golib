@@ -6,10 +6,10 @@ GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
 GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
+LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS) `pkg-config --libs golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
