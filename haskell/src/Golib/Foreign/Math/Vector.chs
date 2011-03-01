@@ -3,6 +3,7 @@
 
 module Golib.Foreign.Math.Vector
 ( Vector,
+  withVector,
   vectorNew,
   getElem',
   dot,

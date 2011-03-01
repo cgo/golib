@@ -32,7 +32,9 @@ extern "C"
   void          golib_matrix_copy (golib_matrix* source, golib_matrix* target);
   int           golib_matrix_equals (golib_matrix* a, golib_matrix* b);
 
-  int           golib_matrix_vector_mult (golib_matrix* m, golib_vector* v);
+  int           golib_matrix_vector_mult (double alpha, const golib_matrix* m, int transA, 
+                                          const golib_vector* v,
+                                          double beta, golib_vector* ret);
 
 
   // void       golib_matrix_scalar_mult (double s, golib_matrix* m);

@@ -1,17 +1,19 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-#ifdef __cplusplus 
-extern "C"
-{
+
+#ifdef __cplusplus
+extern "C" {
 #endif
-#include <stdlib.h>
-
-
   typedef struct {
     void* object;
   } golib_vector;
+#ifdef __cplusplus
+}
+#endif
 
+
+#ifdef __cplusplus 
 
   typedef goMath::Vector<double> vector_t;
   
@@ -25,6 +27,10 @@ extern "C"
     return static_cast<const vector_t*> (m->object);
   }
 
+extern "C"
+{
+#endif
+#include <stdlib.h>
 
   golib_vector* golib_vector_new (size_t n);
   void          golib_vector_destroy (golib_vector*);

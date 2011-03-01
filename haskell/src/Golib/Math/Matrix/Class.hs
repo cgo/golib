@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies  #-}
 module Golib.Math.Matrix.Class
        (MatrixClass(..),
+        MatrixVectorClass(..),
         toList,
         toLists,
         matrixMap,
@@ -8,6 +9,17 @@ module Golib.Math.Matrix.Class
        ) where
 
 import Ix
+import qualified Golib.Math.Vector.Class as VC
+import qualified Golib.Math.Vector as V
+
+{-| Matrix / Vector operations -}
+class (MatrixClass i a mat, VC.VectorClass i a vec) => 
+      MatrixVectorClass i a mat vec | mat -> a, mat -> i, mat -> vec where
+        (#|) :: mat -> vec -> Maybe vec
+        --(|#) :: vec -> mat -> Maybe vec
+        --outer :: vec -> vec -> mat
+  
+
 
 class MatrixClass i a mat | mat -> a, mat -> i where
   matrix   :: i -> i -> mat

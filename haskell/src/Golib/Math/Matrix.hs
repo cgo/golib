@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses, GeneralizedNewtypeDeriving, TypeSynonymInstances #-}
 module Golib.Math.Matrix
        (
          -- Pure things
@@ -9,7 +9,8 @@ module Golib.Math.Matrix
         invert,
         pseudoInverse,
         trans,
-        --module Golib.Math.Matrix.Class,
+        diagIndices,
+        module Golib.Math.Matrix.Class,
         module Golib.Math.Base,
         -- IO things
         prettyPrintMatrixIO,
@@ -36,20 +37,30 @@ module Golib.Math.Matrix
         createMatrix,
         modifyMatrix,
         setElem,
-        getElem
+        getElem,
+        fill,
+        setDiag
        ) where
 
 import Golib.Foreign.Math.Matrix
+import qualified Golib.Math.Vector as V
+import qualified Golib.Foreign.Math.Vector as FV
 import Golib.Math.Matrix.Class
 import Golib.Math.Base
 import Foreign.C.Types
 import Foreign
 import Ix
-import Maybe
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Trans
 import Foreign.Marshal.Utils
+import Data.Maybe (fromJust)
+
+
+instance MatrixVectorClass Index Double Matrix V.Vector where
+  mat #| vec = unsafePerformIO $ FV.vectorNew n >>= \ret -> unsafeMatrixVectorMult 1 mat NoTrans vec 0 ret >>= \t -> if t then return (Just ret) else return Nothing
+    where n = V.vecSize vec
+
 
 
 instance MatrixClass Int Double Matrix where
@@ -60,7 +71,7 @@ instance MatrixClass Int Double Matrix where
   -- a *> mat = mat
   m1 <**> m2 = unsafePerformIO $ matrixMultIO 1 m1 NoTrans m2 NoTrans
 
-
+ 
 instance Eq Matrix where
   m1 == m2 = unsafePerformIO $ matrixEqualsIO m1 m2
 
@@ -81,17 +92,24 @@ matrix' r c = unsafePerformIO matrix'
     matrix' = matrixNew r' c'
 {-# NOINLINE matrix' #-}
 
+ones :: (Real i) => [i]
+ones = 1 : ones
+
+idMatrix :: (Integral i) => i -> Matrix
+idMatrix i = createMatrix i' i' $ setDiag 0 ones
+  where i' = fromIntegral i
+
 
 fromList :: Index -> Index -> [Double] -> Maybe Matrix
-fromList r c l = if (c >= 0 && c >= 0 && (r*c == length l))
+fromList r c l = if c >= 0 && c >= 0 && (r*c == length l)
                  then Just $ createMatrix r c $ 
-                      sequence $ map (\(i,a) -> setElem i a) $ zip [(i,j) | i <- [0..(r-1)], j <- [0..(c-1)]] l
+                      mapM (uncurry setElem) $ zip [(i,j) | i <- [0..(r-1)], j <- [0..(c-1)]] l
                  else Nothing
-
 
 {-| Sets elements in a matrix; caution: invalid indices are silently ommitted. -}
 setElems :: Matrix -> [((Index,Index),Double)] -> Matrix
-setElems mat p = modifyMatrix mat $ sequence $ map (\(ij,a) -> setElem ij a) p
+-- setElems mat p = modifyMatrix mat $ mapM (\(ij,a) -> setElem ij a) p
+setElems mat p = modifyMatrix mat $ mapM (uncurry setElem) p
                                            
 
 {-| Returns Just the inverse of the given matrix if it can be computed, or Nothing. -}
@@ -115,21 +133,35 @@ prettyPrintMatrix m = map ppl $ toLists m
     ppl = concatMap pp
 
 
+{-| Generate indices of a diagonal in a matrix of given shape. -}
+diagIndices :: (Index,Index)  -- ^ The shape of the matrix (rows,columns)
+              -> Index        -- ^ The index of the diagonal -- 0: main diagonal; < 0: lower diagonals; >0: upper diagonals
+              -> [(Index,Index)] -- ^ Index list. Empty if there is no such diagonal.
+diagIndices (r,c) d
+  | d >= 0 && d < c    = diagIndices' (0, d, min (c - d) r)
+  | d < 0 && d > (-r) = diagIndices' (-d, 0, min (r + d) c)
+  | otherwise        = []
+    where
+      diagIndices' :: (Index,Index,Index) -> [(Index,Index)]
+      diagIndices' (rstart,cstart,n) = [(rstart + i, cstart + i) | i <- [0..(max 0 (n-1))]]
+
+
+
 -------------------------------------------------------
 -- All things IO and/or unsafe are coming up now.
 -------------------------------------------------------
 
 prettyPrintMatrixIO :: Matrix -> IO ()
-prettyPrintMatrixIO m = sequence (map putStrLn $ prettyPrintMatrix m) >> return ()
+prettyPrintMatrixIO m = mapM_ putStrLn $ prettyPrintMatrix m
 
 
-rowCountIO mat = withMatrix mat goMatrixRowCount >>= return . fromIntegral
-colCountIO mat = withMatrix mat goMatrixColCount >>= return . fromIntegral
+rowCountIO mat = fmap fromIntegral $ withMatrix mat goMatrixRowCount
+colCountIO mat = fmap fromIntegral $ withMatrix mat goMatrixColCount
 
 
 -- No range checks
 unsafeGetElemIO :: Matrix -> (Index,Index) -> IO Double
-unsafeGetElemIO mat (r,c) = withMatrix mat (\m -> goMatrixGetElem m r' c') >>= return . realToFrac
+unsafeGetElemIO mat (r,c) = fmap realToFrac $ withMatrix mat (\m -> goMatrixGetElem m r' c')
   where
     c' = fromIntegral c
     r' = fromIntegral r
@@ -148,7 +180,7 @@ unsafeSetElemIO :: Matrix -> (Index,Index) -> Double -> IO Bool
 unsafeSetElemIO mat (i,j) a = do
   let t = inMatrixRange mat (i,j)
   if t
-    then liftM (toEnum . fromIntegral) $ (withMatrix mat (\m -> goMatrixSetElem m i' j' a'))
+    then liftM (toEnum . fromIntegral) $ withMatrix mat (\m -> goMatrixSetElem m i' j' a')
     else error $ "setElem: range violation --- index was " ++ show (i,j)
   where
     i' = fromIntegral i
@@ -163,7 +195,7 @@ unsafeFillIO mat a = withMatrix mat $ \m -> goMatrixFill m (realToFrac a)
 
 {-| Transposition of a matrix in place, therefore unsafe. -}
 unsafeTransposeIO :: Matrix -> IO Bool
-unsafeTransposeIO m = liftM (toEnum . fromIntegral) $ withMatrix m (\pm -> goMatrixTranspose pm)
+unsafeTransposeIO m = liftM (toEnum . fromIntegral) $ withMatrix m goMatrixTranspose
 
 
 {-| Safe version of transposition; the matrix is copied, the transposed, and the copy is returned. 
@@ -171,14 +203,11 @@ unsafeTransposeIO m = liftM (toEnum . fromIntegral) $ withMatrix m (\pm -> goMat
 transposeIO :: Matrix -> IO (Maybe Matrix)
 transposeIO m = 
   matrixNew c r >>= \result ->
-  (withMatrix m $ \pm ->
+  withMatrix m (\pm ->
     withMatrix result $ \presult ->
     goMatrixTransposeTo pm presult) >>= \i -> 
-  case toEnum (fromIntegral i) of
-    True -> return $ Just result
-    False -> return Nothing
-  where
-    (r,c) = shape m
+  if toEnum (fromIntegral i) then return (Just result) else return Nothing
+    where (r,c) = shape m
     
 
 unsafeInvertIO :: Matrix -> IO Bool
@@ -189,9 +218,7 @@ invertIO :: Matrix -> IO (Maybe Matrix)
 invertIO m = 
   matrixCopyIO m >>= \result -> 
   withMatrix result goMatrixInvert >>= \i ->
-  case (toEnum . fromIntegral) i of
-    True -> return $ Just result
-    False -> return Nothing
+  if (toEnum . fromIntegral) i then return (Just result) else return Nothing
     
 
 unsafeMatrixCopyIO :: Matrix -> Matrix -> IO ()
@@ -207,14 +234,14 @@ matrixCopyIO m = let (r,c) = shape m in
 matrixEqualsIO :: Matrix -> Matrix -> IO Bool
 matrixEqualsIO m1 m2 = 
   withMatrix m1 $ \mm1 -> withMatrix m2 $ \mm2 ->
-  goMatrixEquals mm1 mm2 >>= return . toBool
+  fmap toBool $ goMatrixEquals mm1 mm2 
 
 
 {-| Computes c <- beta * c + alpha * a(^T) * b(^T).
     That means c is either updated in-place, or created as needed. 
     No sanity checks are made. Non-matching shapes of a and b leads to undefined behaviour. -}
 unsafeMatrixMultIO :: Double -> Matrix -> Trans -> Matrix -> Trans -> Double -> Matrix -> IO ()
-unsafeMatrixMultIO alpha a atrans b btrans beta c = do
+unsafeMatrixMultIO alpha a atrans b btrans beta c =
   withMatrix a $ \ma ->
     withMatrix b $ \mb -> 
       withMatrix c $ \mc ->
@@ -235,7 +262,7 @@ matrixMultIO alpha a atrans b btrans =
   let (r,ac) = shape a
       (br,c) = shape b in
   if ac /= br 
-  then (error $ "Trying to multiply " ++ show (r,ac) ++ " by " ++ show (br,c) ++ " matrix.")
+  then error $ "Trying to multiply " ++ show (r,ac) ++ " by " ++ show (br,c) ++ " matrix."
   else
     matrixNew r c >>= \result -> 
     unsafeMatrixMultIO alpha a NoTrans b NoTrans 0 result >> return result
@@ -267,17 +294,34 @@ modifyMatrix mat m = unsafePerformIO $ matrixCopyIO mat >>= execStateT (unMMM m)
 
 
 getMatrix :: MMM s Matrix
-getMatrix = MMM $ get
+getMatrix = MMM get
 
 
 setElem :: (Index,Index) -> Double -> MMM s Bool
 setElem (i,j) a = MMM $ get >>= \m -> if inMatrixRange m (i,j)
-                                     then (liftIO $ unsafeSetElemIO m (i,j) a) >> return True
+                                     then liftIO (unsafeSetElemIO m (i,j) a) >> return True
                                      else return False
+
+fill :: Double -> MMM s ()
+fill a = MMM $ get >>= \m -> liftIO $ withMatrix m (`goMatrixFill` a')
+  where a' = realToFrac a
+
+
+setDiag :: Index -> [Double] -> MMM s ()
+setDiag d as = MMM $ get >>= \m -> 
+  let (r,c) = shape m 
+      idxs  = diagIndices (r,c) d
+  in
+   case idxs of
+     [] -> return ()
+     ijs -> setDiag' m ijs as
+     where
+       setDiag' :: Matrix -> [(Index,Index)] -> [Double] -> MMonad ()
+       setDiag' m ijs as = mapM_ (\(ij,e) -> liftIO $ unsafeSetElemIO m ij e) (zip ijs as)
 
 
 getElem :: (Index,Index) -> MMM s Double
-getElem (i,j) = MMM $ get >>= \m -> (liftIO $ getElemIO m (i,j))
+getElem (i,j) = MMM $ get >>= \m -> liftIO (getElemIO m (i,j))
 
 -- freezeMatrix :: (Integral i, Fractional a, MatrixClass i a mat) => mat -> MatrixST s mat
 -- setElem :: (Integral i, Fractional a, MatrixClass i a mat) => mat -> (i,i) -> a -> MatrixST s ()

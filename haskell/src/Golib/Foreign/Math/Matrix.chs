@@ -15,16 +15,20 @@ module Golib.Foreign.Math.Matrix
  goMatrixCopy,
  goMatrixEquals,
  matrixNew,
- withMatrix) where
+ withMatrix,
+ unsafeMatrixVectorMult) where
 
 import C2HS
 import Foreign.C.Types
 import Foreign.Ptr
 import Foreign.Storable
 import Golib.Foreign.Base
+import Golib.Math.Base
+-- import Golib.Foreign.Math.Vector
 
 #include "cpp/matrix.h"
 
+{# import Golib.Foreign.Math.Vector #}
 {# context lib="golib" #}
 
 -- getNumber = {#call unsafe getNumber as _getNumber#}
@@ -45,8 +49,14 @@ matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
 --withMatrix :: Matrix -> (Ptr Matrix -> IO a) -> IO a
 --withMatrix (Matrix m) = withForeignPtr m
 
+cToTrans :: (Integral i) => i -> Trans
+cToTrans = toEnum . fromIntegral
+transToC = fromIntegral . fromEnum
 -- {# fun unsafe golib_matrix_vector_mult {withMatrix* FIXME} #}
-
+{# fun unsafe golib_matrix_vector_mult as unsafeMatrixVectorMult {realToFrac `Double', withMatrix* `Matrix', 
+                                         transToC `Trans', withVector* `Vector',
+                                         realToFrac `Double', withVector* `Vector'} -> `Bool' cToBool #}
+ 
 foreign import ccall "matrix.h &golib_matrix_destroy"
   goMatrixFinalize :: FunPtr (Ptr Matrix -> IO ())
 
