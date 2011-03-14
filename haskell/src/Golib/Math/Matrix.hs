@@ -4,12 +4,13 @@ module Golib.Math.Matrix
          -- Pure things
         Matrix,
         fromList,
-        setElems,
         prettyPrintMatrix,
         invert,
         pseudoInverse,
         trans,
         diagIndices,
+        idMatrix,
+        subMatrix,
         module Golib.Math.Matrix.Class,
         module Golib.Math.Base,
         -- IO things
@@ -37,6 +38,9 @@ module Golib.Math.Matrix
         createMatrix,
         modifyMatrix,
         setElem,
+        setElems,
+        setRow,
+        setColumn,
         getElem,
         fill,
         setDiag
@@ -58,8 +62,12 @@ import Data.Maybe (fromJust)
 
 
 instance MatrixVectorClass Index Double Matrix V.Vector where
-  mat #| vec = unsafePerformIO $ FV.vectorNew n >>= \ret -> unsafeMatrixVectorMult 1 mat NoTrans vec 0 ret >>= \t -> if t then return (Just ret) else return Nothing
-    where n = V.vecSize vec
+  mat #| vec = unsafePerformIO $ FV.vectorNew n >>= \ret -> 
+    unsafeMatrixVectorMult 1 mat NoTrans vec 0 ret >>= \t -> 
+    if t 
+    then return ret 
+    else error "Function (#|) failed."
+      where n = V.vecSize vec
 
 
 
@@ -68,8 +76,11 @@ instance MatrixClass Int Double Matrix where
   rowCount gm = unsafePerformIO . rowCountIO $ gm
   colCount gm = unsafePerformIO . colCountIO $ gm
   m ! (r,c) = unsafePerformIO $ getElemIO m (r,c)
-  -- a *> mat = mat
+  a *> mat = unsafePerformIO $ matrixCopyIO mat >>= \m -> unsafeMatrixScalarMult m a >> return m
   m1 <**> m2 = unsafePerformIO $ matrixMultIO 1 m1 NoTrans m2 NoTrans
+  -- NOTE: No range checks are done!
+  m1 <+> m2 = unsafePerformIO $ matrixCopyIO m1 >>= \m -> unsafeMatrixAdd m m2 >> return m
+  m1 <-> m2 = unsafePerformIO $ matrixCopyIO m1 >>= \m -> unsafeMatrixSub m m2 >> return m
 
  
 instance Eq Matrix where
@@ -80,6 +91,7 @@ instance Show Matrix where
   show m = "fromJust (fromList " ++ show r ++ " " ++ show c ++ " " ++ show (toList m) ++ ")"
     where
       (r,c) = shape m
+
 
 
 {-| Construct a new matrix of given shape. 
@@ -106,17 +118,29 @@ fromList r c l = if c >= 0 && c >= 0 && (r*c == length l)
                       mapM (uncurry setElem) $ zip [(i,j) | i <- [0..(r-1)], j <- [0..(c-1)]] l
                  else Nothing
 
-{-| Sets elements in a matrix; caution: invalid indices are silently ommitted. -}
-setElems :: Matrix -> [((Index,Index),Double)] -> Matrix
+{-| Create the sub matrix of given shape at the given position in the given matrix. -}
+subMatrix :: Shape -- ^ The shape of the sub matrix. Note that the shape may be smaller than this, depending on whether the submatrix fits in the given matrix at that position.
+            -> Index -- ^ Row position
+            -> Index -- ^ Column position
+            -> Matrix -- ^ The source matrix to copy values from
+            -> Matrix
+subMatrix (r,c) i j src = createMatrix r' c' $ setElems [(p,src ! (p' p)) | p <- range((0,0),(r',c'))]
+  where
+    p' (i',j') = (i' + i, j' + j)
+    r' = min (rr - i) r
+    c' = min (cc - j) c
+    (rr,cc) = shape src
+
+-- setElems :: Matrix -> [((Index,Index),Double)] -> Matrix
 -- setElems mat p = modifyMatrix mat $ mapM (\(ij,a) -> setElem ij a) p
-setElems mat p = modifyMatrix mat $ mapM (uncurry setElem) p
+-- setElems mat p = modifyMatrix mat $ mapM (uncurry setElem) p
                                            
 
 {-| Returns Just the inverse of the given matrix if it can be computed, or Nothing. -}
 invert :: Matrix -> Maybe Matrix
 invert m = unsafePerformIO $ invertIO m
 
-
+{-| Returns the transposed version of the input matrix. -}
 trans :: Matrix -> Matrix
 trans m = fromJust . unsafePerformIO $ transposeIO m -- Assuming transposition always works (why shouldn't it?)
 
@@ -276,7 +300,8 @@ matrixMultIO alpha a atrans b btrans =
 -- This type is not exported.
 type MMonad = StateT Matrix IO
 
-newtype MMM s a = MMM { unMMM :: MMonad a } deriving Monad
+{-| Matrix modification monad. This is used for creating and modifying matrices efficiently. -}
+newtype MMM s a = MMM { unMMM :: MMonad a } deriving (Monad, Functor)
 
 
 -- Make a copy of the matrix, put it in the state, and let modification functions run on it.
@@ -285,10 +310,16 @@ runMMM :: Matrix -> MMM s a -> IO Matrix
 runMMM mat m = matrixCopyIO mat >>= execStateT (unMMM m)
 
 
-createMatrix :: Index -> Index -> MMM s a -> Matrix
+{-| Create a new matrix of given size and run the given modification action on it; then return
+    The new matrix. -}
+createMatrix :: Index -- ^ The number of rows
+               -> Index -- ^ The number of columns 
+               -> MMM s a -- ^ Modification action
+               -> Matrix -- ^ Return value: The newly created matrix.
 createMatrix r c m = unsafePerformIO $ matrixNew r c >>= execStateT (unMMM m)
 
 
+{-| Modify the given matrix using the given modification action; return the modified matrix. -}
 modifyMatrix :: Matrix -> MMM s a -> Matrix
 modifyMatrix mat m = unsafePerformIO $ matrixCopyIO mat >>= execStateT (unMMM m)
 
@@ -297,17 +328,23 @@ getMatrix :: MMM s Matrix
 getMatrix = MMM get
 
 
+{-| Modification action: Set the value of the given element. Returns True on success, or False if the element is out of bounds. -}
 setElem :: (Index,Index) -> Double -> MMM s Bool
 setElem (i,j) a = MMM $ get >>= \m -> if inMatrixRange m (i,j)
                                      then liftIO (unsafeSetElemIO m (i,j) a) >> return True
                                      else return False
 
+
+{-| Fills the matrix that is currently under modification with a given value. -}
 fill :: Double -> MMM s ()
 fill a = MMM $ get >>= \m -> liftIO $ withMatrix m (`goMatrixFill` a')
   where a' = realToFrac a
 
 
-setDiag :: Index -> [Double] -> MMM s ()
+{-| Sets the diagonal with given index to the given values. Operates on the matrix that is currently under modification. -}
+setDiag :: Index -- ^ Number of the diagonal. 0 Means the main diagonal, negative values mean lower diagonals, positive values mean upper diagonals.
+          -> [Double] -- ^ The values of the diagonal. Only as many values as fit in the diagonal are used.
+          -> MMM s ()  -- ^ Returns the action that sets the diagonal.
 setDiag d as = MMM $ get >>= \m -> 
   let (r,c) = shape m 
       idxs  = diagIndices (r,c) d
@@ -320,6 +357,19 @@ setDiag d as = MMM $ get >>= \m ->
        setDiag' m ijs as = mapM_ (\(ij,e) -> liftIO $ unsafeSetElemIO m ij e) (zip ijs as)
 
 
+{-| Sets elements in a matrix; caution: invalid indices are silently ommitted. -}
+setElems :: [((Index,Index),Double)] -> MMM s ()
+setElems = mapM_ (uncurry setElem)
+
+setRow :: Index -> [Double] -> MMM s ()
+setRow i as = fmap shape getMatrix >>= \(_,c) -> setElems (zip (zip [i,i..] [0..(c-1)]) as)
+
+
+setColumn :: Index -> [Double] -> MMM s ()
+setColumn i as = fmap shape getMatrix >>= \(r,_) -> setElems (zip (zip [0..(r-1)] [i,i..]) as)
+
+
+{-| Get an element of the matrix currently under modification. -}
 getElem :: (Index,Index) -> MMM s Double
 getElem (i,j) = MMM $ get >>= \m -> liftIO (getElemIO m (i,j))
 

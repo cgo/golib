@@ -155,3 +155,37 @@ int golib_matrix_vector_mult (double alpha, const golib_matrix* m, int transA, c
   bool ok = goMath::matrixVectorMult (alpha, *A, transA == 1, *x, beta, *get_vector_t(ret));
   return fromBool (ok);
 }
+
+
+void golib_matrix_scalar_mult (golib_matrix* m, double s)
+{
+  *get_matrix_t(m) *= s;
+}
+
+static inline bool size_matches (const golib_matrix* m1, const golib_matrix* m2)
+{
+  return (get_matrix_t(m1)->getRows() == get_matrix_t(m2)->getRows() &&
+          get_matrix_t(m1)->getColumns() == get_matrix_t(m2)->getColumns());
+}
+
+int golib_matrix_add (golib_matrix* m, const golib_matrix* m2)
+{
+  if (size_matches (m, m2))
+    {
+      *get_matrix_t(m) += *get_matrix_t(m2);
+      return fromBool (true);
+    }
+  
+  return fromBool (false);
+}
+
+int golib_matrix_sub (golib_matrix* m, const golib_matrix* m2)
+{
+  if (size_matches (m, m2))
+    {
+      *get_matrix_t(m) -= *get_matrix_t(m2);
+      return fromBool (true);
+    }
+  
+  return fromBool (false);
+}

@@ -46,6 +46,7 @@ extern "C"
   int           golib_vector_equals (golib_vector* a, golib_vector* b);
   void          golib_vector_scalar_mult (golib_vector* m, double s);
   double        golib_vector_dot (golib_vector* m1, golib_vector* m2);
+  int           golib_vector_add (double, golib_vector* dst, golib_vector* v);
 
 #ifdef __cplusplus 
 }

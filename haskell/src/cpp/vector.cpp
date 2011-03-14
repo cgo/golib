@@ -114,3 +114,8 @@ void golib_vector_scalar_mult (golib_vector* m, double s)
 {
   get_vector_t(m)->operator*= (s);
 }
+
+int golib_vector_add (double alpha, golib_vector* dst, golib_vector* v)
+{
+  return fromBool (goMath::vectorAdd (alpha, *get_vector_t(v), *get_vector_t(dst)));
+}

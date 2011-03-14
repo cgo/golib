@@ -37,7 +37,9 @@ extern "C"
                                           double beta, golib_vector* ret);
 
 
-  // void       golib_matrix_scalar_mult (double s, golib_matrix* m);
+  void          golib_matrix_scalar_mult (golib_matrix* m, double s);
+  int           golib_matrix_add (golib_matrix* m, const golib_matrix* m2);
+  int           golib_matrix_sub (golib_matrix* m, const golib_matrix* m2);
 
 #ifdef __cplusplus 
 }

@@ -16,7 +16,10 @@ module Golib.Foreign.Math.Matrix
  goMatrixEquals,
  matrixNew,
  withMatrix,
- unsafeMatrixVectorMult) where
+ unsafeMatrixVectorMult,
+ unsafeMatrixScalarMult,
+ unsafeMatrixAdd,
+ unsafeMatrixSub) where
 
 import C2HS
 import Foreign.C.Types
@@ -37,6 +40,11 @@ import Golib.Math.Base
 
 {# pointer *golib_matrix as Matrix foreign newtype #}
 -- {# fun unsafe golib_matrix_new as matrixNew' {} -> `Ptr Matrix' id #}
+{# fun unsafe golib_matrix_scalar_mult as unsafeMatrixScalarMult {withMatrix* `Matrix', realToFrac `Double'} -> `()' #}
+{-| Add a matrix to another matrix, inplace. The second argument is added to the first one. -}
+{# fun unsafe golib_matrix_add as unsafeMatrixAdd {withMatrix* `Matrix', withMatrix* `Matrix'} -> `Bool' cToBool #}
+{-| Subtract a matrix from another matrix, inplace. The second argument is subtracted from the first one. -}
+{# fun unsafe golib_matrix_sub as unsafeMatrixSub {withMatrix* `Matrix', withMatrix* `Matrix'} -> `Bool' cToBool #}
 
 matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
   checkNullPtr mp >>= \n ->
@@ -49,8 +57,6 @@ matrixNew r c = goMatrixNew (fromIntegral r) (fromIntegral c) >>= \mp ->
 --withMatrix :: Matrix -> (Ptr Matrix -> IO a) -> IO a
 --withMatrix (Matrix m) = withForeignPtr m
 
-cToTrans :: (Integral i) => i -> Trans
-cToTrans = toEnum . fromIntegral
 transToC = fromIntegral . fromEnum
 -- {# fun unsafe golib_matrix_vector_mult {withMatrix* FIXME} #}
 {# fun unsafe golib_matrix_vector_mult as unsafeMatrixVectorMult {realToFrac `Double', withMatrix* `Matrix', 

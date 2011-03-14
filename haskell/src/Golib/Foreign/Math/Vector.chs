@@ -7,13 +7,17 @@ module Golib.Foreign.Math.Vector
   vectorNew,
   getElem',
   dot,
+  equals,
   vectorSize,
   unsafeFill,
   unsafeCopy,
   unsafeScalarMult,
+  unsafeVectorAdd,
   VMM,
   createVector,
   modifyVector,
+  vectorAdd,
+  getVector,
   getElem,
   setElem,
   setElems) where
@@ -42,7 +46,8 @@ import Control.Monad.State
 {# fun pure golib_vector_equals as equals {withVector* `Vector', withVector* `Vector'} -> `Bool' cToBool #}
 {# fun unsafe golib_vector_dot as unsafeDot {withVector* `Vector', withVector* `Vector'} -> `Double' realToFrac #}
 {# fun unsafe golib_vector_scalar_mult as unsafeScalarMult {withVector* `Vector', realToFrac `Double' } -> `()' #}
-
+{-| Computes unsafeVectorAdd alpha y x computed y <- alpha * x + y. Note that y is overwritten, therefore this is highly unsafe. -}
+{# fun unsafe golib_vector_add as unsafeVectorAdd {realToFrac `Double', withVector* `Vector', withVector* `Vector'} -> `Bool' cToBool #}
 
 rangeCheck :: Vector -> Index -> Bool
 rangeCheck v i = let i' = fromIntegral i 
@@ -92,6 +97,9 @@ createVector :: Index -> VMM s a -> Vector
 createVector n action = unsafePerformIO $ 
                         vectorNew n >>= \mv -> runVMM mv (action >> (VMM get))
     
+getVector :: VMM s Vector
+getVector = VMM get
+
 modifyVector :: Vector -> VMM s a -> Vector
 modifyVector v action = unsafePerformIO $
   vectorNew n >>= \nv -> 
@@ -99,6 +107,11 @@ modifyVector v action = unsafePerformIO $
   where
     n = vectorSize v
     
+{-| Adds alpha * v to the current vector. -}
+vectorAdd :: Double -> Vector -> VMM s ()
+vectorAdd alpha x = VMM $ (get >>= \v -> liftIO $ unsafeVectorAdd alpha v x >>= \t ->
+                            if t then return () else error "vectorAdd failed.")
+
 {-| unsafeSetElem may fail gracefully,
 therefore this method may or may not set the element, depending on a successful range check. -}
 setElem :: Index -> Double -> VMM s ()

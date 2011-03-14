@@ -15,7 +15,7 @@ import qualified Golib.Math.Vector as V
 {-| Matrix / Vector operations -}
 class (MatrixClass i a mat, VC.VectorClass i a vec) => 
       MatrixVectorClass i a mat vec | mat -> a, mat -> i, mat -> vec where
-        (#|) :: mat -> vec -> Maybe vec
+        (#|) :: mat -> vec -> vec
         --(|#) :: vec -> mat -> Maybe vec
         --outer :: vec -> vec -> mat
   
@@ -32,13 +32,16 @@ class MatrixClass i a mat | mat -> a, mat -> i where
   
   (!) :: mat -> (i, i) -> a
   -- Scalar mult
-  -- (*>) :: a -> mat -> mat
-  --  (<*) :: mat -> a -> mat
+  infixl 7 *>
+  (*>) :: a -> mat -> mat
+  infixl 6 <+>
+  (<+>) :: mat -> mat -> mat
+  infixl 6 <->
+  (<->) :: mat -> mat -> mat
   -- Matrix mult
+  infixl 7 <**>
   (<**>) :: mat -> mat -> mat
-  -- Matrix vector mult
-  -- (<**) :: (VectorClass v) => m -> v -> v
-  -- (**>) :: (VectorClass v) => v -> m -> v
+
   
 
 

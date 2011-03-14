@@ -3,10 +3,11 @@
 module Golib.Math.Vector
        (
          module Golib.Foreign.Math.Vector,
-         module Golib.Math.Vector.Class ) where
+         module Golib.Math.Vector.Class, 
+         fromList ) where
 
 import Golib.Math.Base
-import Golib.Foreign.Math.Vector (VMM, Vector, createVector, modifyVector, getElem, setElem, setElems)
+import Golib.Foreign.Math.Vector (VMM, Vector, createVector, modifyVector, getElem, setElem, setElems, getVector, vectorAdd)
 import qualified Golib.Foreign.Math.Vector as F
 import Golib.Math.Vector.Class
 import Foreign
@@ -24,8 +25,24 @@ instance VectorClass Index Double F.Vector where
     Just e -> e
     Nothing -> 0.0
   
-  scalarProduct s v = unsafePerformIO $ 
-                      F.vectorNew (vecSize v) >>= \result -> 
-                      F.unsafeCopy v result >> 
-                      F.unsafeScalarMult result s >> return result
+  s *> v = unsafePerformIO $ 
+           F.vectorNew (vecSize v) >>= \result -> 
+           F.unsafeCopy v result >> 
+           F.unsafeScalarMult result s >> return result
   
+  v1 <+> v2 = modifyVector v1 $ vectorAdd 1 v2
+  v1 <-> v2 = modifyVector v1 $ vectorAdd (-1) v2
+
+
+{-| Create a vector from the given list of values. See also toList. -}
+fromList :: [Double] -> F.Vector
+fromList as = createVector n $ setElems (zip [0..(n-1)] as)
+  where n = length as
+
+
+instance Eq F.Vector where
+  (==) = F.equals
+  
+instance Show F.Vector where
+  show v = "fromList " ++ show (toList v)
+
