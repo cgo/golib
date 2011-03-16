@@ -1,0 +1,12 @@
+import os
+
+env = Environment(ENV=os.environ)
+prefix = ARGUMENTS.get('prefix','/usr/local')
+sources = ["vector.cpp", "matrix.cpp", "general.cpp"]
+
+env.Alias ('install', prefix)
+
+env.ParseConfig ("pkg-config golib --cflags --libs")
+
+hsgolib = env.SharedLibrary ("hsgolib", sources)
+env.Install (prefix + "/lib", hsgolib)
