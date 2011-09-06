@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags gtkmm-2.4` `pkg-config --cflags cairomm-1.0`
 
 LD		= g++
-LDARGS		= $(LDFLAGS)
+LDARGS		= $(LDFLAGS) `pkg-config --libs gtkmm-2.4`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -lGo -lGomatlab -lshape
+LIBS		=  -lGo -lshape
 
 INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(HOME)/Work/partial-shapes/libshape/include
 

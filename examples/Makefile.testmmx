@@ -4,7 +4,7 @@ CXX		= gcc
 CXXARGS		= -c -g -D HAVE_CONFIG_H 
 
 LD		= gcc
-LDARGS		=  
+LDARGS		= ${LDFLAGS}
 
 LIBS		=  -L../lib -lGo
 

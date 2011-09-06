@@ -44,7 +44,7 @@ SET                 (SOURCES
  # src/math/mean.cpp
  # src/math/variance.cpp
 
- # src/math/contours.cpp
+ src/math/contours.cpp
  src/misc/goargs.cpp
  src/misc/goofffile.cpp
  # src/misc/plot.cpp

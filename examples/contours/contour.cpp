@@ -1,10 +1,17 @@
+/* Copyright (C) 1998-2011 Christian Gosch, golib at goschs dot de
+   This file is part of the golib library.
+   For license regulations, see the file COPYING in the main
+   directory of the golib source tree. */
+
+
+#include <gocontours.h>
 #include <gomath.h>
 #include <gofileio.h>
 #include <gosignalhelper.h>
 #include <goplot.h>
 
-#include <engine.h>
-#include <gomatlab.h>
+// #include <engine.h>
+// #include <gomatlab.h>
 
 #include <goshape.h>
 #include <goshapehelper.h>
@@ -47,22 +54,23 @@ int main (int argc, char* argv[])
         // printf ("Found matrix size %d %d\n", el->elem.getRows(), el->elem.getColumns());
         el = el->next;
     }
-    // plot.getGnuplot().call ("set terminal postscript eps color\nset output 'test.eps'\n");
+    plot.getGnuplot().call ("set terminal postscript eps color\nset output 'test.eps'\n");
+    plot.plot ();
+
+    // printf ("Starting matlab\n");
+    // goMatlab matlab;
+    // printf ("...done.\n");
+    // {
+    //     matlab.putSignal (&image, "image");
+    //     matlab.putDouble (level, "level");
+    //     matlab.call ("contour (image, [level level]);");
+    // }
     
-    printf ("Starting matlab\n");
-    goMatlab matlab;
-    printf ("...done.\n");
-    {
-        matlab.putSignal (&image, "image");
-        matlab.putDouble (level, "level");
-        matlab.call ("contour (image, [level level]);");
-    }
-    
-    goShape<goDouble> shape;
-    goExtractShape (image, level, shape, matlab);
-    printf ("Shapes: %d\n", shape.getCurves().getSize());
-    printf ("Contours: %d\n", c.getSize());
-    shape.writeASCII ("shape.txt");
+    // goShape<goDouble> shape;
+    // goExtractShape (image, level, shape, matlab);
+    // printf ("Shapes: %d\n", shape.getCurves().getSize());
+    // printf ("Contours: %d\n", c.getSize());
+    // shape.writeASCII ("shape.txt");
 
     plot.plotPause();
     return 1;

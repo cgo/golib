@@ -10,7 +10,7 @@ SET (TARGET _gomatlab)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/gomatlab_wrap.cxx
                     COMMAND ${SWIG_EXECUTABLE} 
-                        ARGS -I../include -python -fcompact -addextern -c++ gomatlab.i
+                        ARGS -I${CMAKE_CURRENT_SOURCE_DIR}/../../include -python -fcompact -addextern -c++ gomatlab.i
                         DEPENDS gomatlab.i
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 #EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}

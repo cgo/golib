@@ -1,3 +1,9 @@
+/* Copyright (C) 1998-2011 Christian Gosch, golib at goschs dot de
+   This file is part of the golib library.
+   For license regulations, see the file COPYING in the main
+   directory of the golib source tree. */
+
+
 #ifndef GOHASHCACHE_H
 #define GOHASHCACHE_H
 
@@ -43,7 +49,7 @@ class goHashCache {
   ///
   goHashCache ();
   /*!
-   * @todo Problem: Hashtable für Zeiger. Daten müssen per Hand gelöscht werden. 
+   * @todo Problem: Hashtable fuer Zeiger. Daten muessen per Hand geloescht werden. 
    */
   ~goHashCache ();
 
