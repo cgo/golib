@@ -1,11 +1,5 @@
-/* Copyright (C) 1998-2011 Christian Gosch, golib at goschs dot de
-   This file is part of the golib library.
-   For license regulations, see the file COPYING in the main
-   directory of the golib source tree. */
-
-
 /*!
- * \mainpage Online source documentation for goLib
+ * \mainpage Online source documentation for golib
  * - \subpage main Main, general documentation (READ THIS!)
  * - \subpage notes Notes
  */
@@ -15,45 +9,27 @@
  *    trying the library, please drop me a line.</b>
  *
  * \section license License
- * I first indended to release the library under the GPL, but
- * for various reasons this is not the current license.
- * Therefore, copying, changing, or in any way using this library
- * is <b>not</b> allowed without my prior written consent.
- * If you have the code or binary and do not agree to these terms,
- * do not use it and delete it immediately.
- * If you have questions, please contact me.
- * So, here come the
- * \subsection lic_reg Regulations
- * License regulations for golib (in the following also "code", "software").<br>
-1. This code is written by and 
-   copyright by Christian Gosch ("the author"),
-   <christian <AT> goschs dot de> <br>
-2. No copying is allowed without prior written consent
-   from the author. <br>
-3. Neither commercial nor any other use of the code is allowed
-   without prior written consent from the author. <br>
-4. Modifications of the code are not allowed without prior written
-   consent from the author. Modified versions of the code
-   may not be handed on to a third party, regardless of
-   agreements with the author concerning the unmodified code.<br>
- *
- * If you should find that the version you downloaded is out of date
- * and does not match this documentation, please notify the me, the author,
- * at <code>christian __at__ goschs __ de</code>.
- * Since it is under construction quite heavily at the moment,
- * that might well be the case. <br>
- * <strong> 
- * 		Version 0.2.1 of this library is NOT free and NOT for the open
- *		public. If you have it and don't know if you are allowed 
- * 		to use it, please contact the author or simply delete the code
- *		and get another version!
- * </strong>
+ * golib is put under the GNU General Public License.
+ * It can be found in the source directory in the file COPYING or
+ * at http://www.gnu.org/licenses/gpl
  * 
+ * \section contact How to contact the author
+ * You can contact me at golib at goschs dot de, with the usual replacements
+ * to form a valid email address.
+ *
  * \section intro What it is
  * \subsection intro2 Introduction
  * goLib is a C++ class library written by 
  * Christian Gosch</a>.
- * It contains some classes which have proven useful to me, like 
+ * It contains some classes which have proven useful to me and has grown gradually.
+ * Some parts are better maintained and better written than others, that depends completely
+ * on how much I have used them.
+ *
+ * I have also started to rename some things to use a bunch of namespaces (such as goMath),
+ * but that has only been done in a few places. If the library turns out to be used out there
+ * somewhere, I will rework the naming to be more consistent if that is what is needed.
+ *
+ * Some of the things golib includes are:
  * - <b>Arrays, strings, lists, hashtables, binary trees, heaps</b> and so forth
  * - <b>Multithreading</b> wrappers (goThreadObject and related) 
  * - A class for grabbing frames from a <b>video4linux</b> device (recent, goVideoCapture)
