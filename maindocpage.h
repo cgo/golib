@@ -121,6 +121,7 @@
  *	   (ATLAS's LAPACK only implements a subset of LAPACK).
  *	   Many Linux distributors provide for this library, just as for ATLAS.
  *	   You will also need the header files cblas.h and clapack.h from ATLAS.
+ *       - video4linux header files and library
  *	 You may replace ATLAS's CBLAS with another CBLAS implementation. 
  *	 In that case, you have to remove the ATLAS library from
  *	 CMakeFiles.txt and only leave CBLAS. You will be on your own since I haven't tried that.
@@ -150,6 +151,7 @@
      <ul>
       <li>libatlas-base-dev (lapack, blas, atlas)</li>
       <li>libf2c2-dev (lapack)</li>
+      <li>libv4l-dev (for govideocapture.cpp)</li>
      </ul>
      <li>Recommended:</li>
        <ul><li>libdevil-dev</li></ul>
@@ -166,13 +168,6 @@
  *
  * 	\subsection env Environment variables
  * 	You need to set:
- * 	- GOPATH to the golib base directory.
- * 	  E.g., if you have unpacked the source to /home/user/golib, then set
- * 	  GOPATH to that.<br>
- * 	  E.g. in csh, do<br>
- * 	  <code>setenv GOPATH /home/user/golib</code><br>
- * 	  in bash, you would do<br>
- * 	  <code>export GOPATH=/home/user/golib</code><br>
  * 	- MATLAB should point to your Matlab installation path,
  * 	  if you want to build the Matlab module. E.g., <br>
  * 	    setenv MATLAB /usr/opt/matlab
@@ -185,7 +180,7 @@
  * 	- Add any non standard include directories to CPPFLAGS.<br>
  * 	If you don't know what the latter two are, you probably don't need them.
  *
- *	 To be able to run programs linked to goLib, add 
+ *	 To be able to run programs linked to golib, add 
  *	 the path to the shared library to your LD_LIBRARY_PATH environment
  *	 variable. It would also be wise to set the
  *	 environment variable GOPATH to the root path of the golib distribution,
@@ -201,7 +196,8 @@
  *      <li>mkdir build</li>
  *      <li>cd build</li>
  *      <li>cmake ..  or  ccmake ..</li>
- *      <li>  --> select whichever modules you need, and configure/generate
+ *      <li>  --> select whichever modules you need, and configure/generate</li>
+ *      <li> Notice you may have to turn LINK_GFORTRAN to OFF in ccmake, depending on whether the linker complains about it.</li>
  *      <li>make</li>
  *      <li>make install</li>
  *    </ul>
@@ -221,18 +217,21 @@
  * \section state State of development
  * Development has started some time in 1996/97.
  * Some of this is work in progress.
+ * Note that I am currently not working very much on golib,
+ * since I have a day job, a non-virtual life, and other projects which
+ * have precedence.</br>
  * The current version number is <strong>0.5</strong>.
- * Some significant changes are imminent.
+ * Some significant changes are always imminent (;-)).
  * Some of the basic features are not very well documented, but I will fix that
  * in the future. Particularly, "how-to-use" sections are missing in the documentation,
  * even though many classes are straight forward to use.
  * I plan to write some introductory documentation
  * which explains some concepts.<br>
- * You should also be aware that this library was created over a long time
+ * <b>You should also be aware that this library was created over a long time
  * in small parts, some of which I used more than others. The parts I
- * used more are likely to be better documented and better maintained.<br>
+ * used more are likely to be better documented, better maintained, and generally in better shape.</b> <br>
  * I remove bugs
- * as soon as I find them. As I only use parts of the library very often, these parts
+ * as soon as I find them. As I only used to use parts of the library very often, these parts
  * will probably contain less bugs than others.
  * If you find a bug or think you found a bug, please
  * do not hesitate to send me an email to <code>golib __at__ goschs __ de</code>.
