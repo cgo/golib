@@ -3,6 +3,7 @@
    For license regulations, see the file COPYING in the main
    directory of the golib source tree. */
 
+#include <cstddef>
 
 #include <gomatrix.h>
 // #include <gomatrix.hpp>
@@ -619,6 +620,7 @@ bool goMath::Matrix<T>::transpose ()
     }
 
     *this = temp;
+    return true;
 }
 
 template <class T>

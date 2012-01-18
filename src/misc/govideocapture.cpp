@@ -34,7 +34,7 @@
 #  define FOO__STRICT_ANSI__
 #  undef __STRICT_ANSI__
 # endif
-# include <linux/videodev.h>
+# include <libv4l1-videodev.h>
 # ifdef FOO__STRICT_ANSI__
 #  define __STRICT_ANSI__
 #  undef FOO__STRICT_ANSI__
