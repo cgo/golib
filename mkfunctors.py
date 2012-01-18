@@ -6,7 +6,7 @@ import string, sys
 Helper program to create functor implementations up to a given max. number of arguments.
 Versions for void and non-void are made, as well as matching helpers (goFunction() and goMemberFunction())
 and goCaller classes.
-Part of golib
+Part of golib: See http://www.goschs.de
 (C) Copyright 2009 by Christian Gosch
 """
 
