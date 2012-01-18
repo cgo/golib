@@ -175,6 +175,9 @@
  * 	  in order to use the modules from Python.
  *
  * 	You may have to set:
+ *      - For some of the examples in the examples/ subdirectory,
+ *        you may need to set the GOPATH environment variable to point
+ *        to the base directory of golib.
  * 	- LD_LIBRARY_PATH accordingly, depending on where you install golib
  * 	- LDFLAGS for any non standard library directories
  * 	- Add any non standard include directories to CPPFLAGS.<br>

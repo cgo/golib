@@ -68,6 +68,15 @@ GL:
 Python:
  python-dev
 
+
+How to build the HTML documentation
+-----------------------------------
+Get /doxygen/, in Ubuntu e.g. say "sudo apt-get install doxygen".
+Then in the golib base directory, simply call doxygen
+from the command line.
+The documentation will be in doc/html.
+
+
 How to build
 ------------
 Set the environment variable GOPATH to the path where golib resides, e.g. in bash
