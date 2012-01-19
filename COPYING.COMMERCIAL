@@ -1,13 +1,5 @@
 License regulations for golib (in the following also "code", "software").
 
-1. This code is written by and 
-   copyright by Christian Gosch ("the author"),
-   <christian <AT> goschs dot de>
-2. No copying is allowed without prior written consent
-   from the author. 
-3. Neither commercial nor any other use of the code is allowed
-   without prior written consent from the author.
-4. Modifications of the code are not allowed without prior written
-   consent from the author. Modified versions of the code
-   may not be handed on to a third party, regardless of
-   agreements with the author concerning the unmodified code.
+Note the file COPYING, which contains the license (GPL) for this software.
+If you want to use the software in a commercial product, please notice
+you can not do so without explicit written prior permission.
