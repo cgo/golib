@@ -13,4 +13,10 @@ Create a build directory and use cmake from there, e.g.
  make install
 
 See the README file for extra things you need and also
-check the html documentation.
+check the html documentation, which is probably much more up to date
+than this file.
+You can create the HTML documentation using doxygen, simply by calling
+ doxygen
+in the golib base directory.
+The documentation should then be located in doc/html.
+See there also for prerequisites.
