@@ -95,6 +95,16 @@ To build the examples, you will have to build the library first,
 then go to the golib/examples directory and use one of the provided makefiles, like this:
 make -f <YourChosenMakefile>
 
+More recent examples have their own sub-directories in the examples
+directory, and mostly have CMakeLists.txt files for use with cmake.
+You may have to edit some of these files to fit your machine, in particular
+the paths where the libraries and include files are located.
+
+Note there is also a pkg-config file created by cmake. It is called
+ golib.pc
+and is located in the golib base directory after cmake ran successfully.
+
+
 Further reading
 ---------------
 I suggest you go through the online documentation in the golib/doc
@@ -105,38 +115,3 @@ Contact
 Feel free to contact me at golib@goschs.de!
 
 
-DIPLOMARBEIT (version 0.2.1), German only
-------------
-Die Klassen, die für die Diplomarbeit wichtig sind, finden sich in
-src/graphics und src/signal.
-Es sind jedoch nicht ALLE Klassen in diesen Verzeichnissen Teil der 
-Diplomarbeit.
-Im Verzeichnis examples/ finden sich einige Test- und Beispielprogramme.
-Insbesondere ist volumefile.cc ein Beispielprogramm für die 
-Konvertierung von Datensätzen. Eine grafische Oberfläche auf Basis
-von Qt für die Konvertierung findet sich in examples/vf-gui.
-examples/renderdemo beherbergt die in der Diplomarbeit 
-angesprochene Benutzeroberfläche des Systems.
-
-Um einen Joystick zu benutzen, müssen alle dazu notwendigen Treiber
-geladen sein!
-
-Die Bibliothek sollte sich auf jeder neueren Linux-Distribution
-übersetzen lassen. 
-Es werden folgende Bibliotheken und Pakete unbedingt benötigt:
-- SDL mit Joystickunterstützung sowie alle von SDL benötigten Pakete
-  http://www.libsdl.org
-- pthread
-  libpthread sollte auf jeder modernen Linux-Installation bereits 
-  vorhanden sein. Wenn sie das nicht ist, ist sie 
-  über http://rpmfind.net
-  und ähnliche Dienste zu finden.
-- Ein laufendes X Window System
-
-Die Bibliothek und alle wichtigen Beispielprogramme 
-wurden in ihrer vorliegenden Form auf einem Linux-
-System mit einem Kernel Version 2.4.4 mit dem gcc Compiler Version 2.95.3
-erfolgreich übersetzt.
-
-Bitte beachten Sie alle README Dateien sowie Hinweise in dieser Datei
-und in der Dokumentation zur Übersetzung der Bibliothek.

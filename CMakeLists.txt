@@ -19,7 +19,7 @@ SET (BUILD_MATLAB_MEX FALSE CACHE BOOL "Enable/disable building the matlab mex m
 SET (BUILD_GUI_MODULE FALSE CACHE BOOL "Enable/disable building the GUI module (Gogui)")
 SET (BUILD_GUI_MODULE_OPENGL FALSE CACHE BOOL "Enable/disable building the OpenGL widget (needs Gogl)")
 SET (BUILD_GL_MODULE FALSE CACHE BOOL "Enable/disable building the OpenGL module (Gogl)")
-SET (LINK_GFORTRAN TRUE CACHE BOOL "Link gfortran library (for atlas 3.6)")
+SET (LINK_GFORTRAN FALSE CACHE BOOL "Link gfortran library (for atlas 3.6)")
 
 IF (HAVE_MATLAB_GEQ_2007A)
     ADD_DEFINITIONS (-DHAVE_MATLAB_GEQ_2007A)
