@@ -19,60 +19,60 @@
  *
  * \section intro What it is
  * \subsection intro2 Introduction
- * goLib is a C++ class library written by 
- * Christian Gosch</a>.
- * It contains some classes which have proven useful to me and has grown gradually.
- * Some parts are better maintained and better written than others, that depends completely
- * on how much I have used them.
- *
- * I have also started to rename some things to use a bunch of namespaces (such as goMath),
- * but that has only been done in a few places. If the library turns out to be used out there
- * somewhere, I will rework the naming to be more consistent if that is what is needed.
- *
- * Some of the things golib includes are:
- * - <b>Arrays, strings, lists, hashtables, binary trees, heaps</b> and so forth
- * - <b>Multithreading</b> wrappers (goThreadObject and related) 
- * - A class for grabbing frames from a <b>video4linux</b> device (recent, goVideoCapture)
- *   including some small matlab mex modules to use v4l under matlab
- * - Classes for <b>image processing</b>, like container classes for <b>3D grid data</b>
- *   which supports multi-channel data
- *   (source tree under src/signal), wrapper for <b>writing and reading images</b> (goFileIO)
- *   which rely on libdevil
- * - A <b>file system interface</b> in goFileIO to do some basic tasks like
- *   reading/writing ASCII files, checking for file existance, making directories, and so on.
- * - Some <b>matrix and vector classes</b>, and a sparse matrix class 
- *   that acts mainly as a golib-side representation of sparse matrices for the Matlab
- *   interface
- * - A few <b>numerical linear algebra routines</b>,
- *   using BLAS/LAPACK/ATLAS, and
- *   some parts from the free TNT library (incorporated in the code
- *   and marked as such). They include the standard conjugate gradients method 
- *   for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
- *   for solving linear systems, Eigenvalues of complex Hermitian matrices (the latter from
- *   SEISPACK).
- * - An interface to run <b>gnuplot</b> (goPlotter, goMultiPlotter)
- *   comfortably from C++, e.g. to plot a goVector
- * - A <b>process interface</b> for external program calls (goProcess)
- * - A few networking classes (not well tested)
- * - ... it's slowly growing as I find use for more stuff :)
- *
- * There are also additional libraries which use golib and are all included:
- * - A <b>matlab interface wrapper</b>  
- *   to use matlab engines from C++ and swap data
- *   between golib and matlab (you need matlab for this, of course)
- * - A GUI base library using gtkmm, a (very good) C++ wrapper for gtk+
- *   <ul>
- *   <li>http://www.gtkmm.org</li>
- *   </ul>
- *   You need version 2.4 of gtkmm for the GUI library.
- * - A small OpenGL helper library.
- *   You need OpenGL libraries to use this.
- * - A library helping to use embedded Python with the Swig-generated
- *   wrappers for golib classes (good for application scripting)
- * 
- * All additional libraries can be selected to be built from the ccmake
- * interface. 
- *
+ goLib is a C++ class library written by 
+ Christian Gosch</a>.
+ It contains some classes which have proven useful to me and has grown gradually.
+ Some parts are better maintained and better written than others, that depends completely
+ on how much I have used them.
+
+ I have also started to rename some things to use a bunch of namespaces (such as goMath),
+ but that has only been done in a few places. If the library turns out to be used out there
+ somewhere, I will rework the naming to be more consistent if that is what is needed.
+
+ Some of the things golib includes are:
+ - <b>Arrays, strings, lists, hashtables, binary trees, heaps</b> and so forth
+ - <b>Multithreading</b> wrappers (goThreadObject and related) 
+ - A class for grabbing frames from a <b>video4linux</b> device (recent, goVideoCapture)
+   including some small matlab mex modules to use v4l under matlab
+ - Classes for <b>image processing</b>, like container classes for <b>3D grid data</b>
+   which supports multi-channel data
+   (source tree under src/signal), wrapper for <b>writing and reading images</b> (goFileIO)
+   which rely on libdevil
+ - A <b>file system interface</b> in goFileIO to do some basic tasks like
+   reading/writing ASCII files, checking for file existance, making directories, and so on.
+ - Some <b>matrix and vector classes</b>, and a sparse matrix class 
+   that acts mainly as a golib-side representation of sparse matrices for the Matlab
+   interface
+ - A few <b>numerical linear algebra routines</b>,
+   using BLAS/LAPACK/ATLAS, and
+   some parts from the free TNT library (incorporated in the code
+   and marked as such). They include the standard conjugate gradients method 
+   for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
+   for solving linear systems, Eigenvalues of complex Hermitian matrices (the latter from
+   SEISPACK).
+ - An interface to run <b>gnuplot</b> (goPlotter, goMultiPlotter)
+   comfortably from C++, e.g. to plot a goVector
+ - A <b>process interface</b> for external program calls (goProcess)
+ - A few networking classes (not well tested)
+ - ... it's slowly growing as I find use for more stuff :)
+
+ There are also additional libraries which use golib and are all included:
+ - A <b>matlab interface wrapper</b>  
+   to use matlab engines from C++ and swap data
+   between golib and matlab (you need matlab for this, of course)
+ - A GUI base library using gtkmm, a (very good) C++ wrapper for gtk+
+   <ul>
+   <li>http://www.gtkmm.org</li>
+   </ul>
+   You need version 2.4 of gtkmm for the GUI library.
+ - A small OpenGL helper library.
+   You need OpenGL libraries to use this.
+ - A library helping to use embedded Python with the Swig-generated
+   wrappers for golib classes (good for application scripting)
+ 
+ All additional libraries can be selected to be built from the ccmake
+ interface. 
+
  * \par 
  * <strong>Important notice:</strong> All of this was made because I had
  * a use for it. If you want to make your own contributions, please see further 
