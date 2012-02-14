@@ -20,15 +20,15 @@
 # include <goautoptr.h>
 #endif
 
-/** 
- * @addtogroup signal
- * @{
- */
 namespace goSignal
 {
     extern const goSize3D _defaultBlockSize3D;
     extern const goSize3D _defaultBlockSize2D;
 
+/** 
+ * @ingroup signal
+ * @{
+ */
     const goSize3D& defaultBlockSize3D ();
     const goSize3D& defaultBlockSize2D ();
 
@@ -40,7 +40,8 @@ namespace goSignal
     bool RGB2BGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target);
     bool toBGRA (goSignal3DBase<void>& source, goSignal3DBase<void>& target, goFloat alpha = -1.0);
     goAutoPtr<goSignal3D<void> > toBGRA (goSignal3DBase<void>& source, goFloat alpha = -1.0);
-};
 /** @} */
+};
+
 
 #endif

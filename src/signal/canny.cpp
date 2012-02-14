@@ -106,30 +106,13 @@ namespace goSignal
 #endif
         }
 
-//        {
-//            goSignal3D<void> temp;
-//            temp.setDataType (GO_FLOAT);
-//            temp.make (sobel.getSize(), sobel.getBlockSize(), sobel.getBorderSize(), 1);
-//            sobel.setChannel (2);
-//            goCopySignalChannel (&sobel, &temp);
-//            goPlot::Plot p;
-//            p.plotImage (temp, "");
-//            p.plotPause ();
-//        }
 
         //= Non-maximum suppression
         goSignal3DGenericIterator r (&ret);
         goSignal3DGenericIterator s (&sobel);
 
-        //goDouble minSobel, maxSobel;
-        //sobel.setChannel (2);
-        //sobel.getMinMax (minSobel, maxSobel);
-        //sobel.setChannel (0);
-
         goIndex_t index = 0;
         std::queue<goIndex_t> Q;
-        // goFloat thresh1 = 80.0f;
-        // goFloat thresh2 = 40.0f;
         while (!s.endY ())
         {
             s.resetX ();
@@ -178,14 +161,6 @@ namespace goSignal
             r.incrementY ();
         }
 
-        //= Copy the result scaled to [0,255] into ret
-//        goDouble minSobel, maxSobel;
-//        sobel.setChannel (2);
-//        sobel.getMinMax (minSobel, maxSobel);
-//        sobel -= minSobel;
-//        sobel *= 255.0f / (maxSobel - minSobel);
-//        goCopySignalChannel (&sobel, &ret);
-//        sobel.setChannel (0);
 
         //= FIXME: Hysteresis. May be done faster; this is for good readability.
         goIndex_t Nx = static_cast<goIndex_t> (sobel.getSizeX ());
@@ -197,7 +172,6 @@ namespace goSignal
 
             goIndex_t y = i / Nx;
             goIndex_t x = i - y * Nx;
-            // goIndex_t x = i % Nx;
             for (goIndex_t k = -1; k < 2; ++k)
             {
                 for (goIndex_t l = -1; l < 2; ++l)
@@ -211,7 +185,6 @@ namespace goSignal
                     if (ret.getValue (x + k, y + l) <= 0 && sobel.getValue (x + k, y + l, 0, 0) >= thresh2)
                     {
                         Q.push (x + k + (y + l) * Nx);
-                        // sobel.setValue (thresh1, x + k, y + l, 0, 0);
                         ret.setValue (255.0, x + k, y + l);
                     }
                 }
@@ -235,10 +208,8 @@ namespace goSignal
             default: goLog::error ("goSignal::_canny1 (): wrong data type of ret.");
         }
     }
-};
 
 /** 
- * @addtogroup signal
  * @brief Canny edge detector for 2D images.
  *
  * Compute the edge map after Canny.
@@ -261,7 +232,7 @@ namespace goSignal
  * 
  * @return True is successful, false otherwise.
  */
-bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goDouble thresh1, goDouble thresh2)
+bool canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& ret, goDouble thresh1, goDouble thresh2)
 {
     if (ret.getSize() != image.getSize())
     {
@@ -315,3 +286,5 @@ bool goSignal::canny (const goSignal3DBase<void>& image, goSignal3DBase<void>& r
 
     return true;    
 }
+
+};

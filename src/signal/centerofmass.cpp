@@ -48,7 +48,6 @@ static inline bool _signalCOM2 (const goSignal3DBase<void>& sig, goMath::Vectord
 }
 
 /** 
- * @addtogroup signal
  * @brief Calculate centre of mass of \c sig.
  * 
  * @param sig    Data.

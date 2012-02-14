@@ -25,9 +25,6 @@
 # include <gotype.hpp>
 #endif
 
-/** \addtogroup signal
- * @{
- */
 template <class T>
 static void goNormalizeSignal__ (T minimum, T maximum, 
                           const goSignal3DBase<void>* sig, 
@@ -1255,7 +1252,6 @@ void goSignalFlipY (const goSignal3DBase<void>& sig, goSignal3DBase<void>& targe
     }
 }
 
-/** @} */
 
 template bool goCopySignalArray<goInt8>   (const goInt8*, goSignal3DBase<void>*, int*);
 template bool goCopySignalArray<goUInt8>  (const goUInt8*, goSignal3DBase<void>*, int*);

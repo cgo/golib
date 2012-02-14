@@ -27,11 +27,6 @@ class goRRefPtr
             if (myPtr)
             {
                 goLog::error ("~goRRefPtr(): deleting with myPtr != 0");
-                //printf ("goRRefPtr deleting myPtr with myRefCount == %d\n", myRefCount);
-                //myMutex.lock();
-                //delete myPtr;
-                //myPtr = 0;
-                //myMutex.unlock();
             }
         };
 
@@ -47,7 +42,6 @@ class goRRefPtr
         goRRefPtr<T>& operator= (goRRefPtr<To>& other)
         {
             myMutex.lock();
-            //printf ("goRRefPtr = with refcount %d, ptr %p\n", other.myRefCount, other.myPtr);
             this->myRefCount = other.myRefCount;
             this->myPtr = static_cast<T*>(other.myPtr);
             myMutex.unlock();
@@ -67,7 +61,6 @@ class goRRefPtr
         goRRefPtr<T>& operator= (const goRRefPtr<To>& other)
         {
             myMutex.lock();
-            //printf ("goRRefPtr = with refcount %d, ptr %p\n", other.myRefCount, other.myPtr);
             this->myRefCount = other.myRefCount;
             this->myPtr = const_cast<T*>(static_cast<const T*>(other.myPtr));
             myMutex.unlock();
@@ -101,7 +94,6 @@ class goRRefPtr
         {
             myMutex.lock();
             ++myRefCount;
-            //printf ("incref: refcount == %d\n", myRefCount);
             myMutex.unlock();
             return myRefCount;
         };
@@ -109,7 +101,6 @@ class goRRefPtr
         {
             myMutex.lock();
             --myRefCount;
-            //printf ("decref: refcount == %d\n", myRefCount);
             myMutex.unlock();
             return myRefCount;
         };
@@ -184,11 +175,8 @@ class goAutoPtr
         {
             if (myRRefPtr)
             {
-                //printf ("reset decref\n");
                 if (myRRefPtr->decRef() <= 0)
                 {
-                    //printf ("reset(): ref <= 0, deleting pointer.\n");
-                    //fflush (stdout);
                     myRRefPtr->myMutex.lock();
                     delete (T*)myRRefPtr->myPtr;
                     myRRefPtr->myPtr = 0;
@@ -207,16 +195,6 @@ class goAutoPtr
         ~goAutoPtr ()
         {
             this->reset ();
-//            // printf ("~goAutoPtr(): myRRefPtr->getRefCount() == %d\n", myRRefPtr->getRefCount());
-//            if (myRRefPtr)
-//            {
-//                //printf ("delete operator decref\n");
-//                if (myRRefPtr->decRef() <= 0)
-//                {
-//                    delete myRRefPtr;
-//                    myRRefPtr = 0;
-//                }
-//            }
         };
 
         /** 
@@ -251,19 +229,9 @@ class goAutoPtr
                 return *this;
             }
             this->reset ();
-//            if (myRRefPtr)
-//            {
-//                //printf ("op= decref\n");
-//                if (myRRefPtr->decRef() <= 0)
-//                {
-//                    delete myRRefPtr;
-//                    myRRefPtr = 0;
-//                }
-//            }
             myRRefPtr = const_cast<goRRefPtr<void>*>(other.getRRefPtr()); //= refpointers are never const -- only for compatibility with data structures.
             if (myRRefPtr)
             {
-                //printf ("op = incref\n");
                 myRRefPtr->incRef ();
             }
 
@@ -290,25 +258,11 @@ class goAutoPtr
             {
                 return *this;
             }
-            {
-                //= Make the compiler check if a cast is possible.
-                // const T* a = static_cast<const T*> (other.get());
-            }
             this->reset ();
-//            if (myRRefPtr)
-//            {
-//                //printf ("op= decref\n");
-//                if (myRRefPtr->decRef() <= 0)
-//                {
-//                    delete myRRefPtr;
-//                    myRRefPtr = 0;
-//                }
-//            }
             myRRefPtr = const_cast<goRRefPtr<void>*>(other.getRRefPtr()); //= refpointers are never const -- only for compatibility with data structures.
             if (myRRefPtr)
             {
-                //printf ("op = incref\n");
-                myRRefPtr->incRef ();
+	      myRRefPtr->incRef ();
             }
 
             return *this;
@@ -317,7 +271,6 @@ class goAutoPtr
         bool isNull () const
         {
             return (this->myRRefPtr == 0 || this->myRRefPtr->myPtr == 0);
-            // return ((const T*)(*this) == 0);
         };
 
         template <class To>

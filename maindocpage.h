@@ -5,8 +5,6 @@
  */
 /*!
  * \page main Main Documentation
- * <b>A current version is not available online. If you are really interested in
- *    trying the library, please drop me a line.</b>
  *
  * \section license License
  * golib is put under the GNU General Public License.
@@ -50,11 +48,17 @@
    for sparse matrices, Eigenvalue and Singular Value decompositions, LU decomposition
    for solving linear systems, Eigenvalues of complex Hermitian matrices (the latter from
    SEISPACK).
+ - Some optimisation classes, see the "math and numerics" module.
  - An interface to run <b>gnuplot</b> (goPlotter, goMultiPlotter)
    comfortably from C++, e.g. to plot a goVector
  - A <b>process interface</b> for external program calls (goProcess)
+ - Some classes for <b>factor graphs</b> and <b>message passing algorithms</b>
+ - <b>Function-like objects</b> (often called "Functors" in the C++ world), see goFunctorBase,
+   goFunction(), and goMemberFunction().
  - A few networking classes (not well tested)
  - ... it's slowly growing as I find use for more stuff :)
+
+Check out the modules section to get another overview.
 
  There are also additional libraries which use golib and are all included:
  - A <b>matlab interface wrapper</b>  
