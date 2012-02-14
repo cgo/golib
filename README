@@ -16,10 +16,11 @@ About
 libGo is a C++ class library containing all kinds of 
 things that proved useful to me.
 For details, see the HTML source documentation in golib/doc.
+(See "How to build the HTML documentation" below.)
 
 Directories
 -----------
-./			- Main libGo distribution directory
+./		- Main libGo distribution directory
 ./doc		- Documentation
 ./examples	- Example source code and makefiles
 ./exp		- Experimental stuff, guaranteed to be unstable ;)
@@ -31,7 +32,8 @@ Directories
 
 What you need
 -------------
-- You will need a C++ compiler (tested with gnu c++ 3.3)
+- golib was last compiled on a Ubuntu 11.10 (oneiric) system.
+- You will need a C++ compiler (tested with gnu c++ 4.6.1)
 - A current version of CMake (http://www.cmake.org). Earlier versions also
   supported GNU autotools, but that is no longer supported.
 - The pthreads library must be installed.
@@ -41,9 +43,10 @@ What you need
   libdevil (http://openil.sourceforge.net/). You will not be able
   to read/write images when you don't have libdevil.
 - If you want to use the matlab support library, you obviously
-  need Matlab.
+  need Matlab. *NOTE* I do not have access to Matlab anymore,
+  so I can not be of much help if something does not work.
 - If you want the (somewhat restricted) Python interface and
-  the want to use the Python embedding helpers, you need Python 2.7
+  want to use the Python embedding helpers, you need Python 2.7
   or a compatible version. Just give it a try. Python 3 will probably
   not work.
   You will also need SWiG for the Python stuff:
