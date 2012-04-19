@@ -30,6 +30,6 @@ OBJECTS2 := $(subst .cc,.o,$(OBJECTS1))
 OBJECTS = $(OBJECTS2)
 all: $(TARGET)
 $(TARGET): $(OBJECTS)
-	$(LD) $(LDARGS) $(LIBS) -o $(TARGET) $(OBJECTS)
+	$(LD) -o $(TARGET) $(OBJECTS) $(LDARGS) $(LIBS) 
 clean:
 	rm -f *~ *.o
