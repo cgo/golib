@@ -11,7 +11,10 @@
 # include <gomath.h>
 #endif
 
-#include <f2c.h>
+#include <goconfig.h>
+#ifdef HAVE_F2C_H
+# include <f2c.h>
+#endif
 
 //= gets defined in f2c.h and messes up std::max and goMath::max
 #undef max
@@ -19,6 +22,11 @@
 
 #include <golib_clapack.h>
 
+#ifdef OSX
+#include <clapack.h>
+
+typedef __CLPK_integer integer;
+#endif
 
 namespace goMath {
 

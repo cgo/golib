@@ -10,9 +10,9 @@
 #include <iostream>
 #include <ctype.h>
 
-#ifndef isblank
-#define isblank(c)      __isctype((c), _ISblank)
-#endif
+// #ifndef isblank
+// #define isblank(c)      __isctype((c), _ISblank)
+// #endif
 
 static  unsigned char equal = '=';
 static  unsigned char comment = '#';

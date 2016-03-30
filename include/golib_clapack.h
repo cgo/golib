@@ -7,6 +7,11 @@
 #ifndef golib_clapack_h
 #define golib_clapack_h
 
+#include <goconfig.h>
+
+#ifdef OSX
+  #include <Accelerate/Accelerate.h>
+#else
 extern "C" 
 {
  #include <cblas.h>
@@ -45,5 +50,6 @@ extern "C" {
 /* Subroutine */ int dposv_(char *uplo, integer *n, integer *nrhs, doublereal *a, 
 	integer *lda, doublereal *b, integer *ldb, integer *info);
 }
+#endif
 
 #endif

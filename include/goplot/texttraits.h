@@ -10,7 +10,7 @@
 #include <goplot/plot.h>
 #include <string>
 
- #include <pango/pangocairo.h>
+#include <pango/pangocairo.h>
 
 //struct cairo_t;
 //struct PangoLayout;

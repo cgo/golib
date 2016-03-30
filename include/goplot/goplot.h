@@ -7,11 +7,14 @@
 #ifndef GOPLOT_GOPLOT_H
 #define GOPLOT_GOPLOT_H
 
-#include <goplot/plot.h>
+
+// This is for cairo plot, it seems.
+
+// #include <goplot/plot.h>
 // #include <cairoplot.h>
 // #include <goplot/goplot.h>
-#include <goplot/graphaxis.h>
-#include <goplot/graph.h>
+// #include <goplot/graphaxis.h>
+// #include <goplot/graph.h>
 //#include <goplot/layout.h>
 #include <goplot/object2dimage.h>
 #include <goplot/object2dpoints.h>

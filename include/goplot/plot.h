@@ -10,7 +10,7 @@
 #define NSPACE goPlot
 
 #include <math.h>
- #include <cairo.h>
+#include <cairo/cairo.h>
 // #include <pango/pangocairo.h>
 
 #ifndef GOMATRIX_H

@@ -991,7 +991,7 @@ void goPlot::plot (const goMath::Matrix<T>& points,
 
 template <class T>
 void goPlot::plot3D (const goMath::Matrix<T>& M,
-        const char* title, const char* plotOptions = 0, const char* prefix = 0, bool separateRows = false)
+        const char* title, const char* plotOptions, const char* prefix, bool separateRows)
 {
     goMultiPlotter plotter (1,1);
     goSinglePlot plot;

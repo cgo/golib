@@ -26,8 +26,25 @@ IF (HAVE_MATLAB_GEQ_2007A)
     SET (HAVE_MATLAB_GEQ_2007A 1)
 ENDIF (HAVE_MATLAB_GEQ_2007A)
 
+set (MODULE_THREADS    TRUE  CACHE BOOL "Build threading classes")
+set (MODULE_CAIROPLOT  FALSE CACHE BOOL "Build cairo plotting classes")
+set (MODULE_NETWORK    TRUE  CACHE BOOL "Build networking")
+set (MODULE_GRIDS      TRUE  CACHE BOOL "Build classes for grids / signal3d")
+set (MODULE_MATH       TRUE  CACHE BOOL "Build math classes")
+set (MODULE_CONTAINERS TRUE  CACHE BOOL "Build containers")
+set (MODULE_VIDEO      FALSE CACHE BOOL "Build video")
+
+
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
+
+set (CMAKE_FIND_FRAMEWORK FIRST)
+
+if (APPLE)
+  set (OSX 1)
+  # find_package (ACCELERATE REQUIRED NAMES Accelerate)
+endif (APPLE)
+
 
 ## Aufteilung:
 # thread: Thread-Klasse
@@ -40,11 +57,10 @@ SET                 (TARGETNAME Go)
 # gui
 # gl
 # matlab
-SET                 (SOURCES 
+SET (BASE_SOURCES 
  # src/math/mean.cpp
  # src/math/variance.cpp
 
- src/math/contours.cpp
  src/misc/goargs.cpp
  src/misc/goofffile.cpp
  # src/misc/plot.cpp
@@ -67,8 +83,6 @@ SET                 (SOURCES
  # src/system/godirectory.cc # not in windows!
  # src/system/goprocess.cc  # not in windows!
  src/system/goenvironment.cpp
- src/thread/goconsumer.cc # DEPRECATE
- src/thread/goproducer.cc # DEPRECATE
  # src/thread/gosynchronized.cc # not in windows!
  # src/math/gonubs.cpp
  ### For general SVD:
@@ -80,7 +94,7 @@ SET                 (SOURCES
  )
 
 ## Base and stuff
-SET (SOURCES ${SOURCES}
+SET (BASE_SOURCES ${BASE_SOURCES}
  src/misc/goobjectmessage.cc 
  src/misc/goglobal.cpp 
  src/misc/golog.cpp
@@ -89,13 +103,45 @@ SET (SOURCES ${SOURCES}
  src/nifty/gorandom.cc
  src/types/gotype.cpp)
 
+SET (VIDEO_SOURCES
+  src/misc/govideocapture.cpp # not in windows!
+  )
+
+
+IF (NOT WIN32)
+  SET (BASE_SOURCES ${BASE_SOURCES}
+  src/misc/gognuplot.cpp      # not plotting in windows!
+  src/misc/gosingleplot.cpp
+  src/misc/gomultiplotter.cpp
+  src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
+  src/misc/goconfigfileaccess.cc 
+  src/misc/goplot.cpp  # not in windows!
+  src/system/goprocess.cc  # not in windows!
+  # Can I remove any of these permanently?
+  src/system/godirectory.cc # not in windows!
+ # src/misc/gostatusobject.cc  # not in windows!
+ )
+ENDIF (NOT WIN32)
+
+
 ## System, threads
-SET (SOURCES ${SOURCES}
+SET (THREAD_SOURCES
+    src/thread/gosynchronized.cc # not in windows!
     src/thread/gothreadobject.cc
-    src/thread/gothread.cc)
+    src/thread/gothread.cc
+    src/thread/goconsumer.cc # DEPRECATE
+    src/thread/goproducer.cc # DEPRECATE
+)
+
+SET (NETWORK_SOURCES
+  src/network/goconnection.cc # not in windows!
+  src/network/gonetobject.cc  # not in windows!
+  src/network/gonetwork.cc # not in windows!
+  src/network/goserver.cc # not in windows!
+)
 
 ## Data containers
-SET (SOURCES ${SOURCES}
+SET (CONTAINER_SOURCES
  src/data/goarrayi.cc 
  # src/data/golisti.cc 
  # src/data/goheapi.cc 
@@ -106,7 +152,8 @@ SET (SOURCES ${SOURCES}
  src/data/gohashtablei.cpp)
 
 ## goMath
-SET (SOURCES ${SOURCES}
+SET (MATH_SOURCES
+ src/math/contours.cpp
  src/math/goreparam.cpp
  src/math/covariance.cpp
  src/math/gomanifold.cpp
@@ -221,7 +268,7 @@ SET (SOURCES ${SOURCES}
  src/seispack/r_sign.c)
 
 ## goSignal
-SET (SOURCES ${SOURCES}
+SET (SIGNAL_SOURCES
     src/signal/smooth.cpp
     src/signal/convert.cpp
     src/signal/canny.cpp
@@ -257,38 +304,43 @@ SET (SOURCES ${SOURCES}
  src/math/vectormult.cpp)
 
 # Cairo plotting
-SET (SOURCES ${SOURCES}
-       src/plot/cairoplot.cpp
-       src/plot/graph.cpp
-       src/plot/object2dbox.cpp
-       src/plot/object2dtext.cpp
-       src/plot/object2dimage.cpp
-       src/plot/object2dpoints.cpp
-       src/plot/texttraits.cpp
-       src/plot/plot.cpp
-       src/plot/graphaxis.cpp)
+SET (CAIRO_SOURCES
+  src/plot/cairoplot.cpp
+  src/plot/graph.cpp
+  src/plot/object2dbox.cpp
+  src/plot/object2dtext.cpp
+  src/plot/object2dimage.cpp
+  src/plot/object2dpoints.cpp
+  src/plot/texttraits.cpp
+  src/plot/plot.cpp
+  src/plot/graphaxis.cpp)
 
-IF (NOT WIN32)
-    SET (SOURCES ${SOURCES}
-  src/misc/plot.cpp
-  src/misc/gognuplot.cpp      # not plotting in windows!
-  src/misc/gosingleplot.cpp
-  src/misc/gomultiplotter.cpp
-  src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
-  src/misc/goconfigfileaccess.cc 
-  src/misc/goplot.cpp  # not in windows!
-  src/misc/govideocapture.cpp # not in windows!
-  src/system/goprocess.cc  # not in windows!
-  # Can I remove any of these permanently?
-  src/system/godirectory.cc # not in windows!
-  src/network/goconnection.cc # not in windows!
-  src/network/gonetobject.cc  # not in windows!
-  src/network/gonetwork.cc # not in windows!
-  src/network/goserver.cc # not in windows!
-  src/thread/gosynchronized.cc # not in windows!
- # src/misc/gostatusobject.cc  # not in windows!
- )
-ENDIF (NOT WIN32)
+
+set (SOURCES ${BASE_SOURCES})
+if (MODULE_CONTAINERS)
+  set (SOURCES ${SOURCES} ${CONTAINER_SOURCES})
+endif (MODULE_CONTAINERS)
+if (MODULE_MATH)
+  set (SOURCES ${SOURCES} ${MATH_SOURCES})
+endif (MODULE_MATH)
+if (MODULE_GRIDS)
+  set (SOURCES ${SOURCES} ${SIGNAL_SOURCES})
+endif (MODULE_GRIDS)
+if (MODULE_NETWORK)
+  set (SOURCES ${SOURCES} ${NETWORK_SOURCES})
+endif (MODULE_NETWORK)
+if (MODULE_THREADS)
+  set (SOURCES ${SOURCES} ${THREADS_SOURCES})
+endif (MODULE_THREADS)
+if (MODULE_CAIROPLOT)
+  set (SOURCES ${SOURCES} ${CAIRO_SOURCES})
+endif (MODULE_CAIROPLOT)
+if (MODULE_VIDEO)
+  set (SOURCES ${SOURCES} ${VIDEO_SOURCES})
+endif (MODULE_VIDEO)
+  
+  
+
 
 
 IF (BUILD_PYTHON_EMBED)
@@ -332,6 +384,7 @@ ENDIF (${SIZEOF_LONG_LONG_INT} MATCHES 8)
 
 # SET (CMAKE_REQUIRED_INCLUDES /usr/include /usr/local/include)
 
+
 find_file (CLAPACK_H clapack.h PATHS /usr/include/atlas /usr/include ${CMAKE_INSTALL_PREFIX}/include)
 if (CLAPACK_H)
     get_filename_component (CLAPACK_INCLUDE_DIR ${CLAPACK_H} PATH)
@@ -351,7 +404,7 @@ CHECK_INCLUDE_FILE (linux/videodev2.h  HAVE_LINUX_VIDEODEV2_H)
 CHECK_INCLUDE_FILE (linux/videodev.h  HAVE_LINUX_VIDEODEV_H)
 CHECK_INCLUDE_FILE (f2c.h  HAVE_F2C_H)
 CHECK_INCLUDE_FILE (clapack.h  HAVE_CLAPACK_H)
-SET (HAVE_LINUX_VIDEODEV_H 1)
+SET (HAVE_LINUX_VIDEODEV_H 0)
 
 IF (NOT HAVE_F2C_H)
     MESSAGE ("f2c.h not found --- please install f2c.")
@@ -379,14 +432,69 @@ IF (WIN32)
         FIND_LIBRARY (DEVIL NAMES DevIL IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
         FIND_LIBRARY (PTHREAD NAMES pthread PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib)
-ELSE (WIN32)
+ELSE (WIN32) 
+  if (APPLE)
+    message ("Building for MACOSX")
+    find_library (ACCELERATE Accelerate)
+    find_library (VECLIB vecLib)
+    find_library (PTHREAD NAMES pthread) # PATHS /usr/lib /usr/local/lib)
+
+    if (ACCELERATE)
+      message ("Found Accelerate")
+      link_libraries (${ACCELERATE})
+    endif (ACCELERATE)
+    if (VECLIB)
+      message ("Found vecLib")
+      link_libraries (${VECLIB})
+      #find_path (CBLAS_INCLUDE_DIR cblas.h)
+      #include_directories (${CBLAS_INCLUDE_DIR})
+    endif (VECLIB)
+      
+
+  else (APPLE) 
     FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
     FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
     FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
+  endif (APPLE)
 ENDIF (WIN32)
+
+## Cairo and Pango (for use of the goPlot library)
+if (MODULE_CAIROPLOT)
+  pkg_search_module (CAIRO REQUIRED cairo)
+  pkg_search_module (PANGO REQUIRED pango)
+  pkg_search_module (PANGOCAIRO REQUIRED pangocairo)
+  IF (CAIRO_FOUND)
+    MESSAGE("Found cairo.")
+    #message(${CAIRO_INCLUDE_DIRS})
+    #message(${CAIRO_LDFLAGS})
+    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${CAIRO_INCLUDE_DIRS})
+    LINK_LIBRARIES (${CAIRO_LDFLAGS})
+    SET (HAVE_CAIRO 1)
+  ENDIF (CAIRO_FOUND)
+
+  IF (PANGO_FOUND)
+    MESSAGE("Found pango.")
+    #message(${PANGO_INCLUDE_DIRS})
+    #message(${PANGO_LDFLAGS})
+    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PANGO_INCLUDE_DIRS})
+    LINK_LIBRARIES (${PANGO_LDFLAGS})
+    SET (HAVE_PANGO 1)
+  ENDIF (PANGO_FOUND)
+
+  IF (PANGOCAIRO_FOUND)
+    MESSAGE("Found pangocairo.")
+    #message(${PANGOCAIRO_INCLUDE_DIRS})
+    #message(${PANGOCAIRO_LDFLAGS})
+    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PANGOCAIRO_INCLUDE_DIRS})
+    LINK_LIBRARIES (${PANGOCAIRO_LDFLAGS})
+    SET (HAVE_PANGOCAIRO 1)
+  ENDIF (PANGOCAIRO_FOUND)
+endif (MODULE_CAIROPLOT)
+
+
 #FIND_LIBRARY (F2C NAMES f2c PATHS /usr/lib /usr/local/lib)
 
 #CHECK_LIBRARY_EXISTS (atlas ATL_cputime "${GOPATH}/extra" HAVE_LIBATLAS)
@@ -430,30 +538,9 @@ IF (LINK_GFORTRAN)
     SET (EXTRA_LIBS "${EXTRA_LIBS} -lgfortran")
 ENDIF (LINK_GFORTRAN)
 
-SET (EXTRA_INCLUDE_PATH "")
+# SET (EXTRA_INCLUDE_PATH "")
 
-## Cairo and Pango (for use of the goPlot library)
-pkg_search_module (CAIRO REQUIRED cairo)
-pkg_search_module (PANGO REQUIRED pango)
-pkg_search_module (PANGOCAIRO REQUIRED pangocairo)
 
-IF (CAIRO_FOUND)
-    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${CAIRO_INCLUDE_DIRS})
-    LINK_LIBRARIES (${CAIRO_LDFLAGS})
-    SET (HAVE_CAIRO 1)
-ENDIF (CAIRO_FOUND)
-
-IF (PANGO_FOUND)
-    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PANGO_INCLUDE_DIRS})
-    LINK_LIBRARIES (${PANGO_LDFLAGS})
-    SET (HAVE_PANGO 1)
-ENDIF (PANGO_FOUND)
-
-IF (PANGOCAIRO_FOUND)
-    SET (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${PANGOCAIRO_INCLUDE_DIRS})
-    LINK_LIBRARIES (${PANGOCAIRO_LDFLAGS})
-    SET (HAVE_PANGOCAIRO 1)
-ENDIF (PANGOCAIRO_FOUND)
 
 INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/include
@@ -488,27 +575,30 @@ IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
 ENDIF(UNIX)
 
-IF (LAPACK_ATLAS)
+if (NOT APPLE)
+  IF (LAPACK_ATLAS)
     LINK_LIBRARIES (${LAPACK_ATLAS})
-ENDIF (LAPACK_ATLAS)
-IF (LAPACK)
+  ENDIF (LAPACK_ATLAS)
+  IF (LAPACK)
     LINK_LIBRARIES (${LAPACK})
-ENDIF (LAPACK)
-IF (F77BLAS)
+  ENDIF (LAPACK)
+  IF (F77BLAS)
     LINK_LIBRARIES (${F77BLAS})
-ENDIF (F77BLAS)
-IF (BLAS)
+  ENDIF (F77BLAS)
+  IF (BLAS)
     LINK_LIBRARIES (${BLAS})
-ENDIF (BLAS)
-IF (CBLAS)
+  ENDIF (BLAS)
+  IF (CBLAS)
     LINK_LIBRARIES (${CBLAS})
-ENDIF (CBLAS)
-IF (ATLAS)
+  ENDIF (CBLAS)
+  IF (ATLAS)
     LINK_LIBRARIES (${ATLAS})
-ENDIF (ATLAS)
-IF (F2C)
+  ENDIF (ATLAS)
+  IF (F2C)
     LINK_LIBRARIES (${F2C})
-ENDIF (F2C)
+  ENDIF (F2C)
+endif (NOT APPLE)
+
 IF (DEVIL)
     SET (HAVE_LIBIL 1)
     LINK_LIBRARIES (${DEVIL})
@@ -535,12 +625,13 @@ endif (BUILD_GUI_MODULE)
 set (GOLIB_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
 
 set (PCLIBDIR "-L${CMAKE_INSTALL_PREFIX}/lib")
+
 CONFIGURE_FILE (${GOPATH}/golib.pc.cmakeconfig
                 ${GOPATH}/golib.pc
                 @ONLY)
 
 ADD_LIBRARY         (${TARGETNAME} SHARED ${SOURCES})
-STRING (STRIP ${EXTRA_LIBS} EXTRA_LIBS)  ## Remove trailing and leading whitespaces (leads to error in newer cmake)
+# STRING (STRIP ${EXTRA_LIBS} EXTRA_LIBS)  ## Remove trailing and leading whitespaces (leads to error in newer cmake)
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 INSTALL_TARGETS     (/lib ${TARGETNAME})
