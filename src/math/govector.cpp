@@ -13,10 +13,13 @@
 # include <gofileio.h>
 #endif
 #if 1
-extern "C"
-{
-#include <cblas.h>
-}
+
+#include <golib_clapack.h>
+
+//extern "C"
+//{
+//#include <cblas.h>
+//}
 
 template <class T>
 goMath::Vector<T>::Vector () 

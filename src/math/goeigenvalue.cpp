@@ -6,9 +6,15 @@
 
 #include <goeigenvalue.h>
 #include <golog.h>
+#include <goconfig.h>
 
 //= From SEISPACK
-#include <f2c.h>
+#if OSX
+# define integer int
+# define real float
+#else
+# include <f2c.h>
+#endif
 extern "C" int ch_(integer *nm, integer *n, real *ar, real *ai, real *w,
        integer *matz, real *zr, real *zi, real *fv1, real *fv2, real *fm1,
       integer *ierr);
@@ -18,7 +24,7 @@ extern "C" int ch_(integer *nm, integer *n, real *ar, real *ai, real *w,
  */
 /**
  * @brief Eigenvalues and Eigenvectors of a complex Hermitian matrix.
- *
+ * @todo Replace SEISPACK with LAPACKE routines.
  * @return Number of correct eigenvalues and eigenvectors the function was able to compute.
  **/
 goSize_t goMath::complexEigenvaluesHermite (const goMath::Matrix<goComplexf>&          m, 

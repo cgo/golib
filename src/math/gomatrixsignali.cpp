@@ -5,7 +5,7 @@
 
 
 #include <gomatrix.h>
-#include <gomatrix.hpp>
+// #include <gomatrix.hpp>
 #include <gocomplex.h>
 #include <gomath.h>		// MAX()
 #include <iostream>

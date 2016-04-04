@@ -28,14 +28,20 @@
 # include <gofileio.h>
 #endif
 
-extern "C" 
-{
- #include <cblas.h>
- #include <clapack.h>
-}
+#include <goconfig.h>
+
+#include <golib_clapack.h>
+
+
+//extern "C"
+//{
+// #include "cblas.h"
+// // #include <clapack.h>
+//}
 
 template<class T>
 const bool goMath::Matrix<T>::rowMajor = true;
+
 
 /*!
 * @param y Number of rows.
@@ -1589,13 +1595,17 @@ namespace goMath {
               return false;
             }
             int* P = new int [M];
-            if (clapack_sgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            // FIXME: replace lapacke calls with goLapack calls to getrf.
+            if (LAPACKE_sgetrf (rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 P = 0;
                 return false;
             }
-            if (clapack_sgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+
+
+
+            if (LAPACKE_sgetri (rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 P = 0;
@@ -1617,12 +1627,14 @@ namespace goMath {
                 return false;
             }
             int* P = new int [M * M];
-            if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            // if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            int const order = rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+            if (LAPACKE_dgetrf (order, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 return false;
             }
-            if (clapack_dgetri (CblasRowMajor, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            if (LAPACKE_dgetri (order, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 return false;

@@ -393,14 +393,14 @@ goSignal3D<T>::make (goSize_t x, goSize_t y, goSize_t z,
         return false;
     }
     
-    if (!initialize (p, x, y, z,
-                     blockSizeX,
-                     blockSizeY,
-                     blockSizeZ,
-                     border_x,
-                     border_y,
-                     border_z,
-                     channelCount))
+    if (!this->initialize (p, x, y, z,
+    			blockSizeX,
+				blockSizeY,
+				blockSizeZ,
+				border_x,
+				border_y,
+				border_z,
+				channelCount))
     {
         delete[] p;
         p = NULL;

@@ -57,12 +57,12 @@ namespace goMath
             //= Careful: sgesvd_ expects column major arrays, we use row major.
             //= So we here calculate svd(A), because the f2c-generated code thinks
             //= AT = A.
-            integer m = AT.getColumns();  //= rows in row-major
-            integer n = AT.getRows();     //= columns in row-major
+            lapack_int m = AT.getColumns();  //= rows in row-major
+            lapack_int n = AT.getRows();     //= columns in row-major
             myM = m;
             myN = n;
-            integer lda = AT.getLeadingDimension();
-            s.resize (goMath::min<integer>(m,n));
+            lapack_int lda = AT.getLeadingDimension();
+            s.resize (goMath::min<lapack_int>(m,n));
             if (thin)
             {
                 //= sgesvd_ expects column major, so the dimensions are transposed.
@@ -75,11 +75,11 @@ namespace goMath
                 U.resize (m,m);
                 V.resize (n,n);
             }
-            integer ldu = U.getLeadingDimension();
-            integer ldv = V.getLeadingDimension();
+            lapack_int ldu = U.getLeadingDimension();
+            lapack_int ldv = V.getLeadingDimension();
             goFixedArray<goFloat> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
-            integer lwork = work.getSize ();
-            integer info = -1;
+            lapack_int lwork = work.getSize ();
+            lapack_int info = -1;
             char job = thin ? 'S' : 'A';
             char jobvt = thin ? 'A' : 'A'; //= all n rows of V in any case.
             sgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
@@ -100,12 +100,12 @@ namespace goMath
             //= Careful: sgesvd_ expects column major arrays, we use row major.
             //= So we here calculate svd(A), because the f2c-generated code thinks
             //= AT = A.
-            integer m = AT.getColumns();  //= rows in row-major
-            integer n = AT.getRows();     //= columns in row-major
+            lapack_int m = AT.getColumns();  //= rows in row-major
+            lapack_int n = AT.getRows();     //= columns in row-major
             myM = m;
             myN = n;
-            integer lda = AT.getLeadingDimension();
-            s.resize (goMath::min<integer>(m,n));
+            lapack_int lda = AT.getLeadingDimension();
+            s.resize (goMath::min<lapack_int>(m,n));
             if (thin)
             {
                 //= dgesvd_ expects column major, so the dimensions are transposed.
@@ -117,11 +117,11 @@ namespace goMath
                 U.resize (m,m);
                 V.resize (n,n);
             }
-            integer ldu = U.getLeadingDimension();
-            integer ldv = V.getLeadingDimension();
+            lapack_int ldu = U.getLeadingDimension();
+            lapack_int ldv = V.getLeadingDimension();
             goFixedArray<goDouble> work (max(3 * min(m,n) + max(m,n), 5 * min(m,n)));
-            integer lwork = work.getSize ();
-            integer info = -1;
+            lapack_int lwork = work.getSize ();
+            lapack_int info = -1;
             char job = thin ? 'S' : 'A';
             char jobvt = thin ? 'S' : 'A';
             dgesvd_ (&job, &jobvt, &m, &n, AT.getPtr(), &lda, s.getPtr(), U.getPtr(), &ldu,
