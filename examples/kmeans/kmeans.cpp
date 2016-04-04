@@ -8,9 +8,16 @@
 #include <govector.h>
 #include <gorandom.h>
 #include <goplot.h>
+#include <cstdlib>
+#include <iostream>
 
 int main (int argc, char* argv[])
 {
+  if (argc < 2)
+    {
+      std::cout << argv[0] << "<number of clusters>" << std::endl;
+      exit(0);
+    }
     goRandom(true);
     goKMeans<goVectord> kmeans;
     goIndex_t K = atoi(argv[1]);

@@ -1,12 +1,12 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
 
 CXX		= g++
-CXXARGS		= -c   -DHAVE_CONFIG_H -D_REENTRANT
+CXXARGS		= -c   -DHAVE_CONFIG_H -D_REENTRANT `pkg-config --cflags golib`
 
 LD		= g++
 LDARGS		=  
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  `pkg-config --libs golib`
 
 INCLUDE		=  -I$(GOPATH)/include
 

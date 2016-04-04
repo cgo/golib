@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags gtkmm-2.4`
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags pangocairo`
 
 LD		= g++
 LDARGS		=  
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo `pkg-config --libs gtkmm-2.4`
+LIBS		=  -L$(GOPATH)/build -lGo `pkg-config --libs pangocairo`
 
 INCLUDE		=  -I$(GOPATH)/include
 

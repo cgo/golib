@@ -1,12 +1,12 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
 
 CXX		= g++
-CXXARGS		= -c $(CPPFLAGS) `pkg-config --cflags gtkmm-2.4`
+CXXARGS		= -c $(CPPFLAGS) `pkg-config --cflags gtkmm-2.4` `pkg-config --cflags golib` --std=c++11
 
 LD		= g++
 LDARGS		=  $(LDFLAGS)
 
-LIBS		=  -lGo `pkg-config --libs gtkmm-2.4` -lGogui -lGogl
+LIBS		=  `pkg-config --libs-only-L golib` -lGo `pkg-config --libs gtkmm-2.4` -lGogui
 
 INCLUDE		= -I$(GOPATH)/gui/include
 

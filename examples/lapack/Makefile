@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D OSX -D HAVE_CONFIG_H -g `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		= $(LDFLAGS) -L/usr/lib/atlas/sse2
+LDARGS		= $(LDFLAGS) -framework Accelerate
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -lGo -llapack
+LIBS		=  `pkg-config --libs golib`
 
 INCLUDE		=  -I$(GOPATH)/include
 

@@ -4,7 +4,7 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags cairo pango`
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags cairo pango golib`
 
 LD		= g++
 LDARGS		= $(LDFLAGS) `pkg-config --cflags cairo pango`

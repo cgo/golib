@@ -8,12 +8,13 @@
 #include <goconnection.h>
 #include <gonetwork.h>
 #include <gotypes.h>
-#include <iostream.h>
+#include <iostream>
 
 #include <stdlib.h>
 #include <stdio.h>
 
 using namespace goNet;
+using namespace std;
 
 /*
  * This server does not do anything.

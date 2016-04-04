@@ -21,7 +21,7 @@
 class MyWindow : public goGUI::MainWindow
 {
     public:
-        typedef goPlot::Object2DPoints<goPlot::Points2DMatrix<goFloat>, goFloat> PointsObject;
+        typedef goPlot::Object2DPoints PointsObject;
     public:
         MyWindow () : goGUI::MainWindow ()
         {
@@ -62,7 +62,7 @@ class MyWindow : public goGUI::MainWindow
                 x[i] = 2.0 * M_PI * float(i) / float(y.getSize() - 1);
                 y[i] = ::sin (x[i]);
             }
-            goPlot::AutoPtr<goPlot::Object2DPoints<goPlot::Points2DMatrix<goFloat>, goFloat> > obj = goPlot::object2D (x,y);
+            goAutoPtr<goPlot::Object2DPoints> obj = goPlot::object2D (x,y);
             obj->lineTraits ().setColour (goPlot::RGBA (1.0, 0.0, 0.0, 1.0));
             obj->lineTraits ().setWidth (2.0);
 
@@ -83,8 +83,8 @@ class MyWindow : public goGUI::MainWindow
             graph2->axis (0)->setUpper (goMath::max(x));
             graph2->axis (0)->setTics (20);
             graph2->axis (1)->setTics (20);
-            graph2->axis (0)->enableTics (false);
-            graph2->axis (1)->enableTics (false);
+            graph2->axis (0)->enableTics (true);
+            graph2->axis (1)->enableTics (true);
             graph2->axis (0)->enableTicsText (false);
             graph2->axis (1)->enableTicsText (false);
             graph2->axis (2)->setVisible (true);
@@ -103,9 +103,9 @@ class MyWindow : public goGUI::MainWindow
                     goString str;
                     goSignalInfoText (i, str);
                     printf ("%s\n", str.toCharPtr ());
-                    goPlot::AutoPtr<goPlot::Object2DImage> obj = goPlot::object2DImage (*goSignal::toBGRA (i, 128));
+                    goAutoPtr<goPlot::Object2DImage> obj = goPlot::object2DImage (*goSignal::toBGRA (i, 128));
                     // goPlot::AutoPtr<goPlot::Object2DImage> obj = goPlot::object2DImage (i);
-                    goPlot::Trafo2D<goPlot::real> t (1.3 / float(i.getSizeX()), 0, 0, -1.0 / float(i.getSizeY()), 0.5, 0.5);
+                    goPlot::Trafo2D t (2.0 * M_PI / float(i.getSizeX()), 0, 0, -2.0 / float(i.getSizeY()), 0, 1);
                     obj->setTransform (t);
                     graph2->add (obj);
                 }

@@ -2,18 +2,18 @@
 #Template version 
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
-GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
-GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
+GTKMM_CFLAGS = `/usr/local/bin/pkg-config gtkmm-2.4 --cflags`
+GTKMM_LDFLAGS = `/usr/local/bin/pkg-config gtkmm-2.4 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `pkg-config --cflags golib`
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `/usr/local/bin/pkg-config --cflags golib` --std=c++11
 
 LD		= g++
 LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS = `pkg-config --libs golib`
+LIBS = `/usr/local/bin/pkg-config --libs golib`
 
 INCLUDE		=
 
