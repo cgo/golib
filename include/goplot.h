@@ -636,9 +636,9 @@ namespace goPlot
             //points->points().matrix().setColumn (0, x);
             //points->points().matrix().setColumn (1, y);
 
-            Points2DMatrix<T> *p = new Points2DMatrix<T> (x.getSize(), 2);
-            p->setColumn (0, x);
-            p->setColumn (1, y);
+            Points2DMatrix<T> *p = new Points2DMatrix<T> (x.getSize());
+            p->matrix().setColumn (0, x);
+            p->matrix().setColumn (1, y);
             points->setPoints (p);
 
             return points;

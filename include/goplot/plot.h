@@ -139,7 +139,7 @@ namespace goPlot
         class Points2DMatrix : public Points2D
         {
             public:
-                Points2DMatrix (int N = 1) : 
+                explicit Points2DMatrix (int N = 1) :
                     Points2D (),
                     M (new goMath::Matrix<T> (N,2)) { }
 

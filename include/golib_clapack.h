@@ -10,12 +10,17 @@
 #include <goconfig.h>
 
 #ifdef OSX
-  #include <Accelerate/Accelerate.h>
+#define LAPACK_COMPLEX_STRUCTURE
+#include "lapacke_config.h"
+ #include "lapacke.h"
+// Search for that file and include it from here on Apple platforms.
+#include "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/Headers/cblas.h"
+  // #include <Accelerate/Accelerate.h>
 #else
 extern "C" 
 {
  #include <cblas.h>
- #include <clapack.h>
+ #include <lapacke.h>
 }
 
 //=

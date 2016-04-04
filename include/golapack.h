@@ -23,9 +23,7 @@
 #include <golib_clapack.h>
 
 #ifdef OSX
-#include <clapack.h>
-
-typedef __CLPK_integer integer;
+// #include <clapack.h>
 #endif
 
 namespace goMath {
@@ -36,7 +34,7 @@ namespace goMath {
      */
     namespace Lapack {
 
-    void logError (integer info, const char* where = 0);
+    void logError (lapack_int info, const char* where = 0);
 
     template <class matrix_type, class pivot_vector>
         bool getrf (matrix_type& A, pivot_vector& ipiv);
@@ -66,17 +64,19 @@ namespace goMath {
     class TypeDriver
     {
         public:
-            static bool getrf (const enum CBLAS_ORDER order, const int M, const int N, T* A, const int lda, int *ipiv);
-            static bool getrs (const enum CBLAS_ORDER order, const enum CBLAS_TRANSPOSE trans, const int N, const int NRHS, const T* A, const int lda, const int* ipiv, T* B, const int ldb);
-            static bool getri (const enum CBLAS_ORDER order, const int N, T* A, const int lda, const int* ipiv);
-            static bool gels (char *trans, integer *m, integer *n, integer *
-                    nrhs, T *a, integer *lda, T *b, integer *ldb, T *work, 
-                    integer *lwork, integer *info);
-            static bool gelss (integer *m, integer *n, integer *nrhs, T *a, 
-                    integer *lda, T *b, integer *ldb, T *s, T *rcond, integer *
-                    rank, T *work, integer *lwork, integer *info);
-            static bool posv (char *uplo, integer *n, integer *nrhs, T *a,
-                    integer *lda, T *b, integer *ldb, integer *info);
+            static bool getrf (int order, lapack_int M, lapack_int N, T* A, lapack_int lda, lapack_int *ipiv);
+            static bool getrs (int order, char trans, lapack_int N, lapack_int NRHS, const T* A, lapack_int lda, const lapack_int* ipiv, T* B, lapack_int ldb);
+            static bool getri (int order, lapack_int N, T* A, lapack_int lda, const lapack_int* ipiv);
+            static bool gels (int matrix_order, char trans, lapack_int m,
+                    lapack_int n, lapack_int nrhs, T* a,
+                    lapack_int lda, T* b, lapack_int ldb);
+            static bool gelss (int matrix_order, lapack_int m, lapack_int n,
+                    lapack_int nrhs, T* a, lapack_int lda, T* b,
+                    lapack_int ldb, T* s, T rcond,
+                    lapack_int* rank);
+            static bool posv (int matrix_order, char uplo, lapack_int n,
+                    lapack_int nrhs, T* a, lapack_int lda, T* b,
+                    lapack_int ldb);
     };
 
 }; 
@@ -109,7 +109,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
     int N = A.getColumns();
     if (ipiv.getSize() != N)
         ipiv.resize (N);
-    return TypeDriver<typename matrix_type::value_type>::getrf (CblasRowMajor, M, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
+    return TypeDriver<typename matrix_type::value_type>::getrf (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
 }
 
 /** 
@@ -142,7 +142,7 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, matrix_type& B, c
     int NRHS = B.getRows();
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
-    return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
+    return TypeDriver<typename matrix_type::value_type>::getrs (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, transA ? 'T' : 'N', N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), B.getPtr(), B.getLeadingDimension());
 }
 
 template <class matrix_type, class pivot_vector>
@@ -155,7 +155,7 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, goMath::Vector<ty
     int NRHS = 1; // B.getRows();
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
-    return TypeDriver<typename matrix_type::value_type>::getrs (CblasRowMajor, transA ? CblasTrans : CblasNoTrans, N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), b.getPtr(), b.getSize ());
+    return TypeDriver<typename matrix_type::value_type>::getrs (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, transA ? 'T' : 'N', N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), b.getPtr(), b.getSize ());
 }
 
 /** 
@@ -178,7 +178,7 @@ bool goMath::Lapack::getri (matrix_type& A, const pivot_vector& ipiv)
         return false;
     }
     int N = A.getRows();
-    return TypeDriver<typename matrix_type::value_type>::getri (CblasRowMajor, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
+    return TypeDriver<typename matrix_type::value_type>::getri (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
 }
 
 /** 
@@ -206,16 +206,16 @@ bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
 {
     //= Note: gels_() expects column major -- so MxN means in C columns x rows and 
     //= transposed usage of A.
-    integer M = A.getColumns();
-    integer N = A.getRows();
-    integer NRHS = 1;
+    lapack_int M = A.getColumns();
+    lapack_int N = A.getRows();
+    lapack_int NRHS = 1;
     char trans = transA ? 'N' : 'T';  //= The other way around since we use row major
     //= This is from the documentation at http://www.netlib.org/lapack/single/sgels.f
-    integer LWORK = goMath::max<integer> (1, M * N + goMath::max<integer> (M * N, NRHS));
+    lapack_int LWORK = goMath::max<lapack_int> (1, M * N + goMath::max<lapack_int> (M * N, NRHS));
     goMath::Vector<typename matrix_type::value_type> WORK (LWORK);
-    integer info = 0;
-    integer lda = A.getLeadingDimension();
-    integer ldb = b.getSize();
+    lapack_int info = 0;
+    lapack_int lda = A.getLeadingDimension();
+    lapack_int ldb = b.getSize();
     return TypeDriver<typename matrix_type::value_type>::gels (&trans, &M, &N, &NRHS, A.getPtr(), &lda, b.getPtr(), &ldb, WORK.getPtr(), &LWORK, &info);
 }
 
@@ -240,28 +240,31 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
 
     //= Note: gelss_() expects column major -- so MxN means in C columns x rows and 
     //= transposed usage of A.
-    integer M = A.getColumns();
-    integer N = A.getRows();
+    lapack_int M = A.getColumns();
+    lapack_int N = A.getRows();
 
-    integer NRHS = 1;
+    lapack_int NRHS = 1;
     //= This is from the documentation at http://www.netlib.org/lapack/single/sgelss.f
     // LWORK >= 3*min(M,N) + max( 2*min(M,N), max(M,N), NRHS ) --- larger for better performance.
-    integer LWORK = 3 * goMath::min<integer> (M,N) + goMath::max<integer> (2 * goMath::min<integer> (M,N), goMath::max<integer> (goMath::max<integer> (M,N), NRHS));
+    lapack_int LWORK = 3 * goMath::min<lapack_int> (M,N) + goMath::max<lapack_int> (2 * goMath::min<lapack_int> (M,N), goMath::max<lapack_int> (goMath::max<lapack_int> (M,N), NRHS));
     goMath::Vector<typename matrix_type::value_type> WORK (LWORK);
-    integer info = 0;
-    integer lda = A.getLeadingDimension();
-    integer ldb = b.getSize();
+    lapack_int info = 0;
+    lapack_int lda = A.getLeadingDimension();
+    lapack_int ldb = b.getSize();
     typename matrix_type::value_type rcond = -1.0f;
-    integer rank = 0;
+    lapack_int rank = 0;
     vector_type temp_sv(0);
     if (singularValues)
-        singularValues->resize (goMath::min<integer>(M,N));
+        singularValues->resize (goMath::min<lapack_int>(M,N));
     else
-        temp_sv.resize (goMath::min<integer>(M,N));
+        temp_sv.resize (goMath::min<lapack_int>(M,N));
 
-    return TypeDriver<typename matrix_type::value_type>::gelss (&M, &N, &NRHS, A.getPtr(), 
-            &lda, b.getPtr(), &ldb, singularValues ? singularValues->getPtr() : temp_sv.getPtr(), 
-            &rcond, &rank, WORK.getPtr(), &LWORK, &info);
+    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    return TypeDriver<typename matrix_type::value_type>::gelss(order,M,N,NRHS,A.getPtr(),lda,b.getPtr(),ldb,singularValues ? singularValues->getPtr() : temp_sv.getPtr, rcond, &rank);
+
+//    return TypeDriver<typename matrix_type::value_type>::gelss (&M, &N, &NRHS, A.getPtr(),
+//            &lda, b.getPtr(), &ldb, singularValues ? singularValues->getPtr() : temp_sv.getPtr(),
+//            &rcond, &rank, WORK.getPtr(), &LWORK, &info);
 }
 
 /** 
@@ -281,14 +284,17 @@ bool goMath::Lapack::posv (matrix_type& A, vector_type& b)
     //= storage scheme. I.e., A is used transposed, but since it is symmetric it does not matter.
     //= A is assumed to contain the data in the upper triangle (in row major, C-like storage).
     char uplo = 'L';
-    integer n = b.getSize ();
-    integer nrhs = 1;
-    integer ldb = n;
-    integer lda = A.getLeadingDimension ();
-    integer info = 0;
+    lapack_int n = b.getSize ();
+    lapack_int nrhs = 1;
+    lapack_int ldb = n;
+    lapack_int lda = A.getLeadingDimension ();
+    lapack_int info = 0;
 
-    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
-                    &lda, b.getPtr (), &ldb, &info);
+    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    return TypeDriver<typename matrix_type::value_type>::posv(order,uplo,n,nrhs,A.getPtr(),lda,b.getPtr(),ldb);
+
+//    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
+//                    &lda, b.getPtr (), &ldb, &info);
 }
 
 /** 
@@ -313,14 +319,16 @@ bool goMath::Lapack::posv (matrix_type& A, matrix_type& b)
     char uplo = 'L';
 
     //= cols and rows are swapped here, since the type driver uses LAPACK's columns first storage
-    integer n = b.getColumns ();
-    integer nrhs = b.getRows ();
-    integer ldb = b.getLeadingDimension ();
-    integer lda = A.getLeadingDimension ();
-    integer info = 0;
+    lapack_int n = b.getColumns ();
+    lapack_int nrhs = b.getRows ();
+    lapack_int ldb = b.getLeadingDimension ();
+    lapack_int lda = A.getLeadingDimension ();
+    lapack_int info = 0;
 
-    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
-                    &lda, b.getPtr (), &ldb, &info);
+    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    return TypeDriver<typename matrix_type::value_type>::posv(order,uplo,n,nrhs,A.getPtr(),lda,b.getPtr(),ldb);
+    //return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
+    //                &lda, b.getPtr (), &ldb, &info);
 }
 
 /** @} */

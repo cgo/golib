@@ -7,7 +7,17 @@
 #ifndef GOPLOT_LAYOUT_H
 #define GOPLOT_LAYOUT_H
 
-#include <goplot/plot.h>
+#include <sys/_types/_size_t.h>
+#include <algorithm>
+#include <cstdio>
+#include <exception>
+#include <list>
+#include <vector>
+
+// #include "/usr/local/Cellar/cairo/1.14.6_1/include/cairo/cairo.h"
+#include "goautoptr.h"
+#include "graph.h"
+#include "plot.h"
 
 namespace NSPACE
 {
@@ -76,7 +86,7 @@ namespace NSPACE
                 const size_t sz = myGraphs.size ();
                 for (size_t i = 0; i < sz; ++i)
                 {
-                    AutoPtr<Graph>& g = myGraphs[i];
+                    goAutoPtr<Graph>& g = myGraphs[i];
                     if (!g.isNull ())
                     {
                         LayoutGraph& l = myLayouts[i];
@@ -87,7 +97,8 @@ namespace NSPACE
                         //                                1.0 / float (myHeight) * float (l.extY ()),
                         //                                0.0, 1.0));
 
-                        g->setTransform (Trafo2D<real> (1.0 / float (myWidth) * float (l.extX ()), 
+
+                        g->setTransform (Trafo2D (1.0 / float (myWidth) * float (l.extX ()),
                                      0.0, 
                                      0.0, 
                                      1.0 / float (myHeight) * float (l.extY ()),
@@ -117,7 +128,7 @@ namespace NSPACE
 
                         printf ("Borderhint: %f %f %f %f\n", space_x_0, space_x_1, space_y_0, space_y_1);
 
-                        g->setTransform (Trafo2D<real> (1.0 / float (myWidth) * float (l.extX ()) - space_x_0 - space_x_1, 
+                        g->setTransform (Trafo2D (1.0 / float (myWidth) * float (l.extX ()) - space_x_0 - space_x_1,
                                     0.0, 
                                     0.0, 
                                     1.0 / float (myHeight) * float (l.extY ()) - space_y_0 - space_y_1,
@@ -129,7 +140,7 @@ namespace NSPACE
                 }
             }
 
-            AutoPtr<Graph> graph (size_t x, size_t y)
+            goAutoPtr<Graph> graph (size_t x, size_t y)
             {
                 size_t i = x + y * myWidth;
                 if (i < myGraphs.size ())
@@ -140,7 +151,7 @@ namespace NSPACE
                 throw std::exception ();
             }
 
-            void setGraph (AutoPtr<Graph> g, size_t x, size_t y, size_t extent_x = 1, size_t extent_y = 1)
+            void setGraph (goAutoPtr<Graph> g, size_t x, size_t y, size_t extent_x = 1, size_t extent_y = 1)
             {
                 size_t i = x + y * myWidth;
                 if (i >= myGraphs.size ())
@@ -183,8 +194,8 @@ namespace NSPACE
 #endif
 
         private:
-            std::vector <AutoPtr<Graph> >  myGraphs;
-            std::vector <LayoutGraph>      myLayouts;
+            std::vector <goAutoPtr<Graph> >  myGraphs;
+            std::vector <LayoutGraph>        myLayouts;
             size_t myWidth; //= Width in graphs
             size_t myHeight; //= Height in graphs
     };

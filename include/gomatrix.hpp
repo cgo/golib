@@ -15,11 +15,13 @@
 # include <gofileio.h>
 #endif
 
-extern "C" 
-{
- #include <cblas.h>
- #include <clapack.h>
-}
+#include <golib_clapack.h>
+
+//extern "C"
+//{
+// #include <cblas.h>
+// #include <lapacke.h>
+//}
 
 const bool goMatrix<T>::rowMajor = true;
 
