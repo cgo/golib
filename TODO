@@ -6,3 +6,8 @@ Thu Aug 30 11:27:34 CEST 2007
 - Add level curve extraction for 2D images
 - Add "user manual" or "tutorial" like documentation
   for each module
+
+2016-04-03
+----------
+- DevIL durch eine andere Bibliothek ersetzen, die eine weniger restriktive Lizenz
+hat.

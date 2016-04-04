@@ -67,6 +67,33 @@ Python:
  python-dev
 
 
+Package dependencies in Mac OS X El Capitan
+-------------------------------------------
+These notes assume you have homebrew. If you use another
+or no package manager, you need to install the packages
+in another way (or get homebrew).
+
+CMake:
+ brew install cmake
+
+DevIL: you need to do the following:
+ brew install homebrew/versions/gcc49
+ brew install devil
+
+LAPACKE: See tools/lapacke.
+XCode in OS X comes with the Accelerate framework, which contains
+lapack and cblas. /But/, the lapack version is only 3.2.1, and LAPACKE,
+the official C interface to LAPACK, was only added in 3.4.
+You can use the scripts and SConstruct file for scons to build lapacke.
+You should keep lapacke.a and delete lapacke.dylib after building
+if you want to only statically link to lapacke.
+To get scons:
+ brew install scons
+
+GTKMM (for the GUI stuff):
+ brew install gtkmm
+
+
 How to build the HTML documentation
 -----------------------------------
 Get /doxygen/, in Ubuntu e.g. say "sudo apt-get install doxygen".
@@ -90,7 +117,7 @@ Also see the html documentation for details.
 There is also a matlab support library in the matlab directory
 (of course, you need matlab for this) and Python support using SWiG
 in the python directory.
- 
+
 
 I have not had the opportunity to try this on many different machines, 
 so if there are difficulties, please either report them to golib@goschs.de
