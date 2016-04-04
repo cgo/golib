@@ -28,7 +28,7 @@ ENDIF (HAVE_MATLAB_GEQ_2007A)
 
 set (MODULE_THREADS    TRUE  CACHE BOOL "Build threading classes")
 set (MODULE_CAIROPLOT  FALSE CACHE BOOL "Build cairo plotting classes")
-set (MODULE_NETWORK    TRUE  CACHE BOOL "Build networking")
+set (MODULE_NETWORK    FALSE  CACHE BOOL "Build networking")
 set (MODULE_GRIDS      TRUE  CACHE BOOL "Build classes for grids / signal3d")
 set (MODULE_MATH       TRUE  CACHE BOOL "Build math classes")
 set (MODULE_CONTAINERS TRUE  CACHE BOOL "Build containers")
@@ -42,7 +42,6 @@ set (CMAKE_FIND_FRAMEWORK FIRST)
 
 if (APPLE)
   set (OSX 1)
-  # find_package (ACCELERATE REQUIRED NAMES Accelerate)
 endif (APPLE)
 
 
@@ -184,13 +183,16 @@ SET (MATH_SOURCES
  src/math/gogausspdf.cpp 
  src/math/gopoint.cpp  ## Deprecate this, do not use
  src/math/gomath.cpp 
- src/math/goeigenvalue.cpp
+ # src/math/goeigenvalue.cpp
  src/math/cg.cpp
  src/math/integrate.cpp
  src/math/getroots.cpp
  src/math/gopointcloud.cpp
  src/math/gocurve.cpp
- src/seispack/bakvec.c
+ )
+ 
+ set (SEISPACK_SOURCES
+ src/seispack/bakvec.c	
  src/seispack/balanc.c
  src/seispack/balbak.c
  src/seispack/bandr.c
@@ -330,7 +332,7 @@ if (MODULE_NETWORK)
   set (SOURCES ${SOURCES} ${NETWORK_SOURCES})
 endif (MODULE_NETWORK)
 if (MODULE_THREADS)
-  set (SOURCES ${SOURCES} ${THREADS_SOURCES})
+  set (SOURCES ${SOURCES} ${THREAD_SOURCES})
 endif (MODULE_THREADS)
 if (MODULE_CAIROPLOT)
   set (SOURCES ${SOURCES} ${CAIRO_SOURCES})
@@ -436,21 +438,29 @@ ELSE (WIN32)
   if (APPLE)
     message ("Building for MACOSX")
     find_library (ACCELERATE Accelerate)
-    find_library (VECLIB vecLib)
+    # find_library (VECLIB vecLib)
     find_library (PTHREAD NAMES pthread) # PATHS /usr/lib /usr/local/lib)
 
     if (ACCELERATE)
       message ("Found Accelerate")
       link_libraries (${ACCELERATE})
     endif (ACCELERATE)
-    if (VECLIB)
-      message ("Found vecLib")
-      link_libraries (${VECLIB})
-      #find_path (CBLAS_INCLUDE_DIR cblas.h)
-      #include_directories (${CBLAS_INCLUDE_DIR})
-    endif (VECLIB)
-      
+#    if (VECLIB)
+#      message ("Found vecLib")
+#      link_libraries (${VECLIB})
+#      #find_path (CBLAS_INCLUDE_DIR cblas.h)
+#      #include_directories (${CBLAS_INCLUDE_DIR})
+#    endif (VECLIB)
 
+    find_library        (LAPACKE lapacke PATHS ${GOPATH}/tools/lapacke)
+    link_libraries      (${LAPACKE})
+    include_directories (${GOPATH}/tools/lapacke/include)
+    add_definitions     (-DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE)
+    find_library        (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+    find_library        (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+    link_libraries      (${DEVIL})
+    link_libraries      (${DEVILU})
+    
   else (APPLE) 
     FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
@@ -617,7 +627,7 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 # pkg-config file
 set (PCLIBS "-lGo")
-set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${CLAPACK_INCLUDE_DIR}")
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${GOPATH}/tools/lapacke/include")
 if (BUILD_GUI_MODULE)
     set (PCLIBS "${PCLIBS} -lGogui")
 endif (BUILD_GUI_MODULE)

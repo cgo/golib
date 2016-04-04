@@ -2,26 +2,32 @@ INCLUDE             (FindPkgConfig)
 
 SET                 (TARGETNAME Gogui)
 SET                 (SOURCES 
-    src/interactivedraw.cpp
-    src/interactivedrawobject.cpp
-    src/textoutput.cpp
-    src/imagecontrol.cpp
-    src/controldialog.cpp
-    src/controlsbox.cpp
-    src/cannycontrol.cpp
-                             src/cairoplot.cpp
-                             src/warning.cpp
-                             src/plotview.cpp
-                             src/videocapturecontrol.cpp
-                             src/multivectorinput.cpp
-                             src/vectorinput.cpp
-                             src/imageview.cpp
-                             src/draw.cpp
-                             src/control.cpp
-                             src/helper.cpp
-                             src/about.cpp
-                             src/mainwindow.cpp
-                             src/countfilenames.cpp)
+  src/interactivedraw.cpp
+  src/interactivedrawobject.cpp
+  src/textoutput.cpp
+  src/imagecontrol.cpp
+  src/controldialog.cpp
+  src/controlsbox.cpp
+  src/cannycontrol.cpp
+  src/cairoplot.cpp
+  src/warning.cpp
+  src/plotview.cpp
+  src/multivectorinput.cpp
+  src/vectorinput.cpp
+  src/imageview.cpp
+  src/draw.cpp
+  src/control.cpp
+  src/helper.cpp
+  src/about.cpp
+  src/mainwindow.cpp
+  src/countfilenames.cpp)
+
+## If libGo contains the video module:
+if (MODULE_VIDEO)
+  set (SOURCES ${SOURCES}
+    src/videocapturecontrol.cpp)
+endif (MODULE_VIDEO)
+
 
 SET (GOGUI_USE_CAIRO TRUE CACHE BOOL "Use Cairo in the GUI")
 
@@ -130,6 +136,8 @@ IF (GTKGL_INCLUDE_DIRS AND BUILD_GUI_MODULE_OPENGL)
 ENDIF (GTKGL_INCLUDE_DIRS AND BUILD_GUI_MODULE_OPENGL)
 
 ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
+
+set_property (TARGET ${TARGETNAME} PROPERTY CXX_STANDARD 11) 
 
 IF (BUILD_GUI_MODULE_OPENGL)
     ADD_DEPENDENCIES (${TARGETNAME} Gogl)
