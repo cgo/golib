@@ -2,8 +2,8 @@
 #Template version 
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
-GTKMM_CFLAGS = `/usr/local/bin/pkg-config gtkmm-2.4 --cflags`
-GTKMM_LDFLAGS = `/usr/local/bin/pkg-config gtkmm-2.4 --libs`
+GTKMM_CFLAGS = `/usr/local/bin/pkg-config gtkmm-3.0 --cflags`
+GTKMM_LDFLAGS = `/usr/local/bin/pkg-config gtkmm-3.0 --libs`
 
 CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `/usr/local/bin/pkg-config --cflags golib` --std=c++11

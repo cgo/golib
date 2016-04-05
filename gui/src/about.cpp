@@ -29,7 +29,7 @@ void goGUI::about (const goString& text, char* logo[])
 
     Gdk::Color white;
     white.set_rgb_p (1.0, 1.0, 1.0);
-    msg.modify_bg (Gtk::STATE_NORMAL, white);
+    // msg.modify_bg (Gtk::STATE_NORMAL, white);
 
     msg.add_button ("Ok", Gtk::RESPONSE_OK);
 

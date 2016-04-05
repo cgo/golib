@@ -40,8 +40,8 @@ MainWindow::MainWindow ()
 {
     myPrivate = new MainWindowPrivate;
 
-    Gtk::Tooltips* toolTips = Gtk::manage (new Gtk::Tooltips);
-    toolTips->enable ();
+    //Gtk::Tooltip* toolTips = Gtk::manage (new Gtk::Tooltip);
+    //toolTips->enable ();
 
     Gtk::VBox* vbox = Gtk::manage (new Gtk::VBox);
     assert (vbox);
@@ -54,7 +54,7 @@ MainWindow::MainWindow ()
 
     //= Align the menu to the top and add it.
     {
-        Gtk::Alignment* alignment = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_TOP, 1.0, 0.0));
+        Gtk::Alignment* alignment = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_START, Gtk::ALIGN_START, 1.0, 0.0));
         alignment->add (myMenuBar);
         vbox->pack_start (*alignment, Gtk::PACK_SHRINK);
     }
@@ -68,7 +68,7 @@ MainWindow::MainWindow ()
     }
 
     {
-        Gtk::Alignment* alignment = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_TOP, 1.0, 1.0));
+        Gtk::Alignment* alignment = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_START, Gtk::ALIGN_START, 1.0, 1.0));
         alignment->add (myPaned);
         vbox->pack_start (*alignment);
     }
@@ -120,21 +120,23 @@ void MainWindow::addControl (goGUI::Control& c, bool active)
  */
 void MainWindow::setControlsVisibility ()
 {
-    Gtk::Menu_Helpers::MenuList& ml = this->getControlsMenu()->items ();
-    goSize_t i = 0;
-    Gtk::Menu_Helpers::MenuList::iterator it = ml.begin ();
-    Gtk::Menu_Helpers::MenuList::iterator itend = ml.end ();
+	std::vector<Gtk::Widget*> items = this->getControlsMenu()->get_children();
+//    Gtk::MenuList& ml = this->getControlsMenu()->items ();
+//    goSize_t i = 0;
+	auto it = items.begin ();
+	auto itend = items.end ();
+	//    Gtk::MenuList::iterator itend = ml.end ();
     goList<void*>::Element* el = myPrivate->controls.getFrontElement ();
     while (it != itend && el)
     {
-        Gtk::CheckMenuItem* mi = dynamic_cast<Gtk::CheckMenuItem*> (&*it);
+        Gtk::CheckMenuItem* mi = dynamic_cast<Gtk::CheckMenuItem*> (*it);
         if (mi)
         {
             if (mi->get_active())
                 static_cast<Control*> (el->elem)->show ();
             else
                 static_cast<Control*> (el->elem)->hide ();
-            ++i;
+
             el = el->next;
         }
         ++it;
@@ -207,7 +209,7 @@ void MainWindow::controlsToggled (goGUI::Control* control, Gtk::CheckMenuItem* i
     {
         return;
     }
-    assert (myPrivate->controls.getSize() == this->getControlsMenu()->items().size());
+    assert (myPrivate->controls.getSize() == this->getControlsMenu()->get_children().size());
     if (!item)
     {
         //= This case should only be used when the corresponding check items

@@ -41,8 +41,8 @@ namespace goGUI
             {
                 if (myGraph)
                 {
-                    int w, h;
-                    this->get_window()->get_size (w, h);
+                    int x, y, w, h;
+                    this->get_window()->get_geometry (x, y, w, h);
                     goPlot::CairoPlot plot (this->get_window ()->create_cairo_context ()->cobj (), w, h, *myGraph);
                 }
 

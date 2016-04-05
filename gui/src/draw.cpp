@@ -8,10 +8,11 @@
 #include <gotypes.h>
 #include <gogui/draw.h>
 
-goGUI::Draw::Draw (Glib::RefPtr<Gdk::Drawable> drawable)
-    : myDrawable (drawable), myGC()
+goGUI::Draw::Draw (Glib::RefPtr<Gdk::Window> drawable)
+    : myDrawable (drawable), myCairo()
 {
-    this->myGC = Gdk::GC::create (this->myDrawable);
+	this->myCairo = this->myDrawable->create_cairo_context();
+    // this->myGC = Gdk::GC::create (this->myDrawable);
 }
 
 goGUI::Draw::~Draw ()
@@ -24,8 +25,11 @@ void goGUI::Draw::line (goDouble x0, goDouble y0, goDouble x1, goDouble y1)
 //    this->myDrawable->get_size (w,h);
 //    this->myDrawable->draw_line (this->myGC, int(::round(x0 * (float)w)), int(::round(y0 * (float)h)), 
 //                                           int(::round(x1 * (float)w)), int(::round(y1 * (float)h)));
-    this->myDrawable->draw_line (this->myGC, int(::round(x0)), int(::round(y0)), 
-                                           int(::round(x1)), int(::round(y1)));
+    this->myCairo->move_to(::round(x0),::round(y0));
+    this->myCairo->line_to(::round(x1),::round(y1));
+    this->myCairo->stroke ();
+//	this->myCairo->draw_line (this->myGC, int(::round(x0)), int(::round(y0)),
+//    		int(::round(x1)), int(::round(y1)));
 }
 
 void goGUI::Draw::point (goDouble x0, goDouble y0)
@@ -33,7 +37,10 @@ void goGUI::Draw::point (goDouble x0, goDouble y0)
 //    int w,h;
 //    this->myDrawable->get_size (w,h);
 //    this->myDrawable->draw_point (this->myGC, int(::round(x0 * (float)w)), int(::round(y0 * (float)h)));
-    this->myDrawable->draw_point (this->myGC, int(::round(x0)), int(::round(y0)));
+	this->myCairo->move_to(::round(x0),::round(y0));
+	this->myCairo->line_to(::round(x0),::round(y0));
+	this->myCairo->stroke();
+    // this->myDrawable->draw_point (this->myGC, int(::round(x0)), int(::round(y0)));
 }
 
 void goGUI::Draw::curve (const goMatrixd& M)
@@ -69,11 +76,19 @@ void goGUI::Draw::image (const goSignal3D<void>& image)
         goLog::warning ("goGUI::Draw::image(): image must currently be uint8.");
         return;
     }
-    
-    this->myDrawable->draw_rgb_image (this->myGC, 0, 0, image.getSizeX(), image.getSizeY(), Gdk::RGB_DITHER_NONE, (const goUInt8*)image.getPtr(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_data((const guint8*)image.getPtr(), Gdk::COLORSPACE_RGB, false, 24, image.getSizeX(), image.getSizeY(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());
+    Gdk::Cairo::set_source_pixbuf(this->myCairo, pixbuf, 0, 0);
+    myCairo->rectangle (0, 0, image.getSizeX(), image.getSizeY());
+    myCairo->fill();
+    // this->myDrawable->draw_rgb_image (this->myGC, 0, 0, image.getSizeX(), image.getSizeY(), Gdk::RGB_DITHER_NONE, (const goUInt8*)image.getPtr(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());
 }
 
-Glib::RefPtr<Gdk::GC> goGUI::Draw::getGC ()
+Cairo::RefPtr<Cairo::Context> goGUI::Draw::getCairo()
 {
-    return this->myGC;
+	return myCairo;
 }
+
+//Glib::RefPtr<Gdk::GC> goGUI::Draw::getGC ()
+//{
+//    return this->myGC;
+//}

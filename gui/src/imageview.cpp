@@ -108,8 +108,8 @@ namespace goGUI
         if (myPrivate->graph.isNull())
             return;
 
-        int w, h;
-        this->get_window()->get_size (w, h);
+        int x, y, w, h;
+        this->get_window()->get_geometry (x, y, w, h);
         // printf ("ImageView::draw(): size %d %d\n", w, h);
         goPlot::CairoPlot plot (this->get_window ()->create_cairo_context ()->cobj (), w, h, *myPrivate->graph);
     }
@@ -583,12 +583,12 @@ namespace goGUI
      * 
      * @return True if successful, false otherwise.
      */
-    bool goGUI::ImageView::on_expose_event (GdkEventExpose* event)
+    bool goGUI::ImageView::on_draw (Cairo::RefPtr<Cairo::Context> const& context)
     {
         //    this->drawImage ();
         //    this->drawCurves ();
         this->draw ();
-        return Gtk::Widget::on_expose_event (event);
+        return Gtk::Widget::on_draw (context);
     }
 
 };

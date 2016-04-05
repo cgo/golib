@@ -87,7 +87,7 @@ namespace goGUI
             const goList<goMatrixd>& getCurves  () const;
 #endif
         protected:
-            virtual bool on_expose_event (GdkEventExpose* event);
+            virtual bool on_draw (Cairo::RefPtr<Cairo::Context> const& context) override;
 
             goAutoPtr<goSignal3DBase<void> > imageRef (goAutoPtr<goPlot::Object2DImage> img);
 

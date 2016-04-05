@@ -28,7 +28,7 @@ namespace goGUI
     class Draw
     {
         public:
-            Draw (Glib::RefPtr<Gdk::Drawable> drawable); // Widget::get_window()
+            Draw (Glib::RefPtr<Gdk::Window> drawable); // Widget::get_window()
             virtual ~Draw ();
 
             void line (goDouble x0, goDouble y0, goDouble x1, goDouble y1);
@@ -36,11 +36,13 @@ namespace goGUI
             void curve (const goMatrixd& points);
             void image (const goSignal3D<void>& image);
 
-            Glib::RefPtr<Gdk::GC> getGC ();
+            Cairo::RefPtr<Cairo::Context> getCairo();
+            // Glib::RefPtr<Gdk::GC> getGC ();
 
         private:
-            Glib::RefPtr<Gdk::Drawable> myDrawable;
-            Glib::RefPtr<Gdk::GC>       myGC;
+            Glib::RefPtr<Gdk::Window>     myDrawable;
+            // Glib::RefPtr<Gdk::GC>         myGC;
+            Cairo::RefPtr<Cairo::Context> myCairo;
     };
 /** 
  * @}

@@ -89,10 +89,16 @@ goGUI::ImageControl::ImageControl ()
 
     //= Context menu in treeview
     {
-        Gtk::Menu::MenuList& menulist = myPrivate->myTreeContextMenu.items ();
+//        Gtk::Menu::MenuList& menulist = myPrivate->myTreeContextMenu.items ();
 
-        menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Delete",
-                    sigc::mem_fun(*this, &ImageControl::treeDeleteImage) ) );
+        Gtk::MenuItem *menuItem = Gtk::manage(new Gtk::MenuItem("_Delete"));
+
+        menuItem->signal_activate().connect(sigc::mem_fun(*this, &ImageControl::treeDeleteImage));
+
+        myPrivate->myTreeContextMenu.append(*menuItem);
+
+//        menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Delete",
+//                    sigc::mem_fun(*this, &ImageControl::treeDeleteImage) ) );
     }
     myPrivate->myTreeContextMenu.accelerate (*this);
 
@@ -192,7 +198,7 @@ class TreeModelRenumber
 void goGUI::ImageControl::treeDeleteImage ()
 {
     Glib::RefPtr<Gtk::TreeSelection> selection = myPrivate->myTreeView.get_selection ();
-    Gtk::TreeSelection::ListHandle_Path::iterator it = selection->get_selected_rows ().begin ();
+    // std::vector<Gtk::TreeModel::Path>::iterator it = selection->get_selected_rows ().begin ();
 
 //    std::vector<Gtk::TreeModel::iterator> rm_iters;
 //    for (; it != selection->get_selected_rows ().end (); ++it)
@@ -336,7 +342,7 @@ void goGUI::ImageControl::imageViewChanged (int code)
                 goString s = "";
                 s += (int)i;
                 s += " "; s += img->getObjectName();
-                myPrivate->imageList.append_text (Glib::ustring (s.toCharPtr ()));
+                myPrivate->imageList.append (Glib::ustring (s.toCharPtr ()));
                 
                 Gtk::TreeModel::iterator iter = myPrivate->myRefStore->append();
                 Gtk::TreeModel::Row row = *iter;
@@ -379,7 +385,7 @@ void goGUI::ImageControl::treeRowActivated (const Gtk::TreeModel::Path& path, Gt
     //= First entry should mark the selected treemodel entry
     int entry = path[0];
     Gtk::TreePath tp;
-    tp.append_index (entry);
+    tp.push_back (entry);
     Gtk::TreeModel::iterator iter = myPrivate->myRefStore->get_iter (tp);
     //= Get the image index
     goIndex_t index = (*iter)[myPrivate->myColumns.myColNumber];

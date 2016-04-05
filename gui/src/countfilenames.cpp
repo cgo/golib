@@ -12,13 +12,13 @@ goGUI::CountFilenames::CountFilenames ()
       myCount (),
       mySuffixEntry ()
 {
-    Gtk::Alignment* a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_TOP, 1.0, 0.0));
+    Gtk::Alignment* a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_START, Gtk::ALIGN_START, 1.0, 0.0));
     a->add (myBaseEntry);
     this->pack_start (*a, Gtk::PACK_SHRINK);
-    a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_TOP, 1.0, 0.0));
+    a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_START, Gtk::ALIGN_START, 1.0, 0.0));
     a->add (myCount);
     this->pack_start (*a, Gtk::PACK_SHRINK);
-    a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_TOP, 1.0, 0.0));
+    a = Gtk::manage (new Gtk::Alignment(Gtk::ALIGN_START, Gtk::ALIGN_START, 1.0, 0.0));
     a->add (mySuffixEntry);
     this->pack_start (*a, Gtk::PACK_SHRINK);
 
