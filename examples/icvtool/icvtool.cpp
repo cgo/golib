@@ -38,7 +38,7 @@ class ICVTool : public goGUI::MainWindow
     private:
         goGUI::ImageView           myImageView;
         goGUI::ImageControl        myImageControl;
-        goGUI::VideoCaptureControl myVCControl;
+        //goGUI::VideoCaptureControl myVCControl;
 
         goGUI::ControlsBox  myControlsBox;
         goGUI::CannyControl myCannyControl;
@@ -51,7 +51,7 @@ class ICVTool : public goGUI::MainWindow
 ICVTool::ICVTool ()
     : goGUI::MainWindow (),
       myImageView (),
-      myVCControl (),
+      //myVCControl (),
       myImageControl (),
       myControlsBox ("Image Operations"),
       myCannyControl (),
@@ -61,7 +61,7 @@ ICVTool::ICVTool ()
     this->getPaned().add1 (this->myImageView);
     this->addControl (this->myImageControl);
     this->addControl (this->myControlsBox);
-    this->addControl (this->myVCControl);
+    //this->addControl (this->myVCControl);
     this->addControl (this->myGaussImageControl);
 
     this->myControlsBox.addControl (this->myCannyControl);
@@ -79,17 +79,18 @@ ICVTool::ICVTool ()
 
     //= Set the image for the video capture
     myImageView.setImage (640, 480);
-    this->myVCControl.setTarget (myImageView.getImage (0)); //= FIXME: This means the image may not change.
-                                                            //= Also it needs to be changed when the user changes the resolution
-                                                            //= or something similar.
-    this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::imageCaptured));
-    this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::gaussImageUpdate));
-    //this->getPaned().get_child1()->hide ();
+    //this->myVCControl.setTarget (myImageView.getImage (0)); //= FIXME: This means the image may not change.
+    //                                                        //= Also it needs to be changed when the user changes the resolution
+    //                                                        //= or something similar.
+    //this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::imageCaptured));
+    //this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::gaussImageUpdate));
+    // this->getPaned().get_child1()->hide ();
     
     this->myInteractiveDraw.setDrawWidget (&this->myImageView);
 }
 
 //= Make this an extra class.
+#if 0
 void ICVTool::gaussImageUpdate ()
 {
     static goSignal3D<void> mono_image;
@@ -122,6 +123,7 @@ void ICVTool::gaussImageUpdate ()
         myGaussImageControl.difference (image);
     }
 }
+#endif
 
 ICVTool::~ICVTool ()
 {
