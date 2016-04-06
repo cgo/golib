@@ -122,24 +122,33 @@ class MyWindow : public goGUI::MainWindow
         {
         }
 
-        virtual void fileAbout ()
+        virtual void fileAbout () override
         {
-            goGUI::Draw draw (this->getPaned().get_child1()->get_window());
+        	std::cout << "Hello!" << std::endl;
+
+        	goGUI::Draw draw (this->getPaned().get_child2()->get_window());
             draw.line (0.0, 0.0, 1.0, 1.0);
             draw.line (0.0, 1.0, 1.0, 0.0);
 
             goSignal3D<void> image;
             image.setDataType (GO_UINT8);
-            goFileIO::readImage ("/home/gosch/Documents/images/Leeuw.JPG", &image, true);
-            printf ("size: %d %d %d\n", image.getSizeX(), image.getSizeY(), image.getSizeZ());
-            printf ("blocksize: %d %d %d\n", image.getBlockSizeX(), image.getBlockSizeY(), image.getBlockSizeZ());
+            try
+            {
+            	goFileIO::readImage ("/Users/christian/Pictures/Pictures_other/cannondale_trigger.png", &image, true);
+            	printf ("size: %d %d %d\n", image.getSizeX(), image.getSizeY(), image.getSizeZ());
+            	printf ("blocksize: %d %d %d\n", image.getBlockSizeX(), image.getBlockSizeY(), image.getBlockSizeZ());
 
-            goSignal3D<void> image2;
-            image2.setDataType (image.getDataType().getID());
-            image2.make (image.getSize(), image.getBlockSize(), image.getBorderSize(), 3);
-            goCopySignal (&image, &image2);
+            	goSignal3D<void> image2;
+            	image2.setDataType (image.getDataType().getID());
+            	image2.make (image.getSize(), image.getBlockSize(), image.getBorderSize(), 3);
+            	goCopySignal (&image, &image2);
 
-            draw.image (image2);
+            	draw.image (image2);
+            }
+            catch (goException& ex)
+            {
+            	std::cout << "Failed to load image file." << std::endl;
+            }
         }
 
 };
@@ -191,8 +200,13 @@ int main (int argc, char* argv[])
     //::sleep(3);
     //mwt.getThread().join();
 
-    Gtk::Main kit(argc, argv);
+	auto app =
+	    Gtk::Application::create(argc, argv,
+	      "de.goschs.examples", Gio::APPLICATION_HANDLES_OPEN);
+
     MyWindow window;
-    // kit.run (window);
-    Gtk::Main::run(window);
+	//  Gtk::Window window;
+	  window.set_default_size(200, 200);
+
+	  return app->run(window);
 }
