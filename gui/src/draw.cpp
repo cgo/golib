@@ -76,8 +76,9 @@ void goGUI::Draw::image (const goSignal3D<void>& image)
         goLog::warning ("goGUI::Draw::image(): image must currently be uint8.");
         return;
     }
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_data((const guint8*)image.getPtr(), Gdk::COLORSPACE_RGB, false, 24, image.getSizeX(), image.getSizeY(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create_from_data((const guint8*)image.getPtr(), Gdk::COLORSPACE_RGB, false, 8, image.getSizeX(), image.getSizeY(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());
     Gdk::Cairo::set_source_pixbuf(this->myCairo, pixbuf, 0, 0);
+
     myCairo->rectangle (0, 0, image.getSizeX(), image.getSizeY());
     myCairo->fill();
     // this->myDrawable->draw_rgb_image (this->myGC, 0, 0, image.getSizeX(), image.getSizeY(), Gdk::RGB_DITHER_NONE, (const goUInt8*)image.getPtr(), image.getSizeX() * image.getChannelCount() * image.getDataType().getSize());

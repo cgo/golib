@@ -32,7 +32,7 @@ namespace goGUI
             void setGraph (goAutoPtr<goPlot::Graph> g);
 
         protected:
-            virtual bool on_expose_event(GdkEventExpose* event);
+            virtual bool on_draw(Cairo::RefPtr<Cairo::Context> const& context) override;
 
         private:
             goAutoPtr<goPlot::Graph> myGraph;

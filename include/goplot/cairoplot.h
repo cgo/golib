@@ -75,6 +75,7 @@ namespace goPlot
     goAutoPtr<goPlot::Graph> plot (const goVectord& x, const goVectord& y, goAutoPtr<goPlot::Graph> g = 0);
 
     bool plot (goAutoPtr<goPlot::Graph> g, const goString& filename, int w = 600, int h = 400);
+    //! @TODO Remove CairoPlot and replace with plot(). Basically we only need this function.
     void plot (goAutoPtr<goPlot::Graph> g, cairo_t* context, int w = 600, int h = 400);
 
     //= Moved to goGUI
