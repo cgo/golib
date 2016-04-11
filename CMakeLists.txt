@@ -33,7 +33,7 @@ set (MODULE_GRIDS      TRUE  CACHE BOOL "Build classes for grids / signal3d")
 set (MODULE_MATH       TRUE  CACHE BOOL "Build math classes")
 set (MODULE_CONTAINERS TRUE  CACHE BOOL "Build containers")
 set (MODULE_VIDEO      FALSE CACHE BOOL "Build video")
-
+set (MODULE_GNUPLOT    TRUE  CACHE BOOL "Build support for calling gnuplot")
 
 PROJECT             (Go)
 SET                 (TARGETNAME Go)
@@ -62,12 +62,6 @@ SET (BASE_SOURCES
 
  src/misc/goargs.cpp
  src/misc/goofffile.cpp
- # src/misc/plot.cpp
- # src/misc/gognuplot.cpp      # not plotting in windows!
- # src/misc/gosingleplot.cpp
- # src/misc/gomultiplotter.cpp
- # src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
- # src/misc/goconfigfileaccess.cc 
  src/misc/godate.cc # DEPRECATE
  src/misc/gofileio.cc 
  # src/misc/gostatusobject.cc  # not in windows!
@@ -106,15 +100,20 @@ SET (VIDEO_SOURCES
   src/misc/govideocapture.cpp # not in windows!
   )
 
-
-IF (NOT WIN32)
-  SET (BASE_SOURCES ${BASE_SOURCES}
+set (GNUPLOT_SOURCES
   src/misc/gognuplot.cpp      # not plotting in windows!
   src/misc/gosingleplot.cpp
   src/misc/gomultiplotter.cpp
+  src/plot/gnuplot.cpp  # not in windows!
+  src/plot/gnuplot_helperfunctions.cpp
+  src/plot/goplotter.cpp
+  )  
+
+
+IF (NOT WIN32)
+  SET (BASE_SOURCES ${BASE_SOURCES}
   src/misc/goconfigfile.cc    # not in windows! (deprecated anyway)
-  src/misc/goconfigfileaccess.cc 
-  src/misc/goplot.cpp  # not in windows!
+  src/misc/goconfigfileaccess.cc
   src/system/goprocess.cc  # not in windows!
   # Can I remove any of these permanently?
   src/system/godirectory.cc # not in windows!
@@ -319,6 +318,7 @@ SET (CAIRO_SOURCES
 
 
 set (SOURCES ${BASE_SOURCES})
+
 if (MODULE_CONTAINERS)
   set (SOURCES ${SOURCES} ${CONTAINER_SOURCES})
 endif (MODULE_CONTAINERS)
@@ -340,6 +340,9 @@ endif (MODULE_CAIROPLOT)
 if (MODULE_VIDEO)
   set (SOURCES ${SOURCES} ${VIDEO_SOURCES})
 endif (MODULE_VIDEO)
+if (MODULE_GNUPLOT)
+  set (SOURCES ${SOURCES} ${GNUPLOT_SOURCES})
+endif (MODULE_GNUPLOT)
   
   
 
@@ -451,6 +454,11 @@ ELSE (WIN32)
 #      #find_path (CBLAS_INCLUDE_DIR cblas.h)
 #      #include_directories (${CBLAS_INCLUDE_DIR})
 #    endif (VECLIB)
+
+if (BUILD_GL_MODULE)
+  find_library (OPENGL OpenGL)
+  link_libraries (${OPENGL})
+endif (BUILD_GL_MODULE)
 
     find_library        (LAPACKE lapacke PATHS ${GOPATH}/tools/lapacke)
     link_libraries      (${LAPACKE})
@@ -627,10 +635,13 @@ CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
 
 # pkg-config file
 set (PCLIBS "-lGo")
-set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${GOPATH}/tools/lapacke/include")
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${GOPATH}/gl/include -I${GOPATH}/tools/lapacke/include")
 if (BUILD_GUI_MODULE)
     set (PCLIBS "${PCLIBS} -lGogui")
 endif (BUILD_GUI_MODULE)
+if (BUILD_GL_MODULE)
+    set (PCLIBS "${PCLIBS} -lGogl")
+endif (BUILD_GL_MODULE)
 
 set (GOLIB_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
 
