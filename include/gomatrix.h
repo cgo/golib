@@ -19,6 +19,9 @@
 # include <govector.h>
 #endif
 
+// Needed for LAPACK_ROW_MAJOR.
+#include <golib_clapack.h>
+
 // template <class T> class goMath::Vector;
 
 namespace goMath {
@@ -27,6 +30,12 @@ namespace goMath {
 
     template <class T> class VectorIterator;
     template <class T> class ConstVectorIterator;
+
+    /*! @todo FIXME: These are assumed to be row major e.g. by the row/column iterators returned by goMath::Matrix.
+        Make these selectable object-wise.
+     */
+    static int const defaultMatrixOrder = LAPACK_ROW_MAJOR;
+    static bool const rowMajor          = defaultMatrixOrder == LAPACK_ROW_MAJOR;
 
     /*!
      * \brief Matrix class.

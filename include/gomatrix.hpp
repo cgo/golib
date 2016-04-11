@@ -100,7 +100,7 @@ bool goMatrix<T>::resize (goSize_t rows, goSize_t cols)
     this->matrix = new T[rows * cols];
     this->rows = rows;
     this->columns = cols;
-    if (goMatrix<T>::rowMajor)
+    if (goMath::rowMajor)
     {
         this->leadingDimension = cols;
     }
@@ -134,7 +134,7 @@ bool goMatrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
     this->columns = c;
     if (leadingDim == 0)
     {
-        if (goMatrix<T>::rowMajor)
+        if (goMath::rowMajor)
         {
             this->leadingDimension = c;
         }
@@ -176,7 +176,7 @@ bool goMatrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t leadi
     const_cast<goMatrix<T>*>(this)->columns = c;
     if (leadingDim == 0)
     {
-        if (goMatrix<T>::rowMajor)
+        if (goMath::rowMajor)
         {
             const_cast<goMatrix<T>*>(this)->leadingDimension = c;
         }
