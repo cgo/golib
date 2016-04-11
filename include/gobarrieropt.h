@@ -22,7 +22,9 @@
 
 #include <limits>
 
-//= For FE tra (debugging)
+#include <goconfig.h>
+
+//= For FE tra (debugging), some functions not available in OSX.
 extern "C" {
  #include <fenv.h>
  #include <signal.h>
@@ -640,8 +642,10 @@ namespace goMath
 static void fpTraps ()
     {
         ::feclearexcept (FE_ALL_EXCEPT);
+#ifndef OSX
         ::fedisableexcept (FE_ALL_EXCEPT);
         ::feenableexcept (FE_DIVBYZERO | FE_INVALID);
+#endif
         // ::feenableexcept (FE_DIVBYZERO | FE_UNDERFLOW | FE_INVALID);
         //::feenableexcept (FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW | FE_INVALID);
         // ::fedisableexcept (FE_INEXACT);   // raised e.g. by sqrt(2)
