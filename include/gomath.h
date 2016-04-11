@@ -48,6 +48,7 @@
 # include <gomanifold.h>
 #endif
 
+
 // The following functions are taken in part directly from the TNT library
 // (http://math.nist.gov/tnt/). There is no copyright on TNT, but they ask
 // for acknowledgment when TNT is used in a product.
