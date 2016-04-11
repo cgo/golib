@@ -27,6 +27,7 @@
 
 /* functions */
 #cmakedefine HAVE_TMPNAM_R ${HAVE_TMPNAM_R}
+#cmakedefine HAVE_TMPNAM ${HAVE_TMPNAM}
 #cmakedefine HAVE_UNLINK ${HAVE_UNLINK}
 #cmakedefine HAVE_MKDIR ${HAVE_MKDIR}
 #cmakedefine HAVE_MODF ${HAVE_MODF}
