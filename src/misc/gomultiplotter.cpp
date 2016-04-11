@@ -4,7 +4,7 @@
    directory of the golib source tree. */
 
 
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 #include <godefs.h>
 #include <gofileio.h>
 
