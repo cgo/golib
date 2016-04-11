@@ -39,9 +39,6 @@
 // // #include <clapack.h>
 //}
 
-template<class T>
-const bool goMath::Matrix<T>::rowMajor = true;
-
 
 /*!
 * @param y Number of rows.
@@ -82,7 +79,7 @@ goMath::Matrix<T>::Matrix (T* data, goSize_t r, goSize_t c, goSize_t leadingDim)
 {
     if (leadingDim == 0)
     {
-        if (goMath::Matrix<T>::rowMajor)
+        if (goMath::rowMajor)
             leadingDimension = columns;
         else
             leadingDimension = rows;
@@ -223,7 +220,7 @@ bool goMath::Matrix<T>::resize (goSize_t rows, goSize_t cols)
   
   this->rows = rows;
   this->columns = cols;
-  if (goMath::Matrix<T>::rowMajor)
+  if (goMath::rowMajor)
   {
     this->leadingDimension = cols;
   }
@@ -258,7 +255,7 @@ bool goMath::Matrix<T>::reshape (goSize_t rows, goSize_t cols)
 
   this->rows = rows;
   this->columns = cols;
-  if (goMath::Matrix<T>::rowMajor)
+  if (goMath::rowMajor)
   {
     this->leadingDimension = cols;
   }
@@ -294,7 +291,7 @@ bool goMath::Matrix<T>::setData (T* data, goSize_t r, goSize_t c, goSize_t leadi
     this->columns = c;
     if (leadingDim == 0)
     {
-        if (goMath::Matrix<T>::rowMajor)
+        if (goMath::rowMajor)
         {
             this->leadingDimension = c;
         }
@@ -336,7 +333,7 @@ bool goMath::Matrix<T>::setData (const T* data, goSize_t r, goSize_t c, goSize_t
     const_cast<goMath::Matrix<T>*>(this)->columns = c;
     if (leadingDim == 0)
     {
-        if (goMath::Matrix<T>::rowMajor)
+        if (goMath::rowMajor)
         {
             const_cast<goMath::Matrix<T>*>(this)->leadingDimension = c;
         }
@@ -1596,7 +1593,7 @@ namespace goMath {
             }
             int* P = new int [M];
             // FIXME: replace lapacke calls with goLapack calls to getrf.
-            if (LAPACKE_sgetrf (rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            if (LAPACKE_sgetrf (goMath::defaultMatrixOrder, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 P = 0;
@@ -1605,7 +1602,7 @@ namespace goMath {
 
 
 
-            if (LAPACKE_sgetri (rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            if (LAPACKE_sgetri (goMath::defaultMatrixOrder, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 P = 0;
@@ -1628,13 +1625,12 @@ namespace goMath {
             }
             int* P = new int [M * M];
             // if (clapack_dgetrf (CblasRowMajor, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
-            int const order = rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
-            if (LAPACKE_dgetrf (order, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            if (LAPACKE_dgetrf (goMath::defaultMatrixOrder, M, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 return false;
             }
-            if (LAPACKE_dgetri (order, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
+            if (LAPACKE_dgetri (goMath::defaultMatrixOrder, M, this->getPtr(), this->getLeadingDimension(), P) != 0)
             {
                 delete[] P;
                 return false;
