@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glu.h>
+#include <gogl/gl.h>
 
-#include <gtk/gtkgl.h>
+//#include <gtk/gtkgl.h>
 
 static int check_gl_error (const char* name)
 {

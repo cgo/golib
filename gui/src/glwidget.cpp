@@ -5,7 +5,7 @@
 
 
 #include <gogui/glwidget.h>
-#include <gtk/gtkgl.h>
+// #include <gtk/gtkgl.h>
 #include <goquaternion.h>
 
 namespace goGUI
@@ -35,23 +35,26 @@ namespace goGUI
 }
 
 goGUI::GLWidget::GLWidget ()
-    : Gtk::DrawingArea (), myPrivate (0)
+    : Gtk::GLArea (), myPrivate (0)
 {
     myPrivate = new goGUI::GLWidgetPrivate;
 
     this->set_size_request (-1,-1);
 
-    GdkGLConfigMode mode = (GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH);
-    GdkGLConfig* glconfig = gdk_gl_config_new_by_mode (mode);
-    gtk_widget_set_gl_capability (Gtk::Widget::gobj(), 
-                                  glconfig,
-                                  NULL,
-                                  TRUE,
-                                  GDK_GL_RGBA_TYPE);
+    // GdkGLConfigMode mode = (GdkGLConfigMode)(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH);
+    // GdkGLConfig* glconfig = gdk_gl_config_new_by_mode (mode);
+//    gtk_widget_set_gl_capability (Gtk::Widget::gobj(),
+//                                  glconfig,
+//                                  NULL,
+//                                  TRUE,
+//                                  GDK_GL_RGBA_TYPE);
 
     this->add_events (Gdk::EXPOSURE_MASK | Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK
             | Gdk::BUTTON_RELEASE_MASK);
-    this->signal_expose_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::exposeSlot));
+
+
+    this->signal_render().connect (sigc::mem_fun(*this, &goGUI::GLWidget::renderSlot));
+    // this->signal_expose_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::exposeSlot));
 //    this->signal_motion_notify_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::motionSlot));
 //    this->signal_button_press_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
 //    this->signal_button_release_event().connect (sigc::mem_fun (*this, &goGUI::GLWidget::buttonSlot));
@@ -68,12 +71,12 @@ goGUI::GLWidget::~GLWidget ()
 
 void goGUI::GLWidget::GLWidgetBegin ()
 {
-    gdk_gl_drawable_gl_begin (gtk_widget_get_gl_drawable(Gtk::Widget::gobj()), gtk_widget_get_gl_context(Gtk::Widget::gobj()));
+    // gdk_gl_drawable_gl_begin (gtk_widget_get_gl_drawable(Gtk::Widget::gobj()), gtk_widget_get_gl_context(Gtk::Widget::gobj()));
 }
 
 void goGUI::GLWidget::GLWidgetEnd ()
 {
-    gdk_gl_drawable_gl_end (gtk_widget_get_gl_drawable(Gtk::Widget::gobj()));
+    // gdk_gl_drawable_gl_end (gtk_widget_get_gl_drawable(Gtk::Widget::gobj()));
 }
 
 /** 
@@ -81,9 +84,10 @@ void goGUI::GLWidget::GLWidgetEnd ()
  */
 void goGUI::GLWidget::swapBuffers ()
 {
-    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (Gtk::Widget::gobj());
-    if (gdk_gl_drawable_is_double_buffered (gldrawable))
-        gdk_gl_drawable_swap_buffers (gldrawable);
+	this->queue_draw();
+//    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (Gtk::Widget::gobj());
+//    if (gdk_gl_drawable_is_double_buffered (gldrawable))
+//        gdk_gl_drawable_swap_buffers (gldrawable);
 }
 
 #if 0
@@ -122,6 +126,13 @@ const goVectorf& goGUI::GLWidget::getRotationEnd () const
 {
     return myPrivate->rotationEnd;
 }
+
+bool goGUI::GLWidget::renderSlot (const Glib::RefPtr<Gdk::GLContext>& context)
+{
+	this->glDraw();
+	return true;
+}
+
 
 void goGUI::GLWidget::glDraw ()
 {

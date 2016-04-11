@@ -44,8 +44,8 @@ goGUI::GLDrawableObjectInput::GLDrawableObjectInput ()
     myPrivate = new GLDrawableObjectInputPrivate;
     this->getBox()->pack_start (myPrivate->materialInput);
     {
-        myPrivate->shadeModelInput.append_text ("Smooth");
-        myPrivate->shadeModelInput.append_text ("Flat");
+        myPrivate->shadeModelInput.append ("Smooth");
+        myPrivate->shadeModelInput.append ("Flat");
         myPrivate->shadeModelInput.set_active (0);
         Gtk::HBox* hbox = Gtk::manage (new Gtk::HBox);
         Gtk::Label* l = Gtk::manage (new Gtk::Label);

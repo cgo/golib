@@ -8,7 +8,7 @@
 #define GOGUI_GLWIDGET_H
 
 #include <gtkmm.h>
-#include <GL/gl.h>
+#include <gogl/gl.h>
 #include <govector.h>
 #include <goquaternion.h>
 
@@ -31,7 +31,7 @@ namespace goGUI
      * When deriving from \c GLWidget, implement \c glDraw() to contain 
      * any drawing routines (such as drawing opengl scenes).
      */
-    class GLWidget : public Gtk::DrawingArea
+    class GLWidget : public Gtk::GLArea
     {
         public:
             GLWidget ();
@@ -48,6 +48,8 @@ namespace goGUI
             const goVectorf& getRotationEnd   () const;
 
             virtual void glDraw ();
+
+            bool renderSlot (const Glib::RefPtr<Gdk::GLContext>& context);
 
             bool exposeSlot (GdkEventExpose* e);
             bool motionSlot (GdkEventMotion* e);

@@ -16,7 +16,7 @@
 # include <gofunctor.h>
 #endif
 
-#include <goplot.h>
+#include <goplot/goplot.h>
 
 namespace goGUI
 {

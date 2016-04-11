@@ -20,7 +20,7 @@ namespace goGUI
                   saveButton ("Save Animation"),
                   waypointsButton (),
                   tScale (0.0, 1.0, 0.01),
-                  tAdjustment (0.0, 0.0, 1.0, 0.01, 0.1),
+                  tAdjustment (Gtk::Adjustment::create(0.0, 0.0, 1.0, 0.01, 0.1)),
                   //signalPositionChanged (),
                   //signalWaypointSelected (),
                   waypointSelectedCaller (),
@@ -54,7 +54,7 @@ namespace goGUI
             Gtk::Button         saveButton;
             Gtk::SpinButton     waypointsButton;
             Gtk::HScale         tScale;
-            Gtk::Adjustment     tAdjustment;
+            Glib::RefPtr<Gtk::Adjustment>     tAdjustment;
 
             // sigc::signal<void>  signalPositionChanged;
             // sigc::signal<void>  signalWaypointSelected;

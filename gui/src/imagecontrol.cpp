@@ -45,7 +45,7 @@ namespace goGUI
                   myRefStore (),
                   myTreeView (),
                   myImageChangedCaller (),
-                  myTreeContextMenu ()
+                  myTreeContextMenu (Gtk::manage(new Gtk::Menu))
             {
                 myRefStore = Gtk::ListStore::create (myColumns);
                 myTreeView.set_model (myRefStore);
@@ -54,6 +54,8 @@ namespace goGUI
                 myTreeView.set_headers_visible (false);
                 myTreeView.set_reorderable (true);
                 myTreeView.set_grid_lines (Gtk::TREE_VIEW_GRID_LINES_HORIZONTAL);
+
+                myTreeContextMenu->set_visible();
                 // myTreeView.set_hover_selection (true);
             }
 
@@ -66,7 +68,7 @@ namespace goGUI
             Gtk::TreeView                   myTreeView;
             goCaller1 <void, goAutoPtr<goSignal3DBase<void> > > myImageChangedCaller;
 
-            Gtk::Menu                       myTreeContextMenu;
+            Gtk::Menu*                      myTreeContextMenu;
     };
 
 
@@ -95,12 +97,13 @@ goGUI::ImageControl::ImageControl ()
 
         menuItem->signal_activate().connect(sigc::mem_fun(*this, &ImageControl::treeDeleteImage));
 
-        myPrivate->myTreeContextMenu.append(*menuItem);
+        myPrivate->myTreeContextMenu->append(*menuItem);
+        menuItem->set_visible();
 
 //        menulist.push_back( Gtk::Menu_Helpers::MenuElem("_Delete",
 //                    sigc::mem_fun(*this, &ImageControl::treeDeleteImage) ) );
     }
-    myPrivate->myTreeContextMenu.accelerate (*this);
+    myPrivate->myTreeContextMenu->accelerate (*this);
 
     Gtk::ScrolledWindow* sw = Gtk::manage (new Gtk::ScrolledWindow);
     sw->set_size_request (-1, 200);
@@ -123,7 +126,7 @@ void goGUI::ImageControl::treeViewButtonPressed (GdkEventButton* event)
 
     if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
     {
-        myPrivate->myTreeContextMenu.popup (event->button, event->time);
+        myPrivate->myTreeContextMenu->popup (event->button, event->time);
     }
 
     // return return_value;
@@ -216,6 +219,7 @@ void goGUI::ImageControl::treeDeleteImage ()
     {
         Gtk::TreeModel::Row row = *sel_iters.myIterators [i];
         myPrivate->imageView->removeImage (row [myPrivate->myColumns.myColNumber]);
+        // FIXME: This crashes. Why?
         myPrivate->myRefStore->erase (sel_iters.myIterators [i]);
         //= FIXME: Also remove from imageview!
     }

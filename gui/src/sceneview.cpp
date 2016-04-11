@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glu.h>
+#include <gogl/gl.h>
 
-#include <gtk/gtkgl.h>
+// #include <gtk/gtkgl.h>
 
 static int check_gl_error (const char* name)
 {
@@ -495,7 +495,7 @@ bool goGUI::SceneView::motionSlot (GdkEventMotion* e)
         myPrivate->pointerEnd[0] = e->x;
         myPrivate->pointerEnd[1] = e->y;
 
-        goFloat _st[] = {myPrivate->pointerEnd[0] - myPrivate->pointerStart[0], -1.0 * (myPrivate->pointerEnd[1] - myPrivate->pointerStart[1]), 0.0f};
+        goFloat _st[] = {myPrivate->pointerEnd[0] - myPrivate->pointerStart[0], -1.0f * (myPrivate->pointerEnd[1] - myPrivate->pointerStart[1]), 0.0f};
         goVectorf screen_trans (_st, 3, 1);
         
         if (!obj.isNull())

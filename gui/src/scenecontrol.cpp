@@ -47,7 +47,7 @@ namespace goGUI
                   createMovieButton ("Create Movie"),
                   constantSpeedButton ("Speed from translation"),
                   movieStepsButton (),
-                  tooltips (),
+                  // tooltips (),
                   editWaypointConnection1 (),
                   editWaypointConnection2 (),
                   objectInput (),
@@ -61,6 +61,8 @@ namespace goGUI
                 movieStepsButton.set_increments (1, 10);
                 movieStepsButton.set_value (25);
 
+                // FIXME: Tooltips
+#if 0
                 tooltips.enable ();
                 tooltips.set_tip (objectBox, "Select the currently active object here.");
                 tooltips.set_tip (lightBox, "Select the currently active light here.\nThis currently has no function.");
@@ -79,18 +81,19 @@ namespace goGUI
                 tooltips.set_tip (createMovieButton, "Create image sequence from current animation.");
                 tooltips.set_tip (constantSpeedButton, "If set, time steps for waypoints are calculated from\nthe translation.\nIf not set, time is set incrementally.\nUnset if translation does not change\n between two consecutive frames!");
                 tooltips.set_tip (movieStepsButton, "Number of images to save for the movie.");
+#endif
             };
             ~SceneControlPrivate () {};
 
             void updateBoxes ()
             {
                 objectBox.clear ();
-                objectBox.append_text ("None");
+                objectBox.append ("None");
                 for (goSize_t i = 0; i < scene->getObjectCount(); ++i)
                 {
                     goString s = "Object ";
                     s += (int)i;
-                    objectBox.append_text (s.toCharPtr());
+                    objectBox.append (s.toCharPtr());
                 }
             };
 
@@ -124,7 +127,7 @@ namespace goGUI
             Gtk::CheckButton constantSpeedButton;
             Gtk::SpinButton  movieStepsButton;
 
-            Gtk::Tooltips tooltips;
+            //Gtk::Tooltips tooltips;
 
             sigc::connection editWaypointConnection1;
             sigc::connection editWaypointConnection2;
@@ -220,9 +223,9 @@ goGUI::SceneControl::SceneControl ()
         myHBox->pack_start (*vbox, Gtk::PACK_SHRINK);
     }
     {
-        myPrivate->lightBox.append_text ("GL_LIGHT0");
-        myPrivate->lightBox.append_text ("GL_LIGHT1");
-        myPrivate->lightBox.append_text ("GL_LIGHT2");
+        myPrivate->lightBox.append ("GL_LIGHT0");
+        myPrivate->lightBox.append ("GL_LIGHT1");
+        myPrivate->lightBox.append ("GL_LIGHT2");
     }
 
     {

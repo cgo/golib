@@ -23,7 +23,7 @@ namespace goGUI
                   theta ("0.00"),
                   radius (),
                   vbox (),
-                  tips (),
+                  // tips (),
                   view (),
                   viewWindow (),
                   angle_changed (),
@@ -48,7 +48,7 @@ namespace goGUI
             Gtk::Label theta;
             Gtk::SpinButton radius;
             Gtk::VBox   vbox;
-            Gtk::Tooltips tips;
+            // Gtk::Tooltip tips;
 
             goGUI::OFFView view;
             Gtk::Window viewWindow;
@@ -75,7 +75,8 @@ goGUI::OFFViewControl::OFFViewControl ()
         myPrivate->view.callerRotated().connect (goMemberFunction<int, OFFViewControl> (this, &goGUI::OFFViewControl::OFFViewRotated));
     }
 
-    myPrivate->tips.enable ();
+
+    // myPrivate->tips.enable ();
     {
         Gtk::HBox* labelBox = Gtk::manage (new Gtk::HBox);
         labelBox->set_spacing (10);
@@ -84,16 +85,16 @@ goGUI::OFFViewControl::OFFViewControl ()
         labelBox->pack_start (myPrivate->radius, Gtk::PACK_SHRINK);
         myPrivate->vbox.pack_start (*labelBox, Gtk::PACK_SHRINK);
     }
-    myPrivate->tips.set_tip (myPrivate->phi, "phi angle");
-    myPrivate->tips.set_tip (myPrivate->theta, "theta angle");
-    myPrivate->tips.set_tip (myPrivate->radius, "view sphere radius");
+    myPrivate->phi.set_tooltip_text("phi angle");
+    myPrivate->theta.set_tooltip_text("theta angle");
+    myPrivate->radius.set_tooltip_text("view sphere radius");
     
     Gtk::HBox* buttonBox = Gtk::manage (new Gtk::HBox);
     buttonBox->pack_start (myPrivate->loadButton, Gtk::PACK_SHRINK);
-    myPrivate->tips.set_tip (myPrivate->loadButton, "Load OFF file");
+    myPrivate->loadButton.set_tooltip_text("Load OFF file");
     buttonBox->pack_start (myPrivate->alignButton, Gtk::PACK_SHRINK);
     buttonBox->pack_start (myPrivate->lightButton, Gtk::PACK_SHRINK);
-    myPrivate->tips.set_tip (myPrivate->alignButton, "Align object with principal axes");
+    myPrivate->alignButton.set_tooltip_text("Align object with principal axes");
     myPrivate->vbox.pack_start (*buttonBox, Gtk::PACK_SHRINK);
     this->add (myPrivate->vbox);
 
