@@ -4,7 +4,7 @@
    directory of the golib source tree. */
 
 
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 #include <gorandom.h>
 #include <gomath.h>
 #include <gosignal3d.h>
@@ -132,7 +132,7 @@ int main ()
   
     {
         printf ("Testing goPlot::Plot\n");
-        goPlot::Plot p;
+        goPlot::Gnuplot p;
         p.plot (x,y);
         p.plot ();
         char c;

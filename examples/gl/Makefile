@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags golib` -std=c++11 `pkg-config --cflags gtkmm-3.0`
 
 LD		= g++
 LDARGS		= $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -lGo -lGogl -lGogui `pkg-config --libs gtkglext-1.0`
+LIBS		=  `pkg-config --libs golib` -framework OpenGL `pkg-config --libs gtkmm-3.0`
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/gl/include -I$(GOPATH)/gui/include `pkg-config --cflags gtkmm-2.4` `pkg-config --cflags gtkglext-1.0`
+INCLUDE		= 
 
 TARGET		= gl
 

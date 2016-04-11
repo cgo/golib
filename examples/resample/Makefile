@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g
+CXXARGS		= -c   -D HAVE_CONFIG_H -g `pkg-config --cflags golib`
 
 LD		= g++
 LDARGS		= $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -lGo -lGomatlab
+LIBS		=  `pkg-config --libs golib`
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  
 
 TARGET		= resample
 

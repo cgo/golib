@@ -51,7 +51,7 @@ int main ()
     to.stopTimer ();
     printf ("Seconds: %f\n", to.getTimerSeconds ());
 
-    goPlot::Plot p;
+    goPlot::Gnuplot p;
     p.setPrefix ("set yrange [:] reverse\nset palette grey\nset cbtics\n");
     p.plotImage (fimage);
     p.plotImage (fimage2, "", "w image", 1, 0);

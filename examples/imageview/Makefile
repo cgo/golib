@@ -2,20 +2,20 @@
 #Template version 
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
-GTKMM_CFLAGS = `pkg-config gtkmm-2.4 --cflags`
-GTKMM_LDFLAGS = `pkg-config gtkmm-2.4 --libs`
+GTKMM_CFLAGS = `pkg-config gtkmm-3.0 --cflags`
+GTKMM_LDFLAGS = `pkg-config gtkmm-3.0 --libs`
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `pkg-config --cflags golib`
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(GTKMM_CFLAGS) `pkg-config --cflags golib` -std=c++11
 
 LD		= g++
 LDARGS		= $(GTKMM_LDFLAGS) $(LDFLAGS) `pkg-config --libs golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS =  -L$(GOPATH)/../lib -lGo -lGogui -lGogl -lpython2.6 #-lGomatlab 
+LIBS =   #-lGomatlab 
 
-INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
+INCLUDE		=  
 
 TARGET		= imageviewer
 

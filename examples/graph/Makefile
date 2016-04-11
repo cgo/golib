@@ -4,16 +4,16 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags golib` -std=c++11
 
 LD		= g++
 LDARGS		=  
 
-#GOPATH		= /home/christian/pgm/golib
+#GOPATH		=
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  `pkg-config --libs golib` 
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		= 
 
 TARGET		= graph
 

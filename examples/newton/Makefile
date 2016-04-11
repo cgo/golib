@@ -7,13 +7,13 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags cairo pango golib`
 
 LD		= g++
-LDARGS		= $(LDFLAGS) `pkg-config --cflags cairo pango`
+LDARGS		= $(LDFLAGS) `pkg-config --libs cairo pango golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS =  -lGo 
+LIBS =   
 
-INCLUDE		=  -I$(GOPATH)/include -I$(GOPATH)/plot/include -I$(MATLAB)/extern/include -I$(GOPATH)/gui/include
+INCLUDE		=  
 
 TARGET		= newton
 

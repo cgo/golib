@@ -46,7 +46,7 @@ int main (int argc, char* argv[])
     contours.calculate (image, level);
     goList<goMatrixd>& c = contours.getContours();
 
-    goPlot::Plot plot;
+    goPlot::Gnuplot plot;
     goList<goMatrixd>::Element* el = c.getFrontElement();
     while (el)
     {

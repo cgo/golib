@@ -69,7 +69,7 @@ int main ()
         (*y)[N + i] = -1.0;
     }
 
-    goPlot::Plot p;
+    goPlot::Gnuplot p;
     matrix pointsref (points.getPtr(), N, 2);
     p.plot (pointsref, "", "w p lc rgb \"blue\"");
     pointsref.setData (points.getPtr() + 2 * N, N, 2);

@@ -11,7 +11,7 @@
 #include <gonewton.h>
 #include <goopt.h>
 #include <gobarrieropt.h>
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 #include <gofunctor.h>
 
 typedef goDouble REAL;
@@ -94,7 +94,7 @@ int main ()
             }
         }
 
-        goPlot::Plot p;
+        goPlot::Gnuplot p;
         p.setPrefix ("set dgrid3d; set isosamples 30,30; set contour; set cntrparam levels discrete 0;\n");
         p.plot (points, "");
         p.plotPause ();

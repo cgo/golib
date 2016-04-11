@@ -13,9 +13,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glu.h>
+#include <gogl/gl.h>
 
-#include <gtk/gtkgl.h>
+// #include <gtk/gtkgl.h>
 
 static int check_gl_error (const char* name)
 {
@@ -104,8 +104,8 @@ int main (int argc, char* argv[])
     }
 
     Gtk::Main kit(argc, argv);
-    gdk_gl_init (&argc, &argv);
-    gtk_gl_init (&argc, &argv);
+    //gdk_gl_init (&argc, &argv);
+    //gtk_gl_init (&argc, &argv);
     MyWindow w;
     Gtk::Main::run (w);
 
