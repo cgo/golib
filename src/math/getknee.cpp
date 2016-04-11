@@ -5,7 +5,7 @@
 
 
 #include <gomath.h>
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 #include <govector.h>
 
 /**
