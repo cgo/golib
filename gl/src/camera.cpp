@@ -5,8 +5,7 @@
 
 
 #include <gogl/camera.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <gogl/gl.h>
 #include <godefs.h>
 
 goGL::Camera::Camera (int width, int height, goFloat fov_angle, goFloat xy_aspect, goFloat near_clip, goFloat far_clip) 

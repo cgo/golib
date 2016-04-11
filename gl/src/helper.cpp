@@ -5,7 +5,7 @@
 
 
 #include <gogl/helper.h>
-#include <GL/glu.h>
+#include <gogl/gl.h>
 #include <golog.h>
 #include <gomatrix.h>
 

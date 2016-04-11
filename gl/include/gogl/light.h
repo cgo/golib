@@ -7,7 +7,7 @@
 #ifndef GOGL_LIGHT_H
 #define GOGL_LIGHT_H
 
-#include <GL/gl.h>
+#include <gogl/gl.h>
 #include <goobjectbase.h>
 #ifndef GOVECTOR_H
 # include <govector.h>

@@ -6,7 +6,7 @@
 
 #include <gogl/texture.h>
 #include <gosignalhelper.h>
-#include <GL/glu.h>
+
 
 goGL::Texture::Texture (const goSignal3DBase<void>& image)
     : myName (0)

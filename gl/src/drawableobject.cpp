@@ -5,7 +5,7 @@
 
 
 #include <gogl/drawableobject.h>
-#include <GL/gl.h>
+#include <gogl/gl.h>
 
 namespace goGL
 {

@@ -5,7 +5,7 @@
 
 
 #include <gogl/meshobject.h>
-#include <GL/gl.h>
+#include <gogl/gl.h>
 #include <govector.h>
 #include <gofixedarray.h>
 #include <gomatrix.h>

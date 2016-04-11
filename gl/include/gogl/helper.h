@@ -7,7 +7,7 @@
 #ifndef GOGL_HELPER_H
 #define GOGL_HELPER_H
 
-#include <GL/gl.h>
+#include <gogl/gl.h>
 #include <gosignal3d.h>
 #include <govector.h>
 #ifndef GOMATRIX_H

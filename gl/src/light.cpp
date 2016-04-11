@@ -5,7 +5,7 @@
 
 
 #include <gogl/light.h>
-#include <GL/gl.h>
+#include <gogl/gl.h>
 #include <godefs.h>
 
 goGL::Light::Light (GLenum light_enum)

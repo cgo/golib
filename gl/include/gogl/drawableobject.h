@@ -7,9 +7,9 @@
 #ifndef GOGL_DRAWABLEOBJECT_H
 #define GOGL_DRAWABLEOBJECT_H
 
+#include <gogl/gl.h>
 #include <gogl/object.h>
 #include <gogl/material.h>
-#include <GL/gl.h>
 
 namespace goGL
 {

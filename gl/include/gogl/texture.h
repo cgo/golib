@@ -7,7 +7,8 @@
 #ifndef GOGL_TEXTURE_H
 #define GOGL_TEXTURE_H
 
-#include <GL/gl.h>
+#include <goconfig.h>
+#include <gogl/gl.h>
 #include <gosignal3d.h>
 
 namespace goGL

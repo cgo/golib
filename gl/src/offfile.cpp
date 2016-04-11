@@ -5,7 +5,7 @@
 
 
 #include <gogl/offfile.h>
-#include <GL/gl.h>
+#include <gogl/gl.h>
 
 #include <gofixedarray.h>
 #include <govector.h>
