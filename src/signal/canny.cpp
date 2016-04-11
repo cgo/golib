@@ -10,7 +10,7 @@
 #include <golog.h>
 
 #include <gosubsignal3d.h>
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 
 #include <queue>
 
