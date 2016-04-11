@@ -826,8 +826,18 @@ goFileIO::createTempFile (goString& filenameRet)
     filenameRet.resize (::strlen(filenameRet.getPtr()));
     return fopen (filenameRet.toCharPtr(), "w");
 #else
-    goLog::warning ("goFileIO::createTempFile(): golib was compiled without tmpnam_r().");
+ #ifdef HAVE_TMPNAM
+    filenameRet.resize (L_tmpnam);
+    if (tmpnam(filenameRet.getPtr()) == NULL)
+    {
+    	return NULL;
+    }
+    filenameRet.resize(::strlen(filenameRet.getPtr()));
+    return fopen (filenameRet.toCharPtr(), "w");
+ #else
+    goLog::warning ("goFileIO::createTempFile(): golib was compiled without tmpnam_r() or tmpnam().");
     return NULL;
+ #endif
 #endif
 }
 

@@ -101,9 +101,9 @@ SET (VIDEO_SOURCES
   )
 
 set (GNUPLOT_SOURCES
-  src/misc/gognuplot.cpp      # not plotting in windows!
-  src/misc/gosingleplot.cpp
-  src/misc/gomultiplotter.cpp
+  src/plot/gognuplot.cpp      # not plotting in windows!
+  src/plot/gosingleplot.cpp
+  src/plot/gomultiplotter.cpp
   src/plot/gnuplot.cpp  # not in windows!
   src/plot/gnuplot_helperfunctions.cpp
   src/plot/goplotter.cpp
@@ -419,6 +419,7 @@ IF (NOT HAVE_CLAPACK_H)
 ENDIF (NOT HAVE_CLAPACK_H)
 
 CHECK_FUNCTION_EXISTS (tmpnam_r HAVE_TMPNAM_R)
+CHECK_FUNCTION_EXISTS (tmpnam   HAVE_TMPNAM)
 CHECK_FUNCTION_EXISTS (unlink   HAVE_UNLINK)
 CHECK_FUNCTION_EXISTS (modf     HAVE_MODF)
 CHECK_FUNCTION_EXISTS (getenv   HAVE_GETENV)
