@@ -38,7 +38,7 @@ class ICVTool : public goGUI::MainWindow
     private:
         goGUI::ImageView           myImageView;
         goGUI::ImageControl        myImageControl;
-        //goGUI::VideoCaptureControl myVCControl;
+        // goGUI::VideoCaptureControl myVCControl;
 
         goGUI::ControlsBox  myControlsBox;
         goGUI::CannyControl myCannyControl;
@@ -51,7 +51,7 @@ class ICVTool : public goGUI::MainWindow
 ICVTool::ICVTool ()
     : goGUI::MainWindow (),
       myImageView (),
-      //myVCControl (),
+      // myVCControl (),
       myImageControl (),
       myControlsBox ("Image Operations"),
       myCannyControl (),
@@ -67,6 +67,8 @@ ICVTool::ICVTool ()
     this->myControlsBox.addControl (this->myCannyControl);
     this->myCannyControl.getImageCreationCaller().connect (goMemberFunction (&myImageControl, &goGUI::ImageControl::addImage));
     this->myImageControl.getImageChangedCaller().connect (goMemberFunction (&myCannyControl, &goGUI::CannyControl::setImage));
+    this->myImageControl.getImageChangedCaller().connect (goMemberFunction (&myGaussImageControl, &GaussImageControl::update));
+
 
     this->myImageControl.setImageView (&this->myImageView);
 
@@ -78,7 +80,7 @@ ICVTool::ICVTool ()
 
 
     //= Set the image for the video capture
-    myImageView.setImage (640, 480);
+    //myImageView.setImage (640, 480);
     //this->myVCControl.setTarget (myImageView.getImage (0)); //= FIXME: This means the image may not change.
     //                                                        //= Also it needs to be changed when the user changes the resolution
     //                                                        //= or something similar.

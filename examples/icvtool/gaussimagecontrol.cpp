@@ -1,4 +1,4 @@
-/* Copyright (C) 1998-2011 Christian Gosch, golib at goschs dot de
+   /* Copyright (C) 1998-2011 Christian Gosch, golib at goschs dot de
    This file is part of the golib library.
    For license regulations, see the file COPYING in the main
    directory of the golib source tree. */
@@ -22,7 +22,9 @@ class GaussImageControlPrivate
               gaussImage (),
               framesCountInput ("Frames Count for Gaussian", 1)
         {
+        	meanWindow.set_title("Gauss image control: mean");
             meanWindow.add (meanImageView);
+            varianceWindow.set_title("Gauss image control: variance");
             varianceWindow.add (varianceImageView);
             meanWindow.show_all_children ();
             varianceWindow.show_all_children ();
