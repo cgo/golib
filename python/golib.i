@@ -116,7 +116,8 @@
 // #include <gomatrix.hpp>
 #include <gomatrix.h>
 #include <govector.h>
-#include <goplot.h>
+// #include <goplot.h>
+// #include <goplot/gnuplot.h>
 #include <gohistogram.h>
 #include <goautoptr.h>
 #include <golist.h>
@@ -189,7 +190,8 @@
 %include <gofixedarray.h>
 %include <gomatrix.h>
 %include <govector.h>
-%include <goplot.h>
+%include <goplot/goplot.h>
+// %include <goplot/plot.h>
 %include <gohistogram.h>
 %include <goautoptr.h>
 %include <gopointcloud.h>
@@ -239,10 +241,8 @@
             ret = []
             for i in xrange(len(lists)):
                 newlist = []
-                # el = lists[i].getFrontElement()
                 for j in xrange(lists[i].getSize()):
-                    newlist.append (lists[i](j).elem) # el.elem)
-                    # el = el.next  # This does not work ... dont know why.
+                    newlist.append (lists[i](j).elem)
                 ret.append (newlist)
             return ret
 
@@ -258,7 +258,7 @@
                     temp.append (triangles[i][j])
                 ret.append (temp)
             return ret
-    %}
+        %}
 }
 
 %extend goList<int>
@@ -885,7 +885,7 @@
 //    }
 }
 
-%extend goFixedArray<goVector<int> >
+%extend goFixedArray<goMath::Vector<int> >
 {
 //    %pythoncode %{
 //        def setArray (self, A):
@@ -894,7 +894,7 @@
 //            for i in xrange(len(A)):
 //                self[i] = A[i]
 //    %}
-    goVector<int> __getitem__(int i)
+    goMath::Vector<int> __getitem__(int i)
     {
         if (i < 0 || i >= self->getSize())
         {
@@ -902,7 +902,7 @@
         }
         return (*self)[i];
     };
-    void __setitem__(int i, goVector<int> f)
+    void __setitem__(int i, goMath::Vector<int> f)
     {
         if (i < 0 || i >= self->getSize())
         {
@@ -916,7 +916,7 @@
     };
 }
 
-%extend goFixedArray<goVector<goFloat> >
+%extend goFixedArray<goMath::Vector<goFloat> >
 {
 //    %pythoncode %{
 //        def setArray (self, A):
@@ -925,7 +925,7 @@
 //            for i in xrange(len(A)):
 //                self[i] = A[i]
 //    %}
-    goVector<goFloat> __getitem__(int i)
+    goMath::Vector<goFloat> __getitem__(int i)
     {
         if (i < 0 || i >= self->getSize())
         {
@@ -933,7 +933,7 @@
         }
         return (*self)[i];
     };
-    void __setitem__(int i, goVector<goFloat> f)
+    void __setitem__(int i, goMath::Vector<goFloat> f)
     {
         if (i < 0 || i >= self->getSize())
         {
@@ -947,118 +947,118 @@
     };
 }
 
-%extend goVector<goFloat>
+%extend goMath::Vector<goFloat>
 {
 
-    bool copy (goVector<goFloat>& target, goIndex_t startIndex=0, goIndex_t skip=0, goIndex_t lastIndex = -1) const
+    bool copy (goMath::Vector<goFloat>& target, goIndex_t startIndex=0, goIndex_t skip=0, goIndex_t lastIndex = -1) const
     {
         return (*self).copy (target, startIndex, skip, lastIndex);
     };
     // FIXME: Add +-*= operators (can I instantiate the members explicitly?)
-    goVector<goFloat>& operator+= (const goVector<goFloat>& other)
+    goMath::Vector<goFloat>& operator+= (const goMath::Vector<goFloat>& other)
     {
         return (*self) += other;
     };
-//    goVector<goFloat>& operator+= (const goVector<goDouble>& other)
+//    goMath::Vector<goFloat>& operator+= (const goMath::Vector<goDouble>& other)
 //    {
 //        return (*self) += other;
 //    };
-    goVector<goFloat> operator+ (const goVector<goFloat>& other)
+    goMath::Vector<goFloat> operator+ (const goMath::Vector<goFloat>& other)
     {
         return (*self) + other;
     };
-//    goVector<goFloat> operator+ (const goVector<goDouble>& other)
+//    goMath::Vector<goFloat> operator+ (const goMath::Vector<goDouble>& other)
 //    {
 //        return (*self) + other;
 //    };
-    goVector<goFloat>& operator-= (const goVector<goFloat>& other)
+    goMath::Vector<goFloat>& operator-= (const goMath::Vector<goFloat>& other)
     {
         return (*self) -= other;
     };
-//    goVector<goFloat>& operator-= (const goVector<goDouble>& other)
+//    goMath::Vector<goFloat>& operator-= (const goMath::Vector<goDouble>& other)
 //    {
 //        return (*self) -= other;
 //    };
-    goVector<goFloat> operator- (const goVector<goFloat>& other)
+    goMath::Vector<goFloat> operator- (const goMath::Vector<goFloat>& other)
     {
         return (*self) - other;
     };
-//    goVector<goFloat> operator- (const goVector<goDouble>& other)
+//    goMath::Vector<goFloat> operator- (const goMath::Vector<goDouble>& other)
 //    {
 //        return (*self) - other;
 //    };
-    goVector<goFloat> operator* (goFloat n)
+    goMath::Vector<goFloat> operator* (goFloat n)
     {
         return (*self) * n;
     };
-    goVector<goFloat> operator* (goDouble n)
+    goMath::Vector<goFloat> operator* (goDouble n)
     {
         return (*self) * n;
     };
-    goVector<goFloat>& operator*= (const goVector<goFloat>& other)
+    goMath::Vector<goFloat>& operator*= (const goMath::Vector<goFloat>& other)
     {
         (*self) *= other;
         return (*self);
     };
-//    goVector<goFloat>& operator*= (const goVector<goDouble>& other)
+//    goMath::Vector<goFloat>& operator*= (const goMath::Vector<goDouble>& other)
 //    {
 //        (*self) *= other;
 //        return (*self);
 //    };
 }
-%extend goVector<goDouble>
+%extend goMath::Vector<goDouble>
 {
-    bool copy (goVector<goDouble>& target, goIndex_t startIndex=0, goIndex_t skip=0, goIndex_t lastIndex = -1) const
+    bool copy (goMath::Vector<goDouble>& target, goIndex_t startIndex=0, goIndex_t skip=0, goIndex_t lastIndex = -1) const
     {
         return (*self).copy (target, startIndex, skip, lastIndex);
     };
     // FIXME: Add +-*= operators (can I instantiate the members explicitly?)
-//    goVector<goDouble>& operator+= (const goVector<goFloat>& other)
+//    goMath::Vector<goDouble>& operator+= (const goMath::Vector<goFloat>& other)
 //    {
 //        return (*self) += other;
 //    };
-    goVector<goDouble>& operator+= (const goVector<goDouble>& other)
+    goMath::Vector<goDouble>& operator+= (const goMath::Vector<goDouble>& other)
     {
         return (*self) += other;
     };
-//    goVector<goDouble> operator+ (const goVector<goFloat>& other)
+//    goMath::Vector<goDouble> operator+ (const goMath::Vector<goFloat>& other)
 //    {
 //        return (*self) + other;
 //    };
-    goVector<goDouble> operator+ (const goVector<goDouble>& other)
+    goMath::Vector<goDouble> operator+ (const goMath::Vector<goDouble>& other)
     {
         return (*self) + other;
     };
-//    goVector<goDouble>& operator-= (const goVector<goFloat>& other)
+//    goMath::Vector<goDouble>& operator-= (const goMath::Vector<goFloat>& other)
 //    {
 //        return (*self) -= other;
 //    };
-    goVector<goDouble>& operator-= (const goVector<goDouble>& other)
+    goMath::Vector<goDouble>& operator-= (const goMath::Vector<goDouble>& other)
     {
         return (*self) -= other;
     };
-//    goVector<goDouble> operator- (const goVector<goFloat>& other)
+//    goMath::Vector<goDouble> operator- (const goMath::Vector<goFloat>& other)
 //    {
 //        return (*self) - other;
 //    };
-    goVector<goDouble> operator- (const goVector<goDouble>& other)
+    goMath::Vector<goDouble> operator- (const goMath::Vector<goDouble>& other)
     {
         return (*self) - other;
     };
-    goVector<goDouble> operator* (goFloat n)
+    goMath::Vector<goDouble> operator* (goFloat n)
     {
         return (*self) * n;
     };
-    goVector<goDouble> operator* (goDouble n)
+    goMath::Vector<goDouble> operator* (goDouble n)
     {
         return (*self) * n;
     };
-//    goVector<goDouble>& operator*= (const goVector<goFloat>& other)
+//    goMath::Vector<goDouble>& operator*= (const goMath::Vector<goFloat>& other)
 //    {
 //        (*self) *= other;
 //        return (*self);
 //    };
-    goVector<goDouble>& operator*= (const goVector<goDouble>& other)
+    goMath::Vector<goDouble>& operator*= (const goMath::Vector<goDouble>& other)
     {
         (*self) *= other;
         return (*self);
@@ -1072,7 +1072,7 @@
     {
         return (*self).getLength();
     }
-    bool resample_partial (goDouble start, goDouble end, goSize_t N, goList<goVector<goFloat> >& points)
+    bool resample_partial (goDouble start, goDouble end, goSize_t N, goList<goMath::Vector<goFloat> >& points)
     {
         return self->resample (start, end, N, points);
     }
@@ -1088,9 +1088,9 @@
      {
          return self->addCurve (y, title, plotOptions);
      };
-     bool add_curve (const goList<goVector<goFloat> >& points, const char* title, const char* plotOptions = 0)
+     bool add_curve (const goList<goMath::Vector<goFloat> >& points, const char* title, const char* plotOptions = 0)
      {
-        goList<goVector<goFloat> >::ConstElement* el = points.getFrontElement();
+        goList<goMath::Vector<goFloat> >::ConstElement* el = points.getFrontElement();
         goSize_t sz = points.getSize();
         goSize_t szVec = sz;
         if (points.isClosed())
@@ -1114,9 +1114,9 @@
         }
         return self->addCurve (x,y,title,plotOptions);
     };
-     bool add_curve (const goList<goVector<goDouble> >& points, const char* title, const char* plotOptions = 0)
+     bool add_curve (const goList<goMath::Vector<goDouble> >& points, const char* title, const char* plotOptions = 0)
      {
-        goList<goVector<goDouble> >::ConstElement* el = points.getFrontElement();
+        goList<goMath::Vector<goDouble> >::ConstElement* el = points.getFrontElement();
         goSize_t sz = points.getSize();
         goSize_t szVec = sz;
         if (points.isClosed())
@@ -1153,7 +1153,7 @@
 
 %extend goPointCloud<goFloat>
 {
-    bool getCenterOfMass (goVector<goFloat>& ret)
+    bool getCenterOfMass (goMath::Vector<goFloat>& ret)
     {
         return (*self).getCenterOfMass (ret);
     };
@@ -1161,7 +1161,7 @@
 
 %extend goPointCloud<goDouble>
 {
-    bool getCenterOfMass (goVector<goDouble>& ret)
+    bool getCenterOfMass (goMath::Vector<goDouble>& ret)
     {
         return (*self).getCenterOfMass (ret);
     };
@@ -1205,11 +1205,11 @@
         //    goMath::sphereToEuclidean (phi, theta, radius, posRet, upRet);
         //}
     };
-    void goCenterOfMassf (const goMatrix<goFloat>& m, goVector<goFloat>& v)
+    void goCenterOfMassf (const goMatrix<goFloat>& m, goMath::Vector<goFloat>& v)
     {
         goMath::centerOfMass (m, v);
     };
-    void goCenterOfMassd (const goMatrix<goDouble>& m, goVector<goDouble>& v)
+    void goCenterOfMassd (const goMatrix<goDouble>& m, goMath::Vector<goDouble>& v)
     {
         goMath::centerOfMass (m, v);
     };
@@ -1402,13 +1402,13 @@
 %template(goFixedArrayBool)   goFixedArray<bool>;
 %template(goFixedArraySignal3D)   goFixedArray<goAutoPtr<goSignal3D<void> > >;
 %template(goFixedArraygoListInt) goFixedArray<goList<int> >;   // Needed only in gogl python module
-%template(goFixedArraygoVectori) goFixedArray<goVector<int> >;
-%template(goFixedArraygoVectorf) goFixedArray<goVector<goFloat> >;
+%template(goFixedArraygoVectori) goFixedArray<goMath::Vector<int> >;
+%template(goFixedArraygoVectorf) goFixedArray<goMath::Vector<goFloat> >;
 
-%template(goVectorf)       goVector<goFloat>;
-%template(goVectord)       goVector<goDouble>;
-%template(goVectori)       goVector<int>;
-%template(goVectorsz)      goVector<goSize_t>;
+%template(goVectorf)       goMath::Vector<goFloat>;
+%template(goVectord)       goMath::Vector<goDouble>;
+%template(goVectori)       goMath::Vector<int>;
+%template(goVectorsz)      goMath::Vector<goSize_t>;
 %template(goArrayf)        goArray<goFloat>;
 %template(goArrayd)        goArray<goDouble>;
 %template(goArrayi)        goArray<goInt32>;
@@ -1423,8 +1423,8 @@
 %template(goHistogramf)    goHistogram<goFloat>;
 %template(goHistogramd)    goHistogram<goDouble>;
 
-%template(goListgoVectorf)  goList<goVector<goFloat> >;
-%template(goListgoVectord)  goList<goVector<goDouble> >;
+%template(goListgoVectorf)  goList<goMath::Vector<goFloat> >;
+%template(goListgoVectord)  goList<goMath::Vector<goDouble> >;
 %template(goListgoMatrixf)  goList<goMatrixf>;
 %template(goListgoMatrixd)  goList<goMatrixd>;
 %template(goPointCloudf)   goPointCloud<goFloat>;

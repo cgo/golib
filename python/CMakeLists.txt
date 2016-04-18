@@ -12,11 +12,11 @@ SET (TARGET _golib)
 #EXEC_PROGRAM        (chicken-config ARGS -shared -libs OUTPUT_VARIABLE CHICKEN_LIBS)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/golib_wrap.cxx
                     COMMAND ${SWIG_EXECUTABLE} 
-                        ARGS -I../include -python -fcompact -addextern -c++ golib.i
+                        ARGS -v -v -I../include -python -fcompact -addextern -c++ golib.i
                         DEPENDS golib.i
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 #EXEC_PROGRAM        (${SWIG_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}
-#                        ARGS -I../include -python -fcompact -addextern -c++ golib.i )
+#                        ARGS -v -I../include -python -fcompact -addextern -c++ golib.i )
 
 #FIND_LIBRARY        (GOLIB NAMES Go PATHS $ENV{GOPATH}/../lib ${GOPATH}/lib)
 #SET                 (GOMATLAB_LIB "-lGomatlab")
