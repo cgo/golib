@@ -61,6 +61,7 @@ class Vector : public goFixedArray<T>
 
         void print (const char* formatstring = "%f\n") const;
 
+
 #if 0
         template <class To>
         Vector<T> operator- (const Vector<To>& other) const
@@ -150,6 +151,7 @@ class Vector : public goFixedArray<T>
         };
 #endif
 
+
         /**
          * @brief Quite inefficient vector-matrix multiplication.
          * 
@@ -171,6 +173,7 @@ class Vector : public goFixedArray<T>
             temp.copyColumn (0, ret);
             return ret;
         };
+
 
 #if 0
         Vector<T>& operator*= (goFloat n)
@@ -200,6 +203,7 @@ class Vector : public goFixedArray<T>
             return *this;
         };
 #endif
+
         Vector<T> cross (const Vector<T>& other) const
         {
             Vector<T> v(3);
@@ -249,6 +253,7 @@ class Vector : public goFixedArray<T>
         Vector<T> operator+ (const Vector<T>& other) const;
         Vector<T> operator* (T scalar) const;
         Vector<T> operator/ (T scalar) const;
+
 #if 0
         template <class To>
         Vector<T>& operator-= (const Vector<To>& other)
@@ -513,7 +518,6 @@ class Vector : public goFixedArray<T>
 
 // inline goComplexf Vector<goComplexf>::square () const;
 
-
 template<> inline goComplexf Vector<goComplexf>::conjInnerProduct (const Vector<goComplexf>& v) const
 {
     assert (this->getSize() == v.getSize());
@@ -534,6 +538,7 @@ inline T Vector<T>::conjInnerProduct (const Vector<T>& v) const
 {
     return *this * v;
 }
+
 
 #if 0
 extern "C"
@@ -636,6 +641,7 @@ inline T Vector<T>::operator* (const Vector<T>& other) const
 };
 #endif
 
+
 /**
  * @brief y = alpha * x + y
  *
@@ -668,18 +674,24 @@ bool vectorAdd (T alpha, const Vector<T>& x, Vector<T>& y);
 template <class T>
 void vectorOuter (T alpha, const Vector<T>& x, const Vector<T>& y, goMath::Matrix<T>& ret);
 
+
+
 typedef goMath::Vector<goFloat>  Vectorf;
 typedef goMath::Vector<goDouble> Vectord;
 typedef goMath::Vector<goInt32>  Vectori;
 /** @} */
 };
 
+
 typedef goMath::Vector<goFloat>  goVectorf;
 typedef goMath::Vector<goDouble> goVectord;
 typedef goMath::Vector<goInt32>  goVectori;
 
-#ifndef goVector
-# define goVector goMath::Vector
-#endif
+
+#ifndef SWIG
+# ifndef goVector
+#  define goVector goMath::Vector
+# endif
+#endif // SWIG
 
 #endif
