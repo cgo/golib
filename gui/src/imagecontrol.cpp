@@ -213,16 +213,22 @@ void goGUI::ImageControl::treeDeleteImage ()
 //        // myPrivate->myRefStore->erase (iter);
 //    }
 
+
     SelectedTreeModelIterators sel_iters (myPrivate->myTreeView.get_selection ());
 
+    myPrivate->myTreeView.set_model(Glib::RefPtr<Gtk::TreeModel>(NULL));
     for (size_t i = 0; i < sel_iters.myIterators.size (); ++i)
     {
         Gtk::TreeModel::Row row = *sel_iters.myIterators [i];
         myPrivate->imageView->removeImage (row [myPrivate->myColumns.myColNumber]);
-        // FIXME: This crashes. Why?
+        // FIXME: This crashes if we don't unset and then set the refstore again,
+        // when sending a signal. Why?
+        // We do also get a critical glib error GLib-CRITICAL **: g_sequence_get: assertion '!is_end (iter)' failed
+        // when doing it like we do here. What is the correct way of removing an element from a refstore?
         myPrivate->myRefStore->erase (sel_iters.myIterators [i]);
         //= FIXME: Also remove from imageview!
     }
+    myPrivate->myTreeView.set_model(myPrivate->myRefStore);
 
     TreeModelRenumber renumber (myPrivate->myRefStore, myPrivate);
 
