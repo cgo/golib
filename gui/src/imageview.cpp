@@ -426,12 +426,17 @@ namespace goGUI
 
             for (goIndex_t i = 0; i < index; ++i)
             {
+                assert (im_it != myPrivate->images.end());
+                assert (io_it != myPrivate->imageObjects.end());
                 ++im_it;
                 ++io_it;
             }
 
-            myPrivate->images.erase (im_it);
+            assert (im_it != myPrivate->images.end());
+            assert (io_it != myPrivate->imageObjects.end());
+
             myPrivate->imageObjects.erase (io_it);
+            myPrivate->images.erase (im_it);
             myPrivate->changedCaller (IMAGE_REMOVED);
         }
     }
@@ -452,6 +457,7 @@ namespace goGUI
 
         for (size_t i = 0; i < N; ++i)
         {
+        	assert(order[i] >= 0 && order[i] < static_cast<int>(images.size()));
             newImages [i] = images [order[i]];
             newImageObjects [i] = imageObjects [order[i]];
         }
