@@ -54,43 +54,76 @@ int main (int argc, char* argv[])
     tvl1.setAutoTimeStep (true);
     tvl1.setLambda (lambda);
 
+    goSignal3D<void> rgb, tempf;
+	  
     {
-        Gtk::Main kit (argc, argv);
-        Gtk::Window window;
-        // Gtk::ScrolledWindow sw;
-        goGUI::ImageView view;
-        window.add (view);
-        window.show_all ();
-        
-        //= Make a linear RGB image for display
-        goSignal3D<void> rgb, tempf;
-        rgb.setDataType (GO_UINT8);
-        rgb.make (tvl1.getU()->getSize(), tvl1.getU()->getSize(), goSize3D (4, 4, 0), 3);
-        tempf.setDataType (tvl1.getU()->getDataType().getID ());
-        tempf.make (f);
 
-        for (int i = 0; i < 1000; ++i)
+      auto app =
+	Gtk::Application::create(argc, argv,
+				 "org.gtkmm.examples.base");      
+      Gtk::Window window;
+      window.set_default_size(200, 200);
+      app->add_window(window);
+
+      // Gtk::ScrolledWindow sw;
+      goGUI::ImageView view;
+      window.add (view);
+      window.show_all ();
+      view.show();
+      
+      //= Make a linear RGB image for display
+      rgb.setDataType (GO_UINT8);
+      rgb.make (tvl1.getU()->getSize(), tvl1.getU()->getSize(), goSize3D (4, 4, 0), 3);
+      tempf.setDataType (tvl1.getU()->getDataType().getID ());
+      tempf.make (f);
+
+      for (int i = 0; i < 100; ++i)
         {
-            //= Copy to 8byte RGB image for display.
-            goCopySignal (tvl1.getU(), &tempf);
-            tempf *= 255.0f;
-            rgb.setChannel (0);
-            goCopySignalChannel (&tempf, &rgb);
-            rgb.setChannel (1);
-            goCopySignalChannel (&tempf, &rgb);
-            rgb.setChannel (2);
-            goCopySignalChannel (&tempf, &rgb);
-            rgb.setChannel (0);
+	  //= Copy to 8byte RGB image for display.
+	  goCopySignal (tvl1.getU(), &tempf);
+	  tempf *= 255.0f;
+	  rgb.setChannel (0);
+	  goCopySignalChannel (&tempf, &rgb);
+	  rgb.setChannel (1);
+	  goCopySignalChannel (&tempf, &rgb);
+	  rgb.setChannel (2);
+	  goCopySignalChannel (&tempf, &rgb);
+	  rgb.setChannel (0);
 
-            view.setImage (rgb);
-            view.queue_draw ();
-            while (Gtk::Main::events_pending())
+	  view.setImage (rgb);
+
+	  app->run ();
+	  
+	  view.queue_draw ();
+
+	  // app->events_pending();
+	  while (Gtk::Main::events_pending())
             {
-                Gtk::Main::iteration ();
+
+	      Gtk::Main::iteration ();
             }
-            tvl1.evolve (0.01);
+	  tvl1.evolve (0.01);
         }
     }
+
+    goCopySignal (tvl1.getU(), &tempf);
+    tempf *= 255.0f;
+    rgb.setChannel (0);
+    goCopySignalChannel (&tempf, &rgb);
+    rgb.setChannel (1);
+    goCopySignalChannel (&tempf, &rgb);
+    rgb.setChannel (2);
+    goCopySignalChannel (&tempf, &rgb);
+    rgb.setChannel (0);
+
+    try {
+      goFileIO::remove ("/Users/christian/Desktop/tvl1.jpg");
+      goFileIO::writeImage ("/Users/christian/Desktop/tvl1.jpg", &rgb);
+    }
+    catch (goException& e)
+      {
+	// just ignore exceptions.
+      }
 
     exit (1);
 }
