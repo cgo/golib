@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include <gomath.h>
-#include <goplot.h>
+#include <goplot/gnuplot.h>
 #include <gorandom.h>
 
 template<class T>

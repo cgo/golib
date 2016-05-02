@@ -4,14 +4,14 @@
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags golib` -std=c++11 `pkg-config --cflags gtkmm-3.0`
+CXXARGS		= -c   -D HAVE_CONFIG_H -g $(CPPFLAGS) `pkg-config --cflags golib` -std=c++11 `pkg-config --cflags gogui` `pkg-config --cflags gogl`
 
 LD		= g++
 LDARGS		= $(LDFLAGS)
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  `pkg-config --libs golib` -framework OpenGL `pkg-config --libs gtkmm-3.0`
+LIBS		=  `pkg-config --libs golib` -framework OpenGL `pkg-config --libs gogui gogl`
 
 INCLUDE		= 
 
