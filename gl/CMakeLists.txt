@@ -43,6 +43,11 @@ IF (BUILD_WITH_GCC_3_4)
     SET (CMAKE_C_COMPILER gcc-3.4)
 ENDIF (BUILD_WITH_GCC_3_4)
 
+if (APPLE)
+  find_library (OPENGL OpenGL)
+  link_libraries (${OPENGL})
+endif (APPLE)
+
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall -ansi $ENV{CPPFLAGS} -D_REENTRANT)
@@ -56,3 +61,18 @@ ADD_LIBRARY (${TARGETNAME} SHARED ${SOURCES})
 ADD_DEPENDENCIES (${TARGETNAME} Go)
 TARGET_LINK_LIBRARIES  (${TARGETNAME} ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT} Go)
 INSTALL_TARGETS     (/lib ${TARGETNAME})
+
+#
+# pkg-config file
+
+set (GLPCLIBS "-lGogl")
+set (GLPCINCLUDES "-I${GOPATH}/gl/include")
+
+set (GOGL_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
+
+set (GLPCLIBDIR "-L${CMAKE_INSTALL_PREFIX}/lib")
+
+CONFIGURE_FILE (${GOPATH}/gl/gogl.pc.cmakeconfig
+                ${GOPATH}/gl/gogl.pc
+                @ONLY)
+INSTALL (FILES ${GOPATH}/gl/gogl.pc DESTINATION ${GOGL_PKG_CONFIG_INSTALL_DIR})

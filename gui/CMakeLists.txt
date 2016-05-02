@@ -75,13 +75,6 @@ ENDIF (BUILD_WITH_GCC_3_4)
 # PKGCONFIG (gtkmm-2.4 GTKMM_INCLUDE_DIR GTKMM_LIB_DIR GTKMM_LDFLAGS GTKMM_CFLAGS)
 pkg_search_module (GTKMM REQUIRED gtkmm-3.0)
 # Funnily, gtkmm does not include these:
-pkg_search_module (GDKMM REQUIRED gdkmm-3.0)
-# EXEC_PROGRAM (${PKGCONFIG_EXECUTABLE} OUTPUT_VARIABLE o)
-# MESSAGE ("${o}")
-# MESSAGE ("${GTKMM_INCLUDE_DIR}")
-# IF (NOT GTKMM_CFLAGS)
-#     MESSAGE ("Did not find gtkmm-2.4, but it is necessary.")
-# ENDIF (NOT GTKMM_CFLAGS)
 ADD_DEFINITIONS (-DHAVE_GTK_3_0 -DHAVE_GTK_2_4)
 
 SET (EXTRA_LIBS ${EXTRA_LIBS} ${GTKMM_LDFLAGS} ${GDKMM_LDFLAGS})
@@ -123,3 +116,20 @@ IF(UNIX)
 ENDIF(UNIX)
 ADD_DEFINITIONS (${GTKMM_CFLAGS} ${GDKMM_CFLAGS} -DGTKMM_GUI)
 
+#
+# pkg-config file
+
+set (GUIPCLIBS "-lGogui")
+set (GUIPCINCLUDES "-I${GOPATH}/gui/include -I${GOPATH}/gl/include -I${GOPATH}/tools/lapacke/include")
+if (BUILD_GL_MODULE)
+    set (GUIPCLIBS "${GUIPCLIBS} -lGogl")
+endif (BUILD_GL_MODULE)
+
+set (GOGUI_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
+
+set (GUIPCLIBDIR "-L${CMAKE_INSTALL_PREFIX}/lib")
+
+CONFIGURE_FILE (${GOPATH}/gui/gogui.pc.cmakeconfig
+                ${GOPATH}/gui/gogui.pc
+                @ONLY)
+INSTALL (FILES ${GOPATH}/gui/gogui.pc DESTINATION ${GOGUI_PKG_CONFIG_INSTALL_DIR})

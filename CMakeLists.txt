@@ -456,10 +456,10 @@ ELSE (WIN32)
 #      #include_directories (${CBLAS_INCLUDE_DIR})
 #    endif (VECLIB)
 
-if (BUILD_GL_MODULE)
-  find_library (OPENGL OpenGL)
-  link_libraries (${OPENGL})
-endif (BUILD_GL_MODULE)
+#if (BUILD_GL_MODULE)
+#  find_library (OPENGL OpenGL)
+#  link_libraries (${OPENGL})
+#endif (BUILD_GL_MODULE)
 
     find_library        (LAPACKE lapacke PATHS ${GOPATH}/tools/lapacke)
     link_libraries      (${LAPACKE})
@@ -634,15 +634,12 @@ ENDIF (PTHREAD)
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 
+		   
+#
 # pkg-config file
+
 set (PCLIBS "-lGo")
-set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/gui/include -I${GOPATH}/gl/include -I${GOPATH}/tools/lapacke/include")
-if (BUILD_GUI_MODULE)
-    set (PCLIBS "${PCLIBS} -lGogui")
-endif (BUILD_GUI_MODULE)
-if (BUILD_GL_MODULE)
-    set (PCLIBS "${PCLIBS} -lGogl")
-endif (BUILD_GL_MODULE)
+set (PCINCLUDES "-I${GOPATH}/include -I${GOPATH}/tools/lapacke/include")
 
 set (GOLIB_PKG_CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" CACHE PATH "Where to install pkg-config files")
 
