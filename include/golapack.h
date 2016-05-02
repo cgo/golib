@@ -216,7 +216,8 @@ bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
     lapack_int info = 0;
     lapack_int lda = A.getLeadingDimension();
     lapack_int ldb = b.getSize();
-    return TypeDriver<typename matrix_type::value_type>::gels (&trans, &M, &N, &NRHS, A.getPtr(), &lda, b.getPtr(), &ldb, WORK.getPtr(), &LWORK, &info);
+    return TypeDriver<typename matrix_type::value_type>::gels(goMath::defaultMatrixOrder, trans, M, N, NRHS, A.getPtr(), lda, b.getPtr(), ldb);
+    // return TypeDriver<typename matrix_type::value_type>::gels (&trans, &M, &N, &NRHS, A.getPtr(), &lda, b.getPtr(), &ldb, WORK.getPtr(), &LWORK, &info);
 }
 
 /** 
@@ -259,7 +260,7 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
     else
         temp_sv.resize (goMath::min<lapack_int>(M,N));
 
-    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    int const order = goMath::defaultMatrixOrder; // matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
     return TypeDriver<typename matrix_type::value_type>::gelss(order,M,N,NRHS,A.getPtr(),lda,b.getPtr(),ldb,singularValues ? singularValues->getPtr() : temp_sv.getPtr, rcond, &rank);
 
 //    return TypeDriver<typename matrix_type::value_type>::gelss (&M, &N, &NRHS, A.getPtr(),
@@ -290,7 +291,7 @@ bool goMath::Lapack::posv (matrix_type& A, vector_type& b)
     lapack_int lda = A.getLeadingDimension ();
     lapack_int info = 0;
 
-    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    int const order = goMath::defaultMatrixOrder; // matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
     return TypeDriver<typename matrix_type::value_type>::posv(order,uplo,n,nrhs,A.getPtr(),lda,b.getPtr(),ldb);
 
 //    return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
@@ -325,7 +326,8 @@ bool goMath::Lapack::posv (matrix_type& A, matrix_type& b)
     lapack_int lda = A.getLeadingDimension ();
     lapack_int info = 0;
 
-    int const order = matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR;
+    // FIXME: Fix the matrix ordering to be per-object.
+    int const order = goMath::defaultMatrixOrder;
     return TypeDriver<typename matrix_type::value_type>::posv(order,uplo,n,nrhs,A.getPtr(),lda,b.getPtr(),ldb);
     //return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
     //                &lda, b.getPtr (), &ldb, &info);
