@@ -7,18 +7,11 @@
 #ifndef GOIMAGE_H
 #define GOIMAGE_H
 
-#include <goimagebuffer.h>
+#include <gosignal3dbase.h>
 
-class goImagePrivate;
-
-class goImage : goObjectBase 
+namespace go
 {
-    public:
-        goImage  ();
-        virtual ~goImage ();
-    
-    private:
-        goImagePrivate* myPrivate;
-};
+    typedef goSignal3DBase<void> Image;
+}
 
 #endif /* GOIMAGE_H */
