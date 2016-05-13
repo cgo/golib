@@ -26,6 +26,7 @@
 
 #include "gaussimagecontrol.h"
 
+template <int ImageCount>
 class ICVTool : public goGUI::MainWindow
 {
     public:
@@ -36,8 +37,21 @@ class ICVTool : public goGUI::MainWindow
         void gaussImageUpdate ();
 
     private:
-        goGUI::ImageView           myImageView;
-        goGUI::ImageControl        myImageControl;
+
+        void dragImageDataGet (Glib::RefPtr<Gdk::DragContext> const& context, Gtk::SelectionData& data, guint info, guint time)
+        {
+        	std::cout << "Drag: data get" << std::endl;
+        }
+
+        void dragImageDataReceived (const Glib::RefPtr<Gdk::DragContext>& context, int x, int y,
+                const Gtk::SelectionData& selection_data, guint info, guint time)
+        {
+        	std::cout << "Drag: data received" << std::endl;
+        	std::cout << context->get_selection() << std::endl;
+        }
+
+        goGUI::ImageView    myImageViews[ImageCount];
+        goGUI::ImageControl myImageControls[ImageCount];
         // goGUI::VideoCaptureControl myVCControl;
 
         goGUI::ControlsBox  myControlsBox;
@@ -48,32 +62,49 @@ class ICVTool : public goGUI::MainWindow
         goGUI::InteractiveDraw myInteractiveDraw;
 };
 
-ICVTool::ICVTool ()
+
+template <int ImageCount>
+ICVTool<ImageCount>::ICVTool ()
     : goGUI::MainWindow (),
-      myImageView (),
-      // myVCControl (),
-      myImageControl (),
+     // myVCControl (),
+      // myImageControl (),
       myControlsBox ("Image Operations"),
       myCannyControl (),
       myGaussImageControl (),
       myInteractiveDraw ()
 {
-    this->getPaned().add1 (this->myImageView);
-    this->addControl (this->myImageControl);
+	for (int i = 0; i < ImageCount; ++i)
+	{
+		this->getPaned().add1 (this->myImageViews[i]);
+		this->addControl (this->myImageControls[i]);
+		goString label = "Image ";
+		label += i;
+		this->myImageControls[i].set_label (label.getPtr());
+	    this->myImageControls[i].setImageView (&this->myImageViews[i]);
+
+	    std::vector<Gtk::TargetEntry> targets(1);
+	    Glib::ustring targetName = "Image";
+	    targets[0].set_target (targetName);
+	    targets[0].set_flags  (Gtk::TargetFlags(0));
+	    targets[0].set_info   (0);
+
+	    // FIXME: drag and drop works within a treeview for re-ordering, but moving between treeviews needs to be implemented.
+	    this->myImageControls[i].drag_source_set (targets, Gdk::ModifierType(Gdk::SHIFT_MASK), Gdk::ACTION_MOVE);
+	    this->myImageControls[i].drag_dest_set   (targets);
+	    this->myImageControls[i].signal_drag_data_get().connect(sigc::mem_fun(*this, &ICVTool<ImageCount>::dragImageDataGet));
+	}
+
     this->addControl (this->myControlsBox);
     //this->addControl (this->myVCControl);
     this->addControl (this->myGaussImageControl);
 
     this->myControlsBox.addControl (this->myCannyControl);
-    this->myCannyControl.getImageCreationCaller().connect (goMemberFunction (&myImageControl, &goGUI::ImageControl::addImage));
-    this->myImageControl.getImageChangedCaller().connect (goMemberFunction (&myCannyControl, &goGUI::CannyControl::setImage));
-    this->myImageControl.getImageChangedCaller().connect (goMemberFunction (&myGaussImageControl, &GaussImageControl::update));
-
-
-    this->myImageControl.setImageView (&this->myImageView);
+    this->myCannyControl.getImageCreationCaller().connect (goMemberFunction (&myImageControls[0], &goGUI::ImageControl::addImage));
+    this->myImageControls[0].getImageChangedCaller().connect (goMemberFunction (&myCannyControl, &goGUI::CannyControl::setImage));
+    this->myImageControls[0].getImageChangedCaller().connect (goMemberFunction (&myGaussImageControl, &GaussImageControl::update));
 
     Gtk::MenuItem* loadItem = this->addMenuItem (this->getFileMenu (), "Load image");
-    loadItem->signal_activate().connect (sigc::mem_fun (&this->myImageControl, &goGUI::ImageControl::loadImage));
+    loadItem->signal_activate().connect (sigc::mem_fun (&this->myImageControls[0], &goGUI::ImageControl::loadImage));
 
     this->addFileQuit ();
     this->show_all_children ();
@@ -88,7 +119,7 @@ ICVTool::ICVTool ()
     //this->myVCControl.capturedCaller().connect (goMemberFunction (this, &ICVTool::gaussImageUpdate));
     // this->getPaned().get_child1()->hide ();
     
-    this->myInteractiveDraw.setDrawWidget (&this->myImageView);
+    this->myInteractiveDraw.setDrawWidget (&this->myImageViews[0]);
 }
 
 //= Make this an extra class.
@@ -127,11 +158,13 @@ void ICVTool::gaussImageUpdate ()
 }
 #endif
 
-ICVTool::~ICVTool ()
+template <int ImageCount>
+ICVTool<ImageCount>::~ICVTool ()
 {
 }
 
-void ICVTool::imageCaptured ()
+template <int ImageCount>
+void ICVTool<ImageCount>::imageCaptured ()
 {
     this->queue_draw ();
 }
@@ -363,7 +396,7 @@ void ImageViewer::canny ()
 int main (int argc, char* argv[])
 {
     Gtk::Main kit (argc, argv);
-    ICVTool iv;
+    ICVTool<2> iv;
     Gtk::Main::run (iv);
     exit (0);
 }
