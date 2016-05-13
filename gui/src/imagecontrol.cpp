@@ -86,6 +86,14 @@ goGUI::ImageControl::ImageControl ()
 
     //= Drag and drop
     {
+    	std::vector<Gtk::TargetEntry> targets(1);
+    	targets[0].set_target(Glib::ustring("Image"));
+    	targets[0].set_flags(Gtk::TARGET_SAME_APP);
+    	targets[0].set_info(0);
+
+    	myPrivate->myTreeView.drag_source_set(targets, Gdk::SHIFT_MASK, Gdk::ACTION_MOVE);
+    	Glib::RefPtr<Gtk::TargetList> targetList = myPrivate->myTreeView.drag_dest_get_target_list();
+    	targetList->add(targets);
         myPrivate->myTreeView.signal_drag_end ().connect (sigc::mem_fun (*this, &ImageControl::treeViewDragEnd));
     }
 
@@ -238,12 +246,12 @@ void goGUI::ImageControl::treeDeleteImage ()
 /** 
  * @brief Pop up a file open dialog and load an image.
  */
-void goGUI::ImageControl::loadImage ()
+goAutoPtr<goSignal3D<void> > goGUI::ImageControl::loadImage ()
 {
     if (!myPrivate->imageView)
     {
         this->warning ("Image control: no ImageView set.\nCan not load images.");
-        return;
+        return nullptr;
     }
 
     goString fname = "";
@@ -258,17 +266,18 @@ void goGUI::ImageControl::loadImage ()
             goString fname_part;
             fname.getFileName (fname_part);
             image->setObjectName (fname_part);
-            this->addImage (image);
+            // this->addImage (image);
             // myPrivate->imageVview->setImage (*image, 0);
             // this->imageView->setCurrentImage (0);
             myPrivate->imageView->queue_draw ();
+            return image;
             // this->control.setImage (image);
         }
         catch (goFileIOException& ex)
         {
             Gtk::MessageDialog dlg ("Reading image failed.");
             dlg.run ();
-            return;
+            return nullptr;
         }
     }
 }
@@ -371,13 +380,7 @@ void goGUI::ImageControl::imageViewChanged (int code)
 
 void goGUI::ImageControl::treeViewDragEnd (const Glib::RefPtr<Gdk::DragContext>& context)
 {
-//    printf ("Drag end!\n");
-
     TreeModelEnumerate enumerate (myPrivate->myRefStore, myPrivate);
-//    for (std::vector<int>::iterator it = enumerate.myIndex.begin(); it != enumerate.myIndex.end(); ++it)
-//    {
-//        printf ("%d\n", *it);
-//    }
 
     if (myPrivate->imageView)
     {
