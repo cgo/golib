@@ -270,6 +270,7 @@ SET (MATH_SOURCES
 
 ## goSignal
 SET (SIGNAL_SOURCES
+ src/signal/icv.cpp
     src/signal/smooth.cpp
     src/signal/convert.cpp
     src/signal/canny.cpp
