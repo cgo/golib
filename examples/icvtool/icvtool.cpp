@@ -43,11 +43,20 @@ class ICVTool : public goGUI::MainWindow
         	std::cout << "Drag: data get" << std::endl;
         }
 
+        bool dragDropImageControl (Glib::RefPtr< Gdk::DragContext > const& context, int a, int b, guint c)
+        {
+            Glib::ustring const selection = context->get_selection();
+            std::cout << "Selection: " << selection << std::endl;
+            return true;
+        }
+
         void dragImageDataReceived (const Glib::RefPtr<Gdk::DragContext>& context, int x, int y,
                 const Gtk::SelectionData& selection_data, guint info, guint time)
         {
         	std::cout << "Drag: data received" << std::endl;
         	std::cout << context->get_selection() << std::endl;
+
+        	context->drag_finish(true, false, time);
         }
 
         goGUI::ImageView    myImageViews[ImageCount];
@@ -88,10 +97,22 @@ ICVTool<ImageCount>::ICVTool ()
 	    targets[0].set_flags  (Gtk::TargetFlags(0));
 	    targets[0].set_info   (0);
 
+	    {
+	        Gtk::TargetEntry target;
+	        target.set_target ("text/plain");
+	        target.set_flags(Gtk::TARGET_OTHER_APP);
+	        target.set_info(0);
+	        targets.push_back(target);
+	    }
+
+
 	    // FIXME: drag and drop works within a treeview for re-ordering, but moving between treeviews needs to be implemented.
 	    this->myImageControls[i].drag_source_set (targets, Gdk::ModifierType(Gdk::SHIFT_MASK), Gdk::ACTION_MOVE);
 	    this->myImageControls[i].drag_dest_set   (targets);
 	    this->myImageControls[i].signal_drag_data_get().connect(sigc::mem_fun(*this, &ICVTool<ImageCount>::dragImageDataGet));
+	    this->myImageControls[i].drag_dest_add_uri_targets();
+	    this->myImageControls[i].signal_drag_drop().connect (sigc::mem_fun(*this, &ICVTool<ImageCount>::dragDropImageControl));
+        this->myImageControls[i].signal_drag_data_received().connect (sigc::mem_fun(*this, &ICVTool<ImageCount>::dragImageDataReceived));
 	}
 
     this->addControl (this->myControlsBox);

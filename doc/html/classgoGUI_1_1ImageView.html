@@ -173,9 +173,9 @@ goIndex_t&#160;</td><td class="memItemRight" valign="bottom"><b>currentImageInde
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a3996322fb33aa8ebfbfba86a48dcc77f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoGUI_1_1ImageView.html#a3996322fb33aa8ebfbfba86a48dcc77f">on_expose_event</a> (GdkEventExpose *event)</td></tr>
-<tr class="memdesc:a3996322fb33aa8ebfbfba86a48dcc77f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws everything.  <a href="#a3996322fb33aa8ebfbfba86a48dcc77f">More...</a><br /></td></tr>
-<tr class="separator:a3996322fb33aa8ebfbfba86a48dcc77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5fb7cbbdae598f49c492c03ac99284a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoGUI_1_1ImageView.html#ab5fb7cbbdae598f49c492c03ac99284a">on_draw</a> (Cairo::RefPtr&lt; Cairo::Context &gt; const &amp;context) override</td></tr>
+<tr class="memdesc:ab5fb7cbbdae598f49c492c03ac99284a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws everything.  <a href="#ab5fb7cbbdae598f49c492c03ac99284a">More...</a><br /></td></tr>
+<tr class="separator:ab5fb7cbbdae598f49c492c03ac99284a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac94058a204192c6c05c49b7175d2f80b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoAutoPtr.html">goAutoPtr</a>&lt; <a class="el" href="classgoSignal3DBase.html">goSignal3DBase</a>&lt; void &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoGUI_1_1ImageView.html#ac94058a204192c6c05c49b7175d2f80b">imageRef</a> (<a class="el" href="classgoAutoPtr.html">goAutoPtr</a>&lt; <a class="el" href="classgoPlot_1_1Object2DImage.html">goPlot::Object2DImage</a> &gt; img)</td></tr>
 <tr class="memdesc:ac94058a204192c6c05c49b7175d2f80b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an object that references the data in the Object2DImage directly.  <a href="#ac94058a204192c6c05c49b7175d2f80b">More...</a><br /></td></tr>
 <tr class="separator:ac94058a204192c6c05c49b7175d2f80b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,7 +297,7 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a3996322fb33aa8ebfbfba86a48dcc77f"></a>
+<a class="anchor" id="ab5fb7cbbdae598f49c492c03ac99284a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -305,16 +305,16 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool goGUI::ImageView::on_expose_event </td>
+          <td class="memname">bool goGUI::ImageView::on_draw </td>
           <td>(</td>
-          <td class="paramtype">GdkEventExpose *&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
+          <td class="paramtype">Cairo::RefPtr&lt; Cairo::Context &gt; const &amp;&#160;</td>
+          <td class="paramname"><em>context</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

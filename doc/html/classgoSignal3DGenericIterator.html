@@ -296,7 +296,7 @@ Be careful when you use <b>multichannel signals</b>. There is a pitfall: <pre>
        sig.setChannel(2);
       </code>
  </pre> The iterator will run on channel 1 !!!! It will run on channel 2 when you put a it.resetZ() or a it.setPosition(...) after setting the channel in sig.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000049">Todo:</a></b></dt><dd>Maybe do something about the pitfall described in the note (documentation). Low priority.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000050">Todo:</a></b></dt><dd>Maybe do something about the pitfall described in the note (documentation). Low priority.</dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a9de5f9b8c7751bdc0bcb0114b30ff80d"></a>
 <div class="memitem">
@@ -392,7 +392,7 @@ Be careful when you use <b>multichannel signals</b>. There is a pitfall: <pre>
 </div><div class="memdoc">
 <hr/>
  <dl class="bug"><dt><b><a class="el" href="bug.html#_bug000006">Bug:</a></b></dt><dd>See todo. </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000050">Todo:</a></b></dt><dd>This runs over the edge of the dz array when there is no border (holds for all increment functions). This leads to an invalid read operation which may lead to problems. Check if there is a way to fix this without having to change <h2>all iterator calls. </h2>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000051">Todo:</a></b></dt><dd>This runs over the edge of the dz array when there is no border (holds for all increment functions). This leads to an invalid read operation which may lead to problems. Check if there is a way to fix this without having to change <h2>all iterator calls. </h2>
 </dd></dl>
 
 </div>

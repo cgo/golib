@@ -194,12 +194,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>setControlPoints</b> 
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Cubic Non-uniform non-rational B-spline approximation. </p>
 <p>Uses cubic NUBS to approximate a curve. A curve can either be given in the constructor as a goCurve* or as a goList&lt;goPointf&gt; to <a class="el" href="classgoNUBS.html#ab68abc3e562ed2106c1d7b0b4b042b4a" title="Calculate with given point list. ">setControlPoints()</a>. In order to get knots with multiplicity &gt; 0, define points with the desired multiplicity. If you want periodic functions (closed curves), append the first point of the curve at its end. That's not tested, but should suffice.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000038">Todo:</a></b></dt><dd><p class="startdd">B is currently calculated recursively. Use de Boor instead. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000039">Todo:</a></b></dt><dd><p class="startdd">B is currently calculated recursively. Use de Boor instead. </p>
 <p class="enddd">Currently this class is not compiled. Replace the use of <a class="el" href="classgoPoint.html" title="Deprecate this, do not use! ">goPoint</a> with <a class="el" href="classgoMath_1_1Vector.html" title="General vector class. ">goMath::Vector</a>. </p>
 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Christian Gosch</dd></dl>
 <p>Uses cubic NUBS to approximate a curve. A curve can either be given in the constructor as a goCurve* or as a goList&lt;goPointf&gt; to <a class="el" href="classgoNUBS.html#ab68abc3e562ed2106c1d7b0b4b042b4a" title="Calculate with given point list. ">setControlPoints()</a>. In order to get knots with multiplicity &gt; 0, define points with the desired multiplicity. If you want periodic functions (closed curves), append the first point of the curve at its end. That's not tested, but should suffice.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000039">Todo:</a></b></dt><dd>B is currently calculated recursively. Use de Boor instead. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000040">Todo:</a></b></dt><dd>B is currently calculated recursively. Use de Boor instead. </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Christian Gosch </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad8282cde8f93ef765d2fc4333f0c9759"></a>
@@ -304,7 +304,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>setControlPoints</b> 
 
 <p>Evaluate the B-spline curve at u. </p>
 <dl class="section note"><dt>Note</dt><dd>Note that parameter u must be in a half-open interval. If you request nubs.operator()(nurbs.getCurveLength()), you will get (0,0,0) as an answer. E.g., nurbs.operator(nurbs.getCurveLength() - 1e-5) results in something close to the curve's end.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000065">Todo:</a></b></dt><dd><p class="startdd">If it nags someone too much, return the end point when nubs.operator()(nurbs.getCurveLength()) is requested. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000066">Todo:</a></b></dt><dd><p class="startdd">If it nags someone too much, return the end point when nubs.operator()(nurbs.getCurveLength()) is requested. </p>
 <p>Currently intervals are searched for linearly. Improve that when there's time. </p>
 <p class="enddd">Store the control points in an array additionally to speed up access. </p>
 </dd></dl>

@@ -132,17 +132,17 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <dd>Fix the <a class="el" href="classgoList.html">goList</a> issue. golist.hpp must be included at the end of one source file that uses this class.  </dd>
 <dt><a class="anchor" id="_todo000026"></a>Class <a class="el" href="classgoCaller9.html">goCaller9&lt; Tret, Targ0, Targ1, Targ2, Targ3, Targ4, Targ5, Targ6, Targ7, Targ8 &gt;</a>  </dt>
 <dd>Fix the <a class="el" href="classgoList.html">goList</a> issue. golist.hpp must be included at the end of one source file that uses this class.  </dd>
-<dt><a class="anchor" id="_todo000056"></a>Member <a class="el" href="group__types.html#ga4978d723917d777839fdf3ec4217b6f5">goCreateQuantizationTable</a>  (const <a class="el" href="classgoType.html" title="Provides type information. ">goType</a> &amp;sourceType, targetT minTargetValue, targetT maxTargetValue, goIndex_t minIndex, goIndex_t maxIndex, goArray&lt; targetT &gt; &amp;tableRet, goDouble sourceMin=0.0, goDouble sourceMax=-1.0)</dt>
+<dt><a class="anchor" id="_todo000057"></a>Member <a class="el" href="group__types.html#ga4978d723917d777839fdf3ec4217b6f5">goCreateQuantizationTable</a>  (const <a class="el" href="classgoType.html" title="Provides type information. ">goType</a> &amp;sourceType, targetT minTargetValue, targetT maxTargetValue, goIndex_t minIndex, goIndex_t maxIndex, goArray&lt; targetT &gt; &amp;tableRet, goDouble sourceMin=0.0, goDouble sourceMax=-1.0)</dt>
 <dd>sourceMinimum and sourceMaximum does not work because index functions assume certain value ranges (esp. float/double!!) </dd>
 <dt><a class="anchor" id="_todo000008"></a>Class <a class="el" href="classgoDWT.html">goDWT&lt; T &gt;</a>  </dt>
 <dd>src/signal/godwt.cc aufraeumen  </dd>
 <dt><a class="anchor" id="_todo000009"></a>Member <a class="el" href="classgoDWT.html#a3a21e0d6e785aa6d5498349df475fc04">goDWT&lt; T &gt;::unHaar</a>  (goSignal3D&lt; godwt_t &gt; &amp;haarSignal, goSignal3D&lt; T &gt; &amp;targetSignal)</dt>
 <dd>Remove the copy operation at the end by specialising a macro to the last filter operation. Using godwt_t types for all data is better anyway as long as it is scalar data. Use a different solution for multimodal data.  </dd>
-<dt><a class="anchor" id="_todo000072"></a>Member <a class="el" href="classgoFileIO.html#a94ce3122199aa0c61528f93bae11139b">goFileIO::fileSize</a>  (const char *filename)</dt>
+<dt><a class="anchor" id="_todo000073"></a>Member <a class="el" href="classgoFileIO.html#a94ce3122199aa0c61528f93bae11139b">goFileIO::fileSize</a>  (const char *filename)</dt>
 <dd>Fix for 64 bit file offsets </dd>
-<dt><a class="anchor" id="_todo000073"></a>Member <a class="el" href="classgoFileIO.html#a91e478638bfa44eca900ac8c1b6d39b0">goFileIO::readASCIILine</a>  (FILE *f, <a class="el" href="classgoString.html" title="String class. ">goString</a> &amp;target)</dt>
+<dt><a class="anchor" id="_todo000074"></a>Member <a class="el" href="classgoFileIO.html#a91e478638bfa44eca900ac8c1b6d39b0">goFileIO::readASCIILine</a>  (FILE *f, <a class="el" href="classgoString.html" title="String class. ">goString</a> &amp;target)</dt>
 <dd>Uses a gnu extension function. Replace by something own some time (very low priority). </dd>
-<dt><a class="anchor" id="_todo000071"></a>Member <a class="el" href="group__signal.html#ga0302137b866e9f9d451c332d7bb4811a">goFileIO::writeImage</a>  (const char *filename, const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> *signal)</dt>
+<dt><a class="anchor" id="_todo000072"></a>Member <a class="el" href="group__signal.html#ga0302137b866e9f9d451c332d7bb4811a">goFileIO::writeImage</a>  (const char *filename, const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> *signal)</dt>
 <dd>This works only for float signals. Add other types. Add multichannel. </dd>
 <dt><a class="anchor" id="_todo000011"></a>Class <a class="el" href="classgoFilter.html">goFilter&lt; T &gt;</a>  </dt>
 <dd>This works on the old 2D classes. Rework to signal3d.  </dd>
@@ -176,115 +176,115 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </dd>
 <dt><a class="anchor" id="_todo000006"></a>Member <a class="el" href="classgoMath_1_1BarrierOpt.html#a57b9d644b2469299d2e18d942c9c3873">goMath::BarrierOpt&lt; matrix_type, vector_type, opt_function_type &gt;::solve</a>  (vector_type &amp;x, value_type epsilon=0.01, value_type mu=2, value_type t0=1)</dt>
 <dd>Document choice of t0, mu, epsilon </dd>
-<dt><a class="anchor" id="_todo000068"></a>Member <a class="el" href="group__math.html#ga9926b0fb639ce4a5e8d91bc6c5655456">goMath::ddx2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
+<dt><a class="anchor" id="_todo000069"></a>Member <a class="el" href="group__math.html#ga9926b0fb639ce4a5e8d91bc6c5655456">goMath::ddx2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
 <dd>Implement for 3D-signals. </dd>
-<dt><a class="anchor" id="_todo000069"></a>Member <a class="el" href="group__math.html#ga836ba805e0a5c75485ac8e3217f923c2">goMath::ddy2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
+<dt><a class="anchor" id="_todo000070"></a>Member <a class="el" href="group__math.html#ga836ba805e0a5c75485ac8e3217f923c2">goMath::ddy2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
 <dd>Implement for 3D-signals. </dd>
-<dt><a class="anchor" id="_todo000063"></a>Member <a class="el" href="group__math.html#gadaac863106b46ac72fd7e2df6551b977">goMath::goConjugateGradients</a>  (const MatrixType &amp;A, const VectorType &amp;b, VectorType &amp;x, goDouble epsilon=1e-6)</dt>
+<dt><a class="anchor" id="_todo000064"></a>Member <a class="el" href="group__math.html#gadaac863106b46ac72fd7e2df6551b977">goMath::goConjugateGradients</a>  (const MatrixType &amp;A, const VectorType &amp;b, VectorType &amp;x, goDouble epsilon=1e-6)</dt>
 <dd>Spezialimplementierung fuer <a class="el" href="classgoSparseMatrix.html" title="Basic sparse matrix class with Matlab mxArray support. ">goSparseMatrix</a> (gibts schon) und Standardimplementierung fuer andere Matrizen. </dd>
-<dt><a class="anchor" id="_todo000067"></a>Member <a class="el" href="group__math.html#gadd653cdd30778e71f672cf5c87ea2d35">goMath::gradient2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
+<dt><a class="anchor" id="_todo000068"></a>Member <a class="el" href="group__math.html#gadd653cdd30778e71f672cf5c87ea2d35">goMath::gradient2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
 <dd>Look at the code and find the reference where this is documented. It's not simply central differences, but rather central differences including the next neighbours. </dd>
-<dt><a class="anchor" id="_todo000066"></a>Member <a class="el" href="group__math.html#ga25bf56fbb35cd6837d8c0696b1b8065b">goMath::laplacian2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
+<dt><a class="anchor" id="_todo000067"></a>Member <a class="el" href="group__math.html#ga25bf56fbb35cd6837d8c0696b1b8065b">goMath::laplacian2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;sig, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;retValue)</dt>
 <dd>BUG: This sometimes can produce NaNs. </dd>
-<dt><a class="anchor" id="_todo000034"></a>Member <a class="el" href="group__mathla.html#gacc9507d08b008d51de11393994e64060">goMath::matrixVectorMult</a>  (T alpha, const goMath::Matrix&lt; T &gt; &amp;A, bool transA, const goMath::Vector&lt; T &gt; &amp;x, T beta, goMath::Vector&lt; T &gt; &amp;y)</dt>
+<dt><a class="anchor" id="_todo000035"></a>Member <a class="el" href="group__mathla.html#gacc9507d08b008d51de11393994e64060">goMath::matrixVectorMult</a>  (T alpha, const goMath::Matrix&lt; T &gt; &amp;A, bool transA, const goMath::Vector&lt; T &gt; &amp;x, T beta, goMath::Vector&lt; T &gt; &amp;y)</dt>
 <dd>TEST THIS FUNCTION. </dd>
 <dt><a class="anchor" id="_todo000027"></a>Class <a class="el" href="classgoMath_1_1MultiGaussPDF.html">goMath::MultiGaussPDF&lt; input_vector, scalar_type &gt;</a>  </dt>
 <dd>Normalisation factor.  </dd>
-<dt><a class="anchor" id="_todo000036"></a>Class <a class="el" href="classgoMath_1_1NewtonOpt.html">goMath::NewtonOpt&lt; type_ &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000037"></a>Class <a class="el" href="classgoMath_1_1NewtonOpt.html">goMath::NewtonOpt&lt; type_ &gt;</a>  </dt>
 <dd>Add line search </dd>
-<dt><a class="anchor" id="_todo000037"></a>Class <a class="el" href="classgoMath_1_1NewtonOptEq.html">goMath::NewtonOptEq&lt; type_ &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000038"></a>Class <a class="el" href="classgoMath_1_1NewtonOptEq.html">goMath::NewtonOptEq&lt; type_ &gt;</a>  </dt>
 <dd>Detect when Ax=b is fulfilled; then, calculating Ax-b in each step can be skipped (is always feasible then). </dd>
-<dt><a class="anchor" id="_todo000087"></a>Member <a class="el" href="group__math.html#ga51ff1eaa8f69b4aaa6b07142d1c00c3d">goMath::scale2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;source, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;target, bool keep_aspect=false)</dt>
+<dt><a class="anchor" id="_todo000088"></a>Member <a class="el" href="group__math.html#ga51ff1eaa8f69b4aaa6b07142d1c00c3d">goMath::scale2D</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;source, <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;target, bool keep_aspect=false)</dt>
 <dd>Extend to 3D &ndash; this only requires to write a 3D sampling function. </dd>
-<dt><a class="anchor" id="_todo000058"></a>Class <a class="el" href="classgoMath_1_1Vector.html">goMath::Vector&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000059"></a>Class <a class="el" href="classgoMath_1_1Vector.html">goMath::Vector&lt; T &gt;</a>  </dt>
 <dd>Document members. </dd>
-<dt><a class="anchor" id="_todo000060"></a>Member <a class="el" href="classgoMath_1_1Vector.html#ad048545b5ae63f24a6580026f2028519">goMath::Vector&lt; T &gt;::norm1</a>  () const </dt>
+<dt><a class="anchor" id="_todo000061"></a>Member <a class="el" href="classgoMath_1_1Vector.html#ad048545b5ae63f24a6580026f2028519">goMath::Vector&lt; T &gt;::norm1</a>  () const </dt>
 <dd>Use cblas for complex as well. Use cblas internal cblas storage then.  </dd>
-<dt><a class="anchor" id="_todo000059"></a>Member <a class="el" href="classgoMath_1_1Vector.html#aa19f506791606187ad643cdcf257a2cb">goMath::Vector&lt; T &gt;::norm2</a>  () const </dt>
+<dt><a class="anchor" id="_todo000060"></a>Member <a class="el" href="classgoMath_1_1Vector.html#aa19f506791606187ad643cdcf257a2cb">goMath::Vector&lt; T &gt;::norm2</a>  () const </dt>
 <dd>Use cblas for complex as well. Use cblas internal cblas storage then.  </dd>
 <dt><a class="anchor" id="_todo000033"></a>Class <a class="el" href="classgoMatlab.html">goMatlab</a>  </dt>
 <dd>The interface is a little inconsistent (use references instead of pointers!).  </dd>
-<dt><a class="anchor" id="_todo000035"></a>Class <a class="el" href="classgoNet_1_1goNetObject.html">goNet::goNetObject</a>  </dt>
+<dt><a class="anchor" id="_todo000036"></a>Class <a class="el" href="classgoNet_1_1goNetObject.html">goNet::goNetObject</a>  </dt>
 <dd>Add documentation  </dd>
-<dt><a class="anchor" id="_todo000046"></a>Class <a class="el" href="classgoNet_1_1goServer.html">goNet::goServer</a>  </dt>
+<dt><a class="anchor" id="_todo000047"></a>Class <a class="el" href="classgoNet_1_1goServer.html">goNet::goServer</a>  </dt>
 <dd><a class="el" href="classgoNet_1_1goServer.html#a3abe639d9533738b6d4a90f571a56c5e">serverAcceptThread()</a>: Call a thread for every connection? That might be too special and should be implemented in a specialisation class.  </dd>
-<dt><a class="anchor" id="_todo000038"></a>Class <a class="el" href="classgoNUBS.html">goNUBS</a>  </dt>
+<dt><a class="anchor" id="_todo000039"></a>Class <a class="el" href="classgoNUBS.html">goNUBS</a>  </dt>
 <dd><p class="startdd">B is currently calculated recursively. Use de Boor instead. </p>
 <p>Currently this class is not compiled. Replace the use of <a class="el" href="classgoPoint.html" title="Deprecate this, do not use! ">goPoint</a> with <a class="el" href="classgoMath_1_1Vector.html" title="General vector class. ">goMath::Vector</a>. </p>
 <p class="enddd">B is currently calculated recursively. Use de Boor instead.  </p>
 </dd>
-<dt><a class="anchor" id="_todo000065"></a>Member <a class="el" href="classgoNUBS.html#a25a77bbea3f6c569deff7dd820d7f52a">goNUBS::operator()</a>  (goFloat u)</dt>
+<dt><a class="anchor" id="_todo000066"></a>Member <a class="el" href="classgoNUBS.html#a25a77bbea3f6c569deff7dd820d7f52a">goNUBS::operator()</a>  (goFloat u)</dt>
 <dd><p class="startdd">If it nags someone too much, return the end point when nubs.operator()(nurbs.getCurveLength()) is requested. </p>
 <p>Currently intervals are searched for linearly. Improve that when there's time. </p>
 <p class="enddd">Store the control points in an array additionally to speed up access.  </p>
 </dd>
-<dt><a class="anchor" id="_todo000040"></a>Class <a class="el" href="classgoObjectBase.html">goObjectBase</a>  </dt>
+<dt><a class="anchor" id="_todo000041"></a>Class <a class="el" href="classgoObjectBase.html">goObjectBase</a>  </dt>
 <dd><p class="startdd">The object messaging must be stable against re-entries and changing connections during message sending. There is no way to control what connected classes do during a receive call, so this is the place where everything must be stable. Already hardened against disconnecting while receiving, see <a class="el" href="classgoObjectBase.html#a458b28a19417ec95aaf0e7885e5a8b6b" title="Sends a message to all connected objects. ">sendObjectMessage()</a> in the source code. Mutexes alone are of little help since they will lead to deadlocks here. The pointer in the connection list is therefore first set to NULL and later the list is cleaned up. Test this on multi-processor machines.</p>
 <p class="enddd">Do writeObjectFile/readObjectFile as ASCII. Better to port/debug/change. Check if libxml is nice enough to use for this. </p>
 </dd>
-<dt><a class="anchor" id="_todo000074"></a>Member <a class="el" href="classgoObjectBase.html#aceb0d3b86c488f0a8683a2f3ff583640">goObjectBase::connectObject</a>  (<a class="el" href="classgoObjectBase.html" title="Base class for golib objects. ">goObjectBase</a> *object)</dt>
+<dt><a class="anchor" id="_todo000075"></a>Member <a class="el" href="classgoObjectBase.html#aceb0d3b86c488f0a8683a2f3ff583640">goObjectBase::connectObject</a>  (<a class="el" href="classgoObjectBase.html" title="Base class for golib objects. ">goObjectBase</a> *object)</dt>
 <dd>It may be necessary to only allow bi-directional connections.  </dd>
-<dt><a class="anchor" id="_todo000042"></a>Class <a class="el" href="classgoObjectMethodParameters.html">goObjectMethodParameters</a>  </dt>
+<dt><a class="anchor" id="_todo000043"></a>Class <a class="el" href="classgoObjectMethodParameters.html">goObjectMethodParameters</a>  </dt>
 <dd>Add goObjectBase* parameters?  </dd>
-<dt><a class="anchor" id="_todo000077"></a>Member <a class="el" href="classgoPlot_1_1Graph.html#a99084148162a56820eba6a6fc49d6558">goPlot::Graph::setDimensions</a>  (goPlot::real xmin, goPlot::real xmax, goPlot::real ymin, goPlot::real ymax)</dt>
+<dt><a class="anchor" id="_todo000078"></a>Member <a class="el" href="classgoPlot_1_1Graph.html#a99084148162a56820eba6a6fc49d6558">goPlot::Graph::setDimensions</a>  (goPlot::real xmin, goPlot::real xmax, goPlot::real ymin, goPlot::real ymax)</dt>
 <dd>Setting the tics may not be wanted (rethink this). </dd>
-<dt><a class="anchor" id="_todo000078"></a>Member <a class="el" href="classgoPlot_1_1GraphAxis.html#a421373c58bd4ac37f2d6184f858a89dd">goPlot::GraphAxis::configure</a>  (int c)</dt>
+<dt><a class="anchor" id="_todo000079"></a>Member <a class="el" href="classgoPlot_1_1GraphAxis.html#a421373c58bd4ac37f2d6184f858a89dd">goPlot::GraphAxis::configure</a>  (int c)</dt>
 <dd>Replace this or leave it? </dd>
-<dt><a class="anchor" id="_todo000079"></a>Member <a class="el" href="classgoPlot_1_1GraphAxis.html#a3148b4bd4094cf1d8272cbe3afbdc86a">goPlot::GraphAxis::updateTicsText</a>  ()</dt>
+<dt><a class="anchor" id="_todo000080"></a>Member <a class="el" href="classgoPlot_1_1GraphAxis.html#a3148b4bd4094cf1d8272cbe3afbdc86a">goPlot::GraphAxis::updateTicsText</a>  ()</dt>
 <dd>Add variable precision </dd>
-<dt><a class="anchor" id="_todo000075"></a>Member <a class="el" href="group__cairoplot.html#ga33e807bc8cde49c1abb5604a304ab4ea">goPlot::object2DImage</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;img)</dt>
+<dt><a class="anchor" id="_todo000077"></a>Member <a class="el" href="group__cairoplot.html#ga33e807bc8cde49c1abb5604a304ab4ea">goPlot::object2DImage</a>  (const <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; void &gt;</a> &amp;img)</dt>
 <dd>Convert 1-channel images also to ARGB32 </dd>
-<dt><a class="anchor" id="_todo000043"></a>Class <a class="el" href="classgoPointCloud.html">goPointCloud&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000044"></a>Class <a class="el" href="classgoPointCloud.html">goPointCloud&lt; T &gt;</a>  </dt>
 <dd>Add function to create a configuration matrix <a class="el" href="classgoMath_1_1Matrix.html" title="Matrix class. ">goMath::Matrix</a> (N,getDim()) and/or a configuration vector from a point cloud.  </dd>
-<dt><a class="anchor" id="_todo000044"></a>Class <a class="el" href="classgoProcess.html">goProcess</a>  </dt>
+<dt><a class="anchor" id="_todo000045"></a>Class <a class="el" href="classgoProcess.html">goProcess</a>  </dt>
 <dd>If needed, add Windoze support. </dd>
-<dt><a class="anchor" id="_todo000045"></a>Class <a class="el" href="classgoQueue.html">goQueue&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000046"></a>Class <a class="el" href="classgoQueue.html">goQueue&lt; T &gt;</a>  </dt>
 <dd>Document.  </dd>
-<dt><a class="anchor" id="_todo000047"></a>Class <a class="el" href="classgoSignal3D.html">goSignal3D&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000048"></a>Class <a class="el" href="classgoSignal3D.html">goSignal3D&lt; T &gt;</a>  </dt>
 <dd>The size is initially (0,0,0). That may lead to segfaults where getPtr() is used on zero-size signals. Maybe it is better to set size to (1,1,1) by default. </dd>
-<dt><a class="anchor" id="_todo000082"></a>Member <a class="el" href="classgoSignal3D.html#a2db829abeefc4bfaad695434420f841e">goSignal3D&lt; T &gt;::destroy</a>  ()</dt>
+<dt><a class="anchor" id="_todo000083"></a>Member <a class="el" href="classgoSignal3D.html#a2db829abeefc4bfaad695434420f841e">goSignal3D&lt; T &gt;::destroy</a>  ()</dt>
 <dd>Take care what happens when axes are rotated. Nothing bad should happen though.  </dd>
-<dt><a class="anchor" id="_todo000048"></a>Class <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000049"></a>Class <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; T &gt;</a>  </dt>
 <dd><p class="startdd">The <code>void</code> implementation may not completely be done. Check if some of the routines in gosignal3d and base are still marked as "not yet implemented". </p>
 <p class="enddd">typedef the void instantiation to something else and use that. </p>
 </dd>
-<dt><a class="anchor" id="_todo000084"></a>Member <a class="el" href="classgoSignal3DBase.html#a6f60055e0c17e8acda4dcd5c9b97ac3c">goSignal3DBase&lt; T &gt;::flip</a>  (int axis)</dt>
+<dt><a class="anchor" id="_todo000085"></a>Member <a class="el" href="classgoSignal3DBase.html#a6f60055e0c17e8acda4dcd5c9b97ac3c">goSignal3DBase&lt; T &gt;::flip</a>  (int axis)</dt>
 <dd>BROKEN. Fix when there's time.  </dd>
-<dt><a class="anchor" id="_todo000083"></a>Member <a class="el" href="classgoSignal3DBase.html#a522e41fd7fca2fbf561145c958006676">goSignal3DBase&lt; T &gt;::setBorderFlags</a>  (int axes=GO_X|GO_Y|GO_Z, int borderFlag=GO_PERIODIC_BORDER)</dt>
+<dt><a class="anchor" id="_todo000084"></a>Member <a class="el" href="classgoSignal3DBase.html#a522e41fd7fca2fbf561145c958006676">goSignal3DBase&lt; T &gt;::setBorderFlags</a>  (int axes=GO_X|GO_Y|GO_Z, int borderFlag=GO_PERIODIC_BORDER)</dt>
 <dd>If border strategies are mixed, make the corners do something defined. </dd>
-<dt><a class="anchor" id="_todo000085"></a>Member <a class="el" href="classgoSignal3DBase.html#abbbd5968ae9ea9ebd4bc7f6d5088db4c">goSignal3DBase&lt; T &gt;::setChannel</a>  (goSize_t c)</dt>
+<dt><a class="anchor" id="_todo000086"></a>Member <a class="el" href="classgoSignal3DBase.html#abbbd5968ae9ea9ebd4bc7f6d5088db4c">goSignal3DBase&lt; T &gt;::setChannel</a>  (goSize_t c)</dt>
 <dd>This will be a problem with const objects. Find out how that can be solved without const_cast&lt;&gt;  </dd>
-<dt><a class="anchor" id="_todo000049"></a>Class <a class="el" href="classgoSignal3DGenericIterator.html">goSignal3DGenericIterator</a>  </dt>
+<dt><a class="anchor" id="_todo000050"></a>Class <a class="el" href="classgoSignal3DGenericIterator.html">goSignal3DGenericIterator</a>  </dt>
 <dd>Maybe do something about the pitfall described in the note (documentation). Low priority. </dd>
-<dt><a class="anchor" id="_todo000051"></a>Member <a class="el" href="classgoSignal3DGenericIterator2.html#a453faff7a74dc71e1a8b07ee984b4dda">goSignal3DGenericIterator2&lt; T &gt;::incrementZ</a>  ()</dt>
+<dt><a class="anchor" id="_todo000052"></a>Member <a class="el" href="classgoSignal3DGenericIterator2.html#a453faff7a74dc71e1a8b07ee984b4dda">goSignal3DGenericIterator2&lt; T &gt;::incrementZ</a>  ()</dt>
 <dd><p class="startdd">This runs over the edge of the dz array when there is no border (holds for all increment functions). This leads to an invalid read operation which may lead to problems. Check if there is a way to fix this without having to change </p><h2>all iterator calls. </h2>
 <p class="enddd"></p>
 </dd>
-<dt><a class="anchor" id="_todo000050"></a>Member <a class="el" href="classgoSignal3DGenericIterator.html#a4d3d9e476564a90c18d27626f999dc8c">goSignal3DGenericIterator::incrementZ</a>  ()</dt>
+<dt><a class="anchor" id="_todo000051"></a>Member <a class="el" href="classgoSignal3DGenericIterator.html#a4d3d9e476564a90c18d27626f999dc8c">goSignal3DGenericIterator::incrementZ</a>  ()</dt>
 <dd><p class="startdd">This runs over the edge of the dz array when there is no border (holds for all increment functions). This leads to an invalid read operation which may lead to problems. Check if there is a way to fix this without having to change </p><h2>all iterator calls. </h2>
 <p class="enddd"></p>
 </dd>
-<dt><a class="anchor" id="_todo000052"></a>Class <a class="el" href="classgoSignal3DIterator.html">goSignal3DIterator&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000053"></a>Class <a class="el" href="classgoSignal3DIterator.html">goSignal3DIterator&lt; T &gt;</a>  </dt>
 <dd>This needs some testing for functionality and <b>speed</b>  </dd>
-<dt><a class="anchor" id="_todo000053"></a>Class <a class="el" href="classgoSparseMatrix.html">goSparseMatrix</a>  </dt>
+<dt><a class="anchor" id="_todo000054"></a>Class <a class="el" href="classgoSparseMatrix.html">goSparseMatrix</a>  </dt>
 <dd><p class="startdd">Make a "get all nonzero elements" method. </p>
 <p class="enddd">TEST ADD / MULT / SUBTRACT METHODS THOROUGHLY!  </p>
 </dd>
-<dt><a class="anchor" id="_todo000054"></a>Class <a class="el" href="classgoStatusObject.html">goStatusObject</a>  </dt>
+<dt><a class="anchor" id="_todo000055"></a>Class <a class="el" href="classgoStatusObject.html">goStatusObject</a>  </dt>
 <dd>Fix this class when there is a use for it. It is not complete and tested. </dd>
-<dt><a class="anchor" id="_todo000062"></a>Member <a class="el" href="classgoString.html#a1318c959fb46291f37fdd1211110db1b">goString::replace</a>  (const char *str, const char *replacement)</dt>
+<dt><a class="anchor" id="_todo000063"></a>Member <a class="el" href="classgoString.html#a1318c959fb46291f37fdd1211110db1b">goString::replace</a>  (const char *str, const char *replacement)</dt>
 <dd>Inefficient. Rework when there's need and time. </dd>
-<dt><a class="anchor" id="_todo000055"></a>Class <a class="el" href="classgoSubSignal3D.html">goSubSignal3D&lt; T &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000056"></a>Class <a class="el" href="classgoSubSignal3D.html">goSubSignal3D&lt; T &gt;</a>  </dt>
 <dd>Implement GO_PARENT_BORDER as copying jumps and diffs on the border from the parent. Currently, CONSTANT_BORDER is default. </dd>
-<dt><a class="anchor" id="_todo000086"></a>Member <a class="el" href="classgoSubSignal3D.html#a7348347506222f43280d3e1bedd5820f">goSubSignal3D&lt; T &gt;::setPosition</a>  (<a class="el" href="classgoPosition.html" title="3D position. ">goPosition</a> &amp;p)</dt>
+<dt><a class="anchor" id="_todo000087"></a>Member <a class="el" href="classgoSubSignal3D.html#a7348347506222f43280d3e1bedd5820f">goSubSignal3D&lt; T &gt;::setPosition</a>  (<a class="el" href="classgoPosition.html" title="3D position. ">goPosition</a> &amp;p)</dt>
 <dd><p class="startdd">Try out if borders are set correctly. </p>
 <p class="enddd">Enable own border flags or borders from parent as option. Should work easily, but try. </p>
 </dd>
-<dt><a class="anchor" id="_todo000057"></a>Class <a class="el" href="classgoUniformQuantizer.html">goUniformQuantizer&lt; _input_type, _output_type &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000058"></a>Class <a class="el" href="classgoUniformQuantizer.html">goUniformQuantizer&lt; _input_type, _output_type &gt;</a>  </dt>
 <dd>Check the example quantizer.cpp. The last value may not be reached (maybe a rounding problem) and that may also result in the problems with histogram equalisation that have been observed. </dd>
 <dt><a class="anchor" id="_todo000076"></a>Member <a class="el" href="classgoVideoCapture.html#a1b1673cc11051246bcd318b40ce5a3c4">goVideoCapture::getValidRanges</a>  ()</dt>
 <dd>Does not work yet. a) doesn't find the real maximum value the way it works now, b) gets invalid argument all the time.  </dd>
-<dt><a class="anchor" id="_todo000061"></a>Class <a class="el" href="classgoViewVolume.html">goViewVolume</a>  </dt>
+<dt><a class="anchor" id="_todo000062"></a>Class <a class="el" href="classgoViewVolume.html">goViewVolume</a>  </dt>
 <dd>Define operations for this class as they are needed. (Development of goVolumeNavigator will need some more functionality in here).  </dd>
 <dt><a class="anchor" id="_todo000001"></a>Module <a class="el" href="group__gui.html">gui</a>  </dt>
 <dd>Documentation is rudimentary. </dd>

@@ -14,7 +14,7 @@
 #cmakedefine GOGUI_USE_CAIRO ${GOGUI_USE_CAIRO}
 
 /* header files */
-#cmakedefine HAVE_IEEE754_H ${HAVE_IEEE754_H}
+// #cmakedefine HAVE_IEEE754_H ${HAVE_IEEE754_H}
 #cmakedefine HAVE_DIRENT_H ${HAVE_DIRENT_H}
 #cmakedefine HAVE_TIME_H ${HAVE_TIME_H}
 #cmakedefine HAVE_UNISTD_H ${HAVE_UNISTD_H}

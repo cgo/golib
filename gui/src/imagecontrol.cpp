@@ -94,7 +94,8 @@ goGUI::ImageControl::ImageControl ()
     	myPrivate->myTreeView.drag_source_set(targets, Gdk::SHIFT_MASK, Gdk::ACTION_MOVE);
     	Glib::RefPtr<Gtk::TargetList> targetList = myPrivate->myTreeView.drag_dest_get_target_list();
     	targetList->add(targets);
-        myPrivate->myTreeView.signal_drag_end ().connect (sigc::mem_fun (*this, &ImageControl::treeViewDragEnd));
+
+    	myPrivate->myTreeView.signal_drag_end ().connect (sigc::mem_fun (*this, &ImageControl::treeViewDragEnd));
     }
 
     //= Context menu in treeview
@@ -246,12 +247,11 @@ void goGUI::ImageControl::treeDeleteImage ()
 /** 
  * @brief Pop up a file open dialog and load an image.
  */
-goAutoPtr<goSignal3D<void> > goGUI::ImageControl::loadImage ()
+void goGUI::ImageControl::loadImage ()
 {
     if (!myPrivate->imageView)
     {
         this->warning ("Image control: no ImageView set.\nCan not load images.");
-        return nullptr;
     }
 
     goString fname = "";
@@ -266,18 +266,18 @@ goAutoPtr<goSignal3D<void> > goGUI::ImageControl::loadImage ()
             goString fname_part;
             fname.getFileName (fname_part);
             image->setObjectName (fname_part);
-            // this->addImage (image);
+            this->addImage (image);
             // myPrivate->imageVview->setImage (*image, 0);
             // this->imageView->setCurrentImage (0);
             myPrivate->imageView->queue_draw ();
-            return image;
+            // return image;
             // this->control.setImage (image);
         }
         catch (goFileIOException& ex)
         {
             Gtk::MessageDialog dlg ("Reading image failed.");
             dlg.run ();
-            return nullptr;
+            // return nullptr;
         }
     }
 }

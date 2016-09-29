@@ -633,7 +633,7 @@ class goSignal3DBase&lt; T &gt;</h3>
 <p>This can be used as a template class as you would expect, giving the data type as template parameter. Alternatively, giving <code>void</code> as template parameter, <a class="el" href="classgoSignal3DBase.html" title="Base class for up to 3D signals. ">goSignal3DBase</a> and its derivatives can be used as a generic signal container with variable data type. This behaviour is preferable in many situations.</p>
 <p>This class can handle multichannel data (such as RGBA). To select a channel, use <code><a class="el" href="classgoSignal3DBase.html#abbbd5968ae9ea9ebd4bc7f6d5088db4c">setChannel()</a></code>. All data access functions will then work so that any accessed data value is from the selected channel. For details on how to create a multichannel see <code><a class="el" href="classgoSignal3D.html" title="Up to 3-dimensional (signal) data container. ">goSignal3D</a></code></p>
 <dl class="section note"><dt>Note</dt><dd>Although instances for many explicit data types are provided, it is recommended to use the special void type instantiation.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000048">Todo:</a></b></dt><dd><p class="startdd">The <code>void</code> implementation may not completely be done. Check if some of the routines in gosignal3d and base are still marked as "not yet implemented". </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000049">Todo:</a></b></dt><dd><p class="startdd">The <code>void</code> implementation may not completely be done. Check if some of the routines in gosignal3d and base are still marked as "not yet implemented". </p>
 <p class="enddd">typedef the void instantiation to something else and use that.</p>
 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Christian Gosch </dd></dl>
@@ -691,7 +691,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>BROKEN. Fix when there's time. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000084">Todo:</a></b></dt><dd>BROKEN. Fix when there's time. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000085">Todo:</a></b></dt><dd>BROKEN. Fix when there's time. </dd></dl>
 <dl class="bug"><dt><b><a class="el" href="bug.html#_bug000012">Bug:</a></b></dt><dd>BROKEN. Fix when there's time.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1311,7 +1311,7 @@ template&lt;class T &gt; </div>
 <p>Sets the border behaviour. </p>
 <dl class="section note"><dt>Note</dt><dd>Changes only become valid when the data is newly allocated using make() after a call to <a class="el" href="classgoSignal3DBase.html#a522e41fd7fca2fbf561145c958006676" title="Sets the border behaviour. ">setBorderFlags()</a>, or when applyBorderFlags() is called after <a class="el" href="classgoSignal3DBase.html#a522e41fd7fca2fbf561145c958006676" title="Sets the border behaviour. ">setBorderFlags()</a>.</dd></dl>
 <p>Not all axes need to have the same behaviour. If you mix behaviours, be aware that the values in the "corners" of the data set may not be what you expect. Currently they are just the values imposed by the last application of internal periodisation/constantisation functions. I.e. the last behaviour, probably of the z-axis, is mimicked.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000083">Todo:</a></b></dt><dd>If border strategies are mixed, make the corners do something defined.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000084">Todo:</a></b></dt><dd>If border strategies are mixed, make the corners do something defined.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">axes</td><td>Axes to apply borderFlag to. One or more of {GO_X,GO_Y,GO_Z} or'ed together. Default is all axes. </td></tr>
@@ -1339,7 +1339,7 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000085">Todo:</a></b></dt><dd>This will be a problem with const objects. Find out how that can be solved without const_cast&lt;&gt; </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000086">Todo:</a></b></dt><dd>This will be a problem with const objects. Find out how that can be solved without const_cast&lt;&gt; </dd></dl>
 
 </div>
 </div>

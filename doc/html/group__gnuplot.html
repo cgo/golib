@@ -118,8 +118,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoMultiPlotter.html">goMultiPlotter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plotting multiple plots in one window (or on one page).  <a href="classgoMultiPlotter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoPlot_1_1Plot.html">goPlot::Plot</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience interface to <a class="el" href="classgoMultiPlotter.html" title="Plotting multiple plots in one window (or on one page). ">goMultiPlotter</a> and <a class="el" href="classgoSinglePlot.html" title="Single plot class used for goMultiPlotter. ">goSinglePlot</a>.  <a href="classgoPlot_1_1Plot.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoPlot_1_1Gnuplot.html">goPlot::Gnuplot</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience interface to <a class="el" href="classgoMultiPlotter.html" title="Plotting multiple plots in one window (or on one page). ">goMultiPlotter</a> and <a class="el" href="classgoSinglePlot.html" title="Single plot class used for goMultiPlotter. ">goSinglePlot</a>.  <a href="classgoPlot_1_1Gnuplot.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -189,7 +189,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>goPlot::writeGnuplotD
 <p>These are the functions and classes related to plotting with gnuplot. You will generally want to use only</p><ul>
 <li><a class="el" href="classgoMultiPlotter.html" title="Plotting multiple plots in one window (or on one page). ">goMultiPlotter</a> together with a bunch of</li>
 <li><a class="el" href="classgoSinglePlot.html" title="Single plot class used for goMultiPlotter. ">goSinglePlot</a></li>
-<li>or <a class="el" href="classgoPlot_1_1Plot.html" title="Convenience interface to goMultiPlotter and goSinglePlot. ">goPlot::Plot</a> as a simpler interface for a few things. </li>
+<li>or goPlot::Plot as a simpler interface for a few things. </li>
 </ul>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="ga4ee6e052e814dd80d924cef824105d1c"></a>
@@ -262,7 +262,7 @@ template&lt;class arrayT &gt; </div>
     <tr><td class="paramname">array</td><td>Array, currently goArray&lt;&gt; and goFixedArray&lt;&gt; of types goFloat and goDouble are supported. </td></tr>
     <tr><td class="paramname">title</td><td>Title of the plot. </td></tr>
     <tr><td class="paramname">gnuplotCommands</td><td>Commands that come with the plot command, like this: plot &lt;filename&gt; &lt;gnuplotCommands&gt;. You could for example put "with dots" or similar here. If left null, "with lines" is assumed. </td></tr>
-    <tr><td class="paramname">prefixCommands</td><td>Gnuplot commands that go before the plot command. You can for example put commands to select the terminal type here. </td></tr>
+    <tr><td class="paramname">prefixCommands</td><td><a class="el" href="classgoPlot_1_1Gnuplot.html" title="Convenience interface to goMultiPlotter and goSinglePlot. ">Gnuplot</a> commands that go before the plot command. You can for example put commands to select the terminal type here. </td></tr>
     <tr><td class="paramname">shellPostfix</td><td>If this is not null, gnuplot is called in a shell (/bin/sh) and this string is put after the gnuplot command string. Use this e.g. for "&gt; my_file.ps" if you use postscript terminal. </td></tr>
     <tr><td class="paramname">cmdFileNameRet</td><td>If not null, the command file name used by gnuplot (a temporary file) is stored here after the call. </td></tr>
     <tr><td class="paramname">dataFileNameRet</td><td>If not null, the data file name used by gnuplot (a temporary file) is stored here after the call. </td></tr>

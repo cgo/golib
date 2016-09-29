@@ -117,7 +117,6 @@
 #include <gomatrix.h>
 #include <govector.h>
 // #include <goplot.h>
-// #include <goplot/gnuplot.h>
 #include <gohistogram.h>
 #include <goautoptr.h>
 #include <golist.h>
@@ -144,6 +143,7 @@
 #include <goplot/graph.h>
 #include <goplot/cairoplot.h>
 #include <goplot/goplot.h>
+#include <goplot/gnuplot.h>
 #include <goplot/plot.h>
 #include <goplot/graphaxis.h>
 #include <goplot/object2dimage.h>
@@ -217,6 +217,7 @@
 
 %include <goplot/graph.h>
 %include <goplot/cairoplot.h>
+%include <goplot/gnuplot.h>
 %include <goplot/goplot.h>
 %include <goplot/object2dimage.h>
 %include <goplot/object2dtext.h>

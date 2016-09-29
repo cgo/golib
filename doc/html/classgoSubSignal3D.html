@@ -657,7 +657,7 @@ goPtrdiff_t *&#160;</td><td class="memItemRight" valign="bottom"><b>myChannelOff
 class goSubSignal3D&lt; T &gt;</h3>
 
 <p>Access to sub-areas of <code><a class="el" href="classgoSignal3DBase.html" title="Base class for up to 3D signals. ">goSignal3DBase</a></code> objects. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000055">Todo:</a></b></dt><dd>Implement GO_PARENT_BORDER as copying jumps and diffs on the border from the parent. Currently, CONSTANT_BORDER is default.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000056">Todo:</a></b></dt><dd>Implement GO_PARENT_BORDER as copying jumps and diffs on the border from the parent. Currently, CONSTANT_BORDER is default.</dd></dl>
 <p>Enables access to sub signals of a given <code><a class="el" href="classgoSignal3DBase.html" title="Base class for up to 3D signals. ">goSignal3DBase</a></code>. Being derived from it, <code><a class="el" href="classgoSubSignal3D.html" title="Access to sub-areas of goSignal3DBase objects. ">goSubSignal3D</a></code> can do anything a <code><a class="el" href="classgoSignal3D.html" title="Up to 3-dimensional (signal) data container. ">goSignal3D</a></code> can. A parent must be set and the position is initialised to (0,0,0). <code>move()</code> moves in one direction of <br />
  </p><ul>
 <li>
@@ -732,7 +732,7 @@ template&lt;class T &gt; </div>
 <p>Sets the border behaviour. </p>
 <dl class="section note"><dt>Note</dt><dd>Changes only become valid when the data is newly allocated using make() after a call to <a class="el" href="classgoSubSignal3D.html#a5e94ff138831dc1a2db27da8359d240a" title="Sets the border behaviour. ">setBorderFlags()</a>, or when applyBorderFlags() is called after <a class="el" href="classgoSubSignal3D.html#a5e94ff138831dc1a2db27da8359d240a" title="Sets the border behaviour. ">setBorderFlags()</a>.</dd></dl>
 <p>Not all axes need to have the same behaviour. If you mix behaviours, be aware that the values in the "corners" of the data set may not be what you expect. Currently they are just the values imposed by the last application of internal periodisation/constantisation functions. I.e. the last behaviour, probably of the z-axis, is mimicked.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000083">Todo:</a></b></dt><dd>If border strategies are mixed, make the corners do something defined.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000084">Todo:</a></b></dt><dd>If border strategies are mixed, make the corners do something defined.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">axes</td><td>Axes to apply borderFlag to. One or more of {GO_X,GO_Y,GO_Z} or'ed together. Default is all axes. </td></tr>
@@ -761,7 +761,7 @@ template&lt;class T &gt; </div>
       </table>
 </div><div class="memdoc">
 <p>Sets the position of the subblock in the parent block. Take care, this uses internal pointer differences for the parent which get invalid if you change the diffs in the parent.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000086">Todo:</a></b></dt><dd><p class="startdd">Try out if borders are set correctly. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000087">Todo:</a></b></dt><dd><p class="startdd">Try out if borders are set correctly. </p>
 <p class="enddd">Enable own border flags or borders from parent as option. Should work easily, but try.</p>
 </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>

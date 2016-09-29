@@ -34,7 +34,7 @@ namespace goGUI
             ImageControl ();
             virtual ~ImageControl ();
 
-            goAutoPtr<goSignal3D<void> > loadImage ();
+            void loadImage ();
             void addImage (goAutoPtr<goSignal3DBase<void> > img);
 
             void setImageView (ImageView* iv);

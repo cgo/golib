@@ -19,9 +19,6 @@
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
-#ifdef HAVE_IEEE754_H
-#include <ieee754.h>
-#endif
 
 #define GO_PROJECT_NAME		"libGo"
 #define GO_PROJECT_VERSION	"0.4.0"
@@ -92,13 +89,6 @@ typedef goInt32 goIndex_t;
 ///
 ///
 typedef double goDouble;
-#ifdef HAVE_IEEE754_H
-///
-typedef ieee754_double goIeee_double;
-#else 
-typedef goDouble goIeee_double;
-#endif
-///
 typedef float	goFloat;
 //
 

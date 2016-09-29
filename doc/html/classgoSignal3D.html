@@ -651,7 +651,7 @@ goPtrdiff_t *&#160;</td><td class="memItemRight" valign="bottom"><b>myChannelOff
 class goSignal3D&lt; T &gt;</h3>
 
 <p>Up to 3-dimensional (signal) data container. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000047">Todo:</a></b></dt><dd>The size is initially (0,0,0). That may lead to segfaults where getPtr() is used on zero-size signals. Maybe it is better to set size to (1,1,1) by default.</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000048">Todo:</a></b></dt><dd>The size is initially (0,0,0). That may lead to segfaults where getPtr() is used on zero-size signals. Maybe it is better to set size to (1,1,1) by default.</dd></dl>
 <dl class="bug"><dt><b><a class="el" href="bug.html#_bug000005">Bug:</a></b></dt><dd>The size is initially (0,0,0). That may lead to segfaults where getPtr() is used on zero-size signals. Maybe it is better to set size to (1,1,1) by default.</dd></dl>
 <p>The memory layout is sort of optimized to get some data locality when accessing the data locally in all dimensions. </p><dl class="section author"><dt>Author</dt><dd>Christian Gosch </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="dwt_8cc-example.html#_a0">dwt.cc</a>, and <a class="el" href="filter3d_8cc-example.html#_a0">filter3d.cc</a>.</dd>
@@ -814,7 +814,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Deletes the memory used by the block data. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000082">Todo:</a></b></dt><dd>Take care what happens when axes are rotated. Nothing bad should happen though. </dd></dl>
+<p>Deletes the memory used by the block data. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000083">Todo:</a></b></dt><dd>Take care what happens when axes are rotated. Nothing bad should happen though. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classgoSignal3DBase.html">goSignal3DBase&lt; T &gt;</a>.</p>
 
