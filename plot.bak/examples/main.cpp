@@ -19,7 +19,7 @@
 #include <gosignal3dgenericiterator.h>
 #include <gofileio.h>
 
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #if 0
 class MyArea : public Gtk::DrawingArea
@@ -37,7 +37,7 @@ class MyArea : public Gtk::DrawingArea
             Gtk::Allocation allocation = get_allocation();
             const int width = allocation.get_width();
             const int height = allocation.get_height();
-            
+
             Cairo::Matrix m; // (double(width), 0.0, 0.0, double(height), 0.0, 0.0);
             // m.scale (width, height);
             // m.translate (0.0, 0.0);
@@ -54,7 +54,7 @@ template <class T>
 class MyPoints2D : public NSPACE ::Points2D <T>
 {
     public:
-        MyPoints2D () 
+        MyPoints2D ()
             : NSPACE ::Points2D <T> (),
               myMatrix (0, 0)
         {
@@ -78,8 +78,8 @@ class MyPoints2D : public NSPACE ::Points2D <T>
 
         virtual T x (int i) const { return myMatrix (i, 0); }
         virtual T y (int i) const { return myMatrix (i, 1); }
-        
-        virtual void set (int i, T x, T y) 
+
+        virtual void set (int i, T x, T y)
         {
             myMatrix (i, 0) = x;
             myMatrix (i, 1) = y;
@@ -102,7 +102,7 @@ typedef double Real;
 int main (int argc, char* argv[])
 {
     Gtk::Main kit (argc, argv);
-   
+
     NSPACE ::FontList fl;
 
     const int N = 100;
@@ -123,7 +123,7 @@ int main (int argc, char* argv[])
     com[0] = M_PI; com[1] = 0.0;
     goMath::translate (M, com);
     ((NSPACE ::Object2DPoints <MyPoints2D<goFloat>, goFloat >*)mypoints.get())->points() = M;
-    
+
     printf ("Size: %ld\n", ((NSPACE ::Object2DPoints <MyPoints2D<goFloat>, goFloat >*)mypoints.get())->points().size ());
 
     Points_t* p1 = (Points_t*)points.get();
@@ -134,7 +134,7 @@ int main (int argc, char* argv[])
         p1->points().set (i, t, ::sin (t));
         p2->points().set (i, t, ::cos (t));
     }
-    
+
     p1->lineTraits().setColour (NSPACE ::RGBA (1.0, 0.0, 0.0));
     p2->lineTraits().setColour (NSPACE ::RGBA (0.0, 0.0, 1.0, 0.2));
 

@@ -5,7 +5,7 @@
 
 
 #include <goplot/object2dbox.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 goPlot::Object2DBox::Object2DBox (goDouble x1, goDouble y1, goDouble x2, goDouble y2)
     : Object2D (),

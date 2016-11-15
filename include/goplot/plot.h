@@ -10,7 +10,7 @@
 #define NSPACE goPlot
 
 #include <math.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 // #include <pango/pangocairo.h>
 
 #ifndef GOMATRIX_H
@@ -29,7 +29,7 @@ namespace goPlot
 
     // template <class Points, class Real> class Graph;
 
-    /** 
+    /**
      * @brief Base class for types which provide 2D points.
      * @param Real Real type (float or double)
      */
@@ -40,7 +40,7 @@ namespace goPlot
                 Points2DT () { };
                 explicit Points2DT (int N) { };
                 virtual ~Points2DT () { };
-               
+
                 //! Reimplement these.
                 //! Return i'th point x value
                 virtual Real x (int i) const { return Real(0); }
@@ -54,7 +54,7 @@ namespace goPlot
 
     typedef Points2DT<goDouble> Points2D;
 
-    /** 
+    /**
      * @brief Simple 2D points provider. Just stores the points in a C array.
      */
     template <class Real>
@@ -107,8 +107,8 @@ namespace goPlot
                 }
             };
 
-            virtual void set (int i, Real x, Real y) 
-            { 
+            virtual void set (int i, Real x, Real y)
+            {
                 Real* p = &myPoints[i * 2];
                 p[0] = x;
                 p[1] = y;
@@ -126,7 +126,7 @@ namespace goPlot
             bool   myDelete;
     };
 
-    /** 
+    /**
      * @brief Points2D class for accessing points in a goMath::Matrix.
      *
      * The matrix is stored in a goAutoPtr, so you can use a matrix object in some application code
@@ -143,9 +143,9 @@ namespace goPlot
                     Points2D (),
                     M (new goMath::Matrix<T> (N,2)) { }
 
-                /** 
+                /**
                  * @brief Constructor.
-                 * 
+                 *
                  * @param m Matrix auto pointer. If the pointer is null, a new matrix is created
                  * instead with size 1.
                  */
@@ -157,11 +157,11 @@ namespace goPlot
                         M = new goMath::Matrix<T> (1,2);
                 }
 
-                /** 
+                /**
                  * @brief Constructor.
-                 * 
+                 *
                  * Copies the points in m.
-                 * 
+                 *
                  * @param m Configuration matrix, one point per row.
                  */
                 Points2DMatrix (const goMath::Matrix<T>& m)
@@ -174,7 +174,7 @@ namespace goPlot
 
                 goMatrix<T>&       matrix () { return *M; }
                 const goMatrix<T>& matrix () const { return *M; }
-                
+
                 //! Reimplement these.
                 //! Return i'th point x value
                 virtual goDouble x (int i) const { return (*M)(i, 0); }
@@ -184,12 +184,12 @@ namespace goPlot
                 virtual void set (int i, goDouble x, goDouble y) { (*M) (i, 0) = x; (*M) (i, 1) = y; }
                 //! Return number of points
                 virtual size_t size () const { return const_cast<Points2DMatrix<T>*>(this)->M->getRows (); } // sorry :)
-            
+
             private:
                 goAutoPtr<goMath::Matrix<T> > M;
         };
 
-    /** 
+    /**
      * @brief Colour class with alpha channel.
      */
     class RGBA
@@ -203,7 +203,7 @@ namespace goPlot
             double r, g, b, a;
     };
 
-    /** 
+    /**
      * @brief Simple affine transformation representation (2x2 matrix and translation vector).
      *
      * Represents an affine transformation, essentially
@@ -229,7 +229,7 @@ namespace goPlot
 
             Trafo2DT (const Trafo2DT<Real>& t);
             Trafo2DT<Real>& operator= (const Trafo2DT<Real>& t);
-            
+
 
             virtual ~Trafo2DT ();
 
@@ -244,7 +244,7 @@ namespace goPlot
 
     typedef Trafo2DT<real> Trafo2D;
 
-    /** 
+    /**
      * @brief Base class for all 2D drawable objects.
      */
     class Object2D
@@ -265,7 +265,7 @@ namespace goPlot
             bool visible () const;
             void setVisible (bool t);
 
-            void applyTransform (cairo_t* cr); 
+            void applyTransform (cairo_t* cr);
 
         protected:
             Object2D ();
@@ -275,8 +275,8 @@ namespace goPlot
             cairo_t       *myContext;
             bool           myVisible;
     };
-    
-    /** 
+
+    /**
      * @brief Line properties.
      */
     class LineTraits
@@ -304,4 +304,3 @@ namespace goPlot
     /** @} */
 };
 #endif
-

@@ -7,22 +7,22 @@
 #include <goplot/object2dimage.h>
 
 #include <goplot/plot.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #include <exception>
 
 namespace goPlot
 {
     Object2DImage::Object2DImage ()
-        : Object2D (), 
+        : Object2D (),
         myCairoFormat (CAIRO_FORMAT_ARGB32),
         mySurface (0),
         myData (0)
     {
     }
 
-    Object2DImage::~Object2DImage () 
-    { 
+    Object2DImage::~Object2DImage ()
+    {
         if (mySurface)
         {
             cairo_surface_destroy (mySurface);
@@ -30,9 +30,9 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Set image.
-     * 
+     *
      * @param image Image data (must match the format)
      * @param format Format, one of ARGB32, RGB24, A8, A1 (analog to Cairo)
      * @param width Width of the image
@@ -72,10 +72,10 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Creates an image of (width x height)
      * @note The allocated data has stride \c stride().
-     * It is found with 
+     * It is found with
      * \c cairo_format_stride_for_width. Keep this in mind when working with the
      * data!
      *
@@ -108,9 +108,9 @@ namespace goPlot
         mySurface = cairo_image_surface_create_for_data (myData, myCairoFormat, width, height, stride);
     }
 
-    /** 
+    /**
      * @brief Get the data pointer.
-     * 
+     *
      * @return Data pointer.
      */
     unsigned char* Object2DImage::data ()
@@ -118,9 +118,9 @@ namespace goPlot
         return cairo_image_surface_get_data (mySurface);
     }
 
-    /** 
+    /**
      * @brief Get image width.
-     * 
+     *
      * @return Width in pixels
      */
     int Object2DImage::width () const
@@ -128,9 +128,9 @@ namespace goPlot
         return cairo_image_surface_get_width (mySurface);
     }
 
-    /** 
+    /**
      * @brief Get image height.
-     * 
+     *
      * @return Height in pixels
      */
     int Object2DImage::height () const
@@ -138,9 +138,9 @@ namespace goPlot
         return cairo_image_surface_get_height (mySurface);
     }
 
-    /** 
+    /**
      * @brief Get the stride in bytes.
-     * 
+     *
      * @return Stride (number of bytes per row).
      */
     int Object2DImage::stride () const

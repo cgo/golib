@@ -7,7 +7,7 @@
 #include <goplot/object2dpoints.h>
 
 #include <goplot/plot.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #ifndef GOAUTOPTR_H
 # include <goautoptr.h>
@@ -15,10 +15,10 @@
 
 namespace goPlot
 {
-    Object2DPoints::Object2DPoints (size_t N) 
+    Object2DPoints::Object2DPoints (size_t N)
         : Object2D (),
-        myPoints (new Points2DMatrix<goFloat> (N)), 
-        myLineTraits () 
+        myPoints (new Points2DMatrix<goFloat> (N)),
+        myLineTraits ()
     {
         myLineTraits.setWidth (1.0);
     }

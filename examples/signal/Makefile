@@ -1,19 +1,20 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
-#Template version 
+#Template version
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
 
 CXX		= g++
-CXXARGS		= -c   -D HAVE_CONFIG_H -O2 $(CPPFLAGS)
+CXXARGS		= -c   -D HAVE_CONFIG_H -O2 $(CPPFLAGS) `pkg-config --cflags golib`
 
 LD		= g++
-LDARGS		= $(LDFLAGS) 
+LDARGS		= $(LDFLAGS) `pkg-config --libs golib`
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -lGo -lGomatlab
+#LIBS		=  -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
+#INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
+INCLUDE = ""
 
 TARGET		= signal3d
 
@@ -24,7 +25,7 @@ TARGET		= signal3d
 %.o: %.cc
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
 SOURCEDIRS = .
-SOURCES = 
+SOURCES =
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cxx))
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cpp))
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cc))
@@ -38,4 +39,3 @@ $(TARGET): $(OBJECTS)
 	$(LD) $(LDARGS) $(LIBS) -o $(TARGET) $(OBJECTS)
 clean:
 	rm -f *~ *.o
-

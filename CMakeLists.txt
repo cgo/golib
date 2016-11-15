@@ -56,14 +56,14 @@ endif (APPLE)
 # gui
 # gl
 # matlab
-SET (BASE_SOURCES 
+SET (BASE_SOURCES
  # src/math/mean.cpp
  # src/math/variance.cpp
 
  src/misc/goargs.cpp
  src/misc/goofffile.cpp
  src/misc/godate.cc # DEPRECATE
- src/misc/gofileio.cc 
+ src/misc/gofileio.cc
  # src/misc/gostatusobject.cc  # not in windows!
  src/misc/gotransferfunction.cc  # DEPRECATE -- apparently only used in the Diplomarbeit renderer
  # src/misc/goplot.cpp  # not in windows!
@@ -88,11 +88,11 @@ SET (BASE_SOURCES
 
 ## Base and stuff
 SET (BASE_SOURCES ${BASE_SOURCES}
- src/misc/goobjectmessage.cc 
- src/misc/goglobal.cpp 
+ src/misc/goobjectmessage.cc
+ src/misc/goglobal.cpp
  src/misc/golog.cpp
- src/misc/goobjectbase.cc 
- src/misc/goexception.cc 
+ src/misc/goobjectbase.cc
+ src/misc/goexception.cc
  src/nifty/gorandom.cc
  src/types/gotype.cpp)
 
@@ -107,7 +107,7 @@ set (GNUPLOT_SOURCES
   src/plot/gnuplot.cpp  # not in windows!
   src/plot/gnuplot_helperfunctions.cpp
   src/plot/goplotter.cpp
-  )  
+  )
 
 
 IF (NOT WIN32)
@@ -140,11 +140,11 @@ SET (NETWORK_SOURCES
 
 ## Data containers
 SET (CONTAINER_SOURCES
- src/data/goarrayi.cc 
- # src/data/golisti.cc 
- # src/data/goheapi.cc 
- # src/data/gotreei.cc 
- src/data/gobtreei.cpp 
+ src/data/goarrayi.cc
+ # src/data/golisti.cc
+ # src/data/goheapi.cc
+ # src/data/gotreei.cc
+ src/data/gobtreei.cpp
  src/data/goqueuei.cc
  src/data/gostring.cc
  src/data/gohashtablei.cpp)
@@ -168,20 +168,20 @@ SET (MATH_SOURCES
  src/math/getknee.cpp
  src/math/goresample.cpp
  src/math/govector.cpp
- src/math/gokmeans.cpp 
- src/math/gokmeansspatial.cpp 
- src/math/go3vectori.cc 
- src/math/go44matrix.cc 
- src/math/go4vectori.cc 
- src/math/gomatrix.cpp 
- src/math/gocomplex.cc 
- src/math/goposition.cc 
- src/math/goquaternion.cc 
- # src/math/golinearalgebra.cc 
- # src/math/gopdf.cpp 
- src/math/gogausspdf.cpp 
+ src/math/gokmeans.cpp
+ src/math/gokmeansspatial.cpp
+ src/math/go3vectori.cc
+ src/math/go44matrix.cc
+ src/math/go4vectori.cc
+ src/math/gomatrix.cpp
+ src/math/gocomplex.cc
+ src/math/goposition.cc
+ src/math/goquaternion.cc
+ # src/math/golinearalgebra.cc
+ # src/math/gopdf.cpp
+ src/math/gogausspdf.cpp
  src/math/gopoint.cpp  ## Deprecate this, do not use
- src/math/gomath.cpp 
+ src/math/gomath.cpp
  # src/math/goeigenvalue.cpp
  src/math/cg.cpp
  src/math/integrate.cpp
@@ -189,9 +189,9 @@ SET (MATH_SOURCES
  src/math/gopointcloud.cpp
  src/math/gocurve.cpp
  )
- 
+
  set (SEISPACK_SOURCES
- src/seispack/bakvec.c	
+ src/seispack/bakvec.c
  src/seispack/balanc.c
  src/seispack/balbak.c
  src/seispack/bandr.c
@@ -270,7 +270,7 @@ SET (MATH_SOURCES
 
 ## goSignal
 SET (SIGNAL_SOURCES
- src/signal/icv.cpp
+ # src/signal/icv.cpp
     src/signal/smooth.cpp
     src/signal/convert.cpp
     src/signal/canny.cpp
@@ -284,22 +284,22 @@ SET (SIGNAL_SOURCES
  src/signal/transform.cpp
  src/signal/gosignal3dref.cpp
  src/signal/gogaussimage.cpp
- src/signal/gosignal3dbase.cpp 
- src/signal/gosubsignal3d.cc 
- src/signal/gosignal3d.cc 
- src/signal/gofilter3d.cpp 
- src/signal/godwt.cc 
- src/signal/gohaar3d.cpp 
- src/signal/godwt3d.cpp 
- src/signal/gofilter1d.cpp 
- src/signal/gosignalhelper.cpp 
- src/signal/gohistogram.cpp 
- src/signal/gosignal3diterator.cpp 
+ src/signal/gosignal3dbase.cpp
+ src/signal/gosubsignal3d.cc
+ src/signal/gosignal3d.cc
+ src/signal/gofilter3d.cpp
+ src/signal/godwt.cc
+ src/signal/gohaar3d.cpp
+ src/signal/godwt3d.cpp
+ src/signal/gofilter1d.cpp
+ src/signal/gosignalhelper.cpp
+ src/signal/gohistogram.cpp
+ src/signal/gosignal3diterator.cpp
  src/signal/binaryimage.cpp
  ## Bei math Namespace aendern:
  src/math/godenoise.cpp
  src/math/stencil.cpp
- src/math/gradient.cpp 
+ src/math/gradient.cpp
  src/math/divnormalizedgrad2d.cpp
  src/math/divergence.cpp
  src/math/gobiorthowavelet.cpp
@@ -344,8 +344,8 @@ endif (MODULE_VIDEO)
 if (MODULE_GNUPLOT)
   set (SOURCES ${SOURCES} ${GNUPLOT_SOURCES})
 endif (MODULE_GNUPLOT)
-  
-  
+
+
 
 
 
@@ -360,7 +360,7 @@ ENDIF (BUILD_PYTHON_EMBED)
 SET (GOPATH ${PROJECT_SOURCE_DIR})
 
 #
-# Find out the machine type. Currently, assume only 
+# Find out the machine type. Currently, assume only
 # x86 and amd64 machines are supported.
 #
 EXEC_PROGRAM        (uname ARGS -m OUTPUT_VARIABLE UNAME_M)
@@ -434,10 +434,10 @@ IF (WIN32)
         FIND_LIBRARY (F77BLAS NAMES f77blas PATHS $ENV{HOME}/lib ${GOPATH}/extra/lib)
         FIND_LIBRARY (LAPACK NAMES lapack PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
         FIND_LIBRARY (BLAS NAMES cblas blas PATHS $ENV{HOME}/lib /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-        FIND_LIBRARY (DEVIL NAMES DevIL IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-        FIND_LIBRARY (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+        FIND_LIBRARY (DEVIL NAMES DevIL IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
+        FIND_LIBRARY (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
         FIND_LIBRARY (PTHREAD NAMES pthread PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib)
-ELSE (WIN32) 
+ELSE (WIN32)
   if (APPLE)
     message ("Building for MACOSX")
     find_library (ACCELERATE Accelerate)
@@ -464,17 +464,22 @@ ELSE (WIN32)
     link_libraries      (${LAPACKE})
     include_directories (${GOPATH}/tools/lapacke/include)
     add_definitions     (-DHAVE_LAPACK_CONFIG_H -DLAPACK_COMPLEX_STRUCTURE)
-    find_library        (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-    find_library        (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-    link_libraries      (${DEVIL})
-    link_libraries      (${DEVILU})
-    
-  else (APPLE) 
+    pkg_search_module   (DEVIL REQUIRED IL)
+    pkg_search_module   (DEVILU REQUIRED ILU)
+
+    #find_library        (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
+    #find_library        (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
+    link_libraries      (${DEVIL_LDFLAGS})
+    link_libraries      (${DEVILU_LDFLAGS})
+    set (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${DEVIL_INCLUDE_DIRS})
+    set (EXTRA_INCLUDE_PATH ${EXTRA_INCLUDE_PATH} ${DEVILU_INCLUDE_DIRS})
+
+  else (APPLE)
     FIND_LIBRARY (LAPACK_ATLAS NAMES lapack_atlas PATHS /usr/lib /usr/lib64 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (LAPACK NAMES lapack PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
     FIND_LIBRARY (BLAS NAMES blas PATHS /usr/lib/atlas/sse2 /usr/lib/atlas ${GOPATH}/extra/lib)
-    FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
-    FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib) 
+    FIND_LIBRARY (DEVIL NAMES IL PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
+    FIND_LIBRARY (DEVILU NAMES ILU PATHS /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
     FIND_LIBRARY (PTHREAD NAMES pthread PATHS /usr/lib /usr/local/lib)
   endif (APPLE)
 ENDIF (WIN32)
@@ -565,14 +570,14 @@ INCLUDE_DIRECTORIES (${EXTRA_INCLUDE_PATH}
                      ${GOPATH}/plot/include
                      ${GOPATH}/extra/include
                      $ENV{HOME}/include) # Only in windows!
-                        
 
-##                 
+
+##
 ## If your system compiler is a gcc 4.x,
 ## set this explicitly to a 3.x version if using Matlab.
 ## Matlab links to the old libstdc++ version 5 which
 ## causes severe crashes when using it with libstdc++ version 6.
-##                 
+##
 #IF (BUILD_MATLAB_MODULE AND ${MACHINE_TYPE} STREQUAL "x86")
 #    SET (CMAKE_CXX_COMPILER g++-3.3)
 #    SET (CMAKE_C_COMPILER gcc-3.3)
@@ -587,7 +592,7 @@ IF (BUILD_WITH_GCC_3_4)
     SET (CMAKE_CXX_COMPILER g++-3.4)
     SET (CMAKE_C_COMPILER gcc-3.4)
 ENDIF (BUILD_WITH_GCC_3_4)
-                     
+
 # Add -MT flag!
 IF(UNIX)
  ADD_DEFINITIONS     (-Wall $ENV{CPPFLAGS} -D_REENTRANT)
@@ -633,7 +638,7 @@ ENDIF (PTHREAD)
 CONFIGURE_FILE      (${GOPATH}/include/goconfig.h.cmake.in
                      ${GOPATH}/include/goconfig.h)
 
-		   
+
 #
 # pkg-config file
 

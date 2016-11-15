@@ -8,7 +8,7 @@
 #define GOPLOT_OBJECT2DIMAGE_H
 
 #include <goplot/plot.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #include <exception>
 
@@ -26,7 +26,7 @@ namespace goPlot
     /** @addtogroup cairoplot
      * @{
      */
-    /** 
+    /**
      * @brief Image object.
      * @note Set the transform with \c setTransform() sensibly, so the dimensions fit in the
      * graph this object is added to.
@@ -37,8 +37,8 @@ namespace goPlot
 
             //= Same as CAIRO_FORMAT_ARGB23 etc.
             enum {
-                ARGB32 = 0, 
-                RGB24, 
+                ARGB32 = 0,
+                RGB24,
                 A8,
                 A1
             };

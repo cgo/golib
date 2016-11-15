@@ -6,12 +6,12 @@
 
 #include <goplot/cairoplot.h>
 #include <govector.h>
-#include <cairo/cairo.h>
-#include <cairo/cairo-pdf.h>
-#include <cairo/cairo-ps.h>
-#include <cairo/cairo-svg.h>
+#include <cairo.h>
+#include <cairo-pdf.h>
+#include <cairo-ps.h>
+#include <cairo-svg.h>
 
-template <class T> 
+template <class T>
 goAutoPtr<goPlot::Graph> plotT (const goVector<T>& x, const goVector<T>& y, goAutoPtr<goPlot::Graph> g)
 {
     goAutoPtr<goPlot::Graph> graph = g;
@@ -30,15 +30,15 @@ goAutoPtr<goPlot::Graph> plotT (const goVector<T>& x, const goVector<T>& y, goAu
     goDouble ymin = goMath::min (y);
     goDouble ymax = goMath::max (y);
 
-    graph->setDimensions (goMath::min (xmin, x0), 
-                          goMath::max (xmax, x1), 
-                          goMath::min (ymin, y0), 
+    graph->setDimensions (goMath::min (xmin, x0),
+                          goMath::max (xmax, x1),
+                          goMath::min (ymin, y0),
                           goMath::max (ymax, y1));
 
     const goSize_t N = x.getSize();
 
     goAutoPtr<goPlot::Points2DMatrix<T> > points = new goPlot::Points2DMatrix<T> (N);
-    
+
     for (goSize_t i = 0; i < N; ++i)
     {
         points->set (i, x[i], y[i]);
@@ -51,7 +51,7 @@ goAutoPtr<goPlot::Graph> plotT (const goVector<T>& x, const goVector<T>& y, goAu
     return graph;
 }
 
-template <class T> 
+template <class T>
 goAutoPtr<goPlot::Graph> plotT (const goMatrix<T>& curve, goAutoPtr<goPlot::Graph> g)
 {
     goAutoPtr<goPlot::Graph> graph = g;
@@ -67,14 +67,14 @@ goAutoPtr<goPlot::Graph> plotT (const goMatrix<T>& curve, goAutoPtr<goPlot::Grap
 }
 
 
-/** 
+/**
  * @brief Plot a curve given as configuration matrix.
  *
  * The graph will be resized to fit.
  *
  * @param curve Configuration matrix, one point per row.
  * @param g Graph. If Null, a new graph will be created.
- * 
+ *
  * @return Pointer to the graph. If \c g was not null, the same as g.
  */
 goAutoPtr<goPlot::Graph> goPlot::plot (const goMatrixf& curve, goAutoPtr<goPlot::Graph> g)
@@ -82,14 +82,14 @@ goAutoPtr<goPlot::Graph> goPlot::plot (const goMatrixf& curve, goAutoPtr<goPlot:
     return plotT<goFloat> (curve, g);
 }
 
-/** 
+/**
  * @brief Plot a curve given as configuration matrix.
- * 
+ *
  * The graph will be resized to fit.
  *
  * @param curve Configuration matrix, one point per row.
  * @param g Graph. If Null, a new graph will be created.
- * 
+ *
  * @return Pointer to the graph. If \c g was not null, the same as g.
  */
 goAutoPtr<goPlot::Graph> goPlot::plot (const goMatrixd& curve, goAutoPtr<goPlot::Graph> g)
@@ -97,15 +97,15 @@ goAutoPtr<goPlot::Graph> goPlot::plot (const goMatrixd& curve, goAutoPtr<goPlot:
     return plotT<goDouble> (curve, g);
 }
 
-/** 
+/**
  * @brief Plot a curve given as coordinate vectors.
- * 
+ *
  * The graph will be resized to fit.
  *
  * @param x x coordinates of the points.
  * @param y y coordinates of the points.
  * @param g Graph. If Null, a new graph will be created.
- * 
+ *
  * @return Pointer to the graph. If \c g was not null, the same as g.
  */
 goAutoPtr<goPlot::Graph> goPlot::plot (const goVectorf& x, const goVectorf& y, goAutoPtr<goPlot::Graph> g)
@@ -113,15 +113,15 @@ goAutoPtr<goPlot::Graph> goPlot::plot (const goVectorf& x, const goVectorf& y, g
     return plotT<goFloat> (x, y, g);
 }
 
-/** 
+/**
  * @brief Plot a curve given as coordinate vectors.
- * 
+ *
  * The graph will be resized to fit.
  *
  * @param x x coordinates of the points.
  * @param y y coordinates of the points.
  * @param g Graph. If Null, a new graph will be created.
- * 
+ *
  * @return Pointer to the graph. If \c g was not null, the same as g.
  */
 goAutoPtr<goPlot::Graph> goPlot::plot (const goVectord& x, const goVectord& y, goAutoPtr<goPlot::Graph> g)
@@ -138,7 +138,7 @@ static cairo_surface_t* make_surface (const goString& filename, int w, int h)
     }
     if (goString (filename.getPtr() + filename.getSize() - 4) == ".eps")
     {
-        cairo_surface_t* s = ::cairo_ps_surface_create (filename.toCharPtr(), w, h); 
+        cairo_surface_t* s = ::cairo_ps_surface_create (filename.toCharPtr(), w, h);
         ::cairo_ps_surface_set_eps (s, (1 == 1));
         return s;
     }
@@ -151,22 +151,22 @@ static cairo_surface_t* make_surface (const goString& filename, int w, int h)
     return 0;
 }
 
-/** 
+/**
  * @brief Plot a graph to a file.
  *
  * Currently, PDF, EPS and SVG files are supported through the respective functions of Cairo.
- * 
+ *
  * @param g Graph to plot.
  * @param filename Filename. The ending determines the format: one of .pdf, .eps, .svg.
  * @param w Width of the result in points
  * @param h Height of the result in points
- * 
+ *
  * @return True if successful, false otherwise.
  */
 bool goPlot::plot (goAutoPtr<goPlot::Graph> g, const goString& filename, int w, int h)
 {
     cairo_surface_t* s = make_surface (filename, w, h);
-    
+
     if (!s)
         return false;
 
@@ -174,7 +174,7 @@ bool goPlot::plot (goAutoPtr<goPlot::Graph> g, const goString& filename, int w, 
 
     if (!context)
         return false;
-            
+
     plot (g, context, w, h);
 
     ::cairo_surface_finish (s);
@@ -184,11 +184,11 @@ bool goPlot::plot (goAutoPtr<goPlot::Graph> g, const goString& filename, int w, 
     return true;
 }
 
-/** 
+/**
  * @brief Plot to a given Cairo context.
  *
  * Use the other goPlot::plot function to plot directly to files in a more convenient way.
- * 
+ *
  * @param g Graph to plot.
  * @param context Cairo context to plot to.
  * @param w Width of the graph in points.

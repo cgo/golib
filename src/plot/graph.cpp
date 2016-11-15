@@ -8,7 +8,7 @@
 
 #include <goautoptr.h>
 
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 #include <goplot/plot.h>
 #include <goplot/graphaxis.h>
@@ -37,16 +37,16 @@
 
 namespace goPlot
 {
-    /** 
+    /**
      * @brief Construct a graph with axes.
-     * 
+     *
      * @param dim Dimension -- currently, only 2 is supported.
      */
     Graph::Graph (int dim)
-        : Object2D  (), 
-        myAxes    (), 
-        myObjects (), 
-        myDim     (dim), 
+        : Object2D  (),
+        myAxes    (),
+        myObjects (),
+        myDim     (dim),
         myTitle   ("")
     {
         if (dim < 1)
@@ -115,7 +115,7 @@ namespace goPlot
     {
     }
 
-    /** 
+    /**
      * @brief Disables all axes.
      *
      * This can e.g. be used if you want to use this graph as an image display.
@@ -129,7 +129,7 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Multiply the current transformation so that
      * the Y axis is mirrored.
      *
@@ -142,7 +142,7 @@ namespace goPlot
         this->setTransform (t);
     }
 
-    /** 
+    /**
      * @brief Removes all objects.
      */
     void Graph::clear ()
@@ -155,11 +155,11 @@ namespace goPlot
     //= Convenience functions for adding new objects.
     //=
 
-    /** 
+    /**
      * @brief Add a new curve to the graph.
-     * 
+     *
      * @param c Curve points as configuration matrix (one point per row)
-     * 
+     *
      * @return Pointer to the new Object2DPoints.
      */
     goAutoPtr<Object2DPoints> Graph::addCurve (const goMatrixd& c)
@@ -173,13 +173,13 @@ namespace goPlot
         return points;
     }
 
-    /** 
+    /**
      * @brief Makes a new Object2DImage with the given parameters.
-     * 
+     *
      * @param width Width in pixels
      * @param height Height in pixels
      * @param format Format, one of Object2DImage::ARGB32, Object2DImage::RGB24, Object2DImage::A8
-     * 
+     *
      * @return Pointer to the new Object2DImage
      */
     goAutoPtr<Object2DImage> Graph::makeImage (int width, int height, int format)
@@ -210,13 +210,13 @@ namespace goPlot
         return img;
     }
 
-    /** 
+    /**
      * @brief Adds an image to the graph.
      *
      * You may want to adjust the transformation so that the image fits in the graph.
-     * 
+     *
      * @param image The image to draw.
-     * 
+     *
      * @return Pointer to the new Object2DImage object.
      */
     goAutoPtr<Object2DImage> Graph::addImage (const goSignal3DBase<void>& image)
@@ -262,9 +262,9 @@ namespace goPlot
                 }
                 break;
             default:
-                goLog::warning ("Graph::addImage: channel count not supported."); 
+                goLog::warning ("Graph::addImage: channel count not supported.");
                 this->objects2D().pop_back (); // remove the object added by makeImage()
-                return 0; 
+                return 0;
                 break;
         }
 
@@ -275,11 +275,11 @@ namespace goPlot
     //= End convenience functions.
     //================================================================================
 
-    /** 
+    /**
      * @brief Set the dimensions of this graph's axes.
-     * 
+     *
      * Convenience functions calling setLower and setUpper of all axes.
-     * Also sets the tics to 10 tics on each axis. 
+     * Also sets the tics to 10 tics on each axis.
      *
      * The default value range for the axes is [0,1].
      * Note that these dimensions define the "size" of the graph, that means
@@ -313,7 +313,7 @@ namespace goPlot
     }
 
 
-    /** 
+    /**
      * @brief Set the font for the tics text.
      *
      * Convenience function that sets the font of all axes to \c f.
@@ -329,51 +329,51 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Number of dimensions (always 2)
-     * 
+     *
      * @return 2.
      */
     int              Graph::dim () const { return myDim; }
 
 
-    /** 
+    /**
      * @brief Get a pointer to a specific axis.
-     * 
+     *
      * Valid numbers are {0,1,2,3}. 0,1 are the x,y axes, 2 is the upper x axis, 3 is the right y axis.
      *
      * @param i Number of the axis.
-     * 
+     *
      * @return Pointer to the GraphAxis object.
      */
-    goAutoPtr<GraphAxis>  Graph::axis (int i) 
-    { 
+    goAutoPtr<GraphAxis>  Graph::axis (int i)
+    {
         if (i >= 0 && i < int (this->myAxes.size ()))
             return myAxes[i];
 
         throw std::exception (); // ("Graph::axis(): Index out of range");
     }
 
-    /** 
+    /**
      * @brief Get a pointer to a specific axis.
-     * 
+     *
      * Valid numbers are {0,1,2,3}. 0,1 are the x,y axes, 2 is the upper x axis, 3 is the right y axis.
      *
      * @param i Number of the axis.
-     * 
+     *
      * @return Pointer to the GraphAxis object.
      */
-    const goAutoPtr<GraphAxis> Graph::axis (int i) const 
-    { 
+    const goAutoPtr<GraphAxis> Graph::axis (int i) const
+    {
         if (i >= 0 && i < this->dim ())
             return myAxes[i];
 
         throw std::exception (); // ("Graph::axis(): Index out of range");
     }
 
-    /** 
+    /**
      * @brief Adds a Object2D to this graph.
-     * 
+     *
      * @param o The object pointer (managed by a goAutoPtr)
      */
     void Graph::add (goAutoPtr<Object2D> o)
@@ -384,9 +384,9 @@ namespace goPlot
         myObjects.push_back (o);
     }
 
-    /** 
+    /**
      * @brief Removes all occurrences of \c o in this graph.
-     * 
+     *
      * @param o Object pointer to remove.
      */
     void Graph::remove (goAutoPtr<Object2D> o)
@@ -402,12 +402,12 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Sets the title of the graph.
      *
-     * The title is not drawn by the Graph::draw() method. 
+     * The title is not drawn by the Graph::draw() method.
      * It is only stored here and should be drawn by the class arranging and plotting the graphs.
-     * 
+     *
      * @param t Title
      */
     void Graph::setTitle (const char* t)
@@ -415,15 +415,15 @@ namespace goPlot
         myTitle = t;
     }
 
-    /** 
+    /**
      * @brief Get the title text.
      * @see setTitle()
-     * 
+     *
      * @return The title text
      */
     const char* Graph::title () const { return myTitle.c_str (); }
 
-    /** 
+    /**
      * @brief Adds a text label.
      *
      * Convenience function that creates a Object2DText and
@@ -451,9 +451,9 @@ namespace goPlot
         return *txt;
     }
 
-    /** 
+    /**
      * @brief Sets the context and hands it on to all axes and drawable objects.
-     * 
+     *
      * @param c The context
      */
     void Graph::setContext (cairo_t* c)
@@ -472,9 +472,9 @@ namespace goPlot
         }
     }
 
-    /** 
+    /**
      * @brief Applies the transform given by the current axes to the given context.
-     * 
+     *
      * This is called by draw() and probably does not need to be called by the user.
      *
      * @param c The context to apply the transformation to.
@@ -486,7 +486,7 @@ namespace goPlot
         cairo_transform (c, &M);
     }
 
-    /** 
+    /**
      * @brief Draws axes (according to their visibilities) and all objects.
      */
     void Graph::draw ()
