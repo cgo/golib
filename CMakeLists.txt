@@ -443,6 +443,8 @@ ELSE (WIN32)
     find_library (ACCELERATE Accelerate)
     # find_library (VECLIB vecLib)
     find_library (PTHREAD NAMES pthread) # PATHS /usr/lib /usr/local/lib)
+    find_library (DEVIL NAMES DevIL IL PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
+    find_library (DEVILU NAMES ILU PATHS $ENV{HOME}/lib /usr/lib /usr/local/lib ${GOPATH}/extra/lib $ENV{HOME}/Software/lib)
 
     if (ACCELERATE)
       message ("Found Accelerate")
@@ -592,6 +594,8 @@ IF (BUILD_WITH_GCC_3_4)
     SET (CMAKE_CXX_COMPILER g++-3.4)
     SET (CMAKE_C_COMPILER gcc-3.4)
 ENDIF (BUILD_WITH_GCC_3_4)
+
+set(CMAKE_CXX_STANDARD 11)
 
 # Add -MT flag!
 IF(UNIX)
