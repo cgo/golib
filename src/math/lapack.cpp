@@ -8,7 +8,7 @@
 #include <goconfig.h>
 #include <gotypes.h>
 #include <golapack.h>
-
+#include <gomatrix.h>
 #include <golib_clapack.h>
 
 namespace goMath { namespace Lapack {
@@ -161,6 +161,21 @@ namespace goMath { namespace Lapack {
         return true;
     }
 
+    template<> bool TypeDriver<goFloat>::heev (
+      int matrix_order, char jobz, char uplo, lapack_int n,
+      lapack_complex_float* a, lapack_int lda, float* w )
+    {
+        lapack_int const info = LAPACKE_cheev (matrix_order, jobz, uplo,
+          n, a, lda, w);
+        if (info != 0)
+        {
+            logError (info, "goMath::Lapack::TypeDriver::dposv()");
+            return false;
+        }
+        return true;
+    }
+
+
     void logError (lapack_int info, const char* where)
     {
         if (info < 0)
@@ -183,5 +198,71 @@ namespace goMath { namespace Lapack {
         }
     }
 
-}; };
 
+    template <>
+    bool heev (goMatrix<goComplexf> const& A,
+        std::vector<goVector<goComplexf> >* eigenvectors_ret,
+        goVector<goFloat>& eigenvalues_ret)
+    {
+        typedef goMatrix<goComplexf> matrix_type;
+
+        if (A.getColumns() != A.getRows())
+        {
+            return false;
+        }
+
+        lapack_int const n = A.getRows();
+        lapack_int const nm = A.getRows();
+        char const jobz = eigenvectors_ret ? 'V' : 'N';
+        lapack_complex_float* a = new lapack_complex_float [nm * nm];
+        //= I suppose we store in column-major (from Fortran code).
+        {
+            goSize_t i;
+            goSize_t j;
+            for (i = 0; i < A.getRows(); ++i)
+            {
+                for (j = 0; j < A.getColumns(); ++j)
+                {
+                    lapack_complex_float_real(a[j + i * n]) = A(i, j).re();
+                    lapack_complex_float_imag(a[j + i * n]) = A(i, j).im();
+                }
+            }
+        }
+
+        eigenvalues_ret.setSize (nm);
+        lapack_int const lda = n;
+        char const uplo = 'U'; // FIXME: We store the whole matrix, which is unnecessary.
+        // If only a part is stored, this parameter needs to reflect
+        // which.
+        bool ok = goMath::Lapack::TypeDriver<goFloat>::heev(matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR,
+            jobz, uplo, n, a, lda, eigenvalues_ret.getPtr());
+        if (!ok)
+        {
+            goLog::warning ("heev(): ierr != 0.");
+            delete[] a;
+            return false;
+        }
+
+        //= Copy the eigenvectors.
+        if (eigenvectors_ret)
+        {
+            eigenvectors_ret->resize (nm);
+            for (lapack_int i = 0; i < nm; ++i)
+            {
+                (*eigenvectors_ret)[i].resize (nm);
+                for (int j = 0; j < nm; ++j)
+                {
+                    // FIXME: Are the eigenvectors actually stored in /a/ and
+                    // are they stored row-major?
+                    (*eigenvectors_ret)[i][j].re() = lapack_complex_float_real(a[i + j * nm]);
+                    (*eigenvectors_ret)[i][j].im() = lapack_complex_float_imag(a[i + j * nm]);
+                }
+            }
+        }
+
+        delete[] a;
+        return true;
+    }
+
+
+}; };

@@ -1,5 +1,5 @@
 #Makefile automatically created by mkmakefile (C)Christian Gosch
-#Template version 
+#Template version
 # Fill in __TARGETNAME and __SOURCDIRS as well as all other options
 # you might want to have added.
 
@@ -7,11 +7,13 @@ CXX		= g++
 CXXARGS		= -c   -D HAVE_CONFIG_H -O ${CPPFLAGS}
 
 LD		= g++
-LDARGS		= ${LDFLAGS} 
+LDARGS		= ${LDFLAGS}
 
-LIBS		=  -L$(GOPATH)/../lib -lGo -lGomatlab
+LIBS		= `pkg-config --ldflags golib`
+# -L$(GOPATH)/../lib -lGo -lGomatlab
 
-INCLUDE		=  -I$(GOPATH)/include -I$(MATLAB)/extern/include
+INCLUDE		= `pkg-config --cflags golib`
+# -I$(GOPATH)/include -I$(MATLAB)/extern/include
 
 TARGET		= regionls
 
@@ -22,7 +24,7 @@ TARGET		= regionls
 %.o: %.cc
 	$(CXX) $(CXXARGS) $(INCLUDE) -o $@ $<
 SOURCEDIRS = .
-SOURCES = 
+SOURCES =
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cxx))
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cpp))
 SOURCES := $(SOURCES) $(foreach DIR,$(SOURCEDIRS),$(wildcard $(DIR)/*.cc))
@@ -36,4 +38,3 @@ $(TARGET): $(OBJECTS)
 	$(LD) $(LDARGS) $(LIBS) -o $(TARGET) $(OBJECTS)
 clean:
 	rm -f *~ *.o
-

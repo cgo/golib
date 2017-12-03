@@ -15,7 +15,7 @@
 /** @addtogroup data
  * @{
  */
-/** 
+/**
  * @brief Array class.
  *
  * This array can be used as a replacement for simple
@@ -27,7 +27,7 @@
  * goFixedArray also supports resize, but copies data when resizing and the size is larger than
  * the number of reserved elements.
  *
- * To resize an array, use the \c resize() method. It copies the old content to the new array, if the 
+ * To resize an array, use the \c resize() method. It copies the old content to the new array, if the
  * array must be reallocated. It is only reallocated if the new size is larger than the reserved size.
  * Use the \c setSize() method to allocate newly without copying.
  *
@@ -40,7 +40,7 @@
 template <class T> class goFixedArray
 {
     public:
-        /** 
+        /**
          * @brief Constructor.
          *
          * Makes an array of size \c size, with reserved memory for \c reserve elements in total
@@ -51,12 +51,12 @@ template <class T> class goFixedArray
          * @param reserve Reserved memory in number of elements (default 0)
          * @param resize_overhead Resize overhead in number of elements (default 0)
          */
-        explicit goFixedArray (goSize_t size = 1, goSize_t reserve = 0, goSize_t resize_overhead = 0) 
-            : myArray (0), 
-              mySize (0), 
+        explicit goFixedArray (goSize_t size = 1, goSize_t reserve = 0, goSize_t resize_overhead = 0)
+            : myArray (0),
+              mySize (0),
               myReserved (0),
               myResizeOverhead (resize_overhead),
-              myStride(1), 
+              myStride(1),
               myExternal(false)
         {
             if (size > 0)
@@ -68,26 +68,26 @@ template <class T> class goFixedArray
             }
         }
 
-        goFixedArray (const goFixedArray<T>& other) 
-            : myArray (0), mySize (0), myReserved (0), myResizeOverhead (0), myStride(1), 
+        goFixedArray (const goFixedArray<T>& other)
+            : myArray (0), mySize (0), myReserved (0), myResizeOverhead (0), myStride(1),
               myExternal(false)
         {
             this->operator= (other);
         }
 #if 0
         template <class To>
-        goFixedArray (const goFixedArray<To>& other) 
+        goFixedArray (const goFixedArray<To>& other)
             : myArray (0), mySize (0), myLeftBorder (0), myRightBorder (0), myStride(1), myExternal(false)
         {
             this->operator= (other);
         };
 #endif
         goFixedArray (T* ptr, goSize_t size, goIndex_t stride)
-            : myArray (ptr), 
-              mySize (size), 
+            : myArray (ptr),
+              mySize (size),
               myReserved (size),
               myResizeOverhead (0),
-              myStride (stride), 
+              myStride (stride),
               myExternal (true)
         {
         }
@@ -182,20 +182,25 @@ template <class T> class goFixedArray
             return myArray[i * myStride];
         }
 
-        /** 
+        /**
          * @brief Get the size of the array in number of elements.
-         * 
+         *
          * @note This is not necessarily equal to the number of allocated elements.
          * The number of actually reserved elements can be retrieved with getReserved().
          *
          * @return Size of the array in number of elements.
          */
         goSize_t  getSize        () const { return mySize; }
-        
-        /** 
+
+        /**
+         * @brief Same as getSize().
+         */
+        goSize_t  size           () const { return mySize; }
+
+        /**
          * @brief Get the number of actually allocated elements.
          *
-         * Get the number of elements for which memory was allocated. The \b size 
+         * Get the number of elements for which memory was allocated. The \b size
          * of the array is always lower than or equal to the number of reserved elements.
          *
          * This is done in order to allow for quicker appending of new elements
@@ -207,11 +212,11 @@ template <class T> class goFixedArray
          */
         goSize_t  getReserved    () const { return myReserved; }
 
-        /** 
+        /**
          * @brief Get the number of resize overhead elements.
-         * 
+         *
          * The "resize overhead" is a number of elements
-         * that is used in case of a \c resize() if the new size is larger than the 
+         * that is used in case of a \c resize() if the new size is larger than the
          * number of reserved elements (see \c getReserved()).
          * In that case, memory for \c newSize + \c getResizeOverhead()
          * elements will be allocated while the size will be \c newSize (see \c resize()).<br>
@@ -224,16 +229,16 @@ template <class T> class goFixedArray
         //goIndex_t getRightBorder () const { return myLeftBorder; };
         goIndex_t getStride      () const { return myStride; };
 
-        /** 
+        /**
          * @brief Set the resize overhead in number of elements.
-         * 
+         *
          * @see getResizeOverhead()
          *
          * @param ro The new resize overhead in number of elements.
          */
         void setResizeOverhead (goSize_t ro) { myResizeOverhead = ro; }
 
-        /** 
+        /**
          * @brief Set the size of the array, deleting old content.
          *
          * @see resize()
@@ -275,9 +280,9 @@ template <class T> class goFixedArray
             }
         }
 
-        /** 
+        /**
          * @brief Proper resize with copying.
-         * 
+         *
          * New space will be available at the \b end of the array.
          *
          * If \c newSize is larger than the current reserved space as returned by getReserved(),
@@ -291,7 +296,7 @@ template <class T> class goFixedArray
          * In all other cases, the size is simply adjusted.
          *
          * @param newSize New size of the array in number of elements.
-         * 
+         *
          * @return True if successful, false otherwise.
          */
         bool resize (goSize_t newSize)
@@ -308,7 +313,7 @@ template <class T> class goFixedArray
 
                 myReserved = newSize + myResizeOverhead;
                 mySize = newSize;
-                
+
                 T* temptemp = myArray;
                 myArray = temp;
                 if (temptemp)
@@ -337,29 +342,29 @@ template <class T> class goFixedArray
             }
             return true;
         }
-        
+
         bool operator!= (const goFixedArray<T>& other) const
         {
-            return !this->operator==(other);  
+            return !this->operator==(other);
         }
-        
-        /** 
+
+        /**
          * @brief Get the pointer to the data.
-         * 
+         *
          * @return The pointer to the data.
          */
         T*       getPtr  () { return myArray; }
 
-        /** 
+        /**
          * @brief Get the pointer to the data.
-         * 
+         *
          * @return The pointer to the data.
          */
         const T* getPtr  () const { return myArray; }
 
-        /** 
+        /**
          * @brief Fill the array with \c value.
-         * 
+         *
          * @param value The new value.
          */
         void fill (const T& value)
@@ -371,12 +376,12 @@ template <class T> class goFixedArray
                 *array = value;
             }
         }
-       
-        /** 
+
+        /**
          * @brief Flip the direction of the data.
          *
          * Actually \b copies the data.
-         * 
+         *
          * @TODO: An alternative is to just change the stride and start pointer.
          */
         void flip ()

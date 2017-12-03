@@ -11,9 +11,9 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/../lib -lGo
+LIBS		=  `pkg-config --libs golib`
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  `pkg-config --cflags golib`
 
 TARGET		= biortho
 

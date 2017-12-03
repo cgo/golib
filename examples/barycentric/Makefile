@@ -11,9 +11,9 @@ LDARGS		=
 
 #GOPATH		= /home/christian/pgm/golib
 
-LIBS		=  -L$(GOPATH)/build -lGo `pkg-config --libs pangocairo`
+LIBS		=  `pkg-config --libs golib` `pkg-config --libs pangocairo`
 
-INCLUDE		=  -I$(GOPATH)/include
+INCLUDE		=  `pkg-config --cflags golib`
 
 TARGET		= barycentric
 

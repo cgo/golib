@@ -4,7 +4,8 @@
    directory of the golib source tree. */
 
 
-#include <goplot.h>
+#include <goplot/goplot.h>
+#include <goplot/gnuplot.h>
 #include <gobiorthowavelet.h>
 #include <gosignal3d.h>
 #include <gocurve.h>

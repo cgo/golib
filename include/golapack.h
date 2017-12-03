@@ -26,9 +26,11 @@
 // #include <clapack.h>
 #endif
 
+#include <vector>
+
 namespace goMath {
 
-    /*! 
+    /*!
      * \addtogroup mathla
      * @{
      */
@@ -52,13 +54,16 @@ namespace goMath {
     // FIXME
     template <class matrix_type, class vector_type>
         bool gelss (matrix_type& A, bool transA, vector_type& b, vector_type* singularValues = 0);
-    
+
     template <class matrix_type, class vector_type>
         bool posv (matrix_type& A, vector_type& b);
 
     template <class matrix_type>
         bool posv (matrix_type& A, matrix_type& b);
 
+    template <class matrix_type, typename vector_type_scalar, typename vector_type_complex>
+        bool heev (matrix_type const& A, std::vector<vector_type_complex>* eigenvectors_ret,
+                   vector_type_scalar& eigenvalues_ret);
 
     template <class T>
     class TypeDriver
@@ -77,9 +82,12 @@ namespace goMath {
             static bool posv (int matrix_order, char uplo, lapack_int n,
                     lapack_int nrhs, T* a, lapack_int lda, T* b,
                     lapack_int ldb);
+            static  bool heev (
+                      int matrix_order, char jobz, char uplo, lapack_int n,
+                      lapack_complex_float* a, lapack_int lda, float* w);
     };
 
-}; 
+};
 /*! @} */
 };
 
@@ -87,9 +95,9 @@ namespace goMath {
  * \addtogroup mathla
  * @{
  */
-/** 
+/**
  * @brief Lapack getrf.
- * 
+ *
  * @note Uses ATLAS' clapack implementation.
  *
  * Replaces A by its LU-decomposed form,
@@ -99,7 +107,7 @@ namespace goMath {
  * U is unit diagonal, P pivots columns.
  * @param A Matrix to be decomposed.
  * @param ipiv Pivot vector (filled by this function).
- * 
+ *
  * @return True if successful, false otherwise.
  */
 template <class matrix_type, class pivot_vector>
@@ -112,7 +120,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
     return TypeDriver<typename matrix_type::value_type>::getrf (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, M, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
 }
 
-/** 
+/**
  * @brief Lapack getrs.
  *
  * @note Uses ATLAS' clapack implementation.
@@ -121,7 +129,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
  * getrf(). Implemented for goFloat and goDouble. pivot_vector must be of type \c int,
  * and provide getSize(), resize() as well as getPtr() methods (such as goMath::Vector).
  * matrix_type must essentially be goMath::Matrix.
- * 
+ *
  * @note B contains the right hand side vectors in its \b rows. Always remember this.
  * This is apparently an effect of using row major order which stems from ATLAS.
  *
@@ -129,7 +137,7 @@ bool goMath::Lapack::getrf (matrix_type& A, pivot_vector& ipiv)
  * @param transA    Use A transposed
  * @param B         Right hand side (the right hand side vectors are in the \c rows of B, not the columns!). On success, the rows contain the solutions.
  * @param ipiv      Pivot vector (from getrf()).
- * 
+ *
  * @return True if successful, false otherwise.
  */
 template <class matrix_type, class pivot_vector>
@@ -138,7 +146,7 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, matrix_type& B, c
     int N = transA ? A.getRows() : A.getColumns();
     //= For ATLAS, B is always just a concatenation of columns -- that is why
     //= the solution vectors must be in the ROWS of B, since we are working
-    //= with row-major order, as usual in C. 
+    //= with row-major order, as usual in C.
     int NRHS = B.getRows();
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
@@ -151,23 +159,23 @@ bool goMath::Lapack::getrs (const matrix_type& A, bool transA, goMath::Vector<ty
     int N = transA ? A.getRows() : A.getColumns();
     //= For ATLAS, B is always just a concatenation of columns -- that is why
     //= the solution vectors must be in the ROWS of B, since we are working
-    //= with row-major order, as usual in C. 
+    //= with row-major order, as usual in C.
     int NRHS = 1; // B.getRows();
     // int M = transA ? A.getColumns() : A.getRows();
     // int N = transA ? A.getRows() : A.getColumns();
     return TypeDriver<typename matrix_type::value_type>::getrs (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, transA ? 'T' : 'N', N, NRHS, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr(), b.getPtr(), b.getSize ());
 }
 
-/** 
+/**
  * @brief Lapack getri, invert a LU-decomposed matrix.
  *
  * @note Uses ATLAS' clapack implementation.
  *
  * The matrix must be in LU-form created by getrf().
- * 
+ *
  * @param A Matrix to invert. Must be in LU form and must be quadratic.
  * @param ipiv Pivot vector as created by getrf().
- * 
+ *
  * @return True if successful, false otherwise.
  */
 template <class matrix_type, class pivot_vector>
@@ -181,7 +189,7 @@ bool goMath::Lapack::getri (matrix_type& A, const pivot_vector& ipiv)
     return TypeDriver<typename matrix_type::value_type>::getri (matrix_type::rowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR, N, A.getPtr(), A.getLeadingDimension(), ipiv.getPtr());
 }
 
-/** 
+/**
  * @brief Lapack gels. Least square solution of a linear system.
  *
  * For \f$ A \in R^{m \times n}\f$ solves
@@ -189,22 +197,22 @@ bool goMath::Lapack::getri (matrix_type& A, const pivot_vector& ipiv)
  * or
  * \f$ \min_x \|A^T x - b\|\f$
  * if m >= n, or it finds the minimum norm solution of
- * \f$ Ax = b \f$ or 
+ * \f$ Ax = b \f$ or
  * \f$ A^T x = b \f$
  * if m < n, so that \f$ Ax = b\f$ is underdetermined.
  * A must have full rank.
- * 
+ *
  * @param A Matrix A. Will be overwritten by QR or LQ decompositions.
  * @param transA If true, A is used transposed.
  * @param b Right hand side vector. Will be overwritten with the solution vector.
- * 
+ *
  * @return True if successful, false otherwise.
  * @bug Appears not to work -- needs testing (examples/lapack.cpp)
  */
 template <class matrix_type, class vector_type>
 bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
 {
-    //= Note: gels_() expects column major -- so MxN means in C columns x rows and 
+    //= Note: gels_() expects column major -- so MxN means in C columns x rows and
     //= transposed usage of A.
     lapack_int M = A.getColumns();
     lapack_int N = A.getRows();
@@ -220,18 +228,18 @@ bool goMath::Lapack::gels (matrix_type& A, bool transA, vector_type& b)
     // return TypeDriver<typename matrix_type::value_type>::gels (&trans, &M, &N, &NRHS, A.getPtr(), &lda, b.getPtr(), &ldb, WORK.getPtr(), &LWORK, &info);
 }
 
-/** 
+/**
  * @brief Lapack gelss.
  *
  * @note NEEDS TESTING, UNTESTED. Possibly the LDA is wrong if the matrix is not
  * square (which is true in general).
- * 
- * @param A 
- * @param transA 
- * @param b 
- * @param singularValues 
- * 
- * @return 
+ *
+ * @param A
+ * @param transA
+ * @param b
+ * @param singularValues
+ *
+ * @return
  */
 template <class matrix_type, class vector_type>
 bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_type* singularValues)
@@ -239,7 +247,7 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
     if (!transA)
         A.transpose();
 
-    //= Note: gelss_() expects column major -- so MxN means in C columns x rows and 
+    //= Note: gelss_() expects column major -- so MxN means in C columns x rows and
     //= transposed usage of A.
     lapack_int M = A.getColumns();
     lapack_int N = A.getRows();
@@ -268,12 +276,12 @@ bool goMath::Lapack::gelss (matrix_type& A, bool transA, vector_type& b, vector_
 //            &rcond, &rank, WORK.getPtr(), &LWORK, &info);
 }
 
-/** 
+/**
  * @brief Lapack *posv procedure for solving symmetric linear systems.
  *
  * @param A Symmetric matrix, no special storage, must be upper right.
  * @param b Right hand side vector. Contains the solution if the method returns true.
- * 
+ *
  * @return True if successful, false otherwise.
  */
 template <class matrix_type, class vector_type>
@@ -298,7 +306,7 @@ bool goMath::Lapack::posv (matrix_type& A, vector_type& b)
 //                    &lda, b.getPtr (), &ldb, &info);
 }
 
-/** 
+/**
  * @brief Lapack *posv procedure for solving symmetric linear systems.
  *
  * @param A Symmetric matrix, no special storage, must be upper right.
@@ -306,7 +314,7 @@ bool goMath::Lapack::posv (matrix_type& A, vector_type& b)
  * to the actual lapack routine using column major storage and we use the more C-like row major.
  * Contains the solutions if the method returns true. The solutions are contained <b>in the rows</b>,
  * again because of the underlying routine using column major storage.
- * 
+ *
  * @return True if successful, false otherwise.
  */
 template <class matrix_type>
@@ -332,6 +340,7 @@ bool goMath::Lapack::posv (matrix_type& A, matrix_type& b)
     //return TypeDriver<typename matrix_type::value_type>::posv (&uplo, &n, &nrhs, A.getPtr (),
     //                &lda, b.getPtr (), &ldb, &info);
 }
+
 
 /** @} */
 #endif

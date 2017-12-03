@@ -40,20 +40,20 @@ namespace goMath {
     /*!
      * \brief Matrix class.
      *
-     * This class uses linear data storage, row major, i.e. rows are contigious 
+     * This class uses linear data storage, row major, i.e. rows are contigious
      * in memory. It is designed to be compatible with
      * CBLAS operations. Leading dimension in CBLAS is here the
      * number of columns -- get it via getLeadingDimension().
      *
      * There is no support for [i][j] indexing anymore. Use (i,j) instead.
-     * 
+     *
      * \author Christian Gosch
      */
     template <class T>
-        class Matrix 
+        class Matrix
         {
             public:
-                static const bool rowMajor;
+                static const bool rowMajor = goMath::rowMajor;
                 typedef T value_type;
                 typedef VectorIterator<T>      vector_iterator;
                 typedef ConstVectorIterator<T> const_vector_iterator;
@@ -64,16 +64,16 @@ namespace goMath {
                  */
                 Matrix (goSize_t rows = 4, goSize_t cols = 4);
 
-                /** 
+                /**
                  * @brief Copy constructor.
-                 * 
+                 *
                  * @param other Other matrix. Will be deep copied.
                  */
                 Matrix (const Matrix<T>& other);
 
-                /** 
+                /**
                  * @brief Constructor for using external data.
-                 * 
+                 *
                  * @param data Pointer to the external data.
                  * @param r Rows
                  * @param c Columns
@@ -124,57 +124,57 @@ namespace goMath {
                 bool operator== (const Matrix<T>& other) const;
                 bool operator!= (const Matrix<T>& other) const;
 
-                /** 
+                /**
                  * @brief Get data pointer.
                  * @return Pointer to the matrix array.
                  */
                 inline T*       getData   () { return this->matrix; }
-                /** 
+                /**
                  * @brief Get data pointer.
                  * @return Const pointer to the matrix array.
                  */
                 inline const T* getData   () const { return this->matrix; }
 
-                /** 
+                /**
                  * @brief Get data pointer. Same as getData().
                  */
                 inline T*       getPtr    () { return this->matrix; }
-                /** 
+                /**
                  * @brief Get data pointer. Same as getData().
                  */
                 inline const T* getPtr    () const { return this->matrix; }
 
-                /** 
+                /**
                  * @brief Get number of columns.
-                 * 
+                 *
                  * @return Number of columns.
                  */
-                inline goSize_t   getColumns () const 
-                { 
+                inline goSize_t   getColumns () const
+                {
                     return this->columns;
                 }
-                /** 
+                /**
                  * @brief Get number of rows.
-                 * 
+                 *
                  * @return Number of rows.
                  */
-                inline goSize_t   getRows () const 
-                { 
+                inline goSize_t   getRows () const
+                {
                     return this->rows;
                 }
 
-                /** 
+                /**
                  * @brief Get the leading dimension.
                  * In row major order, this is the number of columns.
                  * This can be directly used as LDX parameter in CBLAS routines.<br>
                  *  From http://www.inf.bv.tum.de/~heisserer/softwarelab04/index.html<br>
-                 *    "Note that for cblas-functions the leading dimension (for 2D arrays in C-fashion, i.e. row major order) 
+                 *    "Note that for cblas-functions the leading dimension (for 2D arrays in C-fashion, i.e. row major order)
                  *     is the number of columns of the matrix (not the rows as in Fortran).
-                 *     The leading dimension is the number of entries in memory that separate the e.g. 
-                 *     first elements of rows in c-fashion storage 
+                 *     The leading dimension is the number of entries in memory that separate the e.g.
+                 *     first elements of rows in c-fashion storage
                  *     (row major order, i.e. elements of one row are contiguous in memory).
                  *     As Fortran stores in column major order the leading dimension is the number of rows."
-                 * 
+                 *
                  * @return Leading dimension.
                  */
                 inline goSize_t getLeadingDimension () const
@@ -191,11 +191,11 @@ namespace goMath {
                 inline int        dim2 () const { return this->getColumns(); }
                 inline const Matrix<T>& copy () const { return *this;}  // NOTE: Makes a deep copy here
                 // and a reference in TNT
-                // TNT compatibility methods END  
+                // TNT compatibility methods END
 
-                /** 
+                /**
                  * @brief Make a reference to sub-matrix.
-                 * 
+                 *
                  * refMatrix will be initialised to refer to the sub-matrix starting at
                  * (startRow,startColumn) and extending for num_rows and num_cols rows and columns,
                  * respectively.
@@ -208,7 +208,7 @@ namespace goMath {
                  * @param num_cols     Number of columns.
                  * @param refMatrix    Refers to the defined sub-matrix on return.
                  */
-                inline void ref (goSize_t startRow, goSize_t startColumn, 
+                inline void ref (goSize_t startRow, goSize_t startColumn,
                         goSize_t num_rows, goSize_t num_cols, Matrix<T>& refMatrix)
                 {
                     refMatrix.setData (&(*this)(startRow,startColumn), num_rows, num_cols, this->getLeadingDimension());
@@ -218,9 +218,9 @@ namespace goMath {
                 bool copy (goSize_t startRow, goSize_t startCol, goSize_t endRow, goSize_t endCol, goSize_t target_row, goSize_t target_col, Matrix<T>& target, bool trans = false) const;
                 bool copy (Matrix<T>& target) const;
 
-                /** 
+                /**
                  * @brief Make a reference to sub-matrix.
-                 * 
+                 *
                  * refMatrix will be initialised to refer to the sub-matrix starting at
                  * (startRow,startColumn) and extending for num_rows and num_cols rows and columns,
                  * respectively.
@@ -233,15 +233,15 @@ namespace goMath {
                  * @param num_cols     Number of columns.
                  * @param refMatrix    Refers to the defined sub-matrix on return.
                  */
-                inline void ref (goSize_t startRow, goSize_t startColumn, 
+                inline void ref (goSize_t startRow, goSize_t startColumn,
                         goSize_t num_rows, goSize_t num_cols, const Matrix<T>& refMatrix) const
                 {
                     const_cast<Matrix<T>&>(refMatrix).setData (const_cast<T*>(&(*this)(startRow,startColumn)), num_rows, num_cols, this->getLeadingDimension());
                 }
 
-                /** 
+                /**
                  * @brief Makes a vector reference a row from this matrix.
-                 * 
+                 *
                  * @note The data are not copied.
                  *
                  * @param row Row to reference
@@ -251,9 +251,9 @@ namespace goMath {
                 {
                     v.setData (&(*this)(row,0), this->getColumns(), 1);
                 }
-                /** 
+                /**
                  * @brief Reference to a sub row.
-                 * 
+                 *
                  * @param row    Start element row
                  * @param column Start element column
                  * @param length length of vector
@@ -284,14 +284,14 @@ namespace goMath {
                     }
                 }
 
-                /** 
+                /**
                  * @brief Const reference to row.
-                 * 
+                 *
                  * @note Argument <b>v will be changed</b> even though it is const.
                  * This is just to provide a consistent way to reference rows and columns in const matrices.
                  * It may be bad style from one point of view, on the other hand it enables referencing
                  * without further hassle.
-                 * 
+                 *
                  * @param row Row index.
                  * @param v   WILL BE CHANGED and contains the reference.
                  */
@@ -299,9 +299,9 @@ namespace goMath {
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,0)), this->getColumns(), 1);
                 }
-                /** 
+                /**
                  * @brief Reference to a sub row.
-                 * 
+                 *
                  * @param row    Start element row
                  * @param column Start element column
                  * @param length length of vector
@@ -312,9 +312,9 @@ namespace goMath {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, 1);
                 }
 
-                /** 
+                /**
                  * @brief Makes a vector reference a column from this matrix.
-                 * 
+                 *
                  * @note The data are not copied.
                  *
                  * @param column Column to reference
@@ -324,9 +324,9 @@ namespace goMath {
                 {
                     v.setData (&(*this)(0,column), this->getRows(), this->getLeadingDimension());
                 }
-                /** 
+                /**
                  * @brief Reference to a sub column.
-                 * 
+                 *
                  * @param row    Start element row
                  * @param column Start element column
                  * @param length length of vector
@@ -337,14 +337,14 @@ namespace goMath {
                     v.setData (&(*this)(row,column), length, this->getLeadingDimension());
                 }
 
-                /** 
+                /**
                  * @brief Const reference to column.
-                 * 
+                 *
                  * @note Argument <b>v will be changed</b> even though it is const.
                  * This is just to provide a consistent way to reference rows and columns in const matrices.
                  * It may be bad style from one point of view, on the other hand it enables referencing
                  * without further hassle.
-                 * 
+                 *
                  * @param column Column index.
                  * @param v   WILL BE CHANGED and contains the reference.
                  */
@@ -352,9 +352,9 @@ namespace goMath {
                 {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(0,column)), this->getRows(), this->getLeadingDimension());
                 }
-                /** 
+                /**
                  * @brief Reference to a sub column.
-                 * 
+                 *
                  * @param row    Start element row
                  * @param column Start element column
                  * @param length length of vector
@@ -365,11 +365,11 @@ namespace goMath {
                     const_cast<goMath::Vector<T>&>(v).setData (const_cast<T*>(&(*this)(row,column)), length, this->getLeadingDimension());
                 }
 
-                /** 
+                /**
                  * @brief Copies a row to vector vRet.
                  *
                  * vRet is resized if it vRet.getSize() != this->getColumns().
-                 * 
+                 *
                  * @param row   Row to copy.
                  * @param vRet  Vector.
                  */
@@ -388,11 +388,11 @@ namespace goMath {
                         }
                     }
 
-                /** 
+                /**
                  * @brief Copied a column to vector vRet.
                  *
                  * vRet is resized if it vRet.getSize() != this->getRows().
-                 * 
+                 *
                  * @param col   Column to copy.
                  * @param vRet  Vector.
                  */
@@ -462,13 +462,13 @@ namespace goMath {
                 inline const T& operator[] (goSize_t index) const { return this->matrix[index]; }
 
 
-                /** 
+                /**
                  * @brief Matrix multiplication.
                  * @note Uses CBLAS for goFloat and goDouble types.
                  * @see MatrixMult()
                  *
                  * @param other A matrix.
-                 * 
+                 *
                  * @return this * other
                  */
                 Matrix<T>		operator*  (const Matrix<T>& other) const;
@@ -486,11 +486,11 @@ namespace goMath {
                 goMath::Vector<T>       operator*  (const goMath::Vector<T>& v) const;
                 //  goMath::Vector<T>       operator*  (const goMath::Vector<goDouble>& v) const;
 
-                /** 
+                /**
                  * @brief Multiplication by a scalar.
-                 * 
+                 *
                  * @param scalar A scalar.
-                 * 
+                 *
                  * @return this .* scalar.
                  */
                 inline Matrix<T>&		operator*= (T scalar)
@@ -514,11 +514,11 @@ namespace goMath {
                     return temp;
                 }
 
-                /** 
+                /**
                  * @brief Division by a scalar.
-                 * 
-                 * @param scalar 
-                 * 
+                 *
+                 * @param scalar
+                 *
                  * @return this ./ scalar.
                  */
                 inline Matrix<T>&		operator/= (T scalar)
@@ -535,7 +535,7 @@ namespace goMath {
                 T norm () const;
                 T trace () const;
 
-                /** 
+                /**
                  * @brief Load identity matrix.
                  */
                 inline void setUnity()
@@ -576,8 +576,8 @@ namespace goMath {
                 goSize_t           leadingDimension;
         };
 
-  
-    /** 
+
+    /**
      * @brief Vector iterator for multi-dimensional array data.
      *
      * This class is used as goMath::Matrix::vector_iterator.
@@ -590,14 +590,14 @@ namespace goMath {
         class VectorIterator
         {
             public:
-                /** 
+                /**
                  * @brief Construct an iterator over data starting at \c ptr,
                  * of length \c len, using \c stride to get from one element to the next,
                  * and \c increment to get from one vector to the next.
-                 * 
+                 *
                  * @param ptr Start pointer.
                  * @param len Length of a vector.
-                 * @param stride Stride within the vector (number of elements to add to the pointer 
+                 * @param stride Stride within the vector (number of elements to add to the pointer
                  * in order to get to the next element).
                  * @param increment Increment to get from one vector to the next, in elements.
                  */
@@ -608,7 +608,7 @@ namespace goMath {
                 {
                 }
 
-                /** 
+                /**
                  * @brief Copy constructor.
                  *
                  * @param other Iterator to be copied.
@@ -621,11 +621,11 @@ namespace goMath {
                     *this = other;
                 }
 
-                /** 
+                /**
                  * @brief Copy operator.
-                 * 
+                 *
                  * @param other Iterator to be copied.
-                 * 
+                 *
                  * @return this.
                  */
                 VectorIterator<T>& operator= (const VectorIterator<T>& other)
@@ -637,22 +637,22 @@ namespace goMath {
                     return *this;
                 }
 
-                /** 
+                /**
                  * @brief Length of a vector.
-                 * 
+                 *
                  * @return Length of a vector.
                  */
                 goSize_t len () const { return myLen; }
-                /** 
+                /**
                  * @brief Increment to add to a pointer to get to the next vector.
-                 * 
+                 *
                  * @return Increment to add to a pointer to get to the next vector, in elements.
                  */
                 goPtrdiff_t increment () const { return myIncrement; }
 
-                /** 
+                /**
                  * @brief Increment the iterator (move to the next vector).
-                 * 
+                 *
                  * @return this.
                  */
                 VectorIterator<T>& operator++ ()
@@ -661,9 +661,9 @@ namespace goMath {
                     return *this;
                 }
 
-                /** 
+                /**
                  * @brief Decrement the iterator (move to the previous vector).
-                 * 
+                 *
                  * @return this.
                  */
                 VectorIterator<T>& operator-- ()
@@ -672,26 +672,26 @@ namespace goMath {
                     return *this;
                 }
 
-                /** 
+                /**
                  * @brief Dereference operator.
-                 * 
+                 *
                  * @return The current vector.
                  */
                 Vector<T>& operator* () { return myRef; }
-                /** 
+                /**
                  * @brief Pointer operator.
-                 * 
+                 *
                  * @return Pointer to the current vector.
                  */
                 Vector<T>* operator-> () { return &myRef; }
                 const Vector<T>& operator* () const { return myRef; }
                 const Vector<T>* operator-> () const { return &myRef; }
 
-                /** 
+                /**
                  * @brief Compares the actual pointers.
-                 * 
+                 *
                  * @param other Iterator to compare with.
-                 * 
+                 *
                  * @return True if the pointers are equal, false otherwise.
                  */
                 bool operator== (const VectorIterator<T>& other)
@@ -699,11 +699,11 @@ namespace goMath {
                     return other->getPtr() == myRef.getPtr();
                 }
 
-                /** 
+                /**
                  * @brief Compares the actual pointers.
-                 * 
+                 *
                  * @param other Iterator to compare with.
-                 * 
+                 *
                  * @return True if the pointers are unequal, false otherwise.
                  */
                 bool operator!= (const VectorIterator<T>& other)
@@ -717,7 +717,7 @@ namespace goMath {
                 goPtrdiff_t myIncrement;
         };
 
-    /** 
+    /**
      * @brief Cons iterator over vectors.
      * @see VectorIterator
      */
@@ -786,9 +786,9 @@ namespace goMath {
         };
 
 
-    /** 
+    /**
      * @brief Calculate \f$C = \alpha \cdot A \cdot B + \beta \cdot C \f$.
-     * 
+     *
      * A and B can optionally be used as transpose.
      * This function uses CBLAS functions.
      *
@@ -804,8 +804,8 @@ namespace goMath {
      * @param C        Matrix C, also holds the result.
      */
     template<class T>
-        void matrixMult (T alpha, const goMath::Matrix<T>& A, bool transA, 
-                const goMath::Matrix<T>& B, bool transB, 
+        void matrixMult (T alpha, const goMath::Matrix<T>& A, bool transA,
+                const goMath::Matrix<T>& B, bool transB,
                 T beta, goMath::Matrix<T>& C);
 
     template<class T>

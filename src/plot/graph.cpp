@@ -228,7 +228,7 @@ namespace goPlot
             case 3: format = goPlot::Object2DImage::RGB24; break;
             case 1: format = goPlot::Object2DImage::RGB24; break;
             default:
-                    goLog::warning ("Graph::addImage: channel count not supported."); return false; break;
+                    goLog::warning ("Graph::addImage: channel count not supported."); return nullptr; break;
         }
 
         int w = image.getSizeX();
