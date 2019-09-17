@@ -13,6 +13,9 @@ things that proved useful to me.
 For details, see the HTML source documentation in golib/doc.
 (See "How to build the HTML documentation" below.)
 
+This has been moved from its old home in Mercurial at SourceForge, at https://sourceforge.net/p/libgo/code/ci/default/tree/.
+Note that the latter is no longer maintained and this has been moved to github to consolidate.
+
 Directories
 -----------
 ./		- Main libGo distribution directory
