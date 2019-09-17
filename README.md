@@ -13,20 +13,24 @@ things that proved useful to me.
 For details, see the HTML source documentation in golib/doc.
 (See "How to build the HTML documentation" below.)
 
-This has been moved from its old home in Mercurial at SourceForge, at https://sourceforge.net/p/libgo/code/ci/default/tree/.
+You can find the Doxygen documentation here:
+- https://cgo.github.io/golib/docs/html/
+A useful part is probaby the Modules page: https://cgo.github.io/golib/docs/html/modules.html
+
+This project has been moved from its old home in Mercurial at SourceForge, at https://sourceforge.net/p/libgo/code/ci/default/tree/.
 Note that the latter is no longer maintained and this has been moved to github to consolidate.
 
 Directories
 -----------
-./		- Main libGo distribution directory
-./doc		- Documentation
-./examples	- Example source code and makefiles
-./exp		- Experimental stuff, guaranteed to be unstable ;)
-./include	- All include files
-./src		- Source code, subdivided in different subdirectories
-./tools		- Some scripts, including a Perl script to create makefiles
-./rpm		- Work in progress -- this will contain the files necessary
-			- to build an rpm package
+- ./		- Main libGo distribution directory
+- ./docs	- Documentation
+- ./examples	- Example source code and makefiles
+- ./exp		- Experimental stuff, guaranteed to be unstable ;)
+- ./include	- All include files
+- ./src		- Source code, subdivided in different subdirectories
+- ./tools	- Some scripts, including a Perl script to create makefiles
+- ./rpm		- Work in progress -- this will contain the files necessary
+		- to build an rpm package
 
 What you need
 -------------
