@@ -1,0 +1,25 @@
+var classgoGL_1_1Animation =
+[
+    [ "Animation", "da/d79/classgoGL_1_1Animation.html#a9e96b3f4c9234994492970f95b98db4b", null ],
+    [ "~Animation", "da/d79/classgoGL_1_1Animation.html#a0be7df59bf37d55a3e071ff354c685f5", null ],
+    [ "Animation", "da/d79/classgoGL_1_1Animation.html#a289c4f1428bb74e79eb00a44660ca104", null ],
+    [ "addWaypoint", "da/d79/classgoGL_1_1Animation.html#a7db6fd7468bcb62491c8ffb17b6a2ce0", null ],
+    [ "getAutoTime", "da/d79/classgoGL_1_1Animation.html#a001aef2ee70ac502836c97dfd096d700", null ],
+    [ "getConstantSpeedFromPosition", "da/d79/classgoGL_1_1Animation.html#a82e9dacb34b2056c0f5f4026eb466e17", null ],
+    [ "getSteps", "da/d79/classgoGL_1_1Animation.html#a7f9453028a65cafb2fa458c692b0aa31", null ],
+    [ "getWaypoint", "da/d79/classgoGL_1_1Animation.html#a9f6cd5689597d560f1fc96cba0755ebf", null ],
+    [ "getWaypoints", "da/d79/classgoGL_1_1Animation.html#a245d13929a03fcca728e6b93fe7625a8", null ],
+    [ "initInterpolation", "da/d79/classgoGL_1_1Animation.html#a14b152bcd98ea2edc52d8442c5f9b4ce", null ],
+    [ "insertWaypoint", "da/d79/classgoGL_1_1Animation.html#a5ebb13e9f0d43a52377914d6323ce5f4", null ],
+    [ "interpolate", "da/d79/classgoGL_1_1Animation.html#a1560ca27ee7c0fbb6ccc66a17a10dac7", null ],
+    [ "operator=", "da/d79/classgoGL_1_1Animation.html#a6e958507851796f152a2ae9e73bcb8db", null ],
+    [ "readASCII", "da/d79/classgoGL_1_1Animation.html#a2d4080252796e5cbcf9e68bd2ac3f654", null ],
+    [ "readASCII", "da/d79/classgoGL_1_1Animation.html#af713397b5c256ea3112fd50c263ef2a3", null ],
+    [ "removeWaypoint", "da/d79/classgoGL_1_1Animation.html#ad91c560437b5a251359006ead789dd78", null ],
+    [ "setAutoTime", "da/d79/classgoGL_1_1Animation.html#a188d00122cbe39bcfa4d67e8399028a1", null ],
+    [ "setConstantSpeedFromPosition", "da/d79/classgoGL_1_1Animation.html#ac41a7b29f654f2ba48c785a1dd3dc1d5", null ],
+    [ "setSteps", "da/d79/classgoGL_1_1Animation.html#a26cf25d8c3918f6d6d039c66cbc085f9", null ],
+    [ "setWaypoint", "da/d79/classgoGL_1_1Animation.html#aed9193d4ba54c5fe7809ceb110983965", null ],
+    [ "writeASCII", "da/d79/classgoGL_1_1Animation.html#a7f5e579c63d812a9b900c5fbcc32192b", null ],
+    [ "writeASCII", "da/d79/classgoGL_1_1Animation.html#ac94c7abd20bd5fcfed58f503bd9e0758", null ]
+];

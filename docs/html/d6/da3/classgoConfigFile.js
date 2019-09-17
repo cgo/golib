@@ -1,0 +1,28 @@
+var classgoConfigFile =
+[
+    [ "goConfigFile", "d6/da3/classgoConfigFile.html#aba01868f45e5cebb25c006c367b2580c", null ],
+    [ "~goConfigFile", "d6/da3/classgoConfigFile.html#ad192a9533b291745978ff58dc9b10555", null ],
+    [ "add", "d6/da3/classgoConfigFile.html#abfded7b02fbd0d5607ccc10a8f2c8e7b", null ],
+    [ "add", "d6/da3/classgoConfigFile.html#a62d9f44fb3eecea382c7d7ece063431f", null ],
+    [ "add", "d6/da3/classgoConfigFile.html#ad315462021b2ff0796dbe3418c890144", null ],
+    [ "add", "d6/da3/classgoConfigFile.html#ac3fe9220c0f00c4a09d96ae243373d8f", null ],
+    [ "fail", "d6/da3/classgoConfigFile.html#a9fb0e777f72df2df10901d8d31202e89", null ],
+    [ "find", "d6/da3/classgoConfigFile.html#a8d3d743c4dced63ea174893fbf48a106", null ],
+    [ "get", "d6/da3/classgoConfigFile.html#acb3dbb26fb35005bec04364105a0543e", null ],
+    [ "get", "d6/da3/classgoConfigFile.html#af1bd255c7c14b50fc7c35c75807e880c", null ],
+    [ "get", "d6/da3/classgoConfigFile.html#aac3b8e1cbea86d6c32d2134d03be3802", null ],
+    [ "get", "d6/da3/classgoConfigFile.html#a4041b41151c5fc438a129c77fa28e662", null ],
+    [ "getChapterArray", "d6/da3/classgoConfigFile.html#abbd9eced612218a4748524319a384ad5", null ],
+    [ "read", "d6/da3/classgoConfigFile.html#a48ee4ff71c499f2726e6a03c29fd9e0e", null ],
+    [ "read", "d6/da3/classgoConfigFile.html#abbc474d2472cdd1801e46f2544e0f19b", null ],
+    [ "write", "d6/da3/classgoConfigFile.html#a18b414f2a882f81cb7062ad0d1d90403", null ],
+    [ "write", "d6/da3/classgoConfigFile.html#a4a205fb3764426e16c7fabc7fb7d23f1", null ],
+    [ "chapters", "d6/da3/classgoConfigFile.html#a048408d90b790419c7d8d345b08a3054", null ],
+    [ "dummy", "d6/da3/classgoConfigFile.html#a979a36416cdf66524208aa13108ca0ff", null ],
+    [ "dummyChapter", "d6/da3/classgoConfigFile.html#a4e5e420b3dcaa2d463cc89bf41bdbd8b", null ],
+    [ "last_failed", "d6/da3/classgoConfigFile.html#abe41bcc46dae8c8da401a09c863bc1e2", null ],
+    [ "out_chapters", "d6/da3/classgoConfigFile.html#a1f04e29dad20fc9fa34b2ab7021fc452", null ],
+    [ "out_mode", "d6/da3/classgoConfigFile.html#a3d84e5adee72412a60416c2a437914e2", null ],
+    [ "out_names", "d6/da3/classgoConfigFile.html#a4ad5595d90e1917cdb0caf9c3f795f4c", null ],
+    [ "out_sections", "d6/da3/classgoConfigFile.html#a8e01fb6670f5e55f899b7b5b5385b1de", null ]
+];

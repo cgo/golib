@@ -1,0 +1,26 @@
+var classgoGUI_1_1MainWindow =
+[
+    [ "MainWindow", "d2/d42/classgoGUI_1_1MainWindow.html#a2bb484fd43b3ae6537768fee41b4dd67", null ],
+    [ "~MainWindow", "d2/d42/classgoGUI_1_1MainWindow.html#a20c2b43ba84b7e5d683c251a1bc5bd9f", null ],
+    [ "addControl", "d2/d42/classgoGUI_1_1MainWindow.html#a32dbbe27f2e22f497ff3f4c84ddd895b", null ],
+    [ "addFileAbout", "d2/d42/classgoGUI_1_1MainWindow.html#a83cc19716e8beee068de8f8c96a7f9ea", null ],
+    [ "addFileQuit", "d2/d42/classgoGUI_1_1MainWindow.html#a05eafd803ff2f417545e69c2f26869a5", null ],
+    [ "addMenu", "d2/d42/classgoGUI_1_1MainWindow.html#a3182265c65bffaa4925007bf4f2861a5", null ],
+    [ "addMenuItem", "d2/d42/classgoGUI_1_1MainWindow.html#a13d19c70622f176b8e054cf4a6142875", null ],
+    [ "controlsToggled", "d2/d42/classgoGUI_1_1MainWindow.html#a4da9f6588071ee39a70371dc82692f7f", null ],
+    [ "fileAbout", "d2/d42/classgoGUI_1_1MainWindow.html#ad5f233951bc4b8ef98e8d1c44ee0818e", null ],
+    [ "fileQuit", "d2/d42/classgoGUI_1_1MainWindow.html#a002615d9a60d4e44373040b29b60687e", null ],
+    [ "getControlsMenu", "d2/d42/classgoGUI_1_1MainWindow.html#a87788882f243f884e6a29e0871b9e154", null ],
+    [ "getFileMenu", "d2/d42/classgoGUI_1_1MainWindow.html#a721a358df7eb9c6e8a29f4975e5cfebb", null ],
+    [ "getMenuBar", "d2/d42/classgoGUI_1_1MainWindow.html#a08ac11c2ce1c8801112ebeae0d4ea57d", null ],
+    [ "getPaned", "d2/d42/classgoGUI_1_1MainWindow.html#aad8a9414c3a4c13d1b282150e4e5b9e8", null ],
+    [ "setAboutText", "d2/d42/classgoGUI_1_1MainWindow.html#aea00e5717585a1c44db8d29fbd2c11e3", null ],
+    [ "setControlsVisibility", "d2/d42/classgoGUI_1_1MainWindow.html#a48e2ce3269deac90ce7452a1f5d7cfb7", null ],
+    [ "myAboutText", "d2/d42/classgoGUI_1_1MainWindow.html#a3225ce13eb8344e61d151ce96469b571", null ],
+    [ "myControlBox", "d2/d42/classgoGUI_1_1MainWindow.html#acb88ada25356fcbaf0708d5b0c74a7e7", null ],
+    [ "myControlsMenu", "d2/d42/classgoGUI_1_1MainWindow.html#a3ce103fe883c7854680dcec9be0d681b", null ],
+    [ "myFileMenu", "d2/d42/classgoGUI_1_1MainWindow.html#a45999a8920a2d53252bbbe210cda59d3", null ],
+    [ "myMenuBar", "d2/d42/classgoGUI_1_1MainWindow.html#a80b7c74d67410a8a804813612f586560", null ],
+    [ "myPaned", "d2/d42/classgoGUI_1_1MainWindow.html#acc6cbb505adcc4e0850c73f224617be8", null ],
+    [ "myPrivate", "d2/d42/classgoGUI_1_1MainWindow.html#a7aec335560abde652e10dbbd3c7499ad", null ]
+];

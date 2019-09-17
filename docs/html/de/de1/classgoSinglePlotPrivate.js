@@ -1,0 +1,25 @@
+var classgoSinglePlotPrivate =
+[
+    [ "goSinglePlotPrivate", "de/de1/classgoSinglePlotPrivate.html#ad2447d9d40c12d0f0ec2883dda8a20f0", null ],
+    [ "~goSinglePlotPrivate", "de/de1/classgoSinglePlotPrivate.html#a06e2c01fb226335f6bac45d87dd23fe9", null ],
+    [ "column", "de/de1/classgoSinglePlotPrivate.html#aa40505c6269a0bf659913ab0b3cf9bb5", null ],
+    [ "dataFilenames", "de/de1/classgoSinglePlotPrivate.html#a74e3e751fbce6179395e92458a55fd98", null ],
+    [ "labels", "de/de1/classgoSinglePlotPrivate.html#a2add1dd72ebd23466d9258f9944d9ac1", null ],
+    [ "lineLength", "de/de1/classgoSinglePlotPrivate.html#a352ee7f35ac7f04689ded206dc3366f3", null ],
+    [ "plotCommands", "de/de1/classgoSinglePlotPrivate.html#a3be0f992b346d60a84d370f0f951b782", null ],
+    [ "plotElements", "de/de1/classgoSinglePlotPrivate.html#a33bd0f6fc06ab0b404ca5cd13e5868d0", null ],
+    [ "plotImageMatrixd", "de/de1/classgoSinglePlotPrivate.html#a76e9bca4eefd4c5cd061c31242f047eb", null ],
+    [ "plotImageMatrixf", "de/de1/classgoSinglePlotPrivate.html#af3ec233efcc87b52413b3953b13b5791", null ],
+    [ "plotImages", "de/de1/classgoSinglePlotPrivate.html#aab1392e7c86f8c0656bbbe9c3df52085", null ],
+    [ "plotMatrixd", "de/de1/classgoSinglePlotPrivate.html#aec58d846980e6b4c6f0c81b585ef1d15", null ],
+    [ "plotMatrixf", "de/de1/classgoSinglePlotPrivate.html#a990879b96696c28d512e1b1919444d9d", null ],
+    [ "plotType", "de/de1/classgoSinglePlotPrivate.html#a35e3d1ec7ef0bbb065637daa60571e9e", null ],
+    [ "plotX", "de/de1/classgoSinglePlotPrivate.html#a84f683e7a10f03cf7229c3f56c9e9fa4", null ],
+    [ "plotY", "de/de1/classgoSinglePlotPrivate.html#a6380d0d76d3c1225b8e20bfe732cf3c1", null ],
+    [ "plotZ", "de/de1/classgoSinglePlotPrivate.html#a207131a7018e6d33d4c43a276b4b8eee", null ],
+    [ "prefixCommands", "de/de1/classgoSinglePlotPrivate.html#a08ca12eb42b6b42e8fdf2497776aa5c8", null ],
+    [ "row", "de/de1/classgoSinglePlotPrivate.html#a06d7f42339ef72fb046fdd123ebf72d6", null ],
+    [ "title", "de/de1/classgoSinglePlotPrivate.html#ac2099607e9b5d87cbb161d9ccff16611", null ],
+    [ "titles", "de/de1/classgoSinglePlotPrivate.html#a9a273f50c34bb140463d4c80c663e80d", null ],
+    [ "useFiles", "de/de1/classgoSinglePlotPrivate.html#af196d27e78a842224f900c1c92fac6a4", null ]
+];
