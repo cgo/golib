@@ -15,7 +15,7 @@ For details, see the HTML source documentation in golib/doc.
 
 You can find the Doxygen documentation here:
 - https://cgo.github.io/golib/docs/html/
-A useful part is probaby the Modules page: https://cgo.github.io/golib/docs/html/modules.html
+- A useful part is probaby the Modules page: https://cgo.github.io/golib/docs/html/modules.html
 
 This project has been moved from its old home in Mercurial at SourceForge, at https://sourceforge.net/p/libgo/code/ci/default/tree/.
 Note that the latter is no longer maintained and this has been moved to github to consolidate.
